@@ -1,0 +1,14 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+.venv/
+.vscode/
+.idea/
+.env
+
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+
+# Editor-based HTTP Client requests
+/httpRequests/
