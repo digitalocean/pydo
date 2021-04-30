@@ -1,0 +1,13 @@
+input-file: ./resolved_droplets.yaml
+python: true
+title: DigitalOceanClient
+namespace: digitalocean
+credential-default-policy-type: BearerTokenCredentialPolicy
+credential-scopes: https://api.digitalocean.com
+add-credential: true
+
+directive:
+  from: swagger-document
+  where: "$.components.responses.create_droplet"
+  transform: >
+    $["x-ms-client-name"] = "CreateDropletResponse";
