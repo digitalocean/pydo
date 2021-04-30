@@ -1,11 +1,13 @@
-input-file: ./resolved_droplets.yaml
+input-file: ./spec-temp/resolved_droplets.yaml
 python: true
 title: DigitalOceanClient
 namespace: digitalocean
+
 credential-default-policy-type: BearerTokenCredentialPolicy
 credential-scopes: https://api.digitalocean.com
 add-credential: true
 
+## Not currently working. Left as an example
 directive:
   from: swagger-document
   where: "$.components.responses.create_droplet"
