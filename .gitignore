@@ -1,15 +1,18 @@
-# Binaries for programs and plugins
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
+# Default ignored files
+/shelf/
+/workspace.xml
+.venv/
+.vscode/
+.idea/
+.env
 
-# Test binary, built with `go test -c`
-*.test
+# Python
+__pycache__/
+*.pyc
 
-# Output of the go coverage tool, specifically when used with LiteIDE
-*.out
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
 
-# Dependency directories (remove the comment below to include it)
-# vendor/
+# Editor-based HTTP Client requests
+/httpRequests/
