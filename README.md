@@ -26,4 +26,4 @@ on the [DigitalOcean OpenAPI Specification](https://github.com/digitalocean/open
 
 # Contributing
 
-Visit our [Contribuing Giude](CONTRIBUTING.md) for more information on getting involved in developing this client.
+Visit our [Contribuing Guide](CONTRIBUTING.md) for more information on getting involved in developing this client.
