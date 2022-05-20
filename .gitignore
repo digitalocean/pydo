@@ -16,3 +16,5 @@ __pycache__/
 
 # Editor-based HTTP Client requests
 /httpRequests/
+
+public/
