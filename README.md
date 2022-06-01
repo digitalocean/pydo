@@ -14,6 +14,8 @@ A top priority of this project is to ensure the client abides by the API
 contract. Therefore, the client itself wraps a generated client based
 on the [DigitalOcean OpenAPI Specification](https://github.com/digitalocean/openapi).
 
+# About the DigitalOcean Python Client
+
 # Using the client
 ## Prerequisites
 

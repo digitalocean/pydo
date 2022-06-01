@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - name: delete old generated code
+      run: find . ! -name "*_patch.py" -delete
     - name: Make spec directory
       run: mkdir public
     - name: Download spec file
