@@ -12,7 +12,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: delete old generated code
-      run: find . ! -name "*_patch.py" -delete
+      run: find do-client-python/ ! -name "*_patch.py"  -exec rm -rv {} + -depth
     - name: Make spec directory
       run: mkdir public
     - name: Download spec file
@@ -24,7 +24,7 @@ jobs:
     - name: install autorest
       run: npm install -g autorest
     - name: generate code
-      run: autorest --input-file=public/DigitalOcean-public.v2.yaml --python --output-folder=do-client-python/ 
+      run:  autorest client_gen_config.md --input-file=public/DigitalOcean-public.v2.yaml --output-folder=do-client-python/ 
     - name: Create Pull Request
       id: cpr
       uses: peter-evans/create-pull-request@v4
