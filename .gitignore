@@ -18,3 +18,8 @@ __pycache__/
 /httpRequests/
 
 public/
+
+# client gen
+node_modules/
+tests/digitalocean
+tests/DigitalOcean-public.v2.yaml

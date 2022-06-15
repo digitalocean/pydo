@@ -5,6 +5,7 @@ title: DigitalOceanClient
 namespace: digitalocean
 python: true
 verbose: true
+version-tolerant: true
 
 add-credential: true
 credential-default-policy-type: BearerTokenCredentialPolicy

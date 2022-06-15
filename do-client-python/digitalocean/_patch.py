@@ -7,7 +7,7 @@
 Follow our quickstart for examples: https://aka.ms/azsdk/python/dpcodegen/python/customize
 """
 from typing import TYPE_CHECKING
-from ._digital_ocean_client import DigitalOceanClient as DigitalOceanClientGenerated
+from digitalocean import DigitalOceanClient as DigitalOceanClientGenerated
 from azure.core.credentials import AccessToken
 
 
