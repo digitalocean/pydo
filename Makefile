@@ -14,10 +14,6 @@ download-spec: dev-dependencies ## Download Latest DO Spec
 	touch tests/DigitalOcean-public.v2.yaml
 	curl https://api-engineering.nyc3.digitaloceanspaces.com/spec-ci/DigitalOcean-public.v2.yaml -o ${SPEC_FILE}
 
-# .PHONY: bundle
-# bundle: dev-dependencies download-spec ## Use openapi-cli to bundle the spec
-# 	npm run bundle -- ${SPEC_FILE} -o ${BUNDLE_PATH}
-
 .PHONY: autorest-python
 autorest-python: dev-dependencies 
 	cp -r do-client-python/digitalocean tests/
