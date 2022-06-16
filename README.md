@@ -22,10 +22,40 @@ on the [DigitalOcean OpenAPI Specification](https://github.com/digitalocean/open
 * Python version: >= 3.9
 
 ### TODO
-* Automate packaging and publishing to pipy.
+* Automate packaging and publishing to pypi.
 * Add installation instructions
 * Add usage instructions
 
 # Contributing
 
 Visit our [Contribuing Guide](CONTRIBUTING.md) for more information on getting involved in developing this client.
+
+## Local generation
+
+Sometimes you want to make changes to the client configurations or customizations and test them locally. Everything you need to do this is in the Makefile. Below will provide instructions on how to generate the DO python client locally:
+
+The following command will will download the latest published spec and generatethe client:
+```
+make generate
+```
+
+To overwrite that behavior and use a local spec file, run the following instead:
+```
+SPEC_FILE=path/to/local/spec make generate
+```
+
+To test the client you just generated, we have included a POC that creates a Droplet and Attaches a Volume to the Droplet. Before you run the script, you'll need the following exported variables: 
+```
+export DO_TOKEN=<INSERT-YOUR-DO-TOKEN> 
+export SSH_KEY_NAME=<INSERT-YOUR-SSH_KEY_NAME>       
+```
+
+Instructions on creating a DO token can be found [here](https://docs.digitalocean.com/reference/api/create-personal-access-token/)
+
+Instructions on creating an SSH Key can be found [here](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/)
+
+You are ready to run the script. Run the following:
+> ** Running the following Python script will create billed resources in your account **
+```
+python3 examples/poc_droplets_volumes_sshkeys.py
+```

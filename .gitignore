@@ -10,11 +10,7 @@
 __pycache__/
 *.pyc
 
-# Datasource local storage ignored files
-/dataSources/
-/dataSources.local.xml
+# client gen
+DigitalOcean-public.v2.yaml
 
-# Editor-based HTTP Client requests
-/httpRequests/
-
-public/
+node_modules/*

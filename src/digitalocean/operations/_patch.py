@@ -6,8 +6,12 @@
 
 Follow our quickstart for examples: https://aka.ms/azsdk/python/dpcodegen/python/customize
 """
-from typing import List
+from typing import TYPE_CHECKING
 from ._operations import DropletsOperations as Droplets
+
+if TYPE_CHECKING:
+    # pylint: disable=unused-import,ungrouped-imports
+    from typing import List
 
 class DropletsOperations(Droplets):
 
