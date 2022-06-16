@@ -12,3 +12,5 @@ __pycache__/
 
 # client gen
 DigitalOcean-public.v2.yaml
+
+node_modules/*

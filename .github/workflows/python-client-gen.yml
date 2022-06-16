@@ -11,20 +11,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    - name: delete old generated code
-      run: find do-client-python/ ! -name "*_patch.py"  -exec rm -rv {} + -depth
-    - name: Make spec directory
-      run: mkdir public
+    - name: Removes all generated code
+      run: make clean
     - name: Download spec file
-      run: curl https://api-engineering.nyc3.digitaloceanspaces.com/spec-ci/DigitalOcean-public.v2.yaml -o public/DigitalOcean-public.v2.yaml
+      run: make download-spec
     - uses: actions/upload-artifact@v2
       with:
         name: DigitalOcean-public.v2
-        path: public/DigitalOcean-public.v2.yaml
-    - name: install autorest
-      run: npm install -g autorest
-    - name: generate code
-      run: autorest client_gen_config.md --input-file=public/DigitalOcean-public.v2.yaml --output-folder=do-client-python/ 
+        path: ./DigitalOcean-public.v2.yaml
+    - name: Generate Python client
+      run: make generate
     - name: Create Pull Request
       id: cpr
       uses: peter-evans/create-pull-request@v4
