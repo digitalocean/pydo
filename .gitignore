@@ -9,8 +9,9 @@
 # Python
 __pycache__/
 *.pyc
+build
+dist
+digitalocean.egg-info
 
 # client gen
 DigitalOcean-public.v2.yaml
-
-node_modules/*
