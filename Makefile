@@ -7,11 +7,7 @@ help:
 
 .PHONY: dev-dependencies
 dev-dependencies: ## Install development tooling
-ifeq (, $(shell which autorest))
-	npm install -g autorest
-else
-	@echo "autorest already installed"
-endif
+	npm install --only=dev
 
 .PHONY: clean
 clean: ## Removes all generated code (except _patch.py files)
@@ -28,7 +24,7 @@ download-spec: ## Download Latest DO Spec
 ifndef SPEC_FILE
 generate: SPEC_FILE = $(LOCAL_SPEC_FILE)
 generate: download-spec ## Generates the python client using the latest published spec first.
-endif 
-generate: clean
+endif
+generate: clean dev-dependencies
 	@printf "=== Generating client with spec: $(SPEC_FILE)\n\n"; \
-	autorest client_gen_config.md --input-file=$(SPEC_FILE)
+	npm run autorest -- client_gen_config.md --input-file=$(SPEC_FILE)
