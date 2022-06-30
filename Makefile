@@ -5,8 +5,11 @@ help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'; \
 	printf "\nNOTE: Run 'SPEC_FILE=path/to/local/spec make generate' to skip the download and use a local spec file.\n"
 
-.PHONY: dev-dependencies
-dev-dependencies: ## Install development tooling
+.PHONY: gen-dependencies
+gen-dependencies: ## Install client generation tooling
+ifeq (, $(shell which npm))
+	@(echo "npm is not installed. See https://docs.npmjs.com/downloading-and-installing-node-js-and-npm for more info"; exit 1)
+endif
 ifeq (, $(shell which autorest))
 	npm install -g autorest
 else
@@ -24,11 +27,27 @@ download-spec: ## Download Latest DO Spec
 	touch DigitalOcean-public.v2.yaml && \
 	curl https://api-engineering.nyc3.digitaloceanspaces.com/spec-ci/DigitalOcean-public.v2.yaml -o $(LOCAL_SPEC_FILE)
 
-.PHONY: download-spec generate
+.PHONY: generate
 ifndef SPEC_FILE
 generate: SPEC_FILE = $(LOCAL_SPEC_FILE)
-generate: download-spec ## Generates the python client using the latest published spec first.
+generate: gen-dependencies download-spec ## Generates the python client using the latest published spec first.
 endif 
 generate: clean
 	@printf "=== Generating client with spec: $(SPEC_FILE)\n\n"; \
 	autorest client_gen_config.md --input-file=$(SPEC_FILE)
+
+.PHONY: test-dependencies
+test-dependencies: ## Install test dependencies
+ifneq (, $(shell which poetry))
+	poetry install
+else
+	@(echo "poetry is not installed. See https://python-poetry.org/docs/#installation for more info."; exit 1)
+endif
+
+.PHONY: test-mocked
+test-mocked: test-dependencies
+	pytest -rA --tb=short tests/mocked/.
+
+.PHONY: test-mocked
+test-integration: test-dependencies
+	pytest -rA --tb=short tests/integration/.

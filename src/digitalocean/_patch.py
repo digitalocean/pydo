@@ -7,19 +7,26 @@
 Follow our quickstart for examples: https://aka.ms/azsdk/python/dpcodegen/python/customize
 """
 from typing import TYPE_CHECKING
-from digitalocean import DigitalOceanClient as DigitalOceanClientGenerated
+
 from azure.core.credentials import AccessToken
 
+from digitalocean import DigitalOceanClient as DigitalOceanClientGenerated
 
 if TYPE_CHECKING:
     # pylint: disable=unused-import,ungrouped-imports
     from typing import List
 
 
-class TokenCredentials():
-    """ DO Customized Code:
-        Added to simply authentication.
+def get_version():
+    # TODO: Read version from version.txt once it's created by CI
+    return "dev"
+
+
+class TokenCredentials:
+    """DO Customized Code:
+    Added to simply authentication.
     """
+
     def __init__(self, token: str):
         self._token = token
         self._expires_on = 0
@@ -29,18 +36,19 @@ class TokenCredentials():
 
 
 class DigitalOceanClient(DigitalOceanClientGenerated):
-    """ DO Customized Code:
-        This client patch adds the TokenCredentials to the DO client init.
+    """DO Customized Code:
+    This client patch adds the TokenCredentials to the DO client init.
     """
+
     def __init__(self, token: str, **kwargs):
-        super().__init__(
-            credential=TokenCredentials(token),
-            **kwargs
-        )
+        kwargs["user_agent"] = f"digitalocean/{get_version}"
+
+        super().__init__(credential=TokenCredentials(token), **kwargs)
 
 
 # type: List[str]  # Add all objects you want publicly available to users at this package level
 __all__ = ["DigitalOceanClient"]
+
 
 def patch_sdk():
     """Do not remove from this file.

@@ -3,6 +3,7 @@
 /workspace.xml
 .venv/
 .vscode/
+!.vscode/extensions.json
 .idea/
 .env
 
