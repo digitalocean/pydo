@@ -71,11 +71,11 @@ We use `pytest` to define and run the tests.
 **_Requirements_**
 
 * Python 3.9+
-    * Can be installed using something like
-    [pyenv](https://github.com/pyenv/pyenv) which can also manage python virtual
-    environments.
-* [Poetry](https://python-poetry.org/docs/#installation).
-    * can also be configured to manage python virtual environments.
+    * Can be installed using something like [pyenv](https://github.com/pyenv/pyenv)
+        * used to manage different installed versions of python.
+        * can also manage python virtual environments (with a plugin)
+    * [Poetry](https://python-poetry.org/docs/#installation).
+        * can also be configured to manage python virtual environments.
 
 There are two types of test suites in the `tests/` directory.
 

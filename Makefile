@@ -1,7 +1,5 @@
 LOCAL_SPEC_FILE=./DigitalOcean-public.v2.yaml
 
-PYTEST_CMD = poetry run pytest
-
 .PHONY: help
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'; \
@@ -51,13 +49,13 @@ ifdef TEST_PATTERN
 test-mocked: PYTEST_ARG=-k ${TEST_PATTERN}
 endif
 test-mocked: test-dependencies
-	$(PYTEST_CMD) -rA --tb=short tests/mocked/.
+	poetry run pytest -rA --tb=short tests/mocked/.
 
 .PHONY: test-mocked
 ifdef TEST_PATTERN
 test-integration: PYTEST_ARG=-k ${TEST_PATTERN}
 endif
 test-integration: test-dependencies
-	$(PYTEST_CMD) -rA --tb=short tests/integration/. ${PYTEST_ARG}
+	poetry run pytest -rA --tb=short tests/integration/. ${PYTEST_ARG}
 
 
