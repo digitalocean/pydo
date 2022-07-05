@@ -39,10 +39,15 @@ generate: clean
 .PHONY: test-dependencies
 test-dependencies: ## Install test dependencies
 ifneq (, $(shell which poetry))
-	poetry install
+	poetry install --no-interaction
 else
 	@(echo "poetry is not installed. See https://python-poetry.org/docs/#installation for more info."; exit 1)
 endif
+
+.PHONY: lint-tests
+lint-tests: test-dependencies
+	poetry run black --check tests/. && \
+	poetry run pylint ${PYLINT_ARGS} tests/.
 
 .PHONY: test-mocked
 ifdef TEST_PATTERN
