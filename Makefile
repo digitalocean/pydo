@@ -49,5 +49,10 @@ test-mocked: test-dependencies
 	pytest -rA --tb=short tests/mocked/.
 
 .PHONY: test-mocked
+ifdef TEST_PATTERN
+test-integration: PYTEST_ARG=-k ${TEST_PATTERN}
+endif
 test-integration: test-dependencies
-	pytest -rA --tb=short tests/integration/.
+	pytest -rA --tb=short tests/integration/. ${PYTEST_ARG}
+
+
