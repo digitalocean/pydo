@@ -4,7 +4,7 @@ from digitalocean import DigitalOceanClient
 
 
 @responses.activate
-def test_account_get(mock_client: DigitalOceanClient, mock_client_url):
+def test_get(mock_client: DigitalOceanClient, mock_client_url):
     expected = {
         "account": {
             "droplet_limit": 25,
