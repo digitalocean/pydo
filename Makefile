@@ -31,7 +31,7 @@ download-spec: ## Download Latest DO Spec
 ifndef SPEC_FILE
 generate: SPEC_FILE = $(LOCAL_SPEC_FILE)
 generate: gen-dependencies download-spec ## Generates the python client using the latest published spec first.
-endif 
+endif
 generate: clean
 	@printf "=== Generating client with spec: $(SPEC_FILE)\n\n"; \
 	autorest client_gen_config.md --input-file=$(SPEC_FILE)
@@ -46,8 +46,8 @@ endif
 
 .PHONY: test-mocked
 test-mocked: test-dependencies
-	pytest -rA --tb=short tests/mocked/.
+	poetry run pytest -rA --tb=short tests/mocked/.
 
 .PHONY: test-mocked
 test-integration: test-dependencies
-	pytest -rA --tb=short tests/integration/.
+	poetry run pytest -rA --tb=short tests/integration/.
