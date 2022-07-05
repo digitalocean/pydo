@@ -71,10 +71,11 @@ We use `pytest` to define and run the tests.
 **_Requirements_**
 
 * Python 3.9+
-    * Can be installed using something like [pyenv](https://github.com/pyenv/pyenv) which
-      can also manage python virtual environments
+    * Can be installed using something like
+    [pyenv](https://github.com/pyenv/pyenv) which can also manage python virtual
+    environments.
 * [Poetry](https://python-poetry.org/docs/#installation).
-    * can also be configured to manage python virtual environments
+    * can also be configured to manage python virtual environments.
 
 There are two types of test suites in the `tests/` directory.
 
@@ -82,8 +83,8 @@ There are two types of test suites in the `tests/` directory.
 
 Tests in the `mocked` directory include:
 
-* tests that validate the generated client has all the expected classes and methods for the respective API
-  resources and operations.
+* tests that validate the generated client has all the expected classes and
+methods for the respective API resources and operations.
 * tests that excercise individual operations against mocked responses.
 
 These tests do not act against the real API so no real resources are created.
@@ -96,12 +97,22 @@ make test-mocked
 
 ### `tests/integration/`
 
-Tests in the `integration` directory include tests that simulate specific scenarios a cusomter might use the client to
-interact with the API. **_IMPORTANT:_** test tests require a valid API token and **_DO_** create real resources on the
-respective DigitalOcean account.
+Tests in the `integration` directory include tests that simulate specific
+scenarios a cusomter might use the client to interact with the API.
+**_IMPORTANT:_** test tests require a valid API token and **_DO_** create real
+resources on the respective DigitalOcean account.
 
 To run integration tests, run:
 
 ```
 DO_TOKEN=<valid-token> make test-integration
 ```
+
+#### Customizations
+
+Some test values can be customized so integration tests can exercise different
+scenarios. For example, test use a default region to create resources. All the
+default values are managed in the
+[tests/integration/defaults.py](tests/integration/defaults.py) file. Any value
+that has `environ.get(` can be overwritten by setting the respective environment
+variable.
