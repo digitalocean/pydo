@@ -1,3 +1,8 @@
+"""Integration tests default values
+
+Overwrite default values with environment variables.
+"""
+
 from os import environ
 
 PREFIX = "cgtest"

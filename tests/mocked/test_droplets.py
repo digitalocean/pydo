@@ -1,3 +1,4 @@
+"""Mock tests for the droplets API resource."""
 import responses
 
 from digitalocean import DigitalOceanClient
@@ -5,6 +6,7 @@ from digitalocean import DigitalOceanClient
 
 @responses.activate
 def test_list(mock_client: DigitalOceanClient, mock_client_url):
+    """Mocks the droplets list operation."""
     expected = {
         "droplets": [
             {
@@ -143,9 +145,7 @@ def test_list(mock_client: DigitalOceanClient, mock_client_url):
         "links": {"pages": {}},
         "meta": {"total": 1},
     }
-    responses.add(
-        responses.GET, f"{mock_client_url}/v2/droplets", json=expected
-    )
+    responses.add(responses.GET, f"{mock_client_url}/v2/droplets", json=expected)
     list_resp = mock_client.droplets.list()
 
     assert list_resp == expected
@@ -153,6 +153,7 @@ def test_list(mock_client: DigitalOceanClient, mock_client_url):
 
 @responses.activate
 def test_create(mock_client: DigitalOceanClient, mock_client_url):
+    """Mocks the droplets create operation."""
     expected = {
         "droplet": {
             "id": 3164444,
@@ -295,6 +296,7 @@ def test_create(mock_client: DigitalOceanClient, mock_client_url):
 
 @responses.activate
 def test_get(mock_client: DigitalOceanClient, mock_client_url):
+    """Mocks the droplets get operation."""
     expected = {
         "droplet": {
             "id": 3164444,
@@ -429,9 +431,7 @@ def test_get(mock_client: DigitalOceanClient, mock_client_url):
             "vpc_uuid": "760e09ef-dc84-11e8-981e-3cfdfeaae000",
         }
     }
-    responses.add(
-        responses.GET, f"{mock_client_url}/v2/droplets/1", json=expected
-    )
+    responses.add(responses.GET, f"{mock_client_url}/v2/droplets/1", json=expected)
     get_resp = mock_client.droplets.get(1)
 
     assert get_resp == expected
@@ -439,6 +439,8 @@ def test_get(mock_client: DigitalOceanClient, mock_client_url):
 
 @responses.activate
 def test_delete(mock_client: DigitalOceanClient, mock_client_url):
+    """Mocks the droplets delete operation."""
+
     responses.add(
         responses.DELETE,
         f"{mock_client_url}/v2/droplets/1",

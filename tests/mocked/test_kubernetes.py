@@ -1,10 +1,13 @@
+"""Mocked tests for kubernetes resources."""
 import uuid
 
 import responses
 
 
 @responses.activate
-def test_create_cluster(mock_client):
+def test_create_cluster(mock_client, mock_client_url):
+    """Mocks the kubernetes create_cluster operation."""
+
     expected = {
         "kubernetes_cluster": {
             "id": "bd5f5959-5e1e-4205-a714-a914373942af",
@@ -78,7 +81,7 @@ def test_create_cluster(mock_client):
 
     responses.add(
         responses.POST,
-        f"{mock_client._client._base_url}/v2/kubernetes/clusters",
+        f"{mock_client_url}/v2/kubernetes/clusters",
         json=expected,
         status=201,
     )
