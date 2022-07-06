@@ -1,4 +1,6 @@
 LOCAL_SPEC_FILE=./DigitalOcean-public.v2.yaml
+MODELERFOUR_VERSION="4.23.6"
+AUTOREST_PYTHON_VERSION="6.0.1"
 
 .PHONY: help
 help:
@@ -27,4 +29,7 @@ generate: download-spec ## Generates the python client using the latest publishe
 endif
 generate: clean dev-dependencies
 	@printf "=== Generating client with spec: $(SPEC_FILE)\n\n"; \
-	npm run autorest -- client_gen_config.md --input-file=$(SPEC_FILE)
+	npm run autorest -- client_gen_config.md \
+		--use:@autorest/modelerfour@$(MODELERFOUR_VERSION) \
+		--use:@autorest/python@$(AUTOREST_PYTHON_VERSION) \
+		--input-file=$(SPEC_FILE)
