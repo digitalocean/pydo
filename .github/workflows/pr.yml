@@ -8,36 +8,26 @@ jobs:
     name: Test
     runs-on: ubuntu-latest
 
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version:
+          - "3.9"
+          - "3.10"
+
     steps:
-      - uses: actions/checkout@v2
+      - name: Check out code
+        uses: actions/checkout@v2
 
-      - uses: actions/setup-python@v4
+      - name: Setup python
+        uses: actions/setup-python@v4
         with:
-          python-version: "3.10"
-          cache: "poetry"
+          python-version: ${{ matrix.python-version }}
 
-      - name: Load cached Poetry installation
-        uses: actions/cache@v2
-        with:
-          path: ~/.local
-          key: poetry-1.1.13-0
-
-      - name: Install Poetry
-        uses: snok/install-poetry@v1
+      - name: Install Poetry Action
+        uses: snok/install-poetry@v1.3.1
         with:
           version: 1.1.13
-          virtualenvs-create: true
-          virtualenvs-in-project: true
-
-      - name: Load cached venv
-        uses: actions/cache@v3.0.4
-        with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('**/poetry.lock') }}
-
-      - name: Install dependencies
-        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-        run: poetry install --no-interaction --no-root
 
       - name: Lint tests
         run: make lint-tests
