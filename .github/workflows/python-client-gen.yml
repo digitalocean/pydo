@@ -25,7 +25,7 @@ jobs:
       id: cpr
       uses: peter-evans/create-pull-request@v4
       with:
-        token: ${{ secrets.PY_CLIENT }}
+        token: ${{ secrets.GITHUB_TOKEN }}
         commit-message: Re-generate Python Client
         committer: GitHub <noreply@github.com>
         author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
