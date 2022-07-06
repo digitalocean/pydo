@@ -1,4 +1,6 @@
 LOCAL_SPEC_FILE=./DigitalOcean-public.v2.yaml
+MODELERFOUR_VERSION="4.23.6"
+AUTOREST_PYTHON_VERSION="6.0.1"
 
 .PHONY: help
 help:
@@ -7,16 +9,12 @@ help:
 
 .PHONY: dev-dependencies
 dev-dependencies: ## Install development tooling
-ifeq (, $(shell which autorest))
-	npm install -g autorest
-else
-	@echo "autorest already installed"
-endif
+	npm install --only=dev
 
 .PHONY: clean
 clean: ## Removes all generated code (except _patch.py files)
 	@printf "=== Cleaning src directory\n"
-	@find src/digitalocean -type f ! -name "_patch.py" -exec rm -rf {} + -depth
+	@find src/digitalocean -type f ! -name "_patch.py" -exec rm -rf {} +
 
 .PHONY: download-spec
 download-spec: ## Download Latest DO Spec
@@ -28,7 +26,10 @@ download-spec: ## Download Latest DO Spec
 ifndef SPEC_FILE
 generate: SPEC_FILE = $(LOCAL_SPEC_FILE)
 generate: download-spec ## Generates the python client using the latest published spec first.
-endif 
-generate: clean
+endif
+generate: clean dev-dependencies
 	@printf "=== Generating client with spec: $(SPEC_FILE)\n\n"; \
-	autorest client_gen_config.md --input-file=$(SPEC_FILE)
+	npm run autorest -- client_gen_config.md \
+		--use:@autorest/modelerfour@$(MODELERFOUR_VERSION) \
+		--use:@autorest/python@$(AUTOREST_PYTHON_VERSION) \
+		--input-file=$(SPEC_FILE)
