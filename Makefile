@@ -1,25 +1,20 @@
 LOCAL_SPEC_FILE=./DigitalOcean-public.v2.yaml
+MODELERFOUR_VERSION="4.23.6"
+AUTOREST_PYTHON_VERSION="6.0.1"
 
 .PHONY: help
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'; \
 	printf "\nNOTE: Run 'SPEC_FILE=path/to/local/spec make generate' to skip the download and use a local spec file.\n"
 
-.PHONY: gen-dependencies
-gen-dependencies: ## Install client generation tooling
-ifeq (, $(shell which npm))
-	@(echo "npm is not installed. See https://docs.npmjs.com/downloading-and-installing-node-js-and-npm for more info"; exit 1)
-endif
-ifeq (, $(shell which autorest))
-	npm install -g autorest
-else
-	@echo "autorest already installed"
-endif
+.PHONY: dev-dependencies
+dev-dependencies: ## Install development tooling
+	npm install --only=dev
 
 .PHONY: clean
 clean: ## Removes all generated code (except _patch.py files)
 	@printf "=== Cleaning src directory\n"
-	@find src/digitalocean -type f ! -name "_patch.py" -exec rm -rf {} + -depth
+	@find src/digitalocean -type f ! -name "_patch.py" -exec rm -rf {} +
 
 .PHONY: download-spec
 download-spec: ## Download Latest DO Spec
@@ -30,11 +25,14 @@ download-spec: ## Download Latest DO Spec
 .PHONY: generate
 ifndef SPEC_FILE
 generate: SPEC_FILE = $(LOCAL_SPEC_FILE)
-generate: gen-dependencies download-spec ## Generates the python client using the latest published spec first.
+generate: dev-dependencies download-spec ## Generates the python client using the latest published spec first.
 endif 
-generate: clean
+generate: clean dev-dependencies
 	@printf "=== Generating client with spec: $(SPEC_FILE)\n\n"; \
-	autorest client_gen_config.md --input-file=$(SPEC_FILE)
+	npm run autorest -- client_gen_config.md \
+		--use:@autorest/modelerfour@$(MODELERFOUR_VERSION) \
+		--use:@autorest/python@$(AUTOREST_PYTHON_VERSION) \
+		--input-file=$(SPEC_FILE)
 
 .PHONY: test-dependencies
 test-dependencies: ## Install test dependencies
@@ -62,5 +60,3 @@ test-integration: PYTEST_ARG=-k ${TEST_PATTERN}
 endif
 test-integration: test-dependencies
 	poetry run pytest -rA --tb=short tests/integration/. ${PYTEST_ARG}
-
-
