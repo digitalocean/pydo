@@ -7,23 +7,27 @@
 Follow our quickstart for examples: https://aka.ms/azsdk/python/dpcodegen/python/customize
 """
 from typing import TYPE_CHECKING
+
 from ._operations import DropletsOperations as Droplets
 
 if TYPE_CHECKING:
     # pylint: disable=unused-import,ungrouped-imports
-    from typing import List
+    pass
+
 
 class DropletsOperations(Droplets):
+    def get_public_IPv4(self, droplet_id: int):
+        droplet = self.get(droplet_id)
 
-    @classmethod
-    def get_public_IPv4(self, droplet):
-        ip_address = ''
-        for net in droplet['networks']['v4']:
-            if net['type'] == 'public':
-                ip_address = net['ip_address']
+        ip_address = ""
+        for net in droplet["networks"]["v4"]:
+            if net["type"] == "public":
+                ip_address = net["ip_address"]
         return ip_address
 
+
 __all__ = ["DropletsOperations"]
+
 
 def patch_sdk():
     """Do not remove from this file.

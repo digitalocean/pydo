@@ -3,10 +3,12 @@
 /workspace.xml
 .venv/
 .vscode/
+!.vscode/extensions.json
 .idea/
 .env
 
 # Python
+.python-version
 __pycache__/
 *.pyc
 build

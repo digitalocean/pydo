@@ -50,12 +50,69 @@ export DO_TOKEN=<INSERT-YOUR-DO-TOKEN>
 export SSH_KEY_NAME=<INSERT-YOUR-SSH_KEY_NAME>       
 ```
 
-Instructions on creating a DO token can be found [here](https://docs.digitalocean.com/reference/api/create-personal-access-token/)
+Instructions on creating a DO token can be
+found [here](https://docs.digitalocean.com/reference/api/create-personal-access-token/)
 
-Instructions on creating an SSH Key can be found [here](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/)
+Instructions on creating an SSH Key can be
+found [here](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/)
 
 You are ready to run the script. Run the following:
 > ** Running the following Python script will create billed resources in your account **
+
 ```
 python3 examples/poc_droplets_volumes_sshkeys.py
 ```
+
+## Running tests
+
+The tests included in this repo are used to validate the generated client.
+We use `pytest` to define and run the tests.
+
+**_Requirements_**
+
+* Python 3.9+
+    * Can be installed using something like [pyenv](https://github.com/pyenv/pyenv)
+        * used to manage different installed versions of python.
+        * can also manage python virtual environments (with a plugin)
+    * [Poetry](https://python-poetry.org/docs/#installation).
+        * can also be configured to manage python virtual environments.
+
+There are two types of test suites in the `tests/` directory.
+
+### `tests/mocked/`
+
+Tests in the `mocked` directory include:
+
+* tests that validate the generated client has all the expected classes and
+methods for the respective API resources and operations.
+* tests that excercise individual operations against mocked responses.
+
+These tests do not act against the real API so no real resources are created.
+
+To run mocked tests, run:
+
+```
+make test-mocked
+```
+
+### `tests/integration/`
+
+Tests in the `integration` directory include tests that simulate specific
+scenarios a cusomter might use the client to interact with the API.
+**_IMPORTANT:_** test tests require a valid API token and **_DO_** create real
+resources on the respective DigitalOcean account.
+
+To run integration tests, run:
+
+```
+DO_TOKEN=<valid-token> make test-integration
+```
+
+#### Customizations
+
+Some test values can be customized so integration tests can exercise different
+scenarios. For example, test use a default region to create resources. All the
+default values are managed in the
+[tests/integration/defaults.py](tests/integration/defaults.py) file. Any value
+that has `environ.get(` can be overwritten by setting the respective environment
+variable.
