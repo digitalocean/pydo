@@ -4,7 +4,7 @@ on:
     inputs:
       commit_url:
         description: 'The commit URL that triggered the workflow'
-        required: true 
+        required: true
         type: string
 jobs:
   Generate-Python-Client:
@@ -30,7 +30,6 @@ jobs:
         committer: GitHub <noreply@github.com>
         author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
         branch: bot-regenerate-python-client
-        branch-suffix: short-commit-hash
         delete-branch: true
         title: '[Bot] Re-generate Python Client'
         body: |
