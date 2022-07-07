@@ -15,18 +15,7 @@ if TYPE_CHECKING:
     pass
 
 
-class DropletsOperations(Droplets):
-    def get_public_IPv4(self, droplet_id: int):
-        droplet = self.get(droplet_id)
-
-        ip_address = ""
-        for net in droplet["networks"]["v4"]:
-            if net["type"] == "public":
-                ip_address = net["ip_address"]
-        return ip_address
-
-
-__all__ = ["DropletsOperations"]
+__all__ = []
 
 
 def patch_sdk():
