@@ -1,6 +1,7 @@
 LOCAL_SPEC_FILE=./DigitalOcean-public.v2.yaml
 MODELERFOUR_VERSION="4.23.6"
 AUTOREST_PYTHON_VERSION="6.0.1"
+PACKAGE_VERSION?="dev"
 
 .PHONY: help
 help:
@@ -14,7 +15,7 @@ dev-dependencies: ## Install development tooling
 .PHONY: clean
 clean: ## Removes all generated code (except _patch.py files)
 	@printf "=== Cleaning src directory\n"
-	@find src/digitalocean -type f ! -name "_patch.py" -exec rm -rf {} +
+	@find src/digitalocean -type f ! -name "_patch.py" ! -name "custom_*.py" -exec rm -rf {} +
 
 .PHONY: download-spec
 download-spec: ## Download Latest DO Spec
@@ -32,6 +33,7 @@ generate: clean dev-dependencies
 	npm run autorest -- client_gen_config.md \
 		--use:@autorest/modelerfour@$(MODELERFOUR_VERSION) \
 		--use:@autorest/python@$(AUTOREST_PYTHON_VERSION) \
+		--package-version=$(PACKAGE_VERSION) \
 		--input-file=$(SPEC_FILE)
 
 .PHONY: install
@@ -45,18 +47,12 @@ endif
 .PHONY: lint-tests
 lint-tests: install
 	poetry run black --check tests/. && \
-	poetry run pylint ${PYLINT_ARGS} tests/.
+	poetry run pylint $(PYLINT_ARGS) tests/.
 
 .PHONY: test-mocked
-ifdef TEST_PATTERN
-test-mocked: PYTEST_ARG=-k ${TEST_PATTERN}
-endif
-test-mocked: install
-	poetry run pytest -rA --tb=short tests/mocked/.
+test-mocked: test-dependencies
+	poetry run pytest -rA --tb=short tests/mocked/. $(PYTEST_ARGS)
 
 .PHONY: test-mocked
-ifdef TEST_PATTERN
-test-integration: PYTEST_ARG=-k ${TEST_PATTERN}
-endif
-test-integration: install
-	poetry run pytest -rA --tb=short tests/integration/. ${PYTEST_ARG}
+test-integration: test-dependencies
+	poetry run pytest -rA --tb=short tests/integration/. $(PYTEST_ARGS)
