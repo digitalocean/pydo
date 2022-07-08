@@ -1,30 +1,75 @@
-# digitalocean-python-client
+
+# The DigitalOcean Python library
 
 `digitalocean-python-client` is the official python client library that allows
 python developers to interact with and manage their DigitalOcean account
 resources through the
-[DigitalOcean API](https://developers.digitalocean.com/documentation/v2/).
-
-# Purpose
-
-To provide a "DO simple" Python API for interacting with and managing
-DigitalOcean resources.
+[DigitalOcean API](https://developers.digitalocean.com/documentation/v2/). 
 
 A top priority of this project is to ensure the client abides by the API
 contract. Therefore, the client itself wraps a generated client based
 on the [DigitalOcean OpenAPI Specification](https://github.com/digitalocean/openapi).
 
-# About the DigitalOcean Python Client
 
-# Using the client
+# Getting Started With the Client
 ## Prerequisites
 
 * Python version: >= 3.9
 
-### TODO
-* Automate packaging and publishing to pypi.
-* Add installation instructions
-* Add usage instructions
+## Installation (placeholder- not official yet)
+To install from pip:
+
+    pip install digitalocean-python
+
+To install from source: (todo)
+
+    python setup.py install
+
+## DigitalOcean API
+To support all DigitalOcean's HTTP APIs, a generated library is available which will expose all the endpoints:  [digitalocean-api-client-python](https://github.com/digitalocean/digitalocean-client-python/tree/main/src/digitalocean).
+
+Find below a working example for GET a ssh_key ([per this http request](https://docs.digitalocean.com/reference/api/api-reference/#operation/sshKeys_list)) and printing the ID associated with the ssh key. If you'd like to try out this quick example, you can follow [these instructions](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/) to add ssh keys to your DO account. 
+```python
+import os
+from digitalocean import DigitalOceanClient
+# would be nice to not need this 
+from azure.core.exceptions import HttpResponseError
+
+api_key = <YOUR DO TOKEN>
+ssh_key_fingerprint = <YOUR SSH KEY FINGERPRINT>
+
+class SSHKeyIDGetter:
+    def __init__(self, *args, **kwargs):
+        if api_key == "":
+            raise Exception("No DigitalOcean API token provided")
+        client = DigitalOceanClient(token=api_key)  
+        self.client = client
+    
+    def main(self):
+        if ssh_key_fingerprint == "":
+            raise Exception("SSH_KEY_FINGERPRINT not set")
+        resp = self.get_ssh_key_id(ssh_key_fingerprint)
+        print("SSH Key ID is {0}".format(resp["ssh_key"]["id"]))
+
+
+    def get_ssh_key_id(self, ssh_key_fingerprint):
+        print("GETting ssh key with fingerprint {0}...".format(ssh_key_fingerprint))
+        try: 
+            ssh_key_resp = self.client.ssh_keys.get(ssh_key_identifier=ssh_key_fingerprint)
+            return ssh_key_resp
+        except HttpResponseError as err:
+            self.throw("Error: {0} {1}: {2}".format(err.status_code, err.reason, err.error.message))
+
+        raise Exception("no ssh key found")
+
+
+if __name__ == '__main__':
+    dc = SSHKeyIDGetter()
+    dc.main()
+```
+
+More working examples can be found [here](https://github.com/digitalocean/digitalocean-client-python/tree/main/examples).
+
 
 # Contributing
 
@@ -32,7 +77,7 @@ Visit our [Contribuing Guide](CONTRIBUTING.md) for more information on getting i
 
 ## Local generation
 
-Sometimes you want to make changes to the client configurations or customizations and test them locally. Everything you need to do this is in the Makefile. Below will provide instructions on how to generate the DO python client locally:
+You may want to make changes to the client configurations or customizations and test them locally. Everything you need to do this is in the Makefile. Below will provide instructions on how to generate the DO python client locally:
 
 The following command will will download the latest published spec and generatethe client:
 ```

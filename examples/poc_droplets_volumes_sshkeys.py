@@ -53,7 +53,7 @@ class DropletCreator:
             "droplet_id": droplet['id']
         }
         try:
-            action_resp = self.client.volume_actions.create_by_id(volume['id'], attach_req)
+            action_resp = self.client.volume_actions.post_by_id(volume['id'], attach_req)
             self.wait_for_action(action_resp['action']['id'])
         except HttpResponseError as err:
             self.throw("Error: {0} {1}: {2}".format(err.status_code, err.reason, err.error.message))
