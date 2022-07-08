@@ -68,7 +68,14 @@ if __name__ == '__main__':
     dc.main()
 ```
 
-More working examples can be found [here](https://github.com/digitalocean/digitalocean-client-python/tree/main/examples).
+The above code snippet should output the following:
+```
+GETting ssh key with fingerprint 12:34:5a:67:89:10:c1:1a:f1:12:fc:13:f1:14:9a:f5...
+SSH Key ID is 12345678
+```
+**Consult the full list of supported DigitalOcean API endpoints in [the DigitalOcean Python Client documentation]().**
+
+**Note**: More working examples can be found [here](https://github.com/digitalocean/digitalocean-client-python/tree/main/examples).
 
 
 # Contributing
