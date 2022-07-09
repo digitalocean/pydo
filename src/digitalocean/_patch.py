@@ -9,6 +9,7 @@ Follow our quickstart for examples: https://aka.ms/azsdk/python/dpcodegen/python
 from typing import TYPE_CHECKING
 
 from azure.core.credentials import AccessToken
+from azure.core.pipeline.policies import HttpLoggingPolicy
 
 from digitalocean import DigitalOceanClient as DigitalOceanClientGenerated
 
@@ -17,15 +18,33 @@ if TYPE_CHECKING:
     from typing import List
 
 
-def get_version():
-    # TODO: Read version from version.txt once it's created by CI
-    return "dev"
+class CustomHttpLoggingPolicy(HttpLoggingPolicy):
+
+    # ALLOWED_HEADERS lists headers that will not be redacted when logging
+    ALLOWED_HEADERS = set(
+        [
+            "x-request-id",
+            "ratelimit-limit",
+            "ratelimit-remaining",
+            "ratelimit-reset",
+            "x-gateway",
+            "x-request-id",
+            "x-response-from",
+            "CF-Cache-Status",
+            "Expect-CT",
+            "Server",
+            "CF-RAY",
+            "Content-Encoding",
+        ]
+    )
+
+    def __init__(self, logger=None, **kwargs):
+        super().__init__(logger, **kwargs)
+        self.allowed_header_names.update(self.ALLOWED_HEADERS)
 
 
 class TokenCredentials:
-    """DO Customized Code:
-    Added to simply authentication.
-    """
+    """Credential object used for token authentication"""
 
     def __init__(self, token: str):
         self._token = token
@@ -35,15 +54,20 @@ class TokenCredentials:
         return AccessToken(self._token, expires_on=self._expires_on)
 
 
-class DigitalOceanClient(DigitalOceanClientGenerated):
-    """DO Customized Code:
-    This client patch adds the TokenCredentials to the DO client init.
+class DigitalOceanClient(DigitalOceanClientGenerated):  # type: ignore
+    """The official DigitalOceanClient
+
+    :param token: A valid API token.
+    :type token: str
+    :keyword endpoint: Service URL. Default value is "https://api.digitalocean.com".
+    :paramtype endpoint: str
     """
 
-    def __init__(self, token: str, **kwargs):
-        kwargs["user_agent"] = f"digitalocean/{get_version}"
-
-        super().__init__(credential=TokenCredentials(token), **kwargs)
+    def __init__(self, token: str, *, timeout: int = 120, **kwargs):
+        logger = kwargs.get("logger")
+        if logger is not None and kwargs.get("http_logging_policy") != "":
+            kwargs["http_logging_policy"] = CustomHttpLoggingPolicy(logger=logger)
+        super().__init__(TokenCredentials(token), timeout=timeout, **kwargs)
 
 
 # type: List[str]  # Add all objects you want publicly available to users at this package level

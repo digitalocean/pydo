@@ -4,6 +4,7 @@
 title: DigitalOceanClient
 namespace: digitalocean
 python: true
+black: true
 output-folder: src/
 verbose: true
 version-tolerant: true
