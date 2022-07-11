@@ -198,7 +198,7 @@ def test_class_names(client_resources):
                 "list_snapshots",
                 "list_associated_resources",
             },
-            {"get_public_IPv4"},
+            {},
         ),
         (
             "firewalls",
