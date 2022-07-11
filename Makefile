@@ -50,9 +50,9 @@ lint-tests: install
 	poetry run pylint $(PYLINT_ARGS) tests/.
 
 .PHONY: test-mocked
-test-mocked: test-dependencies
+test-mocked: install
 	poetry run pytest -rA --tb=short tests/mocked/. $(PYTEST_ARGS)
 
 .PHONY: test-mocked
-test-integration: test-dependencies
+test-integration: install
 	poetry run pytest -rA --tb=short tests/integration/. $(PYTEST_ARGS)
