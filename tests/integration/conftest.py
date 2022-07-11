@@ -14,7 +14,7 @@ from digitalocean import DigitalOceanClient
 
 @pytest.fixture(scope="session")
 def integration_client() -> DigitalOceanClient:
-    """Instanciates a DigitalOceanClient for use with integration tests.
+    """Instantiates a DigitalOceanClient for use with integration tests.
 
     The client requires the environment variable DO_TOKEN with a valid API
     token.
@@ -32,7 +32,7 @@ def integration_client() -> DigitalOceanClient:
 
 
 @pytest.fixture(scope="session")
-def ssh_key() -> str:
+def ssh_key(integration_client) -> str:
     """Handles creating or retrieving an ssh_key on the live account."""
 
     key = rsa.generate_private_key(
@@ -48,7 +48,7 @@ def ssh_key() -> str:
         "public_key": public_key.decode(),
     }
 
-    client = integration_client()
+    client = integration_client
     resp = client.ssh_keys.create(req)
     fingerprint = resp["ssh_key"]["fingerprint"]
 
