@@ -6,9 +6,10 @@ custom configuration.
 import logging
 import re
 
-import pytest
 import responses
 from digitalocean import DigitalOceanClient
+
+# pylint: disable=missing-function-docstring
 
 
 def test_custom_headers():
@@ -56,7 +57,7 @@ def test_custom_user_agent():
     )
 
     full_user_agent_pattern = (
-        f"^{user_agent} azsdk-python-digitaloceanclient\/.+Python\/.+\(.+\)$"
+        r"^test azsdk-python-digitaloceanclient\/.+Python\/.+\(.+\)$"
     )
     # pylint: disable=protected-access
     got_user_agent = client._client._config.user_agent_policy.user_agent
