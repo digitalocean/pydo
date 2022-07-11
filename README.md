@@ -3,8 +3,8 @@
 
 `digitalocean-python-client` is the official python client library that allows
 python developers to interact with and manage their DigitalOcean account
-resources through the
-[DigitalOcean API](https://developers.digitalocean.com/documentation/v2/). 
+resources through a python abstraction layer on top of the raw
+[DigitalOcean API HTTP Interface](https://developers.digitalocean.com/documentation/v2/). 
 
 A top priority of this project is to ensure the client abides by the API
 contract. Therefore, the client itself wraps a generated client based
