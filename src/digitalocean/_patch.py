@@ -65,7 +65,7 @@ class DigitalOceanClient(DigitalOceanClientGenerated):  # type: ignore
 
     def __init__(self, token: str, *, timeout: int = 120, **kwargs):
         logger = kwargs.get("logger")
-        if logger is not None and kwargs.get("http_logging_policy") != "":
+        if logger is not None and kwargs.get("http_logging_policy") == "":
             kwargs["http_logging_policy"] = CustomHttpLoggingPolicy(logger=logger)
         super().__init__(TokenCredentials(token), timeout=timeout, **kwargs)
 
