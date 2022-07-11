@@ -16,7 +16,7 @@ on the [DigitalOcean OpenAPI Specification](https://github.com/digitalocean/open
 
 * Python version: >= 3.9
 
-## Installation (placeholder- not official yet)
+## Installation
 To install from pip:
 
     pip install git+https://github.com/digitalocean/digitalocean-client-python.git
