@@ -31,7 +31,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: $(poetry config cache-dir)
-          key: ubuntu-latest-poetry-3.9-${{ hashFiles('**/pyproject.toml') }}
+          key: ubuntu-latest-poetry-3.10-${{ hashFiles('**/pyproject.toml') }}
 
       - name: Lint tests
         run: make lint-tests
@@ -78,7 +78,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: $(poetry config cache-dir)
-          key: ubuntu-latest-poetry-3.9-${{ hashFiles('**/pyproject.toml') }}
+          key: ubuntu-latest-poetry-${{ matrix.python-version }}-${{ hashFiles('**/pyproject.toml') }}
 
       - name: Run mocked tests
         run: make test-mocked
