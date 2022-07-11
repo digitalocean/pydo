@@ -2,6 +2,12 @@ name: pr
 
 on:
   pull_request:
+    paths:
+      - '!*.md'
+      - '!archive'
+      - '!examples'
+      - '!.gitignore'
+      - '!LICENSE'
 
 jobs:
   lint:
