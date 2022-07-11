@@ -27,7 +27,7 @@ download-spec: ## Download Latest DO Spec
 ifndef SPEC_FILE
 generate: SPEC_FILE = $(LOCAL_SPEC_FILE)
 generate: dev-dependencies download-spec ## Generates the python client using the latest published spec first.
-endif 
+endif
 generate: clean dev-dependencies
 	@printf "=== Generating client with spec: $(SPEC_FILE)\n\n"; \
 	npm run autorest -- client_gen_config.md \
@@ -46,7 +46,7 @@ endif
 
 .PHONY: lint-tests
 lint-tests: install
-	poetry run black --check tests/. && \
+	poetry run black --check --diff tests/. && \
 	poetry run pylint $(PYLINT_ARGS) tests/.
 
 .PHONY: test-mocked
