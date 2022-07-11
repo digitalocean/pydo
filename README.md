@@ -1,30 +1,57 @@
-# digitalocean-python-client
+
+# The DigitalOcean Python library
 
 `digitalocean-python-client` is the official python client library that allows
 python developers to interact with and manage their DigitalOcean account
-resources through the
-[DigitalOcean API](https://developers.digitalocean.com/documentation/v2/).
-
-# Purpose
-
-To provide a "DO simple" Python API for interacting with and managing
-DigitalOcean resources.
+resources through a python abstraction layer on top of the raw
+[DigitalOcean API HTTP Interface](https://developers.digitalocean.com/documentation/v2/). 
 
 A top priority of this project is to ensure the client abides by the API
 contract. Therefore, the client itself wraps a generated client based
 on the [DigitalOcean OpenAPI Specification](https://github.com/digitalocean/openapi).
 
-# About the DigitalOcean Python Client
 
-# Using the client
+# Getting Started With the Client
 ## Prerequisites
 
 * Python version: >= 3.9
 
-### TODO
-* Automate packaging and publishing to pypi.
-* Add installation instructions
-* Add usage instructions
+## Installation
+To install from pip:
+
+    pip install git+https://github.com/digitalocean/digitalocean-client-python.git
+
+or, if repo is cloned locally:
+
+    pip install /<PATH>/<TO>/digitalocean-client-python
+
+To install from source:
+
+    make install
+
+## DigitalOcean API
+To support all of DigitalOcean's HTTP APIs, a generated library is available which will expose all the endpoints:  [digitalocean-api-client-python](https://github.com/digitalocean/digitalocean-client-python/tree/main/src/digitalocean).
+
+Find below a working example for GET a ssh_key ([per this http request](https://docs.digitalocean.com/reference/api/api-reference/#operation/sshKeys_list)) and printing the ID associated with the ssh key. If you'd like to try out this quick example, you can follow [these instructions](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/) to add ssh keys to your DO account. 
+```python
+from digitalocean import DigitalOceanClient
+
+client = DigitalOceanClient(token="<YOUR-API-TOKEN>")  
+
+ssh_keys_resp = client.ssh_keys.list()
+for k in ssh_keys_resp["ssh_keys"]:
+    print(f"ID: {k['id']}, NAME: {k['name']}, FINGERPRINT: {k['fingerprint']}")
+```
+
+The above code snippet should output the following:
+```
+ID: 123456, NAME: my_test_ssh_key, FINGERPRINT: 5c:74:7e:60:28:69:34:ca:dd:74:67:c3:f3:00:7f:fe
+ID: 123457, NAME: my_prod_ssh_key, FINGERPRINT: eb:76:c7:2a:d3:3e:80:5d:ef:2e:ca:86:d7:79:94:0d
+```
+**Consult the full list of supported DigitalOcean API endpoints in [the DigitalOcean Python Client documentation]().**
+
+**Note**: More working examples can be found [here](https://github.com/digitalocean/digitalocean-client-python/tree/main/examples).
+
 
 # Contributing
 
@@ -32,7 +59,7 @@ Visit our [Contribuing Guide](CONTRIBUTING.md) for more information on getting i
 
 ## Local generation
 
-Sometimes you want to make changes to the client configurations or customizations and test them locally. Everything you need to do this is in the Makefile. Below will provide instructions on how to generate the DO python client locally:
+You may want to make changes to the client configurations or customizations and test them locally. Everything you need to do this is in the Makefile. Below will provide instructions on how to generate the DO python client locally:
 
 The following command will will download the latest published spec and generatethe client:
 ```
