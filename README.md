@@ -143,3 +143,14 @@ default values are managed in the
 [tests/integration/defaults.py](tests/integration/defaults.py) file. Any value
 that has `environ.get(` can be overwritten by setting the respective environment
 variable.
+
+## Client customization
+
+Several client settings can be customized to suite the applicaiton.
+The configuration options available are currently listed in the 
+[generator's sdk documentation](https://github.com/Azure/azure-sdk-for-python/blob/main/sdk/core/azure-core/README.md#configurations). As this client evolves, we will include these details in our
+documentation.
+
+There are several examples in the
+[examples/customize_client_settings](examples/customize_client_settings) directory that
+help illustrate how to easily customize the client configuration.
