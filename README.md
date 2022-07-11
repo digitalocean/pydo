@@ -19,59 +19,34 @@ on the [DigitalOcean OpenAPI Specification](https://github.com/digitalocean/open
 ## Installation (placeholder- not official yet)
 To install from pip:
 
-    pip install digitalocean-python
+    pip install git+https://github.com/digitalocean/digitalocean-client-python.git
 
-To install from source: (todo)
+or, if repo is cloned locally:
 
-    python setup.py install
+    pip install /<PATH>/<TO>/digitalocean-client-python
+
+To install from source:
+
+    make install
 
 ## DigitalOcean API
-To support all DigitalOcean's HTTP APIs, a generated library is available which will expose all the endpoints:  [digitalocean-api-client-python](https://github.com/digitalocean/digitalocean-client-python/tree/main/src/digitalocean).
+To support all of DigitalOcean's HTTP APIs, a generated library is available which will expose all the endpoints:  [digitalocean-api-client-python](https://github.com/digitalocean/digitalocean-client-python/tree/main/src/digitalocean).
 
 Find below a working example for GET a ssh_key ([per this http request](https://docs.digitalocean.com/reference/api/api-reference/#operation/sshKeys_list)) and printing the ID associated with the ssh key. If you'd like to try out this quick example, you can follow [these instructions](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/) to add ssh keys to your DO account. 
 ```python
-import os
 from digitalocean import DigitalOceanClient
-# would be nice to not need this 
-from azure.core.exceptions import HttpResponseError
 
-api_key = <YOUR DO TOKEN>
-ssh_key_fingerprint = <YOUR SSH KEY FINGERPRINT>
+client = DigitalOceanClient(token="<YOUR-API-TOKEN>")  
 
-class SSHKeyIDGetter:
-    def __init__(self, *args, **kwargs):
-        if api_key == "":
-            raise Exception("No DigitalOcean API token provided")
-        client = DigitalOceanClient(token=api_key)  
-        self.client = client
-    
-    def main(self):
-        if ssh_key_fingerprint == "":
-            raise Exception("SSH_KEY_FINGERPRINT not set")
-        resp = self.get_ssh_key_id(ssh_key_fingerprint)
-        print("SSH Key ID is {0}".format(resp["ssh_key"]["id"]))
-
-
-    def get_ssh_key_id(self, ssh_key_fingerprint):
-        print("GETting ssh key with fingerprint {0}...".format(ssh_key_fingerprint))
-        try: 
-            ssh_key_resp = self.client.ssh_keys.get(ssh_key_identifier=ssh_key_fingerprint)
-            return ssh_key_resp
-        except HttpResponseError as err:
-            self.throw("Error: {0} {1}: {2}".format(err.status_code, err.reason, err.error.message))
-
-        raise Exception("no ssh key found")
-
-
-if __name__ == '__main__':
-    dc = SSHKeyIDGetter()
-    dc.main()
+ssh_keys_resp = client.ssh_keys.list()
+for k in ssh_keys_resp["ssh_keys"]:
+    print(f"ID: {k['id']}, NAME: {k['name']}, FINGERPRINT: {k['fingerprint']}")
 ```
 
 The above code snippet should output the following:
 ```
-GETting ssh key with fingerprint 12:34:5a:67:89:10:c1:1a:f1:12:fc:13:f1:14:9a:f5...
-SSH Key ID is 12345678
+ID: 123456, NAME: my_test_ssh_key, FINGERPRINT: 5c:74:7e:60:28:69:34:ca:dd:74:67:c3:f3:00:7f:fe
+ID: 123457, NAME: my_prod_ssh_key, FINGERPRINT: eb:76:c7:2a:d3:3e:80:5d:ef:2e:ca:86:d7:79:94:0d
 ```
 **Consult the full list of supported DigitalOcean API endpoints in [the DigitalOcean Python Client documentation]().**
 

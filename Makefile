@@ -34,8 +34,8 @@ generate: clean dev-dependencies
 		--use:@autorest/python@$(AUTOREST_PYTHON_VERSION) \
 		--input-file=$(SPEC_FILE)
 
-.PHONY: test-dependencies
-test-dependencies: ## Install test dependencies
+.PHONY: install
+install: ## Install test dependencies
 ifneq (, $(shell which poetry))
 	poetry install --no-interaction
 else
@@ -43,7 +43,7 @@ else
 endif
 
 .PHONY: lint-tests
-lint-tests: test-dependencies
+lint-tests: install
 	poetry run black --check tests/. && \
 	poetry run pylint ${PYLINT_ARGS} tests/.
 
@@ -51,12 +51,12 @@ lint-tests: test-dependencies
 ifdef TEST_PATTERN
 test-mocked: PYTEST_ARG=-k ${TEST_PATTERN}
 endif
-test-mocked: test-dependencies
+test-mocked: install
 	poetry run pytest -rA --tb=short tests/mocked/.
 
 .PHONY: test-mocked
 ifdef TEST_PATTERN
 test-integration: PYTEST_ARG=-k ${TEST_PATTERN}
 endif
-test-integration: test-dependencies
+test-integration: install
 	poetry run pytest -rA --tb=short tests/integration/. ${PYTEST_ARG}
