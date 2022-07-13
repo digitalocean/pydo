@@ -84,6 +84,21 @@ def with_test_droplet(client: DigitalOceanClient, **kwargs):
 
 
 @contextlib.contextmanager
+def with_test_tag(client: DigitalOceanClient, **kwargs):
+    """Context function to create a tag.
+
+    The tag is destroyed when the context ends.
+    """
+    create_resp = client.tags.create(kwargs)
+    id = create_resp["tag"]["name"] or ""
+    assert id != ""
+    try:
+        yield create_resp
+    finally:
+        client.tags.delete(tag_id=id)
+
+
+@contextlib.contextmanager
 def with_test_volume(client: DigitalOceanClient, **kwargs):
     """Context function to create a volume.
 
