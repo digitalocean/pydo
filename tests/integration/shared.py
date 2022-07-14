@@ -3,10 +3,12 @@ This shared module provides helpers for working with the API through the client.
 """
 import contextlib
 from time import sleep
+import secrets
 
 from azure.core.exceptions import HttpResponseError
 
 from digitalocean import DigitalOceanClient
+from tests.integration import defaults
 
 
 class IntegrationTestError(Exception):
@@ -67,20 +69,26 @@ def wait_for_kubernetes_cluster_create(
 
 
 @contextlib.contextmanager
-def with_test_droplet(client: DigitalOceanClient, **kwargs):
-    """Context function to create a droplet.
+def with_test_droplet(client: DigitalOceanClient, public_key: bytes, **kwargs):
+    """Context function to create a Droplet with an SSH key.
+
+    It is not necessary to provide "ssh_keys" the request body. A key is
+    generated, uploaded to the account, and added to the request.
 
     Droplet (and associated resources) is destroyed when the context ends.
     """
-    create_resp = client.droplets.create(kwargs)
-    droplet_id = create_resp["droplet"]["id"] or ""
-    assert droplet_id != ""
-    try:
-        yield create_resp
-    finally:
-        client.droplets.destroy_with_associated_resources_dangerous(
-            droplet_id, x_dangerous=True
-        )
+    with with_ssh_key(client, public_key) as key:
+        kwargs.update({"ssh_keys": [key]})
+
+        create_resp = client.droplets.create(kwargs)
+        droplet_id = create_resp["droplet"]["id"] or ""
+        assert droplet_id != ""
+        try:
+            yield create_resp
+        finally:
+            client.droplets.destroy_with_associated_resources_dangerous(
+                droplet_id, x_dangerous=True
+            )
 
 
 @contextlib.contextmanager
@@ -90,12 +98,12 @@ def with_test_tag(client: DigitalOceanClient, **kwargs):
     The tag is destroyed when the context ends.
     """
     create_resp = client.tags.create(kwargs)
-    id = create_resp["tag"]["name"] or ""
-    assert id != ""
+    tag_id = create_resp["tag"]["name"] or ""
+    assert tag_id != ""
     try:
         yield create_resp
     finally:
-        client.tags.delete(tag_id=id)
+        client.tags.delete(tag_id=tag_id)
 
 
 @contextlib.contextmanager
@@ -126,3 +134,23 @@ def with_test_kubernetes_cluster(client: DigitalOceanClient, **kwargs):
         yield create_resp
     finally:
         client.kubernetes.delete_cluster(kubernetes_cluster)
+
+
+@contextlib.contextmanager
+def with_ssh_key(client: DigitalOceanClient, public_key) -> str:
+    """Handles creating an ssh_key on the live account.
+
+    Yields the fingerprint of the key.
+    """
+    req = {
+        "name": f"{defaults.PREFIX}-{secrets.token_hex(4)}",
+        "public_key": public_key.decode(),
+    }
+
+    resp = client.ssh_keys.create(req)
+    fingerprint = resp["ssh_key"]["fingerprint"]
+
+    try:
+        yield fingerprint
+    finally:
+        client.ssh_keys.delete(fingerprint)
