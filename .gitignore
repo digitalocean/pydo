@@ -21,3 +21,4 @@ DigitalOcean-public.v2.yaml
 node_modules/
 tests/__init__.py
 tests/*/__init__.py
+testscript.py
