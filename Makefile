@@ -56,3 +56,11 @@ test-mocked: install
 .PHONY: test-mocked
 test-integration: install
 	poetry run pytest -rA --tb=short tests/integration/. $(PYTEST_ARGS)
+
+.PHONY: test-lint
+test-lint:
+ifneq (, $(shell which black))
+	black tests/
+else
+	@(echo "black is not installed. install black by running `pip3 install black`"; exit 1)
+endif
