@@ -11,9 +11,9 @@ def test_create_record(mock_client: DigitalOceanClient, mock_client_url):
 
     responses.add(
         responses.POST,
-        f"{mock_client_url}/V2/domains",
+        f"{mock_client_url}/v2/domains",
         json=expected,
-        status=202,
+        status=201,
     )
 
     create_resp = mock_client.domains.create({"name": "clienttest.com"})
