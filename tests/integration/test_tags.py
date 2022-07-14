@@ -1,3 +1,5 @@
+# pylint: disable=duplicate-code
+
 """ test_tags.py
     Integration tests for tags.
 """
