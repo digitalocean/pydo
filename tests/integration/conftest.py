@@ -8,11 +8,12 @@ from cryptography.hazmat.backends import default_backend as crypto_default_backe
 from cryptography.hazmat.primitives import serialization as crypto_serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
-from digitalocean import DigitalOceanClient
+from tests.integration import defaults
+from digitalocean import Client
 
 
 @pytest.fixture(scope="session")
-def integration_client() -> DigitalOceanClient:
+def integration_client() -> Client:
     """Instantiates a DigitalOceanClient for use with integration tests.
 
     The client requires the environment variable DO_TOKEN with a valid API
@@ -26,7 +27,7 @@ def integration_client() -> DigitalOceanClient:
     if token is None:
         pytest.fail("Expected environment variable DO_TOKEN")
 
-    client = DigitalOceanClient(token)
+    client = Client(token)
     return client
 
 

@@ -7,14 +7,14 @@ import logging
 import re
 
 import responses
-from digitalocean import DigitalOceanClient
+from digitalocean import Client
 
 # pylint: disable=missing-function-docstring
 
 
 def test_custom_headers():
     custom_headers = {"x-request-id": "fakeid"}
-    client = DigitalOceanClient("", headers=custom_headers)
+    client = Client("", headers=custom_headers)
 
     # pylint: disable=protected-access
     assert client._client._config.headers_policy.headers == custom_headers
@@ -22,7 +22,7 @@ def test_custom_headers():
 
 def test_custom_timeout():
     timeout = 300
-    client = DigitalOceanClient("", timeout=timeout)
+    client = Client("", timeout=timeout)
 
     # pylint: disable=protected-access
     assert client._client._config.retry_policy.timeout == timeout
@@ -30,7 +30,7 @@ def test_custom_timeout():
 
 def test_custom_endpoint():
     endpoint = "https://fake.local"
-    client = DigitalOceanClient("", endpoint=endpoint)
+    client = Client("", endpoint=endpoint)
 
     # pylint: disable=protected-access
     assert client._client._base_url == endpoint
@@ -39,7 +39,7 @@ def test_custom_endpoint():
 def test_custom_logger():
     name = "mockedtests"
     logger = logging.getLogger(name)
-    client = DigitalOceanClient("", logger=logger)
+    client = Client("", logger=logger)
 
     # pylint: disable=protected-access
     assert client._client._config.http_logging_policy.logger.name == name
@@ -49,7 +49,7 @@ def test_custom_logger():
 def test_custom_user_agent():
     user_agent = "test"
     fake_endpoint = "https://fake.local"
-    client = DigitalOceanClient(
+    client = Client(
         "",
         endpoint=fake_endpoint,
         user_agent=user_agent,

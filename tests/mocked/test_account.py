@@ -1,11 +1,11 @@
 """Mock tests for the account API resource."""
 import responses
 
-from digitalocean import DigitalOceanClient
+from digitalocean import Client
 
 
 @responses.activate
-def test_get(mock_client: DigitalOceanClient, mock_client_url):
+def test_get(mock_client: Client, mock_client_url):
     """Mocks the account get operation."""
     expected = {
         "account": {

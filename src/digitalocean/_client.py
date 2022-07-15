@@ -10,7 +10,7 @@ from typing import Any, TYPE_CHECKING
 from azure.core import PipelineClient
 from azure.core.rest import HttpRequest, HttpResponse
 
-from ._configuration import GeneratedConfiguration
+from ._configuration import GeneratedClientConfiguration
 from ._serialization import Deserializer, Serializer
 from .operations import (
     AccountOperations,
@@ -56,7 +56,7 @@ if TYPE_CHECKING:
     from azure.core.credentials import TokenCredential
 
 
-class Generated:  # pylint: disable=client-accepts-api-version-keyword,too-many-instance-attributes
+class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too-many-instance-attributes
     """Introduction
     ============
 
@@ -608,7 +608,7 @@ class Generated:  # pylint: disable=client-accepts-api-version-keyword,too-many-
     def __init__(
         self, credential: "TokenCredential", *, endpoint: str = "https://api.digitalocean.com", **kwargs: Any
     ) -> None:
-        self._config = GeneratedConfiguration(credential=credential, **kwargs)
+        self._config = GeneratedClientConfiguration(credential=credential, **kwargs)
         self._client = PipelineClient(base_url=endpoint, config=self._config, **kwargs)
 
         self._serialize = Serializer()
@@ -682,7 +682,7 @@ class Generated:  # pylint: disable=client-accepts-api-version-keyword,too-many-
         self._client.close()
 
     def __enter__(self):
-        # type: () -> Generated
+        # type: () -> GeneratedClient
         self._client.__enter__()
         return self
 
