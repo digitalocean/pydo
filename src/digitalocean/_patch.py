@@ -12,7 +12,7 @@ from azure.core.credentials import AccessToken
 from azure.core.pipeline.policies import HttpLoggingPolicy
 
 from digitalocean.custom_policies import CustomHttpLoggingPolicy
-from digitalocean import Generated
+from digitalocean import GeneratedClient
 
 if TYPE_CHECKING:
     # pylint: disable=unused-import,ungrouped-imports
