@@ -17,11 +17,11 @@ def test_list_tags(mock_client: DigitalOceanClient, mock_client_url):
                     "last_tagged_uri": "https://api.digitalocean.com/v2/droplets/123",
                     "droplets": {
                         "count": 2,
-                        "last_tagged_uri": "https://api.digitalocean.com/v2/droplets/123",
+                        "last_tagged_uri": "https://api.digitalocean.com/v2/droplets/123",  # pylint: disable=line-too-long
                     },
                     "images": {
                         "count": 1,
-                        "last_tagged_uri": "https://api.digitalocean.com/v2/images/1234",
+                        "last_tagged_uri": "https://api.digitalocean.com/v2/images/1234",  # pylint: disable=line-too-long
                     },
                     "volumes": {"count": 0},
                     "volume_snapshots": {"count": 0},
@@ -62,11 +62,11 @@ def test_list_tags_pagination(mock_client: DigitalOceanClient, mock_client_url):
                     "last_tagged_uri": "https://api.digitalocean.com/v2/droplets/123",
                     "droplets": {
                         "count": 2,
-                        "last_tagged_uri": "https://api.digitalocean.com/v2/droplets/123",
+                        "last_tagged_uri": "https://api.digitalocean.com/v2/droplets/123",  # pylint: disable=line-too-long
                     },
                     "images": {
                         "count": 1,
-                        "last_tagged_uri": "https://api.digitalocean.com/v2/images/1234",
+                        "last_tagged_uri": "https://api.digitalocean.com/v2/images/1234",  # pylint: disable=line-too-long
                     },
                     "volumes": {"count": 0},
                     "volume_snapshots": {"count": 0},

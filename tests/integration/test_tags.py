@@ -1,3 +1,5 @@
+# pylint: disable=duplicate-code
+
 """ test_tags.py
     Integration tests for tags.
 """
@@ -8,7 +10,7 @@ from tests.integration import defaults, shared
 from digitalocean import DigitalOceanClient
 
 
-def test_tag_droplet(integration_client: DigitalOceanClient, ssh_key):
+def test_tag_droplet(integration_client: DigitalOceanClient, public_key: bytes):
     """Tests tagging a Droplet.
 
     First,  it creates a tag.
@@ -31,10 +33,11 @@ def test_tag_droplet(integration_client: DigitalOceanClient, ssh_key):
             "region": defaults.REGION,
             "size": defaults.DROPLET_SIZE,
             "image": defaults.DROPLET_IMAGE,
-            "ssh_keys": [ssh_key],
         }
 
-        with shared.with_test_droplet(integration_client, **droplet_req) as droplet:
+        with shared.with_test_droplet(
+            integration_client, public_key, **droplet_req
+        ) as droplet:
             shared.wait_for_action(
                 integration_client, droplet["links"]["actions"][0]["id"]
             )
