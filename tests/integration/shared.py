@@ -6,14 +6,14 @@ from time import sleep
 
 from azure.core.exceptions import HttpResponseError
 
-from digitalocean import DigitalOceanClient
+from digitalocean import Client
 
 
 class IntegrationTestError(Exception):
     """Integration test exception"""
 
 
-def wait_for_action(client: DigitalOceanClient, action_id: int, wait_seconds: int = 5):
+def wait_for_action(client: Client, action_id: int, wait_seconds: int = 5):
     """Helper function to poll for an action to complete."""
 
     # TODO: look into implement polling
@@ -41,7 +41,7 @@ def wait_for_action(client: DigitalOceanClient, action_id: int, wait_seconds: in
 
 
 def wait_for_kubernetes_cluster_create(
-    client: DigitalOceanClient, cluster_id: str, wait_seconds: int = 15
+    client: Client, cluster_id: str, wait_seconds: int = 15
 ):
     """Helper function to poll for a kubernetes cluster to be provisioned."""
 
@@ -67,7 +67,7 @@ def wait_for_kubernetes_cluster_create(
 
 
 @contextlib.contextmanager
-def with_test_droplet(client: DigitalOceanClient, **kwargs):
+def with_test_droplet(client: Client, **kwargs):
     """Context function to create a droplet.
 
     Droplet (and associated resources) is destroyed when the context ends.
@@ -84,7 +84,7 @@ def with_test_droplet(client: DigitalOceanClient, **kwargs):
 
 
 @contextlib.contextmanager
-def with_test_tag(client: DigitalOceanClient, **kwargs):
+def with_test_tag(client: Client, **kwargs):
     """Context function to create a tag.
 
     The tag is destroyed when the context ends.
@@ -99,7 +99,7 @@ def with_test_tag(client: DigitalOceanClient, **kwargs):
 
 
 @contextlib.contextmanager
-def with_test_volume(client: DigitalOceanClient, **kwargs):
+def with_test_volume(client: Client, **kwargs):
     """Context function to create a volume.
 
     Volume id deleted when the context ends.
@@ -114,7 +114,7 @@ def with_test_volume(client: DigitalOceanClient, **kwargs):
 
 
 @contextlib.contextmanager
-def with_test_kubernetes_cluster(client: DigitalOceanClient, **kwargs):
+def with_test_kubernetes_cluster(client: Client, **kwargs):
     """Context function that creates a kubernetes cluster.
 
     The cluster is deleted once the context ends.

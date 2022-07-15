@@ -16,8 +16,8 @@ if TYPE_CHECKING:
     from azure.core.credentials_async import AsyncTokenCredential
 
 
-class GeneratedConfiguration(Configuration):  # pylint: disable=too-many-instance-attributes
-    """Configuration for Generated.
+class GeneratedClientConfiguration(Configuration):  # pylint: disable=too-many-instance-attributes
+    """Configuration for GeneratedClient.
 
     Note that all parameters used to create this instance are saved as instance
     attributes.
@@ -27,13 +27,13 @@ class GeneratedConfiguration(Configuration):  # pylint: disable=too-many-instanc
     """
 
     def __init__(self, credential: "AsyncTokenCredential", **kwargs: Any) -> None:
-        super(GeneratedConfiguration, self).__init__(**kwargs)
+        super(GeneratedClientConfiguration, self).__init__(**kwargs)
         if credential is None:
             raise ValueError("Parameter 'credential' must not be None.")
 
         self.credential = credential
         self.credential_scopes = kwargs.pop("credential_scopes", ["https://api.digitalocean.com"])
-        kwargs.setdefault("sdk_moniker", "generated/{}".format(VERSION))
+        kwargs.setdefault("sdk_moniker", "generatedclient/{}".format(VERSION))
         self._configure(**kwargs)
 
     def _configure(self, **kwargs: Any) -> None:

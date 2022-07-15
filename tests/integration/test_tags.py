@@ -5,10 +5,10 @@
 import uuid
 
 from tests.integration import defaults, shared
-from digitalocean import DigitalOceanClient
+from digitalocean import Client
 
 
-def test_tag_droplet(integration_client: DigitalOceanClient, ssh_key):
+def test_tag_droplet(integration_client: Client, ssh_key):
     """Tests tagging a Droplet.
 
     First,  it creates a tag.

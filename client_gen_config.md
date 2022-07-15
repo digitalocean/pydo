@@ -8,7 +8,7 @@ black: true
 output-folder: src/
 verbose: true
 version-tolerant: true
-override-client-name: Generated
+override-client-name: GeneratedClient
 
 add-credential: true
 credential-default-policy-type: BearerTokenCredentialPolicy
