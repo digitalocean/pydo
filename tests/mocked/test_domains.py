@@ -26,14 +26,16 @@ def test_create(mock_client: DigitalOceanClient, mock_client_url):
 def test_get(mock_client: DigitalOceanClient, mock_client_url):
     """Test Record Get by Name"""
     expected = {
-        "name": "clienttest.com",
-        "ttl": 1800,
-        "zone_file": """$ORIGIN clienttest.com.\n$TTL 1800\nclienttest.com. \
+        "domain": {
+            "name": "clienttest.com",
+            "ttl": 1800,
+            "zone_file": """$ORIGIN clienttest.com.\n$TTL 1800\nclienttest.com. \
             IN SOA ns1.digitalocean.com. \
             hostmaster.clienttest.com. 1657812556 10800 3600 604800 1800\nclienttest.com. \
             1800 IN NS ns1.digitalocean.com. \
             \nclienttest.com. 1800 IN NS ns2.digitalocean.com.\nclienttest.com. \
             1800 IN NS ns3.digitalocean.com.\n""",
+        }
     }
 
     responses.add(
@@ -52,16 +54,18 @@ def test_get(mock_client: DigitalOceanClient, mock_client_url):
 def test_list(mock_client: DigitalOceanClient, mock_client_url):
     """Test Record List"""
     expected = {
-        "domains": {
-            "name": "clienttest.com",
-            "ttl": 1800,
-            "zone_file": """$ORIGIN clienttest.com.\n$TTL 1800\nclienttest.com. \
+        "domains": [
+            {
+                "name": "clienttest.com",
+                "ttl": 1800,
+                "zone_file": """$ORIGIN clienttest.com.\n$TTL 1800\nclienttest.com. \
                 IN SOA ns1.digitalocean.com. \
                 hostmaster.clienttest.com. 1657812556 10800 3600 604800 1800\nclienttest.com. \
                 1800 IN NS ns1.digitalocean.com. \
                 \nclienttest.com. 1800 IN NS ns2.digitalocean.com.\nclienttest.com. \
                 1800 IN NS ns3.digitalocean.com.\n""",
-        },
+            },
+        ],
         "links": {},
         "meta": {"total": 1},
     }

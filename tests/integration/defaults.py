@@ -5,7 +5,7 @@ Overwrite default values with environment variables.
 
 from os import environ
 
-PREFIX = "cgtest"
+PREFIX = "IntegrationTest"
 
 # CUSTOMIZABLE
 DROPLET_SIZE = environ.get("DO_DROPLET_SIZE") or "s-1vcpu-1gb"
