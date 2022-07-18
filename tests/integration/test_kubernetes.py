@@ -6,10 +6,10 @@ import uuid
 
 from tests.integration import defaults
 from tests.integration import shared
-from digitalocean import DigitalOceanClient
+from digitalocean import GeneratedClient
 
 
-def test_create_cluster(integration_client: DigitalOceanClient):
+def test_create_cluster(integration_client: GeneratedClient):
     """Tests creating a kubernetes cluster
 
     Waits for the cluster state to be `running`.

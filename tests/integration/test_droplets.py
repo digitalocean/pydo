@@ -6,11 +6,11 @@ import uuid
 
 from tests.integration import defaults
 from tests.integration import shared
-from digitalocean import DigitalOceanClient
+from digitalocean import GeneratedClient
 
 
 def test_droplet_attach_volume(
-    integration_client: DigitalOceanClient, public_key: bytes
+    integration_client: GeneratedClient, public_key: bytes
 ):
     """Tests attaching a volume to a droplet.
 

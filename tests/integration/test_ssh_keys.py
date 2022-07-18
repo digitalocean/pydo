@@ -3,10 +3,10 @@
 """
 
 from tests.integration import shared
-from digitalocean import DigitalOceanClient
+from digitalocean import GeneratedClient
 
 
-def test_ssh_keys(integration_client: DigitalOceanClient, public_key):
+def test_ssh_keys(integration_client: GeneratedClient, public_key):
     """Tests creating and modifying SSH keys on a live account.
 
     First, it creates a key using the shared with_ssh_key contextmanager.
