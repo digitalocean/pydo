@@ -2,11 +2,11 @@
 import responses
 from responses import matchers
 
-from digitalocean import GeneratedClient
+from digitalocean import Client
 
 
 @responses.activate
-def test_list_tags(mock_client: GeneratedClient, mock_client_url):
+def test_list_tags(mock_client: Client, mock_client_url):
     """Mocks the tags list operation."""
     expected = {
         "tags": [
@@ -51,7 +51,7 @@ def test_list_tags(mock_client: GeneratedClient, mock_client_url):
 
 
 @responses.activate
-def test_list_tags_pagination(mock_client: GeneratedClient, mock_client_url):
+def test_list_tags_pagination(mock_client: Client, mock_client_url):
     """Mocks the tags list operation."""
     expected = {
         "tags": [
@@ -107,7 +107,7 @@ def test_list_tags_pagination(mock_client: GeneratedClient, mock_client_url):
 
 
 @responses.activate
-def test_get_tag(mock_client: GeneratedClient, mock_client_url):
+def test_get_tag(mock_client: Client, mock_client_url):
     """Mocks the tags get operation."""
     expected = {
         "tag": {
@@ -136,7 +136,7 @@ def test_get_tag(mock_client: GeneratedClient, mock_client_url):
 
 
 @responses.activate
-def test_create_tag(mock_client: GeneratedClient, mock_client_url):
+def test_create_tag(mock_client: Client, mock_client_url):
     """Mocks the tags create operation."""
     expected = {
         "tag": {
@@ -164,7 +164,7 @@ def test_create_tag(mock_client: GeneratedClient, mock_client_url):
 
 
 @responses.activate
-def test_delete_tag(mock_client: GeneratedClient, mock_client_url):
+def test_delete_tag(mock_client: Client, mock_client_url):
     """Mocks the tags delete operation."""
     responses.add(
         responses.DELETE,
@@ -176,7 +176,7 @@ def test_delete_tag(mock_client: GeneratedClient, mock_client_url):
 
 
 @responses.activate
-def test_assign_resources(mock_client: GeneratedClient, mock_client_url):
+def test_assign_resources(mock_client: Client, mock_client_url):
     """Mocks the tags assign resources operation."""
 
     responses.add(
@@ -197,7 +197,7 @@ def test_assign_resources(mock_client: GeneratedClient, mock_client_url):
 
 
 @responses.activate
-def test_unassign_resources(mock_client: GeneratedClient, mock_client_url):
+def test_unassign_resources(mock_client: Client, mock_client_url):
     """Mocks the tags unassign resources operation."""
 
     responses.add(

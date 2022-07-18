@@ -1,11 +1,11 @@
 """Mock tests for the droplets API resource."""
 import responses
 
-from digitalocean import GeneratedClient
+from digitalocean import Client
 
 
 @responses.activate
-def test_list(mock_client: GeneratedClient, mock_client_url):
+def test_list(mock_client: Client, mock_client_url):
     """Mocks the droplets list operation."""
     expected = {
         "droplets": [
@@ -152,7 +152,7 @@ def test_list(mock_client: GeneratedClient, mock_client_url):
 
 
 @responses.activate
-def test_create(mock_client: GeneratedClient, mock_client_url):
+def test_create(mock_client: Client, mock_client_url):
     """Mocks the droplets create operation."""
     expected = {
         "droplet": {
@@ -295,7 +295,7 @@ def test_create(mock_client: GeneratedClient, mock_client_url):
 
 
 @responses.activate
-def test_get(mock_client: GeneratedClient, mock_client_url):
+def test_get(mock_client: Client, mock_client_url):
     """Mocks the droplets get operation."""
     expected = {
         "droplet": {
@@ -438,7 +438,7 @@ def test_get(mock_client: GeneratedClient, mock_client_url):
 
 
 @responses.activate
-def test_delete(mock_client: GeneratedClient, mock_client_url):
+def test_delete(mock_client: Client, mock_client_url):
     """Mocks the droplets delete operation."""
 
     responses.add(
