@@ -31,7 +31,7 @@ class TokenCredentials:
         return AccessToken(self._token, expires_on=self._expires_on)
 
 
-class DigitalOceanClient(DigitalOceanClientGenerated):  # type: ignore
+class Client(GeneratedClient):  # type: ignore
     """The official DigitalOceanClient
 
     :param token: A valid API token.
@@ -48,7 +48,7 @@ class DigitalOceanClient(DigitalOceanClientGenerated):  # type: ignore
 
 
 # Add all objects you want publicly available to users at this package level
-__all__ = ["DigitalOceanClient"]  # type: List[str]
+__all__ = ["Client"]  # type: List[str]
 
 
 def patch_sdk():

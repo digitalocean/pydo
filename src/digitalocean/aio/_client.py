@@ -11,7 +11,7 @@ from azure.core import AsyncPipelineClient
 from azure.core.rest import AsyncHttpResponse, HttpRequest
 
 from .._serialization import Deserializer, Serializer
-from ._configuration import DigitalOceanClientConfiguration
+from ._configuration import GeneratedClientConfiguration
 from .operations import (
     AccountOperations,
     ActionsOperations,
@@ -56,7 +56,7 @@ if TYPE_CHECKING:
     from azure.core.credentials_async import AsyncTokenCredential
 
 
-class DigitalOceanClient:  # pylint: disable=client-accepts-api-version-keyword,too-many-instance-attributes
+class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too-many-instance-attributes
     """Introduction
     ============
 
@@ -608,7 +608,7 @@ class DigitalOceanClient:  # pylint: disable=client-accepts-api-version-keyword,
     def __init__(
         self, credential: "AsyncTokenCredential", *, endpoint: str = "https://api.digitalocean.com", **kwargs: Any
     ) -> None:
-        self._config = DigitalOceanClientConfiguration(credential=credential, **kwargs)
+        self._config = GeneratedClientConfiguration(credential=credential, **kwargs)
         self._client = AsyncPipelineClient(base_url=endpoint, config=self._config, **kwargs)
 
         self._serialize = Serializer()
@@ -680,7 +680,7 @@ class DigitalOceanClient:  # pylint: disable=client-accepts-api-version-keyword,
     async def close(self) -> None:
         await self._client.close()
 
-    async def __aenter__(self) -> "DigitalOceanClient":
+    async def __aenter__(self) -> "GeneratedClient":
         await self._client.__aenter__()
         return self
 
