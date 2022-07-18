@@ -2,8 +2,7 @@
 """Pytest configuration for mocked tests."""
 import pytest
 
-from digitalocean import DigitalOceanClient
-
+from digitalocean import GeneratedClient
 
 @pytest.fixture(scope="module")
 def mock_client_url():
@@ -12,8 +11,8 @@ def mock_client_url():
 
 
 @pytest.fixture(scope="module")
-def mock_client(mock_client_url) -> DigitalOceanClient:
+def mock_client(mock_client_url) -> GeneratedClient:
     """Initializes a mock client
     The mock client doesn't use a valid token and has a fake API endpoint set.
     """
-    return DigitalOceanClient("", endpoint=mock_client_url)
+    return GeneratedClient("", endpoint=mock_client_url)
