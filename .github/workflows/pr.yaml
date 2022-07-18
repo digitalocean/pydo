@@ -1,0 +1,90 @@
+name: pr
+
+on:
+  pull_request:
+    paths-ignore:
+      - '*.md'
+      - 'archive/**'
+      - 'examples/**'
+      - '.gitignore'
+      - 'LICENSE'
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1.3.1
+        with:
+          version: 1.1.13
+          virtualenvs-path: .venv
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: false
+
+      - name: Restore poetry cache
+        if: success() && !env.ACT
+        uses: actions/cache@v3
+        with:
+          path: $(poetry config cache-dir)
+          key: ubuntu-latest-poetry-3.10-${{ hashFiles('**/pyproject.toml') }}
+
+      - name: Lint tests
+        run: make lint-tests
+        env:
+          # --disable=fixme: disables warnings for TODO comments
+          PYLINT_ARGS: "--disable=fixme"
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+
+    needs:
+      - lint
+
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version:
+          - "3.7"
+          - "3.8"
+          - "3.9"
+          - "3.10"
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1.3.1
+        with:
+          version: 1.1.13
+          virtualenvs-path: .venv
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: false
+
+      - name: Restore poetry cache
+        if: success() && !env.ACT
+        uses: actions/cache@v3
+        with:
+          path: $(poetry config cache-dir)
+          key: ubuntu-latest-poetry-${{ matrix.python-version }}-${{ hashFiles('**/pyproject.toml') }}
+
+      - name: Run mocked tests
+        run: make test-mocked

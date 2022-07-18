@@ -14,7 +14,7 @@ on the [DigitalOcean OpenAPI Specification](https://github.com/digitalocean/open
 # Getting Started With the Client
 ## Prerequisites
 
-* Python version: >= 3.9
+* Python version: >= 3.7.2
 
 ## Installation
 To install from pip:

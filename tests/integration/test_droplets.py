@@ -9,7 +9,9 @@ from tests.integration import shared
 from digitalocean import DigitalOceanClient
 
 
-def test_droplet_attach_volume(integration_client: DigitalOceanClient, ssh_key):
+def test_droplet_attach_volume(
+    integration_client: DigitalOceanClient, public_key: bytes
+):
     """Tests attaching a volume to a droplet.
 
     Creates a droplet and waits for its status to be `active`.
@@ -23,10 +25,11 @@ def test_droplet_attach_volume(integration_client: DigitalOceanClient, ssh_key):
         "region": defaults.REGION,
         "size": defaults.DROPLET_SIZE,
         "image": defaults.DROPLET_IMAGE,
-        "ssh_keys": [ssh_key],
     }
 
-    with shared.with_test_droplet(integration_client, **droplet_req) as droplet:
+    with shared.with_test_droplet(
+        integration_client, public_key, **droplet_req
+    ) as droplet:
         shared.wait_for_action(integration_client, droplet["links"]["actions"][0]["id"])
         droplet_get_resp = integration_client.droplets.get(droplet["droplet"]["id"])
         assert droplet_get_resp["droplet"]["status"] == "active"

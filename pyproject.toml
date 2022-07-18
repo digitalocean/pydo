@@ -6,7 +6,7 @@ authors = ["API Engineering <api-engineering@digitalocean.com>"]
 license = "Apache"
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.7.2"
 azure-core = ">=1.24.0"
 azure-identity = ">=1.5.0"
 isodate = ">=0.6.1"
