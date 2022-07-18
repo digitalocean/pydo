@@ -59,6 +59,8 @@ def test_custom_user_agent():
     full_user_agent_pattern = (
         r"^test azsdk-python-digitaloceanclient\/.+Python\/.+\(.+\)$"
     )
+    "azsdk-python-digitaloceanclient Python/3.9.12 (macOS-12.4-x86_64-i386-64bit)"
+
     # pylint: disable=protected-access
     got_user_agent = client._client._config.user_agent_policy.user_agent
     match = re.match(full_user_agent_pattern, got_user_agent)
