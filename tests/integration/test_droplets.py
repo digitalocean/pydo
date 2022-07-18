@@ -9,9 +9,7 @@ from tests.integration import shared
 from digitalocean import GeneratedClient
 
 
-def test_droplet_attach_volume(
-    integration_client: GeneratedClient, public_key: bytes
-):
+def test_droplet_attach_volume(integration_client: GeneratedClient, public_key: bytes):
     """Tests attaching a volume to a droplet.
 
     Creates a droplet and waits for its status to be `active`.
