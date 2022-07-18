@@ -4,6 +4,7 @@ import pytest
 
 from digitalocean import GeneratedClient
 
+
 @pytest.fixture(scope="module")
 def mock_client_url():
     """Returns a url used as the API endpoint for the mock client."""
