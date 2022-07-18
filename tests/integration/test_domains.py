@@ -2,7 +2,6 @@
     Integration Test for Domains
 """
 
-from turtle import update
 from tests.integration import defaults
 from tests.integration import shared
 from digitalocean import DigitalOceanClient

@@ -92,12 +92,12 @@ def with_test_droplet(client: DigitalOceanClient, public_key: bytes, **kwargs):
 
 
 @contextlib.contextmanager
-def with_test_domain(client: DigitalOceanClient, **kwargs):
+def with_test_domain(client: DigitalOceanClient, create_domain_req):
     """Context function to create a Domain.
 
     Domain is destroyed after context ends
     """
-    create_resp = client.domains.create(kwargs)
+    create_resp = client.domains.create(create_domain_req)
     domain_name = create_resp["domain"]["name"] or ""
     assert domain_name != ""
     try:
@@ -107,12 +107,12 @@ def with_test_domain(client: DigitalOceanClient, **kwargs):
 
 
 @contextlib.contextmanager
-def with_test_domain_record(client: DigitalOceanClient, name, **kwargs):
+def with_test_domain_record(client: DigitalOceanClient, name, create_record):
     """Context function to create a Domain Record.
 
     Record is destroyed after context ends
     """
-    create_resp = client.domains.create_record(name, kwargs)
+    create_resp = client.domains.create_record(name, create_record)
     record_id = create_resp["domain_record"]["id"] or 0
     assert record_id != 0
     try:
