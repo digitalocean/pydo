@@ -8,7 +8,7 @@ from digitalocean import DigitalOceanClient
 
 
 def test_domains_create_record(integration_client: DigitalOceanClient):
-    """Testing the creation of a Domain
+    """Testing the creation of a Domain.
     and creating a record from created domain.
     """
     name = f"{defaults.PREFIX}.com"
