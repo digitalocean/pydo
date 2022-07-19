@@ -47,7 +47,7 @@ def test_list_regions(mock_client: DigitalOceanClient, mock_client_url):
                 "next": "https://api.digitalocean.com/v2/regions?page=2&per_page=1",
             }
         },
-        "meta": {"total": 13},
+        "meta": {"total": 1},
     }
 
     responses.add(responses.GET, f"{mock_client_url}/v2/regions", json=expected)
