@@ -1,6 +1,6 @@
+# pylint: disable=duplicate-code
 """Mock tests for the Sizes API resource"""
 
-import json
 import responses
 
 from digitalocean import DigitalOceanClient

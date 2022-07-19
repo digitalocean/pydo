@@ -1,3 +1,4 @@
+# pylint: disable=duplicate-code
 """Mock tests for the Regions API resource"""
 
 import responses
