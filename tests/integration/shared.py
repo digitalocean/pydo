@@ -92,7 +92,7 @@ def with_test_droplet(client: Client, public_key: bytes, **kwargs):
 
 
 @contextlib.contextmanager
-def with_test_domain(client: DigitalOceanClient, create_domain):
+def with_test_domain(client: Client, create_domain):
     """Context function to create a Domain.
 
     Domain is destroyed after context ends
@@ -107,7 +107,7 @@ def with_test_domain(client: DigitalOceanClient, create_domain):
 
 
 @contextlib.contextmanager
-def with_test_domain_record(client: DigitalOceanClient, name, create_record):
+def with_test_domain_record(client: Client, name, create_record):
     """Context function to create a Domain Record.
 
     Record is destroyed after context ends
@@ -122,7 +122,7 @@ def with_test_domain_record(client: DigitalOceanClient, name, create_record):
 
 
 @contextlib.contextmanager
-def with_test_tag(client: DigitalOceanClient, **kwargs):
+def with_test_tag(client: Client, **kwargs):
     """Context function to create a tag.
 
     The tag is destroyed when the context ends.
