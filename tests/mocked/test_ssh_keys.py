@@ -2,11 +2,11 @@
 import responses
 from responses import matchers
 
-from digitalocean import GeneratedClient
+from digitalocean import Client
 
 
 @responses.activate
-def test_list_ssh_keys(mock_client: GeneratedClient, mock_client_url):
+def test_list_ssh_keys(mock_client: Client, mock_client_url):
     """Tests the SSH keys list operation."""
     expected = {
         "ssh_keys": [
@@ -34,7 +34,7 @@ def test_list_ssh_keys(mock_client: GeneratedClient, mock_client_url):
 
 
 @responses.activate
-def test_list_ssh_keys_pagination(mock_client: GeneratedClient, mock_client_url):
+def test_list_ssh_keys_pagination(mock_client: Client, mock_client_url):
     """Tests the SSH keys list operation."""
     expected = {
         "ssh_keys": [
@@ -73,7 +73,7 @@ def test_list_ssh_keys_pagination(mock_client: GeneratedClient, mock_client_url)
 
 
 @responses.activate
-def test_get_ssh_keys(mock_client: GeneratedClient, mock_client_url):
+def test_get_ssh_keys(mock_client: Client, mock_client_url):
     """Tests the SSH keys get operation."""
     expected = {
         "ssh_key": {
@@ -95,7 +95,7 @@ def test_get_ssh_keys(mock_client: GeneratedClient, mock_client_url):
 
 
 @responses.activate
-def test_create_ssh_keys(mock_client: GeneratedClient, mock_client_url):
+def test_create_ssh_keys(mock_client: Client, mock_client_url):
     """Tests the SSH keys create operation."""
     expected = {
         "ssh_key": {
@@ -117,7 +117,7 @@ def test_create_ssh_keys(mock_client: GeneratedClient, mock_client_url):
 
 
 @responses.activate
-def test_update_ssh_keys(mock_client: GeneratedClient, mock_client_url):
+def test_update_ssh_keys(mock_client: Client, mock_client_url):
     """Tests the SSH keys create operation."""
     expected = {
         "ssh_key": {
@@ -139,7 +139,7 @@ def test_update_ssh_keys(mock_client: GeneratedClient, mock_client_url):
 
 
 @responses.activate
-def test_delete_ssh_keys(mock_client: GeneratedClient, mock_client_url):
+def test_delete_ssh_keys(mock_client: Client, mock_client_url):
     """Tests the SSH keys delete operation."""
     responses.add(
         responses.DELETE,
@@ -151,7 +151,7 @@ def test_delete_ssh_keys(mock_client: GeneratedClient, mock_client_url):
 
 
 @responses.activate
-def test_ssh_keys_error_response(mock_client: GeneratedClient, mock_client_url):
+def test_ssh_keys_error_response(mock_client: Client, mock_client_url):
     """Tests the SSH keys error response."""
     expected = {
         "id": "not_found",
