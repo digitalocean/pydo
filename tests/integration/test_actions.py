@@ -16,7 +16,7 @@ def test_actions(integration_client: DigitalOceanClient):
 
     action_id = list_resp["actions"][0]["id"] or 0
 
-    assert action_id is not 0
+    assert action_id != 0
 
     get_resp = integration_client.actions.get(action_id)
 

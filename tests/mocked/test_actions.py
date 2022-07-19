@@ -1,5 +1,4 @@
 """Mock tests for the actions API resource"""
-import json
 import responses
 
 from digitalocean import DigitalOceanClient
@@ -47,6 +46,13 @@ def test_get(mock_client: DigitalOceanClient, mock_client_url):
             "region": {},
             "region_slug": "string",
         },
+        "links": {
+            "pages": {
+                "first": "https://api.digitalocean.com/v2/account/keys?page=1",
+                "prev": "https://api.digitalocean.com/v2/account/keys?page=2",
+            }
+        },
+        "meta": {"total": 1},
     }
 
     responses.add(
