@@ -10,4 +10,4 @@ def test_regions(integration_client: DigitalOceanClient):
 
     list_resp = integration_client.regions.list()
 
-    assert list_resp is not None
+    assert list_resp >= 13
