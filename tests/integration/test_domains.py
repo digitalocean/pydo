@@ -2,6 +2,8 @@
     Integration Test for Domains
 """
 
+import uuid
+
 from tests.integration import defaults
 from tests.integration import shared
 from digitalocean import DigitalOceanClient
@@ -11,7 +13,7 @@ def test_domains_create_record(integration_client: DigitalOceanClient):
     """Testing the creation of a Domain.
     and creating a record from created domain.
     """
-    name = f"{defaults.PREFIX}.com"
+    name = f"{defaults.PREFIX}{uuid.uuid4()}.com"
     create_domain = {"name": name}
 
     with shared.with_test_domain(integration_client, create_domain) as domain:
