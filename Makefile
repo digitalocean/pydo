@@ -56,3 +56,9 @@ test-mocked: install
 .PHONY: test-mocked
 test-integration: install
 	poetry run pytest -rA --tb=short tests/integration/. $(PYTEST_ARGS)
+
+# This command runs a single integration test
+# > make test-integration-single test=test_actions
+.PHONY: test-mocked
+test-integration-single: install
+	poetry run pytest -rA --tb=short tests/integration/. -k $(test) 
