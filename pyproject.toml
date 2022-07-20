@@ -25,3 +25,6 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.pylint]
 max-line-length=88 # matches black's default
+
+[tool.pylint.messages_control]
+disable = "no-name-in-module"

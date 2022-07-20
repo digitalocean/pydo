@@ -606,7 +606,11 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     """
 
     def __init__(
-        self, credential: "TokenCredential", *, endpoint: str = "https://api.digitalocean.com", **kwargs: Any
+        self,
+        credential: "TokenCredential",
+        *,
+        endpoint: str = "https://api.digitalocean.com",
+        **kwargs: Any
     ) -> None:
         self._config = GeneratedClientConfiguration(credential=credential, **kwargs)
         self._client = PipelineClient(base_url=endpoint, config=self._config, **kwargs)
@@ -614,46 +618,108 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
         self._serialize = Serializer()
         self._deserialize = Deserializer()
         self._serialize.client_side_validation = False
-        self.one_clicks = OneClicksOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.account = AccountOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.ssh_keys = SshKeysOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.actions = ActionsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.apps = AppsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.cdn = CdnOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.certificates = CertificatesOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.balance = BalanceOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.billing_history = BillingHistoryOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.invoices = InvoicesOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.databases = DatabasesOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.domains = DomainsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.droplets = DropletsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.droplet_actions = DropletActionsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.firewalls = FirewallsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.floating_ips = FloatingIPsOperations(self._client, self._config, self._serialize, self._deserialize)
+        self.one_clicks = OneClicksOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.account = AccountOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.ssh_keys = SshKeysOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.actions = ActionsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.apps = AppsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.cdn = CdnOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.certificates = CertificatesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.balance = BalanceOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.billing_history = BillingHistoryOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.invoices = InvoicesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.databases = DatabasesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.domains = DomainsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.droplets = DropletsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.droplet_actions = DropletActionsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.firewalls = FirewallsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.floating_ips = FloatingIPsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
         self.floating_ips_action = FloatingIPsActionOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
-        self.images = ImagesOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.image_actions = ImageActionsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.kubernetes = KubernetesOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.load_balancers = LoadBalancersOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.monitoring = MonitoringOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.projects = ProjectsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.regions = RegionsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.registry = RegistryOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.reserved_ips = ReservedIPsOperations(self._client, self._config, self._serialize, self._deserialize)
+        self.images = ImagesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.image_actions = ImageActionsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.kubernetes = KubernetesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.load_balancers = LoadBalancersOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.monitoring = MonitoringOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.projects = ProjectsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.regions = RegionsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.registry = RegistryOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.reserved_ips = ReservedIPsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
         self.reserved_ips_actions = ReservedIPsActionsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
-        self.sizes = SizesOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.snapshots = SnapshotsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.tags = TagsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.volumes = VolumesOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.volume_actions = VolumeActionsOperations(self._client, self._config, self._serialize, self._deserialize)
+        self.sizes = SizesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.snapshots = SnapshotsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.tags = TagsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.volumes = VolumesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.volume_actions = VolumeActionsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
         self.volume_snapshots = VolumeSnapshotsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
-        self.vpcs = VpcsOperations(self._client, self._config, self._serialize, self._deserialize)
+        self.vpcs = VpcsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
 
     def send_request(self, request: HttpRequest, **kwargs: Any) -> HttpResponse:
         """Runs the network request through the client's chained policies.

@@ -10,8 +10,10 @@ from digitalocean import DigitalOceanClient
 
 REGION = "nyc3"
 
+
 class DigitalOceanError(Exception):
     pass
+
 
 class DropletCreator:
     def __init__(self, *args, **kwargs):
@@ -34,7 +36,7 @@ class DropletCreator:
             "region": REGION,
             "size": "s-1vcpu-1gb",
             "image": "ubuntu-22-04-x64",
-            "ssh_keys": [ssh_key['fingerprint']]
+            "ssh_keys": [ssh_key["fingerprint"]],
         }
         droplet = self.create_droplet(droplet_req)
 
@@ -47,16 +49,21 @@ class DropletCreator:
         }
         volume = self.create_volume(volume_req)
 
-        print("Attaching volume {0} to Droplet {1}...".format(volume['id'], droplet['id']))
-        attach_req = {
-            "type": "attach",
-            "droplet_id": droplet['id']
-        }
+        print(
+            "Attaching volume {0} to Droplet {1}...".format(volume["id"], droplet["id"])
+        )
+        attach_req = {"type": "attach", "droplet_id": droplet["id"]}
         try:
-            action_resp = self.client.volume_actions.post_by_id(volume['id'], attach_req)
-            self.wait_for_action(action_resp['action']['id'])
+            action_resp = self.client.volume_actions.post_by_id(
+                volume["id"], attach_req
+            )
+            self.wait_for_action(action_resp["action"]["id"])
         except HttpResponseError as err:
-            self.throw("Error: {0} {1}: {2}".format(err.status_code, err.reason, err.error.message))
+            self.throw(
+                "Error: {0} {1}: {2}".format(
+                    err.status_code, err.reason, err.error.message
+                )
+            )
 
         print("Done!")
 
@@ -68,18 +75,26 @@ class DropletCreator:
             self.wait_for_action(resp["links"]["actions"][0]["id"])
 
             get_resp = self.client.droplets.get(droplet_id)
-            droplet = get_resp['droplet']
-            ip_address = ''
+            droplet = get_resp["droplet"]
+            ip_address = ""
             # Would be nice if we could surface the IP address somehow.
             # For example godo has the PublicIPv4 method:
             # https://github.com/digitalocean/godo/blob/a084002940af6a9b818e3c8fb31a4920356fbb75/droplets.go#L66-L79
-            for net in droplet['networks']['v4']:
-                if net['type'] == 'public':
-                    ip_address = net['ip_address']
+            for net in droplet["networks"]["v4"]:
+                if net["type"] == "public":
+                    ip_address = net["ip_address"]
         except HttpResponseError as err:
-            self.throw("Error: {0} {1}: {2}".format(err.status_code, err.reason, err.error.message))
+            self.throw(
+                "Error: {0} {1}: {2}".format(
+                    err.status_code, err.reason, err.error.message
+                )
+            )
         else:
-            print("Droplet ID: {0} Name: {1} IP: {2}".format(droplet_id, droplet['name'], ip_address))
+            print(
+                "Droplet ID: {0} Name: {1} IP: {2}".format(
+                    droplet_id, droplet["name"], ip_address
+                )
+            )
             return droplet
 
     def wait_for_action(self, id, wait=5):
@@ -89,14 +104,22 @@ class DropletCreator:
             try:
                 resp = self.client.actions.get(id)
             except HttpResponseError as err:
-                self.throw("Error: {0} {1}: {2}".format(err.status_code, err.reason, err.error.message))
+                self.throw(
+                    "Error: {0} {1}: {2}".format(
+                        err.status_code, err.reason, err.error.message
+                    )
+                )
             else:
-                status = resp['action']['status']
+                status = resp["action"]["status"]
                 if status == "in-progress":
                     print(".", end="", flush=True)
                     sleep(wait)
                 elif status == "errored":
-                    raise Exception("{0} action {1} {2}".format(resp['action']['type'], resp['action']['id'], status))
+                    raise Exception(
+                        "{0} action {1} {2}".format(
+                            resp["action"]["type"], resp["action"]["id"], status
+                        )
+                    )
                 else:
                     print(".")
 
@@ -107,18 +130,22 @@ class DropletCreator:
         while paginated:
             try:
                 resp = self.client.ssh_keys.list(per_page=50, page=page)
-                for k in resp['ssh_keys']:
-                    if k['name'] == name:
-                        print("Found ssh key: {0}".format(k['fingerprint']))
+                for k in resp["ssh_keys"]:
+                    if k["name"] == name:
+                        print("Found ssh key: {0}".format(k["fingerprint"]))
                         return k
             except HttpResponseError as err:
-                self.throw("Error: {0} {1}: {2}".format(err.status_code, err.reason, err.error.message))
+                self.throw(
+                    "Error: {0} {1}: {2}".format(
+                        err.status_code, err.reason, err.error.message
+                    )
+                )
 
             pages = resp.links.pages
-            if 'next' in pages.keys():
+            if "next" in pages.keys():
                 # Having to parse the URL to find the next page is not very friendly.
-                parsed_url = urlparse(pages['next'])
-                page = parse_qs(parsed_url.query)['page'][0]
+                parsed_url = urlparse(pages["next"])
+                page = parse_qs(parsed_url.query)["page"][0]
             else:
                 paginated = False
 
@@ -128,13 +155,18 @@ class DropletCreator:
         print("Creating volume using: {0}".format(req))
         try:
             resp = self.client.volumes.create(body=req)
-            volume = resp['volume']
+            volume = resp["volume"]
         except HttpResponseError as err:
-            self.throw("Error: {0} {1}: {2}".format(err.status_code, err.reason, err.error.message))
+            self.throw(
+                "Error: {0} {1}: {2}".format(
+                    err.status_code, err.reason, err.error.message
+                )
+            )
         else:
-            print("Created volume {0} <ID: {1}>".format(volume['name'], volume['id']))
+            print("Created volume {0} <ID: {1}>".format(volume["name"], volume["id"]))
             return volume
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     dc = DropletCreator()
     dc.main()
