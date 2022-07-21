@@ -6,10 +6,10 @@ import uuid
 
 from tests.integration import defaults
 from tests.integration import shared
-from digitalocean import DigitalOceanClient
+from digitalocean import Client
 
 
-def test_domains_create_record(integration_client: DigitalOceanClient):
+def test_domains_create_record(integration_client: Client):
     """Testing the creation of a Domain.
     and creating a record from created domain.
     """

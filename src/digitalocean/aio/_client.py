@@ -11,7 +11,7 @@ from azure.core import AsyncPipelineClient
 from azure.core.rest import AsyncHttpResponse, HttpRequest
 
 from .._serialization import Deserializer, Serializer
-from ._configuration import DigitalOceanClientConfiguration
+from ._configuration import GeneratedClientConfiguration
 from .operations import (
     AccountOperations,
     ActionsOperations,
@@ -56,7 +56,7 @@ if TYPE_CHECKING:
     from azure.core.credentials_async import AsyncTokenCredential
 
 
-class DigitalOceanClient:  # pylint: disable=client-accepts-api-version-keyword,too-many-instance-attributes
+class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too-many-instance-attributes
     """Introduction
     ============
 
@@ -606,56 +606,126 @@ class DigitalOceanClient:  # pylint: disable=client-accepts-api-version-keyword,
     """
 
     def __init__(
-        self, credential: "AsyncTokenCredential", *, endpoint: str = "https://api.digitalocean.com", **kwargs: Any
+        self,
+        credential: "AsyncTokenCredential",
+        *,
+        endpoint: str = "https://api.digitalocean.com",
+        **kwargs: Any
     ) -> None:
-        self._config = DigitalOceanClientConfiguration(credential=credential, **kwargs)
-        self._client = AsyncPipelineClient(base_url=endpoint, config=self._config, **kwargs)
+        self._config = GeneratedClientConfiguration(credential=credential, **kwargs)
+        self._client = AsyncPipelineClient(
+            base_url=endpoint, config=self._config, **kwargs
+        )
 
         self._serialize = Serializer()
         self._deserialize = Deserializer()
         self._serialize.client_side_validation = False
-        self.one_clicks = OneClicksOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.account = AccountOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.ssh_keys = SshKeysOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.actions = ActionsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.apps = AppsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.cdn = CdnOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.certificates = CertificatesOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.balance = BalanceOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.billing_history = BillingHistoryOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.invoices = InvoicesOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.databases = DatabasesOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.domains = DomainsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.droplets = DropletsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.droplet_actions = DropletActionsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.firewalls = FirewallsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.floating_ips = FloatingIPsOperations(self._client, self._config, self._serialize, self._deserialize)
+        self.one_clicks = OneClicksOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.account = AccountOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.ssh_keys = SshKeysOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.actions = ActionsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.apps = AppsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.cdn = CdnOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.certificates = CertificatesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.balance = BalanceOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.billing_history = BillingHistoryOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.invoices = InvoicesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.databases = DatabasesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.domains = DomainsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.droplets = DropletsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.droplet_actions = DropletActionsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.firewalls = FirewallsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.floating_ips = FloatingIPsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
         self.floating_ips_action = FloatingIPsActionOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
-        self.images = ImagesOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.image_actions = ImageActionsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.kubernetes = KubernetesOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.load_balancers = LoadBalancersOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.monitoring = MonitoringOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.projects = ProjectsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.regions = RegionsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.registry = RegistryOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.reserved_ips = ReservedIPsOperations(self._client, self._config, self._serialize, self._deserialize)
+        self.images = ImagesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.image_actions = ImageActionsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.kubernetes = KubernetesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.load_balancers = LoadBalancersOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.monitoring = MonitoringOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.projects = ProjectsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.regions = RegionsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.registry = RegistryOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.reserved_ips = ReservedIPsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
         self.reserved_ips_actions = ReservedIPsActionsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
-        self.sizes = SizesOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.snapshots = SnapshotsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.tags = TagsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.volumes = VolumesOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.volume_actions = VolumeActionsOperations(self._client, self._config, self._serialize, self._deserialize)
+        self.sizes = SizesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.snapshots = SnapshotsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.tags = TagsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.volumes = VolumesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.volume_actions = VolumeActionsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
         self.volume_snapshots = VolumeSnapshotsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
-        self.vpcs = VpcsOperations(self._client, self._config, self._serialize, self._deserialize)
+        self.vpcs = VpcsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
 
-    def send_request(self, request: HttpRequest, **kwargs: Any) -> Awaitable[AsyncHttpResponse]:
+    def send_request(
+        self, request: HttpRequest, **kwargs: Any
+    ) -> Awaitable[AsyncHttpResponse]:
         """Runs the network request through the client's chained policies.
 
         >>> from azure.core.rest import HttpRequest
@@ -680,7 +750,7 @@ class DigitalOceanClient:  # pylint: disable=client-accepts-api-version-keyword,
     async def close(self) -> None:
         await self._client.close()
 
-    async def __aenter__(self) -> "DigitalOceanClient":
+    async def __aenter__(self) -> "GeneratedClient":
         await self._client.__aenter__()
         return self
 

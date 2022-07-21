@@ -3,11 +3,11 @@
 
 import responses
 
-from digitalocean import DigitalOceanClient
+from digitalocean import Client
 
 
 @responses.activate
-def test_create(mock_client: DigitalOceanClient, mock_client_url):
+def test_create(mock_client: Client, mock_client_url):
     """Tests Record Creation"""
     expected = {"domain": {"name": "clienttest.com", "ttl": 1800, "zone_file": ""}}
 
@@ -24,7 +24,7 @@ def test_create(mock_client: DigitalOceanClient, mock_client_url):
 
 
 @responses.activate
-def test_get(mock_client: DigitalOceanClient, mock_client_url):
+def test_get(mock_client: Client, mock_client_url):
     """Test Record Get by Name"""
     expected = {
         "domain": {
@@ -52,7 +52,7 @@ def test_get(mock_client: DigitalOceanClient, mock_client_url):
 
 
 @responses.activate
-def test_list(mock_client: DigitalOceanClient, mock_client_url):
+def test_list(mock_client: Client, mock_client_url):
     """Test Record List"""
     expected = {
         "domains": [
@@ -84,7 +84,7 @@ def test_list(mock_client: DigitalOceanClient, mock_client_url):
 
 
 @responses.activate
-def test_delete(mock_client: DigitalOceanClient, mock_client_url):
+def test_delete(mock_client: Client, mock_client_url):
     """Test Domain Delete"""
 
     responses.add(
@@ -98,7 +98,7 @@ def test_delete(mock_client: DigitalOceanClient, mock_client_url):
 
 
 @responses.activate
-def test_create_record(mock_client: DigitalOceanClient, mock_client_url):
+def test_create_record(mock_client: Client, mock_client_url):
     """Test Record Create"""
     expected = {
         "domain_record": {
@@ -141,7 +141,7 @@ def test_create_record(mock_client: DigitalOceanClient, mock_client_url):
 
 
 @responses.activate
-def test_list_records(mock_client: DigitalOceanClient, mock_client_url):
+def test_list_records(mock_client: Client, mock_client_url):
     """Test Record Domain List"""
     expected = {
         "domain_records": [
@@ -175,7 +175,7 @@ def test_list_records(mock_client: DigitalOceanClient, mock_client_url):
 
 
 @responses.activate
-def test_get_record(mock_client: DigitalOceanClient, mock_client_url):
+def test_get_record(mock_client: Client, mock_client_url):
     """Test Record Domain Get"""
 
     expected = {
@@ -206,7 +206,7 @@ def test_get_record(mock_client: DigitalOceanClient, mock_client_url):
 
 
 @responses.activate
-def test_update_record(mock_client: DigitalOceanClient, mock_client_url):
+def test_update_record(mock_client: Client, mock_client_url):
     """Test Record Domain Update"""
     expected = {
         "domain_record": {
@@ -243,7 +243,7 @@ def test_update_record(mock_client: DigitalOceanClient, mock_client_url):
 
 
 @responses.activate
-def test_patch_record(mock_client: DigitalOceanClient, mock_client_url):
+def test_patch_record(mock_client: Client, mock_client_url):
     """Test Record Domain Update"""
     expected = {
         "domain_record": {
@@ -280,7 +280,7 @@ def test_patch_record(mock_client: DigitalOceanClient, mock_client_url):
 
 
 @responses.activate
-def test_delete_record(mock_client: DigitalOceanClient, mock_client_url):
+def test_delete_record(mock_client: Client, mock_client_url):
     """Test Domain Record Delete"""
 
     responses.add(

@@ -12,7 +12,7 @@ from azure.core.credentials import AccessToken
 from azure.core.pipeline.policies import HttpLoggingPolicy
 
 from digitalocean.custom_policies import CustomHttpLoggingPolicy
-from digitalocean import DigitalOceanClient as DigitalOceanClientGenerated
+from digitalocean import GeneratedClient, _version
 
 if TYPE_CHECKING:
     # pylint: disable=unused-import,ungrouped-imports
@@ -30,7 +30,7 @@ class TokenCredentials:
         return AccessToken(self._token, expires_on=self._expires_on)
 
 
-class DigitalOceanClient(DigitalOceanClientGenerated):  # type: ignore
+class Client(GeneratedClient):  # type: ignore
     """The official DigitalOceanClient
 
     :param token: A valid API token.
@@ -43,11 +43,15 @@ class DigitalOceanClient(DigitalOceanClientGenerated):  # type: ignore
         logger = kwargs.get("logger")
         if logger is not None and kwargs.get("http_logging_policy") == "":
             kwargs["http_logging_policy"] = CustomHttpLoggingPolicy(logger=logger)
-        super().__init__(TokenCredentials(token), timeout=timeout, **kwargs)
+        sdk_moniker = f"digitaloceanclient/{_version.VERSION}"
+
+        super().__init__(
+            TokenCredentials(token), timeout=timeout, sdk_moniker=sdk_moniker, **kwargs
+        )
 
 
 # type: List[str]  # Add all objects you want publicly available to users at this package level
-__all__ = ["DigitalOceanClient"]
+__all__ = ["Client"]
 
 
 def patch_sdk():
