@@ -207,8 +207,6 @@ def test_get_invoice_summary_by_uuid(mock_client: Client, mock_client_url):
         f"{mock_client_url}/v2/customers/my/invoices/1/summary",
         json=expected,
     )
-    invoice = mock_client.invoices.get_summary_by_uuid(
-        invoice_uuid="1"
-    )
+    invoice = mock_client.invoices.get_summary_by_uuid(invoice_uuid="1")
 
     assert invoice == expected
