@@ -1,11 +1,11 @@
 """Mock tests for the actions API resource"""
 import responses
 
-from digitalocean import DigitalOceanClient
+from digitalocean import Client
 
 
 @responses.activate
-def test_list(mock_client: DigitalOceanClient, mock_client_url):
+def test_list(mock_client: Client, mock_client_url):
     """Mocks the actions list operation."""
     expected = {
         "actions": [
@@ -30,7 +30,7 @@ def test_list(mock_client: DigitalOceanClient, mock_client_url):
 
 
 @responses.activate
-def test_get(mock_client: DigitalOceanClient, mock_client_url):
+def test_get(mock_client: Client, mock_client_url):
     """Mocks the actions get operation."""
 
     action_id = 36804636

@@ -2,10 +2,10 @@
     Integration Test for Domains
 """
 
-from digitalocean import DigitalOceanClient
+from digitalocean import Client
 
 
-def test_actions(integration_client: DigitalOceanClient):
+def test_actions(integration_client: Client):
     """Testing the List and Gets
     of the actions endpoint
     """
