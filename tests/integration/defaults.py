@@ -15,3 +15,5 @@ K8S_VERSION = environ.get("DO_K8S_VERSION") or "latest"
 K8S_NODE_SIZE = environ.get("DO_K8S_NODE_SIZE") or "s-1vcpu-2gb"
 
 REGION = environ.get("DO_REGION") or "nyc3"
+
+INVOICE_UUID_PARM = environ.get("DO_INVOICE_UUID") or "something"
