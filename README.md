@@ -77,11 +77,11 @@ export DO_TOKEN=<INSERT-YOUR-DO-TOKEN>
 export SSH_KEY_NAME=<INSERT-YOUR-SSH_KEY_NAME>       
 ```
 
-Instructions on creating a DO token can be
-found [here](https://docs.digitalocean.com/reference/api/create-personal-access-token/)
+Instructions on creating a DO token can be found 
+[here](https://docs.digitalocean.com/reference/api/create-personal-access-token/)
 
-Instructions on creating an SSH Key can be
-found [here](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/)
+Instructions on creating an SSH Key can be found
+[here](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/)
 
 You are ready to run the script. Run the following:
 > ** Running the following Python script will create billed resources in your account **
@@ -98,7 +98,8 @@ We use `pytest` to define and run the tests.
 **_Requirements_**
 
 * Python 3.9+
-    * Can be installed using something like [pyenv](https://github.com/pyenv/pyenv)
+    * Can be installed using something like 
+      [pyenv](https://github.com/pyenv/pyenv)
         * used to manage different installed versions of python.
         * can also manage python virtual environments (with a plugin)
     * [Poetry](https://python-poetry.org/docs/#installation).
@@ -151,6 +152,45 @@ The configuration options available are currently listed in the
 [generator's sdk documentation](https://github.com/Azure/azure-sdk-for-python/blob/main/sdk/core/azure-core/README.md#configurations). As this client evolves, we will include these details in our
 documentation.
 
-There are several examples in the
-[examples/customize_client_settings](examples/customize_client_settings) directory that
-help illustrate how to easily customize the client configuration.
+There are several examples in the 
+[examples/customize_client_settings](examples/customize_client_settings)
+directory that help illustrate how to easily customize the client
+configuration.
+
+## Docker
+
+The included Dockerfile is a developler convenience to test the package in
+isolation.
+
+To use it, first build the image. Run: 
+
+    docker build -t digitalocean-client-python:dev .
+
+### Use the interactive python shell
+
+Open the python shell:
+
+    docker run -it --rm --name do-client-python digitalocean-client-python:dev python
+
+The above will launch an interactive python shell and display the following:
+
+    Skipping virtualenv creation, as specified in config file.
+    Python 3.10.5 | packaged by conda-forge | (main, Jun 14 2022, 07:06:46) [GCC 10.3.0] on linux
+    Type "help", "copyright", "credits" or "license" for more information.
+    >>>
+
+From here you can use the client interactively:
+
+    >>> from digitalocean import Client
+    >>> c = Client("<YOUR_API_TOKEN>")
+    >>> c.droplets.get()
+
+### Run the tests
+
+Alternatively, the tests can be run by attaching the tests as a volume and
+running pytest directly.
+
+Run: 
+
+    docker run -it --rm --name pydo -v $PWD/tests:/tests digitalocean-client-python:dev pytest tests/mocked
+
