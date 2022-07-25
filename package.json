@@ -2,7 +2,9 @@
   "name": "@digitalocean/digitalocean-client-python",
   "description": "Python client generator based on DigitalOcean's OpenAPI specification.",
   "devDependencies": {
-    "autorest": "^3.6.1"
+    "autorest": "~3.6.1",
+    "@autorest/core": "~3.9.0",
+    "@autorest/modelerfour": "~4.23.6"
   },
   "scripts": {
     "autorest": "autorest"
