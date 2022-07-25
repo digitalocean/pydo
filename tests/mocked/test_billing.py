@@ -151,11 +151,11 @@ def test_get_invoice_csv_by_uuid(mock_client: Client, mock_client_url):
 def test_get_invoice_pdf_by_uuid(mock_client: Client, mock_client_url):
     """Mocks billing's GET invoice PDF by uuid."""
     expected = "product,group_description,description,hours\
-        ,start,end,USD,project_name,category\
-        Floating IPs,,Unused Floating IP - 1.1.1.1,100,2020-07-01\
-        00:00:00 +0000,2020-07-22 18:14:39 +0000,$3.11,,iaas\
-        Taxes,,STATE SALES TAX (6.25%),,2020-07-01 00:00:00 \
-        +0000,2020-07-31 23:59:59 +0000,$0.16,,iaas"
+,start,end,USD,project_name,category\
+Floating IPs,,Unused Floating IP - 1.1.1.1,100,2020-07-01\
+00:00:00 +0000,2020-07-22 18:14:39 +0000,$3.11,,iaas\
+Taxes,,STATE SALES TAX (6.25%),,2020-07-01 00:00:00 \
++0000,2020-07-31 23:59:59 +0000,$0.16,,iaas"
 
     responses.add(
         responses.GET,
@@ -163,12 +163,9 @@ def test_get_invoice_pdf_by_uuid(mock_client: Client, mock_client_url):
         json=expected,
     )
     invoices = mock_client.invoices.get_pdf_by_uuid(invoice_uuid=1)
+    list_in = list(invoices)
 
-    pdf_bytes = io.BytesIO(invoices)
-    pdf = PyPDF2.PdfFileReader(pdf_bytes)
-    fields = pdf.get_fields()
-
-    assert len(fields) > 0
+    assert "group_description" in str(list_in)
 
 
 @responses.activate

@@ -18,7 +18,6 @@ black = "^22.6.0"
 pylint = "^2.14.4"
 pytest = "^7.1.2"
 responses = "^0.21.0"
-PyPDF2 = "^2.8.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

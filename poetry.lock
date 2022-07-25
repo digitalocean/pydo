@@ -436,20 +436,6 @@ python-versions = ">=3.6.8"
 diagrams = ["railroad-diagrams", "jinja2"]
 
 [[package]]
-name = "pypdf2"
-version = "2.8.0"
-description = "A pure-python PDF library capable of splitting, merging, cropping, and transforming PDF files"
-category = "dev"
-optional = false
-python-versions = ">=3.6"
-
-[package.dependencies]
-typing-extensions = {version = "*", markers = "python_version < \"3.10\""}
-
-[package.extras]
-crypto = ["pycryptodome"]
-
-[[package]]
 name = "pytest"
 version = "7.1.2"
 description = "pytest: simple powerful testing with Python"
@@ -604,7 +590,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7.2"
-content-hash = "cdc8a3149651f2c4841669f7616ee9effc61755ad7fa3eda877520ab5a689936"
+content-hash = "75323335ad46f53a59585f9ce524502f99ed211165b74510a48a11e2a360140e"
 
 [metadata.files]
 astroid = [
@@ -883,10 +869,6 @@ pylint = [
 pyparsing = [
     {file = "pyparsing-3.0.9-py3-none-any.whl", hash = "sha256:5026bae9a10eeaefb61dab2f09052b9f4307d44aee4eda64b309723d8d206bbc"},
     {file = "pyparsing-3.0.9.tar.gz", hash = "sha256:2b020ecf7d21b687f219b71ecad3631f644a47f01403fa1d1036b0c6416d70fb"},
-]
-pypdf2 = [
-    {file = "PyPDF2-2.8.0-py3-none-any.whl", hash = "sha256:90d12f0e57e7a41359fc801fce1e87f6f81764d28a89a7f30d8795b3ff67a006"},
-    {file = "PyPDF2-2.8.0.tar.gz", hash = "sha256:69ddfd724ddfe07010ef3a56c95bf1218553ec09e283636ecf0f072ec119599a"},
 ]
 pytest = [
     {file = "pytest-7.1.2-py3-none-any.whl", hash = "sha256:13d0e3ccfc2b6e26be000cb6568c832ba67ba32e719443bfe725814d3c42433c"},

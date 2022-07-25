@@ -59,8 +59,9 @@ def test_billing_get_invoice_pdf_by_uuid(integration_client: Client):
         invoice_uuid=defaults.INVOICE_UUID_PARM
     )
 
-    pdf_reader = PyPDF2.PdfFileReader(get_resp)
-    assert pdf_reader.numPages >= 1
+    list_in = list(get_resp)
+
+    assert "product" in str(list_in)
 
 
 def test_billing_get_invoice_summary_by_uuid(integration_client: Client):
