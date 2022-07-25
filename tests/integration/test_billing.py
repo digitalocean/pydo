@@ -70,9 +70,9 @@ def test_billing_get_invoice_pdf_by_uuid(
 
     pdf_bytes = list(get_resp)[0]
 
-    file = open("tests/integration/invoice.pdf", "a")
-    file.write(str(pdf_bytes))
-    file.close()
+    with open("tests/integration/invoice.pdf", encoding="utf8") as file:
+        file.write(str(pdf_bytes))
+        file.close()
 
     assert os.path.getsize("tests/integration/invoice.pdf") > 0
     os.remove("tests/integration/invoice.pdf")
