@@ -1,5 +1,4 @@
 """Mock tests for the billing API resource."""
-import io
 import responses
 
 from digitalocean import Client
