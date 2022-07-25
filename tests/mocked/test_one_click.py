@@ -1,6 +1,4 @@
-"""Mock tests for the account API resource."""
-import json
-from math import exp
+"""Mock tests for the 1-click API resource."""
 import responses
 from responses import matchers
 
