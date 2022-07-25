@@ -29,7 +29,6 @@ directive:
   - remove-operation: floatingIPsAction_list
   - remove-operation: floatingIPsAction_post
 
-
   - from: openapi-document
     where: '$..["log_line_prefix"]'
     transform: >

@@ -19,8 +19,6 @@ from ._operations import DomainsOperations
 from ._operations import DropletsOperations
 from ._operations import DropletActionsOperations
 from ._operations import FirewallsOperations
-from ._operations import FloatingIPsOperations
-from ._operations import FloatingIPsActionOperations
 from ._operations import ImagesOperations
 from ._operations import ImageActionsOperations
 from ._operations import KubernetesOperations
@@ -59,8 +57,6 @@ __all__ = [
     "DropletsOperations",
     "DropletActionsOperations",
     "FirewallsOperations",
-    "FloatingIPsOperations",
-    "FloatingIPsActionOperations",
     "ImagesOperations",
     "ImageActionsOperations",
     "KubernetesOperations",
