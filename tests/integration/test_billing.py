@@ -60,11 +60,11 @@ def test_billing_get_invoice_csv_by_uuid(
     assert "product,group_description," in get_resp
 
 
-def test_billing_get_invoice_pdf_by_uuid(integration_client: Client):
+def test_billing_get_invoice_pdf_by_uuid(integration_client: Client, invoice_uuid_param):
     """Testing GETting invoice pdf by invoice uuid."""
 
     get_resp = integration_client.invoices.get_pdf_by_uuid(
-        invoice_uuid="8a70e697-c7ce-4b0c-a3f7-0bfd98060ad6"
+        invoice_uuid=invoice_uuid_param
     )
 
     pdf_bytes = list(get_resp)[0]
