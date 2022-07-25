@@ -62,3 +62,11 @@ test-integration: install
 .PHONY: test-mocked
 test-integration-single: install
 	poetry run pytest -rA --tb=short tests/integration/. -k $(test) 
+
+.PHONY: docker-build
+docker-build:
+	docker build -t digitalocean-client-python:dev .
+
+.PHONY: docker-python
+docker-python: docker-build  ## Runs a python shel within a docker container
+	docker run -it --rm --name pydo digitalocean-client-python:dev python
