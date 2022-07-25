@@ -10,7 +10,7 @@ from tests.integration import defaults, shared
 from digitalocean import Client
 
 
-def test_firewalls(integration_client: Client, public_key: bytes):
+def test_firewalls(integration_client: Client):
     """Tests creating, updating, and deleting a firewall"""
     tag_name = f"{defaults.PREFIX}-{uuid.uuid4()}"
     firewall_name = f"{defaults.PREFIX}-{uuid.uuid4()}"

@@ -1,6 +1,5 @@
 """Mock tests for the firewalls API resource."""
 import responses
-from responses import matchers
 
 from digitalocean import Client
 
@@ -335,8 +334,8 @@ def test_firewalls_delete_tags(mock_client: Client, mock_client_url):
 
 
 @responses.activate
-def test_firewalls_add_tags(mock_client: Client, mock_client_url):
-    """Mocks the firewalls add tags operation."""
+def test_firewalls_add_rules(mock_client: Client, mock_client_url):
+    """Mocks the firewalls add rules operation."""
     responses.add(
         responses.POST,
         f"{mock_client_url}/v2/firewalls/aaa-bbb-111-ccc-222/rules",
