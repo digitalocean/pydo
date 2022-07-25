@@ -152,18 +152,24 @@ def with_test_volume(client: Client, **kwargs):
 
 
 @contextlib.contextmanager
-def with_test_kubernetes_cluster(client: Client, **kwargs):
+def with_test_kubernetes_cluster(client: Client, wait=False, **kwargs):
     """Context function that creates a kubernetes cluster.
 
     The cluster is deleted once the context ends.
     """
     create_resp = client.kubernetes.create_cluster(kwargs)
-    kubernetes_cluster = create_resp["kubernetes_cluster"]["id"] or ""
-    assert kubernetes_cluster != ""
+    cluster_id = create_resp["kubernetes_cluster"]["id"] or ""
+    assert cluster_id != ""
+
+    if wait:
+        wait_for_kubernetes_cluster_create(client, cluster_id)
+        get_resp = client.kubernetes.get_cluster(cluster_id)
+        assert get_resp["kubernetes_cluster"]["status"]["state"] == "running"
+
     try:
         yield create_resp
     finally:
-        client.kubernetes.delete_cluster(kubernetes_cluster)
+        client.kubernetes.delete_cluster(cluster_id)
 
 
 @contextlib.contextmanager
