@@ -2,10 +2,10 @@
     Integration Test for Regions
 """
 
-from digitalocean import DigitalOceanClient
+from digitalocean import Client
 
 
-def test_regions(integration_client: DigitalOceanClient):
+def test_regions(integration_client: Client):
     """Testing the list of regions"""
 
     list_resp = integration_client.regions.list()

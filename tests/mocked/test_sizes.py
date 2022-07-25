@@ -3,11 +3,11 @@
 
 import responses
 
-from digitalocean import DigitalOceanClient
+from digitalocean import Client
 
 
 @responses.activate
-def test_list_sizes(mock_client: DigitalOceanClient, mock_client_url):
+def test_list_sizes(mock_client: Client, mock_client_url):
     """Mock the sizes list operation"""
     expected = {
         "sizes": [

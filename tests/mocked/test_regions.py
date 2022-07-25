@@ -3,11 +3,11 @@
 
 import responses
 
-from digitalocean import DigitalOceanClient
+from digitalocean import Client
 
 
 @responses.activate
-def test_list_regions(mock_client: DigitalOceanClient, mock_client_url):
+def test_list_regions(mock_client: Client, mock_client_url):
     """Mocks the regions list operation"""
     expected = {
         "regions": [
