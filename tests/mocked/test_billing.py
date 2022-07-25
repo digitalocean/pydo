@@ -1,6 +1,5 @@
 """Mock tests for the billing API resource."""
 import io
-import PyPDF2
 import responses
 
 from digitalocean import Client

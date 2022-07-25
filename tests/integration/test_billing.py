@@ -2,7 +2,6 @@
     Integration Test for Billing
 """
 
-import PyPDF2
 from digitalocean import Client
 from tests.integration import defaults
 
