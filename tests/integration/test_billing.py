@@ -70,7 +70,7 @@ def test_billing_get_invoice_pdf_by_uuid(
 
     pdf_bytes = list(get_resp)[0]
 
-    with open("tests/integration/invoice.pdf", encoding="utf8") as file:
+    with open("tests/integration/invoice.pdf", "w", encoding="utf8") as file:
         file.write(str(pdf_bytes))
         file.close()
 
