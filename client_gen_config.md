@@ -20,6 +20,15 @@ directive:
     transform: >
       $["x-ms-parameter-location"] = "method";
 
+  # Floating IP operations have been deprecated in favor of reserved IPs.
+  - remove-operation: floatingIPs_get
+  - remove-operation: floatingIPs_create
+  - remove-operation: floatingIPs_list
+  - remove-operation: floatingIPs_delete
+  - remove-operation: floatingIPsAction_get
+  - remove-operation: floatingIPsAction_list
+  - remove-operation: floatingIPsAction_post
+
   - from: openapi-document
     where: '$..["log_line_prefix"]'
     transform: >

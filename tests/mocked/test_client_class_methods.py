@@ -42,8 +42,6 @@ def test_class_names(client_resources):
         "droplet_actions",
         "droplets",
         "firewalls",
-        "floating_ips",
-        "floating_ips_action",
         "image_actions",
         "images",
         "invoices",
@@ -217,8 +215,6 @@ def test_class_names(client_resources):
             },
             {},
         ),
-        ("floating_ips", {"get", "delete", "list", "create"}, {}),
-        ("floating_ips_action", {"get", "post", "list"}, {}),
         ("image_actions", {"get", "post", "list"}, {}),
         ("images", {"list", "get", "update", "create_custom", "delete"}, {}),
         (
