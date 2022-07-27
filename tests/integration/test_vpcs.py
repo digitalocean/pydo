@@ -110,6 +110,7 @@ def test_vpcs_list_members(integration_client: Client, public_key: bytes):
             list_res = integration_client.vpcs.list_members(vpc_id)
             members = list_res["members"]
             assert members[0]["name"] == expected_name
+        # have to wait for droplet to be deleted before you can delete vpc
         list_res = len(integration_client.vpcs.list_members(vpc_id)["members"])
         while list_res != 0:
             list_res = len(integration_client.vpcs.list_members(vpc_id)["members"])
