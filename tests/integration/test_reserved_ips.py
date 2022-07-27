@@ -1,7 +1,7 @@
 # pylint: disable=duplicate-code
 
-""" reserved_ips_tags.py
-    Integration tests for tags.
+""" test_reserved_ips.py
+    Integration tests for reserved IPs.
 """
 
 import uuid
