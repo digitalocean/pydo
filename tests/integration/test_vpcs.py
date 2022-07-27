@@ -2,7 +2,6 @@
     Integration Tests for VPCs
 """
 
-import time
 import uuid
 
 from digitalocean import Client
@@ -31,9 +30,8 @@ def test_vpcs_create(integration_client: Client):
 def test_vpcs_list(integration_client: Client):
     """Testing listing all VPCs"""
 
-    with shared.with_test_vpc(integration_client) as vpc:
-        list_res = integration_client.vpcs.list()
-        assert len(list_res) > 0
+    list_res = integration_client.vpcs.list()
+    assert len(list_res) > 0
 
 
 def test_vpcs_get(integration_client: Client):
@@ -89,7 +87,7 @@ def test_vpcs_delete(integration_client: Client):
             delete_res = integration_client.vpcs.delete(vpc_id)
         finally:
             # empty response body means successful request
-            assert delete_res == None
+            assert delete_res is None
 
 
 def test_vpcs_list_members(integration_client: Client, public_key: bytes):

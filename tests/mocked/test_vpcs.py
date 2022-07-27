@@ -1,15 +1,9 @@
 # pylint: disable=duplicate-code
 """Mock tests for the VPCs resource"""
 
-
-import time
-import uuid
-from requests import delete
 import responses
 
 from digitalocean import Client
-from tests.integration import defaults
-from tests.integration import shared
 
 
 @responses.activate
