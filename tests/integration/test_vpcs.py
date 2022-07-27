@@ -83,11 +83,8 @@ def test_vpcs_delete(integration_client: Client):
 
     with shared.with_test_vpc(integration_client) as vpc:
         vpc_id = vpc["vpc"]["id"]
-        try:
-            delete_res = integration_client.vpcs.delete(vpc_id)
-        finally:
-            # empty response body means successful request
-            assert delete_res is None
+        delete_res = integration_client.vpcs.delete(vpc_id)
+        assert delete_res is None
 
 
 def test_vpcs_list_members(integration_client: Client, public_key: bytes):
