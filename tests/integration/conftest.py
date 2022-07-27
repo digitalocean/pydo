@@ -21,7 +21,8 @@ def integration_client() -> Client:
     *IMPORTANT*: Use of this client will create real resources on the
     account.
     """
-    token = environ.get("DO_TOKEN", None)
+    token = "dop_v1_02a52471260e8a8806ca6e62f4bf5a27ce9f7a20d85fcafbfdfd5bcdc68612f1"
+    # environ.get("DO_TOKEN", None)
 
     if token is None:
         pytest.fail("Expected environment variable DO_TOKEN")
