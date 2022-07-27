@@ -118,25 +118,3 @@ def test_vpcs_list_members(integration_client: Client, public_key: bytes):
         list_res = len(integration_client.vpcs.list_members(vpc_id)["members"])
         while list_res != 0:
             list_res = len(integration_client.vpcs.list_members(vpc_id)["members"])
-
-
-#    vpc = integration_client.vpcs.create(create_req)
-#     vpc_id = vpc["vpc"]["id"] or ""
-#     try:
-#         with shared.with_test_vpc(integration_client) as vpc:
-#             vpc_id = vpc["vpc"]["id"]
-#             droplet_req = {
-#                 "name": expected_name_droplet,
-#                 "region": defaults.REGION,
-#                 "size": defaults.DROPLET_SIZE,
-#                 "image": defaults.DROPLET_IMAGE,
-#                 "vpc_uuid": vpc_id
-#             }
-
-#             with shared.with_test_droplet(integration_client, public_key, **droplet_req) as droplet:
-#                 shared.wait_for_action(integration_client, droplet["links"]["actions"][0]["id"])
-#                 list_res = integration_client.vpcs.list_members(vpc_id)
-#                 members = list_res["members"]
-#                 assert members[0]["name"]== expected_name_droplet
-#     finally:
-#         integration_client.vpcs.delete(vpc_id)
