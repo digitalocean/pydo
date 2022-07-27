@@ -21,6 +21,7 @@ def integration_client() -> Client:
     *IMPORTANT*: Use of this client will create real resources on the
     account.
     """
+
     token = environ.get("DO_TOKEN", None)
 
     if token is None:
@@ -42,3 +43,12 @@ def public_key() -> bytes:
     )
 
     return public_key_material
+
+
+@pytest.fixture(scope="module")
+def invoice_uuid_param():
+    """Gets invoice UUID"""
+    invoice_uuid = environ.get("INVOICE_UUID_PARAM", None)
+
+    if invoice_uuid is None:
+        pytest.fail("Expected environment variable INVOICE_UUID_PARAM")
