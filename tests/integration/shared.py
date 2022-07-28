@@ -4,6 +4,7 @@ This shared module provides helpers for working with the API through the client.
 import contextlib
 from time import sleep
 import secrets
+import uuid
 
 from azure.core.exceptions import HttpResponseError
 
@@ -206,3 +207,25 @@ def with_test_project(client: Client, **kwargs):
         yield create_resp
     finally:
         client.projects.delete(project_id)
+
+
+@contextlib.contextmanager
+def with_test_vpc(client: Client):
+    """Context function to create a VPC.
+
+    VPC is destroyed after context ends
+    """
+    expected_name = f"{defaults.PREFIX}-{uuid.uuid4()}"
+
+    create_req = {
+        "name": expected_name,
+        "description": "VPC for testing client gen",
+        "region": defaults.REGION,
+    }
+    create_resp = client.vpcs.create(create_req)
+    vpc_id = create_resp["vpc"]["id"] or ""
+    assert vpc_id != ""
+    try:
+        yield create_resp
+    finally:
+        client.vpcs.delete(vpc_id)
