@@ -7,7 +7,7 @@
 import uuid
 
 from tests.integration import defaults, shared
-from digitalocean import Client
+from digitalocean import Client, models
 
 
 def test_tag_droplet(integration_client: Client, public_key: bytes):
@@ -28,27 +28,22 @@ def test_tag_droplet(integration_client: Client, public_key: bytes):
         assert get_resp["tag"]["name"] == name
         assert get_resp["tag"]["resources"]["count"] == 0
 
-        droplet_req = {
-            "name": f"{defaults.PREFIX}-{uuid.uuid4()}",
-            "region": defaults.REGION,
-            "size": defaults.DROPLET_SIZE,
-            "image": defaults.DROPLET_IMAGE,
-        }
+        droplet_req = models.DropletSingleCreate(
+            name=f"{defaults.PREFIX}-{uuid.uuid4()}",
+            region=defaults.REGION,
+            size=defaults.DROPLET_SIZE,
+            image=defaults.DROPLET_IMAGE,
+        )  # pyright: ignore
 
         with shared.with_test_droplet(
-            integration_client, public_key, **droplet_req
-        ) as droplet:
-            shared.wait_for_action(
-                integration_client, droplet["links"]["actions"][0]["id"]
-            )
-            droplet_id = droplet["droplet"]["id"]
-            droplet_get_resp = integration_client.droplets.get(droplet_id)
-            assert droplet_get_resp["droplet"]["status"] == "active"
+            integration_client, public_key, droplet_req
+        ) as droplet_ctx:
+            droplet: models.Droplet = droplet_ctx["droplet"]
 
             assign_req = {
                 "resources": [
                     {
-                        "resource_id": f"{droplet_id}",
+                        "resource_id": f"{droplet.id}",
                         "resource_type": "droplet",
                     },
                 ]
@@ -63,7 +58,7 @@ def test_tag_droplet(integration_client: Client, public_key: bytes):
             assert get_resp["tag"]["name"] == name
             assert (
                 get_resp["tag"]["resources"]["last_tagged_uri"]
-                == f"https://api.digitalocean.com/v2/droplets/{droplet_id}"
+                == f"https://api.digitalocean.com/v2/droplets/{droplet.id}"
             )
             assert get_resp["tag"]["resources"]["count"] == 1
             assert get_resp["tag"]["resources"]["droplets"]["count"] == 1

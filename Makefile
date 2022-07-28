@@ -23,18 +23,37 @@ download-spec: ## Download Latest DO Spec
 	touch DigitalOcean-public.v2.yaml && \
 	curl https://api-engineering.nyc3.digitaloceanspaces.com/spec-ci/DigitalOcean-public.v2.yaml -o $(LOCAL_SPEC_FILE)
 
-.PHONY: generate
+.PHONY: generate-client
 ifndef SPEC_FILE
-generate: SPEC_FILE = $(LOCAL_SPEC_FILE)
-generate: dev-dependencies download-spec ## Generates the python client using the latest published spec first.
+generate-client: SPEC_FILE = $(LOCAL_SPEC_FILE)
+generate-client: dev-dependencies download-spec ## Generates the python client using the latest published spec first.
 endif
-generate: clean dev-dependencies
+generate-client: clean dev-dependencies
 	@printf "=== Generating client with spec: $(SPEC_FILE)\n\n"; \
 	npm run autorest -- client_gen_config.md \
 		--use:@autorest/modelerfour@$(MODELERFOUR_VERSION) \
 		--use:@autorest/python@$(AUTOREST_PYTHON_VERSION) \
 		--package-version=$(PACKAGE_VERSION) \
 		--input-file=$(SPEC_FILE)
+
+.PHONY: generate-models
+ifndef SPEC_FILE
+generate-models: SPEC_FILE = $(LOCAL_SPEC_FILE)
+endif
+generate-models:dev-dependencies ## Generate models for client
+	# TODO: report naming issue to upstream
+	@echo && echo "=== GENERATING MODELS" && echo
+	poetry run datamodel-codegen --input $(SPEC_FILE) \
+		--input-file-type openapi \
+		--field-constraints \
+		--strict-nullable \
+		--reuse-model \
+		--output src/digitalocean/models.py && \
+	sed -i "" "s/_m___p___q_user__u_db__d_app__a_/m___p___q_user__u_db__d_app__a_/g" src/digitalocean/models.py && \
+	sed -i "" "s/_t___p_____l_1__user__u_db__d_app__a_client__h/t___p_____l_1__user__u_db__d_app__a_client__h/g" src/digitalocean/models.py
+
+.PHONY: generate
+generate: generate-client generate-models ## Generate client with models
 
 .PHONY: install
 install: ## Install test dependencies

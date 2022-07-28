@@ -12,12 +12,14 @@ azure-identity = ">=1.5.0"
 isodate = ">=0.6.1"
 msrest = ">=0.7.1"
 typing-extensions = ">=3.7.4"
+pydantic = {extras = ["email"], version = "^1.9.1"}
 
 [tool.poetry.dev-dependencies]
 black = "^22.6.0"
 pylint = "^2.14.4"
 pytest = "^7.1.2"
 responses = "^0.21.0"
+datamodel-code-generator = "^0.13.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

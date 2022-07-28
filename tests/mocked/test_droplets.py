@@ -1,7 +1,10 @@
 """Mock tests for the droplets API resource."""
+import pytest
 import responses
 
 from digitalocean import Client
+from digitalocean import models
+from digitalocean.models import Distribution
 
 
 @responses.activate
@@ -148,11 +151,14 @@ def test_list(mock_client: Client, mock_client_url):
     responses.add(responses.GET, f"{mock_client_url}/v2/droplets", json=expected)
     list_resp = mock_client.droplets.list()
 
-    assert list_resp == expected
+    assert len(list_resp) == 1
+    assert list_resp[0].id == 3164444
+    assert list_resp[0].name == "example.com"
+    assert list_resp[0].image.distribution == Distribution.Ubuntu
 
 
 @responses.activate
-def test_create(mock_client: Client, mock_client_url):
+def test_create_single(mock_client: Client, mock_client_url):
     """Mocks the droplets create operation."""
     expected = {
         "droplet": {
@@ -282,16 +288,15 @@ def test_create(mock_client: Client, mock_client_url):
         json=expected,
         status=202,
     )
-    create_resp = mock_client.droplets.create(
-        {
-            "name": "example.com",
-            "region": "nyc3",
-            "size": "s-1vcpu-1gb",
-            "image": "ubuntu-20-04-x64",
-        }
+    single_create = models.DropletSingleCreate(
+        name="example.com", region="nyc3", image="ubuntu-20-04-x64", size="s-1vcpu-1gb"
     )
+    created_droplet, _ = mock_client.droplets.create(single_create)
 
-    assert create_resp == expected
+    assert created_droplet.id == 3164444
+    assert created_droplet.name == "example.com"
+    assert created_droplet.region.slug == "nyc3"
+    assert created_droplet.image.distribution == models.Distribution.Ubuntu
 
 
 @responses.activate

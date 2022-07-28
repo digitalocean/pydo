@@ -8,7 +8,7 @@ import uuid
 
 from azure.core.exceptions import HttpResponseError
 
-from digitalocean import Client
+from digitalocean import Client, models
 from tests.integration import defaults
 
 
@@ -70,7 +70,13 @@ def wait_for_kubernetes_cluster_create(
 
 
 @contextlib.contextmanager
-def with_test_droplet(client: Client, public_key: bytes, **kwargs):
+def with_test_droplet(
+    client: Client,
+    public_key: bytes,
+    droplet_create: models.DropletSingleCreate,
+    *,
+    wait=False,
+):
     """Context function to create a Droplet with an SSH key.
 
     It is not necessary to provide "ssh_keys" the request body. A key is
@@ -79,16 +85,22 @@ def with_test_droplet(client: Client, public_key: bytes, **kwargs):
     Droplet (and associated resources) is destroyed when the context ends.
     """
     with with_ssh_key(client, public_key) as key:
-        kwargs.update({"ssh_keys": [key]})
+        droplet_create.ssh_keys.append(str(key))
 
-        create_resp = client.droplets.create(kwargs)
-        droplet_id = create_resp["droplet"]["id"] or ""
-        assert droplet_id != ""
+        droplet, links = client.droplets.create(droplet_create)
+        assert droplet.id != ""
+        assert len(links["actions"]) == 1
+
+        if wait:
+            wait_for_action(client, links["actions"][0]["id"])
+            droplet_get_resp = client.droplets.get(droplet.id)
+            assert droplet_get_resp["droplet"]["status"] == "active"
+
         try:
-            yield create_resp
+            yield {"droplet": droplet, "links": links}
         finally:
             client.droplets.destroy_with_associated_resources_dangerous(
-                droplet_id, x_dangerous=True
+                droplet.id, x_dangerous=True
             )
 
 
