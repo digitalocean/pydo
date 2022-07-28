@@ -6,7 +6,6 @@ import uuid
 
 from digitalocean import Client
 from tests.integration import defaults
-from tests.integration import shared
 
 
 def test_projects_list(integration_client: Client):
