@@ -190,3 +190,19 @@ def with_ssh_key(client: Client, public_key) -> str:
         yield fingerprint
     finally:
         client.ssh_keys.delete(fingerprint)
+
+
+@contextlib.contextmanager
+def with_test_project(client: Client, **kwargs):
+    """Context function to create a project other than default.
+
+    Project id deleted when the context ends.
+    """
+    create_resp = client.projects.create(kwargs)
+    is_default = create_resp["project"]["is_default"]
+    project_id = create_resp["project"]["id"] or ""
+    assert project_id != "" and not is_default
+    try:
+        yield create_resp
+    finally:
+        client.projects.delete(project_id)
