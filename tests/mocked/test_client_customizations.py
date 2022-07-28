@@ -66,6 +66,7 @@ def test_custom_user_agent():
     assert match is not None
 
     fake_url = f"{fake_endpoint}/v2/account"
+    # pylint: disable=duplicate-code
     resp_json = {
         "account": {
             "droplet_limit": 25,

@@ -1,5 +1,4 @@
 """Mock tests for the droplets API resource."""
-import pytest
 import responses
 
 from digitalocean import Client
