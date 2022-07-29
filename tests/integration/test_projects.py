@@ -6,86 +6,97 @@ import uuid
 
 from digitalocean import Client
 from tests.integration import defaults
+from tests.integration import shared
 
 
-def test_projects_list(integration_client: Client):
-    """Testing the list of all Projects"""
+def test_projects(integration_client: Client):
+    """Tests creating, updating, and deleting a project"""
 
-    list_resp = integration_client.projects.list()
-
-    # only project that should exist is default
-    assert list_resp["projects"][0]["is_default"]
-
-    integration_client.projects.delete(
-        project_id="f8cc2d39-5d36-4406-8a42-9d31b92ba0dd"
-    )
-
-
-def test_projects_create(integration_client: Client):
-    """Testing the POST a new Project operation"""
-
+    # test creating the project
     expected_name = f"{defaults.PREFIX}-{uuid.uuid4()}"
-
     create_req = {
         "name": expected_name,
         "description": "Test project for python client",
         "purpose": "testing",
         "environment": "Development",
     }
-
-    create_resp = integration_client.projects.create(create_req)
+    create_resp = integration_client.projects.create(body=create_req)
     assert create_resp["project"]["name"] == expected_name
-    delete_resp = integration_client.projects.delete(create_resp["project"]["id"])
-    print(delete_resp)
 
-    # client = integration_client
-    # with shared.with_test_project(client, **create_req) as project:
-    #     assert project["project"]["name"] == expected_name
+    project_id = create_resp["project"]["id"]
+
+    # test getting a project
+    get_resp = integration_client.projects.get(project_id=project_id)
+    assert get_resp["project"]["name"] == expected_name
+
+    # test updating a project
+    updated_name = f"{defaults.PREFIX}-{uuid.uuid4()}"
+    update_req = {
+        "name": updated_name,
+        "description": "Test project for python client",
+        "purpose": "testing",
+        "environment": "Development",
+        "is_default": False,
+    }
+    update_resp = integration_client.projects.update(
+        project_id=project_id, body=update_req
+    )
+    assert update_resp["project"]["name"] == updated_name
+
+    # test patching a project
+    patch_name = f"{defaults.PREFIX}-{uuid.uuid4()}"
+    patch_req = {
+        "name": patch_name,
+    }
+    patch_resp = integration_client.projects.patch(
+        project_id=project_id, body=patch_req
+    )
+    assert patch_resp["project"]["name"] == patch_name
+
+    # test listing a project
+    list_resp = integration_client.projects.list()
+    # there should always be atleast a default project
+    assert len(list_resp["projects"]) > 0
+
+    # test deleting a project
+    # Work around endpoint requiring "application/json" for DELETES even though
+    # there is no request or response body.
+    custom_headers = {"Content-Type": "application/json"}
+    delete_resp = integration_client.projects.delete(
+        headers=custom_headers, project_id=project_id
+    )
+    assert delete_resp is None
 
 
-def test_projects_get_default(integration_client: Client):
-    """Testing GETting the default Project operation"""
+def test_projects_default(integration_client: Client):
+    """Testing GETting, updating, patching, getting the default Project operation"""
 
+    # test getting the default project
     get_resp = integration_client.projects.get_default()
-
-    # only project that should exist is default
     assert get_resp["project"]["is_default"]
 
-
-def test_projects_update_default(integration_client: Client):
-    """Testing updating the default project operation"""
-
+    # test updating the default project
     expected_name = f"{defaults.PREFIX}-{uuid.uuid4()}"
-
     update_req = {
         "name": expected_name,
         "description": "Test project for python client",
         "purpose": "testing",
         "environment": "Development",
+        "is_default": True,
     }
+    update_resp = integration_client.projects.update_default(body=update_req)
+    assert (
+        update_resp["project"]["name"] == expected_name
+        and update_resp["project"]["is_default"]
+    )
 
-    create_resp = integration_client.projects.create(body=update_req)
-
-    # only project that should exist is default
-    assert create_resp["project"]["name"] == expected_name
-
-
-def test_projects_delete(integration_client: Client):
-    """Testing delete a project operation"""
-
+    # test patching the default project
     expected_name = f"{defaults.PREFIX}-{uuid.uuid4()}"
-
-    create_req = {
+    patch_req = {
         "name": expected_name,
-        "description": "Test project for python client",
-        "purpose": "testing",
-        "environment": "Development",
     }
-
-    create_resp = integration_client.projects.create(body=create_req)
-    assert create_resp["project"]["name"] == expected_name
-    proj_id = create_resp["project"]["id"]
-
-    delete_resp = integration_client.projects.delete(project_id=proj_id)
-
-    assert delete_resp is None
+    patch_resp = integration_client.projects.patch_default(body=patch_req)
+    assert (
+        patch_resp["project"]["name"] == expected_name
+        and patch_resp["project"]["is_default"]
+    )
