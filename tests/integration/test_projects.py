@@ -87,7 +87,6 @@ def test_projects_default(integration_client: Client):
     assert update_resp["project"]["name"] == expected_name
     assert update_resp["project"]["is_default"]
 
-
     # test patching the default project
     expected_name = f"{defaults.PREFIX}-{uuid.uuid4()}"
     patch_req = {
