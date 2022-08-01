@@ -151,9 +151,11 @@ def test_get_load_balancers(mock_client: Client, mock_client_url):
         f"{mock_client_url}/v2/load_balancers/a91a98de-9b5f-4198-91cd-f852e36f8265",
         json=expected,
     )
-    lb = mock_client.load_balancers.get(lb_id="a91a98de-9b5f-4198-91cd-f852e36f8265")
+    load_balancer = mock_client.load_balancers.get(
+        lb_id="a91a98de-9b5f-4198-91cd-f852e36f8265"
+    )
 
-    assert lb == expected
+    assert load_balancer == expected
 
 
 @responses.activate
@@ -219,7 +221,7 @@ def test_create_load_balancers(mock_client: Client, mock_client_url):
         json=expected,
         status=202,
     )
-    lb = mock_client.load_balancers.create(
+    load_balancer = mock_client.load_balancers.create(
         body={
             "name": "example-lb-01",
             "region": "nyc3",
@@ -235,7 +237,7 @@ def test_create_load_balancers(mock_client: Client, mock_client_url):
         }
     )
 
-    assert lb == expected
+    assert load_balancer == expected
 
 
 @responses.activate
@@ -341,11 +343,11 @@ def test_update_load_balancers(mock_client: Client, mock_client_url):
         f"{mock_client_url}/v2/load_balancers/a91a98de-9b5f-4198-91cd-f852e36f8265",
         json=expected,
     )
-    lb = mock_client.load_balancers.update(
+    load_balancer = mock_client.load_balancers.update(
         lb_id="a91a98de-9b5f-4198-91cd-f852e36f8265", body=body
     )
 
-    assert lb == expected
+    assert load_balancer == expected
 
 
 @responses.activate
@@ -364,7 +366,7 @@ def test_load_balancers_add_droplet(mock_client: Client, mock_client_url):
     """Mocks the load balancers add Droplet operation."""
     responses.add(
         responses.POST,
-        f"{mock_client_url}/v2/load_balancers/a91a98de-9b5f-4198-91cd-f852e36f8265/droplets",
+        f"{mock_client_url}/v2/load_balancers/a91a98de-9b5f-4198-91cd-f852e36f8265/droplets",  # pylint: disable=line-too-long
         status=204,
     )
     mock_client.load_balancers.add_droplets(
@@ -378,7 +380,7 @@ def test_load_balancers_remove_droplet(mock_client: Client, mock_client_url):
     """Mocks the load balancers remove Droplet operation."""
     responses.add(
         responses.DELETE,
-        f"{mock_client_url}/v2/load_balancers/a91a98de-9b5f-4198-91cd-f852e36f8265/droplets",
+        f"{mock_client_url}/v2/load_balancers/a91a98de-9b5f-4198-91cd-f852e36f8265/droplets",  # pylint: disable=line-too-long
         status=204,
     )
     mock_client.load_balancers.remove_droplets(
@@ -392,7 +394,7 @@ def test_load_balancers_add_rule(mock_client: Client, mock_client_url):
     """Mocks the load balancers add rule operation."""
     responses.add(
         responses.POST,
-        f"{mock_client_url}/v2/load_balancers/a91a98de-9b5f-4198-91cd-f852e36f8265/forwarding_rules",
+        f"{mock_client_url}/v2/load_balancers/a91a98de-9b5f-4198-91cd-f852e36f8265/forwarding_rules",  # pylint: disable=line-too-long
         status=204,
     )
     mock_client.load_balancers.add_forwarding_rules(
@@ -416,7 +418,7 @@ def test_load_balancers_remove_rule(mock_client: Client, mock_client_url):
     """Mocks the load balancers remoev rule operation."""
     responses.add(
         responses.DELETE,
-        f"{mock_client_url}/v2/load_balancers/a91a98de-9b5f-4198-91cd-f852e36f8265/forwarding_rules",
+        f"{mock_client_url}/v2/load_balancers/a91a98de-9b5f-4198-91cd-f852e36f8265/forwarding_rules",  # pylint: disable=line-too-long
         status=204,
     )
     mock_client.load_balancers.remove_forwarding_rules(
