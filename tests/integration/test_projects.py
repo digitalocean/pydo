@@ -94,7 +94,5 @@ def test_projects_default(integration_client: Client):
         "name": expected_name,
     }
     patch_resp = integration_client.projects.patch_default(body=patch_req)
-    assert (
-        patch_resp["project"]["name"] == expected_name
-        and patch_resp["project"]["is_default"]
-    )
+    assert patch_resp["project"]["name"] == expected_name
+    assert patch_resp["project"]["is_default"]
