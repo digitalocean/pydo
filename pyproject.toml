@@ -28,3 +28,8 @@ max-line-length=88 # matches black's default
 
 [tool.pylint.messages_control]
 disable = "no-name-in-module"
+
+[tool.pytest.ini_options]
+markers = [
+    "real_billing: Indicates the test requires a real billing account to test"
+]
