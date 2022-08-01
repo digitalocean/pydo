@@ -48,12 +48,14 @@ generate-models:dev-dependencies ## Generate models for client
 		--field-constraints \
 		--strict-nullable \
 		--reuse-model \
-		--output src/digitalocean/models.py && \
-	sed -i "" "s/_m___p___q_user__u_db__d_app__a_/m___p___q_user__u_db__d_app__a_/g" src/digitalocean/models.py && \
-	sed -i "" "s/_t___p_____l_1__user__u_db__d_app__a_client__h/t___p_____l_1__user__u_db__d_app__a_client__h/g" src/digitalocean/models.py
+		--output src/digitalocean/models.py
+
+.PHONY: post-generate
+post-generate:
+	scripts/post-generate.sh
 
 .PHONY: generate
-generate: generate-client generate-models ## Generate client with models
+generate: generate-client generate-models post-generate# Generate client with models
 
 .PHONY: install
 install: ## Install test dependencies

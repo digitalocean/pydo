@@ -37,9 +37,7 @@ class AccountOperations(AccountOperationsGenerated):
         try:
             get_resp = super().get(*args, **kwargs)
         except AzHttpResponseError as az_err:
-            raise custom_errors.HttpResponseError(
-                az_err.message, az_err.response
-            ) from az_err
+            raise custom_errors.HttpResponseError(az_err.message, az_err.response) from az_err
 
         try:
             account_dict = get_resp["account"]
@@ -54,9 +52,7 @@ class AccountOperations(AccountOperationsGenerated):
                     "unable to serialize account get error response"
                 ) from err_exc
 
-        raise custom_errors.ResponseDeserializationError(
-            "unable to serialize account get response"
-        )
+        raise custom_errors.ResponseDeserializationError("unable to serialize account get response")
 
 
 class DropletsOperations(DropletsOperationsGenerated):
@@ -77,9 +73,7 @@ class DropletsOperations(DropletsOperationsGenerated):
         try:
             list_resp = super().list(*args, **kwargs)
         except AzHttpResponseError as az_err:
-            raise custom_errors.HttpResponseError(
-                az_err.message, az_err.response
-            ) from az_err
+            raise custom_errors.HttpResponseError(az_err.message, az_err.response) from az_err
 
         try:
             droplets_list = list_resp["droplets"]
@@ -96,14 +90,10 @@ class DropletsOperations(DropletsOperationsGenerated):
         except ValidationError as exc:
             raise custom_errors.ModelValidationError(exc.raw_errors, exc.model) from exc
 
-        raise custom_errors.ResponseDeserializationError(
-            "unable to serialize droplets list response"
-        )
+        raise custom_errors.ResponseDeserializationError("unable to serialize droplets list response")
 
     def create(  # pylint: disable=arguments-renamed
-        self,
-        droplet_create: Union[models.DropletSingleCreate, models.DropletMultiCreate],
-        **kwargs: Any
+        self, droplet_create: Union[models.DropletSingleCreate, models.DropletMultiCreate], **kwargs: Any
     ) -> Tuple[models.Droplet, dict]:
         """Create a new droplet
 
@@ -123,9 +113,7 @@ class DropletsOperations(DropletsOperationsGenerated):
             create_req = droplet_create.dict(exclude_unset=True)
             create_resp = super().create(create_req, **kwargs)
         except AzHttpResponseError as az_err:
-            raise custom_errors.HttpResponseError(
-                az_err.message, az_err.response
-            ) from az_err
+            raise custom_errors.HttpResponseError(az_err.message, az_err.response) from az_err
 
         try:
             droplet_data = create_resp["droplet"]
@@ -144,9 +132,7 @@ class DropletsOperations(DropletsOperationsGenerated):
         except ValidationError as exc:
             raise custom_errors.ModelValidationError(exc.raw_errors, exc.model) from exc
 
-        raise custom_errors.ResponseDeserializationError(
-            "unable to serialize droplet create response"
-        )
+        raise custom_errors.ResponseDeserializationError("unable to serialize droplet create response")
 
 
 __all__ = [
