@@ -3,6 +3,10 @@ MODELERFOUR_VERSION="4.23.6"
 AUTOREST_PYTHON_VERSION="6.0.1"
 PACKAGE_VERSION?="dev"
 
+ifeq (, $(findstring -m,$(PYTEST_ARGS)))
+	PYTEST_EXCLUDE_MARKS=-m "not real_billing"
+endif
+
 .PHONY: help
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'; \
@@ -55,7 +59,7 @@ test-mocked: install
 
 .PHONY: test-mocked
 test-integration: install
-	poetry run pytest -rA --tb=short tests/integration/. $(PYTEST_ARGS)
+	poetry run pytest -rA --tb=short tests/integration/. $(PYTEST_EXCLUDE_MARKS) $(PYTEST_ARGS)
 
 # This command runs a single integration test
 # > make test-integration-single test=test_actions
