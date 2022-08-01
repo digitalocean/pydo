@@ -4,6 +4,7 @@ This shared module provides helpers for working with the API through the client.
 import contextlib
 from time import sleep
 import secrets
+from typing import Callable, Union
 import uuid
 
 from azure.core.exceptions import HttpResponseError
@@ -41,6 +42,41 @@ def wait_for_action(client: Client, action_id: int, wait_seconds: int = 5):
                 raise Exception(
                     f"{resp['action']['type']} action {resp['action']['id']} {status}"
                 )
+
+
+def wait_for_status(
+    poll_func: Callable,
+    resource_type: str,
+    resource_id: Union[str, int],
+    status_field: str = "status",
+    ready: str = "active",
+    errored: str = "error",
+    wait_seconds: int = 5,
+):  # pylint: disable=too-many-arguments
+    """
+    Polls for a resource until it reaches the desired status. The resource_type
+    argument should be the name of the resource as used as the key in the JSON
+    response. (e.g. {"load_balancer": { ... }})
+
+    Example:
+
+        wait_for_status(client.load_balancers.get, "load_balancer", lb_id)
+    """
+    while True:
+        try:
+            resp = poll_func(resource_id)
+        except HttpResponseError as err:
+            raise IntegrationTestError(
+                f"Error: {err.status_code} {err.reason}: {err.error.message}"
+            ) from err
+        else:
+            resource = resp.get(resource_type)
+            status = resource.get(status_field)
+            if status == ready:
+                break
+            if status == errored:
+                raise Exception(f"Resource status: {status}")
+        sleep(wait_seconds)
 
 
 def wait_for_kubernetes_cluster_create(
@@ -213,3 +249,23 @@ def with_test_vpc(client: Client):
         yield create_resp
     finally:
         client.vpcs.delete(vpc_id)
+
+
+@contextlib.contextmanager
+def with_test_load_balancer(client: Client, body, wait=False):
+    """
+    Context function that creates a load balancer. It is deleted once the context ends.
+    """
+    create_resp = client.load_balancers.create(body=body)
+    lbid = create_resp["load_balancer"]["id"] or ""
+    assert lbid != ""
+
+    if wait:
+        wait_for_status(client.load_balancers.get, "load_balancer", lbid)
+        get_resp = client.load_balancers.get(lb_id=lbid)
+        assert get_resp["load_balancer"]["status"] == "active"
+
+    try:
+        yield create_resp
+    finally:
+        client.load_balancers.delete(lb_id=lbid)
