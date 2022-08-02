@@ -41,8 +41,8 @@ def test_snapshots(integration_client: Client, public_key: bytes):
 
         # get a snapshot
         get_resp = integration_client.snapshots.get(snapshot_id=snapshot_id)
-        get_resp["snapshot"]["name"] == expected_name
+        assert get_resp["snapshot"]["name"] == expected_name
 
         # delete a snapshot
         delete_resp = integration_client.snapshots.delete(snapshot_id=snapshot_id)
-        delete_resp is None
+        assert delete_resp is None
