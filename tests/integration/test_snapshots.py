@@ -21,7 +21,7 @@ def test_snapshots(integration_client: Client, public_key: bytes):
     volume_req = {
         "size_gigabytes": 10,
         "name": f"{defaults.PREFIX}-{uuid.uuid4()}",
-        "description": "Block storage testing",
+        "description": "Snapshots testing",
         "region": defaults.REGION,
         "filesystem_type": "ext4",
     }
