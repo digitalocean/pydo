@@ -1,3 +1,5 @@
+# pylint: disable=too-many-locals
+
 """ test_monitoring.py
     Integration Tests for Monitoring
 """
