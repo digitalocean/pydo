@@ -86,7 +86,7 @@ def test_monitoring_alert_policies(integration_client: Client, public_key: bytes
 def test_monitoring_metrics(integration_client: Client, public_key: bytes):
     """Tests Getting Various Metrics"""
 
-    droplet_req = {
+    test_droplet_req = {
         "name": f"{defaults.PREFIX}-{uuid.uuid4()}",
         "region": defaults.REGION,
         "size": defaults.DROPLET_SIZE,
@@ -95,7 +95,7 @@ def test_monitoring_metrics(integration_client: Client, public_key: bytes):
     }
 
     with shared.with_test_droplet(
-        integration_client, public_key, **droplet_req
+        integration_client, public_key, **test_droplet_req
     ) as droplet:
         shared.wait_for_action(integration_client, droplet["links"]["actions"][0]["id"])
         droplet_get_resp = integration_client.droplets.get(droplet["droplet"]["id"])
