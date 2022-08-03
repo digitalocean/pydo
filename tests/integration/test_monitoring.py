@@ -16,7 +16,7 @@ def test_monitoring_alert_policies(integration_client: Client, public_key: bytes
         "region": defaults.REGION,
         "size": defaults.DROPLET_SIZE,
         "image": defaults.DROPLET_IMAGE,
-        "tags": ["droplet_tag"],
+        "tags": ["cg_test_tag"],
     }
 
     with shared.with_test_droplet(
@@ -35,7 +35,7 @@ def test_monitoring_alert_policies(integration_client: Client, public_key: bytes
             "description": "CPU Alert",
             "enabled": True,
             "entities": [str(droplet_id)],
-            "tags": ["droplet_tag"],
+            "tags": ["cg_test_tag"],
             "type": "v1/insights/droplet/cpu",
             "value": 80,
             "window": "5m",
@@ -64,7 +64,7 @@ def test_monitoring_alert_policies(integration_client: Client, public_key: bytes
             "compare": "GreaterThan",
             "description": "CPU Alert",
             "enabled": True,
-            "tags": ["droplet_tag"],
+            "tags": ["cg_test_tag"],
             "type": "v1/insights/droplet/cpu",
             "value": 80,
             "window": "5m",
@@ -91,7 +91,7 @@ def test_monitoring_metrics(integration_client: Client, public_key: bytes):
         "region": defaults.REGION,
         "size": defaults.DROPLET_SIZE,
         "image": defaults.DROPLET_IMAGE,
-        "tags": ["droplet_tag"],
+        "tags": ["cg_test_tag"],
     }
 
     with shared.with_test_droplet(
