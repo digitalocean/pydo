@@ -1,3 +1,4 @@
+# pylint: disable=line-too-long
 """Mock tests for the certificates API resource"""
 
 import responses
