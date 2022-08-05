@@ -17,7 +17,7 @@ def test_certificates_create(mock_client: Client, mock_client_url):
             "created_at": "2017-02-08T16:02:37Z",
             "dns_names": [""],
             "state": "verified",
-            "type": "custom",
+            "type": "lets_encrypt",
         }
     }
     responses.add(
