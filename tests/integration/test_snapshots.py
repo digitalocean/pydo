@@ -9,7 +9,7 @@ from tests.integration import shared
 from digitalocean import Client
 
 
-def test_snapshots(integration_client: Client):
+def test_volume_snapshots(integration_client: Client):
     """Tests listing, retrieving, and deleting a snapshot.
 
     Creates a droplet and waits for its status to be `active`.
