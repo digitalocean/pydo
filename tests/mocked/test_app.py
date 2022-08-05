@@ -1,5 +1,4 @@
 """Mock tests for the app API resource."""
-from turtle import update
 import responses
 
 from digitalocean import Client
@@ -107,10 +106,14 @@ def test_update(mock_client: Client, mock_client_url):
     }
 
     responses.add(
-        responses.PUT, f"{mock_client_url}/v2/apps", json=expected, status=200
+        responses.PUT,
+        f"{mock_client_url}/v2/apps/4f6c71e2-1e90-4762-9fee-6cc4a0a9f2cf",
+        json=expected,
+        status=200,
     )
 
     update_resp = mock_client.apps.update(
+        "4f6c71e2-1e90-4762-9fee-6cc4a0a9f2cf",
         {
             "spec": {
                 "name": "web-app-01",
@@ -469,6 +472,18 @@ def test_update(mock_client: Client, mock_client_url):
                     }
                 ],
             }
-        }
+        },
     )
     assert update_resp == expected
+
+
+@responses.activate
+def test_delete(mock_client: Client, mock_client_url):
+    expected = {"id": "b7d64052-3706-4cb7-b21a-c5a2f44e63b3"}
+    responses.add(
+        responses.DELETE, f"{mock_client_url}/v2/apps/1", json=expected, status=200
+    )
+
+    del_resp = mock_client.apps.delete(1)
+
+    assert del_resp == expected
