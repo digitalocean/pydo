@@ -19,7 +19,7 @@ dev-dependencies: ## Install development tooling
 .PHONY: clean
 clean: ## Removes all generated code (except _patch.py files)
 	@printf "=== Cleaning src directory\n"
-	@find src/digitalocean -type f ! -name "_patch.py" ! -name "custom_*.py" -exec rm -rf {} +
+	@find src/digitalocean -type f ! -name "_patch.py" ! -name "custom_*.py" ! -name "exceptions.py" -exec rm -rf {} +
 
 .PHONY: download-spec
 download-spec: ## Download Latest DO Spec
