@@ -4,8 +4,11 @@ Overwrite default values with environment variables.
 """
 
 from os import environ
+import random
+import string
 
 PREFIX = "cgtest"
+PREFIX_RANDOM = f"{PREFIX}-{''.join(random.choices(string.ascii_lowercase, k=5))}"
 
 # CUSTOMIZABLE
 DROPLET_SIZE = environ.get("DO_DROPLET_SIZE") or "s-1vcpu-1gb"
