@@ -1,3 +1,4 @@
+# pylint: disable=duplicate-code
 """ test_block_storage.py
     Integration tests for block storage.
 """
@@ -33,14 +34,16 @@ def test_block_storage_snapshots(integration_client: Client):
 
         # list snapshots for a volume
         list_resp = integration_client.volume_snapshots.list(volume_id=vol_id)
-        assert len(list_resp['snapshots']) > 0
+        assert len(list_resp["snapshots"]) > 0
 
         # get an existing snapshot of a volume
         get_resp = integration_client.volume_snapshots.get_by_id(snapshot_id=snap_id)
         assert get_resp["snapshot"]["name"] == expected_name
 
         # delete a volume snapshot
-        delete_resp = integration_client.volume_snapshots.delete_by_id(snapshot_id=snap_id)
+        delete_resp = integration_client.volume_snapshots.delete_by_id(
+            snapshot_id=snap_id
+        )
         assert delete_resp is None
 
 
@@ -62,8 +65,14 @@ def test_block_storage(integration_client: Client):
 
     # list volumes
     list_resp = integration_client.volumes.list()
-    assert len(list_resp['volumes']) > 0
+    assert len(list_resp["volumes"]) > 0
 
     # get an existing volume
     get_resp = integration_client.volumes.get(volume_id=volume_id)
     assert get_resp["volume"]["name"] == volume["volume"]["name"]
+
+    # delete volume by name
+    delete_resp = integration_client.volumes.delete_by_name(
+        name=volume["volume"]["name"], region=defaults.REGION
+    )
+    assert delete_resp is None
