@@ -156,6 +156,7 @@ def test_class_names(client_resources):
                 "get_user",
                 "add",
                 "destroy_cluster",
+                "list_options",
             },
             {},
         ),
