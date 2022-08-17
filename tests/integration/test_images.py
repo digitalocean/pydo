@@ -30,6 +30,11 @@ def test_images(integration_client: Client):
     list_resp = integration_client.images.list()
     assert len(list_resp) > 0
 
+    # list all images with prod tag
+    list_resp = integration_client.images.list(tag_name="prod")
+    assert len(list_resp) > 0
+    assert list_resp["images"][0]["tag_name"] == "prod"
+
     # get an image
     get_resp = integration_client.images.get(image_id=image_id)
     assert get_resp["image"]["name"] == expected_name
