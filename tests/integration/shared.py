@@ -187,7 +187,8 @@ def with_test_volume(client: Client, **kwargs):
     try:
         yield create_resp
     finally:
-        client.volumes.delete(volume_id)
+        del_resp = client.volumes.delete(volume_id)
+        assert del_resp is None
 
 
 @contextlib.contextmanager
