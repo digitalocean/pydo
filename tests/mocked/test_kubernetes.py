@@ -1,87 +1,42 @@
 """Mocked tests for kubernetes resources."""
+
 import uuid
+import pytest
 
 import responses
+from digitalocean import Client
+
+from tests.mocked.data import kubernetes_data as data
+
+BASE_PATH = "v2/kubernetes/clusters"
 
 
 @responses.activate
-def test_create_cluster(mock_client, mock_client_url):
+def test_kubernetes_list_clusters(mock_client: Client, mock_client_url):
+    """Mocks the kubernetes list operation."""
+
+    expected = [data.CLUSTER]
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/{BASE_PATH}",
+        json=expected,
+        status=200,
+    )
+
+    list_resp = mock_client.kubernetes.list_clusters()
+    assert list_resp == expected
+
+
+@responses.activate
+def test_kubernetes_create_cluster(mock_client: Client, mock_client_url):
     """Mocks the kubernetes create_cluster operation."""
 
-    expected = {
-        "kubernetes_cluster": {
-            "id": "bd5f5959-5e1e-4205-a714-a914373942af",
-            "name": "prod-cluster-01",
-            "region": "nyc1",
-            "version": "1.18.6-do.0",
-            "cluster_subnet": "10.244.0.0/16",
-            "service_subnet": "10.245.0.0/16",
-            "vpc_uuid": "c33931f2-a26a-4e61-b85c-4e95a2ec431b",
-            "ipv4": "",
-            "endpoint": "",
-            "tags": ["k8s", "k8s:bd5f5959-5e1e-4205-a714-a914373942af"],
-            "node_pools": [
-                {
-                    "id": "cdda885e-7663-40c8-bc74-3a036c66545d",
-                    "name": "worker-pool",
-                    "size": "s-1vcpu-2gb",
-                    "count": 3,
-                    "tags": [
-                        "k8s",
-                        "k8s:bd5f5959-5e1e-4205-a714-a914373942af",
-                        "k8s:worker",
-                    ],
-                    "labels": None,
-                    "taints": [],
-                    "auto_scale": False,
-                    "min_nodes": 0,
-                    "max_nodes": 0,
-                    "nodes": [
-                        {
-                            "id": "478247f8-b1bb-4f7a-8db9-2a5f8d4b8f8f",
-                            "name": "",
-                            "status": {"state": "provisioning"},
-                            "droplet_id": "",
-                            "created_at": "2018-11-15T16:00:11.000Z",
-                            "updated_at": "2018-11-15T16:00:11.000Z",
-                        },
-                        {
-                            "id": "ad12e744-c2a9-473d-8aa9-be5680500eb1",
-                            "name": "",
-                            "status": {"state": "provisioning"},
-                            "droplet_id": "",
-                            "created_at": "2018-11-15T16:00:11.000Z",
-                            "updated_at": "2018-11-15T16:00:11.000Z",
-                        },
-                        {
-                            "id": "e46e8d07-f58f-4ff1-9737-97246364400e",
-                            "name": "",
-                            "status": {"state": "provisioning"},
-                            "droplet_id": "",
-                            "created_at": "2018-11-15T16:00:11.000Z",
-                            "updated_at": "2018-11-15T16:00:11.000Z",
-                        },
-                    ],
-                }
-            ],
-            "maintenance_policy": {
-                "start_time": "00:00",
-                "duration": "4h0m0s",
-                "day": "any",
-            },
-            "auto_upgrade": False,
-            "status": {"state": "provisioning", "message": "provisioning"},
-            "created_at": "2018-11-15T16:00:11.000Z",
-            "updated_at": "2018-11-15T16:00:11.000Z",
-            "surge_upgrade": False,
-            "registry_enabled": False,
-            "ha": False,
-        }
-    }
+    expected = data.CLUSTER
 
     responses.add(
         responses.POST,
-        f"{mock_client_url}/v2/kubernetes/clusters",
+        f"{mock_client_url}/{BASE_PATH}",
         json=expected,
         status=201,
     )
@@ -102,3 +57,477 @@ def test_create_cluster(mock_client, mock_client_url):
     )
 
     assert resp == expected
+
+
+@responses.activate
+def test_kubernetes_get_cluster(mock_client: Client, mock_client_url):
+    """Mock kubernetes get cluster operation."""
+
+    cluster_id = str(uuid.uuid4())
+    expected = data.CLUSTER
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/{BASE_PATH}/{cluster_id}",
+        json=expected,
+        status=200,
+    )
+
+    list_resp = mock_client.kubernetes.get_cluster(cluster_id)
+    assert list_resp == expected
+
+
+@responses.activate
+def test_kubernetes_update_cluster(mock_client: Client, mock_client_url):
+    """Mock kubernetes update_cluster operation."""
+
+    cluster_id = str(uuid.uuid4())
+    expected = data.CLUSTER
+
+    responses.add(
+        responses.PUT,
+        f"{mock_client_url}/{BASE_PATH}/{cluster_id}",
+        json=expected,
+        status=202,
+    )
+
+    update_resp = mock_client.kubernetes.update_cluster(
+        cluster_id,
+        {
+            "name": "prod-cluster-01",
+            "tags": [
+                "k8s",
+                "k8s:bd5f5959-5e1e-4205-a714-a914373942af",
+                "production",
+                "web-team",
+            ],
+            "maintenance_policy": {"start_time": "12:00", "day": "any"},
+            "auto_upgrade": True,
+            "surge_upgrade": True,
+        },
+    )
+    assert update_resp == expected
+
+
+@responses.activate
+def test_kubernetes_delete_cluster(mock_client: Client, mock_client_url):
+    """Mock kubernetes delete_cluster operation."""
+
+    cluster_id = str(uuid.uuid4())
+
+    responses.add(
+        responses.DELETE,
+        f"{mock_client_url}/{BASE_PATH}/{cluster_id}",
+        status=204,
+    )
+
+    del_resp = mock_client.kubernetes.delete_cluster(cluster_id)
+    assert del_resp is None
+
+
+@responses.activate
+def test_kubernetes_list_associated_resources(mock_client: Client, mock_client_url):
+    """Mock kubernetes list_associated_resources operation."""
+
+    cluster_id = str(uuid.uuid4())
+    expected = data.ASSOCIATED_RESOURCES
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/{BASE_PATH}/{cluster_id}/destroy_with_associated_resources",
+        status=200,
+        json=expected,
+    )
+
+    list_resp = mock_client.kubernetes.list_associated_resources(cluster_id)
+    assert list_resp == expected
+
+
+@responses.activate
+def test_kubernetes_destroy_associated_resources_selective(
+    mock_client: Client, mock_client_url
+):
+    """Mock kubernetes destroy_associated_resources_selective operation."""
+
+    cluster_id = str(uuid.uuid4())
+
+    responses.add(
+        responses.DELETE,
+        (
+            f"{mock_client_url}/{BASE_PATH}/{cluster_id}"
+            "/destroy_with_associated_resources/selective"
+        ),
+        status=204,
+    )
+
+    des_resp = mock_client.kubernetes.destroy_associated_resources_selective(
+        cluster_id,
+        {
+            "load_balancers": ["4de7ac8b-495b-4884-9a69-1050c6793cd6"],
+            "volumes": ["ba49449a-7435-11ea-b89e-0a58ac14480f"],
+            "volume_snapshots": ["edb0478d-7436-11ea-86e6-0a58ac144b91"],
+        },
+    )
+    assert des_resp is None
+
+
+@responses.activate
+def test_kubernetes_destroy_associated_resources_dangerous(
+    mock_client: Client, mock_client_url
+):
+    """Mock kubernetes destroy_associated_resources_dangerous operation."""
+
+    cluster_id = str(uuid.uuid4())
+
+    responses.add(
+        responses.DELETE,
+        (
+            f"{mock_client_url}/{BASE_PATH}/{cluster_id}"
+            "/destroy_with_associated_resources/dangerous"
+        ),
+        status=204,
+    )
+
+    des_resp = mock_client.kubernetes.destroy_associated_resources_dangerous(cluster_id)
+    assert des_resp is None
+
+
+@responses.activate
+def test_kubernetes_get_kubeconfig(mock_client: Client, mock_client_url):
+    """Mock kubernetes get_kubeconfig operation."""
+
+    cluster_id = str(uuid.uuid4())
+    expected = data.KUBECONFIG
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/{BASE_PATH}/{cluster_id}/kubeconfig",
+        headers={"content-type": "application/yaml"},
+        match=[
+            responses.matchers.query_param_matcher({"expiry_seconds": 0}),
+        ],
+        status=200,
+        body=expected,
+    )
+
+    config_resp = mock_client.kubernetes.get_kubeconfig(cluster_id)
+    pytest.skip("The operation currently fails to return content.")
+    # TODO: investigate why the generated client doesn't return the response content
+    # It seems to be something to do with the yaml content type.
+    assert config_resp.decode("utf-8") == expected
+
+
+@responses.activate
+def test_kubernetes_get_credentials(mock_client: Client, mock_client_url):
+    """Mock kubernetes get_credentials operation."""
+
+    cluster_id = str(uuid.uuid4())
+    expected = data.CREDENTIALS
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/{BASE_PATH}/{cluster_id}/credentials",
+        match=[
+            responses.matchers.query_param_matcher({"expiry_seconds": 0}),
+        ],
+        status=200,
+        json=expected,
+    )
+
+    creds_resp = mock_client.kubernetes.get_credentials(cluster_id)
+    assert creds_resp == expected
+
+
+@responses.activate
+def test_kubernetes_get_available_upgrades(mock_client: Client, mock_client_url):
+    """Mock kubernetes available_upgrades operation."""
+
+    cluster_id = str(uuid.uuid4())
+    expected = data.AVAILABLE_UPGRADES
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/{BASE_PATH}/{cluster_id}/upgrades",
+        status=200,
+        json=expected,
+    )
+
+    upgrades_resp = mock_client.kubernetes.get_available_upgrades(cluster_id)
+    assert upgrades_resp == expected
+
+
+@responses.activate
+def test_kubernetes_upgrade_cluster(mock_client: Client, mock_client_url):
+    """Mock kubernetes upgrade_cluster operation."""
+
+    cluster_id = str(uuid.uuid4())
+
+    responses.add(
+        responses.POST,
+        f"{mock_client_url}/{BASE_PATH}/{cluster_id}/upgrade",
+        status=202,
+    )
+
+    upgrade_resp = mock_client.kubernetes.upgrade_cluster(
+        cluster_id, {"version": "1.16.13-do.0"}
+    )
+    assert upgrade_resp is None
+
+
+@responses.activate
+def test_kubernetes_list_node_pools(mock_client: Client, mock_client_url):
+    """Mock kubernetes list_node_pools operation."""
+
+    cluster_id = str(uuid.uuid4())
+    expected = data.NODE_POOLS
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/{BASE_PATH}/{cluster_id}/node_pools",
+        status=200,
+        json=expected,
+    )
+
+    node_pools_resp = mock_client.kubernetes.list_node_pools(cluster_id)
+    assert node_pools_resp == expected
+
+
+@responses.activate
+def test_kubernetes_add_node_pool(mock_client: Client, mock_client_url):
+    """Mock kubernetes add_node_pool operation."""
+
+    cluster_id = str(uuid.uuid4())
+    expected = data.NODE_POOL
+
+    responses.add(
+        responses.POST,
+        f"{mock_client_url}/{BASE_PATH}/{cluster_id}/node_pools",
+        status=201,
+        json=expected,
+    )
+
+    node_pool_resp = mock_client.kubernetes.add_node_pool(
+        cluster_id,
+        {
+            "size": "s-1vcpu-2gb",
+            "count": 3,
+            "name": "new-pool",
+            "tags": ["frontend"],
+            "auto_scale": True,
+            "min_nodes": 3,
+            "max_nodes": 6,
+        },
+    )
+    assert node_pool_resp == expected
+
+
+@responses.activate
+def test_kubernetes_get_node_pool(mock_client: Client, mock_client_url):
+    """Mock kubernetes get_node_pool operation."""
+
+    cluster_id = str(uuid.uuid4())
+    node_pool_id = str(uuid.uuid4())
+    expected = data.NODE_POOL
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/{BASE_PATH}/{cluster_id}/node_pools/{node_pool_id}",
+        status=200,
+        json=expected,
+    )
+
+    node_pool_resp = mock_client.kubernetes.get_node_pool(cluster_id, node_pool_id)
+    assert node_pool_resp == expected
+
+
+@responses.activate
+def test_kubernetes_update_node_pool(mock_client: Client, mock_client_url):
+    """Mock kubernetes update_node_pool operation."""
+
+    cluster_id = str(uuid.uuid4())
+    node_pool_id = str(uuid.uuid4())
+    expected = data.NODE_POOL
+
+    responses.add(
+        responses.PUT,
+        f"{mock_client_url}/{BASE_PATH}/{cluster_id}/node_pools/{node_pool_id}",
+        status=202,
+        json=expected,
+    )
+
+    update_resp = mock_client.kubernetes.update_node_pool(
+        cluster_id,
+        node_pool_id,
+        {
+            "name": "frontend-pool",
+            "count": 3,
+            "tags": [
+                "k8s",
+                "k8s:bd5f5959-5e1e-4205-a714-a914373942af",
+                "k8s-worker",
+                "production",
+                "web-team",
+            ],
+            "labels": None,
+            "taints": [{"key": "priority", "value": "high", "effect": "NoSchedule"}],
+            "auto_scale": True,
+            "min_nodes": 3,
+            "max_nodes": 6,
+        },
+    )
+    assert update_resp == expected
+
+
+@responses.activate
+def test_kubernetes_delete_node_pool(mock_client: Client, mock_client_url):
+    """Mock kubernetes delete_node_pool operation."""
+
+    cluster_id = str(uuid.uuid4())
+    node_pool_id = str(uuid.uuid4())
+
+    responses.add(
+        responses.DELETE,
+        f"{mock_client_url}/{BASE_PATH}/{cluster_id}/node_pools/{node_pool_id}",
+        status=204,
+    )
+
+    del_resp = mock_client.kubernetes.delete_node_pool(cluster_id, node_pool_id)
+    assert del_resp is None
+
+
+@responses.activate
+def test_kubernetes_delete_node(mock_client: Client, mock_client_url):
+    """Mock kubernetes delete_node operation."""
+
+    cluster_id = str(uuid.uuid4())
+    node_pool_id = str(uuid.uuid4())
+    node_id = str(uuid.uuid4())
+
+    responses.add(
+        responses.DELETE,
+        f"{mock_client_url}/{BASE_PATH}/{cluster_id}/node_pools/{node_pool_id}/nodes/{node_id}",  # pylint: disable=line-too-long
+        status=202,
+        match=[
+            responses.matchers.query_param_matcher({"skip_drain": 0, "replace": 0}),
+        ],
+    )
+
+    del_resp = mock_client.kubernetes.delete_node(cluster_id, node_pool_id, node_id)
+    assert del_resp is None
+
+
+@responses.activate
+def test_kubernetes_get_user_info(mock_client: Client, mock_client_url):
+    """Mock kubernetes get_user_info operation."""
+
+    cluster_id = str(uuid.uuid4())
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/{BASE_PATH}/{cluster_id}/user",
+        status=200,
+    )
+
+    user_resp = mock_client.kubernetes.get_cluster_user(cluster_id)
+    assert user_resp is None
+
+
+@responses.activate
+def test_kubernetes_list_options(mock_client: Client, mock_client_url):
+    """Mock kubernetes list_options operation."""
+
+    expected = data.OPTIONS
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/kubernetes/options",
+        status=200,
+        json=expected,
+    )
+
+    options_resp = mock_client.kubernetes.list_options()
+    assert options_resp == expected
+
+
+@responses.activate
+def test_kubernetes_run_clusterlint(mock_client: Client, mock_client_url):
+    """Mock kubernetes run_clusterlint operation."""
+
+    cluster_id = str(uuid.uuid4())
+    expected = {"run_id": "50c2f44c-011d-493e-aee5-361a4a0d1844"}
+
+    responses.add(
+        responses.POST,
+        f"{mock_client_url}/{BASE_PATH}/{cluster_id}/clusterlint",
+        status=202,
+        json=expected,
+    )
+
+    lint_resp = mock_client.kubernetes.run_cluster_lint(cluster_id)
+    assert lint_resp == expected
+
+
+@responses.activate
+def test_kubernetes_get_clusterlint(mock_client: Client, mock_client_url):
+    """Mock kubernetes get_clusterlint operation."""
+
+    cluster_id = str(uuid.uuid4())
+    run_id = str(uuid.uuid4())
+    expected = data.CLUSTER_LINT
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/{BASE_PATH}/{cluster_id}/clusterlint",
+        status=200,
+        match=[
+            responses.matchers.query_param_matcher({"run_id": run_id}),
+        ],
+        json=expected,
+    )
+
+    lint_resp = mock_client.kubernetes.get_cluster_lint_results(
+        cluster_id, run_id=run_id
+    )
+    assert lint_resp == expected
+
+
+@responses.activate
+def test_kubernetes_add_container_registry(mock_client: Client, mock_client_url):
+    """Mock kubernetes add_container_registry operation."""
+
+    responses.add(
+        responses.POST,
+        f"{mock_client_url}/v2/kubernetes/registry",
+        status=204,
+    )
+
+    add_reg_resp = mock_client.kubernetes.add_registry(
+        {
+            "cluster_uuids": [
+                "bd5f5959-5e1e-4205-a714-a914373942af",
+                "50c2f44c-011d-493e-aee5-361a4a0d1844",
+            ]
+        }
+    )
+    assert add_reg_resp is None
+
+
+@responses.activate
+def test_kubernetes_remove_container_registry(mock_client: Client, mock_client_url):
+    """Mock kubernetes remove_container_registry operation."""
+
+    responses.add(
+        responses.DELETE,
+        f"{mock_client_url}/v2/kubernetes/registry",
+        status=204,
+    )
+
+    add_reg_resp = mock_client.kubernetes.remove_registry(
+        {
+            "cluster_uuids": [
+                "bd5f5959-5e1e-4205-a714-a914373942af",
+                "50c2f44c-011d-493e-aee5-361a4a0d1844",
+            ]
+        }
+    )
+    assert add_reg_resp is None

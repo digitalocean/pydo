@@ -104,6 +104,8 @@ def wait_for_kubernetes_cluster_create(
                 raise Exception(f"Cluster {cluster_id} error status: {state}")
         sleep(wait_seconds)
 
+    return resp
+
 
 @contextlib.contextmanager
 def with_test_droplet(client: Client, public_key: bytes, **kwargs):
@@ -185,15 +187,32 @@ def with_test_volume(client: Client, **kwargs):
     try:
         yield create_resp
     finally:
-        client.volumes.delete(volume_id)
+        del_resp = client.volumes.delete(volume_id)
+        assert del_resp is None
 
 
 @contextlib.contextmanager
-def with_test_kubernetes_cluster(client: Client, wait=False, **kwargs):
-    """Context function that creates a kubernetes cluster.
+def with_test_kubernetes_cluster(
+    client: Client, *, wait=False, existing_cluster_id: str = "", **kwargs
+):
+    """Context function that returns a kubernetes cluster.
 
-    The cluster is deleted once the context ends.
+    If an `existing_cluster_id` is passed, the cluster information is fetched
+    and yielded. When the context ends, the cluster is not deleted.
+
+    Otherwise, a new cluster is created and it's response is yielded. The
+    cluster is deleted once the context ends.
     """
+
+    # This adds a bypass for running tests with an existing cluster
+    if existing_cluster_id:
+        existing_cluster = client.kubernetes.get_cluster(existing_cluster_id)
+        cluster_id = existing_cluster["kubernetes_cluster"]["id"] or ""
+        assert cluster_id == existing_cluster_id
+        assert existing_cluster["kubernetes_cluster"]["status"]["state"] == "running"
+        yield existing_cluster
+        return
+
     create_resp = client.kubernetes.create_cluster(kwargs)
     cluster_id = create_resp["kubernetes_cluster"]["id"] or ""
     assert cluster_id != ""
@@ -204,9 +223,16 @@ def with_test_kubernetes_cluster(client: Client, wait=False, **kwargs):
         assert get_resp["kubernetes_cluster"]["status"]["state"] == "running"
 
     try:
+        cluster_id = create_resp["kubernetes_cluster"]["id"] or ""
+        assert cluster_id != ""
+
+        if wait:
+            wait_resp = wait_for_kubernetes_cluster_create(client, cluster_id)
+            assert wait_resp["kubernetes_cluster"]["status"]["state"] == "running"
+
         yield create_resp
     finally:
-        client.kubernetes.delete_cluster(cluster_id)
+        client.kubernetes.destroy_associated_resources_dangerous(cluster_id)
 
 
 @contextlib.contextmanager
