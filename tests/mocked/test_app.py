@@ -1,7 +1,5 @@
 # pylint: disable=duplicate-code
 """Mock tests for the app API resource."""
-import json
-from math import exp
 import responses
 
 from digitalocean import Client
