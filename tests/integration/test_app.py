@@ -2,8 +2,8 @@
     Integration tests for apps.
 """
 
-
 import uuid
+
 from tests.integration import shared
 from digitalocean import Client
 from tests.integration import defaults
@@ -16,11 +16,12 @@ def test_app_lifecycle(integration_client: Client):
     Updates
     Deletes
     """
+    name = f"{defaults.PREFIX}-{uuid.uuid4().hex[:10]}"
     with shared.with_test_app(
         integration_client,
         {
             "spec": {
-                "name": defaults.PREFIX_RANDOM,
+                "name": name,
                 "region": "nyc",
                 "services": [
                     {
@@ -41,4 +42,15 @@ def test_app_lifecycle(integration_client: Client):
     ) as app:
         list_resp = integration_client.apps.list()
 
-        assert app["app"]["id"] in [app["id"] for app in list_resp["apps"]]
+        Id = app["app"]["id"]
+
+        assert Id in [app["id"] for app in list_resp["apps"]]
+
+        config = app["app"]["spec"]
+        config["region"] = "ams"
+        update_payload = {}
+        update_payload["spec"] = config
+
+        update_resp = integration_client.apps.update(Id, update_payload)
+
+        assert update_resp["app"]["spec"]["region"] == "ams"
