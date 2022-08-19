@@ -295,3 +295,21 @@ def with_test_load_balancer(client: Client, body, wait=False):
         yield create_resp
     finally:
         client.load_balancers.delete(lb_id=lbid)
+
+
+@contextlib.contextmanager
+def with_test_app(client: Client, body):
+    """
+    Context function that creates an app
+    """
+
+    create_resp = client.apps.create(body)
+    app_id = create_resp["app"]["id"]
+
+    assert create_resp is not None
+    assert app_id != ""
+
+    try:
+        yield create_resp
+    finally:
+        client.apps.delete(app_id)
