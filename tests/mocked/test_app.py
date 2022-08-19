@@ -1,3 +1,4 @@
+# pylint: disable=duplicate-code
 """Mock tests for the app API resource."""
 import responses
 
@@ -6,6 +7,7 @@ from digitalocean import Client
 
 @responses.activate
 def test_create(mock_client: Client, mock_client_url):
+    "Mock Creating an App"
     expected = {
         "app": {
             "id": "c2a93513-8d9b-4223-9d61-5e7272c81cf5",
@@ -52,6 +54,7 @@ def test_create(mock_client: Client, mock_client_url):
 
 @responses.activate
 def test_list(mock_client: Client, mock_client_url):
+    """Test list of Apps"""
     expected = {
         "apps": [
             {
@@ -87,6 +90,7 @@ def test_list(mock_client: Client, mock_client_url):
 
 @responses.activate
 def test_update(mock_client: Client, mock_client_url):
+    """Mock Update an App"""
     expected = {
         "app": {
             "id": "c2a93513-8d9b-4223-9d61-5e7272c81cf5",
@@ -127,142 +131,9 @@ def test_update(mock_client: Client, mock_client_url):
                         "minimum_tls_version": "1.3",
                     }
                 ],
-                "services": [
-                    {
-                        "name": "api",
-                        "git": {
-                            "branch": "main",
-                            "repo_clone_url": "https://github.com/digitalocean/sample-golang.git",
-                        },
-                        "github": {
-                            "branch": "main",
-                            "deploy_on_push": True,
-                            "repo": "digitalocean/sample-golang",
-                        },
-                        "gitlab": {
-                            "branch": "main",
-                            "deploy_on_push": True,
-                            "repo": "digitalocean/sample-golang",
-                        },
-                        "image": {
-                            "registry": "registry.hub.docker.com",
-                            "registry_type": "DOCR",
-                            "repository": "origin/master",
-                            "tag": "latest",
-                        },
-                        "dockerfile_path": "path/to/Dockerfile",
-                        "build_command": "npm run build",
-                        "run_command": "bin/api",
-                        "source_dir": "path/to/dir",
-                        "envs": [
-                            {
-                                "key": "BASE_URL",
-                                "scope": "BUILD_TIME",
-                                "type": "GENERAL",
-                                "value": "http://example.com",
-                            }
-                        ],
-                        "environment_slug": "node-js",
-                        "log_destinations": {
-                            "name": "my_log_destination",
-                            "papertrail": {
-                                "endpoint": "https://mypapertrailendpoint.com"
-                            },
-                            "datadog": {
-                                "endpoint": "https://mydatadogendpoint.com",
-                                "api_key": "abcdefghijklmnopqrstuvwxyz0123456789",
-                            },
-                            "logtail": {
-                                "token": "abcdefghijklmnopqrstuvwxyz0123456789"
-                            },
-                        },
-                        "instance_count": 2,
-                        "instance_size_slug": "basic-xxs",
-                        "cors": {
-                            "allow_origins": [
-                                {"exact": "https://www.example.com"},
-                                {"regex": "^.*example.com"},
-                            ],
-                            "allow_methods": [
-                                "GET",
-                                "OPTIONS",
-                                "POST",
-                                "PUT",
-                                "PATCH",
-                                "DELETE",
-                            ],
-                            "allow_headers": ["Content-Type", "X-Custom-Header"],
-                            "expose_headers": ["Content-Encoding", "X-Custom-Header"],
-                            "max_age": "5h30m",
-                            "allow_credentials": False,
-                        },
-                        "health_check": {
-                            "failure_threshold": 2,
-                            "port": 80,
-                            "http_path": "/health",
-                            "initial_delay_seconds": 30,
-                            "period_seconds": 60,
-                            "success_threshold": 3,
-                            "timeout_seconds": 45,
-                        },
-                        "http_port": 3000,
-                        "internal_ports": [80, 443],
-                        "routes": [{"path": "/api", "preserve_path_prefix": True}],
-                    }
-                ],
+                "services": [],
                 "static_sites": [
                     {
-                        "name": "api",
-                        "git": {
-                            "branch": "main",
-                            "repo_clone_url": "https://github.com/digitalocean/sample-golang.git",
-                        },
-                        "github": {
-                            "branch": "main",
-                            "deploy_on_push": True,
-                            "repo": "digitalocean/sample-golang",
-                        },
-                        "gitlab": {
-                            "branch": "main",
-                            "deploy_on_push": True,
-                            "repo": "digitalocean/sample-golang",
-                        },
-                        "image": {
-                            "registry": "registry.hub.docker.com",
-                            "registry_type": "DOCR",
-                            "repository": "origin/master",
-                            "tag": "latest",
-                        },
-                        "dockerfile_path": "path/to/Dockerfile",
-                        "build_command": "npm run build",
-                        "run_command": "bin/api",
-                        "source_dir": "path/to/dir",
-                        "envs": [
-                            {
-                                "key": "BASE_URL",
-                                "scope": "BUILD_TIME",
-                                "type": "GENERAL",
-                                "value": "http://example.com",
-                            }
-                        ],
-                        "environment_slug": "node-js",
-                        "log_destinations": {
-                            "name": "my_log_destination",
-                            "papertrail": {
-                                "endpoint": "https://mypapertrailendpoint.com"
-                            },
-                            "datadog": {
-                                "endpoint": "https://mydatadogendpoint.com",
-                                "api_key": "abcdefghijklmnopqrstuvwxyz0123456789",
-                            },
-                            "logtail": {
-                                "token": "abcdefghijklmnopqrstuvwxyz0123456789"
-                            },
-                        },
-                        "index_document": "main.html",
-                        "error_document": "error.html",
-                        "catchall_document": "index.html",
-                        "output_dir": "dist/",
                         "cors": {
                             "allow_origins": [
                                 {"exact": "https://www.example.com"},
@@ -287,15 +158,6 @@ def test_update(mock_client: Client, mock_client_url):
                 "jobs": [
                     {
                         "name": "api",
-                        "git": {
-                            "branch": "main",
-                            "repo_clone_url": "https://github.com/digitalocean/sample-golang.git",
-                        },
-                        "github": {
-                            "branch": "main",
-                            "deploy_on_push": True,
-                            "repo": "digitalocean/sample-golang",
-                        },
                         "gitlab": {
                             "branch": "main",
                             "deploy_on_push": True,
@@ -341,15 +203,6 @@ def test_update(mock_client: Client, mock_client_url):
                 "workers": [
                     {
                         "name": "api",
-                        "git": {
-                            "branch": "main",
-                            "repo_clone_url": "https://github.com/digitalocean/sample-golang.git",
-                        },
-                        "github": {
-                            "branch": "main",
-                            "deploy_on_push": True,
-                            "repo": "digitalocean/sample-golang",
-                        },
                         "gitlab": {
                             "branch": "main",
                             "deploy_on_push": True,
@@ -431,15 +284,6 @@ def test_update(mock_client: Client, mock_client_url):
                                 "value": "http://example.com",
                             }
                         ],
-                        "git": {
-                            "branch": "main",
-                            "repo_clone_url": "https://github.com/digitalocean/sample-golang.git",
-                        },
-                        "github": {
-                            "branch": "main",
-                            "deploy_on_push": True,
-                            "repo": "digitalocean/sample-golang",
-                        },
                         "gitlab": {
                             "branch": "main",
                             "deploy_on_push": True,
@@ -479,6 +323,7 @@ def test_update(mock_client: Client, mock_client_url):
 
 @responses.activate
 def test_delete(mock_client: Client, mock_client_url):
+    """Mock Delete App"""
     expected = {"id": "1"}
     responses.add(
         responses.DELETE, f"{mock_client_url}/v2/apps/1", json=expected, status=200

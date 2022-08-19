@@ -1,12 +1,14 @@
+# pylint: disable=line-too-long
+
 """ test_app.py
     Integration tests for apps.
 """
 
 import uuid
 
+from tests.integration import defaults
 from tests.integration import shared
 from digitalocean import Client
-from tests.integration import defaults
 
 
 def test_app_lifecycle(integration_client: Client):
@@ -17,29 +19,28 @@ def test_app_lifecycle(integration_client: Client):
     Deletes
     """
     name = f"{defaults.PREFIX}-{uuid.uuid4().hex[:10]}"
-    with shared.with_test_app(
-        integration_client,
-        {
-            "spec": {
-                "name": name,
-                "region": "nyc",
-                "services": [
-                    {
-                        "name": "api",
-                        "git": {
-                            "branch": "main",
-                            "repo_clone_url": "https://github.com/digitalocean/sample-golang.git",
-                        },
-                        "run_command": "bin/api",
-                        "environment_slug": "go",
-                        "instance_count": 2,
-                        "instance_size_slug": "professional-xs",
-                        "routes": [{"path": "/"}],
-                    }
-                ],
-            }
-        },
-    ) as app:
+    create_payload = {
+        "spec": {
+            "name": name,
+            "region": "nyc",
+            "services": [
+                {
+                    "name": "api",
+                    "git": {
+                        "branch": "main",
+                        "repo_clone_url": "https://github.com/digitalocean/sample-golang.git",
+                    },
+                    "run_command": "bin/api",
+                    "environment_slug": "go",
+                    "instance_count": 2,
+                    "instance_size_slug": "professional-xs",
+                    "routes": [{"path": "/"}],
+                }
+            ],
+        }
+    }
+
+    with shared.with_test_app(integration_client, create_payload) as app:
         list_resp = integration_client.apps.list()
 
         app_id = app["app"]["id"]
