@@ -42,15 +42,15 @@ def test_app_lifecycle(integration_client: Client):
     ) as app:
         list_resp = integration_client.apps.list()
 
-        Id = app["app"]["id"]
+        app_id = app["app"]["id"]
 
-        assert Id in [app["id"] for app in list_resp["apps"]]
+        assert app_id in [app["id"] for app in list_resp["apps"]]
 
         config = app["app"]["spec"]
         config["region"] = "ams"
         update_payload = {}
         update_payload["spec"] = config
 
-        update_resp = integration_client.apps.update(Id, update_payload)
+        update_resp = integration_client.apps.update(app_id, update_payload)
 
         assert update_resp["app"]["spec"]["region"] == "ams"
