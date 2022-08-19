@@ -479,7 +479,7 @@ def test_update(mock_client: Client, mock_client_url):
 
 @responses.activate
 def test_delete(mock_client: Client, mock_client_url):
-    expected = {"id": "b7d64052-3706-4cb7-b21a-c5a2f44e63b3"}
+    expected = {"id": "1"}
     responses.add(
         responses.DELETE, f"{mock_client_url}/v2/apps/1", json=expected, status=200
     )
