@@ -1,9 +1,6 @@
+# pylint: disable=duplicate-code
+# pylint: disable=line-too-long
 """Mock tests for the app API resource."""
-import json
-from re import I
-from unittest import expectedFailure
-from urllib import response
-from xmlrpc.client import ResponseError
 import responses
 
 from digitalocean import Client

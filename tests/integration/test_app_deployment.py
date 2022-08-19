@@ -1,3 +1,5 @@
+# pylint: disable=duplicate-code
+# pylint: disable=line-too-long
 """ test_app_deployment.py
     Integration tests for app deployments
 """
