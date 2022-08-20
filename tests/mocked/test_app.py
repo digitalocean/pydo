@@ -1,4 +1,5 @@
 # pylint: disable=duplicate-code
+# pylint: disable=line-too-long
 """Mock tests for the app API resource."""
 import responses
 
@@ -332,3 +333,164 @@ def test_delete(mock_client: Client, mock_client_url):
     del_resp = mock_client.apps.delete(1)
 
     assert del_resp == expected
+
+
+@responses.activate
+def test_propose(mock_client: Client, mock_client_url):
+    """Mock Propose App"""
+    expected = {
+        "app_name_available": True,
+        "existing_static_apps": "2",
+        "max_free_static_apps": "3",
+        "spec": {
+            "name": "sample-golang",
+            "services": [
+                {
+                    "name": "web",
+                    "github": {
+                        "repo": "digitalocean/sample-golang",
+                        "branch": "branch",
+                    },
+                    "run_command": "bin/sample-golang",
+                    "environment_slug": "go",
+                    "instance_size_slug": "basic-xxs",
+                    "instance_count": 1,
+                    "http_port": 8080,
+                    "routes": [{"path": "/"}],
+                }
+            ],
+            "region": "ams",
+        },
+        "app_cost": 5,
+        "app_tier_upgrade_cost": 17,
+    }
+
+    responses.add(
+        responses.POST, f"{mock_client_url}/v2/apps/propose", json=expected, status=200
+    )
+
+    proposed_spec = {
+        "spec": {
+            "name": "web-app",
+            "region": "nyc",
+            "services": [
+                {
+                    "name": "api",
+                    "github": {
+                        "branch": "main",
+                        "deploy_on_push": True,
+                        "repo": "digitalocean/sample-golang",
+                    },
+                    "run_command": "bin/api",
+                    "environment_slug": "node-js",
+                    "instance_count": 2,
+                    "instance_size_slug": "basic-xxs",
+                    "routes": [{"path": "/api"}],
+                }
+            ],
+        },
+        "app_id": "b6bdf840-2854-4f87-a36c-5f231c617c84",
+    }
+
+    propose_resp = mock_client.apps.validate_app_spec(proposed_spec)
+
+    assert propose_resp == expected
+
+
+@responses.activate
+def test_list_alerts(mock_client: Client, mock_client_url):
+    """Mock list alerts"""
+
+    expected = {
+        "alerts": [
+            {
+                "id": "e552e1f9-c1b0-4e6d-8777-ad6f27767306",
+                "spec": {"rule": "DEPLOYMENT_FAILED"},
+                "emails": ["sammy@digitalocean.com"],
+                "phase": "ACTIVE",
+                "progress": {
+                    "steps": [
+                        {
+                            "name": "alert-configure-insight-alert",
+                            "status": "SUCCESS",
+                            "started_at": "2020-07-28T18:00:00Z",
+                            "ended_at": "2020-07-28T18:00:00Z",
+                        }
+                    ]
+                },
+            },
+            {
+                "id": "b58cc9d4-0702-4ffd-ab45-4c2a8d979527",
+                "spec": {
+                    "rule": "CPU_UTILIZATION",
+                    "operator": "GREATER_THAN",
+                    "value": 85,
+                    "window": "FIVE_MINUTES",
+                },
+                "emails": ["sammy@digitalocean.com"],
+                "phase": "ACTIVE",
+                "progress": {
+                    "steps": [
+                        {
+                            "name": "alert-configure-insight-alert",
+                            "status": "SUCCESS",
+                            "started_at": "2020-07-28T18:00:00Z",
+                            "ended_at": "2020-07-28T18:00:00Z",
+                        }
+                    ]
+                },
+            },
+        ]
+    }
+    responses.add(
+        responses.GET, f"{mock_client_url}/v2/apps/1/alerts", json=expected, status=200
+    )
+
+    list_resp = mock_client.apps.list_alerts("1")
+
+    assert list_resp == expected
+
+
+@responses.activate
+def test_change_alerts(mock_client: Client, mock_client_url):
+    """Test Change Alerts"""
+
+    expected = {
+        "alert": {
+            "id": "e552e1f9-c1b0-4e6d-8777-ad6f27767306",
+            "spec": {"rule": "DEPLOYMENT_FAILED"},
+            "emails": ["sammy@digitalocean.com"],
+            "phase": "ACTIVE",
+            "progress": {
+                "steps": [
+                    {
+                        "name": "alert-configure-insight-alert",
+                        "status": "SUCCESS",
+                        "started_at": "2020-07-28T18:00:00Z",
+                        "ended_at": "2020-07-28T18:00:00Z",
+                    }
+                ]
+            },
+        }
+    }
+
+    responses.add(
+        responses.POST,
+        f"{mock_client_url}/v2/apps/1/alerts/2/destinations",
+        json=expected,
+        status=200,
+    )
+
+    req = {
+        "emails": ["sammy@digitalocean.com"],
+        "slack_webhooks": [
+            {
+                "url": "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX",
+                "channel": "Channel Name",
+            }
+        ],
+    }
+
+    post_resp = mock_client.apps.assign_alert_destinations("1", "2", req)
+
+    assert post_resp == expected

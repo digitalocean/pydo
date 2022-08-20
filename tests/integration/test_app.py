@@ -40,12 +40,31 @@ def test_app_lifecycle(integration_client: Client):
         }
     }
 
+    propose_resp = integration_client.apps.validate_app_spec(create_payload)
+
+    assert propose_resp["app_name_available"] is True
+
     with shared.with_test_app(integration_client, create_payload) as app:
         list_resp = integration_client.apps.list()
 
         app_id = app["app"]["id"]
 
         assert app_id in [app["id"] for app in list_resp["apps"]]
+
+        # An app may not have any alerts once running
+        # TODO: figure out how to manually trigger app alerts
+        # alerts_resp = integration_client.apps.list_alerts(app_id)
+
+        # assert alerts_resp is not None
+
+        # alert_id = alerts_resp["alerts"][0]["id"]
+        # alert_req = {"emails": ["api-engineering@digitalocean.com"]}
+
+        # alert_resp = integration_client.apps.assign_alert_destinations(
+        #     app_id, alert_id, alert_req
+        # )
+
+        # assert alert_resp is not None
 
         config = app["app"]["spec"]
         config["region"] = "ams"
