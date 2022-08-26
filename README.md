@@ -214,7 +214,7 @@ In the generated python client, when calling client.kubernetes.get_kubeconfig(cl
 In the generated python client, when calling  `invoices.get_pdf_by_uuid`, the response returns a  Iterator[bytes] that does not format correctly into a PDF.
 
 ##### Getting documentation via cli "help(<client function>)"
-Currently, calling the "help(<client function>)" will return documentation specific to the API endpoints, not the python client.  
+Currently, calling the "help(<client function>)" includes the API documentation for the respective operation which is substantial and can be confusing in the context of this client. 
 
 
 ## Roadmap
@@ -224,7 +224,7 @@ This section lists short-term and long-term goals for the project.
 Short term:
 > Usability, stability, and marketing.
 
-Short term are focused on improving usability and user productivity (part of this is getting the word out).
+Short term, we are focused on improving usability and user productivity (part of this is getting the word out).
 * Documentation
     * Support an automated process for creating comprehensive documentation that explains working of codes
     * Support a clean cli `help(<client function>)` documentation solution
