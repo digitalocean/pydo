@@ -52,7 +52,17 @@ ID: 123457, NAME: my_prod_ssh_key, FINGERPRINT: eb:76:c7:2a:d3:3e:80:5d:ef:2e:ca
 
 **Note**: More working examples can be found [here](https://github.com/digitalocean/digitalocean-client-python/tree/main/examples).
 
-
+##### Pagination Example
+Below is an example on handling pagination. One must parse the URL to find the next page.
+```
+        resp = self.client.ssh_keys.list(per_page=50, page=page)
+        pages = resp.links.pages
+            if 'next' in pages.keys():
+                parsed_url = urlparse(pages['next'])
+                page = parse_qs(parsed_url.query)['page'][0]
+            else:
+                paginated = False
+```
 # Contributing
 
 Visit our [Contribuing Guide](CONTRIBUTING.md) for more information on getting involved in developing this client.
@@ -194,3 +204,35 @@ Run:
 
     docker run -it --rm --name pydo -v $PWD/tests:/tests digitalocean-client-python:dev pytest tests/mocked
 
+
+### Known Issues
+This selection lists the known issues of the client generator. 
+##### `kubernetes.get_kubeconfig` Does not serialize response content
+In the generated python client, when calling client.kubernetes.get_kubeconfig(clust_id), the deserialization logic raises an error when the response content-type is applicaiton/yaml. We need to determine if the spec/schema can be configured such that the generator results in functions that properly handle the content. We will likely need to report the issue upstream to request support for the content-type.
+
+##### `invoices.get_pdf_by_uuid(invoice_uuid=invoice_uuid_param)` Does not return PDF
+In the generated python client, when calling  `invoices.get_pdf_by_uuid`, the response returns a  Iterator[bytes] that does not format correctly into a PDF.
+
+##### Getting documentation via cli "help(<client function>)"
+Currently, calling the "help(<client function>)" includes the API documentation for the respective operation which is substantial and can be confusing in the context of this client. 
+
+
+## Roadmap
+This section lists short-term and long-term goals for the project.
+**Note**: These are goals, not necessarily commitments. The sections are not intended to represent exclusive focus during these terms. 
+
+Short term:
+> Usability, stability, and marketing.
+
+Short term, we are focused on improving usability and user productivity (part of this is getting the word out).
+* Documentation
+    * Support an automated process for creating comprehensive documentation that explains working of codes
+    * Support a clean cli `help(<client function>)` documentation solution
+* Release stability
+    * define release strategy
+    * pip release
+
+Long term:
+> Model support, expand on supporting functions 
+* The client currently inputs and outputs JSON dictionaries. Adding models would unlock features such as typing and validation. 
+* Add supporting functions to elevate customer experience (i.e. adding a funtion that surfaces IP address for a Droplet)
