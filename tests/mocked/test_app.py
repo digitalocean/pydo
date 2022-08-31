@@ -448,6 +448,8 @@ def test_list_alerts(mock_client: Client, mock_client_url):
 
     list_resp = mock_client.apps.list_alerts("1")
 
+    assert list_resp == expected
+
 
 @responses.activate
 def test_tiers(mock_client: Client, mock_client_url):
