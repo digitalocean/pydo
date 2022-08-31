@@ -532,6 +532,29 @@ def test_change_alerts(mock_client: Client, mock_client_url):
 
 
 @responses.activate
+def test_tier(mock_client: Client, mock_client_url):
+    """Tests Get Tier"""
+    expected = {
+        "tier": {
+            "name": "Basic",
+            "slug": "basic",
+            "egress_bandwidth_bytes": "42949672960",
+            "build_seconds": "24000",
+        }
+    }
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/apps/tiers/basic",
+        json=expected,
+        status=200,
+    )
+    get_resp = mock_client.apps.get_tier("basic")
+
+    assert get_resp == expected
+
+
+@responses.activate
 def test_instances(mock_client: Client, mock_client_url):
     """Tests Get Instances"""
     expected = {
