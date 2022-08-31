@@ -1,8 +1,7 @@
 # pylint: disable=duplicate-code
 # pylint: disable=line-too-long
+# pylint: disable=too-many-lines
 """Mock tests for the app API resource."""
-from math import exp
-from wsgiref import validate
 import responses
 
 from digitalocean import Client
