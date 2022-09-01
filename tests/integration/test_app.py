@@ -40,12 +40,31 @@ def test_app_lifecycle(integration_client: Client):
         }
     }
 
+    propose_resp = integration_client.apps.validate_app_spec(create_payload)
+
+    assert propose_resp["app_name_available"] is True
+
     with shared.with_test_app(integration_client, create_payload) as app:
         list_resp = integration_client.apps.list()
 
         app_id = app["app"]["id"]
 
         assert app_id in [app["id"] for app in list_resp["apps"]]
+
+        # An app may not have any alerts once running
+        # TODO: figure out how to manually trigger app alerts
+        # alerts_resp = integration_client.apps.list_alerts(app_id)
+
+        # assert alerts_resp is not None
+
+        # alert_id = alerts_resp["alerts"][0]["id"]
+        # alert_req = {"emails": ["api-engineering@digitalocean.com"]}
+
+        # alert_resp = integration_client.apps.assign_alert_destinations(
+        #     app_id, alert_id, alert_req
+        # )
+
+        # assert alert_resp is not None
 
         config = app["app"]["spec"]
         config["region"] = "ams"
@@ -55,3 +74,27 @@ def test_app_lifecycle(integration_client: Client):
         update_resp = integration_client.apps.update(app_id, update_payload)
 
         assert update_resp["app"]["spec"]["region"] == "ams"
+
+
+def test_app_info(integration_client: Client):
+    """Tests all information endpoints"""
+
+    list_app_tier = integration_client.apps.list_tiers()
+
+    assert len(list_app_tier["tiers"]) >= 3
+
+    get_app_tier = integration_client.apps.get_tier("basic")
+
+    assert get_app_tier["tier"]["slug"] == "basic"
+
+    list_instance_sizes = integration_client.apps.list_instance_sizes()
+
+    assert len(list_instance_sizes["instance_sizes"]) >= 4
+
+    get_instance_size = integration_client.apps.get_instance_size("basic-xxs")
+
+    assert get_instance_size["instance_size"]["slug"] == "basic-xxs"
+
+    list_regions = integration_client.apps.list_regions()
+
+    assert len(list_regions["regions"]) >= 5
