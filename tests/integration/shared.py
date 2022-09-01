@@ -313,3 +313,10 @@ def with_test_app(client: Client, body):
         yield create_resp
     finally:
         client.apps.delete(app_id)
+
+
+@contextlib.contextmanager
+def with_test_space(client: Client, body):
+    """
+    Context function that creates a DO Space
+    """
