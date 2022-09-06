@@ -48,6 +48,10 @@ else
 	@(echo "poetry is not installed. See https://python-poetry.org/docs/#installation for more info."; exit 1)
 endif
 
+.PHONY shell
+shell: # Turns the current terminal into a 
+	poetry shell
+
 .PHONY: lint-tests
 lint-tests: install
 	poetry run black --check --diff tests/. && \
