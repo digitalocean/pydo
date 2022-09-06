@@ -49,7 +49,7 @@ else
 endif
 
 .PHONY shell
-shell: # Turns the current terminal into a 
+shell: # Turns the current terminal into a poetry env
 	poetry shell
 
 .PHONY: lint-tests
