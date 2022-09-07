@@ -52,3 +52,14 @@ def invoice_uuid_param():
 
     if invoice_uuid is None:
         pytest.fail("Expected environment variable INVOICE_UUID_PARAM")
+
+
+@pytest.fixture(scope="session")
+def spaces_endpoint() -> str:
+    """Get the spaces endpoint"""
+    spaces_endpoint = environ.get("SPACES_ENDPOINT", None)
+
+    if spaces_endpoint is None:
+        pytest.fail("Expected environment variable SPACES_ENDPOINT")
+
+    return spaces_endpoint

@@ -29,7 +29,7 @@ def test_cdn_lifecycle(integration_client: Client, spaces_endpoint: str):
 
         update_resp = integration_client.cdn.update_endpoints(cdn_id, update_req)
 
-        assert update_resp["endpoints"]["ttl"] == ttl
+        assert update_resp["endpoint"]["ttl"] == ttl
 
         purge_req = {"files": ["*"]}
 
