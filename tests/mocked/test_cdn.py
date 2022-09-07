@@ -100,7 +100,7 @@ def test_update(mock_client: Client, mock_client_url):
         responses.PUT,
         f"{mock_client_url}/v2/cdn/endpoints/1",
         json=expected,
-        status=202,
+        status=200,
     )
 
     update_req = {
