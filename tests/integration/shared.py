@@ -321,7 +321,7 @@ def with_test_cdn(client: Client, body):
     Context function that creates a DO Space
     """
     create_resp = client.cdn.create_endpoint(body)
-    cdn_id = create_resp["endpoint"]["id"]
+    cdn_id = create_resp["endpoint"]["id"] or ""
 
     assert create_resp is not None
     assert cdn_id != ""
