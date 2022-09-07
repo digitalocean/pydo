@@ -6,12 +6,12 @@ from tests.integration import shared
 from digitalocean import Client
 
 
-def test_cdn_lifecycle(integration_client: Client):
+def test_cdn_lifecycle(integration_client: Client, spaces_endpoint: str):
     """Tests the complete lifecycle of a CDN
     Creates, Lists, Gets, Updates, Deletes, Purges.
     """
 
-    cdn_req = {"origin": "pythonclienttest.sfo3.digitaloceanspaces.com", "ttl": 3600}
+    cdn_req = {"origin": spaces_endpoint, "ttl": 3600}
 
     with shared.with_test_cdn(integration_client, cdn_req) as cdn:
         cdn_id = cdn["endpoint"]["id"]
