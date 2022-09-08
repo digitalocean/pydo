@@ -152,7 +152,7 @@ Some test values can be customized so integration tests can exercise different
 scenarios. For example, test use a default region to create resources. All the
 default values are managed in the
 [tests/integration/defaults.py](tests/integration/defaults.py) file. Any value
-that has `environ.get(` can be overwritten by setting the respective environment
+that has `environ.get()` can be overwritten by setting the respective environment
 variable.
 
 ## Client customization
