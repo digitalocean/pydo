@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 from azure.core.credentials import AccessToken
 
 from digitalocean.custom_policies import CustomHttpLoggingPolicy
-from digitalocean.aio import DigitalOceanClient as DigitalOceanClientGenerated
+from digitalocean.aio import GeneratedClient
 
 if TYPE_CHECKING:
     # pylint: disable=unused-import,ungrouped-imports
@@ -32,7 +32,7 @@ class TokenCredentials:
 
 
 class Client(GeneratedClient):  # type: ignore
-    """The official DigitalOceanClient
+    """The official DigitalOcean Python client
 
     :param token: A valid API token.
     :type token: str

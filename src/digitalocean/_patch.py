@@ -9,7 +9,6 @@ Follow our quickstart for examples: https://aka.ms/azsdk/python/dpcodegen/python
 from typing import TYPE_CHECKING
 
 from azure.core.credentials import AccessToken
-from azure.core.pipeline.policies import HttpLoggingPolicy
 
 from digitalocean.custom_policies import CustomHttpLoggingPolicy
 from digitalocean import GeneratedClient, _version
@@ -31,7 +30,7 @@ class TokenCredentials:
 
 
 class Client(GeneratedClient):  # type: ignore
-    """The official DigitalOceanClient
+    """The official DigitalOcean Python client
 
     :param token: A valid API token.
     :type token: str
