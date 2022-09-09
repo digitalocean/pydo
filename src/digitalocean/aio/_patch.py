@@ -27,7 +27,7 @@ class TokenCredentials:
         self._token = token
         self._expires_on = 0
 
-    def get_token(self, *args, **kwargs) -> AccessToken:
+    async def get_token(self, *args, **kwargs) -> AccessToken:
         return AccessToken(self._token, expires_on=self._expires_on)
 
 
