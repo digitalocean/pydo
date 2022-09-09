@@ -313,3 +313,20 @@ def with_test_app(client: Client, body):
         yield create_resp
     finally:
         client.apps.delete(app_id)
+
+
+@contextlib.contextmanager
+def with_test_cdn(client: Client, body):
+    """
+    Context function that creates a DO Space
+    """
+    create_resp = client.cdn.create_endpoint(body)
+    cdn_id = create_resp["endpoint"]["id"] or ""
+
+    assert create_resp is not None
+    assert cdn_id != ""
+
+    try:
+        yield create_resp
+    finally:
+        client.cdn.delete_endpoint(cdn_id)
