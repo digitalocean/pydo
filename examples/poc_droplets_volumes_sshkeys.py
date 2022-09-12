@@ -6,7 +6,7 @@ from urllib.parse import parse_qs
 # Would be nice to not need azure branded imports.
 from azure.core.exceptions import HttpResponseError
 
-from digitalocean import DigitalOceanClient
+from digitalocean import Client
 
 REGION = "nyc3"
 
@@ -20,7 +20,7 @@ class DropletCreator:
         token = os.environ.get("DO_TOKEN")
         if token == "":
             raise Exception("No DigitalOcean API token in DO_TOKEN env var")
-        self.client = DigitalOceanClient(token=os.environ.get("DO_TOKEN"))
+        self.client = Client(token=os.environ.get("DO_TOKEN"))
 
     def throw(self, message):
         raise DigitalOceanError(message) from None

@@ -1,7 +1,7 @@
 import logging
 import os
 
-from digitalocean import DigitalOceanClient
+from digitalocean import Client
 
 LOG_FILE = "simple_ssh_keys.log"
 
@@ -13,7 +13,7 @@ token = os.environ.get("DO_TOKEN")
 if token == "":
     raise Exception("No DigitalOcean API token in DO_TOKEN env var")
 # Initialize the client with the `logger` kwarg set to the application's logger.
-client = DigitalOceanClient(
+client = Client(
     token,
     logger=LOGGER,
 )

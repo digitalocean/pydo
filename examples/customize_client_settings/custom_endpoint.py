@@ -1,6 +1,6 @@
 from os import environ
 
-from digitalocean import DigitalOceanClient
+from digitalocean import Client
 
 # Set the DO_ENDPOINT environment variable to a valid endpoint
 ENDPOINT = environ.get("DO_ENDPOINT") or "https://my.proxy"
@@ -10,7 +10,7 @@ if token == "":
     raise Exception("No DigitalOcean API token in DO_TOKEN env var")
 
 # Initialize the client with the `endpoint` kwarg set to the custom endpoint.
-client = DigitalOceanClient(token, endpoint=ENDPOINT)
+client = Client(token, endpoint=ENDPOINT)
 droplets_resp = client.droplets.list()
 
 total = droplets_resp["meta"]["total"]
