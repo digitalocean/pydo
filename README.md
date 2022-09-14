@@ -34,9 +34,9 @@ To support all of DigitalOcean's HTTP APIs, a generated library is available whi
 
 Find below a working example for GET a ssh_key ([per this http request](https://docs.digitalocean.com/reference/api/api-reference/#operation/sshKeys_list)) and printing the ID associated with the ssh key. If you'd like to try out this quick example, you can follow [these instructions](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/) to add ssh keys to your DO account. 
 ```python
-from digitalocean import DigitalOceanClient
+from digitalocean import Client
 
-client = DigitalOceanClient(token="<YOUR-API-TOKEN>")  
+client = Client(token="<YOUR-API-TOKEN>")  
 
 ssh_keys_resp = client.ssh_keys.list()
 for k in ssh_keys_resp["ssh_keys"]:
