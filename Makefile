@@ -74,3 +74,7 @@ docker-build:
 .PHONY: docker-python
 docker-python: docker-build  ## Runs a python shel within a docker container
 	docker run -it --rm --name pydo digitalocean-client-python:dev python
+
+.PHONY: lint-docs
+lint-docs:
+	markdownlint .
