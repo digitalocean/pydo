@@ -19,6 +19,8 @@ black = "^22.6.0"
 pylint = "^2.14.4"
 pytest = "^7.1.2"
 responses = "^0.21.0"
+pytest-asyncio = "^0.19.0"
+aioresponses = "^0.7.3"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -34,3 +36,6 @@ disable = "no-name-in-module"
 markers = [
     "real_billing: Indicates the test requires a real billing account to test"
 ]
+
+[tool.poetry.extras]
+aio = ["aiohttp"]

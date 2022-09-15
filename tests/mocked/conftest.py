@@ -3,6 +3,7 @@
 import pytest
 
 from digitalocean import Client
+from digitalocean.aio import Client as aioClient
 
 
 @pytest.fixture(scope="module")
@@ -17,3 +18,11 @@ def mock_client(mock_client_url) -> Client:
     The mock client doesn't use a valid token and has a fake API endpoint set.
     """
     return Client("", endpoint=mock_client_url)
+
+
+@pytest.fixture(scope="module")
+def mock_aio_client(mock_client_url) -> aioClient:
+    """Initializes a mock aio client
+    The mock client doesn't use a valid token and has a fake API endpoint set.
+    """
+    return aioClient("", endpoint=mock_client_url)
