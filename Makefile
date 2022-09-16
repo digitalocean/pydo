@@ -43,7 +43,7 @@ generate: clean dev-dependencies
 .PHONY: install
 install: ## Install test dependencies
 ifneq (, $(shell which poetry))
-	poetry install --no-interaction
+	poetry install --no-interaction -E aio
 else
 	@(echo "poetry is not installed. See https://python-poetry.org/docs/#installation for more info."; exit 1)
 endif
