@@ -25,6 +25,7 @@ from .operations import (
     DropletActionsOperations,
     DropletsOperations,
     FirewallsOperations,
+    FunctionsOperations,
     ImageActionsOperations,
     ImagesOperations,
     InvoicesOperations,
@@ -559,6 +560,8 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype droplet_actions: digitalocean.aio.operations.DropletActionsOperations
     :ivar firewalls: FirewallsOperations operations
     :vartype firewalls: digitalocean.aio.operations.FirewallsOperations
+    :ivar functions: FunctionsOperations operations
+    :vartype functions: digitalocean.aio.operations.FunctionsOperations
     :ivar images: ImagesOperations operations
     :vartype images: digitalocean.aio.operations.ImagesOperations
     :ivar image_actions: ImageActionsOperations operations
@@ -623,6 +626,7 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
         self.droplets = DropletsOperations(self._client, self._config, self._serialize, self._deserialize)
         self.droplet_actions = DropletActionsOperations(self._client, self._config, self._serialize, self._deserialize)
         self.firewalls = FirewallsOperations(self._client, self._config, self._serialize, self._deserialize)
+        self.functions = FunctionsOperations(self._client, self._config, self._serialize, self._deserialize)
         self.images = ImagesOperations(self._client, self._config, self._serialize, self._deserialize)
         self.image_actions = ImageActionsOperations(self._client, self._config, self._serialize, self._deserialize)
         self.kubernetes = KubernetesOperations(self._client, self._config, self._serialize, self._deserialize)
