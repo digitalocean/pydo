@@ -42,6 +42,7 @@ def test_class_names(client_resources):
         "droplet_actions",
         "droplets",
         "firewalls",
+        "functions",
         "image_actions",
         "images",
         "invoices",
