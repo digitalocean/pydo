@@ -1,5 +1,6 @@
 # pylint: disable=duplicate-code
 # pylint: disable=line-too-long
+# pylint: disable=too-many-lines
 """Mock tests for the app API resource."""
 import responses
 
@@ -785,3 +786,258 @@ def test_regions(mock_client: Client, mock_client_url):
     list_resp = mock_client.apps.list_regions()
 
     assert list_resp == expected
+
+
+@responses.activate
+def test_rollback(mock_client: Client, mock_client_url):
+    """Test Rollback"""
+
+    expected = {
+        "deployment": {
+            "id": "2",
+            "spec": {
+                "name": "sample-golang",
+                "services": [
+                    {
+                        "name": "web",
+                        "github": {
+                            "repo": "digitalocean/sample-golang",
+                            "branch": "branch",
+                        },
+                        "run_command": "bin/sample-golang",
+                        "environment_slug": "go",
+                        "instance_size_slug": "basic-xxs",
+                        "instance_count": 2,
+                        "routes": [{"path": "/"}],
+                    }
+                ],
+                "region": "ams",
+            },
+            "services": [
+                {
+                    "name": "web",
+                    "source_commit_hash": "9a4df0b8e161e323bc3cdf1dc71878080fe144fa",
+                }
+            ],
+            "phase_last_updated_at": "0001-01-01T00:00:00Z",
+            "created_at": "2020-07-28T18:00:00Z",
+            "updated_at": "2020-07-28T18:00:00Z",
+            "cause": "commit 9a4df0b pushed to github/digitalocean/sample-golang",
+            "progress": {
+                "pending_steps": 6,
+                "total_steps": 6,
+                "steps": [
+                    {
+                        "name": "build",
+                        "status": "PENDING",
+                        "steps": [
+                            {"name": "initialize", "status": "PENDING"},
+                            {
+                                "name": "components",
+                                "status": "PENDING",
+                                "steps": [
+                                    {
+                                        "name": "web",
+                                        "status": "PENDING",
+                                        "component_name": "web",
+                                        "message_base": "Building service",
+                                    }
+                                ],
+                            },
+                        ],
+                    },
+                    {
+                        "name": "deploy",
+                        "status": "PENDING",
+                        "steps": [
+                            {"name": "initialize", "status": "PENDING"},
+                            {
+                                "name": "components",
+                                "status": "PENDING",
+                                "steps": [
+                                    {
+                                        "name": "web",
+                                        "status": "PENDING",
+                                        "steps": [
+                                            {
+                                                "name": "deploy",
+                                                "status": "PENDING",
+                                                "component_name": "web",
+                                                "message_base": "Deploying service",
+                                            },
+                                            {
+                                                "name": "wait",
+                                                "status": "PENDING",
+                                                "component_name": "web",
+                                                "message_base": "Waiting for service",
+                                            },
+                                        ],
+                                        "component_name": "web",
+                                    }
+                                ],
+                            },
+                            {"name": "finalize", "status": "PENDING"},
+                        ],
+                    },
+                ],
+            },
+            "phase": "PENDING_BUILD",
+            "tier_slug": "basic",
+        }
+    }
+
+    responses.add(
+        responses.POST,
+        f"{mock_client_url}/v2/apps/1/rollback",
+        json=expected,
+        status=200,
+    )
+
+    post_req = {"deployment_id": "2", "skip_pin": False}
+
+    post_resp = mock_client.apps.create_rollback("1", post_req)
+
+    assert post_resp == expected
+
+
+@responses.activate
+def test_rollback_validate(mock_client: Client, mock_client_url):
+    """Test Validate Rollback"""
+
+    expected = {"valid": True}
+
+    responses.add(
+        responses.POST,
+        f"{mock_client_url}/v2/apps/1/rollback/validate",
+        json=expected,
+        status=200,
+    )
+
+    validate_req = {"deployment_id": "2", "skip_pin": False}
+
+    validate_resp = mock_client.apps.validate_rollback("1", validate_req)
+
+    assert validate_resp == expected
+
+
+@responses.activate
+def test_rollback_commit(mock_client: Client, mock_client_url):
+    """Test Commit Rollback"""
+
+    responses.add(
+        responses.POST, f"{mock_client_url}/v2/apps/1/rollback/commit", status=200
+    )
+
+    commit_resp = mock_client.apps.commit_rollback("1")
+
+    assert commit_resp is None
+
+
+@responses.activate
+def test_rollback_revert(mock_client: Client, mock_client_url):
+    """Test Revert Rollback"""
+
+    expected = {
+        "deployment": {
+            "id": "b6bdf840-2854-4f87-a36c-5f231c617c84",
+            "spec": {
+                "name": "sample-golang",
+                "services": [
+                    {
+                        "name": "web",
+                        "github": {
+                            "repo": "digitalocean/sample-golang",
+                            "branch": "branch",
+                        },
+                        "run_command": "bin/sample-golang",
+                        "environment_slug": "go",
+                        "instance_size_slug": "basic-xxs",
+                        "instance_count": 2,
+                        "routes": [{"path": "/"}],
+                    }
+                ],
+                "region": "ams",
+            },
+            "services": [
+                {
+                    "name": "web",
+                    "source_commit_hash": "9a4df0b8e161e323bc3cdf1dc71878080fe144fa",
+                }
+            ],
+            "phase_last_updated_at": "0001-01-01T00:00:00Z",
+            "created_at": "2020-07-28T18:00:00Z",
+            "updated_at": "2020-07-28T18:00:00Z",
+            "cause": "commit 9a4df0b pushed to github/digitalocean/sample-golang",
+            "progress": {
+                "pending_steps": 6,
+                "total_steps": 6,
+                "steps": [
+                    {
+                        "name": "build",
+                        "status": "PENDING",
+                        "steps": [
+                            {"name": "initialize", "status": "PENDING"},
+                            {
+                                "name": "components",
+                                "status": "PENDING",
+                                "steps": [
+                                    {
+                                        "name": "web",
+                                        "status": "PENDING",
+                                        "component_name": "web",
+                                        "message_base": "Building service",
+                                    }
+                                ],
+                            },
+                        ],
+                    },
+                    {
+                        "name": "deploy",
+                        "status": "PENDING",
+                        "steps": [
+                            {"name": "initialize", "status": "PENDING"},
+                            {
+                                "name": "components",
+                                "status": "PENDING",
+                                "steps": [
+                                    {
+                                        "name": "web",
+                                        "status": "PENDING",
+                                        "steps": [
+                                            {
+                                                "name": "deploy",
+                                                "status": "PENDING",
+                                                "component_name": "web",
+                                                "message_base": "Deploying service",
+                                            },
+                                            {
+                                                "name": "wait",
+                                                "status": "PENDING",
+                                                "component_name": "web",
+                                                "message_base": "Waiting for service",
+                                            },
+                                        ],
+                                        "component_name": "web",
+                                    }
+                                ],
+                            },
+                            {"name": "finalize", "status": "PENDING"},
+                        ],
+                    },
+                ],
+            },
+            "phase": "PENDING_BUILD",
+            "tier_slug": "basic",
+        }
+    }
+
+    responses.add(
+        responses.POST,
+        f"{mock_client_url}/v2/apps/1/rollback/revert",
+        json=expected,
+        status=200,
+    )
+
+    revert_resp = mock_client.apps.revert_rollback("1")
+
+    assert revert_resp == expected

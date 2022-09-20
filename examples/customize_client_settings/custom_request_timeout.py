@@ -2,7 +2,7 @@ import random
 import string
 from os import environ
 
-from digitalocean import DigitalOceanClient
+from digitalocean import Client
 
 KUBERNETES_VERSION = "latest"
 REGION = "nyc3"
@@ -14,7 +14,7 @@ if token == "":
     raise Exception("No DigitalOcean API token in DO_TOKEN env var")
 
 # Overwrite the default timeout set by the client with your own
-client = DigitalOceanClient(token, timeout=TIMEOUT_APP)
+client = Client(token, timeout=TIMEOUT_APP)
 
 # Normal operation calls will use the app's timeout
 clusters_resp = client.kubernetes.list_clusters()

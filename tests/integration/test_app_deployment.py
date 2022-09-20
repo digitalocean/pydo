@@ -1,5 +1,6 @@
 # pylint: disable=duplicate-code
 # pylint: disable=line-too-long
+# pylint: disable=too-many-locals
 """ test_app_deployment.py
     Integration tests for app deployments
 """
@@ -77,3 +78,23 @@ def test_app_deployment_lifecycle(integration_client: Client):
         )
 
         assert deployment_id == cancel_deployment["deployment"]["id"]
+
+        validate_rollback_req = {"deployment_id": deployment_id, "skip_pin": False}
+
+        validate_resp = integration_client.apps.validate_rollback(
+            app_id, validate_rollback_req
+        )
+
+        assert validate_resp["valid"] is True
+
+        rollback_req = validate_rollback_req
+
+        rollback_resp = integration_client.apps.create_rollback(app_id, rollback_req)
+
+        assert rollback_resp["deployment"]["id"] is not None
+
+        integration_client.apps.commit_rollback(app_id)
+
+        revert_resp = integration_client.apps.revert_rollback(app_id)
+
+        assert revert_resp["deployment"]["id"] is not None

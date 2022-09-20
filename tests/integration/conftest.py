@@ -9,6 +9,7 @@ from cryptography.hazmat.primitives import serialization as crypto_serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 
 from digitalocean import Client
+from digitalocean.aio import Client as aioClient
 
 
 @pytest.fixture(scope="session")
@@ -28,6 +29,26 @@ def integration_client() -> Client:
         pytest.fail("Expected environment variable DO_TOKEN")
 
     client = Client(token)
+    return client
+
+
+@pytest.fixture(scope="session")
+def async_integration_client() -> aioClient:
+    """Instantiates a DigitalOceanClient for use with integration tests.
+
+    The client requires the environment variable DO_TOKEN with a valid API
+    token.
+
+    *IMPORTANT*: Use of this client will create real resources on the
+    account.
+    """
+
+    token = environ.get("DO_TOKEN", None)
+
+    if token is None:
+        pytest.fail("Expected environment variable DO_TOKEN")
+
+    client = aioClient(token)
     return client
 
 
@@ -52,3 +73,14 @@ def invoice_uuid_param():
 
     if invoice_uuid is None:
         pytest.fail("Expected environment variable INVOICE_UUID_PARAM")
+
+
+@pytest.fixture(scope="session")
+def spaces_endpoint() -> str:
+    """Get the spaces endpoint"""
+    spaces = environ.get("SPACES_ENDPOINT", None)
+
+    if spaces is None:
+        pytest.fail("Expected environment variable SPACES_ENDPOINT")
+
+    return spaces
