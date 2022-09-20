@@ -44,7 +44,7 @@ Find below a working example for GET a ssh_key ([per this http request](https://
 ```python
 from digitalocean import Client
 
-client = Client(token="<YOUR-API-TOKEN>")
+client = Client(token=$DIGITALOCEAN_TOKEN)
 
 ssh_keys_resp = client.ssh_keys.list()
 for k in ssh_keys_resp["ssh_keys"]:
@@ -106,8 +106,8 @@ Droplet and Attaches a Volume to the Droplet. Before you run the script, you'll
 need the following exported variables:
 
 ```shell
-export DO_TOKEN=<INSERT-YOUR-DO-TOKEN>
-export SSH_KEY_NAME=<INSERT-YOUR-SSH_KEY_NAME>
+export DO_TOKEN=$DIGITALOCEAN_TOKEN
+export SSH_KEY_NAME=$SSH_KEY_NAME
 ```
 
 Instructions on creating a DO token can be found
@@ -167,7 +167,7 @@ resources on the respective DigitalOcean account.
 To run integration tests, run:
 
 ```shell
-DO_TOKEN=<valid-token> make test-integration
+DO_TOKEN=$DIGITALOCEAN_TOKEN make test-integration
 ```
 
 #### Customizations
@@ -223,7 +223,7 @@ From here you can use the client interactively:
 
 ```shell
 >>> from digitalocean import Client
->>> c = Client("<YOUR_API_TOKEN>")
+>>> c = Client($DIGITALOCEAN_TOKEN)
 >>> c.droplets.get()
 ```
 
