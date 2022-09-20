@@ -21,11 +21,17 @@ jobs:
         path: ./DigitalOcean-public.v2.yaml
     - name: Generate Python client
       run: make generate
+    - name: grab ssh
+      uses: webfactory/ssh-agent@v0.2.0
+      with:
+        ssh-private-key: ${{ secrets.COMMIT_KEY }}
+    - name: Checkout via SSH
+      run: git clone git@github.com:peter-evans/create-pull-request.git .    
     - name: Create Pull Request
       id: cpr
       uses: peter-evans/create-pull-request@v4
       with:
-        ssh-key: "${{ secrets.COMMIT_KEY }}"
+        token: ${{ secrets.GITHUB_TOKEN }}
         commit-message: Re-generate Python Client
         committer: GitHub <noreply@github.com>
         author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
