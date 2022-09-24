@@ -19,6 +19,22 @@ directive:
     where: '$.components.parameters[*]'
     transform: >
       $["x-ms-parameter-location"] = "method";
+  - from: openapi-document
+    where: '$.components.responses.unauthorized'
+    transform: >
+      $["x-ms-error-response"] = true;
+  - from: openapi-document
+    where: '$.components.responses.too_many_requests'
+    transform: >
+      $["x-ms-error-response"] = true;
+  - from: openapi-document
+    where: '$.components.responses.server_error'
+    transform: >
+      $["x-ms-error-response"] = true;
+  - from: openapi-document
+    where: '$.components.responses.unexpected_error'
+    transform: >
+      $["x-ms-error-response"] = true;
 
   # Floating IP operations have been deprecated in favor of reserved IPs.
   - remove-operation: floatingIPs_get
