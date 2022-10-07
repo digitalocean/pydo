@@ -21,6 +21,8 @@ jobs:
         path: ./DigitalOcean-public.v2.yaml
     - name: Generate Python client
       run: make generate
+    - name: Generate Python client documentation
+      run: make generate-docs
     - name: Create Pull Request
       id: cpr
       uses: peter-evans/create-pull-request@v4

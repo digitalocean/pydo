@@ -74,3 +74,16 @@ docker-build:
 .PHONY: docker-python
 docker-python: docker-build  ## Runs a python shel within a docker container
 	docker run -it --rm --name pydo digitalocean-client-python:dev python
+
+.PHONY: generate-docs
+generate-docs: ## Generate documentation for Client using Sphinx
+	@echo Generating documentation...; \
+	poetry export -f requirements.txt -o requirements.txt --without-hashes && \
+	cd docs && \
+	sphinx-apidoc -o source/ ../src/digitalocean && \
+	make html
+
+.PHONY: clean-docs
+clean-docs: ## Delete everything in docs/build/html
+	cd docs && \
+	make clean
