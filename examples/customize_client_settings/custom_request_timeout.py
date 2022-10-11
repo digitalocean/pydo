@@ -2,7 +2,7 @@ import random
 import string
 from os import environ
 
-from digitalocean import Client
+from pydo import Client
 
 KUBERNETES_VERSION = "latest"
 REGION = "nyc3"

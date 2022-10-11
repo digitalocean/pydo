@@ -1,7 +1,7 @@
 import logging
 import os
 
-from digitalocean import Client
+from pydo import Client
 
 LOG_FILE = "simple_ssh_keys.log"
 

@@ -3,8 +3,8 @@
 """
 import pytest
 
-from digitalocean import Client
-from digitalocean.aio import Client as aioClient
+from pydo import Client
+from pydo.aio import Client as aioClient
 
 
 def test_sizes_list(integration_client: Client):

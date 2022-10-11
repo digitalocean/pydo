@@ -6,7 +6,7 @@ import uuid
 
 from tests.integration import defaults
 from tests.integration import shared
-from digitalocean import Client
+from pydo import Client
 
 
 def test_volume_snapshots(integration_client: Client):

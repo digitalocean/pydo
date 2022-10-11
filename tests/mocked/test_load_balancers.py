@@ -3,7 +3,7 @@
 """Mock tests for the load balancers API resource."""
 import responses
 
-from digitalocean import Client
+from pydo import Client
 
 
 @responses.activate

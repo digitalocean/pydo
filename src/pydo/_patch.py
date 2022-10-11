@@ -10,8 +10,8 @@ from typing import TYPE_CHECKING
 
 from azure.core.credentials import AccessToken
 
-from digitalocean.custom_policies import CustomHttpLoggingPolicy
-from digitalocean.aio import GeneratedClient
+from pydo.custom_policies import CustomHttpLoggingPolicy
+from pydo import GeneratedClient, _version
 
 if TYPE_CHECKING:
     # pylint: disable=unused-import,ungrouped-imports
@@ -19,15 +19,13 @@ if TYPE_CHECKING:
 
 
 class TokenCredentials:
-    """DO Customized Code:
-    Added to simplify authentication.
-    """
+    """Credential object used for token authentication"""
 
     def __init__(self, token: str):
         self._token = token
         self._expires_on = 0
 
-    async def get_token(self, *args, **kwargs) -> AccessToken:
+    def get_token(self, *args, **kwargs) -> AccessToken:
         return AccessToken(self._token, expires_on=self._expires_on)
 
 
@@ -44,11 +42,15 @@ class Client(GeneratedClient):  # type: ignore
         logger = kwargs.get("logger")
         if logger is not None and kwargs.get("http_logging_policy") == "":
             kwargs["http_logging_policy"] = CustomHttpLoggingPolicy(logger=logger)
-        super().__init__(TokenCredentials(token), timeout=timeout, **kwargs)
+        sdk_moniker = f"digitaloceanclient/{_version.VERSION}"
+
+        super().__init__(
+            TokenCredentials(token), timeout=timeout, sdk_moniker=sdk_moniker, **kwargs
+        )
 
 
-# Add all objects you want publicly available to users at this package level
-__all__ = ["Client"]  # type: List[str]
+# type: List[str]  # Add all objects you want publicly available to users at this package level
+__all__ = ["Client"]
 
 
 def patch_sdk():

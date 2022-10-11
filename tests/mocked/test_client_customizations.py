@@ -7,7 +7,7 @@ import logging
 import re
 
 import responses
-from digitalocean import Client
+from pydo import Client
 
 # pylint: disable=missing-function-docstring
 

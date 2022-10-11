@@ -3,7 +3,7 @@
 """
 
 from tests.integration import shared
-from digitalocean import Client
+from pydo import Client
 
 
 def test_ssh_keys(integration_client: Client, public_key):
