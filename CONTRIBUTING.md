@@ -91,9 +91,10 @@ In this `_patch.py` file:
 digitalocean-client-python
 │   README.md
 │
-└───digitalocean
-    └───sdk
-        └───models
+└───src
+    └───pydo
+        └───sdk
+        └───operations
         │   _models.py # where the generated models are
         |   _patch.py # where we customize the models code
 ```
@@ -131,8 +132,9 @@ In this `_patch.py` file:
 digitalocean-client-python
 │   README.md
 │
-└───digitalocean
-    └───sdk
+└───src
+    └───pydo
+        └───sdk
         └───operations
         │   _operations.py # where the generated operations are
         |   _patch.py # where we customize the operations code
@@ -171,8 +173,9 @@ In this `_patch.py` file:
 digitalocean-client-python
 │   README.md
 │
-└───digitalocean
-    └───sdk
+└───src
+    └───pydo
+        └───sdk
         └───operations
         │   _operations.py # where the generated operations are
         |   _patch.py # where we customize the operations code
@@ -216,8 +219,9 @@ In this `_patch.py` file:
 digitalocean-client-python
 │   README.md
 │
-└───digitalocean
-    └───sdk
+└───src
+    └───pydo
+        └───sdk
         │   _service_client.py # where the generated service client is
         |   _patch.py # where we customize the client code
         └───operations
@@ -268,8 +272,9 @@ In this `_patch.py` file:
 digitalocean-client-python
 │   README.md
 │
-└───digitalocean
-    └───sdk
+└───src
+    └───pydo
+        └───sdk
         │   _service_client.py # where the generated service client is
         |   _patch.py # where we customize the client code
         └───operations

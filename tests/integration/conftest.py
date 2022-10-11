@@ -14,7 +14,7 @@ from pydo.aio import Client as aioClient
 
 @pytest.fixture(scope="session")
 def integration_client() -> Client:
-    """Instantiates a DigitalOceanClient for use with integration tests.
+    """Instantiates a pydo Client for use with integration tests.
 
     The client requires the environment variable DO_TOKEN with a valid API
     token.
@@ -34,7 +34,7 @@ def integration_client() -> Client:
 
 @pytest.fixture(scope="session")
 def async_integration_client() -> aioClient:
-    """Instantiates a DigitalOceanClient for use with integration tests.
+    """Instantiates a pydo Client for use with integration tests.
 
     The client requires the environment variable DO_TOKEN with a valid API
     token.

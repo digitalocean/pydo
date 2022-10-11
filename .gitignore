@@ -14,7 +14,7 @@ __pycache__/
 *.pyc
 build
 dist
-digitalocean.egg-info
+pydo.egg-info
 
 # client gen
 DigitalOcean-public.v2.yaml

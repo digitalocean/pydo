@@ -20,6 +20,8 @@ from .operations import (
     BillingHistoryOperations,
     CdnOperations,
     CertificatesOperations,
+    CheckOperations,
+    ChecksOperations,
     DatabasesOperations,
     DomainsOperations,
     DropletActionsOperations,
@@ -532,73 +534,73 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     because the browser will typically do all of the work for you.
 
     :ivar one_clicks: OneClicksOperations operations
-    :vartype one_clicks: digitalocean.aio.operations.OneClicksOperations
+    :vartype one_clicks: pydo.aio.operations.OneClicksOperations
     :ivar account: AccountOperations operations
-    :vartype account: digitalocean.aio.operations.AccountOperations
+    :vartype account: pydo.aio.operations.AccountOperations
     :ivar ssh_keys: SshKeysOperations operations
-    :vartype ssh_keys: digitalocean.aio.operations.SshKeysOperations
+    :vartype ssh_keys: pydo.aio.operations.SshKeysOperations
     :ivar actions: ActionsOperations operations
-    :vartype actions: digitalocean.aio.operations.ActionsOperations
+    :vartype actions: pydo.aio.operations.ActionsOperations
     :ivar apps: AppsOperations operations
-    :vartype apps: digitalocean.aio.operations.AppsOperations
+    :vartype apps: pydo.aio.operations.AppsOperations
     :ivar cdn: CdnOperations operations
-    :vartype cdn: digitalocean.aio.operations.CdnOperations
+    :vartype cdn: pydo.aio.operations.CdnOperations
     :ivar certificates: CertificatesOperations operations
-    :vartype certificates: digitalocean.aio.operations.CertificatesOperations
+    :vartype certificates: pydo.aio.operations.CertificatesOperations
     :ivar balance: BalanceOperations operations
-    :vartype balance: digitalocean.aio.operations.BalanceOperations
+    :vartype balance: pydo.aio.operations.BalanceOperations
     :ivar billing_history: BillingHistoryOperations operations
-    :vartype billing_history: digitalocean.aio.operations.BillingHistoryOperations
+    :vartype billing_history: pydo.aio.operations.BillingHistoryOperations
     :ivar invoices: InvoicesOperations operations
-    :vartype invoices: digitalocean.aio.operations.InvoicesOperations
+    :vartype invoices: pydo.aio.operations.InvoicesOperations
     :ivar databases: DatabasesOperations operations
-    :vartype databases: digitalocean.aio.operations.DatabasesOperations
+    :vartype databases: pydo.aio.operations.DatabasesOperations
     :ivar domains: DomainsOperations operations
-    :vartype domains: digitalocean.aio.operations.DomainsOperations
+    :vartype domains: pydo.aio.operations.DomainsOperations
     :ivar droplets: DropletsOperations operations
-    :vartype droplets: digitalocean.aio.operations.DropletsOperations
+    :vartype droplets: pydo.aio.operations.DropletsOperations
     :ivar droplet_actions: DropletActionsOperations operations
-    :vartype droplet_actions: digitalocean.aio.operations.DropletActionsOperations
+    :vartype droplet_actions: pydo.aio.operations.DropletActionsOperations
     :ivar firewalls: FirewallsOperations operations
-    :vartype firewalls: digitalocean.aio.operations.FirewallsOperations
+    :vartype firewalls: pydo.aio.operations.FirewallsOperations
     :ivar functions: FunctionsOperations operations
-    :vartype functions: digitalocean.aio.operations.FunctionsOperations
+    :vartype functions: pydo.aio.operations.FunctionsOperations
     :ivar images: ImagesOperations operations
-    :vartype images: digitalocean.aio.operations.ImagesOperations
+    :vartype images: pydo.aio.operations.ImagesOperations
     :ivar image_actions: ImageActionsOperations operations
-    :vartype image_actions: digitalocean.aio.operations.ImageActionsOperations
+    :vartype image_actions: pydo.aio.operations.ImageActionsOperations
     :ivar kubernetes: KubernetesOperations operations
-    :vartype kubernetes: digitalocean.aio.operations.KubernetesOperations
+    :vartype kubernetes: pydo.aio.operations.KubernetesOperations
     :ivar load_balancers: LoadBalancersOperations operations
-    :vartype load_balancers: digitalocean.aio.operations.LoadBalancersOperations
+    :vartype load_balancers: pydo.aio.operations.LoadBalancersOperations
     :ivar monitoring: MonitoringOperations operations
-    :vartype monitoring: digitalocean.aio.operations.MonitoringOperations
+    :vartype monitoring: pydo.aio.operations.MonitoringOperations
     :ivar projects: ProjectsOperations operations
-    :vartype projects: digitalocean.aio.operations.ProjectsOperations
+    :vartype projects: pydo.aio.operations.ProjectsOperations
     :ivar regions: RegionsOperations operations
-    :vartype regions: digitalocean.aio.operations.RegionsOperations
+    :vartype regions: pydo.aio.operations.RegionsOperations
     :ivar registry: RegistryOperations operations
-    :vartype registry: digitalocean.aio.operations.RegistryOperations
+    :vartype registry: pydo.aio.operations.RegistryOperations
     :ivar reserved_ips: ReservedIPsOperations operations
-    :vartype reserved_ips: digitalocean.aio.operations.ReservedIPsOperations
+    :vartype reserved_ips: pydo.aio.operations.ReservedIPsOperations
     :ivar reserved_ips_actions: ReservedIPsActionsOperations operations
-    :vartype reserved_ips_actions: digitalocean.aio.operations.ReservedIPsActionsOperations
+    :vartype reserved_ips_actions: pydo.aio.operations.ReservedIPsActionsOperations
     :ivar sizes: SizesOperations operations
-    :vartype sizes: digitalocean.aio.operations.SizesOperations
+    :vartype sizes: pydo.aio.operations.SizesOperations
     :ivar snapshots: SnapshotsOperations operations
-    :vartype snapshots: digitalocean.aio.operations.SnapshotsOperations
+    :vartype snapshots: pydo.aio.operations.SnapshotsOperations
     :ivar tags: TagsOperations operations
-    :vartype tags: digitalocean.aio.operations.TagsOperations
+    :vartype tags: pydo.aio.operations.TagsOperations
     :ivar volumes: VolumesOperations operations
-    :vartype volumes: digitalocean.aio.operations.VolumesOperations
+    :vartype volumes: pydo.aio.operations.VolumesOperations
     :ivar volume_actions: VolumeActionsOperations operations
-    :vartype volume_actions: digitalocean.aio.operations.VolumeActionsOperations
+    :vartype volume_actions: pydo.aio.operations.VolumeActionsOperations
     :ivar volume_snapshots: VolumeSnapshotsOperations operations
-    :vartype volume_snapshots: digitalocean.aio.operations.VolumeSnapshotsOperations
+    :vartype volume_snapshots: pydo.aio.operations.VolumeSnapshotsOperations
     :ivar vpcs: VpcsOperations operations
-    :vartype vpcs: digitalocean.aio.operations.VpcsOperations
+    :vartype vpcs: pydo.aio.operations.VpcsOperations
     :ivar uptime: UptimeOperations operations
-    :vartype uptime: digitalocean.aio.operations.UptimeOperations
+    :vartype uptime: pydo.aio.operations.UptimeOperations
     :param credential: Credential needed for the client to connect to Azure. Required.
     :type credential: ~azure.core.credentials_async.AsyncTokenCredential
     :keyword endpoint: Service URL. Default value is "https://api.digitalocean.com".
@@ -606,54 +608,126 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     """
 
     def __init__(
-        self, credential: "AsyncTokenCredential", *, endpoint: str = "https://api.digitalocean.com", **kwargs: Any
+        self,
+        credential: "AsyncTokenCredential",
+        *,
+        endpoint: str = "https://api.digitalocean.com",
+        **kwargs: Any
     ) -> None:
         self._config = GeneratedClientConfiguration(credential=credential, **kwargs)
-        self._client = AsyncPipelineClient(base_url=endpoint, config=self._config, **kwargs)
+        self._client = AsyncPipelineClient(
+            base_url=endpoint, config=self._config, **kwargs
+        )
 
         self._serialize = Serializer()
         self._deserialize = Deserializer()
         self._serialize.client_side_validation = False
-        self.one_clicks = OneClicksOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.account = AccountOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.ssh_keys = SshKeysOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.actions = ActionsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.apps = AppsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.cdn = CdnOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.certificates = CertificatesOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.balance = BalanceOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.billing_history = BillingHistoryOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.invoices = InvoicesOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.databases = DatabasesOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.domains = DomainsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.droplets = DropletsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.droplet_actions = DropletActionsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.firewalls = FirewallsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.functions = FunctionsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.images = ImagesOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.image_actions = ImageActionsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.kubernetes = KubernetesOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.load_balancers = LoadBalancersOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.monitoring = MonitoringOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.projects = ProjectsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.regions = RegionsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.registry = RegistryOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.reserved_ips = ReservedIPsOperations(self._client, self._config, self._serialize, self._deserialize)
+        self.one_clicks = OneClicksOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.account = AccountOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.ssh_keys = SshKeysOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.actions = ActionsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.apps = AppsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.cdn = CdnOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.certificates = CertificatesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.balance = BalanceOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.billing_history = BillingHistoryOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.invoices = InvoicesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.databases = DatabasesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.domains = DomainsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.droplets = DropletsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.droplet_actions = DropletActionsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.firewalls = FirewallsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.functions = FunctionsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.images = ImagesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.image_actions = ImageActionsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.kubernetes = KubernetesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.load_balancers = LoadBalancersOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.monitoring = MonitoringOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.projects = ProjectsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.regions = RegionsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.registry = RegistryOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.reserved_ips = ReservedIPsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
         self.reserved_ips_actions = ReservedIPsActionsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
-        self.sizes = SizesOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.snapshots = SnapshotsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.tags = TagsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.volumes = VolumesOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.volume_actions = VolumeActionsOperations(self._client, self._config, self._serialize, self._deserialize)
+        self.sizes = SizesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.snapshots = SnapshotsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.tags = TagsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.volumes = VolumesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.volume_actions = VolumeActionsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
         self.volume_snapshots = VolumeSnapshotsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
-        self.vpcs = VpcsOperations(self._client, self._config, self._serialize, self._deserialize)
-        self.uptime = UptimeOperations(self._client, self._config, self._serialize, self._deserialize)
+        self.vpcs = VpcsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.uptime = UptimeOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
 
-    def send_request(self, request: HttpRequest, **kwargs: Any) -> Awaitable[AsyncHttpResponse]:
+    def send_request(
+        self, request: HttpRequest, **kwargs: Any
+    ) -> Awaitable[AsyncHttpResponse]:
         """Runs the network request through the client's chained policies.
 
         >>> from azure.core.rest import HttpRequest

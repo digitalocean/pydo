@@ -9,7 +9,9 @@ Follow our quickstart for examples: https://aka.ms/azsdk/python/dpcodegen/python
 from typing import TYPE_CHECKING
 
 from azure.core.credentials import AccessToken
+from azure.core.credentials_async import AsyncTokenCredential
 
+from pydo import _version
 from pydo.custom_policies import CustomHttpLoggingPolicy
 from pydo.aio import GeneratedClient
 
@@ -18,7 +20,7 @@ if TYPE_CHECKING:
     from typing import List
 
 
-class TokenCredentials:
+class TokenCredentials(AsyncTokenCredential):
     """DO Customized Code:
     Added to simplify authentication.
     """
@@ -44,7 +46,11 @@ class Client(GeneratedClient):  # type: ignore
         logger = kwargs.get("logger")
         if logger is not None and kwargs.get("http_logging_policy") == "":
             kwargs["http_logging_policy"] = CustomHttpLoggingPolicy(logger=logger)
-        super().__init__(TokenCredentials(token), timeout=timeout, **kwargs)
+        sdk_moniker = f"pydo/{_version.VERSION}"
+
+        super().__init__(
+            TokenCredentials(token), timeout=timeout, sdk_moniker=sdk_moniker, **kwargs
+        )
 
 
 # Add all objects you want publicly available to users at this package level

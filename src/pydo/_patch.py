@@ -42,14 +42,13 @@ class Client(GeneratedClient):  # type: ignore
         logger = kwargs.get("logger")
         if logger is not None and kwargs.get("http_logging_policy") == "":
             kwargs["http_logging_policy"] = CustomHttpLoggingPolicy(logger=logger)
-        sdk_moniker = f"digitaloceanclient/{_version.VERSION}"
+        sdk_moniker = f"pydo/{_version.VERSION}"
 
         super().__init__(
             TokenCredentials(token), timeout=timeout, sdk_moniker=sdk_moniker, **kwargs
         )
 
 
-# type: List[str]  # Add all objects you want publicly available to users at this package level
 __all__ = ["Client"]
 
 
