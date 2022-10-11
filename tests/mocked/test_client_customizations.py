@@ -56,9 +56,7 @@ def test_custom_user_agent():
         user_agent_overwrite=True,
     )
 
-    full_user_agent_pattern = (
-        r"^test azsdk-python-digitaloceanclient\/.+Python\/.+\(.+\)$"
-    )
+    full_user_agent_pattern = r"^test azsdk-python-pydo\/.+Python\/.+\(.+\)$"
 
     # pylint: disable=protected-access
     got_user_agent = client._client._config.user_agent_policy.user_agent

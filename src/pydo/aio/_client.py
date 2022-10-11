@@ -20,8 +20,6 @@ from .operations import (
     BillingHistoryOperations,
     CdnOperations,
     CertificatesOperations,
-    CheckOperations,
-    ChecksOperations,
     DatabasesOperations,
     DomainsOperations,
     DropletActionsOperations,
