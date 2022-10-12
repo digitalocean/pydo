@@ -1,7 +1,8 @@
 name: pr
 
+# DO NOT PUT REPO LEVEL SECRETS. IF ADDING REPO LEVEL SECRETS NEED TO CREATE AN ENVIRONMENT. #
 on:
-  pull_request:
+  pull_request_target:
 
 jobs:
   lint:
