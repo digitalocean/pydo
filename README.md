@@ -236,3 +236,5 @@ Long term:
 > Model support, expand on supporting functions 
 * The client currently inputs and outputs JSON dictionaries. Adding models would unlock features such as typing and validation. 
 * Add supporting functions to elevate customer experience (i.e. adding a funtion that surfaces IP address for a Droplet)
+
+delete me
