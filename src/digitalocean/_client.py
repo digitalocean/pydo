@@ -42,6 +42,7 @@ from .operations import (
     SnapshotsOperations,
     SshKeysOperations,
     TagsOperations,
+    UptimeOperations,
     VolumeActionsOperations,
     VolumeSnapshotsOperations,
     VolumesOperations,
@@ -596,6 +597,8 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype volume_snapshots: digitalocean.operations.VolumeSnapshotsOperations
     :ivar vpcs: VpcsOperations operations
     :vartype vpcs: digitalocean.operations.VpcsOperations
+    :ivar uptime: UptimeOperations operations
+    :vartype uptime: digitalocean.operations.UptimeOperations
     :param credential: Credential needed for the client to connect to Azure. Required.
     :type credential: ~azure.core.credentials.TokenCredential
     :keyword endpoint: Service URL. Default value is "https://api.digitalocean.com".
@@ -648,6 +651,7 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.vpcs = VpcsOperations(self._client, self._config, self._serialize, self._deserialize)
+        self.uptime = UptimeOperations(self._client, self._config, self._serialize, self._deserialize)
 
     def send_request(self, request: HttpRequest, **kwargs: Any) -> HttpResponse:
         """Runs the network request through the client's chained policies.
