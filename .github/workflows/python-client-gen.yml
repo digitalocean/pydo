@@ -1,4 +1,4 @@
-name: Python Client Generation
+name: Python Client Generation something
 on:
   workflow_dispatch:
     inputs:
@@ -24,6 +24,6 @@ jobs:
     - name: Generate Python client
       run: make generate
     - name: Create Pull Request
-      run: gh pr create --title "[bot] Re-Generate w/ digitalocean/openapi " --body "Regenerate python client with the something release of digitalocean/openapi. Reviewers must review and see if new tests need to be added." -B someting
+      run: gh pr create --title "[bot] Re-Generate w/ digitalocean/openapi ${{ github.event.inputs.release_version }}" --body "Regenerate python client with the ${{ github.event.inputs.release_version }} release of digitalocean/openapi. Reviewers must review and see if new tests need to be added." -B ${{ github.event.inputs.release_version }}
       env:
         GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}    
