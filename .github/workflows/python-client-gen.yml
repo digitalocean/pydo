@@ -28,7 +28,10 @@ jobs:
     - name: Generate Python client
       run: make generate
     - name: Add and commit changes
-      run: git commit -am "[bot] Updated client"
+      run: |
+        git config --global user.email "delhertani@digitalocean.com"
+        git config --global user.name "Dana Elhertani"
+        git commit -am "[bot] Updated client"
       env:
         GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}  
     - name: Create Pull Request
