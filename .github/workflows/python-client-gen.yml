@@ -33,6 +33,7 @@ jobs:
         git config --global user.name "Dana Elhertani"
         git add .
         git commit -m "[bot] Updated client"
+        git push
       env:
         GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}  
     - name: Create Pull Request
