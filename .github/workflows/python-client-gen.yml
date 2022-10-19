@@ -31,7 +31,7 @@ jobs:
       run: |
         git config --global user.email "delhertani@digitalocean.com"
         git config --global user.name "Dana Elhertani"
-        git commit -A
+        git add .
         git commit -m "[bot] Updated client"
       env:
         GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}  
