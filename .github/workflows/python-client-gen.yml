@@ -16,7 +16,7 @@ jobs:
     - name: Download spec file
       run: gh release download --repo danaelhe/openapi ${{ github.event.inputs.release_version }} --pattern 'openapi-bundled.yaml' > DigitalOcean-public.v2.yaml
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
     - uses: actions/upload-artifact@v2
       with:
         name: DigitalOcean-public.v2
