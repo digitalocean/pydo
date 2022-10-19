@@ -20,3 +20,4 @@ digitalocean.egg-info
 DigitalOcean-public.v2.yaml
 node_modules/
 testscript.py
+openapi-bundled.yaml
