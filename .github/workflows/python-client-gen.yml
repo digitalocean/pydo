@@ -15,7 +15,7 @@ jobs:
       run: make clean
     - name: Download spec file and Update DO_OPENAPI_VERSION.txt
       run: |
-        gh release download --repo danaelhe/openapi ${{ github.event.inputs.release_version }} --pattern 'openapi-bundled.yaml' > DigitalOcean-public.v2.yaml
+        gh release download --repo digitalocean/openapi ${{ github.event.inputs.release_version }} --pattern 'openapi-bundled.yaml' > DigitalOcean-public.v2.yaml
         ${{ github.event.inputs.release_version }} > DO_OPENAPI_VERSION.txt
       env:
         GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
