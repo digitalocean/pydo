@@ -1,4 +1,7 @@
 name: Python Client Generation soemthing
+# re-generates the python client when a new release
+# of digitalocean/openapi is cut.
+# Creates a PR with the changes
 on:
   workflow_dispatch:
     inputs:
