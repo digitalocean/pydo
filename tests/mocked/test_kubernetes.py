@@ -4,7 +4,7 @@ import uuid
 import pytest
 
 import responses
-from digitalocean import Client
+from pydo import Client
 
 from tests.mocked.data import kubernetes_data as data
 

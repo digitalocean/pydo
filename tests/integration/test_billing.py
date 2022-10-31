@@ -3,7 +3,7 @@
 """
 import os
 import pytest
-from digitalocean import Client
+from pydo import Client
 
 
 pytestmark = pytest.mark.real_billing

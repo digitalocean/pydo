@@ -1,6 +1,6 @@
 from os import environ
 
-from digitalocean import Client
+from pydo import Client
 
 # Set the DO_ENDPOINT environment variable to a valid endpoint
 ENDPOINT = environ.get("DO_ENDPOINT") or "https://my.proxy"

@@ -4,7 +4,7 @@
 
 import uuid
 
-from digitalocean import Client
+from pydo import Client
 from tests.integration import defaults
 from tests.integration import shared
 

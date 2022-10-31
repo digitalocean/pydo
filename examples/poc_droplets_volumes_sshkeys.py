@@ -6,7 +6,7 @@ from urllib.parse import parse_qs
 # Would be nice to not need azure branded imports.
 from azure.core.exceptions import HttpResponseError
 
-from digitalocean import Client
+from pydo import Client
 
 REGION = "nyc3"
 

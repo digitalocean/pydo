@@ -3,8 +3,8 @@ import pytest
 import responses
 from aioresponses import aioresponses
 
-from digitalocean import Client
-from digitalocean.aio import Client as aioClient
+from pydo import Client
+from pydo.aio import Client as aioClient
 
 EXPECTED_ACCOUNT = {
     "account": {

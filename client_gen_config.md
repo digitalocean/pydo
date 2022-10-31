@@ -2,7 +2,7 @@
 
 ```yaml
 title: DigitalOceanClient
-namespace: digitalocean
+namespace: pydo
 python: true
 black: true
 output-folder: src/

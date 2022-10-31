@@ -1,7 +1,7 @@
 """Mock tests for the actions API resource"""
 import responses
 
-from digitalocean import Client
+from pydo import Client
 
 
 @responses.activate

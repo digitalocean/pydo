@@ -1,6 +1,6 @@
 from os import environ
 
-from digitalocean import Client
+from pydo import Client
 
 # Define a custom value for your application's user-agent
 USER_AGENT = "droplets-example"

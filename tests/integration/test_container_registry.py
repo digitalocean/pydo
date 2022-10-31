@@ -6,7 +6,7 @@
 import uuid
 
 from tests.integration import defaults
-from digitalocean import Client
+from pydo import Client
 
 
 def test_container_registry(integration_client: Client):
