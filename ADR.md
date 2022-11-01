@@ -1,5 +1,12 @@
 # Architecture Decision Record for Pydo
 
+## Title: Client to be Regenerated on digitalocean/openapi Commit instead of Release
+## Date: 10/31/2022
+## Description
+The python-client-gen workflow will be triggered with an digitalocean/openapi commit instead of an digitalocean/openapi tagged release.
+## Additional Context
+We decided to not support releases in digitalocean/openapi repo because it would be too much of a maintenance for that repo. Therefore, to keep Pydo and our DO spec up to date with eachother, we will trigger the workflow on a commit to digitalocean/openapi main's branch.
+
 ## Title: Remove Third-Party Create PR Github Actions Step 
 ## Date: 10/31/2022
 ## Description
