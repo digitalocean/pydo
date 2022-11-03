@@ -1,7 +1,7 @@
 
 # The DigitalOcean Python library
 
-`digitalocean-python-client` is the official python client library that allows
+`pydo` is the official python client library that allows
 python developers to interact with and manage their DigitalOcean account
 resources through a python abstraction layer on top of the raw
 [DigitalOcean API HTTP Interface](https://developers.digitalocean.com/documentation/v2/). 
@@ -19,18 +19,18 @@ on the [DigitalOcean OpenAPI Specification](https://github.com/digitalocean/open
 ## Installation
 To install from pip:
 
-    pip install git+https://github.com/digitalocean/digitalocean-client-python.git
+    pip install git+https://github.com/digitalocean/pydo.git
 
 or, if repo is cloned locally:
 
-    pip install /<PATH>/<TO>/digitalocean-client-python
+    pip install /<PATH>/<TO>/pydo
 
 To install from source:
 
     make install
 
 ## DigitalOcean API
-To support all of DigitalOcean's HTTP APIs, a generated library is available which will expose all the endpoints:  [digitalocean-api-client-python](https://github.com/digitalocean/digitalocean-client-python/tree/main/src/digitalocean).
+To support all of DigitalOcean's HTTP APIs, a generated library is available which will expose all the endpoints:  [pydo](https://github.com/digitalocean/pydo/tree/main/src/digitalocean).
 
 Find below a working example for GET a ssh_key ([per this http request](https://docs.digitalocean.com/reference/api/api-reference/#operation/sshKeys_list)) and printing the ID associated with the ssh key. If you'd like to try out this quick example, you can follow [these instructions](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/) to add ssh keys to your DO account. 
 ```python
@@ -50,7 +50,7 @@ ID: 123457, NAME: my_prod_ssh_key, FINGERPRINT: eb:76:c7:2a:d3:3e:80:5d:ef:2e:ca
 ```
 **Consult the full list of supported DigitalOcean API endpoints in [the DigitalOcean Python Client documentation]().**
 
-**Note**: More working examples can be found [here](https://github.com/digitalocean/digitalocean-client-python/tree/main/examples).
+**Note**: More working examples can be found [here](https://github.com/digitalocean/pydo/tree/main/examples).
 
 ##### Pagination Example
 Below is an example on handling pagination. One must parse the URL to find the next page.
@@ -174,13 +174,13 @@ isolation.
 
 To use it, first build the image. Run: 
 
-    docker build -t digitalocean-client-python:dev .
+    docker build -t pydo:dev .
 
 ### Use the interactive python shell
 
 Open the python shell:
 
-    docker run -it --rm --name do-client-python digitalocean-client-python:dev python
+    docker run -it --rm --name pydo pydo:dev python
 
 The above will launch an interactive python shell and display the following:
 
@@ -202,7 +202,7 @@ running pytest directly.
 
 Run: 
 
-    docker run -it --rm --name pydo -v $PWD/tests:/tests digitalocean-client-python:dev pytest tests/mocked
+    docker run -it --rm --name pydo -v $PWD/tests:/tests pydo:dev pytest tests/mocked
 
 
 ### Known Issues
