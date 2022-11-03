@@ -3,7 +3,7 @@ First: if you're unsure or afraid of anything, just ask or submit the issue or p
 
 ## A Little Bit of Context...
 
-The DigitalOcean Python client is generated using [AutoRest](https://github.com/Azure/autorest). The AutoRest tool generates client libraries for accessing RESTful web services. Input to AutoRest is a spec that describes the DigitalOcean REST API using the OpenAPI 3.0 Specification format. The spec can be found [here](https://github.com/digitalocean/openapi). AutoRest allows customizations to be made on top the generated code. This allows us to mold the raw generated client to be more easier to use and more user friendly. This guide will show you 1) how to generate the client using Autorest and 2) how to add customizations on top of the generated code.
+The DigitalOcean Python client is generated using [AutoRest](https://github.com/Azure/autorest). The AutoRest tool generates client libraries for accessing RESTful web services. Input to AutoRest is a spec that describes the DigitalOcean REST API using the OpenAPI 3.0 Specification format. The spec can be found [here](https://github.com/digitalocean/openapi). AutoRest allows customizations to be made on top the generated code. This allows us to mold the raw generated client to be more easier to use and more user friendly. This guide will show you 1) how to generate the client using AutoRest and 2) how to add customizations on top of the generated code.
 
 
 ## Prerequisites
@@ -19,7 +19,7 @@ We chose not to tie this repository to tooling for managing python installations
 We like these:
 * [pyenv](https://github.com/pyenv/pyenv): python version management
   * [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv):
-  a pyenv pluging to enable pyenv to manage virtualenvs for development
+  a pyenv plugin to enable pyenv to manage virtualenvs for development
   environment isolation
 
 ## Setup
@@ -30,7 +30,7 @@ We like these:
     cd pydo
     ```
 
-1. (Optional) Ensure you have the right version of python installed using your prefered python version manager. This is what you'd run if you used `pyenv`:
+1. (Optional) Ensure you have the right version of python installed using your preferred python version manager. This is what you'd run if you used `pyenv`:
     ```sh
     pyenv install 3.9.4
     ```
