@@ -23,6 +23,7 @@ def test_app_lifecycle(integration_client: Client):
         "spec": {
             "name": name,
             "region": "nyc",
+            "alerts": [{"rule": "DEPLOYMENT_LIVE"}],
             "services": [
                 {
                     "name": "api",
@@ -51,19 +52,19 @@ def test_app_lifecycle(integration_client: Client):
         assert app_id in [app["id"] for app in list_resp["apps"]]
 
         # An app may not have any alerts once running
-        # TODO: figure out how to manually trigger app alerts
-        # alerts_resp = integration_client.apps.list_alerts(app_id)
+        alerts_resp = integration_client.apps.list_alerts(app_id)
 
-        # assert alerts_resp is not None
+        assert alerts_resp is not None
+        assert alerts_resp["alerts"][0]["spec"]["rule"] == "DEPLOYMENT_LIVE"
 
-        # alert_id = alerts_resp["alerts"][0]["id"]
-        # alert_req = {"emails": ["api-engineering@digitalocean.com"]}
+        alert_id = alerts_resp["alerts"][0]["id"]
+        alert_req = {"emails": ["api-engineering@digitalocean.com"]}
 
-        # alert_resp = integration_client.apps.assign_alert_destinations(
-        #     app_id, alert_id, alert_req
-        # )
+        alert_resp = integration_client.apps.assign_alert_destinations(
+            app_id, alert_id, alert_req
+        )
 
-        # assert alert_resp is not None
+        assert alert_resp is not None
 
         config = app["app"]["spec"]
         config["region"] = "ams"
