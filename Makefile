@@ -69,8 +69,8 @@ test-integration-single: install
 
 .PHONY: docker-build
 docker-build:
-	docker build -t digitalocean-client-python:dev .
+	docker build -t pydo:dev .
 
 .PHONY: docker-python
 docker-python: docker-build  ## Runs a python shel within a docker container
-	docker run -it --rm --name pydo digitalocean-client-python:dev python
+	docker run -it --rm --name pydo pydo:dev python

@@ -26,8 +26,8 @@ We like these:
 
 1. Clone this repository. Run:
     ```sh
-    git clone git@github.com:digitalocean/clientgen.git digitalocean-python-client
-    cd digitalocean-python-client
+    git clone git@github.com:digitalocean/pydo.git
+    cd pydo
     ```
 
 1. (Optional) Ensure you have the right version of python installed using your prefered python version manager. This is what you'd run if you used `pyenv`:
@@ -88,7 +88,7 @@ instead of just `str`.
 In this `_patch.py` file:
 
 ```
-digitalocean-client-python
+pydo
 │   README.md
 │
 └───src
@@ -129,7 +129,7 @@ We want to also allow users to input strings, and return a string response if us
 In this `_patch.py` file:
 
 ```
-digitalocean-client-python
+pydo
 │   README.md
 │
 └───src
@@ -170,7 +170,7 @@ in the `_patch.py` file in the `operations` subfolders.
 In this `_patch.py` file:
 
 ```
-digitalocean-client-python
+pydo
 │   README.md
 │
 └───src
@@ -216,7 +216,7 @@ In this example, we change the default authentication policy for a client.
 In this `_patch.py` file:
 
 ```
-digitalocean-client-python
+pydo
 │   README.md
 │
 └───src
@@ -269,7 +269,7 @@ Here, we will be adding an alternate form of authentication on the client, class
 In this `_patch.py` file:
 
 ```
-digitalocean-client-python
+pydo
 │   README.md
 │
 └───src

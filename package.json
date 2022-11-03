@@ -1,5 +1,5 @@
 {
-  "name": "@digitalocean/digitalocean-client-python",
+  "name": "@digitalocean/pydo",
   "description": "Python client generator based on DigitalOcean's OpenAPI specification.",
   "devDependencies": {
     "autorest": "~3.6.1",
@@ -11,12 +11,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/digitalocean/digitalocean-client-python.git"
+    "url": "git+https://github.com/digitalocean/pydo.git"
   },
   "author": "DigitalOcean API Engineering",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/digitalocean/digitalocean-client-python/issues"
+    "url": "https://github.com/digitalocean/pydo/issues"
   },
-  "homepage": "https://github.com/digitalocean/digitalocean-client-python#readme"
+  "homepage": "https://github.com/digitalocean/pydo#readme"
 }
