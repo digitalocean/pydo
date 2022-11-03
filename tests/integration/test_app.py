@@ -30,7 +30,6 @@ def test_app_lifecycle(integration_client: Client):
                         "branch": "main",
                         "repo_clone_url": "https://github.com/digitalocean/sample-golang.git",
                     },
-                    "run_command": "bin/api",
                     "environment_slug": "go",
                     "instance_count": 2,
                     "instance_size_slug": "professional-xs",
