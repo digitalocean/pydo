@@ -58,7 +58,11 @@ def test_app_lifecycle(integration_client: Client):
         assert alerts_resp["alerts"][0]["spec"]["rule"] == "DEPLOYMENT_LIVE"
 
         alert_id = alerts_resp["alerts"][0]["id"]
-        alert_req = {"emails": ["api-engineering@digitalocean.com"]}
+
+        # assign_alert_destinations requires an email address that has access to the app
+        account_resp = integration_client.account.get()
+        assert account_resp is not None
+        alert_req = {"emails": [account_resp["account"]["email"]]}
 
         alert_resp = integration_client.apps.assign_alert_destinations(
             app_id, alert_id, alert_req
