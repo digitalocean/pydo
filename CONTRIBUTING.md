@@ -3,7 +3,7 @@ First: if you're unsure or afraid of anything, just ask or submit the issue or p
 
 ## A Little Bit of Context...
 
-The DigitalOcean Python client is generated using [AutoRest](https://github.com/Azure/autorest). The AutoRest tool generates client libraries for accessing RESTful web services. Input to AutoRest is a spec that describes the DigitalOcean REST API using the OpenAPI 3.0 Specification format. The spec can be found [here](https://github.com/digitalocean/openapi). AutoRest allows customizations to be made on top the generated code. This allows us to mold the raw generated client to be more easier to use and more user friendly. This guide will show you 1) how to generate the client using Autorest and 2) how to add customizations on top of the generated code.
+The DigitalOcean Python client is generated using [AutoRest](https://github.com/Azure/autorest). The AutoRest tool generates client libraries for accessing RESTful web services. Input to AutoRest is a spec that describes the DigitalOcean REST API using the OpenAPI 3.0 Specification format. The spec can be found [here](https://github.com/digitalocean/openapi). AutoRest allows customizations to be made on top the generated code. This allows us to mold the raw generated client to be more easier to use and more user friendly. This guide will show you 1) how to generate the client using AutoRest and 2) how to add customizations on top of the generated code.
 
 
 ## Prerequisites
@@ -19,18 +19,18 @@ We chose not to tie this repository to tooling for managing python installations
 We like these:
 * [pyenv](https://github.com/pyenv/pyenv): python version management
   * [pyenv-virtualenv](https://github.com/pyenv/pyenv-virtualenv):
-  a pyenv pluging to enable pyenv to manage virtualenvs for development
+  a pyenv plugin to enable pyenv to manage virtualenvs for development
   environment isolation
 
 ## Setup
 
 1. Clone this repository. Run:
     ```sh
-    git clone git@github.com:digitalocean/clientgen.git digitalocean-python-client
-    cd digitalocean-python-client
+    git clone git@github.com:digitalocean/pydo.git
+    cd pydo
     ```
 
-1. (Optional) Ensure you have the right version of python installed using your prefered python version manager. This is what you'd run if you used `pyenv`:
+1. (Optional) Ensure you have the right version of python installed using your preferred python version manager. This is what you'd run if you used `pyenv`:
     ```sh
     pyenv install 3.9.4
     ```
@@ -88,12 +88,13 @@ instead of just `str`.
 In this `_patch.py` file:
 
 ```
-digitalocean-client-python
+pydo
 │   README.md
 │
-└───digitalocean
-    └───sdk
-        └───models
+└───src
+    └───pydo
+        └───sdk
+        └───operations
         │   _models.py # where the generated models are
         |   _patch.py # where we customize the models code
 ```
@@ -128,11 +129,12 @@ We want to also allow users to input strings, and return a string response if us
 In this `_patch.py` file:
 
 ```
-digitalocean-client-python
+pydo
 │   README.md
 │
-└───digitalocean
-    └───sdk
+└───src
+    └───pydo
+        └───sdk
         └───operations
         │   _operations.py # where the generated operations are
         |   _patch.py # where we customize the operations code
@@ -168,11 +170,12 @@ in the `_patch.py` file in the `operations` subfolders.
 In this `_patch.py` file:
 
 ```
-digitalocean-client-python
+pydo
 │   README.md
 │
-└───digitalocean
-    └───sdk
+└───src
+    └───pydo
+        └───sdk
         └───operations
         │   _operations.py # where the generated operations are
         |   _patch.py # where we customize the operations code
@@ -213,11 +216,12 @@ In this example, we change the default authentication policy for a client.
 In this `_patch.py` file:
 
 ```
-digitalocean-client-python
+pydo
 │   README.md
 │
-└───digitalocean
-    └───sdk
+└───src
+    └───pydo
+        └───sdk
         │   _service_client.py # where the generated service client is
         |   _patch.py # where we customize the client code
         └───operations
@@ -265,11 +269,12 @@ Here, we will be adding an alternate form of authentication on the client, class
 In this `_patch.py` file:
 
 ```
-digitalocean-client-python
+pydo
 │   README.md
 │
-└───digitalocean
-    └───sdk
+└───src
+    └───pydo
+        └───sdk
         │   _service_client.py # where the generated service client is
         |   _patch.py # where we customize the client code
         └───operations

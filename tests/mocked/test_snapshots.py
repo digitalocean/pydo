@@ -2,7 +2,7 @@
 
 import responses
 
-from digitalocean import Client
+from pydo import Client
 
 
 @responses.activate

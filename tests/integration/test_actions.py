@@ -2,7 +2,7 @@
     Integration Test for Domains
 """
 
-from digitalocean import Client
+from pydo import Client
 
 
 def test_actions(integration_client: Client):

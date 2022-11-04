@@ -19,7 +19,7 @@ dev-dependencies: ## Install development tooling
 .PHONY: clean
 clean: ## Removes all generated code (except _patch.py files)
 	@printf "=== Cleaning src directory\n"
-	@find src/digitalocean -type f ! -name "_patch.py" ! -name "custom_*.py" ! -name "exceptions.py" -exec rm -rf {} +
+	@find src/pydo -type f ! -name "_patch.py" ! -name "custom_*.py" ! -name "exceptions.py" -exec rm -rf {} +
 
 .PHONY: download-spec
 download-spec: ## Download Latest DO Spec
@@ -69,11 +69,11 @@ test-integration-single: install
 
 .PHONY: docker-build
 docker-build:
-	docker build -t digitalocean-client-python:dev .
+	docker build -t pydo:dev .
 
 .PHONY: docker-python
 docker-python: docker-build  ## Runs a python shel within a docker container
-	docker run -it --rm --name pydo digitalocean-client-python:dev python
+	docker run -it --rm --name pydo pydo:dev python
 
 .PHONY: lint-docs
 lint-docs:

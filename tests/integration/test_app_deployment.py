@@ -9,7 +9,7 @@ import time
 import uuid
 from tests.integration import defaults
 from tests.integration import shared
-from digitalocean import Client
+from pydo import Client
 
 
 def test_app_deployment_lifecycle(integration_client: Client):
