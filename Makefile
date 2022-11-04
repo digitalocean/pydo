@@ -2,6 +2,7 @@ LOCAL_SPEC_FILE=./DigitalOcean-public.v2.yaml
 MODELERFOUR_VERSION="4.23.6"
 AUTOREST_PYTHON_VERSION="6.0.1"
 PACKAGE_VERSION?="dev"
+ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
 ifeq (, $(findstring -m,$(PYTEST_ARGS)))
 	PYTEST_EXCLUDE_MARKS=-m "not real_billing"
@@ -74,3 +75,7 @@ docker-build:
 .PHONY: docker-python
 docker-python: docker-build  ## Runs a python shel within a docker container
 	docker run -it --rm --name pydo pydo:dev python
+
+.PHONY: lint-docs
+lint-docs:
+	docker run -v $(ROOT_DIR):/workdir ghcr.io/igorshubovych/markdownlint-cli:latest "*.md"

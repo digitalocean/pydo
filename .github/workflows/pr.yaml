@@ -39,6 +39,11 @@ jobs:
           # --disable=fixme: disables warnings for TODO comments
           PYLINT_ARGS: "--disable=fixme"
 
+      - name: Lint docs
+        uses: avto-dev/markdown-lint@v1
+        with:
+          args: "."
+
   test:
     name: Test
     runs-on: ubuntu-latest
