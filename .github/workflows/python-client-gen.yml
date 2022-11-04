@@ -16,7 +16,7 @@ jobs:
     - name: Download spec file and Update DO_OPENAPI_COMMIT_SHA.txt
       run: |
         curl --fail https://api-engineering.nyc3.digitaloceanspaces.com/spec-ci/DigitalOcean-public-${{ github.event.inputs.openapi_short_sha }}.v2.yaml -o DigitalOcean-public.v2.yaml
-        ${{ github.event.inputs.openapi_short_sha }} > DO_OPENAPI_COMMIT_SHA.txt
+        echo ${{ github.event.inputs.openapi_short_sha }} > DO_OPENAPI_COMMIT_SHA.txt
       env:
         GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
     - uses: actions/upload-artifact@v2
@@ -26,7 +26,7 @@ jobs:
     - name: Checkout new Branch
       run: git checkout -b openapi-${{ github.event.inputs.openapi_short_sha }}/clientgen
       env:
-        GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}   
+        GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
     - name: Generate Python client
       run: make generate
     - name: Add and commit changes
@@ -37,8 +37,8 @@ jobs:
         git commit -m "[bot] Updated client based on openapi/${{ github.event.inputs.openapi_short_sha }}"
         git push --set-upstream origin ${{ github.event.inputs.openapi_short_sha }}
       env:
-        GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}  
+        GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
     - name: Create Pull Request
       run: gh pr create --title "[bot] Re-Generate w/ digitalocean/openapi ${{ github.event.inputs.openapi_short_sha }}" --body "Regenerate python client with the commit,${{ github.event.inputs.openapi_short_sha }}, pushed to digitalocean/openapi. Owners must review to confirm if integration/mocked tests need to be added to the client to reflect the changes." --head "openapi_trigger_${{ github.event.inputs.openapi_short_sha }}" -r owners
       env:
-        GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}    
+        GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
