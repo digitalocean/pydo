@@ -12,7 +12,9 @@ if TYPE_CHECKING:
     # pylint: disable=unused-import,ungrouped-imports
     from typing import List
 
-__all__ = []  # type: List[str]  # Add all objects you want publicly available to users at this package level
+__all__ = (
+    []
+)  # type: List[str]  # Add all objects you want publicly available to users at this package level
 
 
 def patch_sdk():
