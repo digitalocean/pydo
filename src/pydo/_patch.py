@@ -44,7 +44,9 @@ class Client(GeneratedClient):  # type: ignore
             kwargs["http_logging_policy"] = CustomHttpLoggingPolicy(logger=logger)
         sdk_moniker = f"pydo/{_version.VERSION}"
 
-        super().__init__(TokenCredentials(token), timeout=timeout, sdk_moniker=sdk_moniker, **kwargs)
+        super().__init__(
+            TokenCredentials(token), timeout=timeout, sdk_moniker=sdk_moniker, **kwargs
+        )
 
 
 __all__ = ["Client"]
