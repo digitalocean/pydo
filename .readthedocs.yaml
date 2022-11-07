@@ -1,0 +1,18 @@
+version: 2
+
+build:
+  os: ubuntu-22.04
+  tools:
+    python: "3.7"
+  jobs:
+    # need to change references of GeneratedClient to Client to avoid confusion
+    pre_build:
+      - echo "find . -type f -name 'index.html' | xargs sed -i '' 's/GeneratedClient/Client/g'"
+
+sphinx:
+   configuration: docs/source/conf.py
+
+# Optionally declare the Python requirements required to build your docs
+python:
+   install:
+   - requirements: requirements.txt
