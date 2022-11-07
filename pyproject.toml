@@ -5,8 +5,8 @@ description = "The official client for interacting with the DigitalOcean API"
 authors = ["API Engineering <api-engineering@digitalocean.com>"]
 license = "Apache-2.0"
 readme = "README.md"
-repository = https://github.com/digitalocean/pydo
-documentation = https://github.com/digitalocean/pydo
+repository = "https://github.com/digitalocean/pydo"
+documentation = "https://github.com/digitalocean/pydo"
 keywords = ["digitalocean", "api", "client"]
 classifiers = [
     "Development Status :: 4 - Beta",
