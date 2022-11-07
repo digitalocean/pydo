@@ -1,15 +1,15 @@
-# The DigitalOcean Python library
+# **PyDo**
 
-`pydo` is the official python client library that allows
-python developers to interact with and manage their DigitalOcean account
-resources through a python abstraction layer on top of the raw
+`pydo` is the official Python client library that allows
+Python developers to interact with and manage their DigitalOcean
+resources through a Python abstraction layer on top of the raw
 [DigitalOcean API HTTP Interface](https://developers.digitalocean.com/documentation/v2/).
 
 A top priority of this project is to ensure the client abides by the API
 contract. Therefore, the client itself wraps a generated client based
-on the [DigitalOcean OpenAPI Specification](https://github.com/digitalocean/openapi).
+on the [DigitalOcean OpenAPI Specification](https://github.com/digitalocean/openapi) to support all of DigitalOcean's HTTP APIs.
 
-# Getting Started With the Client
+# **Getting Started With the Client**
 
 ## Prerequisites
 
@@ -35,11 +35,22 @@ To install from source:
 make install
 ```
 
-## DigitalOcean API
+## **`pydo` Quickstart**
 
-To support all of DigitalOcean's HTTP APIs, a generated library is available which will expose all the endpoints:  [pydo](https://github.com/digitalocean/pydo/tree/main/src/digitalocean).
+> A quick guide to getting started with the client.
 
-Find below a working example for GET a ssh_key ([per this http request](https://docs.digitalocean.com/reference/api/api-reference/#operation/sshKeys_list)) and printing the ID associated with the ssh key. If you'd like to try out this quick example, you can follow [these instructions](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/) to add ssh keys to your DO account.
+`pydo` must be initialized with `pydo.Client()`. A DigitalOcean API Token is required. The token can be passed explicitly to `pydo.Client()`, as such:
+
+```python
+import os
+from pydo import Client
+
+client = Client(token=os.getenv("$DIGITALOCEAN_TOKEN"))
+```
+
+#### Example of Using `pydo` to Access DO Resources
+
+Find below a working example for GETting a ssh_key ([per this http request](https://docs.digitalocean.com/reference/api/api-reference/#operation/sshKeys_list)) and printing the ID associated with the ssh key. If you'd like to try out this quick example, you can follow [these instructions](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/) to add ssh keys to your DO account.
 
 ```python
 import os
@@ -59,11 +70,11 @@ ID: 123456, NAME: my_test_ssh_key, FINGERPRINT: 5c:74:7e:60:28:69:34:ca:dd:74:67
 ID: 123457, NAME: my_prod_ssh_key, FINGERPRINT: eb:76:c7:2a:d3:3e:80:5d:ef:2e:ca:86:d7:79:94:0d
 ```
 
-**Consult the full list of supported DigitalOcean API endpoints in [the DigitalOcean Python Client documentation](https://pydo.readthedocs.io/en/latest/).**
+**Consult the full list of supported DigitalOcean API endpoints in [PyDo's documentation](https://pydo.readthedocs.io/en/latest/).**
 
 **Note**: More working examples can be found [here](https://github.com/digitalocean/pydo/tree/main/examples).
 
-### Pagination Example
+#### Pagination Example
 
 Below is an example on handling pagination. One must parse the URL to find the
 next page.
@@ -78,56 +89,14 @@ pages = resp.links.pages
         paginated = False
 ```
 
-# Contributing
+# **Contributing**
 
-Visit our [Contribuing Guide](CONTRIBUTING.md) for more information on getting
+>Visit our [Contribuing Guide](CONTRIBUTING.md) for more information on getting
 involved in developing this client.
 
-## Local generation
+# **Tests**
 
-You may want to make changes to the client configurations or customizations and
-test them locally. Everything you need to do this is in the Makefile. Below will
-provide instructions on how to generate the DO python client locally:
-
-The following command will will download the latest published spec and generate
-the client:
-
-```shell
-make generate
-```
-
-To overwrite that behavior and use a local spec file, run the following instead:
-
-```shell
-SPEC_FILE=path/to/local/spec make generate
-```
-
-To test the client you just generated, we have included a POC that creates a
-Droplet and Attaches a Volume to the Droplet. Before you run the script, you'll
-need the following exported variables:
-
-```shell
-export DO_TOKEN=$DIGITALOCEAN_TOKEN
-export SSH_KEY_NAME=$SSH_KEY_NAME
-```
-
-Instructions on creating a DO token can be found
-[here](https://docs.digitalocean.com/reference/api/create-personal-access-token/)
-
-Instructions on creating an SSH Key can be found
-[here](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/)
-
-You are ready to run the script. Run the following:
-
-> **Running the following Python script will create billed resources in your account**
-
-```shell
-python3 examples/poc_droplets_volumes_sshkeys.py
-```
-
-## Running tests
-
-The tests included in this repo are used to validate the generated client.
+>The tests included in this repo are used to validate the generated client.
 We use `pytest` to define and run the tests.
 
 **_Requirements_**
@@ -142,7 +111,7 @@ We use `pytest` to define and run the tests.
 
 There are two types of test suites in the `tests/` directory.
 
-### `tests/mocked/`
+#### Mocked Tests: `tests/mocked/`
 
 Tests in the `mocked` directory include:
 
@@ -158,7 +127,7 @@ To run mocked tests, run:
 make test-mocked
 ```
 
-### `tests/integration/`
+#### Integration Tests: `tests/integration/`
 
 Tests in the `integration` directory include tests that simulate specific
 scenarios a cusomter might use the client to interact with the API.
@@ -171,7 +140,7 @@ To run integration tests, run:
 DO_TOKEN=$DIGITALOCEAN_TOKEN make test-integration
 ```
 
-#### Customizations
+#### Test Customizations
 
 Some test values can be customized so integration tests can exercise different
 scenarios. For example, test use a default region to create resources. All the
@@ -180,19 +149,7 @@ default values are managed in the
 that has `environ.get()` can be overwritten by setting the respective environment
 variable.
 
-## Client customization
-
-Several client settings can be customized to suite the applicaiton.
-The configuration options available are currently listed in the
-[generator's sdk documentation](https://github.com/Azure/azure-sdk-for-python/blob/main/sdk/core/azure-core/README.md#configurations). As this client evolves, we will include these details in our
-documentation.
-
-There are several examples in the
-[examples/customize_client_settings](examples/customize_client_settings)
-directory that help illustrate how to easily customize the client
-configuration.
-
-## Docker
+#### Tests with Docker
 
 The included Dockerfile is a developler convenience to test the package in
 isolation.
@@ -203,7 +160,7 @@ To use it, first build the image. Run:
 docker build -t pydo:dev .
 ```
 
-### Use the interactive python shell
+##### Use the interactive python shell
 
 Open the python shell:
 
@@ -228,8 +185,6 @@ From here you can use the client interactively:
 >>> c.droplets.get()
 ```
 
-### Run the tests
-
 Alternatively, the tests can be run by attaching the tests as a volume and
 running pytest directly.
 
@@ -239,9 +194,9 @@ Run:
 docker run -it --rm --name pydo -v $PWD/tests:/tests pydo:dev pytest tests/mocked
 ```
 
-### Known Issues
+# **Known Issues**
 
-This selection lists the known issues of the client generator.
+>This selection lists the known issues of the client generator.
 
 #### `kubernetes.get_kubeconfig` Does not serialize response content
 
@@ -255,9 +210,9 @@ In the generated python client, when calling `invoices.get_pdf_by_uuid`, the res
 
 Currently, calling the "help(<client function>)" includes the API documentation for the respective operation which is substantial and can be confusing in the context of this client.
 
-## Roadmap
+# **Roadmap**
 
-This section lists short-term and long-term goals for the project.
+>This section lists short-term and long-term goals for the project.
 **Note**: These are goals, not necessarily commitments. The sections are not intended to represent exclusive focus during these terms.
 
 Short term:
