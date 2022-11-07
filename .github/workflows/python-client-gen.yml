@@ -11,22 +11,36 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+
     - name: Removes all generated code
       run: make clean
+
     - name: Download spec file and Update DO_OPENAPI_COMMIT_SHA.txt
       run: |
         curl --fail https://api-engineering.nyc3.digitaloceanspaces.com/spec-ci/DigitalOcean-public-${{ github.event.inputs.openapi_short_sha }}.v2.yaml -o DigitalOcean-public.v2.yaml
         echo ${{ github.event.inputs.openapi_short_sha }} > DO_OPENAPI_COMMIT_SHA.txt
       env:
         GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+
     - uses: actions/upload-artifact@v2
       with:
         name: DigitalOcean-public.v2
         path: ./DigitalOcean-public.v2.yaml
+
     - name: Checkout new Branch
       run: git checkout -b openapi-${{ github.event.inputs.openapi_short_sha }}/clientgen
       env:
         GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1.3.1
+      with:
+        version: 1.1.13
+        virtualenvs-path: .venv
+        virtualenvs-create: true
+        virtualenvs-in-project: true
+        installer-parallel: false
+
     - name: Generate Python client
       run: make generate
     - name: Generate Python client documentation
@@ -40,6 +54,7 @@ jobs:
         git push --set-upstream origin ${{ github.event.inputs.openapi_short_sha }}
       env:
         GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+
     - name: Create Pull Request
       run: gh pr create --title "[bot] Re-Generate w/ digitalocean/openapi ${{ github.event.inputs.openapi_short_sha }}" --body "Regenerate python client with the commit,${{ github.event.inputs.openapi_short_sha }}, pushed to digitalocean/openapi. Owners must review to confirm if integration/mocked tests need to be added to the client to reflect the changes." --head "openapi_trigger_${{ github.event.inputs.openapi_short_sha }}" -r owners
       env:
