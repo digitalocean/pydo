@@ -1,9 +1,9 @@
 # **PyDo**
 
 `pydo` is the official Python client library that allows
-Python developers to interact with and manage their DigitalOcean 
+Python developers to interact with and manage their DigitalOcean
 resources through a Python abstraction layer on top of the raw
-[DigitalOcean API HTTP Interface](https://developers.digitalocean.com/documentation/v2/). 
+[DigitalOcean API HTTP Interface](https://developers.digitalocean.com/documentation/v2/).
 
 A top priority of this project is to ensure the client abides by the API
 contract. Therefore, the client itself wraps a generated client based
@@ -36,15 +36,18 @@ make install
 ```
 
 ## **`pydo` Quickstart**
+
 > A quick guide to getting started with the client.
 
-`pydo` must be initialized with `pydo.Client()`. A DigitalOcean API Token is required. The token can be passed explicitly to `pydo.Client()`, as such: 
+`pydo` must be initialized with `pydo.Client()`. A DigitalOcean API Token is required. The token can be passed explicitly to `pydo.Client()`, as such:
+
 ```python
 import os
 from pydo import Client
 
 client = Client(token=os.getenv("$DIGITALOCEAN_TOKEN"))
 ```
+
 #### Example of Using `pydo` to Access DO Resources
 
 Find below a working example for GETting a ssh_key ([per this http request](https://docs.digitalocean.com/reference/api/api-reference/#operation/sshKeys_list)) and printing the ID associated with the ssh key. If you'd like to try out this quick example, you can follow [these instructions](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/) to add ssh keys to your DO account.
@@ -87,6 +90,7 @@ pages = resp.links.pages
 ```
 
 # **Contributing**
+
 >Visit our [Contribuing Guide](CONTRIBUTING.md) for more information on getting
 involved in developing this client.
 

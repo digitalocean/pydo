@@ -8,7 +8,7 @@ The DigitalOcean Python client is generated using [AutoRest](https://github.com/
 
 ## Generating PyDo Locally
 
-PyDo is a generated client. This section will walk you through generating the client locally. One might ask, when would one want to generate PyDo locally? Local generation is really helpful when making changes to the client configuration itself. It is good practice to re-generate the client to ensure the behavior is as expected. 
+PyDo is a generated client. This section will walk you through generating the client locally. One might ask, when would one want to generate PyDo locally? Local generation is really helpful when making changes to the client configuration itself. It is good practice to re-generate the client to ensure the behavior is as expected.
 
 ### Prerequisites
 
@@ -56,17 +56,22 @@ We like these:
     poetry shell
     ```
 
-### Using `make` commands to re-generate the client.
+### Using `make` commands to re-generate the client
+
 1. Remove the previous generated code.
+
     ```sh
     make clean
     ```
- 2. Re-download the latest DO OpenAPI 3.0 Specification.
+
+2. Re-download the latest DO OpenAPI 3.0 Specification.
+
     ```sh
     make download-spec
     ```
+
 3. Generate the client
- 
+
     ```sh
     make generate
     ```
@@ -76,7 +81,7 @@ We like these:
     ```sh
     make test-mocked
     ```
-    
+
 ## Customizing the Client Using Patch Files
 
 On top of generating our client, we've added a few customizations to create an optimal user experience. These customizations can by making changes to the `_patch.py` file. To learn more about adding customizations, please follow Autorest's documentation for it [here](https://github.com/Azure/autorest.python/blob/autorestv3/docs/customizations.md)
