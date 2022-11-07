@@ -33,7 +33,7 @@ ifndef SPEC_FILE
 generate: SPEC_FILE = $(LOCAL_SPEC_FILE)
 generate: dev-dependencies download-spec ## Generates the python client using the latest published spec first.
 endif
-generate: clean dev-dependencies
+generate: install clean dev-dependencies
 	@printf "=== Generating client with spec: $(SPEC_FILE)\n\n"; \
 	npm run autorest -- client_gen_config.md \
 		--use:@autorest/modelerfour@$(MODELERFOUR_VERSION) \
