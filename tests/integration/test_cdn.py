@@ -3,7 +3,7 @@
 """
 
 from tests.integration import shared
-from digitalocean import Client
+from pydo import Client
 
 
 def test_cdn_lifecycle(integration_client: Client, spaces_endpoint: str):

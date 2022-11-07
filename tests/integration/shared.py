@@ -9,7 +9,7 @@ import uuid
 
 from azure.core.exceptions import HttpResponseError
 
-from digitalocean import Client
+from pydo import Client
 from tests.integration import defaults
 
 

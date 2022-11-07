@@ -10,8 +10,8 @@ import pytest
 
 from tests.integration import defaults
 from tests.integration import shared
-from digitalocean import Client
-from digitalocean.exceptions import HttpResponseError
+from pydo import Client
+from pydo.exceptions import HttpResponseError
 
 CLUSTER_CREATE_BASIC_REQ = {
     "name": f"{defaults.PREFIX}-cluster-{uuid.uuid4().hex}",

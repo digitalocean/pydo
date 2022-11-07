@@ -2,7 +2,7 @@
     Integration Test for Regions
 """
 
-from digitalocean import Client
+from pydo import Client
 
 
 def test_regions(integration_client: Client):

@@ -2,7 +2,7 @@
 
 ```yaml
 title: DigitalOceanClient
-namespace: digitalocean
+namespace: pydo
 python: true
 black: true
 output-folder: src/
@@ -30,6 +30,23 @@ directive:
   - remove-operation: floatingIPsAction_post
 
   - from: openapi-document
+    where: '$.components.responses.unauthorized'
+    transform: >
+      $["x-ms-error-response"] = true;
+  - from: openapi-document
+    where: '$.components.responses.too_many_requests'
+    transform: >
+      $["x-ms-error-response"] = true;
+  - from: openapi-document
+    where: '$.components.responses.server_error'
+    transform: >
+      $["x-ms-error-response"] = true;
+  - from: openapi-document
+    where: '$.components.responses.unexpected_error'
+    transform: >
+      $["x-ms-error-response"] = true;
+      
+  - from: openapi-document
     where: '$..["log_line_prefix"]'
     transform: >
       $["x-ms-enum"] = {
@@ -50,4 +67,10 @@ directive:
           }
         ]
       };
+
+  # Remove accept and content-type arguments from the app.Create method.
+  - from: openapi-document
+    where: '$.paths."/v2/apps".post'
+    transform: >
+      $["parameters"] = [];
 ```
