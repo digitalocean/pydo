@@ -2,7 +2,7 @@
 
 ```yaml
 title: DigitalOceanClient
-namespace: digitalocean
+namespace: pydo
 python: true
 black: true
 output-folder: src/
@@ -50,4 +50,10 @@ directive:
           }
         ]
       };
+
+  # Remove accept and content-type arguments from the app.Create method.
+  - from: openapi-document
+    where: '$.paths."/v2/apps".post'
+    transform: >
+      $["parameters"] = [];
 ```

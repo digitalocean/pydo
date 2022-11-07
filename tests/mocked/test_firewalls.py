@@ -1,7 +1,7 @@
 """Mock tests for the firewalls API resource."""
 import responses
 
-from digitalocean import Client
+from pydo import Client
 
 
 @responses.activate

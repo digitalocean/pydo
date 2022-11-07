@@ -7,7 +7,7 @@
 import uuid
 
 from tests.integration import defaults, shared
-from digitalocean import Client
+from pydo import Client
 
 
 def test_load_balancers_tag(integration_client: Client, public_key: bytes):

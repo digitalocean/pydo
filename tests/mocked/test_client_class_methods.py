@@ -59,6 +59,7 @@ def test_class_names(client_resources):
         "snapshots",
         "ssh_keys",
         "tags",
+        "uptime",
         "volume_actions",
         "volume_snapshots",
         "volumes",

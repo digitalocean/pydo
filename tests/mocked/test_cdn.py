@@ -1,7 +1,7 @@
 """Mock tests for the CDN endpoints."""
 import responses
 
-from digitalocean import Client
+from pydo import Client
 
 
 @responses.activate
