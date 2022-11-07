@@ -29,6 +29,8 @@ jobs:
         GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
     - name: Generate Python client
       run: make generate
+    - name: Generate Python client documentation
+      run: make generate-docs
     - name: Add and commit changes
       run: |
         git config --global user.email "api-engineering@digitalocean.com"
