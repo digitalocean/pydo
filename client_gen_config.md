@@ -30,6 +30,23 @@ directive:
   - remove-operation: floatingIPsAction_post
 
   - from: openapi-document
+    where: '$.components.responses.unauthorized'
+    transform: >
+      $["x-ms-error-response"] = true;
+  - from: openapi-document
+    where: '$.components.responses.too_many_requests'
+    transform: >
+      $["x-ms-error-response"] = true;
+  - from: openapi-document
+    where: '$.components.responses.server_error'
+    transform: >
+      $["x-ms-error-response"] = true;
+  - from: openapi-document
+    where: '$.components.responses.unexpected_error'
+    transform: >
+      $["x-ms-error-response"] = true;
+      
+  - from: openapi-document
     where: '$..["log_line_prefix"]'
     transform: >
       $["x-ms-enum"] = {
