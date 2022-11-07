@@ -48,8 +48,8 @@ else
 	@(echo "poetry is not installed. See https://python-poetry.org/docs/#installation for more info."; exit 1)
 endif
 
-.PHONY: shell
-shell: # Turns the current terminal into a poetry env
+.PHONY: dev
+dev: dev-dependencies # Turns the current terminal into a poetry env
 	poetry shell
 
 .PHONY: lint-tests
