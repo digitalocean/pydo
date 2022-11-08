@@ -12,8 +12,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2.5.0
 
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
       - name: Install Poetry
-        uses: snok/install-poetry@v1.3.1
+        uses: snok/install-poetry@v1.3.3
         with:
           version: 1.1.13
           virtualenvs-path: .venv
@@ -42,6 +47,9 @@ jobs:
 
   release:
     runs-on: ubuntu-latest
+
+    needs: build-and-publish
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2.5.0
