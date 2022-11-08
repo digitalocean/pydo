@@ -95,8 +95,11 @@ number vor the tag.
 *Before pushing a tag*, the pyproject version needs to be bumped.
 
 1. Run `make changes` to review the merged PRs since last release.
+    * Review the tags on each PR and make sure they are categorized
+      appropriately.
 2. Determine the bump type (major, minor, patch).
-3. Run `BUMP=(bugfix|feature|breaking) make bump_version` to update the `pydo` version.
+3. Run `BUMP=(bugfix|feature|breaking) make bump_version` to update the `pydo`
+   version.
     * `BUMP` also accepts `(patch|minor|major)`
 4. Make a pull request with this change. It should be separate from PRs
    containing chagnes to the library (including regenerated code).
@@ -105,3 +108,5 @@ number vor the tag.
    Run `make tag` to tag the latest commit and push the tag to ORIGIN.
     * To tag an earlier commit, run `COMMIT=${commit} make tag`.
     * To push the tag to a different remote, run `ORIGIN=${REMOTE} make tag`.
+6. Once the release process completes, review the draft release for correctness
+   and publish the release. Also, ensure the release has been marked `Latest`.
