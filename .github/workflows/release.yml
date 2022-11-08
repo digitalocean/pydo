@@ -1,0 +1,76 @@
+name: tagged-release
+
+on:
+  push:
+    tags:
+      - "v[0-9].[0-9]+.[0-9]+"
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.5.0
+
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1.3.3
+        with:
+          version: 1.1.13
+          virtualenvs-path: .venv
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: false
+
+      - name: Restore poetry cache
+        if: success() && !env.ACT
+        uses: actions/cache@v3
+        with:
+          path: $(poetry config cache-dir)
+          key: ubuntu-latest-poetry-${{ matrix.python-version }}-${{ hashFiles('**/pyproject.toml') }}
+
+      - name: Build
+        run: poetry build
+
+      - name: Upload a Build Artifacts
+        uses: actions/upload-artifact@v3.1.1
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish
+        run: poetry publish
+        env:
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
+
+  release:
+    runs-on: ubuntu-latest
+
+    needs: build-and-publish
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.5.0
+
+      - name: Download the Build Artifacts
+        uses: actions/download-artifact@v3.0.1
+        with:
+          name: dist
+          path: dist/
+
+      - name: Set TAG
+        run: echo "TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
+      - name: Create release
+        run: |
+          gh release create ${{ env.TAG }} \
+           dist/* \
+           --title "${{ env.TAG }}" \
+           --generate-notes \
+           --draft
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
