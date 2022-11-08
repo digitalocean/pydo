@@ -101,7 +101,7 @@ We use `pytest` to define and run the tests.
 
 **_Requirements_**
 
-- Python 3.9+
+- Python 3.7+
   - Can be installed using something like
     [pyenv](https://github.com/pyenv/pyenv)
     - used to manage different installed versions of python.
