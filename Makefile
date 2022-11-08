@@ -84,3 +84,17 @@ docker-python: docker-build  ## Runs a python shel within a docker container
 .PHONY: lint-docs
 lint-docs:
 	docker run -v $(ROOT_DIR):/workdir ghcr.io/igorshubovych/markdownlint-cli:latest "*.md"
+
+.PHONY: generate-docs
+generate-docs: ## Generate documentation for Client using Sphinx
+	@echo Generating documentation...; \
+	@echo Converting poetry file to requirements.txt...; \
+	poetry export -f requirements.txt -o requirements.txt --without-hashes && \
+	cd docs && \
+	sphinx-apidoc -o source/ ../src/pydo && \
+	make html
+
+.PHONY: clean-docs
+clean-docs: ## Delete everything in docs/build/html
+	cd docs && \
+	make clean
