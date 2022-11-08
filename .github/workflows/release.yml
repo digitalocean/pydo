@@ -68,7 +68,7 @@ jobs:
       - name: Create release
         run: |
           gh release create ${{ env.TAG }} \
-           dist/*
+           dist/* \
            --title "${{ env.TAG }}" \
            --generate-notes \
            --draft
