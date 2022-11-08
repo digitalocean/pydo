@@ -3,6 +3,8 @@ MODELERFOUR_VERSION="4.23.6"
 AUTOREST_PYTHON_VERSION="6.0.1"
 PACKAGE_VERSION?="dev"
 ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
+ORIGIN ?= origin
+BUMP ?= patch
 
 ifeq (, $(findstring -m,$(PYTEST_ARGS)))
 	PYTEST_EXCLUDE_MARKS=-m "not real_billing"
@@ -98,3 +100,35 @@ generate-docs: ## Generate documentation for Client using Sphinx
 clean-docs: ## Delete everything in docs/build/html
 	cd docs && \
 	make clean
+
+.PHONY: _install_github_release_notes
+_install_github_release_notes:
+	@GO111MODULE=off go get -u github.com/digitalocean/github-changelog-generator
+
+.PHONY: changes
+changes: _install_github_release_notes
+	@echo "==> Merged PRs since last release"
+	@echo ""
+	@github-changelog-generator -org digitalocean -repo pydo
+
+.PHONY: version
+version:
+	@poetry version
+
+.PHONY: _install_sembump
+_install_sembump:
+	@echo "=> installing/updating sembump tool"
+	@echo ""
+	@GO111MODULE=off go get -u github.com/jessfraz/junk/sembump
+
+.PHONY: bump_version
+bump_version: _install_sembump
+	@echo "==> BUMP=${BUMP} bump_version"
+	@echo ""
+	@ORIGIN=${ORIGIN} scripts/bumpversion.sh
+
+.PHONY: tag
+tag:
+	@echo "==> ORIGIN=${ORIGIN} COMMIT=${COMMIT} tag"
+	@echo ""
+	@ORIGIN=${ORIGIN} scripts/tag.sh

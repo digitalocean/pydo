@@ -1,0 +1,19 @@
+# Automatic release notes configuration
+# https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes
+
+changelog:
+  exclude:
+    labels:
+      - ignore-for-changelog
+  categories:
+    - title: "Breaking Changes :warning:"
+      labels:
+        - semver-major
+        - breaking-change
+    - title: "Features :tada:"
+      labels:
+        - semver-minor
+        - enhancement
+    - title: "Other Changes :hammer_and_pick: (Bug fixes, documenation, etc)"
+      labels:
+        - "*"
