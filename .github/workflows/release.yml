@@ -61,3 +61,4 @@ jobs:
             --draft
         env:
           TAG: ${GITHUB_REF#refs/*/}
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
