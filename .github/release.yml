@@ -14,6 +14,9 @@ changelog:
       labels:
         - semver-minor
         - enhancement
-    - title: "Other Changes :hammer_and_pick: (Bug fixes, documenation, etc)"
+    - title: Bug fixes 🐞
+      labels:
+        - bug
+    - title: "Other Changes :hammer_and_pick: (documentation, testing, etc)"
       labels:
         - "*"
