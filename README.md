@@ -117,7 +117,7 @@ Tests in the `mocked` directory include:
 
 - tests that validate the generated client has all the expected classes and
   methods for the respective API resources and operations.
-- tests that excercise individual operations against mocked responses.
+- tests that exercise individual operations against mocked responses.
 
 These tests do not act against the real API so no real resources are created.
 
@@ -130,8 +130,8 @@ make test-mocked
 #### Integration Tests: `tests/integration/`
 
 Tests in the `integration` directory include tests that simulate specific
-scenarios a cusomter might use the client to interact with the API.
-**_IMPORTANT:_** test tests require a valid API token and **_DO_** create real
+scenarios a customer might use the client for to interact with the API.
+**_IMPORTANT:_** these tests require a valid API token and **_DO_** create real
 resources on the respective DigitalOcean account.
 
 To run integration tests, run:
