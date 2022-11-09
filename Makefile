@@ -89,7 +89,7 @@ lint-docs:
 
 .PHONY: generate-docs
 generate-docs: ## Generate documentation for Client using Sphinx
-	@echo Generating documentation...; \
+	@echo Generating documentation...;
 	@echo Converting poetry file to requirements.txt...; \
 	poetry export -f requirements.txt -o requirements.txt --without-hashes && \
 	cd docs && \
