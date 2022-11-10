@@ -90,8 +90,8 @@ lint-docs:
 .PHONY: generate-docs
 generate-docs: install ## readthedocs requires a requirements.txt file, this step converts poetry file to requirements.txt file before re-gen the docs
 	@echo Generating documentation...;
-	@echo Converting poetry file to requirements.txt...; \
-	poetry export -f requirements.txt -o requirements.txt --without-hashes && \
+	@echo Converting poetry file to requirements.txt...; 
+	poetry export -f requirements.txt -o requirements.txt --without-hashes
 	cd docs && \
 	poetry run sphinx-apidoc -o source/ ../src/pydo && \
 	poetry run make html
@@ -99,7 +99,7 @@ generate-docs: install ## readthedocs requires a requirements.txt file, this ste
 .PHONY: clean-docs
 clean-docs: ## Delete everything in docs/build/html
 	cd docs && \
-	make clean
+	poetry run make clean
 
 .PHONY: _install_github_release_notes
 _install_github_release_notes:
