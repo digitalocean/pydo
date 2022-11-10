@@ -88,10 +88,10 @@ lint-docs:
 	docker run -v $(ROOT_DIR):/workdir ghcr.io/igorshubovych/markdownlint-cli:latest "*.md"
 
 .PHONY: generate-docs
-generate-docs: install
+generate-docs: install ## readthedocs requires a requirements.txt file, this step converts poetry file to requirements.txt file
 	@echo Generating documentation...;
 	@echo Converting poetry file to requirements.txt...; \
-	poetry export -f requirements.txt -o requirements.txt --without-hashes && \
+	poetry export -f requirements.txt -o requirements.txt --without-hashes && \ 
 	cd docs && \
 	poetry run sphinx-apidoc -o source/ ../src/pydo && \
 	poetry run make html
