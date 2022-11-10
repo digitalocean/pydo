@@ -6,12 +6,13 @@ on:
         description: "The short commit sha that triggered the workflow"
         required: true
         type: string
+
+env:
+  NEW_BRANCH: openapi-${{ github.event.inputs.openapi_short_sha }}/clientgen
+
 jobs:
   Generate-Python-Client:
     runs-on: ubuntu-latest
-
-    env:
-      NEW_BRANCH: openapi-${{ github.event.inputs.openapi_short_sha }}/clientgen
 
     steps:
       - uses: actions/checkout@v3
@@ -52,6 +53,8 @@ jobs:
         run: make generate-docs
 
       - name: Add and commit changes
+        id: add-commit-changes
+        continue-on-error: true
         run: |
           git config --global user.email "api-engineering@digitalocean.com"
           git config --global user.name "API Engineering"
@@ -62,6 +65,9 @@ jobs:
           GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
 
       - name: Create Pull Request
+        id: create-pr
+        if: steps.add-commit-changes.outcome == 'success'
+        continue-on-error: true
         run: |
           gh pr create \
             --title "[bot] Re-Generate w/ digitalocean/openapi ${{ github.event.inputs.openapi_short_sha }}" \
@@ -70,3 +76,12 @@ jobs:
             -r owners
         env:
           GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+
+      - name: Cleanup
+        # If steps.create-pr was anything but successful, it's possible that
+        # the branch was created in steps.add-commit-changes so it should be
+        # cleaned up.
+        # This doesn't need to run if the PR was created successfully because
+        # the branch will get deleted when the PR is merged.
+        if: steps.create-pr.outcome != 'success'
+        run: git push origin --delete ${{ env.NEW_BRANCH }}
