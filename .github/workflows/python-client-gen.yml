@@ -1,4 +1,4 @@
-name: Python Client Generation something
+name: Python Client Generation
 on:
   workflow_dispatch:
     inputs:
