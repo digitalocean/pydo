@@ -905,7 +905,7 @@ aio = ["aiohttp"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7.2"
-content-hash = "66e3d8bd7fdec6ab309d3cff304b95bdf8a213f3182d1da9721bf2cf642c331d"
+content-hash = "512472fb520b3b7d1a98630bff6235d1617a8bf47c78ab9e99318b85dba3cdcb"
 
 [metadata.files]
 aiohttp = [
