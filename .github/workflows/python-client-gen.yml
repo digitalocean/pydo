@@ -72,7 +72,6 @@ jobs:
     - name: Create Pull Request
       id: create-pr
       if: steps.add-commit-changes.outcome == 'success'
-      continue-on-error: true
       run: gh pr create --title "[bot] Re-Generate w/ digitalocean/openapi ${{ github.event.inputs.openapi_short_sha }}" --body "Regenerate python client with the commit, [${{ github.event.inputs.openapi_short_sha }}](https://github.com/digitalocean/openapi/commit/${{ github.event.inputs.openapi_short_sha }}) , pushed to digitalocean/openapi. Owners must review to confirm if integration/mocked tests need to be added to the client to reflect the changes." --head "${{ env.NEW_BRANCH }}" -r digitalocean/api-cli
       env:
         GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}  
