@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       openapi_short_sha:
-        description: 'The short commit sha that triggered the workflow'
+        description: "The short commit sha that triggered the workflow"
         required: true
         type: string
 
@@ -13,65 +13,119 @@ env:
 jobs:
   Generate-Python-Client:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Removes all generated code
-      run: make clean
+      - name: OpenAPI Changelist
+        env:
+          GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+        run: |
+          last_commit_sha=$(cat DO_OPENAPI_COMMIT_SHA.txt)
+          test $last_commit_sha || (echo "last_commit_sha cannot be empty" && exit 1)
+          echo "last_commit_sha=$last_commit_sha" >> $GITHUB_ENV
 
-    - name: Download spec file and Update DO_OPENAPI_COMMIT_SHA.txt
-      run: |
-        curl --fail https://api-engineering.nyc3.digitaloceanspaces.com/spec-ci/DigitalOcean-public-${{ github.event.inputs.openapi_short_sha }}.v2.yaml -o DigitalOcean-public.v2.yaml
-        echo ${{ github.event.inputs.openapi_short_sha }} > DO_OPENAPI_COMMIT_SHA.txt
-      env:
-        GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+          last_commit_date=$(
+            gh pr --repo digitalocean/openapi list \
+              -s merged --json number,title,mergedAt,labels,mergeCommit | \
+              jq -r --arg sha $last_commit_sha \
+              '.[] | select(.mergeCommit.oid | startswith($sha)) | .mergedAt'
+          )
+          test $last_commit_date || (echo "last_commit_date cannot be empty" && exit 1)
 
-    - uses: actions/upload-artifact@v2
-      with:
-        name: DigitalOcean-public.v2
-        path: ./DigitalOcean-public.v2.yaml
+          echo "LAST COMMIT DATE: $last_commit_date"
 
-    - name: Checkout new Branch
-      run:  git checkout -b ${{ env.NEW_BRANCH }} 
-      env:
-        GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+          current_commit_date=$(
+            gh pr --repo digitalocean/openapi list \
+              -s merged --json number,title,mergedAt,labels,mergeCommit | \
+              jq -r --arg sha ${{ github.event.inputs.openapi_short_sha }} \
+              '.[] | select(.mergeCommit.oid | startswith($sha)) | .mergedAt'
+          )
+          test $current_commit_date || (echo "current_commit_date cannot be empty" && exit 1)
+          echo "CURRENT COMMIT DATE: $current_commit_date"
 
-    - name: Install Poetry
-      uses: snok/install-poetry@v1.3.1
-      with:
-        version: 1.1.13
-        virtualenvs-path: .venv
-        virtualenvs-create: true
-        virtualenvs-in-project: true
-        installer-parallel: false
+          gh pr --repo digitalocean/openapi list \
+            -s merged --json number,title,mergedAt,labels \
+            --jq '[.[] |  {"number": .number, "title": .title, "mergedAt": .mergedAt, "labels": ([.labels[] | .name] | join("|"))}]' | \
+            jq --arg prev $last_commit_date --arg current $current_commit_date \
+              '[.[] | select(.mergedAt > $prev) | select(.mergedAt <= $current)]' | \
+              jq -r '.[] | select(.labels | contains("ignore-for-changelog") | not) | "* digitalocean/openapi#\(.number): \( .title) - \(.mergedAt) [\(.labels)]"' \
+          >> changelist.md
 
-    - name: Generate Python client
-      run: make generate
-    - name: Generate Python client documentation
-      run: make generate-docs
-    - name: Add and commit changes
-      id: add-commit-changes
-      continue-on-error: true
-      run: |
-        git config --global user.email "api-engineering@digitalocean.com"
-        git config --global user.name "API Engineering"
-        git add .
-        git commit -m "[bot] Updated client based on ${{ env.NEW_BRANCH }}"
-        git push --set-upstream origin ${{ env.NEW_BRANCH }}
-      env:
-        GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+      - name: Removes all generated code
+        run: make clean
 
-    - name: Check if branch existed
-      # If steps.create-pr was anything but successful, it's possible that
-      # the branch was created in previous pipeline runs so it should be manually deleted.
-      if: steps.add-commit-changes.outcome != 'success'
-      run: |
-        echo "Add and commit changes step failed. It's possible the branch ${{ env.NEW_BRANCH }} already existed. Please delete the branch and re-run the pipeline."
-        exit 1
+      - name: Download spec file and Update DO_OPENAPI_COMMIT_SHA.txt
+        run: |
+          curl --fail https://api-engineering.nyc3.digitaloceanspaces.com/spec-ci/DigitalOcean-public-${{ github.event.inputs.openapi_short_sha }}.v2.yaml -o DigitalOcean-public.v2.yaml
+          echo ${{ github.event.inputs.openapi_short_sha }} > DO_OPENAPI_COMMIT_SHA.txt
+        env:
+          GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
 
-    - name: Create Pull Request
-      id: create-pr
-      if: steps.add-commit-changes.outcome == 'success'
-      run: gh pr create --title "[bot] Re-Generate w/ digitalocean/openapi ${{ github.event.inputs.openapi_short_sha }}" --body "Regenerate python client with the commit, [${{ github.event.inputs.openapi_short_sha }}](https://github.com/digitalocean/openapi/commit/${{ github.event.inputs.openapi_short_sha }}) , pushed to digitalocean/openapi. Owners must review to confirm if integration/mocked tests need to be added to the client to reflect the changes." --head "${{ env.NEW_BRANCH }}" -r digitalocean/api-cli
-      env:
-        GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}  
+      - uses: actions/upload-artifact@v2
+        with:
+          name: DigitalOcean-public.v2
+          path: ./DigitalOcean-public.v2.yaml
+
+      - name: Checkout new Branch
+        run: git checkout -b ${{ env.NEW_BRANCH }}
+        env:
+          GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1.3.1
+        with:
+          version: 1.1.13
+          virtualenvs-path: .venv
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: false
+
+      - name: Generate Python client
+        run: make generate
+
+      - name: Generate Python client documentation
+        run: make generate-docs
+
+      - name: Add and commit changes
+        id: add-commit-changes
+        continue-on-error: true
+        run: |
+          git config --global user.email "api-engineering@digitalocean.com"
+          git config --global user.name "API Engineering"
+          git add .
+          git commit -m "[bot] Updated client based on ${{ env.NEW_BRANCH }}"
+          git push --set-upstream origin ${{ env.NEW_BRANCH }}
+        env:
+          GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+
+      - name: Check if branch existed
+        # If steps.create-pr was anything but successful, it's possible that
+        # the branch was created in previous pipeline runs so it should be manually deleted.
+        if: steps.add-commit-changes.outcome != 'success'
+        run: |
+          echo "Add and commit changes step failed. It's possible the branch ${{ env.NEW_BRANCH }} already existed. Please delete the branch and re-run the pipeline."
+          exit 1
+
+      - name: Create Pull Request
+        id: create-pr
+        if: steps.add-commit-changes.outcome == 'success'
+        run: |
+          echo "CHANGELIST"
+          cat changelist.md
+
+          echo "Regenerate python client from digitalocean/openapi@${{ github.event.inputs.openapi_short_sha }}" > pr_body.md
+          echo >> pr_body.md
+          echo "Owners must review to confirm if integration/mocked tests need to be added to the client to reflect the changes." >> pr_body.md
+          echo >> pr_body.md
+          echo "The following pull requests were merged to digitalocean/openapi@main since the previous commit (${{ env.last_commit_sha }}" >> pr_body.md
+
+          cat changelist.md >> pr_body.md                
+
+          gh pr create \
+            --title "[bot] Re-Generate w/ digitalocean/openapi ${{ github.event.inputs.openapi_short_sha }}" \
+            --body-file pr_body.md \
+            --head "${{ env.NEW_BRANCH }}" \
+            -r digitalocean/api-cli
+        env:
+          GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
