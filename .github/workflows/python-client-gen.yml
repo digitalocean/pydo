@@ -21,36 +21,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
         run: |
-          last_commit_sha=$(cat DO_OPENAPI_COMMIT_SHA.txt)
-          test $last_commit_sha || (echo "last_commit_sha cannot be empty" && exit 1)
-          echo "last_commit_sha=$last_commit_sha" >> $GITHUB_ENV
-
-          last_commit_date=$(
-            gh pr --repo digitalocean/openapi list \
-              -s merged --json number,title,mergedAt,labels,mergeCommit | \
-              jq -r --arg sha $last_commit_sha \
-              '.[] | select(.mergeCommit.oid | startswith($sha)) | .mergedAt'
-          )
-          test $last_commit_date || (echo "last_commit_date cannot be empty" && exit 1)
-
-          echo "LAST COMMIT DATE: $last_commit_date"
-
-          current_commit_date=$(
-            gh pr --repo digitalocean/openapi list \
-              -s merged --json number,title,mergedAt,labels,mergeCommit | \
-              jq -r --arg sha ${{ github.event.inputs.openapi_short_sha }} \
-              '.[] | select(.mergeCommit.oid | startswith($sha)) | .mergedAt'
-          )
-          test $current_commit_date || (echo "current_commit_date cannot be empty" && exit 1)
-          echo "CURRENT COMMIT DATE: $current_commit_date"
-
-          gh pr --repo digitalocean/openapi list \
-            -s merged --json number,title,mergedAt,labels \
-            --jq '[.[] |  {"number": .number, "title": .title, "mergedAt": .mergedAt, "labels": ([.labels[] | .name] | join("|"))}]' | \
-            jq --arg prev $last_commit_date --arg current $current_commit_date \
-              '[.[] | select(.mergedAt > $prev) | select(.mergedAt <= $current)]' | \
-              jq -r '.[] | select(.labels | contains("ignore-for-changelog") | not) | "* digitalocean/openapi#\(.number): \( .title) - \(.mergedAt) [\(.labels)]"' \
-          >> changelist.md
+          current_sha=$(cat DO_OPENAPI_COMMIT_SHA.txt)
+          echo "current_sha=$current_sha" >> $GITHUB_ENV
+          target_sha=${{ github.event.inputs.openapi_short_sha }}
+          scripts/openapi_changelist.sh $current_sha $target_sha > changelist.md
 
       - name: Removes all generated code
         run: make clean
@@ -111,19 +85,16 @@ jobs:
         id: create-pr
         if: steps.add-commit-changes.outcome == 'success'
         run: |
-          echo "CHANGELIST"
-          cat changelist.md
+          export CURRENT=$(cat DO_OPENAPI_COMMIT_SHA.txt)
+          export TARGET=${{ github.event.inputs.openapi_short_sha }}
+          envsubst < scripts/pr_body.md_tmpl > pr_body.md
+          cat changelist.md >> pr_body.md
 
-          echo "Regenerate python client from digitalocean/openapi@${{ github.event.inputs.openapi_short_sha }}" > pr_body.md
-          echo >> pr_body.md
-          echo "Owners must review to confirm if integration/mocked tests need to be added to the client to reflect the changes." >> pr_body.md
-          echo >> pr_body.md
-          echo "The following pull requests were merged to digitalocean/openapi@main since the previous commit (${{ env.last_commit_sha }}" >> pr_body.md
-
-          cat changelist.md >> pr_body.md                
+          echo "PR BODY:"
+          cat pr_body.md
 
           gh pr create \
-            --title "[bot] Re-Generate w/ digitalocean/openapi ${{ github.event.inputs.openapi_short_sha }}" \
+            --title "[bot] Re-Generate w/ digitalocean/openapi@$TARGET" \
             --body-file pr_body.md \
             --head "${{ env.NEW_BRANCH }}" \
             -r digitalocean/api-cli

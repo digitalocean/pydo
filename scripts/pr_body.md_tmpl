@@ -1,0 +1,15 @@
+
+## Python client generation
+
+The change to regenerate the python client was triggered by
+digitalocean/openapi@$TARGET.
+
+Note: Owners must review to confirm if integration or mocked tests need to be
+updated to the client to reflect the changes."
+
+The following pull requests were merged to digitalocean/openapi@main since the
+previous commit (digitalocean/openapi@$CURRENT):
+
+> Note: each PR should include a list of labels to help categorize the level
+(semver) of changes included.
+
