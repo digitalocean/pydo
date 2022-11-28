@@ -318,33 +318,33 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     each request. The relevant headers are:
 
 
-    * **RateLimit-Limit**\ : The number of requests that can be made per hour.
-    * **RateLimit-Remaining**\ : The number of requests that remain before you hit your request
+    * **ratelimit-limit**\ : The number of requests that can be made per hour.
+    * **ratelimit-remaining**\ : The number of requests that remain before you hit your request
     limit. See the information below for how the request limits expire.
-    * **RateLimit-Reset**\ : This represents the time when the oldest request will expire. The
+    * **ratelimit-reset**\ : This represents the time when the oldest request will expire. The
     value is given in `Unix epoch time <http://en.wikipedia.org/wiki/Unix_time>`_. See below for
     more information about how request limits expire.
 
-    As long as the ``RateLimit-Remaining`` count is above zero, you will be able
+    As long as the ``ratelimit-remaining`` count is above zero, you will be able
     to make additional requests.
 
     The way that a request expires and is removed from the current limit count
     is important to understand. Rather than counting all of the requests for an
-    hour and resetting the ``RateLimit-Remaining`` value at the end of the hour,
+    hour and resetting the ``ratelimit-remaining`` value at the end of the hour,
     each request instead has its own timer.
 
-    This means that each request contributes toward the ``RateLimit-Remaining``
+    This means that each request contributes toward the ``ratelimit-remaining``
     count for one complete hour after the request is made. When that request's
     timer runs out, it is no longer counted towards the request limit.
 
-    This has implications on the meaning of the ``RateLimit-Reset`` header as
+    This has implications on the meaning of the ``ratelimit-reset`` header as
     well. Because the entire rate limit is not reset at one time, the value of
     this header is set to the time when the *oldest* request will expire.
 
-    Keep this in mind if you see your ``RateLimit-Reset`` value change, but not
+    Keep this in mind if you see your ``ratelimit-reset`` value change, but not
     move an entire hour into the future.
 
-    If the ``RateLimit-Remaining`` reaches zero, subsequent requests will receive
+    If the ``ratelimit-remaining`` reaches zero, subsequent requests will receive
     a 429 error code until the request reset has been reached. You can see the
     format of the response in the examples.
 
@@ -363,9 +363,9 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     .. code-block::
 
            . . .
-           RateLimit-Limit: 1200
-           RateLimit-Remaining: 1193
-           RateLimit-Reset: 1402425459
+           ratelimit-limit: 1200
+           ratelimit-remaining: 1193
+           rateLimit-reset: 1402425459
            . . .
 
     Sample Rate Exceeded Response
