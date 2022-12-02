@@ -16,17 +16,17 @@ from pydo.aio import Client as aioClient
 def integration_client() -> Client:
     """Instantiates a pydo Client for use with integration tests.
 
-    The client requires the environment variable DO_TOKEN with a valid API
+    The client requires the environment variable DIGITALOCEAN_TOKEN with a valid API
     token.
 
     *IMPORTANT*: Use of this client will create real resources on the
     account.
     """
 
-    token = environ.get("DO_TOKEN", None)
+    token = environ.get("DIGITALOCEAN_TOKEN", None)
 
     if token is None:
-        pytest.fail("Expected environment variable DO_TOKEN")
+        pytest.fail("Expected environment variable DIGITALOCEAN_TOKEN")
 
     client = Client(token)
     return client
@@ -36,17 +36,17 @@ def integration_client() -> Client:
 def async_integration_client() -> aioClient:
     """Instantiates a pydo Client for use with integration tests.
 
-    The client requires the environment variable DO_TOKEN with a valid API
+    The client requires the environment variable DIGITALOCEAN_TOKEN with a valid API
     token.
 
     *IMPORTANT*: Use of this client will create real resources on the
     account.
     """
 
-    token = environ.get("DO_TOKEN", None)
+    token = environ.get("DIGITALOCEAN_TOKEN", None)
 
     if token is None:
-        pytest.fail("Expected environment variable DO_TOKEN")
+        pytest.fail("Expected environment variable DIGITALOCEAN_TOKEN")
 
     client = aioClient(token)
     return client
