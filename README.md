@@ -137,7 +137,7 @@ resources on the respective DigitalOcean account.
 To run integration tests, run:
 
 ```shell
-DO_TOKEN=$DIGITALOCEAN_TOKEN make test-integration
+DIGITALOCEAN_TOKEN=... make test-integration
 ```
 
 #### Test Customizations

@@ -5,9 +5,9 @@ from pydo import Client
 # Define a custom value for your application's user-agent
 USER_AGENT = "droplets-example"
 
-token = environ.get("DO_TOKEN")
+token = environ.get("DIGITALOCEAN_TOKEN")
 if token == "":
-    raise Exception("No DigitalOcean API token in DO_TOKEN env var")
+    raise Exception("No DigitalOcean API token in DIGITALOCEAN_TOKEN env var")
 
 if environ.get("DO_OVERWRITE_AGENT"):
     # When the `user_agent_overwrite` client setting is True, the `user_agent` value

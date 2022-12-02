@@ -17,10 +17,10 @@ class DigitalOceanError(Exception):
 
 class DropletCreator:
     def __init__(self, *args, **kwargs):
-        token = os.environ.get("DO_TOKEN")
+        token = os.environ.get("DIGITALOCEAN_TOKEN")
         if token == "":
-            raise Exception("No DigitalOcean API token in DO_TOKEN env var")
-        self.client = Client(token=os.environ.get("DO_TOKEN"))
+            raise Exception("No DigitalOcean API token in DIGITALOCEAN_TOKEN env var")
+        self.client = Client(token=os.environ.get("DIGITALOCEAN_TOKEN"))
 
     def throw(self, message):
         raise DigitalOceanError(message) from None
