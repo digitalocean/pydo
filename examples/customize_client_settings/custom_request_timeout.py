@@ -35,7 +35,9 @@ new_cluster_req = {
 
 # Setting the `timeout` kwarg value for a specific operation method call will overwrite
 # the timeout for that request.
-cluster_create_resp = client.kubernetes.create_cluster(new_cluster_req, timeout=TIMEOUT_KUBERNETES_CREATE)
+cluster_create_resp = client.kubernetes.create_cluster(
+    new_cluster_req, timeout=TIMEOUT_KUBERNETES_CREATE
+)
 # Note: This method was chosen for the sake of the example. The `create_cluster`
 # kubernetes operation isn't a log running process (unlike the background action that
 # tracks the clusters provisioning state).
