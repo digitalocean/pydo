@@ -93,6 +93,7 @@ pages = resp.links.pages
 
 >Visit our [Contribuing Guide](CONTRIBUTING.md) for more information on getting
 involved in developing this client.
+Code formatting is automatically tested against [psf/black](https://github.com/psf/black).
 
 # **Tests**
 
