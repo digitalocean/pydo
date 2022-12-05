@@ -9,9 +9,9 @@ REGION = "nyc3"
 TIMEOUT_APP = 120
 TIMEOUT_KUBERNETES_CREATE = 1200
 
-token = environ.get("DO_TOKEN")
+token = environ.get("DIGITALOCEAN_TOKEN")
 if token == "":
-    raise Exception("No DigitalOcean API token in DO_TOKEN env var")
+    raise Exception("No DigitalOcean API token in DIGITALOCEAN_TOKEN env var")
 
 # Overwrite the default timeout set by the client with your own
 client = Client(token, timeout=TIMEOUT_APP)

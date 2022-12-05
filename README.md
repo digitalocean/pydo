@@ -82,11 +82,11 @@ next page.
 ```python
 resp = self.client.ssh_keys.list(per_page=50, page=page)
 pages = resp.links.pages
-    if 'next' in pages.keys():
-        parsed_url = urlparse(pages['next'])
-        page = parse_qs(parsed_url.query)['page'][0]
-    else:
-        paginated = False
+if 'next' in pages.keys():
+    parsed_url = urlparse(pages['next'])
+    page = parse_qs(parsed_url.query)['page'][0]
+else:
+    paginated = False
 ```
 
 # **Contributing**
@@ -138,7 +138,7 @@ resources on the respective DigitalOcean account.
 To run integration tests, run:
 
 ```shell
-DO_TOKEN=$DIGITALOCEAN_TOKEN make test-integration
+DIGITALOCEAN_TOKEN=... make test-integration
 ```
 
 #### Test Customizations

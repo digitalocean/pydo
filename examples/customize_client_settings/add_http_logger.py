@@ -9,9 +9,9 @@ LOG_FILE = "simple_ssh_keys.log"
 logging.basicConfig(filename=LOG_FILE, level=logging.DEBUG)
 LOGGER = logging.getLogger(__name__)
 
-token = os.environ.get("DO_TOKEN")
+token = os.environ.get("DIGITALOCEAN_TOKEN")
 if token == "":
-    raise Exception("No DigitalOcean API token in DO_TOKEN env var")
+    raise Exception("No DigitalOcean API token in DIGITALOCEAN_TOKEN env var")
 # Initialize the client with the `logger` kwarg set to the application's logger.
 client = Client(
     token,
