@@ -1,7 +1,7 @@
 LOCAL_SPEC_FILE=./DigitalOcean-public.v2.yaml
 MODELERFOUR_VERSION="4.23.6"
 AUTOREST_PYTHON_VERSION="6.0.1"
-PACKAGE_VERSION?="dev"
+PACKAGE_VERSION?="0.1.3"
 ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 ORIGIN ?= origin
 BUMP ?= patch
