@@ -101,7 +101,7 @@ number vor the tag.
 3. Run `BUMP=(bugfix|feature|breaking) make bump_version` to update the `pydo`
    version.
     * `BUMP` also accepts `(patch|minor|major)`
-4. Run `make generate` to update the version in the codebase. 
+4. Run `make generate` to update the version in the codebase.
 5. Make a pull request with this change. It should be separate from PRs
    containing changes to the library (including regenerated code).
 6. *Once the version bump PR has been pushed*, tag the commit to trigger the
