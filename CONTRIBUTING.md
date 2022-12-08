@@ -104,7 +104,7 @@ number vor the tag.
 4. Run `make generate` to update the version in the codebase.
 5. Make a pull request with this change. It should be separate from PRs
    containing changes to the library (including regenerated code).
-6. *Once the version bump PR has been pushed*, tag the commit to trigger the
+6. *Once the version bump PR has been pushed and merged*, tag the commit to trigger the
    release workflow.
    Run `make tag` to tag the latest commit and push the tag to ORIGIN.
     * To tag an earlier commit, run `COMMIT=${commit} make tag`.
