@@ -5,6 +5,7 @@ from responses import matchers
 
 from pydo import Client
 
+
 @responses.activate
 def test_list_reserved_ips(mock_client: Client, mock_client_url):
     """Mocks the reserved IPs list operation."""
@@ -206,6 +207,7 @@ def test_list_reserved_ips(mock_client: Client, mock_client_url):
     rips = mock_client.reserved_ips.list()
 
     assert rips == expected
+
 
 @responses.activate
 def test_list_reserved_ips_with_pagination(mock_client: Client, mock_client_url):
@@ -410,7 +412,12 @@ def test_list_reserved_ips_with_pagination(mock_client: Client, mock_client_url)
     }
 
     params = {"per_page": 20, "page": 1}
-    responses.add(responses.GET, f"{mock_client_url}/v2/reserved_ips", json=expected, match=[matchers.query_param_matcher(params)])
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/reserved_ips",
+        json=expected,
+        match=[matchers.query_param_matcher(params)],
+    )
     rips = mock_client.reserved_ips.list()
 
     assert rips == expected

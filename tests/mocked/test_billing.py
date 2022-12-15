@@ -54,6 +54,7 @@ def test_list_billing_history(mock_client: Client, mock_client_url):
 
     assert balance == expected
 
+
 @responses.activate
 def test_list_invoices(mock_client: Client, mock_client_url):
     """Mocks billing's GET a list of invoices."""
@@ -86,6 +87,7 @@ def test_list_invoices(mock_client: Client, mock_client_url):
 
     assert balance == expected
 
+
 @responses.activate
 def test_list_invoices_with_pagination(mock_client: Client, mock_client_url):
     """Mocks billing's GET a list of invoices."""
@@ -111,14 +113,17 @@ def test_list_invoices_with_pagination(mock_client: Client, mock_client_url):
         "links": {
             "pages": {
                 "next": "https://api.digitalocean.com/v2/customers/my/invoices?page=2&per_page=20",
-                "last": "https://api.digitalocean.com/v2/customers/my/invoices?page=6&per_page=20"
+                "last": "https://api.digitalocean.com/v2/customers/my/invoices?page=6&per_page=20",
             }
         },
         "meta": {"total": 6},
     }
     params = {"per_page": 20, "page": 1}
     responses.add(
-        responses.GET, f"{mock_client_url}/v2/customers/my/invoices", json=expected, match=[matchers.query_param_matcher(params)],
+        responses.GET,
+        f"{mock_client_url}/v2/customers/my/invoices",
+        json=expected,
+        match=[matchers.query_param_matcher(params)],
     )
     balance = mock_client.invoices.list()
 

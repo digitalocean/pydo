@@ -71,7 +71,7 @@ def test_list_with_pagination(mock_client: Client, mock_client_url):
         "links": {
             "pages": {
                 "next": "https://api.digitalocean.com/v2/domains?page=2&per_page=20",
-                "last": "https://api.digitalocean.com/v2/domains?page=6&per_page=20"
+                "last": "https://api.digitalocean.com/v2/domains?page=6&per_page=20",
             }
         },
         "meta": {"total": 6},
@@ -147,6 +147,7 @@ def test_create_record(mock_client: Client, mock_client_url):
 
     assert create_resp == expected
 
+
 @responses.activate
 def test_list(mock_client: Client, mock_client_url):
     """Test Record List"""
@@ -177,6 +178,7 @@ def test_list(mock_client: Client, mock_client_url):
     list_resp = mock_client.domains.list()
 
     assert list_resp == expected
+
 
 @responses.activate
 def test_list_records(mock_client: Client, mock_client_url):
@@ -211,6 +213,7 @@ def test_list_records(mock_client: Client, mock_client_url):
 
     assert list_resp == expected
 
+
 @responses.activate
 def test_list_records_with_pagination(mock_client: Client, mock_client_url):
     """Test Record Domain List"""
@@ -232,7 +235,7 @@ def test_list_records_with_pagination(mock_client: Client, mock_client_url):
         "links": {
             "pages": {
                 "next": "https://api.digitalocean.com/v2/domains/ec.com/records?page=2&per_page=20",
-                "last": "https://api.digitalocean.com/v2/domains/ec.com/records?page=3&per_page=20"
+                "last": "https://api.digitalocean.com/v2/domains/ec.com/records?page=3&per_page=20",
             }
         },
         "meta": {"total": 6},
@@ -243,7 +246,7 @@ def test_list_records_with_pagination(mock_client: Client, mock_client_url):
         responses.GET,
         f"{mock_client_url}/v2/domains/ec.com/records",
         json=expected,
-        status=200, 
+        status=200,
         match=[matchers.query_param_matcher(params)],
     )
 

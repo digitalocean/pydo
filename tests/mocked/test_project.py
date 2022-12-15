@@ -5,6 +5,7 @@ import responses
 from pydo import Client
 from responses import matchers
 
+
 @responses.activate
 def test_projects_list(mock_client: Client, mock_client_url):
     """Mocks the projects list operation"""
@@ -49,6 +50,7 @@ def test_projects_list(mock_client: Client, mock_client_url):
 
     assert list_resp == expected
 
+
 @responses.activate
 def test_projects_list(mock_client: Client, mock_client_url):
     """Mocks the projects list operation"""
@@ -89,7 +91,12 @@ def test_projects_list(mock_client: Client, mock_client_url):
     }
 
     params = {"per_page": 20, "page": 1}
-    responses.add(responses.GET, f"{mock_client_url}/v2/projects", json=expected, match=[matchers.query_param_matcher(params)])
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/projects",
+        json=expected,
+        match=[matchers.query_param_matcher(params)],
+    )
     list_resp = mock_client.projects.list()
 
     assert list_resp == expected
