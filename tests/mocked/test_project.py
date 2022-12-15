@@ -6,7 +6,6 @@ from responses import matchers
 from pydo import Client
 
 
-
 @responses.activate
 def test_projects_list(mock_client: Client, mock_client_url):
     """Mocks the projects list operation"""
