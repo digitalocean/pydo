@@ -1,9 +1,10 @@
 """Mock tests for the Projects API resource"""
 
 import responses
+from responses import matchers
 
 from pydo import Client
-from responses import matchers
+
 
 
 @responses.activate
@@ -52,7 +53,7 @@ def test_projects_list(mock_client: Client, mock_client_url):
 
 
 @responses.activate
-def test_projects_list(mock_client: Client, mock_client_url):
+def test_projects_list_with_pagination(mock_client: Client, mock_client_url):
     """Mocks the projects list operation"""
     expected = {
         "projects": [

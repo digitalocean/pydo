@@ -1,4 +1,6 @@
 # pylint: disable=duplicate-code
+# pylint: disable=line-too-long
+
 """Mock tests for the domains API resource"""
 
 import responses
