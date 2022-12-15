@@ -2,6 +2,7 @@
 """Mock tests for the domains API resource"""
 
 import responses
+from responses import matchers
 
 from pydo import Client
 
@@ -52,7 +53,7 @@ def test_get(mock_client: Client, mock_client_url):
 
 
 @responses.activate
-def test_list(mock_client: Client, mock_client_url):
+def test_list_with_pagination(mock_client: Client, mock_client_url):
     """Test Record List"""
     expected = {
         "domains": [
@@ -67,15 +68,22 @@ def test_list(mock_client: Client, mock_client_url):
                 1800 IN NS ns3.digitalocean.com.\n""",
             },
         ],
-        "links": {},
-        "meta": {"total": 1},
+        "links": {
+            "pages": {
+                "next": "https://api.digitalocean.com/v2/domains?page=2&per_page=20",
+                "last": "https://api.digitalocean.com/v2/domains?page=6&per_page=20"
+            }
+        },
+        "meta": {"total": 6},
     }
 
+    params = {"per_page": 20, "page": 1}
     responses.add(
         responses.GET,
         f"{mock_client_url}/v2/domains",
         json=expected,
         status=200,
+        match=[matchers.query_param_matcher(params)],
     )
 
     list_resp = mock_client.domains.list()
@@ -139,6 +147,36 @@ def test_create_record(mock_client: Client, mock_client_url):
 
     assert create_resp == expected
 
+@responses.activate
+def test_list(mock_client: Client, mock_client_url):
+    """Test Record List"""
+    expected = {
+        "domains": [
+            {
+                "name": "clienttest.com",
+                "ttl": 1800,
+                "zone_file": """$ORIGIN clienttest.com.\n$TTL 1800\nclienttest.com. \
+                IN SOA ns1.digitalocean.com. \
+                hostmaster.clienttest.com. 1657812556 10800 3600 604800 1800\nclienttest.com. \
+                1800 IN NS ns1.digitalocean.com. \
+                \nclienttest.com. 1800 IN NS ns2.digitalocean.com.\nclienttest.com. \
+                1800 IN NS ns3.digitalocean.com.\n""",
+            },
+        ],
+        "links": {},
+        "meta": {"total": 1},
+    }
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/domains",
+        json=expected,
+        status=200,
+    )
+
+    list_resp = mock_client.domains.list()
+
+    assert list_resp == expected
 
 @responses.activate
 def test_list_records(mock_client: Client, mock_client_url):
@@ -167,6 +205,46 @@ def test_list_records(mock_client: Client, mock_client_url):
         f"{mock_client_url}/v2/domains/ec.com/records",
         json=expected,
         status=200,
+    )
+
+    list_resp = mock_client.domains.list_records("ec.com")
+
+    assert list_resp == expected
+
+@responses.activate
+def test_list_records_with_pagination(mock_client: Client, mock_client_url):
+    """Test Record Domain List"""
+    expected = {
+        "domain_records": [
+            {
+                "id": 324119029,
+                "type": "A",
+                "name": "ec.com",
+                "data": "162.10.66.0",
+                "priority": None,
+                "port": None,
+                "ttl": 1800,
+                "weight": None,
+                "flags": None,
+                "tag": None,
+            },
+        ],
+        "links": {
+            "pages": {
+                "next": "https://api.digitalocean.com/v2/domains/ec.com/records?page=2&per_page=20",
+                "last": "https://api.digitalocean.com/v2/domains/ec.com/records?page=3&per_page=20"
+            }
+        },
+        "meta": {"total": 6},
+    }
+
+    params = {"per_page": 20, "page": 1}
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/domains/ec.com/records",
+        json=expected,
+        status=200, 
+        match=[matchers.query_param_matcher(params)],
     )
 
     list_resp = mock_client.domains.list_records("ec.com")

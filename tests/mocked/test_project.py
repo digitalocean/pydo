@@ -3,7 +3,7 @@
 import responses
 
 from pydo import Client
-
+from responses import matchers
 
 @responses.activate
 def test_projects_list(mock_client: Client, mock_client_url):
@@ -45,6 +45,51 @@ def test_projects_list(mock_client: Client, mock_client_url):
     }
 
     responses.add(responses.GET, f"{mock_client_url}/v2/projects", json=expected)
+    list_resp = mock_client.projects.list()
+
+    assert list_resp == expected
+
+@responses.activate
+def test_projects_list(mock_client: Client, mock_client_url):
+    """Mocks the projects list operation"""
+    expected = {
+        "projects": [
+            {
+                "id": "4e1bfbc3-dc3e-41f2-a18f-1b4d7ba71679",
+                "owner_uuid": "99525febec065ca37b2ffe4f852fd2b2581895e7",
+                "owner_id": 258992,
+                "name": "my-web-api",
+                "description": "My website API",
+                "purpose": "Service or API",
+                "environment": "Production",
+                "is_default": "false",
+                "created_at": "2018-09-27T20:10:35Z",
+                "updated_at": "2018-09-27T20:10:35Z",
+            },
+            {
+                "id": "addb4547-6bab-419a-8542-76263a033cf6",
+                "owner_uuid": "99525febec065ca37b2ffe4f852fd2b2581895e7",
+                "owner_id": 258992,
+                "name": "Default",
+                "description": "Default project",
+                "purpose": "Just trying out DigitalOcean",
+                "environment": "Development",
+                "is_default": "true",
+                "created_at": "2017-10-19T21:44:20Z",
+                "updated_at": "2019-11-05T18:50:03Z",
+            },
+        ],
+        "links": {
+            "pages": {
+                "first": "https://api.digitalocean.com/v2/projects?page=2&per_page=20",
+                "last": "https://api.digitalocean.com/v2/projects?page=6&per_page=20",
+            }
+        },
+        "meta": {"total": 6},
+    }
+
+    params = {"per_page": 20, "page": 1}
+    responses.add(responses.GET, f"{mock_client_url}/v2/projects", json=expected, match=[matchers.query_param_matcher(params)])
     list_resp = mock_client.projects.list()
 
     assert list_resp == expected
