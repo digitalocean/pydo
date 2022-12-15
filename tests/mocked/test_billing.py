@@ -1,5 +1,8 @@
+# pylint: disable=line-too-long
+
 """Mock tests for the billing API resource."""
 import responses
+from responses import matchers
 
 from pydo import Client
 
@@ -81,6 +84,48 @@ def test_list_invoices(mock_client: Client, mock_client_url):
     }
     responses.add(
         responses.GET, f"{mock_client_url}/v2/customers/my/invoices", json=expected
+    )
+    balance = mock_client.invoices.list()
+
+    assert balance == expected
+
+
+@responses.activate
+def test_list_invoices_with_pagination(mock_client: Client, mock_client_url):
+    """Mocks billing's GET a list of invoices."""
+    expected = {
+        "invoices": [
+            {
+                "invoice_uuid": "22737513-0ea7-4206-8ceb-98a575af7681",
+                "amount": "12.34",
+                "invoice_period": "2019-12",
+            },
+            {
+                "invoice_uuid": "fdabb512-6faf-443c-ba2e-665452332a9e",
+                "amount": "23.45",
+                "invoice_period": "2019-11",
+            },
+        ],
+        "invoice_preview": {
+            "invoice_uuid": "1afe95e6-0958-4eb0-8d9a-9c5060d3ef03",
+            "amount": "34.56",
+            "invoice_period": "2020-02",
+            "updated_at": "2020-02-23T06:31:50Z",
+        },
+        "links": {
+            "pages": {
+                "next": "https://api.digitalocean.com/v2/customers/my/invoices?page=2&per_page=20",
+                "last": "https://api.digitalocean.com/v2/customers/my/invoices?page=6&per_page=20",
+            }
+        },
+        "meta": {"total": 6},
+    }
+    params = {"per_page": 20, "page": 1}
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/customers/my/invoices",
+        json=expected,
+        match=[matchers.query_param_matcher(params)],
     )
     balance = mock_client.invoices.list()
 
