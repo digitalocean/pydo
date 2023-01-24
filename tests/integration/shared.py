@@ -2,10 +2,10 @@
 This shared module provides helpers for working with the API through the client.
 """
 import contextlib
-from time import sleep
 import secrets
-from typing import Callable, Union
 import uuid
+from time import sleep
+from typing import Callable, Union
 
 from azure.core.exceptions import HttpResponseError
 
@@ -52,6 +52,7 @@ def wait_for_status(
     ready: str = "active",
     errored: str = "error",
     wait_seconds: int = 5,
+    max_retries: int = 0,
 ):  # pylint: disable=too-many-arguments
     """
     Polls for a resource until it reaches the desired status. The resource_type
@@ -62,6 +63,7 @@ def wait_for_status(
 
         wait_for_status(client.load_balancers.get, "load_balancer", lb_id)
     """
+    retry = 0
     while True:
         try:
             resp = poll_func(resource_id)
@@ -76,7 +78,11 @@ def wait_for_status(
                 break
             if status == errored:
                 raise Exception(f"Resource status: {status}")
+
+        if 0 < max_retries <= retry:
+            return
         sleep(wait_seconds)
+        retry += 1
 
 
 def wait_for_kubernetes_cluster_create(
@@ -330,3 +336,35 @@ def with_test_cdn(client: Client, body):
         yield create_resp
     finally:
         client.cdn.delete_endpoint(cdn_id)
+
+
+@contextlib.contextmanager
+def with_test_database(
+    client: Client, *, wait=False, wait_seconds=60, max_wait_retries=30, **kwargs
+):
+    """Context function to create a Database.
+
+    Database is destroyed when the context ends.
+    """
+    create_resp = client.databases.create_cluster(kwargs)
+    cluster_id = create_resp["database"]["id"] or ""
+    assert cluster_id != ""
+
+    try:
+        if wait:
+            ready = "online"
+            wait_for_status(
+                client.databases.get_cluster,
+                "database",
+                cluster_id,
+                ready=ready,
+                wait_seconds=wait_seconds,
+                max_retries=max_wait_retries,
+            )
+            get_resp = client.databases.get_cluster(cluster_id)
+            assert get_resp["database"]["status"] == ready
+
+        yield create_resp
+
+    finally:
+        client.databases.destroy_cluster(cluster_id)
