@@ -79,7 +79,7 @@ def wait_for_status(
             if status == errored:
                 raise Exception(f"Resource status: {status}")
 
-        if max_retries > 0 and retry >= max_retries:
+        if 0 < max_retries <= retry:
             return
         sleep(wait_seconds)
         retry += 1
