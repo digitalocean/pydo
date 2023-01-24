@@ -1041,3 +1041,68 @@ def test_rollback_revert(mock_client: Client, mock_client_url):
     revert_resp = mock_client.apps.revert_rollback("1")
 
     assert revert_resp == expected
+
+
+@responses.activate
+def test_app_metrics_list_bandwidth_daily(mock_client: Client, mock_client_url):
+    """Test retrieving bandwidth daily metrics for multiple apps"""
+
+    expected = {
+        "app_bandwidth_usage": [
+            {
+                "app_id": "4f6c71e2-1e90-4762-9fee-6cc4a0a9f2cf",
+                "bandwidth_bytes": "513668",
+            },
+            {
+                "app_id": "c2a93513-8d9b-4223-9d61-5e7272c81cf5",
+                "bandwidth_bytes": "254847",
+            },
+        ],
+        "date": "2023-01-17T00:00:00Z",
+    }
+
+    responses.add(
+        responses.POST,
+        f"{mock_client_url}/v2/apps/metrics/bandwidth_daily",
+        json=expected,
+        status=200,
+    )
+
+    req = {
+        "app_ids": [
+            "4f6c71e2-1e90-4762-9fee-6cc4a0a9f2cf",
+            "c2a93513-8d9b-4223-9d61-5e7272c81cf5",
+        ],
+        "date": "2023-01-17T00:00:00Z",
+    }
+    resp = mock_client.apps.list_metrics_bandwidth_daily(body=req)
+
+    assert resp == expected
+
+
+@responses.activate
+def test_app_metrics_get_bandwidth_daily(mock_client: Client, mock_client_url):
+    """Test retrieving bandwidth daily metrics for multiple apps"""
+
+    expected = {
+        "app_bandwidth_usage": [
+            {
+                "app_id": "4f6c71e2-1e90-4762-9fee-6cc4a0a9f2cf",
+                "bandwidth_bytes": "513668",
+            }
+        ],
+        "date": "2023-01-17T00:00:00Z",
+    }
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/apps/4f6c71e2-1e90-4762-9fee-6cc4a0a9f2cf/metrics/bandwidth_daily",
+        json=expected,
+        status=200,
+    )
+
+    resp = mock_client.apps.get_metrics_bandwidth_daily(
+        "4f6c71e2-1e90-4762-9fee-6cc4a0a9f2cf"
+    )
+
+    assert resp == expected
