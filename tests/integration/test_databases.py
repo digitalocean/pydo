@@ -106,4 +106,3 @@ def test_databases_update_major_version(integration_client: Client):
         )
 
         assert update_resp is None
-

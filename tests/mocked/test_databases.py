@@ -26,6 +26,7 @@ def test_databases_update_connection_pool(mock_client: Client, mock_client_url):
 
     assert resp is None
 
+
 @responses.activate
 def test_databases_update_major_version(mock_client: Client, mock_client_url):
     """Mocks the databases update major version."""
