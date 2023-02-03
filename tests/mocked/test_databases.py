@@ -46,6 +46,7 @@ def test_databases_update_major_version(mock_client: Client, mock_client_url):
 
     assert resp is None
 
+
 @responses.activate
 def test_databases_promote_replica(mock_client: Client, mock_client_url):
     """Mocks the databases promote replica to primary cluster function."""
@@ -59,8 +60,6 @@ def test_databases_promote_replica(mock_client: Client, mock_client_url):
         status=204,
     )
 
-    resp = mock_client.databases.promote_replica(
-        cluster_uuid, replica_name
-    )
+    resp = mock_client.databases.promote_replica(cluster_uuid, replica_name)
 
     assert resp is None

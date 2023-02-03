@@ -107,6 +107,7 @@ def test_databases_update_major_version(integration_client: Client):
 
         assert update_resp is None
 
+
 @pytest.mark.long_running
 def test_databases_create_replica_and_promote_as_primary(integration_client: Client):
     """Tests creating a replica of a database and promoting the
@@ -132,7 +133,7 @@ def test_databases_create_replica_and_promote_as_primary(integration_client: Cli
         create_replica = {
             "name": replica_name,
             "region": "nyc3",
-            "size": "db-s-2vcpu-4gb"
+            "size": "db-s-2vcpu-4gb",
         }
 
         create_rep_response = integration_client.databases.create_replica(
