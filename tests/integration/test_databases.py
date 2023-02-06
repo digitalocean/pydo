@@ -106,3 +106,44 @@ def test_databases_update_major_version(integration_client: Client):
         )
 
         assert update_resp is None
+
+
+@pytest.mark.long_running
+def test_databases_create_replica_and_promote_as_primary(integration_client: Client):
+    """Tests creating a replica of a database and promoting the
+    replica as the primary database.
+    """
+
+    db_create_req = {
+        "name": f"{defaults.PREFIX}-{uuid.uuid4()}",
+        "engine": "pg",
+        "version": "13",
+        "region": "nyc3",
+        "size": "db-s-2vcpu-4gb",
+        "num_nodes": 2,
+        "tags": ["production"],
+    }
+
+    with shared.with_test_database(
+        integration_client, wait=True, **db_create_req
+    ) as database_resp:
+        db_id = database_resp["database"]["id"]
+        replica_name = "read-nyc3-01"
+
+        create_replica = {
+            "name": replica_name,
+            "region": "nyc3",
+            "size": "db-s-2vcpu-4gb",
+        }
+
+        create_rep_response = integration_client.databases.create_replica(
+            db_id, create_replica
+        )
+
+        assert create_rep_response is not None
+
+        promote_replica = integration_client.databases.promote_replica(
+            db_id, replica_name
+        )
+
+        assert promote_replica is None
