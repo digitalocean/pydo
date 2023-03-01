@@ -356,6 +356,13 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     made per 60 seconds.
     * Only 10 ``GET`` requests to the ``/v2/account/keys`` endpoint to list SSH keys can be made
     per 60 seconds.
+    * Only 5 requests to any and all ``v2/cdn/endpoints`` can be made per 10 seconds. This includes
+    ``v2/cdn/endpoints``\ ,
+      ``v2/cdn/endpoints/$ENDPOINT_ID``\ , and ``v2/cdn/endpoints/$ENDPOINT_ID/cache``.
+    * Only 50 strings within the ``files`` json struct in the
+    ``v2/cdn/endpoints/$ENDPOINT_ID/cache`` `payload
+    <https://docs.digitalocean.com/reference/api/api-reference/#operation/cdn_purge_cache>`_
+      can be requested every 20 seconds.
 
     Sample Rate Limit Headers
     ^^^^^^^^^^^^^^^^^^^^^^^^^
