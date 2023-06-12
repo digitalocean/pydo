@@ -280,7 +280,7 @@ def test_container_registry_list_repositories_tags(
 
     responses.add(
         responses.GET,
-        f"{mock_client_url}/v2/registry/example/repo-1/tags",
+        f"{mock_client_url}/v2/registry/example/repositories/repo-1/tags",
         json=expected,
         status=200,
     )
@@ -298,7 +298,7 @@ def test_container_registry_tag_delete(mock_client: Client, mock_client_url):
 
     responses.add(
         responses.DELETE,
-        f"{mock_client_url}/v2/registry/example/repo-1/tags/tag1",
+        f"{mock_client_url}/v2/registry/example/repositories/repo-1/tags/tag1",
         status=204,
     )
     del_resp = mock_client.registry.delete_repository_tag(
@@ -352,7 +352,7 @@ def test_container_registry_list_repository_manifests(
 
     responses.add(
         responses.GET,
-        f"{mock_client_url}/v2/registry/example/repo-1/digests",
+        f"{mock_client_url}/v2/registry/example/repositories/repo-1/digests",
         json=expected,
         status=200,
     )
@@ -370,7 +370,7 @@ def test_container_registry_repository_delete(mock_client: Client, mock_client_u
 
     responses.add(
         responses.DELETE,
-        f"{mock_client_url}/v2/registry/example/repo-1/digests/manifest_digest",
+        f"{mock_client_url}/v2/registry/example/repositories/repo-1/digests/manifest_digest",
         status=204,
     )
     del_resp = mock_client.registry.delete_repository_manifest(
