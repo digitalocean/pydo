@@ -54,26 +54,24 @@ else
 endif
 
 .PHONY: dev
-dev: dev-dependencies # Turns the current terminal into a poetry env
+dev: dev-dependencies ## Turns the current terminal into a poetry env
 	poetry shell
 
 .PHONY: lint-tests
-lint-tests: install
+lint-tests: install ## Lints the code
 	poetry run black --check --diff tests/. && \
 	poetry run pylint $(PYLINT_ARGS) tests/.
 
 .PHONY: test-mocked
-test-mocked: install
+test-mocked: install ## Runs the mock test suite
 	poetry run pytest -rA --tb=short tests/mocked/. $(PYTEST_ARGS)
 
 .PHONY: test-mocked
-test-integration: install
+test-integration: install ## Runs the integration test suite
 	poetry run pytest -rA --tb=short tests/integration/. $(PYTEST_EXCLUDE_MARKS) $(PYTEST_ARGS)
 
-# This command runs a single integration test
-# > make test-integration-single test=test_actions
 .PHONY: test-mocked
-test-integration-single: install
+test-integration-single: install ## This command runs a single integration test, e.g. > make test-integration-single test=test_actions
 	poetry run pytest -rA --tb=short tests/integration/. -k $(test)
 
 .PHONY: docker-build
@@ -123,13 +121,13 @@ _install_sembump:
 	@GO111MODULE=off go get -u github.com/jessfraz/junk/sembump
 
 .PHONY: bump_version
-bump_version: _install_sembump
+bump_version: _install_sembump ## Bumps the version
 	@echo "==> BUMP=${BUMP} bump_version"
 	@echo ""
 	@ORIGIN=${ORIGIN} scripts/bumpversion.sh
 
 .PHONY: tag
-tag:
+tag: ## Tags a release
 	@echo "==> ORIGIN=${ORIGIN} COMMIT=${COMMIT} tag"
 	@echo ""
 	@ORIGIN=${ORIGIN} scripts/tag.sh
