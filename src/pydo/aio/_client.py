@@ -325,6 +325,12 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     value is given in `Unix epoch time <http://en.wikipedia.org/wiki/Unix_time>`_. See below for
     more information about how request limits expire.
 
+    More rate limiting information is returned only within burst limit error response headers:
+
+
+    * **retry-after**\ : The number of seconds to wait before making another request when rate
+    limited.
+
     As long as the ``ratelimit-remaining`` count is above zero, you will be able
     to make additional requests.
 
@@ -345,10 +351,14 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     move an entire hour into the future.
 
     If the ``ratelimit-remaining`` reaches zero, subsequent requests will receive
-    a 429 error code until the request reset has been reached. You can see the
-    format of the response in the examples. ``ratelimit-remaining`` reaching zero
-    can also indicate that the 250 requests per minute limit was met, even if
-    the 5,000 requests per hour limit was not.
+    a 429 error code until the request reset has been reached.
+
+    ``ratelimit-remaining`` reaching zero can also indicate that the "burst limit" of 250
+    requests per minute limit was met, even if the 5,000 requests per hour limit was not.
+    In this case, the 429 error response will include a retry-after header to indicate how
+    long to wait (in seconds) until the request may be retried.
+
+    You can see the format of the response in the examples.
 
     **Note:** The following endpoints have special rate limit requirements that
     are independent of the limits defined above.
@@ -375,6 +385,18 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
            ratelimit-limit: 1200
            ratelimit-remaining: 1193
            rateLimit-reset: 1402425459
+           . . .
+
+    Sample Rate Limit Headers When Burst Limit is Reached:
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    .. code-block::
+
+           . . .
+           ratelimit-limit: 5000
+           ratelimit-remaining: 0
+           rateLimit-reset: 1402425459
+           retry-after: 29
            . . .
 
     Sample Rate Exceeded Response
