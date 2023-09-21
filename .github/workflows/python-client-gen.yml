@@ -83,7 +83,7 @@ jobs:
 
       - name: Set pr_title outputs 
         id: pr_title_var
-        run: echo "PR_TITLE=$(gh pr list --search "${{ github.event.inputs.openapi_short_sha }}" --json title --jq '.[0].title' --repo danaelhe/openapi --state merged)" >> $GITHUB_OUTPUT
+        run: echo "PR_TITLE=$(gh pr list --search "${{ github.event.inputs.openapi_short_sha }}" --json title --jq '.[0].title' --repo digitalocean/openapi --state merged)" >> $GITHUB_OUTPUT
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Check pr_title outputs 
