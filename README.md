@@ -97,7 +97,9 @@ retry policy. If you'd like to modify any of these values, you can pass them as 
 ```python
 client = Client(token=os.getenv("$DIGITALOCEAN_TOKEN"), retry_total=3)
 ```
+
 or
+
 ```python
 client = Client(token=os.getenv("$DIGITALOCEAN_TOKEN"), retry_policy=MyRetryPolicy())
 ```
