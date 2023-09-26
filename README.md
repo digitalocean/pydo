@@ -89,16 +89,16 @@ else:
     paginated = False
 ```
 
-#### Retries and Backoff 
+#### Retries and Backoff
 
-By default the client uses [this](https://learn.microsoft.com/en-us/python/api/azure-core/azure.core.pipeline.policies.retrypolicy?view=azure-python) 
+By default the client uses [this](https://learn.microsoft.com/en-us/python/api/azure-core/azure.core.pipeline.policies.retrypolicy?view=azure-python)
 retry policy. If you'd like to modify any of these values, you can pass them as keywords to your client initialization:
 
-```
+```python
 client = Client(token=os.getenv("$DIGITALOCEAN_TOKEN"), retry_total=3)
 ```
-or 
-```
+or
+```python
 client = Client(token=os.getenv("$DIGITALOCEAN_TOKEN"), retry_policy=MyRetryPolicy())
 ```
 
