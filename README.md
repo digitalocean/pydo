@@ -91,7 +91,7 @@ else:
 
 #### Retries and Backoff
 
-By default the client uses [this](https://learn.microsoft.com/en-us/python/api/azure-core/azure.core.pipeline.policies.retrypolicy?view=azure-python)
+By default the client uses the same retry policy as the [Azure SDK for Python](https://learn.microsoft.com/en-us/python/api/azure-core/azure.core.pipeline.policies.retrypolicy?view=azure-python).
 retry policy. If you'd like to modify any of these values, you can pass them as keywords to your client initialization:
 
 ```python
