@@ -329,3 +329,62 @@ def test_block_storage_snapshots_create(mock_client: Client, mock_client_url):
     )
 
     assert create_resp == expected
+
+@responses.activate
+def test_volume_actions_list(mock_client: Client, mock_client_url):
+    """Tests retrieving all actions that have been executed on a volume"""
+    expected = {
+            "actions": [
+                {
+                "id": 72531856,
+                "status": "completed",
+                "type": "attach_volume",
+                "started_at": "2020-11-21T21:51:09Z",
+                "completed_at": "2020-11-21T21:51:09Z",
+                "resource_type": "volume",
+                "region": {
+                    "name": "New York 1",
+                    "slug": "nyc1",
+                    "sizes": [
+                    "s-1vcpu-1gb",
+                    "s-1vcpu-2gb",
+                    "s-1vcpu-3gb",
+                    "s-2vcpu-2gb",
+                    "s-3vcpu-1gb",
+                    "s-2vcpu-4gb",
+                    "s-4vcpu-8gb",
+                    "s-6vcpu-16gb",
+                    "s-8vcpu-32gb",
+                    "s-12vcpu-48gb",
+                    "s-16vcpu-64gb",
+                    "s-20vcpu-96gb",
+                    "s-24vcpu-128gb",
+                    "s-32vcpu-192gb"
+                    ],
+                    "features": [
+                    "private_networking",
+                    "backups",
+                    "ipv6",
+                    "metadata"
+                    ],
+                    "available": True
+                },
+                "region_slug": "nyc1"
+                }
+            ],
+            "links": {},
+            "meta": {
+                "total": 1
+            }
+        }
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/volumes/7724db7c/actions",
+        json=expected,
+        status=200,
+    )
+
+    get_resp = mock_client.volume_actions.list(volume_id="7724db7c")
+
+    assert get_resp == expected
