@@ -5,8 +5,6 @@ import responses
 
 from pydo import Client
 
-import uuid
-
 
 @responses.activate
 def test_databases_add(mock_client: Client, mock_client_url):
@@ -149,8 +147,6 @@ def test_databases_create_cluster(mock_client: Client, mock_client_url):
             "version_end_of_availability": "2023-05-09T00:00:00Z",
         }
     }
-
-    cluster_uuid = "9cc10173-e9ea-4176-9dbc-a4cee4c4ff30"
 
     responses.add(
         responses.POST,
