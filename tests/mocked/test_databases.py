@@ -103,7 +103,7 @@ def test_databases_create_cluster(mock_client: Client, mock_client_url):
     expected = {
         "database": {
             "id": "9cc10173-e9ea-4176-9dbc-a4cee4c4ff30",
-            "name": "backend",
+            "name": "backend-cluster",
             "engine": "pg",
             "version": "14",
             "semantic_version": "14.5",
@@ -129,7 +129,7 @@ def test_databases_create_cluster(mock_client: Client, mock_client_url):
                 {"name": "doadmin", "role": "primary", "password": "wv78n3zpz42xezdk"}
             ],
             "db_names": ["defaultdb"],
-            "num_nodes": 2,
+            "num_nodes": 3,
             "region": "nyc3",
             "status": "creating",
             "created_at": "2019-01-11T18:37:36Z",
@@ -161,12 +161,12 @@ def test_databases_create_cluster(mock_client: Client, mock_client_url):
 
     resp = mock_client.databases.create_cluster(
         {
-            "name": "backend",
+            "name": "backend-cluster",
             "engine": "pg",
             "version": "14",
             "region": "nyc3",
             "size": "db-s-2vcpu-4gb",
-            "num_nodes": 2,
+            "num_nodes": 3,
             "tags": ["production"],
         }
     )
