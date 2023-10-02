@@ -335,14 +335,14 @@ def test_block_storage_snapshots_create(mock_client: Client, mock_client_url):
 def test_volume_actions_get(mock_client: Client, mock_client_url):
     """Tests to retrieve the status of a volume action"""
     expected = {
-            "action": {
-                "id": 72531856,
-                "status": "completed",
-                "type": "attach_volume",
-                "started_at": "2020-11-12T17:51:03Z",
-                "completed_at": "2020-11-12T17:51:14Z",
-                "resource_type": "volume",
-                "region": {
+        "action": {
+            "id": 72531856,
+            "status": "completed",
+            "type": "attach_volume",
+            "started_at": "2020-11-12T17:51:03Z",
+            "completed_at": "2020-11-12T17:51:14Z",
+            "resource_type": "volume",
+            "region": {
                 "name": "New York 1",
                 "slug": "nyc1",
                 "sizes": [
@@ -359,19 +359,14 @@ def test_volume_actions_get(mock_client: Client, mock_client_url):
                     "s-16vcpu-64gb",
                     "s-20vcpu-96gb",
                     "s-24vcpu-128gb",
-                    "s-32vcpu-192gb"
+                    "s-32vcpu-192gb",
                 ],
-                "features": [
-                    "private_networking",
-                    "backups",
-                    "ipv6",
-                    "metadata"
-                ],
-                "available": True
-                },
-                "region_slug": "nyc1"
-            }
+                "features": ["private_networking", "backups", "ipv6", "metadata"],
+                "available": True,
+            },
+            "region_slug": "nyc1",
         }
+    }
 
     responses.add(
         responses.GET,
@@ -380,7 +375,9 @@ def test_volume_actions_get(mock_client: Client, mock_client_url):
         status=200,
     )
 
-    get_resp = mock_client.volume_actions.get(volume_id="7724db7c", action_id="72531856")
+    get_resp = mock_client.volume_actions.get(
+        volume_id="7724db7c", action_id="72531856"
+    )
 
     assert get_resp == expected
 
@@ -389,8 +386,8 @@ def test_volume_actions_get(mock_client: Client, mock_client_url):
 def test_volume_actions_list(mock_client: Client, mock_client_url):
     """Tests retrieving all actions that have been executed on a volume"""
     expected = {
-            "actions": [
-                {
+        "actions": [
+            {
                 "id": 72531856,
                 "status": "completed",
                 "type": "attach_volume",
@@ -401,37 +398,30 @@ def test_volume_actions_list(mock_client: Client, mock_client_url):
                     "name": "New York 1",
                     "slug": "nyc1",
                     "sizes": [
-                    "s-1vcpu-1gb",
-                    "s-1vcpu-2gb",
-                    "s-1vcpu-3gb",
-                    "s-2vcpu-2gb",
-                    "s-3vcpu-1gb",
-                    "s-2vcpu-4gb",
-                    "s-4vcpu-8gb",
-                    "s-6vcpu-16gb",
-                    "s-8vcpu-32gb",
-                    "s-12vcpu-48gb",
-                    "s-16vcpu-64gb",
-                    "s-20vcpu-96gb",
-                    "s-24vcpu-128gb",
-                    "s-32vcpu-192gb"
+                        "s-1vcpu-1gb",
+                        "s-1vcpu-2gb",
+                        "s-1vcpu-3gb",
+                        "s-2vcpu-2gb",
+                        "s-3vcpu-1gb",
+                        "s-2vcpu-4gb",
+                        "s-4vcpu-8gb",
+                        "s-6vcpu-16gb",
+                        "s-8vcpu-32gb",
+                        "s-12vcpu-48gb",
+                        "s-16vcpu-64gb",
+                        "s-20vcpu-96gb",
+                        "s-24vcpu-128gb",
+                        "s-32vcpu-192gb",
                     ],
-                    "features": [
-                    "private_networking",
-                    "backups",
-                    "ipv6",
-                    "metadata"
-                    ],
-                    "available": True
+                    "features": ["private_networking", "backups", "ipv6", "metadata"],
+                    "available": True,
                 },
-                "region_slug": "nyc1"
-                }
-            ],
-            "links": {},
-            "meta": {
-                "total": 1
+                "region_slug": "nyc1",
             }
-        }
+        ],
+        "links": {},
+        "meta": {"total": 1},
+    }
 
     responses.add(
         responses.GET,
@@ -449,52 +439,45 @@ def test_volume_actions_list(mock_client: Client, mock_client_url):
 def test_volume_actions_post(mock_client: Client, mock_client_url):
     """Tests to initiate an action on a block storage volume by Name"""
     expected = {
-                "action": {
-                    "id": 72531856,
-                    "status": "completed",
-                    "type": "attach_volume",
-                    "started_at": "2020-11-12T17:51:03Z",
-                    "completed_at": "2020-11-12T17:51:14Z",
-                    "resource_type": "volume",
-                    "region": {
-                    "name": "New York 1",
-                    "slug": "nyc1",
-                    "sizes": [
-                        "s-1vcpu-1gb",
-                        "s-1vcpu-2gb",
-                        "s-1vcpu-3gb",
-                        "s-2vcpu-2gb",
-                        "s-3vcpu-1gb",
-                        "s-2vcpu-4gb",
-                        "s-4vcpu-8gb",
-                        "s-6vcpu-16gb",
-                        "s-8vcpu-32gb",
-                        "s-12vcpu-48gb",
-                        "s-16vcpu-64gb",
-                        "s-20vcpu-96gb",
-                        "s-24vcpu-128gb",
-                        "s-32vcpu-192gb"
-                    ],
-                    "features": [
-                        "private_networking",
-                        "backups",
-                        "ipv6",
-                        "metadata"
-                    ],
-                    "available": True
-                    },
-                    "region_slug": "nyc1"
-                }
-            }
-     
-    post_body={
-            "type": "attach",
-            "volume_name": "example",
-            "droplet_id": 11612190,
-            "region": "nyc1",
-            "tags": [
-            "aninterestingtag"
-            ]
+        "action": {
+            "id": 72531856,
+            "status": "completed",
+            "type": "attach_volume",
+            "started_at": "2020-11-12T17:51:03Z",
+            "completed_at": "2020-11-12T17:51:14Z",
+            "resource_type": "volume",
+            "region": {
+                "name": "New York 1",
+                "slug": "nyc1",
+                "sizes": [
+                    "s-1vcpu-1gb",
+                    "s-1vcpu-2gb",
+                    "s-1vcpu-3gb",
+                    "s-2vcpu-2gb",
+                    "s-3vcpu-1gb",
+                    "s-2vcpu-4gb",
+                    "s-4vcpu-8gb",
+                    "s-6vcpu-16gb",
+                    "s-8vcpu-32gb",
+                    "s-12vcpu-48gb",
+                    "s-16vcpu-64gb",
+                    "s-20vcpu-96gb",
+                    "s-24vcpu-128gb",
+                    "s-32vcpu-192gb",
+                ],
+                "features": ["private_networking", "backups", "ipv6", "metadata"],
+                "available": True,
+            },
+            "region_slug": "nyc1",
+        }
+    }
+
+    post_body = {
+        "type": "attach",
+        "volume_name": "example",
+        "droplet_id": 11612190,
+        "region": "nyc1",
+        "tags": ["aninterestingtag"],
     }
 
     responses.add(
@@ -504,9 +487,7 @@ def test_volume_actions_post(mock_client: Client, mock_client_url):
         status=202,
     )
 
-    create_resp = mock_client.volume_actions.post(
-        body=post_body
-    )
+    create_resp = mock_client.volume_actions.post(body=post_body)
 
     assert create_resp == expected
 
@@ -516,24 +497,22 @@ def test_volume_actions_post_by_id(mock_client: Client, mock_client_url):
     """Tests to initiate an action on a block storage volume by Id"""
     expected = {
         "action": {
-        "id": 72531856,
-        "status": "completed",
-        "type": "attach_volume",
-        "started_at": "2020-11-12T17:51:03Z",
-        "completed_at": "2020-11-12T17:51:14Z",
-        "resource_type": "volume",
-        "region": {},
-        "region_slug": "nyc1"
+            "id": 72531856,
+            "status": "completed",
+            "type": "attach_volume",
+            "started_at": "2020-11-12T17:51:03Z",
+            "completed_at": "2020-11-12T17:51:14Z",
+            "resource_type": "volume",
+            "region": {},
+            "region_slug": "nyc1",
         }
     }
-     
+
     post_body = {
         "type": "attach",
         "droplet_id": 11612190,
         "region": "nyc1",
-        "tags": [
-            "aninterestingtag"
-        ]
+        "tags": ["aninterestingtag"],
     }
 
     responses.add(
