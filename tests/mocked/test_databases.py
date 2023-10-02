@@ -278,7 +278,6 @@ def test_databases_promote_replica(mock_client: Client, mock_client_url):
 
 
 @responses.activate
-<<<<<<< HEAD
 def test_databases_get_user(mock_client: Client, mock_client_url):
     """Mocks the databases get user method."""
 
@@ -712,7 +711,8 @@ def test_databases_list_users(mock_client: Client, mock_client_url):
     resp = mock_client.databases.list_users(cluster_uuid)
 
     assert expected == resp
-=======
+
+
 def test_databases_delete(mock_client: Client, mock_client_url):
     """Mocks the databases delete operation."""
 
@@ -804,4 +804,3 @@ def test_databases_destroy_replica(mock_client: Client, mock_client_url):
     resp = mock_client.databases.destroy_replica(cluster_uuid, replica_name)
 
     assert resp is None
->>>>>>> e83536b8fadeafc89659d7c9da3f6fb0cf4e0a04
