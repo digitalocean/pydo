@@ -278,6 +278,442 @@ def test_databases_promote_replica(mock_client: Client, mock_client_url):
 
 
 @responses.activate
+def test_databases_get_user(mock_client: Client, mock_client_url):
+    """Mocks the databases get user method."""
+
+    expected = {
+        "user": {"name": "app-01", "role": "normal", "password": "jge5lfxtzhx42iff"}
+    }
+
+    cluster_uuid = "9cc10173-e9ea-4176-9dbc-a4cee4c4ff30"
+    user_name = "app-01"
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/databases/{cluster_uuid}/users/{user_name}",
+        json=expected,
+        status=200,
+    )
+
+    resp = mock_client.databases.get_user(cluster_uuid, user_name)
+
+    assert expected == resp
+
+
+@responses.activate
+def test_databases_list(mock_client: Client, mock_client_url):
+    """Mocks the databases list operation"""
+
+    expected = {"dbs": [{"name": "alpha"}, {"name": "defaultdb"}]}
+
+    cluster_uuid = "9cc10173-e9ea-4176-9dbc-a4cee4c4ff30"
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/databases/{cluster_uuid}/dbs",
+        json=expected,
+        status=200,
+    )
+
+    resp = mock_client.databases.list(cluster_uuid)
+
+    assert expected == resp
+
+
+@responses.activate
+def test_databases_list_backups(mock_client: Client, mock_client_url):
+    """Mocks the databases list backups operation."""
+
+    expected = {
+        "backups": [
+            {"created_at": "2019-01-11T18:42:27Z", "size_gigabytes": 0.03357696},
+            {"created_at": "2019-01-12T18:42:29Z", "size_gigabytes": 0.03364864},
+        ]
+    }
+
+    cluster_uuid = "9cc10173-e9ea-4176-9dbc-a4cee4c4ff30"
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/databases/{cluster_uuid}/backups",
+        json=expected,
+        status=200,
+    )
+
+    resp = mock_client.databases.list_backups(cluster_uuid)
+
+    assert expected == resp
+
+
+@responses.activate
+def test_databases_list_clusters(mock_client: Client, mock_client_url):
+    """Mocks the databases list clusters operation."""
+
+    expected = [
+        {
+            "databases": [
+                {
+                    "id": "9cc10173-e9ea-4176-9dbc-a4cee4c4ff30",
+                    "name": "backend",
+                    "engine": "pg",
+                    "version": "10",
+                    "connection": {
+                        "uri": "postgres://doadmin:wv78n3zpz42xezdk@backend-do-user-19081923-0.db.ondigitalocean.com:25060/defaultdb?sslmode=require",
+                        "database": "",
+                        "host": "backend-do-user-19081923-0.db.ondigitalocean.com",
+                        "port": 25060,
+                        "user": "doadmin",
+                        "password": "wv78n3zpz42xezdk",
+                        "ssl": True,
+                    },
+                    "private_connection": {
+                        "uri": "postgres://doadmin:wv78n3zpz42xezdk@private-backend-do-user-19081923-0.db.ondigitalocean.com:25060/defaultdb?sslmode=require",
+                        "database": "",
+                        "host": "private-backend-do-user-19081923-0.db.ondigitalocean.com",
+                        "port": 25060,
+                        "user": "doadmin",
+                        "password": "wv78n3zpz42xezdk",
+                        "ssl": True,
+                    },
+                    "users": [
+                        {
+                            "name": "doadmin",
+                            "role": "primary",
+                            "password": "wv78n3zpz42xezdk",
+                        }
+                    ],
+                    "db_names": ["defaultdb"],
+                    "num_nodes": 1,
+                    "region": "nyc3",
+                    "status": "online",
+                    "created_at": "2019-01-11T18:37:36Z",
+                    "maintenance_window": {
+                        "day": "saturday",
+                        "hour": "08:45:12",
+                        "pending": True,
+                        "description": [
+                            "Update TimescaleDB to version 1.2.1",
+                            "Upgrade to PostgreSQL 11.2 and 10.7 bugfix releases",
+                        ],
+                    },
+                    "size": "db-s-2vcpu-4gb",
+                    "tags": ["production"],
+                    "private_network_uuid": "d455e75d-4858-4eec-8c95-da2f0a5f93a7",
+                    "version_end_of_life": "2023-11-09T00:00:00Z",
+                    "version_end_of_availability": "2023-05-09T00:00:00Z",
+                }
+            ]
+        }
+    ]
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/databases",
+        json=expected,
+        status=200,
+    )
+
+    resp = mock_client.databases.list_clusters()
+
+    assert expected == resp
+
+
+@responses.activate
+def test_databases_list_connection_pools(mock_client: Client, mock_client_url):
+    """Mocks the databases list connection pools operation."""
+
+    expected = {
+        "pool": {
+            "user": "doadmin",
+            "name": "backend-pool",
+            "size": 10,
+            "db": "defaultdb",
+            "mode": "transaction",
+            "connection": {
+                "uri": "postgres://doadmin:wv78n3zpz42xezdk@backend-do-user-19081923-0.db.ondigitalocean.com:25061/backend-pool?sslmode=require",
+                "database": "backend-pool",
+                "host": "backend-do-user-19081923-0.db.ondigitalocean.com",
+                "port": 25061,
+                "user": "doadmin",
+                "password": "wv78n3zpz42xezdk",
+                "ssl": True,
+            },
+        }
+    }
+
+    cluster_uuid = "9cc10173-e9ea-4176-9dbc-a4cee4c4ff30"
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/databases/{cluster_uuid}/pools",
+        json=expected,
+        status=200,
+    )
+
+    resp = mock_client.databases.list_connection_pools(cluster_uuid)
+
+    assert expected == resp
+
+
+@responses.activate
+def test_databases_list_firewall_rules(mock_client: Client, mock_client_url):
+    """Mocks the databases list firewall rules operation."""
+
+    expected = {
+        "rules": [
+            {
+                "uuid": "79f26d28-ea8a-41f2-8ad8-8cfcdd020095",
+                "cluster_uuid": "9cc10173-e9ea-4176-9dbc-a4cee4c4ff30",
+                "type": "k8s",
+                "value": "ff2a6c52-5a44-4b63-b99c-0e98e7a63d61",
+                "created_at": "2019-11-14T20:30:28Z",
+            },
+            {
+                "uuid": "adfe81a8-0fa1-4e2d-973f-06aa5af19b44",
+                "cluster_uuid": "9cc10173-e9ea-4176-9dbc-a4cee4c4ff30",
+                "type": "ip_addr",
+                "value": "192.168.1.1",
+                "created_at": "2019-11-14T20:30:28Z",
+            },
+            {
+                "uuid": "b9b42276-8295-4313-b40f-74173a7f46e6",
+                "cluster_uuid": "9cc10173-e9ea-4176-9dbc-a4cee4c4ff30",
+                "type": "droplet",
+                "value": "163973392",
+                "created_at": "2019-11-14T20:30:28Z",
+            },
+            {
+                "uuid": "718d23e0-13d7-4129-8a00-47fb72ee0deb",
+                "cluster_uuid": "9cc10173-e9ea-4176-9dbc-a4cee4c4ff30",
+                "type": "tag",
+                "value": "backend",
+                "created_at": "2019-11-14T20:30:28Z",
+            },
+        ]
+    }
+
+    cluster_uuid = "9cc10173-e9ea-4176-9dbc-a4cee4c4ff30"
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/databases/{cluster_uuid}/firewall",
+        json=expected,
+        status=200,
+    )
+
+    resp = mock_client.databases.list_firewall_rules(cluster_uuid)
+
+    assert expected == resp
+
+
+@responses.activate
+def test_databases_list_options(mock_client: Client, mock_client_url):
+    """Mocks the databases list options."""
+
+    expected = {
+        "options": {
+            "mongodb": {
+                "regions": ["ams3", "blr1"],
+                "versions": ["4.4", "5.0"],
+                "layouts": [
+                    {"num_nodes": 1, "sizes": ["db-s-1vcpu-1gb", "db-s-1vcpu-2gb"]},
+                    {
+                        "num_nodes": 3,
+                        "sizes": [
+                            "db-s-1vcpu-1gb",
+                            "db-s-1vcpu-2gb",
+                            "db-s-2vcpu-4gb",
+                            "db-s-4vcpu-8gb",
+                        ],
+                    },
+                ],
+            },
+            "mysql": {
+                "regions": ["ams3", "blr1"],
+                "versions": ["8"],
+                "layouts": [
+                    {"num_nodes": 1, "sizes": ["db-s-1vcpu-1gb", "db-s-1vcpu-2gb"]},
+                    {
+                        "num_nodes": 2,
+                        "sizes": [
+                            "db-s-1vcpu-1gb",
+                            "db-s-1vcpu-2gb",
+                            "db-s-2vcpu-4gb",
+                            "db-s-4vcpu-8gb",
+                        ],
+                    },
+                    {
+                        "num_nodes": 3,
+                        "sizes": [
+                            "db-s-1vcpu-1gb",
+                            "db-s-1vcpu-2gb",
+                            "db-s-2vcpu-4gb",
+                            "db-s-4vcpu-8gb",
+                        ],
+                    },
+                ],
+            },
+            "pg": {
+                "regions": ["ams3", "blr1"],
+                "versions": ["11", "12", "13", "14"],
+                "layouts": [
+                    {"num_nodes": 1, "sizes": ["db-s-1vcpu-1gb", "db-s-1vcpu-2gb"]},
+                    {
+                        "num_nodes": 2,
+                        "sizes": [
+                            "db-s-1vcpu-1gb",
+                            "db-s-1vcpu-2gb",
+                            "db-s-2vcpu-4gb",
+                            "db-s-4vcpu-8gb",
+                        ],
+                    },
+                ],
+            },
+            "redis": {
+                "regions": ["ams3", "blr1"],
+                "versions": ["6"],
+                "layouts": [
+                    {"num_nodes": 1, "sizes": ["db-s-1vcpu-1gb", "db-s-1vcpu-2gb"]},
+                    {
+                        "num_nodes": 2,
+                        "sizes": [
+                            "db-s-1vcpu-1gb",
+                            "db-s-1vcpu-2gb",
+                            "db-s-2vcpu-4gb",
+                            "db-s-4vcpu-8gb",
+                        ],
+                    },
+                ],
+            },
+        },
+        "version_availability": {
+            "redis": [
+                {"end_of_life": "null", "end_of_availability": "null", "version": "7"}
+            ],
+            "mysql": [
+                {"end_of_life": "null", "end_of_availability": "null", "version": "8"}
+            ],
+            "pg": [
+                {
+                    "end_of_life": "2023-11-09T00:00:00Z",
+                    "end_of_availability": "2023-05-09T00:00:00Z",
+                    "version": "11",
+                },
+                {
+                    "end_of_life": "2024-11-14T00:00:00Z",
+                    "end_of_availability": "2024-05-14T00:00:00Z",
+                    "version": "12",
+                },
+                {
+                    "end_of_life": "2025-11-13T00:00:00Z",
+                    "end_of_availability": "2025-05-13T00:00:00Z",
+                    "version": "13",
+                },
+                {
+                    "end_of_life": "2026-11-12T00:00:00Z",
+                    "end_of_availability": "2026-05-12T00:00:00Z",
+                    "version": "14",
+                },
+            ],
+            "mongodb": [
+                {
+                    "end_of_life": "2024-02-01T08:00:00Z",
+                    "end_of_availability": "null",
+                    "version": "4.4",
+                },
+                {
+                    "end_of_life": "2024-10-01T07:00:00Z",
+                    "end_of_availability": "null",
+                    "version": "5.0",
+                },
+            ],
+        },
+    }
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/databases/options",
+        json=expected,
+        status=200,
+    )
+
+    resp = mock_client.databases.list_options()
+
+    assert expected == resp
+
+
+@responses.activate
+def test_databases_list_replicas(mock_client: Client, mock_client_url):
+    """Mocks the databases list replicas operation."""
+
+    expected = {
+        "replicas": [
+            {
+                "name": "read-nyc3-01",
+                "connection": {
+                    "uri": "",
+                    "database": "defaultdb",
+                    "host": "read-nyc3-01-do-user-19081923-0.db.ondigitalocean.com",
+                    "port": 25060,
+                    "user": "doadmin",
+                    "password": "wv78n3zpz42xezdk",
+                    "ssl": True,
+                },
+                "private_connection": {
+                    "uri": "postgres://doadmin:wv78n3zpz42xezdk@private-read-nyc3-01-do-user-19081923-0.db.ondigitalocean.com:25060/defaultdb?sslmode=require",
+                    "database": "",
+                    "host": "private-read-nyc3-01-do-user-19081923-0.db.ondigitalocean.com",
+                    "port": 25060,
+                    "user": "doadmin",
+                    "password": "wv78n3zpz42xezdk",
+                    "ssl": True,
+                },
+                "region": "nyc3",
+                "status": "online",
+                "created_at": "2019-01-11T18:37:36Z",
+            }
+        ]
+    }
+
+    cluster_uuid = "9cc10173-e9ea-4176-9dbc-a4cee4c4ff30"
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/databases/{cluster_uuid}/replicas",
+        json=expected,
+        status=200,
+    )
+
+    resp = mock_client.databases.list_replicas(cluster_uuid)
+
+    assert expected == resp
+
+
+@responses.activate
+def test_databases_list_users(mock_client: Client, mock_client_url):
+    """Mocks the databases get list users operation."""
+
+    expected = {
+        "users": [
+            {"name": "app-01", "role": "normal", "password": "jge5lfxtzhx42iff"},
+            {"name": "doadmin", "role": "primary", "password": "wv78n3zpz42xezd"},
+        ]
+    }
+
+    cluster_uuid = "9cc10173-e9ea-4176-9dbc-a4cee4c4ff30"
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/databases/{cluster_uuid}/users",
+        json=expected,
+        status=200,
+    )
+
+    resp = mock_client.databases.list_users(cluster_uuid)
+
+    assert expected == resp
+
+
+@responses.activate
 def test_databases_delete(mock_client: Client, mock_client_url):
     """Mocks the databases delete operation."""
 
