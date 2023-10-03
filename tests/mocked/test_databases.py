@@ -1,4 +1,5 @@
 # pylint: disable=line-too-long
+# pylint: disable=too-many-lines
 """Mock tests for the databases API resource."""
 
 import responses
