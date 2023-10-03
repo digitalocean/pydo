@@ -111,6 +111,7 @@ def test_update_check_put(mock_client: Client, mock_client_url):
 @responses.activate
 def test_list_all_alerts_get(mock_client: Client, mock_client_url):
     """Mock Uptime Check List All Alerts"""
+    url = "https://hooks.slack.com/services/T1234567/AAAAAAAA/ZZZZZZ"
     expected = {
         "alerts": [
             {
@@ -124,7 +125,7 @@ def test_list_all_alerts_get(mock_client: Client, mock_client_url):
                     "slack": [
                         {
                             "channel": "Production Alerts",
-                            "url": "https://hooks.slack.com/services/T1234567/AAAAAAAA/ZZZZZZ",
+                            "url": url,
                         }
                     ],
                 },
@@ -157,6 +158,7 @@ def test_list_all_alerts_get(mock_client: Client, mock_client_url):
 @responses.activate
 def test_update_alert_put(mock_client: Client, mock_client_url):
     """Mock Uptime Update Alert"""
+    url = "https://hooks.slack.com/services/T1234567/AAAAAAAA/ZZZZZZ"
     expected = {
         "alert": {
             "id": "5a4981aa-9653-4bd1-bef5-d6bff52042e4",
@@ -169,7 +171,7 @@ def test_update_alert_put(mock_client: Client, mock_client_url):
                 "slack": [
                     {
                         "channel": "Production Alerts",
-                        "url": "https://hooks.slack.com/services/T1234567/AAAAAAAA/ZZZZZZ",
+                        "url": url,
                     }
                 ],
             },
@@ -194,7 +196,7 @@ def test_update_alert_put(mock_client: Client, mock_client_url):
             "slack": [
                 {
                     "channel": "Production Alerts",
-                    "url": "https://hooks.slack.com/services/T1234567/AAAAAAAA/ZZZZZZ",
+                    "url": url,
                 }
             ],
         },
