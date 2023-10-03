@@ -713,6 +713,7 @@ def test_databases_list_users(mock_client: Client, mock_client_url):
     assert expected == resp
 
 
+@responses.activate
 def test_databases_delete(mock_client: Client, mock_client_url):
     """Mocks the databases delete operation."""
 
