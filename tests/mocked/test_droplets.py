@@ -450,3 +450,113 @@ def test_delete(mock_client: Client, mock_client_url):
     del_resp = mock_client.droplets.destroy(1)
 
     assert del_resp is None
+
+
+@responses.activate
+def test_droplets_list_backups(mock_client: Client, mock_client_url):
+    """Mocks the droplets list backups operation."""
+    droplet_id = 12345
+    expected = {
+        "backups": [
+            {"id": 123, "name": "Backup 1", "created_at": "2023-05-01T12:00:00Z"},
+            {"id": 124, "name": "Backup 2", "created_at": "2023-05-02T12:00:00Z"},
+        ]
+    }
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/droplets/{droplet_id}/backups",
+        json=expected,
+    )
+
+    resp = mock_client.droplets.list_backups(droplet_id)
+
+    assert expected == resp
+
+
+@responses.activate
+def test_droplets_list_snapshots(mock_client: Client, mock_client_url):
+    """Mocks the droplets list snapshots operation."""
+    droplet_id = 12345
+    expected = {
+        "snapshots": [
+            {"id": 321, "name": "Snapshot 1", "created_at": "2023-05-01T12:00:00Z"},
+            {"id": 322, "name": "Snapshot 2", "created_at": "2023-05-02T12:00:00Z"},
+        ]
+    }
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/droplets/{droplet_id}/snapshots",
+        json=expected,
+    )
+
+    resp = mock_client.droplets.list_snapshots(droplet_id)
+
+    assert expected == resp
+
+
+@responses.activate
+def test_droplets_list_kernels(mock_client: Client, mock_client_url):
+    """Mocks the droplets list kernels operation."""
+    droplet_id = 12345
+    expected = {
+        "kernels": [
+            {"id": 456, "name": "Kernel 1", "version": "5.4.0"},
+            {"id": 457, "name": "Kernel 2", "version": "5.5.0"},
+        ]
+    }
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/droplets/{droplet_id}/kernels",
+        json=expected,
+    )
+
+    resp = mock_client.droplets.list_kernels(droplet_id)
+
+    assert expected == resp
+
+
+@responses.activate
+def test_droplets_list_firewalls(mock_client: Client, mock_client_url):
+    """Mocks the droplets list firewalls operation."""
+    droplet_id = 12345
+    expected = {
+        "firewalls": [
+            {"id": "fw-1", "name": "Firewall 1"},
+            {"id": "fw-2", "name": "Firewall 2"},
+        ]
+    }
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/droplets/{droplet_id}/firewalls",
+        json=expected,
+    )
+
+    resp = mock_client.droplets.list_firewalls(droplet_id)
+
+    assert expected == resp
+
+
+@responses.activate
+def test_droplets_list_neighbors(mock_client: Client, mock_client_url):
+    """Mocks the droplets list neighbors operation."""
+    droplet_id = 12345
+    expected = {
+        "neighbors": [
+            {"id": 54321, "name": "Neighbor Droplet 1"},
+            {"id": 54322, "name": "Neighbor Droplet 2"},
+        ]
+    }
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/droplets/{droplet_id}/neighbors",
+        json=expected,
+    )
+
+    resp = mock_client.droplets.list_neighbors(droplet_id)
+
+    assert expected == resp
