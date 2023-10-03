@@ -369,3 +369,124 @@ def test_databases_destroy_replica(mock_client: Client, mock_client_url):
     resp = mock_client.databases.destroy_replica(cluster_uuid, replica_name)
 
     assert resp is None
+
+@responses.activate
+def test_databases_create_cluster_v2(mock_client: Client, mock_client_url):
+    """Mocks the databases create cluster operation."""
+    expected = {
+        "database": {
+            "id": "9cc10173-e9ea-4176-9dbc-a4cee4c4ff31",
+            "name": "backend-cluster-v2",
+            "engine": "pg",
+            "version": "15",
+            "semantic_version": "15.0",
+            "connection": {
+                "uri": "postgres://doadmin:wv78n3zpz42xezdk@backend-do-user-19081923-0.db.ondigitalocean.com:25060/defaultdb?sslmode=require",
+                "database": "",
+                "host": "backend-do-user-19081923-0.db.ondigitalocean.com",
+                "port": 25060,
+                "user": "doadmin",
+                "password": "wv78n3zpz42xezdk",
+                "ssl": True,
+            },
+            "private_connection": {
+                "uri": "postgres://doadmin:wv78n3zpz42xezdk@private-backend-do-user-19081923-0.db.ondigitalocean.com:25060/defaultdb?sslmode=require",
+                "database": "",
+                "host": "private-backend-do-user-19081923-0.db.ondigitalocean.com",
+                "port": 25060,
+                "user": "doadmin",
+                "password": "wv78n3zpz42xezdk",
+                "ssl": True,
+            },
+            "users": [
+                {"name": "doadmin", "role": "primary", "password": "wv78n3zpz42xezdk"}
+            ],
+            "db_names": ["defaultdb"],
+            "num_nodes": 3,
+            "region": "nyc3",
+            "status": "creating",
+            "created_at": "2020-01-11T18:37:36Z",
+            "maintenance_window": {
+                "day": "saturday",
+                "hour": "08:45:12",
+                "pending": True,
+                "description": [
+                    "Update TimescaleDB to version 1.2.1",
+                    "Upgrade to PostgreSQL 11.2 and 10.7 bugfix releases",
+                ],
+            },
+            "size": "db-s-2vcpu-4gb",
+            "tags": ["production"],
+            "private_network_uuid": "d455e75d-4858-4eec-8c95-da2f0a5f93a7",
+            "version_end_of_life": "2024-11-09T00:00:00Z",
+            "version_end_of_availability": "2024-05-09T00:00:00Z",
+        }
+    }
+
+    responses.add(
+        responses.POST,
+        f"{mock_client_url}/v2/databases",
+        json=expected,
+        status=201,
+    )
+
+    resp = mock_client.databases.create_cluster(
+        {
+            "name": "backend-cluster-v2",
+            "engine": "pg",
+            "version": "15",
+            "region": "nyc3",
+            "size": "db-s-2vcpu-4gb",
+            "num_nodes": 3,
+            "tags": ["production"],
+        }
+    )
+
+    assert expected == resp
+
+
+@responses.activate
+def test_databases_create_replica_v2(mock_client: Client, mock_client_url):
+    """Mocks the databases create replica operation."""
+    expected = {
+        "replica": {
+            "name": "read-nyc3-02",
+            "connection": {
+                "uri": "",
+                "database": "defaultdb",
+                "host": "read-nyc3-02-do-user-19081923-0.db.ondigitalocean.com",
+                "port": 25060,
+                "user": "doadmin",
+                "password": "wv78n3zpz42xezdk",
+                "ssl": True,
+            },
+            "private_connection": {
+                "uri": "postgres://doadmin:wv78n3zpz42xezdk@private-read-nyc3-02-do-user-19081923-0.db.ondigitalocean.com:25060/defaultdb?sslmode=require",
+                "database": "",
+                "host": "private-read-nyc3-02-do-user-19081923-0.db.ondigitalocean.com",
+                "port": 25060,
+                "user": "doadmin",
+                "password": "wv78n3zpz42xezdk",
+                "ssl": True,
+            },
+            "region": "nyc3",
+            "status": "online",
+            "created_at": "2020-01-11T18:37:36Z",
+        }
+    }
+
+    cluster_uuid = "9cc10173-e9ea-4176-9dbc-a4cee4c4ff30"
+
+    responses.add(
+        responses.POST,
+        f"{mock_client_url}/v2/databases/{cluster_uuid}/replicas",
+        json=expected,
+        status=201,
+    )
+
+    resp = mock_client.databases.create_replica(
+        cluster_uuid,
+        {"name": "read-nyc3-02", "region": "nyc3", "size": "db-s-2vcpu-4gb"},
+    )
+
+    assert expected == resp
