@@ -375,11 +375,9 @@ def test_volume_actions_get(mock_client: Client, mock_client_url):
         status=200,
     )
 
-    get_resp = mock_client.volume_actions.get(
-        volume_id="7724db7c", action_id="72531856"
-    )
+    get_response = mock_client.volume_actions.get(volume_id="7724db7c", action_id="72531856")
 
-    assert get_resp == expected
+    assert get_response == expected
 
 
 @responses.activate
