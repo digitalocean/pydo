@@ -225,6 +225,15 @@ In the generated python client, when calling `invoices.get_pdf_by_uuid`, the res
 
 Currently, calling the "help(<client function>)" includes the API documentation for the respective operation which is substantial and can be confusing in the context of this client.
 
+#### projects.delete(project_id=project_id) expects a request body.
+
+This is a backend issue with the API endpoint. The API endpoint expects the header `content-type: application/json` to be set. If you do not set it you will receive a 415. Since the endpoint doesn't require a request or response body, it is an unnecessary header. For this to work in Pydo, ensure `application/json` header is passed in, as such:
+```
+    custom_headers = {"Content-Type": "application/json"}
+    delete_resp = client.projects.delete(
+        headers=custom_headers, project_id=project_id
+    )
+```
 # **Roadmap**
 
 >This section lists short-term and long-term goals for the project.
