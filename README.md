@@ -197,7 +197,7 @@ From here you can use the client interactively:
 ```shell
 >>> from pydo import Client
 >>> c = Client(DIGITALOCEAN_TOKEN)
->>> c.droplets.get()
+>>> c.droplets.list()
 ```
 
 Alternatively, the tests can be run by attaching the tests as a volume and
