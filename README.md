@@ -45,7 +45,7 @@ make install
 import os
 from pydo import Client
 
-client = Client(token=os.getenv("$DIGITALOCEAN_TOKEN"))
+client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"))
 ```
 
 #### Example of Using `pydo` to Access DO Resources
@@ -56,7 +56,7 @@ Find below a working example for GETting a ssh_key ([per this http request](http
 import os
 from pydo import Client
 
-client = Client(token=os.getenv("$DIGITALOCEAN_TOKEN"))
+client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"))
 
 ssh_keys_resp = client.ssh_keys.list()
 for k in ssh_keys_resp["ssh_keys"]:
@@ -95,13 +95,13 @@ By default the client uses the same retry policy as the [Azure SDK for Python](h
 retry policy. If you'd like to modify any of these values, you can pass them as keywords to your client initialization:
 
 ```python
-client = Client(token=os.getenv("$DIGITALOCEAN_TOKEN"), retry_total=3)
+client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"), retry_total=3)
 ```
 
 or
 
 ```python
-client = Client(token=os.getenv("$DIGITALOCEAN_TOKEN"), retry_policy=MyRetryPolicy())
+client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"), retry_policy=MyRetryPolicy())
 ```
 
 # **Contributing**
@@ -196,7 +196,7 @@ From here you can use the client interactively:
 
 ```shell
 >>> from pydo import Client
->>> c = Client($DIGITALOCEAN_TOKEN)
+>>> c = Client(DIGITALOCEAN_TOKEN)
 >>> c.droplets.get()
 ```
 
