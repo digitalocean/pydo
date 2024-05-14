@@ -217,6 +217,26 @@ docker run -it --rm --name pydo -v $PWD/tests:/tests pydo:dev pytest tests/mocke
 
 In the generated python client, when calling client.kubernetes.get_kubeconfig(clust_id), the deserialization logic raises an error when the response content-type is applicaiton/yaml. We need to determine if the spec/schema can be configured such that the generator results in functions that properly handle the content. We will likely need to report the issue upstream to request support for the content-type.
 
+Workaround (with std lib httplib):
+```
+from http.client import HTTPSConnection
+
+conn = HTTPSConnection('api.digitalocean.com')
+conn.request(
+    'GET',
+    f'/v2/kubernetes/clusters/{cluster_id}/kubeconfig',
+    headers={'Authorization': f'Bearer {os.environ["DIGITALOCEAN_TOKEN"]}'}
+)
+response = conn.getresponse()
+
+if response.getcode() > 400:
+    msg = 'Unable to get kubeconfig'
+    raise RuntimeError(msg)
+
+kube_config =  response.read().decode('utf-8')
+conn.close()
+```
+
 #### `invoices.get_pdf_by_uuid(invoice_uuid=invoice_uuid_param)` Does not return PDF
 
 In the generated python client, when calling `invoices.get_pdf_by_uuid`, the response returns a Iterator[bytes] that does not format correctly into a PDF.
