@@ -34,14 +34,13 @@ def wait_for_action(client: Client, action_id: int, wait_seconds: int = 5):
             raise IntegrationTestError(
                 f"Error: {err.status_code} {err.reason}: {err.error.message}"
             ) from err
-        else:
-            status = resp["action"]["status"]
-            if status == "in-progress":
-                sleep(wait_seconds)
-            elif status == "errored":
-                raise Exception(
-                    f"{resp['action']['type']} action {resp['action']['id']} {status}"
-                )
+        status = resp["action"]["status"]
+        if status == "in-progress":
+            sleep(wait_seconds)
+        elif status == "errored":
+            raise Exception(
+                f"{resp['action']['type']} action {resp['action']['id']} {status}"
+            )
 
 
 def wait_for_status(
