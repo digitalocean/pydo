@@ -1,4 +1,5 @@
 """Mock tests for the 1-click API resource."""
+
 import responses
 from responses import matchers
 
