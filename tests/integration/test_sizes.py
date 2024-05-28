@@ -1,6 +1,7 @@
 """ test_sizes.py
     Integration Test for Sizes
 """
+
 import pytest
 
 from pydo import Client

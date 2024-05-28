@@ -3,6 +3,7 @@
 These tests aren't essential but serve as good examples for using the client with
 custom configuration.
 """
+
 import logging
 import re
 

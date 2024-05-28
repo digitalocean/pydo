@@ -1,4 +1,5 @@
 """Mock tests for the tags API resource."""
+
 import responses
 from responses import matchers
 
