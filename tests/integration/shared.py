@@ -34,14 +34,13 @@ def wait_for_action(client: Client, action_id: int, wait_seconds: int = 5):
             raise IntegrationTestError(
                 f"Error: {err.status_code} {err.reason}: {err.error.message}"
             ) from err
-        else:
-            status = resp["action"]["status"]
-            if status == "in-progress":
-                sleep(wait_seconds)
-            elif status == "errored":
-                raise Exception(
-                    f"{resp['action']['type']} action {resp['action']['id']} {status}"
-                )
+        status = resp["action"]["status"]
+        if status == "in-progress":
+            sleep(wait_seconds)
+        elif status == "errored":
+            raise ValueError(
+                f"{resp['action']['type']} action {resp['action']['id']} {status}"
+            )
 
 
 def wait_for_status(
@@ -71,13 +70,12 @@ def wait_for_status(
             raise IntegrationTestError(
                 f"Error: {err.status_code} {err.reason}: {err.error.message}"
             ) from err
-        else:
-            resource = resp.get(resource_type)
-            status = resource.get(status_field)
-            if status == ready:
-                break
-            if status == errored:
-                raise Exception(f"Resource status: {status}")
+        resource = resp.get(resource_type)
+        status = resource.get(status_field)
+        if status == ready:
+            break
+        if status == errored:
+            raise ValueError(f"Resource status: {status}")
 
         if 0 < max_retries <= retry:
             return
@@ -102,12 +100,11 @@ def wait_for_kubernetes_cluster_create(
             raise IntegrationTestError(
                 f"Error: {err.status_code} {err.reason}: {err.error.message}"
             ) from err
-        else:
-            state = resp["kubernetes_cluster"]["status"]["state"]
-            if state == "running":
-                break
-            if state == "error":
-                raise Exception(f"Cluster {cluster_id} error status: {state}")
+        state = resp["kubernetes_cluster"]["status"]["state"]
+        if state == "running":
+            break
+        if state == "error":
+            raise ValueError(f"Cluster {cluster_id} error status: {state}")
         sleep(wait_seconds)
 
     return resp

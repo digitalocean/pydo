@@ -17,7 +17,7 @@ def test_custom_headers():
     client = Client("", headers=custom_headers)
 
     # pylint: disable=protected-access
-    assert client._client._config.headers_policy.headers == custom_headers
+    assert client._config.headers_policy.headers == custom_headers
 
 
 def test_custom_timeout():
@@ -25,7 +25,7 @@ def test_custom_timeout():
     client = Client("", timeout=timeout)
 
     # pylint: disable=protected-access
-    assert client._client._config.retry_policy.timeout == timeout
+    assert client._config.retry_policy.timeout == timeout
 
 
 def test_custom_endpoint():
@@ -42,7 +42,7 @@ def test_custom_logger():
     client = Client("", logger=logger)
 
     # pylint: disable=protected-access
-    assert client._client._config.http_logging_policy.logger.name == name
+    assert client._config.http_logging_policy.logger.name == name
 
 
 @responses.activate
@@ -59,7 +59,7 @@ def test_custom_user_agent():
     full_user_agent_pattern = r"^test azsdk-python-pydo\/.+Python\/.+\(.+\)$"
 
     # pylint: disable=protected-access
-    got_user_agent = client._client._config.user_agent_policy.user_agent
+    got_user_agent = client._config.user_agent_policy.user_agent
     match = re.match(full_user_agent_pattern, got_user_agent)
     assert match is not None
 
