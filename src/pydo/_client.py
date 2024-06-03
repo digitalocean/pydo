@@ -103,8 +103,7 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
        * - PATCH
          - Some resources support partial modification. In these cases, the PATCH method is
     available. Unlike PUT which generally requires a complete representation of a resource, a PATCH
-    request is is a set of instructions on how to modify a resource updating only specific
-    attributes.
+    request is a set of instructions on how to modify a resource updating only specific attributes.
        * - POST
          - To create a new object, your request should specify the POST method. The POST request
     includes all of the attributes necessary to create a new object.  When you wish to create a new
@@ -200,7 +199,7 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     Response for a Single Object
     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    .. code-block::
+    .. code-block:: json
 
            {
                "droplet": {
@@ -212,7 +211,7 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     Response for an Object Collection
     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    .. code-block::
+    .. code-block:: json
 
            {
                "droplets": [
@@ -244,7 +243,7 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     Sample Meta Object
     ^^^^^^^^^^^^^^^^^^
 
-    .. code-block::
+    .. code-block:: json
 
            {
                . . .
@@ -287,7 +286,7 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     Sample Links Object
     ^^^^^^^^^^^^^^^^^^^
 
-    .. code-block::
+    .. code-block:: json
 
            {
                . . .
@@ -354,7 +353,7 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
 
     ``ratelimit-remaining`` reaching zero can also indicate that the "burst limit" of 250
     requests per minute limit was met, even if the 5,000 requests per hour limit was not.
-    In this case, the 429 error response will include a retry-after header to indicate how
+    In this case, the 429 error response will include a ``retry-after`` header to indicate how
     long to wait (in seconds) until the request may be retried.
 
     You can see the format of the response in the examples.
