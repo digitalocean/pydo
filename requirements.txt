@@ -25,5 +25,5 @@ requests-oauthlib==2.0.0 ; python_full_version >= "3.8.0" and python_full_versio
 requests==2.32.2 ; python_version >= "3.8" and python_full_version < "4.0.0"
 six==1.16.0 ; python_version >= "3.8" and python_full_version < "4.0.0"
 typing-extensions==4.12.0 ; python_version >= "3.8" and python_full_version < "4.0.0"
-urllib3==2.2.1 ; python_version >= "3.8" and python_full_version < "4.0.0"
+urllib3==2.2.2 ; python_version >= "3.8" and python_full_version < "4.0.0"
 yarl==1.9.4 ; python_version >= "3.8" and python_full_version < "4.0.0"
