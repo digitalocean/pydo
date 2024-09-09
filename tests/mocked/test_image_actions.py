@@ -13,38 +13,36 @@ def test_image_actions_get(mock_client: Client, mock_client_url):
     image_id = 7938269
     action_id = 36805527
     expected = {
-        "action":   {
-            "id":   action_id,
-            "status":   "in-progress",
-            "type":   "transfer",
-            "started_at":   "2014-11-14T16:42:45Z",
-            "completed_at":   None,
-            "resource_id":   image_id,
-            "resource_type":   "image",
-            "region":   {
-                "name":   "New York 3",
-                "slug":   "nyc3",
-                "sizes":   [
-                    "s-1vcpu-3gb",
-                    "m-1vcpu-8gb"
-                ],
-                "features":   [
-                    "private_networking",
-                    "image_transfer"
-                ],
-                "available":   True
+        "action": {
+            "id": action_id,
+            "status": "in-progress",
+            "type": "transfer",
+            "started_at": "2014-11-14T16:42:45Z",
+            "completed_at": None,
+            "resource_id": image_id,
+            "resource_type": "image",
+            "region": {
+                "name": "New York 3",
+                "slug": "nyc3",
+                "sizes": ["s-1vcpu-3gb", "m-1vcpu-8gb"],
+                "features": ["private_networking", "image_transfer"],
+                "available": True,
             },
-            "region_slug":   "nyc3"
+            "region_slug": "nyc3",
         }
     }
 
-    responses.add(responses.GET, f"{mock_client_url}/v2/images/{image_id}/actions/{action_id}", json=expected)
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/images/{image_id}/actions/{action_id}",
+        json=expected,
+    )
 
     get_resp = mock_client.image_actions.get(image_id=image_id, action_id=action_id)
-    # TODO (to remove): 
+    # TODO (to remove):
     # 1. action_id is missing in openapi spec for Python in Request samples:
     # https://docs.digitalocean.com/reference/api/api-reference/#operation/imageActions_get
-    # 2. image_id in Python Request samples is better be updated 
+    # 2. image_id in Python Request samples is better be updated
     # with the value in response - 7938269 - to avoid confusion
     # Should we update openapi spec? Should the ticket be created for this update?
 
@@ -68,50 +66,25 @@ def test_image_actions_list(mock_client: Client, mock_client_url):
                 "region": {
                     "name": "New York 2",
                     "slug": "nyc2",
-                    "sizes": [
-                    "s-1vcpu-3gb",
-                    "m-1vcpu-8gb",
-                    "s-3vcpu-1gb",
-                    "s-1vcpu-2gb",
-                    "s-2vcpu-2gb",
-                    "s-2vcpu-4gb",
-                    "s-4vcpu-8gb",
-                    "s-6vcpu-16gb",
-                    "s-8vcpu-32gb",
-                    "s-12vcpu-48gb",
-                    "s-16vcpu-64gb",
-                    "s-20vcpu-96gb",
-                    "s-1vcpu-1gb",
-                    "c-1vcpu-2gb",
-                    "s-24vcpu-128gb"
-                    ],
-                    "features": [
-                    "private_networking",
-                    "backups",
-                    "ipv6",
-                    "metadata",
-                    "server_id",
-                    "install_agent",
-                    "storage",
-                    "image_transfer"
-                    ],
-                    "available": True
+                    "sizes": ["s-1vcpu-3gb", "s-24vcpu-128gb"],
+                    "features": ["private_networking", "image_transfer"],
+                    "available": True,
                 },
-                "region_slug": "nyc2"
+                "region_slug": "nyc2",
             }
         ],
         "links": {
             "pages": {
                 "last": "https://api.digitalocean.com/v2/images/{image_id}/actions?page=5&per_page=1",
-                "next": "https://api.digitalocean.com/v2/images/{image_id}/actions?page=2&per_page=1"
+                "next": "https://api.digitalocean.com/v2/images/{image_id}/actions?page=2&per_page=1",
             }
         },
-        "meta": {
-            "total": 5
-        }
+        "meta": {"total": 5},
     }
 
-    responses.add(responses.GET, f"{mock_client_url}/v2/images/{image_id}/actions", json=expected)
+    responses.add(
+        responses.GET, f"{mock_client_url}/v2/images/{image_id}/actions", json=expected
+    )
     list_resp = mock_client.image_actions.list(image_id=image_id)
     # TODO:
     # 1. Go Request samples seems to be mising the call itself
@@ -137,38 +110,13 @@ def test_image_actions_post(mock_client: Client, mock_client_url):
             "resource_id": image_id,
             "resource_type": "image",
             "region": {
-            "name": "New York 3",
-            "slug": "nyc3",
-            "sizes": [
-                "s-1vcpu-3gb",
-                "m-1vcpu-8gb",
-                "s-3vcpu-1gb",
-                "s-1vcpu-2gb",
-                "s-2vcpu-2gb",
-                "s-2vcpu-4gb",
-                "s-4vcpu-8gb",
-                "s-6vcpu-16gb",
-                "s-8vcpu-32gb",
-                "s-12vcpu-48gb",
-                "s-16vcpu-64gb",
-                "s-20vcpu-96gb",
-                "s-1vcpu-1gb",
-                "c-1vcpu-2gb",
-                "s-24vcpu-128gb"
-            ],
-            "features": [
-                "private_networking",
-                "backups",
-                "ipv6",
-                "metadata",
-                "server_id",
-                "install_agent",
-                "storage",
-                "image_transfer"
-            ],
-            "available": True
+                "name": "New York 3",
+                "slug": "nyc3",
+                "sizes": ["s-1vcpu-3gb", "s-24vcpu-128gb"],
+                "features": ["private_networking", "image_transfer"],
+                "available": True,
             },
-            "region_slug": "nyc3"
+            "region_slug": "nyc3",
         }
     }
 
@@ -179,9 +127,7 @@ def test_image_actions_post(mock_client: Client, mock_client_url):
         status=201,
     )
 
-    create_req = {
-        "type": "convert"
-    }
+    create_req = {"type": "convert"}
     post_resp = mock_client.image_actions.post(image_id=image_id, body=create_req)
 
     assert post_resp == expected
