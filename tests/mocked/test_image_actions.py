@@ -39,12 +39,6 @@ def test_image_actions_get(mock_client: Client, mock_client_url):
     )
 
     get_resp = mock_client.image_actions.get(image_id=image_id, action_id=action_id)
-    # TODO (to remove):
-    # 1. action_id is missing in openapi spec for Python in Request samples:
-    # https://docs.digitalocean.com/reference/api/api-reference/#operation/imageActions_get
-    # 2. image_id in Python Request samples is better be updated
-    # with the value in response - 7938269 - to avoid confusion
-    # Should we update openapi spec? Should the ticket be created for this update?
 
     assert get_resp == expected
 
@@ -86,12 +80,6 @@ def test_image_actions_list(mock_client: Client, mock_client_url):
         responses.GET, f"{mock_client_url}/v2/images/{image_id}/actions", json=expected
     )
     list_resp = mock_client.image_actions.list(image_id=image_id)
-    # TODO:
-    # 1. Go Request samples seems to be mising the call itself
-    # 2. Python Request sample is missing image_id as an input parameter for a list call
-    # https://docs.digitalocean.com/reference/api/api-reference/#operation/imageActions_list
-    #
-    # Can we include it to the ticket mentioned in test_image_actions_get TODO?
 
     assert list_resp == expected
 
