@@ -940,6 +940,23 @@ def test_databases_update_maintenance_window(mock_client: Client, mock_client_ur
 
     assert resp is None
 
+@responses.activate
+def test_databases_update_install_update(mock_client: Client, mock_client_url):
+    """Mocks the databases Starts installation of updates."""
+
+    cluster_uuid = "9cc10173-e9ea-4176-9dbc-a4cee4c4ff30"
+
+    responses.add(
+        responses.PUT,
+        f"{mock_client_url}/v2/databases/{cluster_uuid}/install_update",
+        status=204,
+    )
+
+    resp = mock_client.databases.install_update(
+        cluster_uuid,
+    )
+
+    assert resp is None
 
 @responses.activate
 def test_databases_update_online_migration(mock_client: Client, mock_client_url):
