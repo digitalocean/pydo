@@ -87,14 +87,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Check pr_title outputs 
-        run: echo ${{ steps.pr_title_var.outputs.PR_TITLE }}
+        run: echo "${{ steps.pr_title_var.outputs.PR_TITLE }}"
 
       - name: Create Pull Request
         id: create-pr
         if: steps.add-commit-changes.outcome == 'success'
         run: |
-          export CURRENT=$(cat DO_OPENAPI_COMMIT_SHA.txt)
-          export TARGET=${{ github.event.inputs.openapi_short_sha }}
+          export CURRENT="$(cat DO_OPENAPI_COMMIT_SHA.txt)"
+          export TARGET="${{ github.event.inputs.openapi_short_sha }}"
           export TITLE="${{ steps.pr_title_var.outputs.PR_TITLE }}"
           envsubst < scripts/pr_body.md_tmpl > pr_body.md
           cat changelist.md >> pr_body.md
