@@ -509,6 +509,37 @@ def test_list_backups(mock_client: Client, mock_client_url):
 
 
 @responses.activate
+def test_get_backup_policy(mock_client: Client, mock_client_url):
+    """Mocks the droplets get backup policy operation."""
+
+    droplet_id = 1
+
+    expected = {
+        "policy": {
+            "droplet_id": droplet_id,
+            "backup_policy": {
+                "plan": "weekly",
+                "weekday": "SUN",
+                "hour": 20,
+                "window_length_hours": 4,
+                "retention_period_days": 28,
+            },
+        }
+    }
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/droplets/{droplet_id}/backups/policy",
+        json=expected,
+        status=200,
+    )
+
+    resp = mock_client.droplets.get_backup_policy(droplet_id)
+
+    assert expected == resp
+
+
+@responses.activate
 def test_list_snapshots(mock_client: Client, mock_client_url):
     """Mocks the droplets list snapshots operation."""
 
