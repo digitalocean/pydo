@@ -1046,7 +1046,7 @@ def test_databases_get_metrics_credentials(mock_client: Client, mock_client_url)
     expected = {
         "credentials": {
             "basic_auth_username": "username",
-            "basic_auth_password": "password"
+            "basic_auth_password": "password",
         }
     }
 
@@ -1054,7 +1054,7 @@ def test_databases_get_metrics_credentials(mock_client: Client, mock_client_url)
         responses.GET,
         f"{mock_client_url}/v2/databases/metrics/credentials",
         json=expected,
-        status=200
+        status=200,
     )
 
     resp = mock_client.databases.get_cluster_metrics_credentials()
@@ -1074,9 +1074,9 @@ def test_databases_update_metrics_credentials(mock_client: Client, mock_client_u
 
     resp = mock_client.databases.update_cluster_metrics_credentials(
         {
-        "credentials": {
-            "basic_auth_username": "new_username",
-            "basic_auth_password": "new_password"
+            "credentials": {
+                "basic_auth_username": "new_username",
+                "basic_auth_password": "new_password",
             }
         }
     )
