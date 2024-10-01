@@ -610,7 +610,7 @@ def test_list_snapshots(mock_client: Client, mock_client_url):
 
 @responses.activate
 def list_supported_backup_policies(mock_client: Client, mock_client_url):
-    """Mocks the supported backup policies."""
+    """Mocks the list supported backup policies."""
 
     expected = {
         "supported_policies": [
