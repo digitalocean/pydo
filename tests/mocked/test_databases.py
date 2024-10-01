@@ -975,6 +975,25 @@ def test_databases_update_online_migration(mock_client: Client, mock_client_url)
     )
 
     assert expected == resp
+    
+    
+@responses.activate
+def test_databases_install_update(mock_client: Client, mock_client_url):
+    """Mocks the databases install update."""
+
+    cluster_uuid = "9cc10173-e9ea-4176-9dbc-a4cee4c4ff30"
+
+    responses.add(
+        responses.PUT,
+        f"{mock_client_url}/v2/databases/{cluster_uuid}/install_update",
+        status=204,
+    )
+
+    resp = mock_client.databases.install_update(
+        cluster_uuid
+    )
+
+    assert resp == None
 
 
 @responses.activate
