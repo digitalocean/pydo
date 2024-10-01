@@ -1054,3 +1054,48 @@ def test_databases_update_sql_mode(mock_client: Client, mock_client_url):
     )
 
     assert resp is None
+
+
+@responses.activate
+def test_databases_get_metrics_credentials(mock_client: Client, mock_client_url):
+    """Mocks the databases retrieve clusters' metrics endpoint credentials operation."""
+
+    expected = {
+        "credentials": {
+            "basic_auth_username": "username",
+            "basic_auth_password": "password",
+        }
+    }
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/databases/metrics/credentials",
+        json=expected,
+        status=200,
+    )
+
+    resp = mock_client.databases.get_cluster_metrics_credentials()
+
+    assert expected == resp
+
+
+@responses.activate
+def test_databases_update_metrics_credentials(mock_client: Client, mock_client_url):
+    """Mocks the databases update clusters' metrics endpoint credentials operation."""
+
+    responses.add(
+        responses.PUT,
+        f"{mock_client_url}/v2/databases/metrics/credentials",
+        status=204,
+    )
+
+    resp = mock_client.databases.update_cluster_metrics_credentials(
+        {
+            "credentials": {
+                "basic_auth_username": "new_username",
+                "basic_auth_password": "new_password",
+            }
+        }
+    )
+
+    assert resp is None
