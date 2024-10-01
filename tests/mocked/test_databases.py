@@ -26,6 +26,7 @@ def test_databases_add(mock_client: Client, mock_client_url):
 
     assert expected == resp
 
+
 @responses.activate
 def test_databases_add_connection_pool(mock_client: Client, mock_client_url):
     """Mocks the databases add connection pool operation."""
@@ -975,7 +976,7 @@ def test_databases_update_online_migration(mock_client: Client, mock_client_url)
 
     assert expected == resp
 
-     
+
 @responses.activate
 def test_databases_install_update(mock_client: Client, mock_client_url):
     """Mocks the databases install update."""
@@ -988,8 +989,8 @@ def test_databases_install_update(mock_client: Client, mock_client_url):
         status=204,
     )
 
-    resp = mock_client.databases.install_update(cluster_uuid) 
-    
+    resp = mock_client.databases.install_update(cluster_uuid)
+
     assert resp is None
 
 
