@@ -302,6 +302,29 @@ def test_databases_get_user(mock_client: Client, mock_client_url):
 
 
 @responses.activate
+def test_databases_update_user(mock_client: Client, mock_client_url):
+    """Mocks the databases update user method."""
+
+    expected = {"user": {"name": "app-01"}}
+
+    cluster_uuid = "9cc10173-e9ea-4176-9dbc-a4cee4c4ff30"
+    user_name = "app-01"
+
+    responses.add(
+        responses.PUT,
+        f"{mock_client_url}/v2/databases/{cluster_uuid}/users/{user_name}",
+        json=expected,
+        status=201,
+    )
+
+    resp = mock_client.databases.update_user(
+        cluster_uuid, user_name, {"user": {"name": "app-01"}}
+    )
+
+    assert expected == resp
+
+
+@responses.activate
 def test_databases_list(mock_client: Client, mock_client_url):
     """Mocks the databases list operation"""
 
