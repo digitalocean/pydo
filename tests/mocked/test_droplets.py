@@ -573,6 +573,39 @@ def test_list_snapshots(mock_client: Client, mock_client_url):
 
 
 @responses.activate
+def list_supported_backup_policies(mock_client: Client, mock_client_url):
+    """Mocks the supported backup policies."""
+
+    expected = {
+        "supported_policies": [
+            {
+                "name": "weekly",
+                "possible_window_starts": [],
+                "window_length_hours": 2,
+                "retention_period_days": 20,
+            },
+            {
+                "name": "daily",
+                "possible_window_starts": [],
+                "window_length_hours": 3,
+                "retention_period_days": 9,
+            },
+        ],
+    }
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/droplets/backups/supported_policies",
+        json=expected,
+        status=200,
+    )
+
+    resp = mock_client.droplets.list_supported_backup_policies()
+
+    assert expected == resp
+
+
+@responses.activate
 def test_list_kernels(mock_client: Client, mock_client_url):
     """Mocks the droplets list kernels operation."""
 
