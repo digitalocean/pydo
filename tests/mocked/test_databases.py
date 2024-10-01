@@ -974,8 +974,8 @@ def test_databases_update_online_migration(mock_client: Client, mock_client_url)
     )
 
     assert expected == resp
-    
-    
+
+     
 @responses.activate
 def test_databases_install_update(mock_client: Client, mock_client_url):
     """Mocks the databases install update."""
@@ -989,7 +989,8 @@ def test_databases_install_update(mock_client: Client, mock_client_url):
     )
 
     resp = mock_client.databases.install_update(cluster_uuid) 
-    assert resp == None
+    
+    assert resp is None
 
 
 @responses.activate
