@@ -90,7 +90,7 @@ lint-docs:
 generate-docs: install ## readthedocs requires a requirements.txt file, this step converts poetry file to requirements.txt file before re-gen the docs
 	@echo Generating documentation...;
 	@echo Converting poetry file to requirements.txt...; 
-	poetry export -f requirements.txt -o requirements.txt --without-hashes
+	poetry export -f requirements.txt -o requirements.txt --without-hashes --with dev
 	cd docs && \
 	poetry run sphinx-apidoc -o source/ ../src/pydo && \
 	poetry run make html
