@@ -37,6 +37,8 @@ from ._operations import VolumesOperations
 from ._operations import VolumeActionsOperations
 from ._operations import VolumeSnapshotsOperations
 from ._operations import VpcsOperations
+from ._operations import VpcsPeeringsOperations
+from ._operations import VpcPeeringsOperations
 from ._operations import UptimeOperations
 
 from ._patch import __all__ as _patch_all
@@ -77,6 +79,8 @@ __all__ = [
     "VolumeActionsOperations",
     "VolumeSnapshotsOperations",
     "VpcsOperations",
+    "VpcsPeeringsOperations",
+    "VpcPeeringsOperations",
     "UptimeOperations",
 ]
 __all__.extend([p for p in _patch_all if p not in __all__])

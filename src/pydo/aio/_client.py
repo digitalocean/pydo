@@ -47,7 +47,9 @@ from .operations import (
     VolumeActionsOperations,
     VolumeSnapshotsOperations,
     VolumesOperations,
+    VpcPeeringsOperations,
     VpcsOperations,
+    VpcsPeeringsOperations,
 )
 
 if TYPE_CHECKING:
@@ -626,6 +628,10 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype volume_snapshots: pydo.aio.operations.VolumeSnapshotsOperations
     :ivar vpcs: VpcsOperations operations
     :vartype vpcs: pydo.aio.operations.VpcsOperations
+    :ivar vpcs_peerings: VpcsPeeringsOperations operations
+    :vartype vpcs_peerings: pydo.aio.operations.VpcsPeeringsOperations
+    :ivar vpc_peerings: VpcPeeringsOperations operations
+    :vartype vpc_peerings: pydo.aio.operations.VpcPeeringsOperations
     :ivar uptime: UptimeOperations operations
     :vartype uptime: pydo.aio.operations.UptimeOperations
     :param credential: Credential needed for the client to connect to Azure. Required.
@@ -767,6 +773,12 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.vpcs = VpcsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.vpcs_peerings = VpcsPeeringsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.vpc_peerings = VpcPeeringsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.uptime = UptimeOperations(
