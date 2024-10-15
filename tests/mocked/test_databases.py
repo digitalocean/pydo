@@ -963,6 +963,7 @@ def test_databases_update_maintenance_window(mock_client: Client, mock_client_ur
 
     assert resp is None
 
+
 @responses.activate
 def test_databases_update_install_update(mock_client: Client, mock_client_url):
     """Mocks the databases Starts installation of updates."""
@@ -980,6 +981,7 @@ def test_databases_update_install_update(mock_client: Client, mock_client_url):
     )
 
     assert resp is None
+
 
 @responses.activate
 def test_databases_update_online_migration(mock_client: Client, mock_client_url):
