@@ -302,6 +302,29 @@ def test_databases_get_user(mock_client: Client, mock_client_url):
 
 
 @responses.activate
+def test_databases_update_user(mock_client: Client, mock_client_url):
+    """Mocks the databases update user method."""
+
+    expected = {"user": {"name": "app-01"}}
+
+    cluster_uuid = "9cc10173-e9ea-4176-9dbc-a4cee4c4ff30"
+    user_name = "app-01"
+
+    responses.add(
+        responses.PUT,
+        f"{mock_client_url}/v2/databases/{cluster_uuid}/users/{user_name}",
+        json=expected,
+        status=201,
+    )
+
+    resp = mock_client.databases.update_user(
+        cluster_uuid, user_name, {"user": {"name": "app-01"}}
+    )
+
+    assert expected == resp
+
+
+@responses.activate
 def test_databases_list(mock_client: Client, mock_client_url):
     """Mocks the databases list operation"""
 
@@ -995,6 +1018,23 @@ def test_databases_update_online_migration(mock_client: Client, mock_client_url)
 
 
 @responses.activate
+def test_databases_install_update(mock_client: Client, mock_client_url):
+    """Mocks the databases install update."""
+
+    cluster_uuid = "9cc10173-e9ea-4176-9dbc-a4cee4c4ff30"
+
+    responses.add(
+        responses.PUT,
+        f"{mock_client_url}/v2/databases/{cluster_uuid}/install_update",
+        status=204,
+    )
+
+    resp = mock_client.databases.install_update(cluster_uuid)
+
+    assert resp is None
+
+
+@responses.activate
 def test_databases_update_region(mock_client: Client, mock_client_url):
     """Mocks the databases update firewall rules operation."""
 
@@ -1028,6 +1068,51 @@ def test_databases_update_sql_mode(mock_client: Client, mock_client_url):
         {
             "sql_mode": "ANSI,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION,NO_ZERO_DATE,NO_ZERO_IN_DATE"
         },
+    )
+
+    assert resp is None
+
+
+@responses.activate
+def test_databases_get_metrics_credentials(mock_client: Client, mock_client_url):
+    """Mocks the databases retrieve clusters' metrics endpoint credentials operation."""
+
+    expected = {
+        "credentials": {
+            "basic_auth_username": "username",
+            "basic_auth_password": "password",
+        }
+    }
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/databases/metrics/credentials",
+        json=expected,
+        status=200,
+    )
+
+    resp = mock_client.databases.get_cluster_metrics_credentials()
+
+    assert expected == resp
+
+
+@responses.activate
+def test_databases_update_metrics_credentials(mock_client: Client, mock_client_url):
+    """Mocks the databases update clusters' metrics endpoint credentials operation."""
+
+    responses.add(
+        responses.PUT,
+        f"{mock_client_url}/v2/databases/metrics/credentials",
+        status=204,
+    )
+
+    resp = mock_client.databases.update_cluster_metrics_credentials(
+        {
+            "credentials": {
+                "basic_auth_username": "new_username",
+                "basic_auth_password": "new_password",
+            }
+        }
     )
 
     assert resp is None
