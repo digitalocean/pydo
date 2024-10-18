@@ -108,7 +108,8 @@ def test_delete_trigger(mock_client: Client, mock_client_url):
 
     responses.add(
         responses.DELETE,
-        f"{mock_client_url}/v2/functions/namespaces/{namespace_id}/triggers/{trigger_name}",
+        f"{mock_client_url}/v2/functions/namespaces/"
+        f"{namespace_id}/triggers/{trigger_name}",
         status=204,
     )
 
@@ -177,7 +178,8 @@ def test_get_trigger(mock_client: Client, mock_client_url):
 
     responses.add(
         responses.GET,
-        f"{mock_client_url}/v2/functions/namespaces/{namespace_id}/triggers/{trigger_name}",
+        f"{mock_client_url}/v2/functions/namespaces/"
+        f"{namespace_id}/triggers/{trigger_name}",
         json=expected,
         status=200,
     )
@@ -201,7 +203,8 @@ def test_list_namespaces(mock_client: Client, mock_client_url):
                 "label": "my namespace",
                 "region": "nyc1",
                 "uuid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-                "key": "d1zcd455h01mqjfs4s2eaewyejehi5f2uj4etqq3h7cera8iwkub6xg5of1wdde2",
+                "key": "d1zcd455h01mqjfs4s2eaewyejehi5f"
+                "2uj4etqq3h7cera8iwkub6xg5of1wdde2",
             }
         ]
     }
@@ -287,7 +290,8 @@ def test_update_trigger(mock_client: Client, mock_client_url):
 
     responses.add(
         responses.PUT,
-        f"{mock_client_url}/v2/functions/namespaces/{namespace_id}/triggers/{trigger_name}",
+        f"{mock_client_url}/v2/functions/namespaces/"
+        f"{namespace_id}/triggers/{trigger_name}",
         json=expected,
         status=200,
     )
