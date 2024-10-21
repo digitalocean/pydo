@@ -632,3 +632,139 @@ def test_monitoring_get_droplet_available_memory(mock_client: Client, mock_clien
     )
 
     assert get_resp == expected
+
+
+@responses.activate
+def test_get_app_cpu_percentage_metrics(mock_client: Client, mock_client_url):
+    """Mocks the monitoring get app cpu percentage metrics operation"""
+
+    app_id = "2db3c021-15ad-4088-bfe8-99dc972b9cf6"
+    app_component = "sample-application"
+    start = "1620683817"
+    end = "1620705417"
+
+    expected = {
+        "status": "success",
+        "data": {
+            "resultType": "matrix",
+            "result": [
+                {
+                    "metric": {
+                        "app_component": app_component,
+                        "app_component_instance": "sample-application-0",
+                        "app_uuid": app_id,
+                    },
+                    "values": [
+                        [1634052360, "5.016600450090265357"],
+                        [1634052480, "12.015085955677299055"],
+                        [1634052600, "8.014941163855322308"],
+                        [1634052720, "32.016214285714285712"],
+                    ],
+                }
+            ],
+        },
+    }
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/monitoring/metrics/apps/cpu_percentage",
+        json=expected,
+        status=200,
+    )
+
+    # resp = mock_client.monitoring.get_app_cpu_percentage_metrics(app_id, start, end)
+    resp = mock_client.monitoring.get_app_cpu_percentage_metrics(
+        app_id=app_id, start=start, end=end, app_component=end
+    )
+
+    assert expected == resp
+
+
+@responses.activate
+def test_get_app_restart_count_metrics_yml(mock_client: Client, mock_client_url):
+    """Mocks monitoring get app restart count metrics operation"""
+
+    app_id = "2db3c021-15ad-4088-bfe8-99dc972b9cf6"
+    app_component = "sample-application"
+    start = "1620683817"
+    end = "1620705417"
+
+    expected = {
+        "status": "success",
+        "data": {
+            "resultType": "matrix",
+            "result": [
+                {
+                    "metric": {
+                        "app_component": app_component,
+                        "app_component_instance": "sample-application-0",
+                        "app_uuid": app_id,
+                    },
+                    "values": [
+                        [1634052360, "5.016600450090265357"],
+                        [1634052480, "12.015085955677299055"],
+                        [1634052600, "8.014941163855322308"],
+                        [1634052720, "32.016214285714285712"],
+                    ],
+                }
+            ],
+        },
+    }
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/monitoring/metrics/apps/restart_count",
+        json=expected,
+        status=200,
+    )
+
+    resp = mock_client.monitoring.get_app_restart_count_metrics_yml(
+        app_id=app_id, start=start, end=end, app_component=app_component
+    )
+
+    assert expected == resp
+
+
+@responses.activate
+def test_get_app_memory_percentage_metrics(mock_client: Client, mock_client_url):
+    """Mocks monitorings get app memory percentage metrics operation"""
+
+    app_id = "2db3c021-15ad-4088-bfe8-99dc972b9cf6"
+    app_component = "sample-application"
+    start = "1620683817"
+    end = "1620705417"
+
+    expected = {
+        "status": "success",
+        "data": {
+            "resultType": "matrix",
+            "result": [
+                {
+                    "metric": {
+                        "app_component": app_component,
+                        "app_component_instance": "sample-application-0",
+                        "app_uuid": app_id,
+                    },
+                    "values": [
+                        [1634052360, "5.016600450090265357"],
+                        [1634052480, "12.015085955677299055"],
+                        [1634052600, "8.014941163855322308"],
+                        [1634052720, "32.016214285714285712"],
+                    ],
+                }
+            ],
+        },
+    }
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/monitoring/metrics/apps/memory_percentage",
+        json=expected,
+        status=200,
+    )
+
+    resp = mock_client.monitoring.get_app_memory_percentage_metrics(
+        app_id=app_id, start=start, end=end, app_component=app_component
+    )
+
+    assert expected == resp
