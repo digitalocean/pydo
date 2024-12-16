@@ -17,6 +17,7 @@ from .operations import (
     AccountOperations,
     ActionsOperations,
     AppsOperations,
+    AutoscalepoolsOperations,
     BalanceOperations,
     BillingHistoryOperations,
     CdnOperations,
@@ -589,6 +590,8 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype droplets: pydo.operations.DropletsOperations
     :ivar droplet_actions: DropletActionsOperations operations
     :vartype droplet_actions: pydo.operations.DropletActionsOperations
+    :ivar autoscalepools: AutoscalepoolsOperations operations
+    :vartype autoscalepools: pydo.operations.AutoscalepoolsOperations
     :ivar firewalls: FirewallsOperations operations
     :vartype firewalls: pydo.operations.FirewallsOperations
     :ivar functions: FunctionsOperations operations
@@ -713,6 +716,9 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.droplet_actions = DropletActionsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.autoscalepools = AutoscalepoolsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.firewalls = FirewallsOperations(

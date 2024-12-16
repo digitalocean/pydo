@@ -18,6 +18,7 @@ from ._operations import DatabasesOperations
 from ._operations import DomainsOperations
 from ._operations import DropletsOperations
 from ._operations import DropletActionsOperations
+from ._operations import AutoscalepoolsOperations
 from ._operations import FirewallsOperations
 from ._operations import FunctionsOperations
 from ._operations import ImagesOperations
@@ -59,6 +60,7 @@ __all__ = [
     "DomainsOperations",
     "DropletsOperations",
     "DropletActionsOperations",
+    "AutoscalepoolsOperations",
     "FirewallsOperations",
     "FunctionsOperations",
     "ImagesOperations",
