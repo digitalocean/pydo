@@ -101,20 +101,21 @@ number vor the tag.
 1. Run `BUMP=(bugfix|feature|breaking) make bump_version` to update the `pydo`
    version.
     * `BUMP` also accepts `(patch|minor|major)`
-    
-    Command example:
-    ```
-    make BUMP=minor bump_version
-    ```
-1. Run `make generate` to update the version in the codebase. Make a pull request with this change. It should be separate from PRs
-   containing changes to the library (including regenerated code).
+
+  Command example:
+
+  ```code
+  make BUMP=minor bump_version
+  ```
+
+1. Run `make generate` to update the version in the codebase. Make a pull request with this change.
+It should be separate from PRs containing changes to the library (including regenerated code).
 1. Once the version bump PR has been pushed and merged, tag the commit to trigger the
    release workflow: run `make tag` to tag the latest commit and push the tag to ORIGIN.
-   
+
    Notes:
     * To tag an earlier commit, run `COMMIT=${commit} make tag`.
     * To push the tag to a different remote, run `ORIGIN=${REMOTE} make tag`.
-1. Once the release process completes, review the draft release for correctness
-   and publish the release. 
-   
-   Ensure the release has been marked `Latest`.
+1. Once the release process completes, review the draft release for correctness and publish the release.
+
+  Ensure the release has been marked `Latest`.
