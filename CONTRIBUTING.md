@@ -92,29 +92,28 @@ The repo uses GitHub workflows to publish a draft release when a new tag is
 pushed. We use [semver](https://semver.org/#summary) to determine the version
 number vor the tag.
 
-*Before pushing a tag*, the pyproject version needs to be bumped.
-
 1. Run `make changes` to review the merged PRs since last release and decide what kind of release you are doing (bugfix, feature or breaking).
     * Review the tags on each PR and make sure they are categorized
       appropriately.
 
-2. Run `BUMP=(bugfix|feature|breaking) make bump_version` to update the `pydo`
-   version.
-    * `BUMP` also accepts `(patch|minor|major)`
+1. Run `BUMP=(bugfix|feature|breaking) make bump_version` to update the `pydo`
+   version.  
+`BUMP` also accepts `(patch|minor|major)`  
 
-  Command example:
+    Command example:
+ 
+    ```bash
+    make BUMP=minor bump_version
+    ```  
 
-  ```code
-  make BUMP=minor bump_version
-  ```
+1. Update the Pydo version in `pyproject.toml` and `src/pydo/_version.py`. Create a separate PR with only these changes.
 
-3. Update the Pydo version in `pyproject.toml` and `src/pydo/_version.py`. Create a separate PR with only these changes.
-
-4. Once the PR has been pushed and merged, tag the commit to trigger the
+1. Once the PR has been pushed and merged, tag the commit to trigger the
    release workflow: run `make tag` to tag the latest commit and push the tag to ORIGIN.
 
    Notes:
     * To tag an earlier commit, run `COMMIT=${commit} make tag`.
     * To push the tag to a different remote, run `ORIGIN=${REMOTE} make tag`.
-5. Once the release process completes, review the draft release for correctness and publish the release.  
+
+1. Once the release process completes, review the draft release for correctness and publish the release.  
 Ensure the release has been marked `Latest`.
