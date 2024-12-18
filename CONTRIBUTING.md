@@ -103,7 +103,7 @@ number vor the tag.
     * `BUMP` also accepts `(patch|minor|major)`
     
     Command example:
-    ```code
+    ```
     make BUMP=minor bump_version
     ```
 1. Run `make generate` to update the version in the codebase. Make a pull request with this change. It should be separate from PRs
