@@ -101,7 +101,7 @@ number vor the tag.
 `BUMP` also accepts `(patch|minor|major)`  
 
     Command example:
- 
+
     ```bash
     make BUMP=minor bump_version
     ```  
