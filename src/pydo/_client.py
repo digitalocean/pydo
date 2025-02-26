@@ -41,6 +41,8 @@ from .operations import (
     RegistryOperations,
     ReservedIPsActionsOperations,
     ReservedIPsOperations,
+    ReservedIPv6ActionsOperations,
+    ReservedIPv6Operations,
     SizesOperations,
     SnapshotsOperations,
     SshKeysOperations,
@@ -617,6 +619,10 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype reserved_ips: pydo.operations.ReservedIPsOperations
     :ivar reserved_ips_actions: ReservedIPsActionsOperations operations
     :vartype reserved_ips_actions: pydo.operations.ReservedIPsActionsOperations
+    :ivar reserved_ipv6: ReservedIPv6Operations operations
+    :vartype reserved_ipv6: pydo.operations.ReservedIPv6Operations
+    :ivar reserved_ipv6_actions: ReservedIPv6ActionsOperations operations
+    :vartype reserved_ipv6_actions: pydo.operations.ReservedIPv6ActionsOperations
     :ivar sizes: SizesOperations operations
     :vartype sizes: pydo.operations.SizesOperations
     :ivar snapshots: SnapshotsOperations operations
@@ -758,6 +764,12 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.reserved_ips_actions = ReservedIPsActionsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.reserved_ipv6 = ReservedIPv6Operations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.reserved_ipv6_actions = ReservedIPv6ActionsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.sizes = SizesOperations(

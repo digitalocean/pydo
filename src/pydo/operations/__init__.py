@@ -31,6 +31,8 @@ from ._operations import RegionsOperations
 from ._operations import RegistryOperations
 from ._operations import ReservedIPsOperations
 from ._operations import ReservedIPsActionsOperations
+from ._operations import ReservedIPv6Operations
+from ._operations import ReservedIPv6ActionsOperations
 from ._operations import SizesOperations
 from ._operations import SnapshotsOperations
 from ._operations import TagsOperations
@@ -74,6 +76,8 @@ __all__ = [
     "RegistryOperations",
     "ReservedIPsOperations",
     "ReservedIPsActionsOperations",
+    "ReservedIPv6Operations",
+    "ReservedIPv6ActionsOperations",
     "SizesOperations",
     "SnapshotsOperations",
     "TagsOperations",
