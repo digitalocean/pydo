@@ -45,6 +45,7 @@ from .operations import (
     ReservedIPv6Operations,
     SizesOperations,
     SnapshotsOperations,
+    SpacesKeyOperations,
     SshKeysOperations,
     TagsOperations,
     UptimeOperations,
@@ -627,6 +628,8 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype sizes: pydo.operations.SizesOperations
     :ivar snapshots: SnapshotsOperations operations
     :vartype snapshots: pydo.operations.SnapshotsOperations
+    :ivar spaces_key: SpacesKeyOperations operations
+    :vartype spaces_key: pydo.operations.SpacesKeyOperations
     :ivar tags: TagsOperations operations
     :vartype tags: pydo.operations.TagsOperations
     :ivar volumes: VolumesOperations operations
@@ -776,6 +779,9 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.snapshots = SnapshotsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.spaces_key = SpacesKeyOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.tags = TagsOperations(
