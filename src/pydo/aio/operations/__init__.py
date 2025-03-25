@@ -35,6 +35,7 @@ from ._operations import ReservedIPv6Operations
 from ._operations import ReservedIPv6ActionsOperations
 from ._operations import SizesOperations
 from ._operations import SnapshotsOperations
+from ._operations import SpacesKeyOperations
 from ._operations import TagsOperations
 from ._operations import VolumesOperations
 from ._operations import VolumeActionsOperations
@@ -80,6 +81,7 @@ __all__ = [
     "ReservedIPv6ActionsOperations",
     "SizesOperations",
     "SnapshotsOperations",
+    "SpacesKeyOperations",
     "TagsOperations",
     "VolumesOperations",
     "VolumeActionsOperations",
