@@ -17,6 +17,7 @@ from .operations import (
     AccountOperations,
     ActionsOperations,
     AppsOperations,
+    AttachmentsOperations,
     AutoscalepoolsOperations,
     BalanceOperations,
     BillingHistoryOperations,
@@ -610,6 +611,8 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype load_balancers: pydo.operations.LoadBalancersOperations
     :ivar monitoring: MonitoringOperations operations
     :vartype monitoring: pydo.operations.MonitoringOperations
+    :ivar attachments: AttachmentsOperations operations
+    :vartype attachments: pydo.operations.AttachmentsOperations
     :ivar projects: ProjectsOperations operations
     :vartype projects: pydo.operations.ProjectsOperations
     :ivar regions: RegionsOperations operations
@@ -752,6 +755,9 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.monitoring = MonitoringOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.attachments = AttachmentsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.projects = ProjectsOperations(
