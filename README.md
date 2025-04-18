@@ -22,6 +22,7 @@ To install from pip:
 ```shell
     pip install pydo
 ```
+
 or,
 
 ```shell
