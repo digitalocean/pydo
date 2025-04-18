@@ -80,13 +80,27 @@ Below is an example on handling pagination. One must parse the URL to find the
 next page.
 
 ```python
-resp = self.client.ssh_keys.list(per_page=50, page=page)
-pages = resp.links.pages
-if 'next' in pages.keys():
-    parsed_url = urlparse(pages['next'])
-    page = parse_qs(parsed_url.query)['page'][0]
-else:
-    paginated = False
+import os
+from pydo import Client
+from urllib.parse import urlparse, parse_qs
+
+client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"))
+
+paginated = True
+page = 1
+
+while paginated:
+    resp = client.ssh_keys.list(per_page=50, page=page)
+
+    for k in resp["ssh_keys"]:
+        print(f"ID: {k['id']}, NAME: {k['name']}, FINGERPRINT: {k['fingerprint']}")
+
+    pages = resp.get("links", {}).get("pages", {})
+    if "next" in pages:
+        parsed_url = urlparse(pages["next"])
+        page = int(parse_qs(parsed_url.query)["page"][0])
+    else:
+        paginated = False
 ```
 
 #### Retries and Backoff
