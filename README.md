@@ -23,6 +23,7 @@ To install from pip:
     pip install pydo
 ```
 or,
+
 ```shell
     pip install git+https://github.com/digitalocean/pydo.git
 ```
