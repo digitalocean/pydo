@@ -20,6 +20,10 @@ on the [DigitalOcean OpenAPI Specification](https://github.com/digitalocean/open
 To install from pip:
 
 ```shell
+    pip install pydo
+```
+or,
+```shell
     pip install git+https://github.com/digitalocean/pydo.git
 ```
 
