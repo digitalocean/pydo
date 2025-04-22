@@ -23,24 +23,6 @@ To install from pip:
     pip install pydo
 ```
 
-or,
-
-```shell
-    pip install git+https://github.com/digitalocean/pydo.git
-```
-
-or, if repo is cloned locally:
-
-```shell
-    pip install /<PATH>/<TO>/pydo
-```
-
-To install from source:
-
-```shell
-make install
-```
-
 ## **`pydo` Quickstart**
 
 > A quick guide to getting started with the client.
