@@ -20,19 +20,7 @@ on the [DigitalOcean OpenAPI Specification](https://github.com/digitalocean/open
 To install from pip:
 
 ```shell
-    pip install git+https://github.com/digitalocean/pydo.git
-```
-
-or, if repo is cloned locally:
-
-```shell
-    pip install /<PATH>/<TO>/pydo
-```
-
-To install from source:
-
-```shell
-make install
+    pip install pydo
 ```
 
 ## **`pydo` Quickstart**
