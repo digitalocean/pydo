@@ -39,6 +39,7 @@ from .operations import (
     PartnerAttachmentsOperations,
     ProjectsOperations,
     RegionsOperations,
+    RegistriesOperations,
     RegistryOperations,
     ReservedIPsActionsOperations,
     ReservedIPsOperations,
@@ -617,6 +618,8 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype projects: pydo.aio.operations.ProjectsOperations
     :ivar regions: RegionsOperations operations
     :vartype regions: pydo.aio.operations.RegionsOperations
+    :ivar registries: RegistriesOperations operations
+    :vartype registries: pydo.aio.operations.RegistriesOperations
     :ivar registry: RegistryOperations operations
     :vartype registry: pydo.aio.operations.RegistryOperations
     :ivar reserved_ips: ReservedIPsOperations operations
@@ -764,6 +767,9 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.regions = RegionsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.registries = RegistriesOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.registry = RegistryOperations(
