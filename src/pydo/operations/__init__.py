@@ -29,6 +29,7 @@ from ._operations import MonitoringOperations
 from ._operations import PartnerAttachmentsOperations
 from ._operations import ProjectsOperations
 from ._operations import RegionsOperations
+from ._operations import RegistriesOperations
 from ._operations import RegistryOperations
 from ._operations import ReservedIPsOperations
 from ._operations import ReservedIPsActionsOperations
@@ -76,6 +77,7 @@ __all__ = [
     "PartnerAttachmentsOperations",
     "ProjectsOperations",
     "RegionsOperations",
+    "RegistriesOperations",
     "RegistryOperations",
     "ReservedIPsOperations",
     "ReservedIPsActionsOperations",
