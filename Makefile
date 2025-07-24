@@ -90,7 +90,7 @@ lint-docs:
 generate-docs: install ## readthedocs requires a requirements.txt file, this step converts poetry file to requirements.txt file before re-gen the docs
 	@echo Generating documentation...;
 	@echo Converting poetry file to requirements.txt...; 
-	poetry export -f requirements.txt -o requirements.txt --without-hashes
+	poetry export -f requirements.txt -o requirements.txt --without-hashes --with dev
 	cd docs && \
 	poetry run sphinx-apidoc -o source/ ../src/pydo && \
 	poetry run make html
@@ -114,14 +114,8 @@ changes: _install_github_release_notes
 version:
 	@poetry version
 
-.PHONY: _install_sembump
-_install_sembump:
-	@echo "=> installing/updating sembump tool"
-	@echo ""
-	@GO111MODULE=off go get -u github.com/jessfraz/junk/sembump
-
 .PHONY: bump_version
-bump_version: _install_sembump ## Bumps the version
+bump_version: ## Bumps the version
 	@echo "==> BUMP=${BUMP} bump_version"
 	@echo ""
 	@ORIGIN=${ORIGIN} scripts/bumpversion.sh
