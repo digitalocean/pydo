@@ -1,4 +1,5 @@
 """Mock tests for the keys API resource."""
+
 import responses
 from responses import matchers
 

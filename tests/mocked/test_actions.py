@@ -1,4 +1,5 @@
 """Mock tests for the actions API resource"""
+
 import responses
 
 from pydo import Client

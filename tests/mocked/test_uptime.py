@@ -206,3 +206,193 @@ def test_update_alert_put(mock_client: Client, mock_client_url):
     put_res = mock_client.uptime.update_alert(check_id, alert_id, body=req)
 
     assert put_res == expected
+
+
+@responses.activate
+def test_create_alert(mock_client: Client, mock_client_url):
+    """Mocks uptime create alert operation"""
+
+    check_id = "4de7ac8b-495b-4884-9a69-1050c6793cd6"
+    url = "https://hooks.slack.com/services/T1234567/AAAAAAAA/ZZZZZZ"
+
+    expected = {
+        "alert": {
+            "id": check_id,
+            "name": "Landing page degraded performance",
+            "type": "latency",
+            "threshold": 300,
+            "comparison": "greater_than",
+            "notifications": {
+                "email": ["bob@example.com"],
+                "slack": [
+                    {
+                        "channel": "Production Alerts",
+                        "url": url,
+                    }
+                ],
+            },
+            "period": "2m",
+        }
+    }
+
+    responses.add(
+        responses.POST,
+        f"{mock_client_url}/v2/uptime/checks/{check_id}/alerts",
+        json=expected,
+        status=201,
+    )
+
+    req = {
+        "name": "Landing page degraded performance",
+        "type": "latency",
+        "threshold": 300,
+        "comparison": "greater_than",
+        "notifications": {
+            "email": ["bob@example.com"],
+            "slack": [
+                {
+                    "channel": "Production Alerts",
+                    "url": url,
+                }
+            ],
+        },
+        "period": "2m",
+    }
+
+    resp = mock_client.uptime.create_alert(check_id, body=req)
+
+    assert expected == resp
+
+
+@responses.activate
+def test_create_check(mock_client: Client, mock_client_url):
+    """Mocks uptimes create check operation"""
+
+    expected = {
+        "check": {
+            "id": "5a4981aa-9653-4bd1-bef5-d6bff52042e4",
+            "name": "Landing page check",
+            "type": "https",
+            "target": "https://www.landingpage.com",
+            "regions": ["us_east", "eu_west"],
+            "enabled": True,
+        }
+    }
+
+    responses.add(
+        responses.POST,
+        f"{mock_client_url}/v2/uptime/checks",
+        json=expected,
+        status=201,
+    )
+
+    req = {
+        "name": "Landing page check",
+        "type": "https",
+        "target": "https://www.landingpage.com",
+        "regions": ["us_east", "eu_west"],
+        "enabled": True,
+    }
+
+    resp = mock_client.uptime.create_check(body=req)
+
+    assert expected == resp
+
+
+@responses.activate
+def test_delete_alert(mock_client: Client, mock_client_url):
+    """Mocks uptimes delete alert operation"""
+
+    check_id = "4de7ac8b-495b-4884-9a69-1050c6793cd6"
+    alert_id = "17f0f0ae-b7e5-4ef6-86e3-aa569db58284"
+
+    responses.add(
+        responses.DELETE,
+        f"{mock_client_url}/v2/uptime/checks/{check_id}/alerts/{alert_id}",
+        status=204,
+    )
+
+    del_resp = mock_client.uptime.delete_alert(check_id, alert_id)
+
+    assert del_resp is None
+
+
+@responses.activate
+def test_delete_check(mock_client: Client, mock_client_url):
+    """Mocks uptimes delete check operation"""
+
+    check_id = "4de7ac8b-495b-4884-9a69-1050c6793cd6"
+
+    responses.add(
+        responses.DELETE,
+        f"{mock_client_url}/v2/uptime/checks/{check_id}",
+        status=204,
+    )
+
+    del_resp = mock_client.uptime.delete_check(check_id)
+
+    assert del_resp is None
+
+
+@responses.activate
+def test_get_alert(mock_client: Client, mock_client_url):
+    """Mocks uptimes get alert operation"""
+
+    check_id = "4de7ac8b-495b-4884-9a69-1050c6793cd6"
+    alert_id = "17f0f0ae-b7e5-4ef6-86e3-aa569db58284"
+    url = "https://hooks.slack.com/services/T1234567/AAAAAAAA/ZZZZZZ"
+
+    expected = {
+        "alert": {
+            "id": alert_id,
+            "name": "Landing page degraded performance",
+            "type": "latency",
+            "threshold": 300,
+            "comparison": "greater_than",
+            "notifications": {
+                "email": ["bob@example.com"],
+                "slack": [{"channel": "Production Alerts", "url": url}],
+            },
+            "period": "2m",
+        }
+    }
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/uptime/checks/{check_id}/alerts/{alert_id}",
+        json=expected,
+        status=200,
+    )
+
+    resp = mock_client.uptime.get_alert(check_id, alert_id)
+
+    assert expected == resp
+
+
+@responses.activate
+def test_get_check(mock_client: Client, mock_client_url):
+    """Mocks uptimes get check operation"""
+
+    check_id = "4de7ac8b-495b-4884-9a69-1050c6793cd6"
+
+    expected = {
+        "check": {
+            "id": "5a4981aa-9653-4bd1-bef5-d6bff52042e4",
+            "name": "Landing page check",
+            "type": "https",
+            "target": "https://www.landingpage.com",
+            "regions": ["us_east", "eu_west"],
+            "enabled": True,
+        }
+    }
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/uptime/checks/{check_id}",
+        json=expected,
+        status=200,
+    )
+
+    resp = mock_client.uptime.get_check(check_id)
+
+    assert expected == resp

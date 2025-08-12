@@ -453,41 +453,6 @@ def test_list_alerts(mock_client: Client, mock_client_url):
 
 
 @responses.activate
-def test_tiers(mock_client: Client, mock_client_url):
-    """Tests list Tiers"""
-    expected = {
-        "tiers": [
-            {
-                "name": "Starter",
-                "slug": "starter",
-                "egress_bandwidth_bytes": "1073741824",
-                "build_seconds": "6000",
-            },
-            {
-                "name": "Basic",
-                "slug": "basic",
-                "egress_bandwidth_bytes": "42949672960",
-                "build_seconds": "24000",
-            },
-            {
-                "name": "Professional",
-                "slug": "professional",
-                "egress_bandwidth_bytes": "107374182400",
-                "build_seconds": "60000",
-            },
-        ]
-    }
-
-    responses.add(
-        responses.GET, f"{mock_client_url}/v2/apps/tiers", json=expected, status=200
-    )
-
-    list_resp = mock_client.apps.list_tiers()
-
-    assert list_resp == expected
-
-
-@responses.activate
 def test_change_alerts(mock_client: Client, mock_client_url):
     """Test Change Alerts"""
 
@@ -530,29 +495,6 @@ def test_change_alerts(mock_client: Client, mock_client_url):
     post_resp = mock_client.apps.assign_alert_destinations("1", "2", req)
 
     assert post_resp == expected
-
-
-@responses.activate
-def test_tier(mock_client: Client, mock_client_url):
-    """Tests Get Tier"""
-    expected = {
-        "tier": {
-            "name": "Basic",
-            "slug": "basic",
-            "egress_bandwidth_bytes": "42949672960",
-            "build_seconds": "24000",
-        }
-    }
-
-    responses.add(
-        responses.GET,
-        f"{mock_client_url}/v2/apps/tiers/basic",
-        json=expected,
-        status=200,
-    )
-    get_resp = mock_client.apps.get_tier("basic")
-
-    assert get_resp == expected
 
 
 @responses.activate

@@ -1,4 +1,5 @@
 """Mock tests for the CDN endpoints."""
+
 import responses
 
 from pydo import Client

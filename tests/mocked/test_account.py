@@ -1,4 +1,5 @@
 """Mock tests for the account API resource."""
+
 import pytest
 import responses
 from aioresponses import aioresponses
