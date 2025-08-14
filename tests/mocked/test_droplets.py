@@ -509,6 +509,73 @@ def test_list_backups(mock_client: Client, mock_client_url):
 
 
 @responses.activate
+def test_get_backup_policy(mock_client: Client, mock_client_url):
+    """Mocks the droplets get backup policy operation."""
+
+    droplet_id = 1
+
+    expected = {
+        "policy": {
+            "droplet_id": droplet_id,
+            "backup_policy": {
+                "plan": "weekly",
+                "weekday": "SUN",
+                "hour": 20,
+                "window_length_hours": 4,
+                "retention_period_days": 28,
+            },
+        }
+    }
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/droplets/{droplet_id}/backups/policy",
+        json=expected,
+        status=200,
+    )
+
+    resp = mock_client.droplets.get_backup_policy(droplet_id)
+
+    assert expected == resp
+
+
+@responses.activate
+def test_list_backup_policies(mock_client: Client, mock_client_url):
+    """Mocks the droplets list backup policies operation."""
+
+    expected = {
+        "policies": {
+            "436444618": {
+                "droplet_id": 436444618,
+                "backup_enabled": False,
+            },
+            "444909706": {
+                "droplet_id": 444909706,
+                "backup_enabled": True,
+                "backup_policy": {
+                    "plan": "weekly",
+                    "weekday": "SUN",
+                    "hour": 20,
+                    "window_length_hours": 4,
+                    "retention_period_days": 28,
+                },
+            },
+        }
+    }
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/droplets/backups/policies",
+        json=expected,
+        status=200,
+    )
+
+    resp = mock_client.droplets.list_backup_policies()
+
+    assert expected == resp
+
+
+@responses.activate
 def test_list_snapshots(mock_client: Client, mock_client_url):
     """Mocks the droplets list snapshots operation."""
 
@@ -537,6 +604,39 @@ def test_list_snapshots(mock_client: Client, mock_client_url):
     )
 
     resp = mock_client.droplets.list_snapshots(droplet_id)
+
+    assert expected == resp
+
+
+@responses.activate
+def list_supported_backup_policies(mock_client: Client, mock_client_url):
+    """Mocks the list of supported backup policies."""
+
+    expected = {
+        "supported_policies": [
+            {
+                "name": "weekly",
+                "possible_window_starts": [],
+                "window_length_hours": 2,
+                "retention_period_days": 20,
+            },
+            {
+                "name": "daily",
+                "possible_window_starts": [],
+                "window_length_hours": 3,
+                "retention_period_days": 9,
+            },
+        ],
+    }
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/droplets/backups/supported_policies",
+        json=expected,
+        status=200,
+    )
+
+    resp = mock_client.droplets.list_supported_backup_policies()
 
     assert expected == resp
 
@@ -815,5 +915,141 @@ def test_list_associated_resources(mock_client: Client, mock_client_url):
     )
 
     resp = mock_client.droplets.list_associated_resources(droplet_id)
+
+    assert expected == resp
+
+
+@responses.activate
+def test_destroy_with_associated_resources_selective(
+    mock_client: Client, mock_client_url
+):
+    """Mocks the droplets selectively destroy with associated resources operation."""
+
+    droplet_id = 3164444
+
+    responses.add(
+        responses.DELETE,
+        f"{mock_client_url}/v2/droplets/{droplet_id}/destroy_with_associated_resources/selective",
+        status=202,
+    )
+
+    resp = mock_client.droplets.destroy_with_associated_resources_selective(droplet_id)
+
+    assert resp is None
+
+
+@responses.activate
+def test_destroy_with_associated_resources_dangerous(
+    mock_client: Client, mock_client_url
+):
+    """Mocks the droplets destroy with associated resources dangerous."""
+
+    droplet_id = 3164444
+
+    responses.add(
+        responses.DELETE,
+        f"{mock_client_url}/v2/droplets/{droplet_id}/destroy_with_associated_resources/dangerous",
+        status=202,
+    )
+
+    resp = mock_client.droplets.destroy_with_associated_resources_dangerous(
+        droplet_id, x_dangerous=True
+    )
+
+    assert resp is None
+
+
+@responses.activate
+def test_get_destroy_associated_resources_status(mock_client: Client, mock_client_url):
+    """Mocks the droplets check status of a droplet with associated resources operation"""
+
+    expected = {
+        "droplet": {
+            "id": "187000742",
+            "name": "ubuntu-s-1vcpu-1gb-nyc1-01",
+            "destroyed_at": "2020-04-01T18:11:49Z",
+        },
+        "resources": {
+            "reserved_ips": [
+                {
+                    "id": "6186916",
+                    "name": "45.55.96.47",
+                    "destroyed_at": "2020-04-01T18:11:44Z",
+                }
+            ],
+            "floating_ips": [
+                {
+                    "id": "6186916",
+                    "name": "45.55.96.47",
+                    "destroyed_at": "2020-04-01T18:11:44Z",
+                }
+            ],
+            "snapshots": [
+                {
+                    "id": "61486916",
+                    "name": "ubuntu-s-1vcpu-1gb-nyc1-01-1585758823330",
+                    "destroyed_at": "2020-04-01T18:11:44Z",
+                }
+            ],
+            "volumes": [],
+            "volume_snapshots": [
+                {
+                    "id": "edb0478d-7436-11ea-86e6-0a58ac144b91",
+                    "name": "volume-nyc1-01-1585758983629",
+                    "destroyed_at": "2020-04-01T18:11:44Z",
+                }
+            ],
+        },
+        "completed_at": "2020-04-01T18:11:49Z",
+        "failures": 0,
+    }
+
+    droplet_id = 3164444
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/droplets/{droplet_id}/destroy_with_associated_resources/status",
+        json=expected,
+        status=200,
+    )
+
+    resp = mock_client.droplets.get_destroy_associated_resources_status(droplet_id)
+
+    assert expected == resp
+
+
+@responses.activate
+def test_destroy_retry_with_associated_resources(mock_client: Client, mock_client_url):
+    """Mocks the droplets retry destroy with associated resources operation"""
+
+    droplet_id = 3164444
+
+    responses.add(
+        responses.POST,
+        f"{mock_client_url}/v2/droplets/{droplet_id}/destroy_with_associated_resources/retry",
+        status=202,
+    )
+
+    resp = mock_client.droplets.destroy_retry_with_associated_resources(droplet_id)
+
+    assert resp is None
+
+
+@responses.activate
+def test_list_neighbors_ids(mock_client: Client, mock_client_url):
+    """Mocks the droplets list all neighbors operation"""
+
+    expected = {
+        "neighbor_ids": [[168671828, 168663509, 168671815], [168671883, 168671750]]
+    }
+
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/reports/droplet_neighbors_ids",
+        json=expected,
+        status=200,
+    )
+
+    resp = mock_client.droplets.list_neighbors_ids()
 
     assert expected == resp

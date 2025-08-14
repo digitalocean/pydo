@@ -17,8 +17,10 @@ from .operations import (
     AccountOperations,
     ActionsOperations,
     AppsOperations,
+    AutoscalepoolsOperations,
     BalanceOperations,
     BillingHistoryOperations,
+    ByoipPrefixesOperations,
     CdnOperations,
     CertificatesOperations,
     DatabasesOperations,
@@ -27,6 +29,7 @@ from .operations import (
     DropletsOperations,
     FirewallsOperations,
     FunctionsOperations,
+    GenaiOperations,
     ImageActionsOperations,
     ImagesOperations,
     InvoicesOperations,
@@ -34,19 +37,25 @@ from .operations import (
     LoadBalancersOperations,
     MonitoringOperations,
     OneClicksOperations,
+    PartnerAttachmentsOperations,
     ProjectsOperations,
     RegionsOperations,
+    RegistriesOperations,
     RegistryOperations,
     ReservedIPsActionsOperations,
     ReservedIPsOperations,
+    ReservedIPv6ActionsOperations,
+    ReservedIPv6Operations,
     SizesOperations,
     SnapshotsOperations,
+    SpacesKeyOperations,
     SshKeysOperations,
     TagsOperations,
     UptimeOperations,
     VolumeActionsOperations,
     VolumeSnapshotsOperations,
     VolumesOperations,
+    VpcPeeringsOperations,
     VpcsOperations,
 )
 
@@ -588,6 +597,8 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype droplets: pydo.aio.operations.DropletsOperations
     :ivar droplet_actions: DropletActionsOperations operations
     :vartype droplet_actions: pydo.aio.operations.DropletActionsOperations
+    :ivar autoscalepools: AutoscalepoolsOperations operations
+    :vartype autoscalepools: pydo.aio.operations.AutoscalepoolsOperations
     :ivar firewalls: FirewallsOperations operations
     :vartype firewalls: pydo.aio.operations.FirewallsOperations
     :ivar functions: FunctionsOperations operations
@@ -602,20 +613,32 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype load_balancers: pydo.aio.operations.LoadBalancersOperations
     :ivar monitoring: MonitoringOperations operations
     :vartype monitoring: pydo.aio.operations.MonitoringOperations
+    :ivar partner_attachments: PartnerAttachmentsOperations operations
+    :vartype partner_attachments: pydo.aio.operations.PartnerAttachmentsOperations
     :ivar projects: ProjectsOperations operations
     :vartype projects: pydo.aio.operations.ProjectsOperations
     :ivar regions: RegionsOperations operations
     :vartype regions: pydo.aio.operations.RegionsOperations
+    :ivar registries: RegistriesOperations operations
+    :vartype registries: pydo.aio.operations.RegistriesOperations
     :ivar registry: RegistryOperations operations
     :vartype registry: pydo.aio.operations.RegistryOperations
     :ivar reserved_ips: ReservedIPsOperations operations
     :vartype reserved_ips: pydo.aio.operations.ReservedIPsOperations
     :ivar reserved_ips_actions: ReservedIPsActionsOperations operations
     :vartype reserved_ips_actions: pydo.aio.operations.ReservedIPsActionsOperations
+    :ivar reserved_ipv6: ReservedIPv6Operations operations
+    :vartype reserved_ipv6: pydo.aio.operations.ReservedIPv6Operations
+    :ivar reserved_ipv6_actions: ReservedIPv6ActionsOperations operations
+    :vartype reserved_ipv6_actions: pydo.aio.operations.ReservedIPv6ActionsOperations
+    :ivar byoip_prefixes: ByoipPrefixesOperations operations
+    :vartype byoip_prefixes: pydo.aio.operations.ByoipPrefixesOperations
     :ivar sizes: SizesOperations operations
     :vartype sizes: pydo.aio.operations.SizesOperations
     :ivar snapshots: SnapshotsOperations operations
     :vartype snapshots: pydo.aio.operations.SnapshotsOperations
+    :ivar spaces_key: SpacesKeyOperations operations
+    :vartype spaces_key: pydo.aio.operations.SpacesKeyOperations
     :ivar tags: TagsOperations operations
     :vartype tags: pydo.aio.operations.TagsOperations
     :ivar volumes: VolumesOperations operations
@@ -626,8 +649,12 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype volume_snapshots: pydo.aio.operations.VolumeSnapshotsOperations
     :ivar vpcs: VpcsOperations operations
     :vartype vpcs: pydo.aio.operations.VpcsOperations
+    :ivar vpc_peerings: VpcPeeringsOperations operations
+    :vartype vpc_peerings: pydo.aio.operations.VpcPeeringsOperations
     :ivar uptime: UptimeOperations operations
     :vartype uptime: pydo.aio.operations.UptimeOperations
+    :ivar genai: GenaiOperations operations
+    :vartype genai: pydo.aio.operations.GenaiOperations
     :param credential: Credential needed for the client to connect to Azure. Required.
     :type credential: ~azure.core.credentials_async.AsyncTokenCredential
     :keyword endpoint: Service URL. Default value is "https://api.digitalocean.com".
@@ -712,6 +739,9 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
         self.droplet_actions = DropletActionsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
+        self.autoscalepools = AutoscalepoolsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
         self.firewalls = FirewallsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
@@ -733,10 +763,16 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
         self.monitoring = MonitoringOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
+        self.partner_attachments = PartnerAttachmentsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
         self.projects = ProjectsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.regions = RegionsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.registries = RegistriesOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.registry = RegistryOperations(
@@ -748,10 +784,22 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
         self.reserved_ips_actions = ReservedIPsActionsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
+        self.reserved_ipv6 = ReservedIPv6Operations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.reserved_ipv6_actions = ReservedIPv6ActionsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.byoip_prefixes = ByoipPrefixesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
         self.sizes = SizesOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.snapshots = SnapshotsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.spaces_key = SpacesKeyOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.tags = TagsOperations(
@@ -769,7 +817,13 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
         self.vpcs = VpcsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
+        self.vpc_peerings = VpcPeeringsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
         self.uptime = UptimeOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.genai = GenaiOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
 

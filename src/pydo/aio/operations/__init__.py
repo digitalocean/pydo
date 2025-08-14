@@ -18,6 +18,7 @@ from ._operations import DatabasesOperations
 from ._operations import DomainsOperations
 from ._operations import DropletsOperations
 from ._operations import DropletActionsOperations
+from ._operations import AutoscalepoolsOperations
 from ._operations import FirewallsOperations
 from ._operations import FunctionsOperations
 from ._operations import ImagesOperations
@@ -25,19 +26,27 @@ from ._operations import ImageActionsOperations
 from ._operations import KubernetesOperations
 from ._operations import LoadBalancersOperations
 from ._operations import MonitoringOperations
+from ._operations import PartnerAttachmentsOperations
 from ._operations import ProjectsOperations
 from ._operations import RegionsOperations
+from ._operations import RegistriesOperations
 from ._operations import RegistryOperations
 from ._operations import ReservedIPsOperations
 from ._operations import ReservedIPsActionsOperations
+from ._operations import ReservedIPv6Operations
+from ._operations import ReservedIPv6ActionsOperations
+from ._operations import ByoipPrefixesOperations
 from ._operations import SizesOperations
 from ._operations import SnapshotsOperations
+from ._operations import SpacesKeyOperations
 from ._operations import TagsOperations
 from ._operations import VolumesOperations
 from ._operations import VolumeActionsOperations
 from ._operations import VolumeSnapshotsOperations
 from ._operations import VpcsOperations
+from ._operations import VpcPeeringsOperations
 from ._operations import UptimeOperations
+from ._operations import GenaiOperations
 
 from ._patch import __all__ as _patch_all
 from ._patch import *  # pylint: disable=unused-wildcard-import
@@ -58,6 +67,7 @@ __all__ = [
     "DomainsOperations",
     "DropletsOperations",
     "DropletActionsOperations",
+    "AutoscalepoolsOperations",
     "FirewallsOperations",
     "FunctionsOperations",
     "ImagesOperations",
@@ -65,19 +75,27 @@ __all__ = [
     "KubernetesOperations",
     "LoadBalancersOperations",
     "MonitoringOperations",
+    "PartnerAttachmentsOperations",
     "ProjectsOperations",
     "RegionsOperations",
+    "RegistriesOperations",
     "RegistryOperations",
     "ReservedIPsOperations",
     "ReservedIPsActionsOperations",
+    "ReservedIPv6Operations",
+    "ReservedIPv6ActionsOperations",
+    "ByoipPrefixesOperations",
     "SizesOperations",
     "SnapshotsOperations",
+    "SpacesKeyOperations",
     "TagsOperations",
     "VolumesOperations",
     "VolumeActionsOperations",
     "VolumeSnapshotsOperations",
     "VpcsOperations",
+    "VpcPeeringsOperations",
     "UptimeOperations",
+    "GenaiOperations",
 ]
 __all__.extend([p for p in _patch_all if p not in __all__])
 _patch_sdk()
