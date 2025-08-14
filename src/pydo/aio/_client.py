@@ -56,6 +56,7 @@ from .operations import (
     VolumeSnapshotsOperations,
     VolumesOperations,
     VpcPeeringsOperations,
+    VpcnatgatewaysOperations,
     VpcsOperations,
 )
 
@@ -651,6 +652,8 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype vpcs: pydo.aio.operations.VpcsOperations
     :ivar vpc_peerings: VpcPeeringsOperations operations
     :vartype vpc_peerings: pydo.aio.operations.VpcPeeringsOperations
+    :ivar vpcnatgateways: VpcnatgatewaysOperations operations
+    :vartype vpcnatgateways: pydo.aio.operations.VpcnatgatewaysOperations
     :ivar uptime: UptimeOperations operations
     :vartype uptime: pydo.aio.operations.UptimeOperations
     :ivar genai: GenaiOperations operations
@@ -818,6 +821,9 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.vpc_peerings = VpcPeeringsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.vpcnatgateways = VpcnatgatewaysOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.uptime = UptimeOperations(
