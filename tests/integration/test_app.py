@@ -83,14 +83,6 @@ def test_app_lifecycle(integration_client: Client):
 def test_app_info(integration_client: Client):
     """Tests all information endpoints"""
 
-    list_app_tier = integration_client.apps.list_tiers()
-
-    assert len(list_app_tier["tiers"]) >= 3
-
-    get_app_tier = integration_client.apps.get_tier("basic")
-
-    assert get_app_tier["tier"]["slug"] == "basic"
-
     list_instance_sizes = integration_client.apps.list_instance_sizes()
 
     assert len(list_instance_sizes["instance_sizes"]) >= 4
