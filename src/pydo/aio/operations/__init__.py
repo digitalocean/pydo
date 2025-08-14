@@ -45,6 +45,7 @@ from ._operations import VolumeActionsOperations
 from ._operations import VolumeSnapshotsOperations
 from ._operations import VpcsOperations
 from ._operations import VpcPeeringsOperations
+from ._operations import VpcnatgatewaysOperations
 from ._operations import UptimeOperations
 from ._operations import GenaiOperations
 
@@ -94,6 +95,7 @@ __all__ = [
     "VolumeSnapshotsOperations",
     "VpcsOperations",
     "VpcPeeringsOperations",
+    "VpcnatgatewaysOperations",
     "UptimeOperations",
     "GenaiOperations",
 ]
