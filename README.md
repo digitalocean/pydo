@@ -58,7 +58,7 @@ ID: 123456, NAME: my_test_ssh_key, FINGERPRINT: 5c:74:7e:60:28:69:34:ca:dd:74:67
 ID: 123457, NAME: my_prod_ssh_key, FINGERPRINT: eb:76:c7:2a:d3:3e:80:5d:ef:2e:ca:86:d7:79:94:0d
 ```
 
-**Consult the full list of supported DigitalOcean API endpoints in [PyDo's documentation](https://pydo.readthedocs.io/en/latest/).**
+**Consult the full list of supported DigitalOcean API endpoints in [PyDo's documentation](https://docs.digitalocean.com/reference/pydo/).**
 
 **Note**: More working examples can be found [here](https://github.com/digitalocean/pydo/tree/main/examples).
 
