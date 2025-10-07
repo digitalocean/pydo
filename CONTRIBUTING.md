@@ -90,7 +90,7 @@ On top of generating our client, we've added a few customizations to create an o
 
 The repo uses GitHub workflows to publish a draft release when a new tag is
 pushed. We use [semver](https://semver.org/#summary) to determine the version
-number vor the tag.
+number for the tag.
 
 1. Run `make changes` to review the merged PRs since last release and decide what kind of release you are doing (bugfix, feature or breaking).
     * Review the tags on each PR and make sure they are categorized
