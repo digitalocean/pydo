@@ -93,8 +93,7 @@ while paginated:
 
 #### Retries and Backoff
 
-By default the client uses the same retry policy as the [Azure SDK for Python](https://learn.microsoft.com/en-us/python/api/azure-core/azure.core.pipeline.policies.retrypolicy?view=azure-python).
-retry policy. If you'd like to modify any of these values, you can pass them as keywords to your client initialization:
+By default the client uses the same retry policy as the [Azure SDK for Python](https://learn.microsoft.com/en-us/python/api/azure-core/azure.core.pipeline.policies.retrypolicy?view=azure-python) retry policy. If you'd like to modify any of these values, you can pass them as keywords to your client initialization:
 
 ```python
 client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"), retry_total=3)
