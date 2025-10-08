@@ -124,6 +124,22 @@ for d in droplets["droplets"]:
     print(f"ID: {d['id']}, Name: {d['name']}, Status: {d['status']}")
 ```
 
+#### Setting Environment Variables
+
+Before running the script, make sure you set your DigitalOcean API token as an environment variable:
+
+**Windows (PowerShell):**
+```bash
+setx DIGITALOCEAN_TOKEN "your_api_token_here"
+```
+
+**MacOS/Linux(Terminal):**
+```bash
+export DIGITALOCEAN_TOKEN="your_api_token_here"
+```
+
+This keeps your API token secure and avoids hardcoding it directly in your scripts.
+
 
 # **Contributing**
 
