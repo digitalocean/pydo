@@ -106,6 +106,46 @@ or
 client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"), retry_policy=MyRetryPolicy())
 ```
 
+#### Error Handling
+
+When you make an API call that fails, `pydo` will raise an `HttpResponseError`. You can use a `try...except` block to catch this error and see what went wrong.
+
+Here's how you can handle errors and print the details:
+
+```python
+from pydo import Client
+from pydo.exceptions import HttpResponseError
+
+# Make sure to set your DIGITALOCEAN_TOKEN environment variable
+client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"))
+
+try:
+    # This line will cause an error because the droplet doesn't exist
+    client.droplets.get(droplet_id="non-existent-droplet")
+except HttpResponseError as error:
+    print(f"Oops! An error occurred.")
+    print(f"The server responded with status code: {error.response.status_code}")
+
+    # The error response from DigitalOcean contains more details in JSON format
+    error_details = error.response.json()
+    error_id = error_details.get('id')
+    error_message = error_details.get('message')
+
+    if error_id and error_message:
+        print(f"DigitalOcean error ID: {error_id}")
+        print(f"Message: {error_message}")
+```
+
+When you run this code, you'll see output like this:
+
+```
+Oops! An error occurred.
+The server responded with status code: 404
+DigitalOcean error ID: not_found
+Message: The resource you were accessing could not be found.
+```
+This makes it easy to understand why your API call failed.
+
 # **Contributing**
 
 >Visit our [Contribuing Guide](CONTRIBUTING.md) for more information on getting
