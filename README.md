@@ -93,7 +93,9 @@ while paginated:
 
 #### Retries and Backoff
 
-By default the client uses the same retry policy as the [Azure SDK for Python](https://learn.microsoft.com/en-us/python/api/azure-core/azure.core.pipeline.policies.retrypolicy?view=azure-python) retry policy. If you'd like to modify any of these values, you can pass them as keywords to your client initialization:
+By default the client uses the same retry policy as the [Azure SDK for Python](https://learn.microsoft.com/en-us/python/api/azure-core/azure.core.pipeline.policies.retrypolicy?view=azure-python)
+retry policy. If you'd like to modify any of these values, you can pass them as
+keywords to your client initialization:
 
 ```python
 client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"), retry_total=3)
@@ -107,13 +109,13 @@ client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"), retry_policy=MyRetryPolic
 
 # **Contributing**
 
->Visit our [Contribuing Guide](CONTRIBUTING.md) for more information on getting
-involved in developing this client.
+> Visit our [Contribuing Guide](CONTRIBUTING.md) for more information on
+> getting involved in developing this client.
 
 # **Tests**
 
->The tests included in this repo are used to validate the generated client.
-We use `pytest` to define and run the tests.
+> The tests included in this repo are used to validate the generated client.
+> We use `pytest` to define and run the tests.
 
 **_Requirements_**
 
@@ -212,7 +214,7 @@ docker run -it --rm --name pydo -v $PWD/tests:/tests pydo:dev pytest tests/mocke
 
 # **Known Issues**
 
->This selection lists the known issues of the client generator.
+> This selection lists the known issues of the client generator.
 
 #### `kubernetes.get_kubeconfig` Does not serialize response content
 
@@ -260,8 +262,8 @@ This is a backend issue with the API endpoint. The API endpoint expects the head
 
 # **Roadmap**
 
->This section lists short-term and long-term goals for the project.
-**Note**: These are goals, not necessarily commitments. The sections are not intended to represent exclusive focus during these terms.
+> This section lists short-term and long-term goals for the project.
+> **Note**: These are goals, not necessarily commitments. The sections are not intended to represent exclusive focus during these terms.
 
 Short term:
 
