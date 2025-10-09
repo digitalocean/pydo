@@ -372,8 +372,6 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     are independent of the limits defined above.
 
 
-    * Only 12 ``POST`` requests to the ``/v2/floating_ips`` endpoint to create Floating IPs can be
-    made per 60 seconds.
     * Only 10 ``GET`` requests to the ``/v2/account/keys`` endpoint to list SSH keys can be made
     per 60 seconds.
     * Only 5 requests to any and all ``v2/cdn/endpoints`` can be made per 10 seconds. This includes
