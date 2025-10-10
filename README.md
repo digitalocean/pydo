@@ -91,6 +91,38 @@ while paginated:
         paginated = False
 ```
 
+#### Error Handling
+
+When an API request fails, `pydo` raises an `HttpResponseError`. You can import this exception from `pydo.exceptions` and use a `try...except` block to handle failures gracefully. The exception object contains details about the response, such as the status code and reason.
+
+Here is an example of attempting to retrieve a non-existent droplet and inspecting the error:
+
+```python
+import os
+from pydo import Client
+from pydo.exceptions import HttpResponseError
+
+client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"))
+
+try:
+    # Attempt to get a droplet with an invalid ID
+    client.droplets.get(droplet_id="invalid-droplet-id")
+except HttpResponseError as e:
+    print(f"Request failed with status code: {e.status_code}")
+    print(f"Reason: {e.reason}")
+    # The error message from the API is also available
+    if e.error:
+        print(f"API Error: {e.error.message}")
+```
+
+This would output something similar to:
+
+```text
+Request failed with status code: 404
+Reason: Not Found
+API Error: The resource you were looking for could not be found.
+```
+
 #### Retries and Backoff
 
 By default the client uses the same retry policy as the [Azure SDK for Python](https://learn.microsoft.com/en-us/python/api/azure-core/azure.core.pipeline.policies.retrypolicy?view=azure-python).
