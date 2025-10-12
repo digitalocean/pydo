@@ -6,14 +6,16 @@
 
 Follow our quickstart for examples: https://aka.ms/azsdk/python/dpcodegen/python/customize
 """
-from typing import TYPE_CHECKING, Generator, Any, Dict, Callable
+from typing import TYPE_CHECKING, Generator, Any, Dict, Callable, Optional
 
 from azure.core.credentials import AccessToken
+from azure.core.exceptions import HttpResponseError
 
 from pydo.custom_policies import CustomHttpLoggingPolicy
 from pydo import GeneratedClient, _version
 from pydo.aio import AsyncClient
 from pydo import types
+from pydo import exceptions
 
 if TYPE_CHECKING:
     # pylint: disable=unused-import,ungrouped-imports
@@ -83,6 +85,72 @@ class Client(GeneratedClient):  # type: ignore
                 break
 
             page += 1
+
+    @staticmethod
+    def _handle_http_error(error: HttpResponseError) -> exceptions.DigitalOceanError:
+        """Convert HTTP errors to appropriate DigitalOcean custom exceptions.
+
+        :param error: The HttpResponseError from azure
+        :return: Appropriate DigitalOcean exception
+        :rtype: exceptions.DigitalOceanError
+        """
+        status_code = getattr(error, 'status', None) or getattr(error.response, 'status_code', None)
+
+        if status_code == 401:
+            return exceptions.AuthenticationError(
+                "Authentication failed. Please check your API token.",
+                status_code=status_code,
+                response=error.response
+            )
+        elif status_code == 403:
+            return exceptions.PermissionDeniedError(
+                "Access forbidden. You don't have permission to perform this action.",
+                status_code=status_code,
+                response=error.response
+            )
+        elif status_code == 404:
+            return exceptions.ResourceNotFoundError(
+                "Resource not found. The requested resource does not exist.",
+                status_code=status_code,
+                response=error.response
+            )
+        elif status_code == 400:
+            return exceptions.ValidationError(
+                "Bad request. Please check your request parameters.",
+                status_code=status_code,
+                response=error.response
+            )
+        elif status_code == 409:
+            return exceptions.ConflictError(
+                "Conflict. The resource is in a state that conflicts with the request.",
+                status_code=status_code,
+                response=error.response
+            )
+        elif status_code == 429:
+            return exceptions.RateLimitError(
+                "Rate limit exceeded. Please wait before making more requests.",
+                status_code=status_code,
+                response=error.response
+            )
+        elif status_code and status_code >= 500:
+            return exceptions.ServerError(
+                "Server error. Please try again later.",
+                status_code=status_code,
+                response=error.response
+            )
+        elif status_code == 503:
+            return exceptions.ServiceUnavailableError(
+                "Service temporarily unavailable. Please try again later.",
+                status_code=status_code,
+                response=error.response
+            )
+        else:
+            # Fallback to generic DigitalOcean error
+            return exceptions.DigitalOceanError(
+                f"API request failed: {str(error)}",
+                status_code=status_code,
+                response=error.response
+            )
         logger = kwargs.get("logger")
         if logger is not None and kwargs.get("http_logging_policy") == "":
             kwargs["http_logging_policy"] = CustomHttpLoggingPolicy(logger=logger)
@@ -93,7 +161,7 @@ class Client(GeneratedClient):  # type: ignore
         )
 
 
-__all__ = ["Client", "AsyncClient", "types"]
+__all__ = ["Client", "AsyncClient", "types", "exceptions"]
 
 
 def patch_sdk():

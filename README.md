@@ -108,6 +108,39 @@ def process_droplet(droplet: Droplet) -> None:
 # Response types: DropletsResponse, SSHKeysResponse, etc.
 ```
 
+#### Custom Exceptions for Better Error Handling
+
+PyDo includes custom exceptions for better error handling and debugging:
+
+```python
+from pydo import Client
+from pydo.exceptions import AuthenticationError, ResourceNotFoundError, RateLimitError
+
+client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"))
+
+try:
+    # This will raise AuthenticationError if token is invalid
+    droplets = client.droplets.list()
+except AuthenticationError as e:
+    print(f"Authentication failed: {e.message}")
+except RateLimitError as e:
+    print(f"Rate limit exceeded: {e.message}")
+except ResourceNotFoundError as e:
+    print(f"Resource not found: {e.message}")
+except Exception as e:
+    print(f"Other error: {e}")
+
+# Available exceptions:
+# - AuthenticationError (401)
+# - PermissionDeniedError (403)
+# - ResourceNotFoundError (404)
+# - ValidationError (400)
+# - ConflictError (409)
+# - RateLimitError (429)
+# - ServerError (5xx)
+# - ServiceUnavailableError (503)
+```
+
 #### Pagination Example
 
 ##### Manual Pagination (Traditional Approach)
