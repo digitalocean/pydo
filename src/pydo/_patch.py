@@ -12,6 +12,7 @@ from azure.core.credentials import AccessToken
 
 from pydo.custom_policies import CustomHttpLoggingPolicy
 from pydo import GeneratedClient, _version
+from pydo.aio import AsyncClient
 
 if TYPE_CHECKING:
     # pylint: disable=unused-import,ungrouped-imports
@@ -49,7 +50,7 @@ class Client(GeneratedClient):  # type: ignore
         )
 
 
-__all__ = ["Client"]
+__all__ = ["Client", "AsyncClient"]
 
 
 def patch_sdk():
