@@ -23,6 +23,12 @@ To install from pip:
     pip install pydo
 ```
 
+For async support, install with the `aio` extra:
+
+```shell
+    pip install pydo[aio]
+```
+
 ## **`pydo` Quickstart**
 
 > A quick guide to getting started with the client.
@@ -34,6 +40,22 @@ import os
 from pydo import Client
 
 client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"))
+```
+
+For asynchronous operations, use the `AsyncClient`:
+
+```python
+import os
+import asyncio
+from pydo import AsyncClient
+
+async def main():
+    client = AsyncClient(token=os.getenv("DIGITALOCEAN_TOKEN"))
+    # Use await for async operations
+    result = await client.ssh_keys.list()
+    print(result)
+
+asyncio.run(main())
 ```
 
 #### Example of Using `pydo` to Access DO Resources
