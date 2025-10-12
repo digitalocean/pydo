@@ -86,8 +86,8 @@ ID: 123457, NAME: my_prod_ssh_key, FINGERPRINT: eb:76:c7:2a:d3:3e:80:5d:ef:2e:ca
 
 #### Pagination Example
 
-Below is an example on handling pagination. One must parse the URL to find the
-next page.
+##### Manual Pagination (Traditional Approach)
+Below is an example of handling pagination manually by parsing URLs:
 
 ```python
 import os
@@ -111,6 +111,24 @@ while paginated:
         page = int(parse_qs(parsed_url.query)["page"][0])
     else:
         paginated = False
+```
+
+##### Automatic Pagination (New Helper Method)
+The client now includes a `paginate()` helper method that automatically handles pagination:
+
+```python
+import os
+from pydo import Client
+
+client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"))
+
+# Automatically paginate through all SSH keys
+for key in client.paginate(client.ssh_keys.list, per_page=50):
+    print(f"ID: {key['id']}, NAME: {key['name']}, FINGERPRINT: {key['fingerprint']}")
+
+# Works with any paginated endpoint
+for droplet in client.paginate(client.droplets.list):
+    print(f"Droplet: {droplet['name']} - {droplet['status']}")
 ```
 
 #### Retries and Backoff
