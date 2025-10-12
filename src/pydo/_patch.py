@@ -6,10 +6,11 @@
 
 Follow our quickstart for examples: https://aka.ms/azsdk/python/dpcodegen/python/customize
 """
-from typing import TYPE_CHECKING, Generator, Any, Dict, Callable, Optional
+from typing import TYPE_CHECKING, Generator, Any, Dict, Callable, Optional, Union
 
 from azure.core.credentials import AccessToken
 from azure.core.exceptions import HttpResponseError
+from azure.core.pipeline.policies import RetryPolicy
 
 from pydo.custom_policies import CustomHttpLoggingPolicy
 from pydo import GeneratedClient, _version
@@ -40,7 +41,50 @@ class Client(GeneratedClient):  # type: ignore
     :type token: str
     :keyword endpoint: Service URL. Default value is "https://api.digitalocean.com".
     :paramtype endpoint: str
+    :keyword retry_total: Total number of retries for failed requests. Default is 3.
+    :paramtype retry_total: int
+    :keyword retry_backoff_factor: Backoff factor for retry delays. Default is 0.5.
+    :paramtype retry_backoff_factor: float
+    :keyword retry_status_codes: HTTP status codes to retry on. Default is [429, 500, 502, 503, 504].
+    :paramtype retry_status_codes: list[int]
+    :keyword timeout: Request timeout in seconds. Default is 120.
+    :paramtype timeout: int
     """
+
+    def __init__(
+        self,
+        token: str,
+        *,
+        retry_total: int = 3,
+        retry_backoff_factor: float = 0.5,
+        retry_status_codes: Optional[list[int]] = None,
+        timeout: int = 120,
+        **kwargs
+    ):
+        # Set default retry status codes if not provided
+        if retry_status_codes is None:
+            retry_status_codes = [429, 500, 502, 503, 504]
+
+        # Create custom retry policy with user-specified parameters
+        retry_policy = RetryPolicy(
+            retry_total=retry_total,
+            retry_backoff_factor=retry_backoff_factor,
+            retry_on_status_codes=retry_status_codes,
+        )
+
+        # Add retry policy to kwargs if not already specified
+        if 'retry_policy' not in kwargs:
+            kwargs['retry_policy'] = retry_policy
+
+        # Handle logging policy
+        logger = kwargs.get("logger")
+        if logger is not None and kwargs.get("http_logging_policy") == "":
+            kwargs["http_logging_policy"] = CustomHttpLoggingPolicy(logger=logger)
+        sdk_moniker = f"pydo/{_version.VERSION}"
+
+        super().__init__(
+            TokenCredentials(token), timeout=timeout, sdk_moniker=sdk_moniker, **kwargs
+        )
 
     def paginate(self, method: Callable[..., Dict[str, Any]], *args, **kwargs) -> Generator[Dict[str, Any], None, None]:
         """Automatically paginate through all results from a method that returns paginated data.
@@ -151,14 +195,6 @@ class Client(GeneratedClient):  # type: ignore
                 status_code=status_code,
                 response=error.response
             )
-        logger = kwargs.get("logger")
-        if logger is not None and kwargs.get("http_logging_policy") == "":
-            kwargs["http_logging_policy"] = CustomHttpLoggingPolicy(logger=logger)
-        sdk_moniker = f"pydo/{_version.VERSION}"
-
-        super().__init__(
-            TokenCredentials(token), timeout=timeout, sdk_moniker=sdk_moniker, **kwargs
-        )
 
 
 __all__ = ["Client", "AsyncClient", "types", "exceptions"]

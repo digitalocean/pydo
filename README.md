@@ -190,18 +190,54 @@ for droplet in client.paginate(client.droplets.list):
 
 #### Retries and Backoff
 
-By default the client uses the same retry policy as the [Azure SDK for Python](https://learn.microsoft.com/en-us/python/api/azure-core/azure.core.pipeline.policies.retrypolicy?view=azure-python).
-retry policy. If you'd like to modify any of these values, you can pass them as keywords to your client initialization:
+The client includes intelligent retry logic to handle transient network issues and server errors. By default, it retries on HTTP status codes 429 (rate limit), 500, 502, 503, and 504.
+
+##### Basic Retry Configuration
 
 ```python
-client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"), retry_total=3)
+# Use default retry settings (3 retries, 0.5s backoff factor)
+client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"))
+
+# Customize retry attempts
+client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"), retry_total=5)
+
+# Customize backoff timing
+client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"), retry_backoff_factor=1.0)
+
+# Customize which status codes to retry on
+client = Client(
+    token=os.getenv("DIGITALOCEAN_TOKEN"),
+    retry_status_codes=[429, 500, 502, 503, 504, 408]  # Add timeout retries
+)
 ```
 
-or
+##### Advanced Retry Configuration
+
+For full control over retry behavior, you can provide a custom retry policy:
 
 ```python
-client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"), retry_policy=MyRetryPolicy())
+from azure.core.pipeline.policies import RetryPolicy
+
+custom_retry_policy = RetryPolicy(
+    retry_total=3,
+    retry_backoff_factor=0.8,
+    retry_on_status_codes=[429, 500, 502, 503, 504],
+    retry_on_exceptions=[ConnectionError, TimeoutError]
+)
+
+client = Client(
+    token=os.getenv("DIGITALOCEAN_TOKEN"),
+    retry_policy=custom_retry_policy
+)
 ```
+
+##### Retry Behavior
+
+- **Exponential Backoff**: Delays increase exponentially (0.5s, 1.0s, 2.0s, etc.)
+- **Jitter**: Random variation prevents thundering herd problems
+- **Smart Status Codes**: Only retries on recoverable errors
+- **Timeout Handling**: Automatic retry on network timeouts
+- **Rate Limit Respect**: Built-in handling of 429 responses
 
 # **Contributing**
 
