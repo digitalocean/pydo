@@ -6,13 +6,14 @@
 
 Follow our quickstart for examples: https://aka.ms/azsdk/python/dpcodegen/python/customize
 """
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Generator, Any, Dict, Callable
 
 from azure.core.credentials import AccessToken
 
 from pydo.custom_policies import CustomHttpLoggingPolicy
 from pydo import GeneratedClient, _version
 from pydo.aio import AsyncClient
+from pydo import types
 
 if TYPE_CHECKING:
     # pylint: disable=unused-import,ungrouped-imports
@@ -39,13 +40,14 @@ class Client(GeneratedClient):  # type: ignore
     :paramtype endpoint: str
     """
 
-    def paginate(self, method, *args, **kwargs):
+    def paginate(self, method: Callable[..., Dict[str, Any]], *args, **kwargs) -> Generator[Dict[str, Any], None, None]:
         """Automatically paginate through all results from a method that returns paginated data.
 
         :param method: The method to call (e.g., self.droplets.list)
         :param args: Positional arguments to pass to the method
         :param kwargs: Keyword arguments to pass to the method
         :return: Generator yielding all items from all pages
+        :rtype: Generator[Dict[str, Any], None, None]
         """
         page = 1
         per_page = kwargs.get('per_page', 20)  # Default per_page if not specified
@@ -91,7 +93,7 @@ class Client(GeneratedClient):  # type: ignore
         )
 
 
-__all__ = ["Client", "AsyncClient"]
+__all__ = ["Client", "AsyncClient", "types"]
 
 
 def patch_sdk():

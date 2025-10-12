@@ -84,6 +84,30 @@ ID: 123457, NAME: my_prod_ssh_key, FINGERPRINT: eb:76:c7:2a:d3:3e:80:5d:ef:2e:ca
 
 **Note**: More working examples can be found [here](https://github.com/digitalocean/pydo/tree/main/examples).
 
+#### Type Hints and Models
+
+PyDo includes comprehensive type hints for better IDE support and type checking:
+
+```python
+from pydo import Client
+from pydo.types import Droplet, SSHKey, DropletsResponse
+
+client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"))
+
+# Type hints help with autocomplete and validation
+droplets: DropletsResponse = client.droplets.list()
+for droplet in droplets["droplets"]:
+    # droplet is properly typed as Droplet
+    print(f"ID: {droplet['id']}, Name: {droplet['name']}")
+
+# Use specific types for better type safety
+def process_droplet(droplet: Droplet) -> None:
+    print(f"Processing {droplet['name']} in {droplet['region']['slug']}")
+
+# Available types: Droplet, SSHKey, Region, Size, Image, Volume, etc.
+# Response types: DropletsResponse, SSHKeysResponse, etc.
+```
+
 #### Pagination Example
 
 ##### Manual Pagination (Traditional Approach)
