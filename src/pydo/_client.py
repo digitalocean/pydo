@@ -36,6 +36,7 @@ from .operations import (
     KubernetesOperations,
     LoadBalancersOperations,
     MonitoringOperations,
+    NfsOperations,
     OneClicksOperations,
     PartnerAttachmentsOperations,
     ProjectsOperations,
@@ -612,6 +613,8 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype load_balancers: pydo.operations.LoadBalancersOperations
     :ivar monitoring: MonitoringOperations operations
     :vartype monitoring: pydo.operations.MonitoringOperations
+    :ivar nfs: NfsOperations operations
+    :vartype nfs: pydo.operations.NfsOperations
     :ivar partner_attachments: PartnerAttachmentsOperations operations
     :vartype partner_attachments: pydo.operations.PartnerAttachmentsOperations
     :ivar projects: ProjectsOperations operations
@@ -762,6 +765,9 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.monitoring = MonitoringOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.nfs = NfsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.partner_attachments = PartnerAttachmentsOperations(
