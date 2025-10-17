@@ -14,6 +14,7 @@ on the [DigitalOcean OpenAPI Specification](https://github.com/digitalocean/open
 ## Prerequisites
 
 - Python version: >= 3.7.2
+- Configuring the `DIGITALOCEAN_TOKEN` environment variable to set the DigitalOcean API Token.
 
 ## Installation
 
