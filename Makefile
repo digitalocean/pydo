@@ -66,13 +66,13 @@ lint-tests: install ## Lints the code
 test-mocked: install ## Runs the mock test suite
 	poetry run pytest -rA --tb=short tests/mocked/. $(PYTEST_ARGS)
 
-.PHONY: test-mocked
+.PHONY: test-integration
 test-integration: install ## Runs the integration test suite
 	poetry run pytest -rA --tb=short tests/integration/. $(PYTEST_EXCLUDE_MARKS) $(PYTEST_ARGS)
 
-.PHONY: test-mocked
-test-integration-single: install ## This command runs a single integration test, e.g. > make test-integration-single test=test_actions
-	poetry run pytest -rA --tb=short tests/integration/. -k $(test)
+.PHONY: test-integration-single
+test-integration-single: install ## Runs a single integration test, e.g. > make test-integration-single test=test_actions
+	poetry run pytest -rA --tb=short tests/integration/. -k $(TEST_FILTER)
 
 .PHONY: docker-build
 docker-build:
