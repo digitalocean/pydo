@@ -23,6 +23,12 @@ To install from pip:
     pip install pydo
 ```
 
+For async support, install with the `aio` extra:
+
+```shell
+    pip install pydo[aio]
+```
+
 ## **`pydo` Quickstart**
 
 > A quick guide to getting started with the client.
@@ -34,6 +40,22 @@ import os
 from pydo import Client
 
 client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"))
+```
+
+For asynchronous operations, use the `AsyncClient`:
+
+```python
+import os
+import asyncio
+from pydo import AsyncClient
+
+async def main():
+    client = AsyncClient(token=os.getenv("DIGITALOCEAN_TOKEN"))
+    # Use await for async operations
+    result = await client.ssh_keys.list()
+    print(result)
+
+asyncio.run(main())
 ```
 
 #### Example of Using `pydo` to Access DO Resources
@@ -62,10 +84,67 @@ ID: 123457, NAME: my_prod_ssh_key, FINGERPRINT: eb:76:c7:2a:d3:3e:80:5d:ef:2e:ca
 
 **Note**: More working examples can be found [here](https://github.com/digitalocean/pydo/tree/main/examples).
 
+#### Type Hints and Models
+
+PyDo includes comprehensive type hints for better IDE support and type checking:
+
+```python
+from pydo import Client
+from pydo.types import Droplet, SSHKey, DropletsResponse
+
+client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"))
+
+# Type hints help with autocomplete and validation
+droplets: DropletsResponse = client.droplets.list()
+for droplet in droplets["droplets"]:
+    # droplet is properly typed as Droplet
+    print(f"ID: {droplet['id']}, Name: {droplet['name']}")
+
+# Use specific types for better type safety
+def process_droplet(droplet: Droplet) -> None:
+    print(f"Processing {droplet['name']} in {droplet['region']['slug']}")
+
+# Available types: Droplet, SSHKey, Region, Size, Image, Volume, etc.
+# Response types: DropletsResponse, SSHKeysResponse, etc.
+```
+
+#### Custom Exceptions for Better Error Handling
+
+PyDo includes custom exceptions for better error handling and debugging:
+
+```python
+from pydo import Client
+from pydo.exceptions import AuthenticationError, ResourceNotFoundError, RateLimitError
+
+client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"))
+
+try:
+    # This will raise AuthenticationError if token is invalid
+    droplets = client.droplets.list()
+except AuthenticationError as e:
+    print(f"Authentication failed: {e.message}")
+except RateLimitError as e:
+    print(f"Rate limit exceeded: {e.message}")
+except ResourceNotFoundError as e:
+    print(f"Resource not found: {e.message}")
+except Exception as e:
+    print(f"Other error: {e}")
+
+# Available exceptions:
+# - AuthenticationError (401)
+# - PermissionDeniedError (403)
+# - ResourceNotFoundError (404)
+# - ValidationError (400)
+# - ConflictError (409)
+# - RateLimitError (429)
+# - ServerError (5xx)
+# - ServiceUnavailableError (503)
+```
+
 #### Pagination Example
 
-Below is an example on handling pagination. One must parse the URL to find the
-next page.
+##### Manual Pagination (Traditional Approach)
+Below is an example of handling pagination manually by parsing URLs:
 
 ```python
 import os
@@ -91,20 +170,74 @@ while paginated:
         paginated = False
 ```
 
+##### Automatic Pagination (New Helper Method)
+The client now includes a `paginate()` helper method that automatically handles pagination:
+
+```python
+import os
+from pydo import Client
+
+client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"))
+
+# Automatically paginate through all SSH keys
+for key in client.paginate(client.ssh_keys.list, per_page=50):
+    print(f"ID: {key['id']}, NAME: {key['name']}, FINGERPRINT: {key['fingerprint']}")
+
+# Works with any paginated endpoint
+for droplet in client.paginate(client.droplets.list):
+    print(f"Droplet: {droplet['name']} - {droplet['status']}")
+```
+
 #### Retries and Backoff
 
-By default the client uses the same retry policy as the [Azure SDK for Python](https://learn.microsoft.com/en-us/python/api/azure-core/azure.core.pipeline.policies.retrypolicy?view=azure-python).
-retry policy. If you'd like to modify any of these values, you can pass them as keywords to your client initialization:
+The client includes intelligent retry logic to handle transient network issues and server errors. By default, it retries on HTTP status codes 429 (rate limit), 500, 502, 503, and 504.
+
+##### Basic Retry Configuration
 
 ```python
-client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"), retry_total=3)
+# Use default retry settings (3 retries, 0.5s backoff factor)
+client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"))
+
+# Customize retry attempts
+client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"), retry_total=5)
+
+# Customize backoff timing
+client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"), retry_backoff_factor=1.0)
+
+# Customize which status codes to retry on
+client = Client(
+    token=os.getenv("DIGITALOCEAN_TOKEN"),
+    retry_status_codes=[429, 500, 502, 503, 504, 408]  # Add timeout retries
+)
 ```
 
-or
+##### Advanced Retry Configuration
+
+For full control over retry behavior, you can provide a custom retry policy:
 
 ```python
-client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"), retry_policy=MyRetryPolicy())
+from azure.core.pipeline.policies import RetryPolicy
+
+custom_retry_policy = RetryPolicy(
+    retry_total=3,
+    retry_backoff_factor=0.8,
+    retry_on_status_codes=[429, 500, 502, 503, 504],
+    retry_on_exceptions=[ConnectionError, TimeoutError]
+)
+
+client = Client(
+    token=os.getenv("DIGITALOCEAN_TOKEN"),
+    retry_policy=custom_retry_policy
+)
 ```
+
+##### Retry Behavior
+
+- **Exponential Backoff**: Delays increase exponentially (0.5s, 1.0s, 2.0s, etc.)
+- **Jitter**: Random variation prevents thundering herd problems
+- **Smart Status Codes**: Only retries on recoverable errors
+- **Timeout Handling**: Automatic retry on network timeouts
+- **Rate Limit Respect**: Built-in handling of 429 responses
 
 # **Contributing**
 
