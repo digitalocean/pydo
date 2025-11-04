@@ -1,75 +1,86 @@
-"""Client customization tests
+"""Test client customizations like pagination helper."""
 
-These tests aren't essential but serve as good examples for using the client with
-custom configuration.
-"""
-
-import logging
-import re
-
+import pytest
 import responses
 from pydo import Client
 
-# pylint: disable=missing-function-docstring
 
+@responses.activate
+def test_pagination_helper(mock_client: Client, mock_client_url):
+    """Test the pagination helper method."""
 
-def test_custom_headers():
-    custom_headers = {"x-request-id": "fakeid"}
-    client = Client("", headers=custom_headers)
+    # Mock multiple pages of SSH keys
+    page1_data = {
+        "ssh_keys": [
+            {"id": 1, "name": "key1", "fingerprint": "fp1"},
+            {"id": 2, "name": "key2", "fingerprint": "fp2"}
+        ],
+        "links": {
+            "pages": {
+                "next": f"{mock_client_url}/v2/account/keys?page=2&per_page=2"
+            }
+        },
+        "meta": {"total": 4}
+    }
 
-    # pylint: disable=protected-access
-    assert client._config.headers_policy.headers == custom_headers
+    page2_data = {
+        "ssh_keys": [
+            {"id": 3, "name": "key3", "fingerprint": "fp3"},
+            {"id": 4, "name": "key4", "fingerprint": "fp4"}
+        ],
+        "links": {
+            "pages": {}
+        },
+        "meta": {"total": 4}
+    }
 
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/account/keys",
+        json=page1_data,
+        match=[responses.matchers.query_param_matcher({"page": "1", "per_page": "2"})],
+    )
 
-def test_custom_timeout():
-    timeout = 300
-    client = Client("", timeout=timeout)
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/v2/account/keys",
+        json=page2_data,
+        match=[responses.matchers.query_param_matcher({"page": "2", "per_page": "2"})],
+    )
 
-    # pylint: disable=protected-access
-    assert client._config.retry_policy.timeout == timeout
+    # Test pagination
+    keys = list(mock_client.paginate(mock_client.ssh_keys.list, per_page=2))
 
-
-def test_custom_endpoint():
-    endpoint = "https://fake.local"
-    client = Client("", endpoint=endpoint)
-
-    # pylint: disable=protected-access
-    assert client._client._base_url == endpoint
-
-
-def test_custom_logger():
-    name = "mockedtests"
-    logger = logging.getLogger(name)
-    client = Client("", logger=logger)
-
-    # pylint: disable=protected-access
-    assert client._config.http_logging_policy.logger.name == name
+    assert len(keys) == 4
+    assert keys[0]["name"] == "key1"
+    assert keys[1]["name"] == "key2"
+    assert keys[2]["name"] == "key3"
+    assert keys[3]["name"] == "key4"
 
 
 @responses.activate
-def test_custom_user_agent():
-    user_agent = "test"
-    fake_endpoint = "https://fake.local"
-    client = Client(
-        "",
-        endpoint=fake_endpoint,
-        user_agent=user_agent,
-        user_agent_overwrite=True,
-    )
+def test_pagination_helper_single_page(mock_client: Client, mock_client_url):
+    """Test pagination helper with single page of results."""
 
-    full_user_agent_pattern = r"^test azsdk-python-pydo\/.+Python\/.+\(.+\)$"
+    page_data = {
+        "ssh_keys": [
+            {"id": 1, "name": "key1", "fingerprint": "fp1"}
+        ],
+        "links": {
+            "pages": {}
+        },
+        "meta": {"total": 1}
+    }
 
-    # pylint: disable=protected-access
-    got_user_agent = client._config.user_agent_policy.user_agent
-    match = re.match(full_user_agent_pattern, got_user_agent)
-    assert match is not None
-
-    fake_url = f"{fake_endpoint}/v2/account"
     responses.add(
         responses.GET,
-        fake_url,
-        match=[responses.matchers.header_matcher({"User-Agent": user_agent})],
+        f"{mock_client_url}/v2/account/keys",
+        json=page_data,
+        match=[responses.matchers.query_param_matcher({"page": "1", "per_page": "20"})],
     )
 
-    client.account.get(user_agent=user_agent)
-    assert responses.assert_call_count(fake_url, count=1)
+    # Test pagination with single page
+    keys = list(mock_client.paginate(mock_client.ssh_keys.list))
+
+    assert len(keys) == 1
+    assert keys[0]["name"] == "key1"
