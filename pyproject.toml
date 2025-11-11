@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pydo"
-version = "0.17.0"
+version = "0.19.0"
 description = "The official client for interacting with the DigitalOcean API"
 authors = ["API Engineering <api-engineering@digitalocean.com>"]
 license = "Apache-2.0"
