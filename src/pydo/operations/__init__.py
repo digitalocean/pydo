@@ -8,6 +8,7 @@ from ._operations import OneClicksOperations
 from ._operations import AccountOperations
 from ._operations import SshKeysOperations
 from ._operations import ActionsOperations
+from ._operations import AddonsOperations
 from ._operations import AppsOperations
 from ._operations import CdnOperations
 from ._operations import CertificatesOperations
@@ -59,6 +60,7 @@ __all__ = [
     "AccountOperations",
     "SshKeysOperations",
     "ActionsOperations",
+    "AddonsOperations",
     "AppsOperations",
     "CdnOperations",
     "CertificatesOperations",
