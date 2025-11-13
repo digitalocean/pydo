@@ -16,6 +16,7 @@ from ._configuration import GeneratedClientConfiguration
 from .operations import (
     AccountOperations,
     ActionsOperations,
+    AddonsOperations,
     AppsOperations,
     AutoscalepoolsOperations,
     BalanceOperations,
@@ -577,6 +578,8 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype ssh_keys: pydo.aio.operations.SshKeysOperations
     :ivar actions: ActionsOperations operations
     :vartype actions: pydo.aio.operations.ActionsOperations
+    :ivar addons: AddonsOperations operations
+    :vartype addons: pydo.aio.operations.AddonsOperations
     :ivar apps: AppsOperations operations
     :vartype apps: pydo.aio.operations.AppsOperations
     :ivar cdn: CdnOperations operations
@@ -711,6 +714,9 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.actions = ActionsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.addons = AddonsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.apps = AppsOperations(
