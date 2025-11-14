@@ -211,9 +211,6 @@ def test_kubernetes_get_kubeconfig(mock_client: Client, mock_client_url):
     )
 
     config_resp = mock_client.kubernetes.get_kubeconfig(cluster_id)
-    pytest.skip("The operation currently fails to return content.")
-    # TODO: investigate why the generated client doesn't return the response content
-    # It seems to be something to do with the yaml content type.
     assert config_resp.decode("utf-8") == expected
 
 
