@@ -283,3 +283,23 @@ Long term:
 
 - The client currently inputs and outputs JSON dictionaries. Adding models would unlock features such as typing and validation.
 - Add supporting functions to elevate customer experience (i.e. adding a funtion that surfaces IP address for a Droplet)
+
+- Add supporting functions to elevate customer experience (i.e. adding a funtion that surfaces IP address for a Droplet)
+
+### 🧩 Handling Error Codes
+
+When using `pydo`, some API responses may include specific error codes.  
+To make debugging easier, you can catch and print these codes from exceptions.  
+
+**Example:**
+```python
+from pydo import Client
+import os
+
+client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"))
+
+try:
+    client.droplets.list()
+except Exception as e:
+    print("Error code:", getattr(e, "code", "Unknown"))
+    print("Error message:", e)
