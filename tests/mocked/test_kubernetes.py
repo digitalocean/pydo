@@ -531,3 +531,69 @@ def test_kubernetes_remove_container_registry(mock_client: Client, mock_client_u
         }
     )
     assert add_reg_resp is None
+
+
+@responses.activate
+def test_kubernetes_cluster_with_registry_integration(
+    mock_client: Client, mock_client_url
+):
+    """Test demonstrating correct approach for registry integration.
+    
+    This test shows that registry_enabled cannot be set during cluster creation.
+    Instead, the add_registry operation must be used after cluster creation.
+    
+    Related to: https://github.com/digitalocean/pydo/issues/433
+    """
+    cluster_id = "bd5f5959-5e1e-4205-a714-a914373942af"
+
+    # Create cluster - registry_enabled will be False by default
+    cluster_without_registry = data.CLUSTER.copy()
+    responses.add(
+        responses.POST,
+        f"{mock_client_url}/{BASE_PATH}",
+        json=cluster_without_registry,
+        status=201,
+    )
+
+    cluster = mock_client.kubernetes.create_cluster(
+        {
+            "name": "registry-test-cluster",
+            "region": "ams3",
+            "version": "1.32",
+            "node_pools": [
+                {
+                    "size": "s-1vcpu-2gb",
+                    "count": 2,
+                    "name": "worker-pool",
+                }
+            ],
+        }
+    )
+    
+    # Verify cluster was created with registry_enabled=False
+    assert cluster["kubernetes_cluster"]["registry_enabled"] is False
+
+    # Add registry integration
+    responses.add(
+        responses.POST,
+        f"{mock_client_url}/v2/kubernetes/registry",
+        status=204,
+    )
+
+    mock_client.kubernetes.add_registry({"cluster_uuids": [cluster_id]})
+
+    # Get cluster details - now registry should be enabled
+    cluster_with_registry = data.CLUSTER.copy()
+    cluster_with_registry["kubernetes_cluster"]["registry_enabled"] = True
+    
+    responses.add(
+        responses.GET,
+        f"{mock_client_url}/{BASE_PATH}/{cluster_id}",
+        json=cluster_with_registry,
+        status=200,
+    )
+
+    updated_cluster = mock_client.kubernetes.get_cluster(cluster_id)
+    assert (
+        updated_cluster["kubernetes_cluster"]["registry_enabled"] is True
+    ), "Expected registry to be enabled after add_registry call"
