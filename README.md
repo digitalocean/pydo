@@ -215,6 +215,37 @@ docker run -it --rm --name pydo -v $PWD/tests:/tests pydo:dev pytest tests/mocke
 
 >This selection lists the known issues of the client generator.
 
+#### `kubernetes.create_cluster` does not accept `registry_enabled` parameter
+
+The `registry_enabled` field in Kubernetes cluster responses is read-only and cannot be set during cluster creation. To enable container registry integration with a Kubernetes cluster, you must use the `add_registry` operation after creating the cluster.
+
+**Correct approach:**
+
+```python
+# Create cluster
+cluster = client.kubernetes.create_cluster({
+    'name': 'my-cluster',
+    'region': 'nyc3',
+    'version': '1.32',
+    'node_pools': [{
+        'size': 's-1vcpu-2gb',
+        'count': 2,
+        'name': 'worker-pool'
+    }]
+})
+
+cluster_id = cluster['kubernetes_cluster']['id']
+
+# Enable registry integration
+client.kubernetes.add_registry({'cluster_uuids': [cluster_id]})
+
+# Verify registry is enabled
+updated_cluster = client.kubernetes.get_cluster(cluster_id)
+assert updated_cluster['kubernetes_cluster']['registry_enabled'] is True
+```
+
+See [issue #433](https://github.com/digitalocean/pydo/issues/433) for more details.
+
 #### `kubernetes.get_kubeconfig` Does not serialize response content
 
 In the generated python client, when calling client.kubernetes.get_kubeconfig(clust_id), the deserialization logic raises an error when the response content-type is applicaiton/yaml. We need to determine if the spec/schema can be configured such that the generator results in functions that properly handle the content. We will likely need to report the issue upstream to request support for the content-type.
