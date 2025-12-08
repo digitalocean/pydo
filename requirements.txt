@@ -15,7 +15,7 @@ cffi==1.16.0 ; python_version >= "3.8" and python_full_version < "4.0.0" and pla
 charset-normalizer==3.3.2 ; python_version >= "3.8" and python_full_version < "4.0.0"
 click==8.1.7 ; python_version >= "3.8" and python_full_version < "4.0.0"
 colorama==0.4.6 ; python_version >= "3.8" and python_full_version < "4.0.0" and (sys_platform == "win32" or platform_system == "Windows")
-cryptography==43.0.1 ; python_version >= "3.8" and python_full_version < "4.0.0"
+cryptography==44.0.1 ; python_version >= "3.8" and python_full_version < "4.0.0"
 dill==0.3.8 ; python_version >= "3.8" and python_full_version < "4.0.0"
 docutils==0.18.1 ; python_full_version >= "3.8.0" and python_full_version < "4.0.0"
 exceptiongroup==1.2.1 ; python_full_version >= "3.8.0" and python_version < "3.11"
