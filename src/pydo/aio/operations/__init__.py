@@ -8,6 +8,7 @@ from ._operations import OneClicksOperations
 from ._operations import AccountOperations
 from ._operations import SshKeysOperations
 from ._operations import ActionsOperations
+from ._operations import AddonsOperations
 from ._operations import AppsOperations
 from ._operations import CdnOperations
 from ._operations import CertificatesOperations
@@ -26,6 +27,7 @@ from ._operations import ImageActionsOperations
 from ._operations import KubernetesOperations
 from ._operations import LoadBalancersOperations
 from ._operations import MonitoringOperations
+from ._operations import NfsOperations
 from ._operations import PartnerAttachmentsOperations
 from ._operations import ProjectsOperations
 from ._operations import RegionsOperations
@@ -58,6 +60,7 @@ __all__ = [
     "AccountOperations",
     "SshKeysOperations",
     "ActionsOperations",
+    "AddonsOperations",
     "AppsOperations",
     "CdnOperations",
     "CertificatesOperations",
@@ -76,6 +79,7 @@ __all__ = [
     "KubernetesOperations",
     "LoadBalancersOperations",
     "MonitoringOperations",
+    "NfsOperations",
     "PartnerAttachmentsOperations",
     "ProjectsOperations",
     "RegionsOperations",
