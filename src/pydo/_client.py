@@ -21,6 +21,7 @@ from .operations import (
     AutoscalepoolsOperations,
     BalanceOperations,
     BillingHistoryOperations,
+    BillingInsightsOperations,
     ByoipPrefixesOperations,
     CdnOperations,
     CertificatesOperations,
@@ -592,6 +593,8 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype billing_history: pydo.operations.BillingHistoryOperations
     :ivar invoices: InvoicesOperations operations
     :vartype invoices: pydo.operations.InvoicesOperations
+    :ivar billing_insights: BillingInsightsOperations operations
+    :vartype billing_insights: pydo.operations.BillingInsightsOperations
     :ivar databases: DatabasesOperations operations
     :vartype databases: pydo.operations.DatabasesOperations
     :ivar domains: DomainsOperations operations
@@ -735,6 +738,9 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.invoices = InvoicesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.billing_insights = BillingInsightsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.databases = DatabasesOperations(
