@@ -15,6 +15,7 @@ from ._operations import CertificatesOperations
 from ._operations import BalanceOperations
 from ._operations import BillingHistoryOperations
 from ._operations import InvoicesOperations
+from ._operations import BillingInsightsOperations
 from ._operations import DatabasesOperations
 from ._operations import DomainsOperations
 from ._operations import DropletsOperations
@@ -67,6 +68,7 @@ __all__ = [
     "BalanceOperations",
     "BillingHistoryOperations",
     "InvoicesOperations",
+    "BillingInsightsOperations",
     "DatabasesOperations",
     "DomainsOperations",
     "DropletsOperations",
