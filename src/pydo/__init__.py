@@ -16,8 +16,34 @@ except ImportError:
     _patch_all = []
 from ._patch import patch_sdk as _patch_sdk
 
+# Import droplet action helpers
+from .helpers.droplet_actions import (
+    perform_action,
+    power_on,
+    power_off,
+    reboot,
+    shutdown,
+    power_cycle,
+    snapshot,
+    resize,
+    rename,
+    rebuild,
+    password_reset,
+)
+
 __all__ = [
     "GeneratedClient",
+    "perform_action",
+    "power_on",
+    "power_off",
+    "reboot",
+    "shutdown",
+    "power_cycle",
+    "snapshot",
+    "resize",
+    "rename",
+    "rebuild",
+    "password_reset",
 ]
 __all__.extend([p for p in _patch_all if p not in __all__])
 
