@@ -16,10 +16,12 @@ from ._configuration import GeneratedClientConfiguration
 from .operations import (
     AccountOperations,
     ActionsOperations,
+    AddonsOperations,
     AppsOperations,
     AutoscalepoolsOperations,
     BalanceOperations,
     BillingHistoryOperations,
+    BillingInsightsOperations,
     ByoipPrefixesOperations,
     CdnOperations,
     CertificatesOperations,
@@ -36,6 +38,7 @@ from .operations import (
     KubernetesOperations,
     LoadBalancersOperations,
     MonitoringOperations,
+    NfsOperations,
     OneClicksOperations,
     PartnerAttachmentsOperations,
     ProjectsOperations,
@@ -372,8 +375,6 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     are independent of the limits defined above.
 
 
-    * Only 12 ``POST`` requests to the ``/v2/floating_ips`` endpoint to create Floating IPs can be
-    made per 60 seconds.
     * Only 10 ``GET`` requests to the ``/v2/account/keys`` endpoint to list SSH keys can be made
     per 60 seconds.
     * Only 5 requests to any and all ``v2/cdn/endpoints`` can be made per 10 seconds. This includes
@@ -578,6 +579,8 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype ssh_keys: pydo.aio.operations.SshKeysOperations
     :ivar actions: ActionsOperations operations
     :vartype actions: pydo.aio.operations.ActionsOperations
+    :ivar addons: AddonsOperations operations
+    :vartype addons: pydo.aio.operations.AddonsOperations
     :ivar apps: AppsOperations operations
     :vartype apps: pydo.aio.operations.AppsOperations
     :ivar cdn: CdnOperations operations
@@ -590,6 +593,8 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype billing_history: pydo.aio.operations.BillingHistoryOperations
     :ivar invoices: InvoicesOperations operations
     :vartype invoices: pydo.aio.operations.InvoicesOperations
+    :ivar billing_insights: BillingInsightsOperations operations
+    :vartype billing_insights: pydo.aio.operations.BillingInsightsOperations
     :ivar databases: DatabasesOperations operations
     :vartype databases: pydo.aio.operations.DatabasesOperations
     :ivar domains: DomainsOperations operations
@@ -614,6 +619,8 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype load_balancers: pydo.aio.operations.LoadBalancersOperations
     :ivar monitoring: MonitoringOperations operations
     :vartype monitoring: pydo.aio.operations.MonitoringOperations
+    :ivar nfs: NfsOperations operations
+    :vartype nfs: pydo.aio.operations.NfsOperations
     :ivar partner_attachments: PartnerAttachmentsOperations operations
     :vartype partner_attachments: pydo.aio.operations.PartnerAttachmentsOperations
     :ivar projects: ProjectsOperations operations
@@ -712,6 +719,9 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
         self.actions = ActionsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
+        self.addons = AddonsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
         self.apps = AppsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
@@ -728,6 +738,9 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.invoices = InvoicesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.billing_insights = BillingInsightsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.databases = DatabasesOperations(
@@ -764,6 +777,9 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.monitoring = MonitoringOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.nfs = NfsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.partner_attachments = PartnerAttachmentsOperations(

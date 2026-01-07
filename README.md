@@ -218,7 +218,7 @@ docker run -it --rm --name pydo -v $PWD/tests:/tests pydo:dev pytest tests/mocke
 
 #### `kubernetes.get_kubeconfig` Does not serialize response content
 
-In the generated python client, when calling client.kubernetes.get_kubeconfig(clust_id), the deserialization logic raises an error when the response content-type is applicaiton/yaml. We need to determine if the spec/schema can be configured such that the generator results in functions that properly handle the content. We will likely need to report the issue upstream to request support for the content-type.
+In the generated Python client, calling client.kubernetes.get_kubeconfig(cluster_id) raises a deserialization error when the response content-type is application/yaml. This occurs because the generator does not correctly handle YAML responses. We should investigate whether the OpenAPI spec or generator configuration can be adjusted to support this content-type. If not, the issue should be reported upstream to improve YAML support in client generation.
 
 Workaround (with std lib httplib):
 
