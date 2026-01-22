@@ -18,17 +18,17 @@ class DigitalOceanError(Exception):
 class DropletCreator:
     def __init__(self, *args, **kwargs):
         token = os.environ.get("DIGITALOCEAN_TOKEN")
-        if token == "":
-            raise Exception("No DigitalOcean API token in DIGITALOCEAN_TOKEN env var")
-        self.client = Client(token=os.environ.get("DIGITALOCEAN_TOKEN"))
+        if not token:
+            raise DigitalOceanError("No DigitalOcean API token in DIGITALOCEAN_TOKEN env var")
+        self.client = Client(token=token)
 
     def throw(self, message):
         raise DigitalOceanError(message) from None
 
     def main(self):
         key_name = os.environ.get("SSH_KEY_NAME")
-        if key_name == "":
-            raise Exception("SSH_KEY_NAME not set")
+        if not key_name:
+            raise DigitalOceanError("SSH_KEY_NAME not set")
         ssh_key = self.find_ssh_key(key_name)
 
         droplet_req = {
@@ -67,7 +67,9 @@ class DropletCreator:
 
         print("Done!")
 
-    def create_droplet(self, req={}):
+    def create_droplet(self, req=None):
+        if req is None:
+            req = {}
         print("Creating Droplet using: {0}".format(req))
         try:
             resp = self.client.droplets.create(body=req)
@@ -77,9 +79,6 @@ class DropletCreator:
             get_resp = self.client.droplets.get(droplet_id)
             droplet = get_resp["droplet"]
             ip_address = ""
-            # Would be nice if we could surface the IP address somehow.
-            # For example godo has the PublicIPv4 method:
-            # https://github.com/digitalocean/godo/blob/a084002940af6a9b818e3c8fb31a4920356fbb75/droplets.go#L66-L79
             for net in droplet["networks"]["v4"]:
                 if net["type"] == "public":
                     ip_address = net["ip_address"]
@@ -115,7 +114,7 @@ class DropletCreator:
                     print(".", end="", flush=True)
                     sleep(wait)
                 elif status == "errored":
-                    raise Exception(
+                    raise DigitalOceanError(
                         "{0} action {1} {2}".format(
                             resp["action"]["type"], resp["action"]["id"], status
                         )
@@ -141,17 +140,19 @@ class DropletCreator:
                     )
                 )
 
-            pages = resp.links.pages
-            if "next" in pages.keys():
-                # Having to parse the URL to find the next page is not very friendly.
+            # Fix: Use dict access for links/pages and int for page
+            pages = resp.get("links", {}).get("pages", {})
+            if "next" in pages:
                 parsed_url = urlparse(pages["next"])
-                page = parse_qs(parsed_url.query)["page"][0]
+                page = int(parse_qs(parsed_url.query)["page"][0])
             else:
                 paginated = False
 
-        raise Exception("no ssh key found")
+        raise DigitalOceanError("no ssh key found")
 
-    def create_volume(self, req={}):
+    def create_volume(self, req=None):
+        if req is None:
+            req = {}
         print("Creating volume using: {0}".format(req))
         try:
             resp = self.client.volumes.create(body=req)
