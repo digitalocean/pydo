@@ -1,26 +1,28 @@
-# ------------------------------------
-# Copyright (c) Microsoft Corporation.
-# Licensed under the MIT License.
-# ------------------------------------
-"""Customize generated code here.
+"""This file is for patching generated code.""" 
+import functools
+from typing import Any, Callable
 
-Follow our quickstart for examples: https://aka.ms/azsdk/python/dpcodegen/python/customize
-"""
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    # pylint: disable=unused-import,ungrouped-imports
-    from typing import List
-
-__all__ = (
-    []
-)  # type: List[str]  # Add all objects you want publicly available to users at this package level
+from ._operations import RegistryOperations
 
 
-def patch_sdk():
-    """Do not remove from this file.
+def patch_registry_delete_repository_manifest(
+    func: Callable[..., Any]
+) -> Callable[..., Any]:
+    """This patch is to address a bug in the DO API.
 
-    `patch_sdk` is a last resort escape hatch that allows you to do customizations
-    you can't accomplish using the techniques described in
-    https://aka.ms/azsdk/python/dpcodegen/python/customize
+    The delete_repository_manifest endpoint does not support url encoding.
+    This patch will skip url encoding for the manifest_digest parameter.
     """
+
+    @functools.wraps(func)
+    def wrapper(
+        self, manifest_digest: str, *args: Any, **kwargs: Any
+    ) -> Callable[..., Any]:
+        return func(self, manifest_digest, *args, **kwargs, _skip_url_encoding=True)
+
+    return wrapper
+
+
+RegistryOperations.delete_repository_manifest = patch_registry_delete_repository_manifest(
+    RegistryOperations.delete_repository_manifest
+)
