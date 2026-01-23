@@ -107,6 +107,41 @@ or
 client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"), retry_policy=MyRetryPolicy())
 ```
 
+#### Example: Listing Droplets Using Environment Variables
+
+You can safely use your DigitalOcean API token stored as an environment variable to list all droplets in your account.
+
+```python
+import os
+from pydo import Client
+
+# Initialize the client using an environment variable for the token
+client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"))
+
+print("Fetching list of your DigitalOcean droplets...\n")
+
+droplets = client.droplets.list()
+for d in droplets["droplets"]:
+    print(f"ID: {d['id']}, Name: {d['name']}, Status: {d['status']}")
+```
+
+#### Setting Environment Variables
+
+Before running the script, make sure you set your DigitalOcean API token as an environment variable:
+
+**Windows (PowerShell):**
+```bash
+setx DIGITALOCEAN_TOKEN "your_api_token_here"
+```
+
+**MacOS/Linux(Terminal):**
+```bash
+export DIGITALOCEAN_TOKEN="your_api_token_here"
+```
+
+This keeps your API token secure and avoids hardcoding it directly in your scripts.
+
+
 # **Contributing**
 
 > Visit our [Contribuing Guide](CONTRIBUTING.md) for more information on
