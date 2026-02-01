@@ -203,12 +203,11 @@ Taxes,,STATE SALES TAX (6.25%),,2020-07-01 00:00:00 \
     responses.add(
         responses.GET,
         f"{mock_client_url}/v2/customers/my/invoices/1/pdf",
-        json=expected,
+        body=expected,
     )
     invoices = mock_client.invoices.get_pdf_by_uuid(invoice_uuid=1)
-    list_in = list(invoices)
 
-    assert "group_description" in str(list_in)
+    assert "group_description" in str(invoices)
 
 
 @responses.activate
