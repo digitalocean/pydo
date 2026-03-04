@@ -216,31 +216,6 @@ docker run -it --rm --name pydo -v $PWD/tests:/tests pydo:dev pytest tests/mocke
 
 > This selection lists the known issues of the client generator.
 
-#### `kubernetes.get_kubeconfig` Does not serialize response content
-
-In the generated Python client, calling client.kubernetes.get_kubeconfig(cluster_id) raises a deserialization error when the response content-type is application/yaml. This occurs because the generator does not correctly handle YAML responses. We should investigate whether the OpenAPI spec or generator configuration can be adjusted to support this content-type. If not, the issue should be reported upstream to improve YAML support in client generation.
-
-Workaround (with std lib httplib):
-
-```python
-from http.client import HTTPSConnection
-
-conn = HTTPSConnection('api.digitalocean.com')
-conn.request(
-    'GET',
-    f'/v2/kubernetes/clusters/{cluster_id}/kubeconfig',
-    headers={'Authorization': f'Bearer {os.environ["DIGITALOCEAN_TOKEN"]}'}
-)
-response = conn.getresponse()
-
-if response.getcode() > 400:
-    msg = 'Unable to get kubeconfig'
-    raise RuntimeError(msg)
-
-kube_config =  response.read().decode('utf-8')
-conn.close()
-```
-
 #### `invoices.get_pdf_by_uuid(invoice_uuid=invoice_uuid_param)` Does not return PDF
 
 In the generated python client, when calling `invoices.get_pdf_by_uuid`, the response returns a Iterator[bytes] that does not format correctly into a PDF.
