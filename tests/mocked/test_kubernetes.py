@@ -1,14 +1,27 @@
 """Mocked tests for kubernetes resources."""
 
+import re
 import uuid
+from unittest.mock import patch
+
 import pytest
 
 import responses
+from azure.core.exceptions import DecodeError, ResourceNotFoundError
+
 from pydo import Client
+from pydo.operations._operations import (
+    KubernetesOperations as _GeneratedKubernetesOperations,
+)
 
 from tests.mocked.data import kubernetes_data as data
 
 BASE_PATH = "v2/kubernetes/clusters"
+
+# URL pattern for kubeconfig so the mock matches the actual request (with query string)
+KUBECONFIG_URL_PATTERN = re.compile(
+    r"https://testing\.local/v2/kubernetes/clusters/[^/]+/kubeconfig\?expiry_seconds=0"
+)
 
 
 @responses.activate
@@ -192,29 +205,89 @@ def test_kubernetes_destroy_associated_resources_dangerous(
     assert des_resp is None
 
 
-@responses.activate
-def test_kubernetes_get_kubeconfig(mock_client: Client, mock_client_url):
-    """Mock kubernetes get_kubeconfig operation."""
+def _kubeconfig_yaml_callback(_request):
+    """Return 200 with body as YAML and Content-Type: application/yaml only.
 
+    The responses library can merge headers and yield e.g. "text/plain,
+    application/yaml", which the pipeline treats as text/plain and does not
+    raise DecodeError. A callback ensures the response has exactly
+    application/yaml so the content policy fails (matching real API behaviour).
+    """
+    return (200, {"Content-Type": "application/yaml"}, data.KUBECONFIG)
+
+
+@responses.activate
+def test_kubernetes_get_kubeconfig_generated_raises_decode_error(mock_client: Client):
+    """Without our override, get_kubeconfig with application/yaml raises DecodeError.
+
+    The mock uses a callback so Content-Type is exactly application/yaml (no
+    text/plain). That makes the pipeline's content policy try to deserialize and
+    raise DecodeError, matching the real API. Our override (stream=True + return
+    body as text) fixes this. If this test fails, the issue was likely fixed
+    upstream and the override can be removed.
+    """
+    cluster_id = str(uuid.uuid4())
+    # Regex so the mock matches the actual request URL including ?expiry_seconds=0
+    responses.add_callback(
+        responses.GET,
+        KUBECONFIG_URL_PATTERN,
+        callback=_kubeconfig_yaml_callback,
+    )
+    # Use generated (unpatched) operations so the pipeline tries to deserialize YAML
+    # pylint: disable=protected-access
+    generated_ops = _GeneratedKubernetesOperations(
+        mock_client.kubernetes._client,
+        mock_client._config,
+        mock_client._serialize,
+        mock_client._deserialize,
+    )
+    with pytest.raises(DecodeError):
+        generated_ops.get_kubeconfig(cluster_id)
+
+
+@responses.activate
+def test_kubernetes_get_kubeconfig(mock_client: Client):
+    """Mock kubernetes get_kubeconfig operation.
+
+    The patched client returns the response body as a string (YAML). The mock uses
+    the same callback as test_kubernetes_get_kubeconfig_generated_raises_decode_error
+    (Content-Type: application/yaml only) so behaviour matches the real API.
+    """
     cluster_id = str(uuid.uuid4())
     expected = data.KUBECONFIG
 
+    responses.add_callback(
+        responses.GET,
+        KUBECONFIG_URL_PATTERN,
+        callback=_kubeconfig_yaml_callback,
+    )
+
+    # Regression: override must use stream=True or pipeline deserializes and fails
+    # pylint: disable=protected-access
+    pipeline = mock_client.kubernetes._client._pipeline
+    with patch.object(pipeline, "run", wraps=pipeline.run) as run_mock:
+        config_resp = mock_client.kubernetes.get_kubeconfig(cluster_id)
+        run_mock.assert_called_once()
+        assert run_mock.call_args[1]["stream"] is True, (
+            "get_kubeconfig must call pipeline.run(..., stream=True) so the "
+            "content policy skips deserialization (API returns application/yaml)."
+        )
+    assert isinstance(config_resp, str)
+    assert config_resp == expected
+
+
+@responses.activate
+def test_kubernetes_get_kubeconfig_404_raises(mock_client: Client, mock_client_url):
+    """get_kubeconfig raises ResourceNotFoundError on 404."""
+    cluster_id = str(uuid.uuid4())
     responses.add(
         responses.GET,
         f"{mock_client_url}/{BASE_PATH}/{cluster_id}/kubeconfig",
-        headers={"content-type": "application/yaml"},
-        match=[
-            responses.matchers.query_param_matcher({"expiry_seconds": 0}),
-        ],
-        status=200,
-        body=expected,
+        json={"id": "not_found", "message": "Cluster not found"},
+        status=404,
     )
-
-    config_resp = mock_client.kubernetes.get_kubeconfig(cluster_id)
-    pytest.skip("The operation currently fails to return content.")
-    # TODO: investigate why the generated client doesn't return the response content
-    # It seems to be something to do with the yaml content type.
-    assert config_resp.decode("utf-8") == expected
+    with pytest.raises(ResourceNotFoundError):
+        mock_client.kubernetes.get_kubeconfig(cluster_id)
 
 
 @responses.activate
