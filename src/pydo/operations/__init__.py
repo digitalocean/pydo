@@ -17,6 +17,7 @@ from ._operations import BillingHistoryOperations
 from ._operations import InvoicesOperations
 from ._operations import BillingInsightsOperations
 from ._operations import DatabasesOperations
+from ._operations import DedicatedInferencesOperations
 from ._operations import DomainsOperations
 from ._operations import DropletsOperations
 from ._operations import DropletActionsOperations
@@ -70,6 +71,7 @@ __all__ = [
     "InvoicesOperations",
     "BillingInsightsOperations",
     "DatabasesOperations",
+    "DedicatedInferencesOperations",
     "DomainsOperations",
     "DropletsOperations",
     "DropletActionsOperations",

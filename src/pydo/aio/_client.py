@@ -26,6 +26,7 @@ from .operations import (
     CdnOperations,
     CertificatesOperations,
     DatabasesOperations,
+    DedicatedInferencesOperations,
     DomainsOperations,
     DropletActionsOperations,
     DropletsOperations,
@@ -597,6 +598,8 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype billing_insights: pydo.aio.operations.BillingInsightsOperations
     :ivar databases: DatabasesOperations operations
     :vartype databases: pydo.aio.operations.DatabasesOperations
+    :ivar dedicated_inferences: DedicatedInferencesOperations operations
+    :vartype dedicated_inferences: pydo.aio.operations.DedicatedInferencesOperations
     :ivar domains: DomainsOperations operations
     :vartype domains: pydo.aio.operations.DomainsOperations
     :ivar droplets: DropletsOperations operations
@@ -744,6 +747,9 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.databases = DatabasesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.dedicated_inferences = DedicatedInferencesOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.domains = DomainsOperations(
