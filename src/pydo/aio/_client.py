@@ -26,6 +26,7 @@ from .operations import (
     CdnOperations,
     CertificatesOperations,
     DatabasesOperations,
+    DedicatedInferencesOperations,
     DomainsOperations,
     DropletActionsOperations,
     DropletsOperations,
@@ -49,6 +50,7 @@ from .operations import (
     ReservedIPsOperations,
     ReservedIPv6ActionsOperations,
     ReservedIPv6Operations,
+    SecurityOperations,
     SizesOperations,
     SnapshotsOperations,
     SpacesKeyOperations,
@@ -597,6 +599,8 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype billing_insights: pydo.aio.operations.BillingInsightsOperations
     :ivar databases: DatabasesOperations operations
     :vartype databases: pydo.aio.operations.DatabasesOperations
+    :ivar dedicated_inferences: DedicatedInferencesOperations operations
+    :vartype dedicated_inferences: pydo.aio.operations.DedicatedInferencesOperations
     :ivar domains: DomainsOperations operations
     :vartype domains: pydo.aio.operations.DomainsOperations
     :ivar droplets: DropletsOperations operations
@@ -641,6 +645,8 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype reserved_ipv6_actions: pydo.aio.operations.ReservedIPv6ActionsOperations
     :ivar byoip_prefixes: ByoipPrefixesOperations operations
     :vartype byoip_prefixes: pydo.aio.operations.ByoipPrefixesOperations
+    :ivar security: SecurityOperations operations
+    :vartype security: pydo.aio.operations.SecurityOperations
     :ivar sizes: SizesOperations operations
     :vartype sizes: pydo.aio.operations.SizesOperations
     :ivar snapshots: SnapshotsOperations operations
@@ -746,6 +752,9 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
         self.databases = DatabasesOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
+        self.dedicated_inferences = DedicatedInferencesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
         self.domains = DomainsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
@@ -810,6 +819,9 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.byoip_prefixes = ByoipPrefixesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.security = SecurityOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.sizes = SizesOperations(
