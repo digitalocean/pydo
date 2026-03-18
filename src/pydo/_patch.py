@@ -81,8 +81,6 @@ class Client(GeneratedClient):  # type: ignore
         inference_proxy = _InferenceClientProxy(
             self._client,
             inference_endpoint,
-            strip_path_segments=["/inference/"],
-            version_prefix="/v1/",
         )
 
         agent_proxy = None
@@ -90,7 +88,6 @@ class Client(GeneratedClient):  # type: ignore
             agent_proxy = _InferenceClientProxy(
                 self._client,
                 agent_endpoint,
-                path_replacements={"/v1/": "/api/v1/"},
             )
 
         for attr in self.__dict__.values():
