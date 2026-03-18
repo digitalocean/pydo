@@ -11,7 +11,7 @@ from typing import TYPE_CHECKING
 from azure.core.credentials import AccessToken
 
 from pydo.custom_policies import CustomHttpLoggingPolicy
-from pydo.custom_inference import _InferenceClientProxy, INFERENCE_BASE_URL
+from pydo.custom_extensions import _BaseURLProxy, INFERENCE_BASE_URL
 from pydo import GeneratedClient, _version
 
 if TYPE_CHECKING:
@@ -78,14 +78,14 @@ class Client(GeneratedClient):  # type: ignore
 
         Both use the same token passed to ``Client.__init__``.
         """
-        inference_proxy = _InferenceClientProxy(
+        inference_proxy = _BaseURLProxy(
             self._client,
             inference_endpoint,
         )
 
         agent_proxy = None
         if agent_endpoint:
-            agent_proxy = _InferenceClientProxy(
+            agent_proxy = _BaseURLProxy(
                 self._client,
                 agent_endpoint,
             )

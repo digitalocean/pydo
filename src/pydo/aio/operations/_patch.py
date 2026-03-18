@@ -30,7 +30,7 @@ except ImportError:
     _HAS_INFERENCE = False
 
 if _HAS_INFERENCE:
-    from pydo.custom_inference import (
+    from pydo.custom_extensions import (
         AsyncStreamingMixin,
         install_streaming_wrappers,
     )
@@ -66,7 +66,7 @@ except ImportError:
 
 if _HAS_AGENT_INFERENCE:
     if not _HAS_INFERENCE:
-        from pydo.custom_inference import (
+        from pydo.custom_extensions import (
             AsyncStreamingMixin,
             install_streaming_wrappers,
         )

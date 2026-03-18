@@ -13,7 +13,7 @@ from azure.core.credentials_async import AsyncTokenCredential
 
 from pydo import _version
 from pydo.custom_policies import CustomHttpLoggingPolicy
-from pydo.custom_inference import _InferenceClientProxy, INFERENCE_BASE_URL
+from pydo.custom_extensions import _BaseURLProxy, INFERENCE_BASE_URL
 from pydo.aio import GeneratedClient
 
 if TYPE_CHECKING:
@@ -82,14 +82,14 @@ class Client(GeneratedClient):  # type: ignore
 
         Both use the same token passed to ``Client.__init__``.
         """
-        inference_proxy = _InferenceClientProxy(
+        inference_proxy = _BaseURLProxy(
             self._client,
             inference_endpoint,
         )
 
         agent_proxy = None
         if agent_endpoint:
-            agent_proxy = _InferenceClientProxy(
+            agent_proxy = _BaseURLProxy(
                 self._client,
                 agent_endpoint,
             )

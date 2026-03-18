@@ -13,7 +13,7 @@ All generated methods on ``InferenceOperations`` and
 **automatically** wrapped at init time.  When the caller passes
 ``"stream": True`` in the request body, the wrapper bypasses the
 generated (non-streaming) code, runs the HTTP pipeline with
-``stream=True``, and returns an :class:`~pydo.custom_inference.SSEStream`.
+``stream=True``, and returns an :class:`~pydo.custom_extensions.SSEStream`.
 
 This means new endpoints added to the OpenAPI spec and regenerated via
 ``make generate`` get streaming support with **zero manual changes** to
@@ -39,7 +39,7 @@ except ImportError:
     _HAS_INFERENCE = False
 
 if _HAS_INFERENCE:
-    from pydo.custom_inference import (
+    from pydo.custom_extensions import (
         StreamingMixin,
         install_streaming_wrappers,
     )
@@ -77,7 +77,7 @@ except ImportError:
 
 if _HAS_AGENT_INFERENCE:
     if not _HAS_INFERENCE:
-        from pydo.custom_inference import (
+        from pydo.custom_extensions import (
             StreamingMixin,
             install_streaming_wrappers,
         )

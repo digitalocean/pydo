@@ -78,7 +78,7 @@ directive:
   # Without this, Autorest generates a duplicate `endpoint` parameter in
   # GeneratedClient.__init__ (one per unique server URL), which is a Python
   # syntax error.  Runtime multi-base-URL routing is handled by
-  # _InferenceClientProxy in custom_inference.py instead.
+  # _BaseURLProxy in custom_extensions.py instead.
   - from: openapi-document
     where: '$.paths.*'
     transform: >

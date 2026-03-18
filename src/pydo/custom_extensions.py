@@ -2,23 +2,22 @@
 # Copyright (c) DigitalOcean.
 # Licensed under the Apache-2.0 License.
 # ------------------------------------
-"""Multi-base-URL routing and SSE streaming support for inference operations.
+"""Multi-base-URL routing and SSE streaming support.
 
 This file is preserved during ``make clean`` (matches the custom_*.py pattern)
 and is NOT overwritten by code generation.
 
 Architecture
 ------------
-* ``_InferenceClientProxy``  – lightweight proxy around a ``PipelineClient``
-  that rewrites request URLs to a configured base URL.  Supports stripping
-  tag-based path segments (e.g. ``/inference/``) and rewriting the API
-  version prefix (``/v2/`` → ``/v1/`` by default).  Reuses the original
-  client's pipeline (auth, retry, logging).
+* ``_BaseURLProxy``  – lightweight proxy around a ``PipelineClient``
+  that prepends a configured base URL to the generated path.  Reuses
+  the original client's pipeline (auth, retry, logging).  Usable for
+  any alternate host, not limited to inference endpoints.
 
 * ``StreamingMixin`` / ``AsyncStreamingMixin``  – mix-in classes that provide
-  the ``_auto_streaming_call`` method used by both ``InferenceOperations``
-  and ``AgentInferenceOperations`` (and any future groups) in their
-  ``_patch.py`` files.
+  the ``_auto_streaming_call`` method.  Can be mixed into any operation
+  group (e.g. ``InferenceOperations``, ``AgentInferenceOperations``, or
+  future groups) in their ``_patch.py`` files.
 
 * ``SSEStream`` / ``AsyncSSEStream``  – iterators that parse Server-Sent
   Events from a streaming HTTP response and yield parsed JSON chunks.
@@ -30,15 +29,6 @@ Architecture
   falling through to the generated code (which would do ``response.json()``
   and fail on SSE data).
 
-Supported routing patterns
---------------------------
-==============================  ==================================  ==============
-Pattern                         Base URL                            Auth
-==============================  ==================================  ==============
-Serverless Inference            ``inference.do-ai.run``             Model access key
-Agent Inference                 ``{id}.agents.do-ai.run``           Access key
-==============================  ==================================  ==============
-
 Extensibility
 -------------
 Both multi-base-URL **and** streaming are fully automatic for new endpoints:
@@ -48,7 +38,7 @@ Both multi-base-URL **and** streaming are fully automatic for new endpoints:
    matching ``build_<tag>_<method>_request`` function.
 3. ``install_streaming_wrappers`` discovers the pair at init time and creates
    a wrapper that intercepts ``stream: True``.
-4. ``_InferenceClientProxy`` routes the request to the correct server.
+4. ``_BaseURLProxy`` routes the request to the correct server.
 
 No manual changes to any ``_patch.py`` file are needed.
 """
@@ -56,7 +46,7 @@ import inspect
 import json
 import re
 from io import IOBase
-from typing import Any, AsyncIterator, Callable, Iterator, Optional, Union
+from typing import Any, AsyncIterator, Callable, Iterator, Optional
 from urllib.parse import urlparse
 
 from azure.core.exceptions import (
@@ -86,11 +76,13 @@ _STREAMING_ERROR_MAP = {
 # ---------------------------------------------------------------------------
 
 
-class _InferenceClientProxy:
+class _BaseURLProxy:
     """Proxy that redirects a PipelineClient to an alternate base URL.
 
     Reuses the wrapped client's pipeline (auth, retry, logging, etc.)
-    while transparently rewriting URL paths.
+    while transparently prepending a different base URL to the
+    generated path.  This is a generic utility and is not limited to
+    inference endpoints.
 
     Parameters
     ----------
@@ -98,54 +90,13 @@ class _InferenceClientProxy:
         The client whose pipeline (and transport) will be reused.
     base_url : str
         Target base URL (e.g. ``https://inference.do-ai.run``).
-    strip_path_segments : list[str] | None
-        Tag-based path segments to remove from the generated URL.
-        For example ``["/inference/"]`` strips the Autorest-generated
-        ``/inference/`` segment so ``/v1/inference/chat/completions``
-        becomes ``/v1/chat/completions``.
-    path_replacements : dict[str, str] | None
-        Arbitrary find→replace pairs applied to the URL path before
-        the base URL is prepended.  Applied after ``strip_path_segments``.
-        Example: ``{"/v1/agent/": "/api/v1/"}`` rewrites the generated
-        ``/v1/agent/chat/completions`` to ``/api/v1/chat/completions``.
-    version_prefix : str
-        Replacement for the ``/v2/`` prefix that Autorest generates.
-        Defaults to ``"/v1/"`` (serverless inference).  Set to ``"/"``
-        to strip the version entirely (agent inference).
     """
 
-    def __init__(
-        self,
-        original_client,
-        base_url: str,
-        *,
-        strip_path_segments: Optional[list] = None,
-        path_replacements: Optional[dict] = None,
-        version_prefix: str = "/v1/",
-    ):
+    def __init__(self, original_client, base_url: str):
         self._original = original_client
         self._base_url = base_url.rstrip("/")
-        self._strip_path_segments = strip_path_segments or []
-        self._path_replacements = path_replacements or {}
-        self._version_prefix = version_prefix
 
     def format_url(self, url_template: str, **kwargs: Any) -> str:
-        if url_template.startswith("/v2/"):
-            url_template = self._version_prefix + url_template[4:]
-        elif url_template == "/v2":
-            url_template = self._version_prefix.rstrip("/") or "/"
-
-        for seg in self._strip_path_segments:
-            if seg in url_template:
-                url_template = url_template.replace(seg, "/", 1)
-
-        for find, replace in self._path_replacements.items():
-            if find in url_template:
-                url_template = url_template.replace(find, replace, 1)
-
-        while "//" in url_template and not url_template.startswith("http"):
-            url_template = url_template.replace("//", "/")
-
         parsed = urlparse(url_template)
         if not parsed.scheme:
             return self._base_url + url_template
@@ -244,7 +195,7 @@ def _bind_streaming_wrapper(instance, name, parent_fn, builder, is_async):
 
 
 # ---------------------------------------------------------------------------
-# Streaming call mix-ins  (reused by Inference & AgentInference _patch.py)
+# Streaming call mix-ins  (reused by any operation group's _patch.py)
 # ---------------------------------------------------------------------------
 
 
@@ -373,7 +324,7 @@ class SSEStream:
 
     Usage::
 
-        stream = client.inference.<method>({
+        stream = client.<operations>.<method>(body={
             ...,
             "stream": True,
         })
@@ -425,7 +376,7 @@ class AsyncSSEStream:
 
     Usage::
 
-        stream = await client.inference.<method>({
+        stream = await client.<operations>.<method>(body={
             ...,
             "stream": True,
         })
