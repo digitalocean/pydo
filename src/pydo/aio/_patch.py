@@ -13,6 +13,7 @@ from azure.core.credentials_async import AsyncTokenCredential
 
 from pydo import _version
 from pydo.custom_policies import CustomHttpLoggingPolicy
+from pydo.custom_extensions import _BaseURLProxy, INFERENCE_BASE_URL
 from pydo.aio import GeneratedClient
 
 if TYPE_CHECKING:
@@ -34,15 +35,30 @@ class TokenCredentials(AsyncTokenCredential):
 
 
 class Client(GeneratedClient):  # type: ignore
-    """The official DigitalOcean Python client
+    """The official DigitalOcean Python client (async)
 
-    :param token: A valid API token.
+    :param token: A valid API token / model access key.
     :type token: str
     :keyword endpoint: Service URL. Default value is "https://api.digitalocean.com".
     :paramtype endpoint: str
+    :keyword inference_endpoint: Serverless inference URL.
+        Default value is "https://inference.do-ai.run".
+    :paramtype inference_endpoint: str
+    :keyword agent_endpoint: Agent inference URL.  Pass the per-agent
+        subdomain (e.g. ``"https://<id>.agents.do-ai.run"``).
+        Required only when using agent inference endpoints.
+    :paramtype agent_endpoint: str
     """
 
-    def __init__(self, token: str, *, timeout: int = 120, **kwargs):
+    def __init__(
+        self,
+        token: str,
+        *,
+        timeout: int = 120,
+        inference_endpoint: str = INFERENCE_BASE_URL,
+        agent_endpoint: str = "",
+        **kwargs,
+    ):
         logger = kwargs.get("logger")
         if logger is not None and kwargs.get("http_logging_policy") == "":
             kwargs["http_logging_policy"] = CustomHttpLoggingPolicy(logger=logger)
@@ -51,6 +67,41 @@ class Client(GeneratedClient):  # type: ignore
         super().__init__(
             TokenCredentials(token), timeout=timeout, sdk_moniker=sdk_moniker, **kwargs
         )
+
+        self._setup_inference_routing(inference_endpoint, agent_endpoint)
+
+    def _setup_inference_routing(
+        self,
+        inference_endpoint: str,
+        agent_endpoint: str,
+    ) -> None:
+        """Route Inference / AgentInference operation groups to their endpoints.
+
+        * ``*Inference*`` (but not ``*AgentInference*``) → *inference_endpoint*
+        * ``*AgentInference*`` → *agent_endpoint*
+
+        Both use the same token passed to ``Client.__init__``.
+        """
+        inference_proxy = _BaseURLProxy(
+            self._client,
+            inference_endpoint,
+        )
+
+        agent_proxy = None
+        if agent_endpoint:
+            agent_proxy = _BaseURLProxy(
+                self._client,
+                agent_endpoint,
+            )
+
+        for attr in self.__dict__.values():
+            if not hasattr(attr, "_client"):
+                continue
+            class_name = type(attr).__name__
+            if class_name.startswith("AgentInference") and agent_proxy:
+                attr._client = agent_proxy
+            elif class_name.startswith("Inference"):
+                attr._client = inference_proxy
 
 
 # Add all objects you want publicly available to users at this package level
