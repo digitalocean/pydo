@@ -17,12 +17,14 @@ from ._operations import BillingHistoryOperations
 from ._operations import InvoicesOperations
 from ._operations import BillingInsightsOperations
 from ._operations import DatabasesOperations
+from ._operations import DedicatedInferencesOperations
 from ._operations import DomainsOperations
 from ._operations import DropletsOperations
 from ._operations import DropletActionsOperations
 from ._operations import AutoscalepoolsOperations
 from ._operations import FirewallsOperations
 from ._operations import FunctionsOperations
+from ._operations import FunctionsAccessKeyOperations
 from ._operations import ImagesOperations
 from ._operations import ImageActionsOperations
 from ._operations import KubernetesOperations
@@ -39,6 +41,7 @@ from ._operations import ReservedIPsActionsOperations
 from ._operations import ReservedIPv6Operations
 from ._operations import ReservedIPv6ActionsOperations
 from ._operations import ByoipPrefixesOperations
+from ._operations import SecurityOperations
 from ._operations import SizesOperations
 from ._operations import SnapshotsOperations
 from ._operations import SpacesKeyOperations
@@ -70,12 +73,14 @@ __all__ = [
     "InvoicesOperations",
     "BillingInsightsOperations",
     "DatabasesOperations",
+    "DedicatedInferencesOperations",
     "DomainsOperations",
     "DropletsOperations",
     "DropletActionsOperations",
     "AutoscalepoolsOperations",
     "FirewallsOperations",
     "FunctionsOperations",
+    "FunctionsAccessKeyOperations",
     "ImagesOperations",
     "ImageActionsOperations",
     "KubernetesOperations",
@@ -92,6 +97,7 @@ __all__ = [
     "ReservedIPv6Operations",
     "ReservedIPv6ActionsOperations",
     "ByoipPrefixesOperations",
+    "SecurityOperations",
     "SizesOperations",
     "SnapshotsOperations",
     "SpacesKeyOperations",
