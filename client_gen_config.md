@@ -73,4 +73,17 @@ directive:
     where: '$.paths."/v2/apps".post'
     transform: >
       $["parameters"] = [];
+
+  # Strip path-level and operation-level "servers" overrides from all paths.
+  # Without this, Autorest generates a duplicate `endpoint` parameter in
+  # GeneratedClient.__init__ (one per unique server URL), which is a Python
+  # syntax error.  Runtime multi-base-URL routing is handled by
+  # _BaseURLProxy in custom_extensions.py instead.
+  - from: openapi-document
+    where: '$.paths.*'
+    transform: >
+      delete $["servers"];
+      for (const m of ["get","post","put","patch","delete","head","options"]) {
+        if ($[m] && $[m].servers) { delete $[m].servers; }
+      }
 ```
