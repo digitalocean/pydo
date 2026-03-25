@@ -17,6 +17,7 @@ from .operations import (
     AccountOperations,
     ActionsOperations,
     AddonsOperations,
+    AgentInferenceOperations,
     AppsOperations,
     AutoscalepoolsOperations,
     BalanceOperations,
@@ -36,6 +37,7 @@ from .operations import (
     GenaiOperations,
     ImageActionsOperations,
     ImagesOperations,
+    InferenceOperations,
     InvoicesOperations,
     KubernetesOperations,
     LoadBalancersOperations,
@@ -674,6 +676,10 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype uptime: pydo.aio.operations.UptimeOperations
     :ivar genai: GenaiOperations operations
     :vartype genai: pydo.aio.operations.GenaiOperations
+    :ivar inference: InferenceOperations operations
+    :vartype inference: pydo.aio.operations.InferenceOperations
+    :ivar agent_inference: AgentInferenceOperations operations
+    :vartype agent_inference: pydo.aio.operations.AgentInferenceOperations
     :param credential: Credential needed for the client to connect to Azure. Required.
     :type credential: ~azure.core.credentials_async.AsyncTokenCredential
     :keyword endpoint: Service URL. Default value is "https://api.digitalocean.com".
@@ -864,6 +870,12 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.genai = GenaiOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.inference = InferenceOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.agent_inference = AgentInferenceOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
 
