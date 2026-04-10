@@ -1,8 +1,8 @@
 # pylint: disable=duplicate-code
 # pylint: disable=line-too-long
 # pylint: disable=too-many-locals
-"""test_app_deployment.py
-Integration tests for app deployments
+""" test_app_deployment.py
+    Integration tests for app deployments
 """
 
 import time
@@ -85,9 +85,7 @@ def test_app_deployment_lifecycle(integration_client: Client):
             app_id, validate_rollback_req
         )
 
-        assert validate_resp is not None
-        if "valid" in validate_resp:
-            assert validate_resp["valid"] is True
+        assert validate_resp["valid"] is True
 
         rollback_req = validate_rollback_req
 

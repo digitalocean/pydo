@@ -1,5 +1,5 @@
-"""test_snapshots.py
-Integration tests for snapshots.
+""" test_snapshots.py
+    Integration tests for snapshots.
 """
 
 import uuid

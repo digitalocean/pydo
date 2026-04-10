@@ -1,5 +1,5 @@
-"""test_databases.py
-Integration Test for Databases
+""" test_databases.py
+    Integration Test for Databases
 """
 
 import uuid
@@ -22,7 +22,7 @@ def test_databases_update_connection_pool(integration_client: Client):
     db_create_req = {
         "name": f"{defaults.PREFIX}-{uuid.uuid4()}",
         "engine": "pg",
-        "version": "16",
+        "version": "14",
         "region": "nyc3",
         "size": "db-s-2vcpu-4gb",
         "num_nodes": 2,
@@ -85,7 +85,7 @@ def test_databases_update_major_version(integration_client: Client):
     db_create_req = {
         "name": f"{defaults.PREFIX}-{uuid.uuid4()}",
         "engine": "pg",
-        "version": "16",
+        "version": "13",
         "region": "nyc3",
         "size": "db-s-2vcpu-4gb",
         "num_nodes": 2,
@@ -98,7 +98,7 @@ def test_databases_update_major_version(integration_client: Client):
         db_id = database_resp["database"]["id"]
 
         update_req = {
-            "version": "17",
+            "version": "14",
         }
 
         update_resp = integration_client.databases.update_major_version(
@@ -117,7 +117,7 @@ def test_databases_create_replica_and_promote_as_primary(integration_client: Cli
     db_create_req = {
         "name": f"{defaults.PREFIX}-{uuid.uuid4()}",
         "engine": "pg",
-        "version": "16",
+        "version": "13",
         "region": "nyc3",
         "size": "db-s-2vcpu-4gb",
         "num_nodes": 2,

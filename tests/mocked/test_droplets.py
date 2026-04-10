@@ -2,7 +2,6 @@
 # pylint: disable=too-many-lines
 
 """Mock tests for the droplets API resource."""
-
 import responses
 
 from pydo import Client

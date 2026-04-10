@@ -1,5 +1,5 @@
-"""test_kubernetes.py
-Integration tests for kubernetes.
+""" test_kubernetes.py
+    Integration tests for kubernetes.
 """
 
 from os import environ
@@ -63,8 +63,8 @@ def test_kubernetes(integration_client: Client, existing_cluster_id):
         # list_options
         opts_resp = integration_client.kubernetes.list_options()
         assert "options" in opts_resp
-        options = set(opts_resp["options"].keys())
-        assert {"regions", "versions", "sizes"}.issubset(options)
+        options = list(opts_resp["options"].keys())
+        assert options == ["regions", "versions", "sizes"]
 
         # add_registry
         add_reg_resp = integration_client.kubernetes.add_registry(

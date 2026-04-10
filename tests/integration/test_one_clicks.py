@@ -1,4 +1,4 @@
-"""Integration Test for 1-clicks"""
+""" Integration Test for 1-clicks"""
 
 import uuid
 import pytest

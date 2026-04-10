@@ -1,6 +1,5 @@
 # pylint: disable=duplicate-code
 """Mock Tests For Uptime Resources"""
-
 import responses
 
 from pydo import Client

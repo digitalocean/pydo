@@ -1,7 +1,6 @@
 # pylint: disable=duplicate-code
 # pylint: disable=line-too-long
 """Mock tests for the app API resource."""
-
 import responses
 
 from pydo import Client

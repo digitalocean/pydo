@@ -1,6 +1,6 @@
 # pylint: disable=duplicate-code,line-too-long,too-many-locals
-"""test_container_registry.py
-Integration tests for container registry.
+""" test_container_registry.py
+    Integration tests for container registry.
 """
 
 import uuid

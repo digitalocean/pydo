@@ -1,7 +1,6 @@
 # pylint: disable=duplicate-code
 
 """Mock tests for the load balancers API resource."""
-
 import responses
 
 from pydo import Client
