@@ -42,11 +42,23 @@ Both multi-base-URL **and** streaming are fully automatic for new endpoints:
 
 No manual changes to any ``_patch.py`` file are needed.
 """
+import asyncio
+import codecs
 import inspect
 import json
+import random
 import re
+import time
 from io import IOBase
-from typing import Any, AsyncIterator, Callable, Iterator, Optional
+from typing import (
+    Any,
+    AsyncIterator,
+    AsyncGenerator,
+    Callable,
+    Dict,
+    Iterator,
+    Optional,
+)
 from urllib.parse import urlparse
 
 from azure.core.exceptions import (
@@ -60,8 +72,71 @@ from azure.core.exceptions import (
 from azure.core.rest import HttpRequest
 from azure.core.utils import case_insensitive_dict
 
+try:
+    from azure.core.exceptions import ServiceRequestError
+except ImportError:  # pragma: no cover
+    ServiceRequestError = RuntimeError  # type: ignore[misc,assignment]
+
+from pydo.exceptions import (
+    SSEStreamDecodeError,
+    SSEStreamRetryExhaustedError,
+    SSEStreamTransportError,
+)
+
 
 INFERENCE_BASE_URL = "https://inference.do-ai.run"
+
+
+# ---------------------------------------------------------------------------
+# DotDict — recursive attribute-style access over plain JSON dicts
+# ---------------------------------------------------------------------------
+
+
+class DotDict(dict):
+    """A ``dict`` subclass that supports attribute-style access.
+
+    Recursively wraps nested dicts and lists so that the entire response
+    tree is accessible with dot notation::
+
+        completion = client.chat.completions.create(...)
+        print(completion.choices[0].message.content)  # works!
+        print(completion["choices"][0]["message"]["content"])  # also works
+
+    ``DotDict`` is a real ``dict``, so ``json.dumps``, ``in``, ``.get()``,
+    ``.items()`` etc. all behave as expected.
+    """
+
+    def __getattr__(self, name: str) -> Any:
+        try:
+            return self[name]
+        except KeyError:
+            raise AttributeError(
+                f"{type(self).__name__!r} object has no attribute {name!r}"
+            ) from None
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        self[name] = value
+
+    def __delattr__(self, name: str) -> None:
+        try:
+            del self[name]
+        except KeyError:
+            raise AttributeError(name) from None
+
+    def __repr__(self) -> str:
+        return f"DotDict({dict.__repr__(self)})"
+
+
+def _wrap(obj: Any) -> Any:
+    """Recursively wrap dicts → DotDict and lists → list-of-wrapped."""
+    if isinstance(obj, DotDict):
+        return obj
+    if isinstance(obj, dict):
+        return DotDict({k: _wrap(v) for k, v in obj.items()})
+    if isinstance(obj, list):
+        return [_wrap(item) for item in obj]
+    return obj
+
 
 _STREAMING_ERROR_MAP = {
     401: ClientAuthenticationError,
@@ -69,6 +144,15 @@ _STREAMING_ERROR_MAP = {
     409: ResourceExistsError,
     304: ResourceNotModifiedError,
 }
+
+# Transient failures while reading a streamed response body.
+_STREAM_READ_ERRORS: tuple[type, ...] = (
+    ServiceRequestError,
+    TimeoutError,
+    BrokenPipeError,
+    ConnectionError,
+    ConnectionResetError,
+)
 
 
 # ---------------------------------------------------------------------------
@@ -322,6 +406,10 @@ class SSEStream:
     Yields parsed JSON objects for each ``data:`` line.  Stops on
     ``data: [DONE]``.
 
+    On read failures, raises :exc:`~pydo.exceptions.SSEStreamTransportError`.
+    On invalid JSON for a full line, raises
+    :exc:`~pydo.exceptions.SSEStreamDecodeError`.
+
     Usage::
 
         stream = client.<operations>.<method>(body={
@@ -331,6 +419,9 @@ class SSEStream:
         with stream:
             for chunk in stream:
                 print(chunk)
+
+    For automatic retries on **transient** transport errors **before any chunk
+    is yielded**, see :func:`iter_sse_with_retry`.
     """
 
     def __init__(self, response: Any):
@@ -341,22 +432,41 @@ class SSEStream:
 
     def _iter_events(self) -> Iterator[dict]:
         buf = ""
-        for raw in self._response.iter_bytes():
-            text = raw.decode("utf-8") if isinstance(raw, bytes) else raw
-            buf += text
-            while "\n" in buf:
-                line, buf = buf.split("\n", 1)
-                line = line.strip()
-                if not line:
-                    continue
-                if line.startswith("data:"):
-                    data = line[5:].strip()
-                    if data == "[DONE]":
-                        return
-                    try:
-                        yield json.loads(data)
-                    except json.JSONDecodeError:
+        decoder = codecs.getincrementaldecoder("utf-8")("replace")
+        try:
+            for raw in self._response.iter_bytes():
+                text = decoder.decode(raw, False) if isinstance(raw, bytes) else raw
+                buf += text
+                while "\n" in buf:
+                    line, buf = buf.split("\n", 1)
+                    line = line.strip()
+                    if not line:
                         continue
+                    if line.startswith("data:"):
+                        data = line[5:].strip()
+                        if data == "[DONE]":
+                            return
+                        try:
+                            yield _wrap(json.loads(data))
+                        except json.JSONDecodeError as err:
+                            snippet = data if len(data) <= 240 else data[:240] + "..."
+                            raise SSEStreamDecodeError(
+                                f"invalid JSON in SSE data line: {snippet!r}"
+                            ) from err
+            if buf.strip():
+                raise SSEStreamTransportError(
+                    "SSE stream ended with an incomplete line (connection closed "
+                    "early or truncated transfer)."
+                )
+        except SSEStreamTransportError:
+            raise
+        except SSEStreamDecodeError:
+            raise
+        except _STREAM_READ_ERRORS as err:
+            raise SSEStreamTransportError(
+                "SSE stream interrupted while reading bytes (network drop, "
+                "timeout, or connection reset)."
+            ) from err
 
     def close(self) -> None:
         self._response.close()
@@ -371,18 +481,8 @@ class SSEStream:
 class AsyncSSEStream:
     """Asynchronous iterator over Server-Sent Events.
 
-    Yields parsed JSON objects for each ``data:`` line.  Stops on
-    ``data: [DONE]``.
-
-    Usage::
-
-        stream = await client.<operations>.<method>(body={
-            ...,
-            "stream": True,
-        })
-        async with stream:
-            async for chunk in stream:
-                print(chunk)
+    Transport and decode errors match :class:`SSEStream`.  See
+    :func:`async_iter_sse_with_retry` for retries before the first chunk.
     """
 
     def __init__(self, response: Any):
@@ -393,28 +493,127 @@ class AsyncSSEStream:
 
     async def _iter_events(self) -> AsyncIterator[dict]:
         buf = ""
-        async for raw in self._response.iter_bytes():
-            text = raw.decode("utf-8") if isinstance(raw, bytes) else raw
-            buf += text
-            while "\n" in buf:
-                line, buf = buf.split("\n", 1)
-                line = line.strip()
-                if not line:
-                    continue
-                if line.startswith("data:"):
-                    data = line[5:].strip()
-                    if data == "[DONE]":
-                        return
-                    try:
-                        yield json.loads(data)
-                    except json.JSONDecodeError:
+        decoder = codecs.getincrementaldecoder("utf-8")("replace")
+        try:
+            async for raw in self._response.iter_bytes():
+                text = decoder.decode(raw, False) if isinstance(raw, bytes) else raw
+                buf += text
+                while "\n" in buf:
+                    line, buf = buf.split("\n", 1)
+                    line = line.strip()
+                    if not line:
                         continue
+                    if line.startswith("data:"):
+                        data = line[5:].strip()
+                        if data == "[DONE]":
+                            return
+                        try:
+                            yield _wrap(json.loads(data))
+                        except json.JSONDecodeError as err:
+                            snippet = data if len(data) <= 240 else data[:240] + "..."
+                            raise SSEStreamDecodeError(
+                                f"invalid JSON in SSE data line: {snippet!r}"
+                            ) from err
+            if buf.strip():
+                raise SSEStreamTransportError(
+                    "SSE stream ended with an incomplete line (connection closed "
+                    "early or truncated transfer)."
+                )
+        except SSEStreamTransportError:
+            raise
+        except SSEStreamDecodeError:
+            raise
+        except _STREAM_READ_ERRORS as err:
+            raise SSEStreamTransportError(
+                "SSE stream interrupted while reading bytes (network drop, "
+                "timeout, or connection reset)."
+            ) from err
 
-    def close(self) -> None:
-        self._response.close()
+    async def close(self) -> None:
+        result = self._response.close()
+        if inspect.isawaitable(result):
+            await result
 
     async def __aenter__(self) -> "AsyncSSEStream":
         return self
 
     async def __aexit__(self, *args: Any) -> None:
-        self.close()
+        await self.close()
+
+
+def iter_sse_with_retry(
+    stream_factory: Callable[[], "SSEStream"],
+    *,
+    max_attempts: int = 3,
+    base_delay: float = 0.5,
+    max_jitter: float = 0.15,
+) -> Iterator[Dict[str, Any]]:
+    """Yield SSE JSON chunks, retrying **only** on :exc:`SSEStreamTransportError`
+    **before** any chunk is yielded.
+
+    After the first chunk, transport errors are re-raised immediately (retrying
+    would duplicate content).  Uses exponential backoff with optional jitter.
+
+    *stream_factory* must return a **new** :class:`SSEStream` on each call (new
+    HTTP request), e.g. ``lambda: client.inference.create_chat_completion({...})``.
+
+    Raises :exc:`~pydo.exceptions.SSEStreamRetryExhaustedError` if all attempts fail.
+    """
+    last_exc: Optional[BaseException] = None
+    for attempt in range(max_attempts):
+        stream = stream_factory()
+        yielded = False
+        try:
+            with stream:
+                for chunk in stream:
+                    yielded = True
+                    yield chunk
+            return
+        except SSEStreamTransportError as exc:
+            last_exc = exc
+            if yielded:
+                raise
+            if attempt == max_attempts - 1:
+                raise SSEStreamRetryExhaustedError(
+                    f"SSE stream failed after {max_attempts} attempt(s)"
+                ) from exc
+            delay = base_delay * (2**attempt) + random.uniform(0.0, max_jitter)
+            time.sleep(delay)
+        except SSEStreamDecodeError:
+            raise
+
+    raise SSEStreamRetryExhaustedError("SSE stream failed") from last_exc
+
+
+async def async_iter_sse_with_retry(
+    stream_factory: Callable[[], "AsyncSSEStream"],
+    *,
+    max_attempts: int = 3,
+    base_delay: float = 0.5,
+    max_jitter: float = 0.15,
+) -> AsyncGenerator[Dict[str, Any], None]:
+    """Async variant of :func:`iter_sse_with_retry`."""
+    last_exc: Optional[BaseException] = None
+    for attempt in range(max_attempts):
+        stream = stream_factory()
+        yielded = False
+        try:
+            async with stream:
+                async for chunk in stream:
+                    yielded = True
+                    yield chunk
+            return
+        except SSEStreamTransportError as exc:
+            last_exc = exc
+            if yielded:
+                raise
+            if attempt == max_attempts - 1:
+                raise SSEStreamRetryExhaustedError(
+                    f"SSE stream failed after {max_attempts} attempt(s)"
+                ) from exc
+            delay = base_delay * (2**attempt) + random.uniform(0.0, max_jitter)
+            await asyncio.sleep(delay)
+        except SSEStreamDecodeError:
+            raise
+
+    raise SSEStreamRetryExhaustedError("SSE stream failed") from last_exc

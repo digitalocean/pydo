@@ -3,6 +3,7 @@
 """
 
 import uuid
+from time import sleep
 
 from tests.integration import defaults
 from tests.integration import shared
@@ -49,7 +50,7 @@ def test_droplet_attach_volume(integration_client: Client, public_key: bytes):
             shared.wait_for_action(integration_client, vol_attach_resp["action"]["id"])
             droplet_get_resp = integration_client.droplets.get(droplet["droplet"]["id"])
             assert (
-                vol_attach_resp["volume"]["id"]
+                volume["volume"]["id"]
                 in droplet_get_resp["droplet"]["volume_ids"]
             )
 
@@ -58,8 +59,9 @@ def test_droplet_attach_volume(integration_client: Client, public_key: bytes):
                 {"type": "detach", "droplet_id": droplet["droplet"]["id"]},
             )
             shared.wait_for_action(integration_client, vol_dettach_resp["action"]["id"])
+            sleep(5)
             droplet_get_resp = integration_client.droplets.get(droplet["droplet"]["id"])
             assert (
-                vol_attach_resp["volume"]["id"]
-                in droplet_get_resp["droplet"]["volume_ids"]
+                volume["volume"]["id"]
+                not in droplet_get_resp["droplet"]["volume_ids"]
             )

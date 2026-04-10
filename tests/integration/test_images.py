@@ -33,7 +33,7 @@ def test_images(integration_client: Client):
     # list all images with prod tag
     list_resp = integration_client.images.list(tag_name="prod")
     assert len(list_resp) > 0
-    assert list_resp["images"][0]["tag_name"] == "prod"
+    assert "prod" in list_resp["images"][0]["tags"]
 
     # get an image
     get_resp = integration_client.images.get(image_id=image_id)

@@ -23,6 +23,7 @@ dev-dependencies: ## Install development tooling
 .PHONY: clean
 clean: ## Removes all generated code (except _patch.py files)
 	@printf "=== Cleaning src directory\n"
+	@rm -rf src/pydo/resources
 	@find src/pydo -type f ! -name "_patch.py" ! -name "custom_*.py" ! -name "exceptions.py" -exec rm -rf {} +
 
 .PHONY: download-spec
@@ -44,6 +45,8 @@ generate: install clean dev-dependencies
 		--package-version=$(PACKAGE_VERSION) \
 		--input-file=$(SPEC_FILE)
 	@poetry run black src
+	@poetry run python scripts/generate_inference_resources.py
+	@poetry run black src/pydo/resources
 
 .PHONY: install
 install: ## Install test dependencies

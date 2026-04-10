@@ -22,7 +22,7 @@ def test_databases_update_connection_pool(integration_client: Client):
     db_create_req = {
         "name": f"{defaults.PREFIX}-{uuid.uuid4()}",
         "engine": "pg",
-        "version": "14",
+        "version": "16",
         "region": "nyc3",
         "size": "db-s-2vcpu-4gb",
         "num_nodes": 2,
@@ -85,7 +85,7 @@ def test_databases_update_major_version(integration_client: Client):
     db_create_req = {
         "name": f"{defaults.PREFIX}-{uuid.uuid4()}",
         "engine": "pg",
-        "version": "13",
+        "version": "16",
         "region": "nyc3",
         "size": "db-s-2vcpu-4gb",
         "num_nodes": 2,
@@ -98,7 +98,7 @@ def test_databases_update_major_version(integration_client: Client):
         db_id = database_resp["database"]["id"]
 
         update_req = {
-            "version": "14",
+            "version": "17",
         }
 
         update_resp = integration_client.databases.update_major_version(
@@ -117,7 +117,7 @@ def test_databases_create_replica_and_promote_as_primary(integration_client: Cli
     db_create_req = {
         "name": f"{defaults.PREFIX}-{uuid.uuid4()}",
         "engine": "pg",
-        "version": "13",
+        "version": "16",
         "region": "nyc3",
         "size": "db-s-2vcpu-4gb",
         "num_nodes": 2,

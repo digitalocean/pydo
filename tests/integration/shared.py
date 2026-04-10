@@ -183,7 +183,8 @@ def with_test_tag(client: Client, **kwargs):
 def with_test_volume(client: Client, **kwargs):
     """Context function to create a volume.
 
-    Volume id deleted when the context ends.
+    Volume is deleted when the context ends. Retries deletion if the volume
+    is still attached (race condition after detach).
     """
     create_resp = client.volumes.create(kwargs)
     volume_id = create_resp["volume"]["id"] or ""
@@ -191,8 +192,16 @@ def with_test_volume(client: Client, **kwargs):
     try:
         yield create_resp
     finally:
-        del_resp = client.volumes.delete(volume_id)
-        assert del_resp is None
+        for attempt in range(5):
+            try:
+                del_resp = client.volumes.delete(volume_id)
+                assert del_resp is None
+                break
+            except HttpResponseError:
+                if attempt < 4:
+                    sleep(5)
+                else:
+                    raise
 
 
 @contextlib.contextmanager
