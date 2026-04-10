@@ -1,7 +1,7 @@
 # pylint: disable=duplicate-code
 
-""" test_load_balancers.py
-    Integration tests for load balancers.
+"""test_load_balancers.py
+Integration tests for load balancers.
 """
 
 import uuid

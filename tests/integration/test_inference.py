@@ -1,10 +1,9 @@
-# pylint: disable=duplicate-code
+# pylint: disable=duplicate-code,redefined-outer-name,too-few-public-methods
 
 """test_inference.py
-    Integration tests for serverless inference endpoints.
+Integration tests for serverless inference endpoints.
 """
 
-import json
 import time
 from os import environ
 
@@ -29,6 +28,7 @@ TTS_MODEL = "fal-ai/elevenlabs/tts/multilingual-v2"
 
 @pytest.fixture(scope="module")
 def inference_token():
+    """Return the MODEL_ACCESS_KEY or skip the test."""
     token = environ.get("MODEL_ACCESS_KEY")
     if token is None:
         pytest.skip("MODEL_ACCESS_KEY not set")
@@ -37,6 +37,7 @@ def inference_token():
 
 @pytest.fixture(scope="module")
 def inference_client(inference_token):
+    """Module-scoped sync inference client."""
     return Client(inference_token)
 
 
@@ -50,6 +51,8 @@ def async_client(inference_token):
 
 
 class TestListModels:
+    """Integration tests for GET /v1/models."""
+
     def test_list_models_sync(self, inference_client):
         """GET /v1/models returns a list of available models."""
         response = inference_client.models.list()
@@ -81,6 +84,8 @@ class TestListModels:
 
 
 class TestChatCompletions:
+    """Integration tests for POST /v1/chat/completions."""
+
     def test_chat_completion_sync(self, inference_client):
         """POST /v1/chat/completions returns a valid completion."""
         completion = inference_client.chat.completions.create(
@@ -119,10 +124,7 @@ class TestChatCompletions:
                 chunks.append(chunk)
 
         assert len(chunks) > 0
-        assert any(
-            hasattr(c, "choices") and len(c.choices) > 0
-            for c in chunks
-        )
+        assert any(hasattr(c, "choices") and len(c.choices) > 0 for c in chunks)
 
     @pytest.mark.asyncio
     async def test_chat_completion_async(self, async_client):
@@ -168,6 +170,8 @@ class TestChatCompletions:
 
 
 class TestResponses:
+    """Integration tests for POST /v1/responses."""
+
     @pytest.mark.asyncio
     async def test_responses_non_streaming(self, async_client):
         """POST /v1/responses returns a text response."""
@@ -210,6 +214,8 @@ class TestResponses:
 
 
 class TestImageGeneration:
+    """Integration tests for async-invoke image generation."""
+
     def test_image_generation_queued(self, inference_client):
         """POST /v1/async-invoke for image gen returns a queued job."""
         result = inference_client.async_invoke.images.generate(
@@ -248,13 +254,17 @@ class TestImageGeneration:
                     assert "url" in data["output"]["images"][0]
                     return
 
-        pytest.fail(f"Image generation did not complete within 90s (request_id={request_id})")
+        pytest.fail(
+            f"Image generation did not complete within 90s (request_id={request_id})"
+        )
 
 
 # ── Audio Generation (async-invoke) ──────────────────────────────────────
 
 
 class TestAudioGeneration:
+    """Integration tests for async-invoke audio generation."""
+
     def test_audio_generation_queued(self, inference_client):
         """POST /v1/async-invoke for audio gen returns a queued job."""
         result = inference_client.async_invoke.audio.generate(
@@ -272,6 +282,8 @@ class TestAudioGeneration:
 
 
 class TestTextToSpeech:
+    """Integration tests for async-invoke text-to-speech."""
+
     def test_tts_queued(self, inference_client):
         """POST /v1/async-invoke for TTS returns a queued job."""
         result = inference_client.async_invoke.audio.speech.create(
@@ -288,7 +300,11 @@ class TestTextToSpeech:
 
 
 class TestAsyncInvokePoll:
-    def test_poll_returns_result_for_completed_job(self, inference_token, inference_client):
+    """Integration tests for polling async-invoke results."""
+
+    def test_poll_returns_result_for_completed_job(
+        self, inference_token, inference_client
+    ):
         """GET /v1/async-invoke/{request_id} returns output for a completed job.
 
         Submits a fast image generation, waits for completion, then verifies
@@ -326,6 +342,8 @@ class TestAsyncInvokePoll:
 
 
 class TestDotDictAccess:
+    """Integration tests verifying dot notation access on live responses."""
+
     def test_chat_completion_dot_access(self, inference_client):
         """Verify responses support dot notation access."""
         completion = inference_client.chat.completions.create(

@@ -2,6 +2,7 @@
 # pylint: disable=line-too-long
 # pylint: disable=too-many-lines
 """Mock tests for the app API resource."""
+
 import responses
 
 from pydo import Client

@@ -1,6 +1,6 @@
 # pylint: disable=line-too-long
-""" test_images.py
-    Integration tests for images.
+"""test_images.py
+Integration tests for images.
 """
 
 import uuid

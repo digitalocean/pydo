@@ -1,5 +1,5 @@
-""" test_cdn.py
-    Integration tests for CDN
+"""test_cdn.py
+Integration tests for CDN
 """
 
 from tests.integration import shared

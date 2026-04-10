@@ -1,6 +1,7 @@
 # pylint: disable=line-too-long
 
 """Mock tests for the billing API resource."""
+
 import responses
 from responses import matchers
 

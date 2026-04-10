@@ -2,6 +2,7 @@
 # pylint: disable=line-too-long
 
 """Mock tests for the reserved IPs API resource."""
+
 import responses
 from responses import matchers
 

@@ -1,11 +1,10 @@
-""" test_billing.py
-    Integration Test for Billing
+"""test_billing.py
+Integration Test for Billing
 """
 
 import os
 import pytest
 from pydo import Client
-
 
 pytestmark = pytest.mark.real_billing
 

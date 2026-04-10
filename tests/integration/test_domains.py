@@ -1,5 +1,5 @@
-""" test_domain.py
-    Integration Test for Domains
+"""test_domain.py
+Integration Test for Domains
 """
 
 import uuid

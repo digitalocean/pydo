@@ -1,6 +1,6 @@
 # pylint: disable=duplicate-code
-""" test_block_storage.py
-    Integration tests for block storage.
+"""test_block_storage.py
+Integration tests for block storage.
 """
 
 import uuid

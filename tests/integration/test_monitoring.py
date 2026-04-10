@@ -1,7 +1,7 @@
 # pylint: disable=too-many-locals
 
-""" test_monitoring.py
-    Integration Tests for Monitoring
+"""test_monitoring.py
+Integration Tests for Monitoring
 """
 
 import uuid

@@ -1,5 +1,5 @@
-""" test_droplets.py
-    Integration tests for droplets.
+"""test_droplets.py
+Integration tests for droplets.
 """
 
 import uuid
@@ -49,10 +49,7 @@ def test_droplet_attach_volume(integration_client: Client, public_key: bytes):
             )
             shared.wait_for_action(integration_client, vol_attach_resp["action"]["id"])
             droplet_get_resp = integration_client.droplets.get(droplet["droplet"]["id"])
-            assert (
-                volume["volume"]["id"]
-                in droplet_get_resp["droplet"]["volume_ids"]
-            )
+            assert volume["volume"]["id"] in droplet_get_resp["droplet"]["volume_ids"]
 
             vol_dettach_resp = integration_client.volume_actions.post_by_id(
                 volume["volume"]["id"],
@@ -62,6 +59,5 @@ def test_droplet_attach_volume(integration_client: Client, public_key: bytes):
             sleep(5)
             droplet_get_resp = integration_client.droplets.get(droplet["droplet"]["id"])
             assert (
-                volume["volume"]["id"]
-                not in droplet_get_resp["droplet"]["volume_ids"]
+                volume["volume"]["id"] not in droplet_get_resp["droplet"]["volume_ids"]
             )

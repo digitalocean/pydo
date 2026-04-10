@@ -1,3 +1,4 @@
+# pylint: disable=missing-class-docstring,missing-function-docstring
 # ------------------------------------
 # Copyright (c) DigitalOcean.
 # Licensed under the Apache-2.0 License.
@@ -50,17 +51,13 @@ class _TruncatedBytes:
 
 
 def test_sse_stream_happy_path():
-    body = (
-        b'data: {"x": 1}\n\n'
-        b'data: {"x": 2}\n\n'
-        b"data: [DONE]\n\n"
-    )
+    body = b'data: {"x": 1}\n\n' b'data: {"x": 2}\n\n' b"data: [DONE]\n\n"
     stream = SSEStream(_SyncBytes([body]))
     assert list(stream) == [{"x": 1}, {"x": 2}]
 
 
 def test_sse_stream_invalid_json_raises():
-    stream = SSEStream(_SyncBytes([b'data: not-json\n\n']))
+    stream = SSEStream(_SyncBytes([b"data: not-json\n\n"]))
     with pytest.raises(SSEStreamDecodeError, match="invalid JSON"):
         list(stream)
 
@@ -80,7 +77,7 @@ def test_sse_stream_connection_error_wrapped():
 def test_async_sse_stream_invalid_json_raises():
     class _AsyncBytes:
         async def iter_bytes(self):
-            yield b'data: not-json\n\n'
+            yield b"data: not-json\n\n"
 
         def close(self):
             pass
@@ -109,10 +106,7 @@ def test_iter_sse_with_retry_recover_before_first_chunk():
         calls.append(len(calls))
         if len(calls) == 1:
             return SSEStream(_FailBeforeYield())
-        body = (
-            b'data: {"recovered": true}\n\n'
-            b"data: [DONE]\n\n"
-        )
+        body = b'data: {"recovered": true}\n\n' b"data: [DONE]\n\n"
         return SSEStream(_SyncBytes([body]))
 
     chunks = list(iter_sse_with_retry(factory, max_attempts=3))
@@ -135,10 +129,7 @@ def test_async_iter_sse_with_retry_recover_before_first_chunk():
         calls.append(len(calls))
         if len(calls) == 1:
             return AsyncSSEStream(_FailBeforeYield())
-        body = (
-            b'data: {"recovered": true}\n\n'
-            b"data: [DONE]\n\n"
-        )
+        body = b'data: {"recovered": true}\n\n' b"data: [DONE]\n\n"
 
         class _AsyncOk:
             async def iter_bytes(self):

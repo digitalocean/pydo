@@ -1,5 +1,5 @@
-""" test_ssh_keys.py
-    Integration tests for SSH keys.
+"""test_ssh_keys.py
+Integration tests for SSH keys.
 """
 
 from tests.integration import shared

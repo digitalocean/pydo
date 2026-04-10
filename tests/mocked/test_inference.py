@@ -1,7 +1,10 @@
+# pylint: disable=redefined-outer-name,line-too-long,import-outside-toplevel
 """Mock tests for inference API resources.
 
 These tests mock HTTP responses so they run without network access or tokens.
 """
+
+import json
 
 import pytest
 import responses
@@ -9,7 +12,7 @@ from aioresponses import aioresponses
 
 from pydo import Client
 from pydo.aio import Client as aioClient
-from pydo.custom_extensions import DotDict, SSEStream, AsyncSSEStream
+from pydo.custom_extensions import DotDict, SSEStream
 
 INFERENCE_URL = "https://inference.do-ai.run"
 
@@ -85,11 +88,13 @@ ASYNC_INVOKE_RESPONSE = {
 
 @pytest.fixture(scope="module")
 def inference_client():
+    """Sync inference client with a fake token."""
     return Client("fake-token", inference_endpoint=INFERENCE_URL)
 
 
 @pytest.fixture(scope="module")
 def aio_inference_client():
+    """Async inference client with a fake token."""
     return aioClient("fake-token", inference_endpoint=INFERENCE_URL)
 
 
@@ -97,8 +102,11 @@ def aio_inference_client():
 
 
 class TestListModelsMocked:
+    """Mocked tests for the list models endpoint."""
+
     @responses.activate
     def test_list_models(self, inference_client):
+        """GET /v1/models returns the model list."""
         responses.add(
             responses.GET,
             f"{INFERENCE_URL}/v1/models",
@@ -115,6 +123,7 @@ class TestListModelsMocked:
 
     @pytest.mark.asyncio
     async def test_list_models_async(self, aio_inference_client):
+        """GET /v1/models (async) returns the model list."""
         with aioresponses() as mock:
             mock.get(
                 f"{INFERENCE_URL}/v1/models",
@@ -133,8 +142,11 @@ class TestListModelsMocked:
 
 
 class TestChatCompletionsMocked:
+    """Mocked tests for chat completions."""
+
     @responses.activate
     def test_chat_completion(self, inference_client):
+        """POST /v1/chat/completions returns a valid completion."""
         responses.add(
             responses.POST,
             f"{INFERENCE_URL}/v1/chat/completions",
@@ -155,6 +167,7 @@ class TestChatCompletionsMocked:
 
     @responses.activate
     def test_chat_completion_dot_and_dict_access(self, inference_client):
+        """Dot and dict access return the same values."""
         responses.add(
             responses.POST,
             f"{INFERENCE_URL}/v1/chat/completions",
@@ -167,11 +180,15 @@ class TestChatCompletionsMocked:
             messages=[{"role": "user", "content": "Hello"}],
         )
 
-        assert completion.choices[0].message.content == completion["choices"][0]["message"]["content"]
+        assert (
+            completion.choices[0].message.content
+            == completion["choices"][0]["message"]["content"]
+        )
         assert completion.model == completion["model"]
 
     @responses.activate
     def test_chat_completion_streaming(self, inference_client):
+        """POST /v1/chat/completions with stream=True returns SSE chunks."""
         responses.add(
             responses.POST,
             f"{INFERENCE_URL}/v1/chat/completions",
@@ -196,6 +213,7 @@ class TestChatCompletionsMocked:
 
     @pytest.mark.asyncio
     async def test_chat_completion_async(self, aio_inference_client):
+        """POST /v1/chat/completions (async) returns a valid completion."""
         with aioresponses() as mock:
             mock.post(
                 f"{INFERENCE_URL}/v1/chat/completions",
@@ -213,6 +231,7 @@ class TestChatCompletionsMocked:
 
     @responses.activate
     def test_chat_completion_sends_correct_body(self, inference_client):
+        """Verifies the request body sent to the API."""
         responses.add(
             responses.POST,
             f"{INFERENCE_URL}/v1/chat/completions",
@@ -226,7 +245,6 @@ class TestChatCompletionsMocked:
             temperature=0.7,
         )
 
-        import json
         sent = json.loads(responses.calls[0].request.body)
         assert sent["model"] == "minimax-m2.5"
         assert sent["messages"] == [{"role": "user", "content": "test"}]
@@ -237,8 +255,11 @@ class TestChatCompletionsMocked:
 
 
 class TestResponsesMocked:
+    """Mocked tests for the responses endpoint."""
+
     @responses.activate
     def test_responses_create(self, inference_client):
+        """POST /v1/responses returns a valid response."""
         responses.add(
             responses.POST,
             f"{INFERENCE_URL}/v1/responses",
@@ -256,6 +277,7 @@ class TestResponsesMocked:
 
     @responses.activate
     def test_responses_streaming(self, inference_client):
+        """POST /v1/responses with stream=True returns SSE events."""
         responses.add(
             responses.POST,
             f"{INFERENCE_URL}/v1/responses",
@@ -284,8 +306,11 @@ class TestResponsesMocked:
 
 
 class TestAsyncInvokeMocked:
+    """Mocked tests for async-invoke endpoints (images, audio, TTS)."""
+
     @responses.activate
     def test_image_generation_queued(self, inference_client):
+        """POST /v1/async-invoke for image gen returns QUEUED."""
         responses.add(
             responses.POST,
             f"{INFERENCE_URL}/v1/async-invoke",
@@ -304,6 +329,7 @@ class TestAsyncInvokeMocked:
 
     @responses.activate
     def test_image_generation_sends_correct_body(self, inference_client):
+        """Verifies the image generation request body."""
         responses.add(
             responses.POST,
             f"{INFERENCE_URL}/v1/async-invoke",
@@ -316,14 +342,17 @@ class TestAsyncInvokeMocked:
             prompt="A red circle.",
         )
 
-        import json
         sent = json.loads(responses.calls[0].request.body)
         assert sent["model_id"] == "fal-ai/fast-sdxl"
         assert sent["input"]["prompt"] == "A red circle."
 
     @responses.activate
     def test_audio_generation_queued(self, inference_client):
-        audio_response = {**ASYNC_INVOKE_RESPONSE, "model_id": "fal-ai/stable-audio-25/text-to-audio"}
+        """POST /v1/async-invoke for audio gen returns QUEUED."""
+        audio_response = {
+            **ASYNC_INVOKE_RESPONSE,
+            "model_id": "fal-ai/stable-audio-25/text-to-audio",
+        }
         responses.add(
             responses.POST,
             f"{INFERENCE_URL}/v1/async-invoke",
@@ -342,6 +371,7 @@ class TestAsyncInvokeMocked:
 
     @responses.activate
     def test_audio_generation_sends_correct_body(self, inference_client):
+        """Verifies the audio generation request body."""
         responses.add(
             responses.POST,
             f"{INFERENCE_URL}/v1/async-invoke",
@@ -355,7 +385,6 @@ class TestAsyncInvokeMocked:
             seconds_total=30,
         )
 
-        import json
         sent = json.loads(responses.calls[0].request.body)
         assert sent["model_id"] == "fal-ai/stable-audio-25/text-to-audio"
         assert sent["input"]["prompt"] == "Rain sounds"
@@ -363,7 +392,11 @@ class TestAsyncInvokeMocked:
 
     @responses.activate
     def test_tts_queued(self, inference_client):
-        tts_response = {**ASYNC_INVOKE_RESPONSE, "model_id": "fal-ai/elevenlabs/tts/multilingual-v2"}
+        """POST /v1/async-invoke for TTS returns QUEUED."""
+        tts_response = {
+            **ASYNC_INVOKE_RESPONSE,
+            "model_id": "fal-ai/elevenlabs/tts/multilingual-v2",
+        }
         responses.add(
             responses.POST,
             f"{INFERENCE_URL}/v1/async-invoke",
@@ -381,6 +414,7 @@ class TestAsyncInvokeMocked:
 
     @responses.activate
     def test_tts_sends_correct_body(self, inference_client):
+        """Verifies the TTS request body."""
         responses.add(
             responses.POST,
             f"{INFERENCE_URL}/v1/async-invoke",
@@ -393,13 +427,13 @@ class TestAsyncInvokeMocked:
             input="Hello world.",
         )
 
-        import json
         sent = json.loads(responses.calls[0].request.body)
         assert sent["model_id"] == "fal-ai/elevenlabs/tts/multilingual-v2"
         assert sent["input"]["text"] == "Hello world."
 
     @pytest.mark.asyncio
     async def test_async_invoke_async(self, aio_inference_client):
+        """POST /v1/async-invoke (async) returns QUEUED."""
         with aioresponses() as mock:
             mock.post(
                 f"{INFERENCE_URL}/v1/async-invoke",
@@ -420,8 +454,11 @@ class TestAsyncInvokeMocked:
 
 
 class TestInferenceErrorsMocked:
+    """Mocked tests for inference error responses."""
+
     @responses.activate
     def test_model_not_found_404(self, inference_client):
+        """404 raises ResourceNotFoundError."""
         responses.add(
             responses.POST,
             f"{INFERENCE_URL}/v1/chat/completions",
@@ -430,6 +467,7 @@ class TestInferenceErrorsMocked:
         )
 
         from azure.core.exceptions import ResourceNotFoundError
+
         with pytest.raises(ResourceNotFoundError):
             inference_client.chat.completions.create(
                 model="nonexistent-model",
@@ -438,6 +476,7 @@ class TestInferenceErrorsMocked:
 
     @responses.activate
     def test_auth_error_401(self, inference_client):
+        """401 raises ClientAuthenticationError."""
         responses.add(
             responses.POST,
             f"{INFERENCE_URL}/v1/chat/completions",
@@ -446,6 +485,7 @@ class TestInferenceErrorsMocked:
         )
 
         from azure.core.exceptions import ClientAuthenticationError
+
         with pytest.raises(ClientAuthenticationError):
             inference_client.chat.completions.create(
                 model="minimax-m2.5",
@@ -454,6 +494,7 @@ class TestInferenceErrorsMocked:
 
     @responses.activate
     def test_server_error_500(self, inference_client):
+        """500 raises HttpResponseError."""
         responses.add(
             responses.POST,
             f"{INFERENCE_URL}/v1/async-invoke",
@@ -462,6 +503,7 @@ class TestInferenceErrorsMocked:
         )
 
         from azure.core.exceptions import HttpResponseError
+
         with pytest.raises(HttpResponseError):
             inference_client.async_invoke.images.generate(
                 model_id="fal-ai/fast-sdxl",
@@ -473,30 +515,37 @@ class TestInferenceErrorsMocked:
 
 
 class TestDotDict:
+    """Unit tests for DotDict attribute access."""
+
     def test_basic_access(self):
+        """Basic attribute and key access."""
         d = DotDict({"a": 1, "b": "hello"})
         assert d.a == 1
         assert d.b == "hello"
         assert d["a"] == 1
 
     def test_nested_access(self):
+        """Nested dict and list access via dot notation."""
         from pydo.custom_extensions import _wrap
+
         d = _wrap({"choices": [{"message": {"content": "hi"}}]})
         assert d.choices[0].message.content == "hi"
 
     def test_missing_attr_raises(self):
+        """Missing attribute raises AttributeError."""
         d = DotDict({"a": 1})
         with pytest.raises(AttributeError, match="no_such"):
             _ = d.no_such
 
     def test_dict_compatibility(self):
+        """DotDict supports standard dict operations."""
         d = DotDict({"x": 1, "y": 2})
         assert "x" in d
         assert d.get("z", 99) == 99
         assert list(d.keys()) == ["x", "y"]
 
     def test_json_serializable(self):
-        import json
+        """DotDict round-trips through JSON."""
         d = DotDict({"a": [1, 2], "b": {"c": 3}})
         roundtrip = json.loads(json.dumps(d))
         assert roundtrip == {"a": [1, 2], "b": {"c": 3}}

@@ -1,7 +1,7 @@
 # pylint: disable=duplicate-code
 
-""" test_firewalls.py
-    Integration tests for firewalls.
+"""test_firewalls.py
+Integration tests for firewalls.
 """
 
 import uuid

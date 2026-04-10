@@ -1,7 +1,7 @@
 # pylint: disable=line-too-long
 
-""" test_app.py
-    Integration tests for apps.
+"""test_app.py
+Integration tests for apps.
 """
 
 import uuid

@@ -1,5 +1,6 @@
 # pylint: disable=redefined-outer-name
 """Pytest configuration for mocked tests."""
+
 import pytest
 
 from pydo import Client

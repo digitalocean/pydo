@@ -1,5 +1,5 @@
-""" test_actions.py
-    Integration Test for Domains
+"""test_actions.py
+Integration Test for Domains
 """
 
 from pydo import Client

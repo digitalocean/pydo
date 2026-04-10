@@ -1,4 +1,4 @@
-""" shared.py
+"""shared.py
 This shared module provides helpers for working with the API through the client.
 """
 

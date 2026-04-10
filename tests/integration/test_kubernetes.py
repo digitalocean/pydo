@@ -1,5 +1,5 @@
-""" test_kubernetes.py
-    Integration tests for kubernetes.
+"""test_kubernetes.py
+Integration tests for kubernetes.
 """
 
 from os import environ

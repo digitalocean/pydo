@@ -1,5 +1,5 @@
-""" test_regions.py
-    Integration Test for Regions
+"""test_regions.py
+Integration Test for Regions
 """
 
 from pydo import Client
