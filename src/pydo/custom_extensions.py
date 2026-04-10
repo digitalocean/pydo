@@ -146,7 +146,7 @@ _STREAMING_ERROR_MAP = {
 }
 
 # Transient failures while reading a streamed response body.
-_STREAM_READ_ERRORS: tuple[type, ...] = (
+_STREAM_READ_ERRORS = (
     ServiceRequestError,
     TimeoutError,
     BrokenPipeError,
