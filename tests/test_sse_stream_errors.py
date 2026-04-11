@@ -142,8 +142,8 @@ def test_async_iter_sse_with_retry_recover_before_first_chunk():
 
     async def _run():
         out = []
-        async for c in async_iter_sse_with_retry(factory, max_attempts=3):
-            out.append(c)
+        async for chunk in async_iter_sse_with_retry(factory, max_attempts=3):
+            out.append(chunk)
         return out
 
     chunks = asyncio.run(_run())
