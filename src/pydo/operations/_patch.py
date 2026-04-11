@@ -39,9 +39,12 @@ except ImportError:
     _HAS_INFERENCE = False
 
 if _HAS_INFERENCE:
+    from azure.core.exceptions import HttpResponseError
+
     from pydo.custom_extensions import (
         StreamingMixin,
         install_streaming_wrappers,
+        recover_async_invoke_from_200_error,
     )
 
     class InferenceOperations(StreamingMixin, _GeneratedInferenceOperations):
@@ -57,6 +60,15 @@ if _HAS_INFERENCE:
             install_streaming_wrappers(
                 self, _GeneratedInferenceOperations, _ops, is_async=False
             )
+
+        def create_async_invoke(self, body, **kwargs):
+            try:
+                return super().create_async_invoke(body, **kwargs)
+            except HttpResponseError as exc:
+                recovered = recover_async_invoke_from_200_error(exc)
+                if recovered is not None:
+                    return recovered
+                raise
 
 
 # ---------------------------------------------------------------------------

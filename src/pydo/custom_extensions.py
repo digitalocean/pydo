@@ -87,6 +87,31 @@ from pydo.exceptions import (
 INFERENCE_BASE_URL = "https://inference.do-ai.run"
 
 
+def recover_async_invoke_from_200_error(exc: HttpResponseError):
+    """If ``create_async_invoke`` failed only because the status was 200, not 202.
+
+    The published spec lists **202 Accepted** for async-invoke; some deployments
+    return **200 OK** with the same JSON (e.g. ``status: "QUEUED"``). The
+    generated client only accepts 202 and raises :class:`HttpResponseError`.
+    When the body looks like a valid async-invocation record, return it as a
+    normal success payload.
+    """
+    if getattr(exc, "status_code", None) != 200:
+        return None
+    resp = exc.response
+    if resp is None:
+        return None
+    try:
+        data = resp.json()
+    except (TypeError, ValueError, AttributeError):
+        return None
+    if not isinstance(data, dict):
+        return None
+    if "request_id" not in data or "status" not in data:
+        return None
+    return data
+
+
 # ---------------------------------------------------------------------------
 # DotDict — recursive attribute-style access over plain JSON dicts
 # ---------------------------------------------------------------------------
@@ -115,7 +140,10 @@ class DotDict(dict):
             ) from None
 
     def __setattr__(self, name: str, value: Any) -> None:
-        self[name] = value
+        if name == "__class__":
+            super().__setattr__(name, value)
+        else:
+            self[name] = value
 
     def __delattr__(self, name: str) -> None:
         try:
@@ -128,14 +156,44 @@ class DotDict(dict):
 
 
 def _wrap(obj: Any) -> Any:
-    """Recursively wrap dicts → DotDict and lists → list-of-wrapped."""
+    """Recursively wrap dicts → DotDict and lists → list-of-wrapped.
+
+    If the dict has an ``object`` key that matches a known response type
+    (e.g. ``"chat.completion"``), the top-level wrapper is a typed subclass
+    from :mod:`pydo.types` instead of plain :class:`DotDict`.
+    """
     if isinstance(obj, DotDict):
         return obj
     if isinstance(obj, dict):
-        return DotDict({k: _wrap(v) for k, v in obj.items()})
+        wrapped = DotDict({k: _wrap(v) for k, v in obj.items()})
+        obj_field = wrapped.get("object")
+        if obj_field:
+            _ensure_type_map()
+            cls = _OBJECT_TYPE_MAP.get(obj_field)
+            if cls is not None:
+                wrapped.__class__ = cls
+        return wrapped
     if isinstance(obj, list):
         return [_wrap(item) for item in obj]
     return obj
+
+
+# Lazy-loaded type registry — populated on first access.
+_OBJECT_TYPE_MAP: dict = {}
+_OBJECT_TYPE_MAP_LOADED = False
+
+
+def _ensure_type_map() -> None:
+    global _OBJECT_TYPE_MAP, _OBJECT_TYPE_MAP_LOADED  # noqa: PLW0603
+    if _OBJECT_TYPE_MAP_LOADED:
+        return
+    _OBJECT_TYPE_MAP_LOADED = True
+    try:
+        from pydo.types._type_registry import _OBJECT_TYPE_MAP as _m  # type: ignore
+
+        _OBJECT_TYPE_MAP.update(_m)
+    except ImportError:
+        pass
 
 
 _STREAMING_ERROR_MAP = {
