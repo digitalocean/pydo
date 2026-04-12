@@ -6,6 +6,8 @@
 
 Follow our quickstart for examples: https://aka.ms/azsdk/python/dpcodegen/python/customize
 """
+from typing import Optional
+
 from azure.core.credentials import AccessToken
 
 from pydo.custom_policies import CustomHttpLoggingPolicy
@@ -41,8 +43,10 @@ class Client(  # type: ignore
 ):
     """The official DigitalOcean Python client
 
-    :param token: A valid API token / model access key.
+    :param token: A valid API token / model access key (positional or ``token=``).
     :type token: str
+    :keyword api_key: Same as ``token`` — OpenAI-style alias for a model access key.
+    :paramtype api_key: str
     :keyword endpoint: Service URL. Default value is "https://api.digitalocean.com".
     :paramtype endpoint: str
     :keyword inference_endpoint: Serverless inference URL.
@@ -56,20 +60,30 @@ class Client(  # type: ignore
 
     def __init__(
         self,
-        token: str,
+        token: Optional[str] = None,
         *,
+        api_key: Optional[str] = None,
         timeout: int = 120,
         inference_endpoint: str = INFERENCE_BASE_URL,
         agent_endpoint: str = "",
         **kwargs,
     ):
+        if token is not None and api_key is not None:
+            raise TypeError("Pass only one of token or api_key.")
+        resolved: Optional[str] = token if token is not None else api_key
+        if not resolved:
+            raise TypeError(
+                "Client() requires a token or api_key "
+                "(e.g. Client(os.environ['MODEL_ACCESS_KEY']) or Client(api_key=...))."
+            )
+
         logger = kwargs.get("logger")
         if logger is not None and kwargs.get("http_logging_policy") == "":
             kwargs["http_logging_policy"] = CustomHttpLoggingPolicy(logger=logger)
         sdk_moniker = f"pydo/{_version.VERSION}"
 
         super().__init__(
-            TokenCredentials(token), timeout=timeout, sdk_moniker=sdk_moniker, **kwargs
+            TokenCredentials(resolved), timeout=timeout, sdk_moniker=sdk_moniker, **kwargs
         )
 
         self._setup_inference_routing(inference_endpoint, agent_endpoint)
