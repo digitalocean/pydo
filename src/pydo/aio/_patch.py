@@ -90,7 +90,10 @@ class Client(  # type: ignore
         sdk_moniker = f"pydo/{_version.VERSION}"
 
         super().__init__(
-            TokenCredentials(resolved), timeout=timeout, sdk_moniker=sdk_moniker, **kwargs
+            TokenCredentials(resolved),
+            timeout=timeout,
+            sdk_moniker=sdk_moniker,
+            **kwargs,
         )
 
         self._setup_inference_routing(inference_endpoint, agent_endpoint)

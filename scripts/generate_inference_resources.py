@@ -19,11 +19,11 @@ Also emits ``client_surface*.py`` mixins so :class:`pydo.Client` shortcuts
 (``chat``, ``models``, ``inference_layout``, ``agent``, …) track whatever the
 spec contains — no hand-maintained list in ``_patch.py``.
 
-Shortcuts on :class:`pydo.Client`: use ``client.image_generations`` (or
-``client.inference_layout.images``) for ``POST /v1/images/generations`` — we do **not**
-expose ``client.images`` for inference because that name is reserved for the DO v2 Images
-API. ``client.audio`` / ``client.speech`` / ``client.async_images`` mirror familiar
-paths; ``async_invoke`` still exposes ``.images`` / ``.audio`` under the layout.
+For ``POST /v1/images/generations``, :class:`pydo.Client` injects
+``client.images.generate`` onto the v2 Images API object (see ``_patch.py``).
+Shortcuts: ``client.audio`` / ``client.speech`` / ``client.async_images`` for
+async-invoke; ``async_invoke`` exposes ``.images`` / ``.audio`` under
+``inference_layout``.
 
 Run after Autorest (``make generate``).
 """
@@ -607,15 +607,6 @@ def _write_client_surface(
         )
         lines.append(
             "        return self._require_inference_resource_root().async_invoke.images\n"
-        )
-    if "images" in inference_top_segments:
-        lines.append("    @property")
-        lines.append("    def image_generations(self) -> Any:")
-        lines.append(
-            '        """Explicit ``images.generations`` (sync ``POST /v1/images/generations``)."""\n'
-        )
-        lines.append(
-            "        return self._require_inference_resource_root().images.generations\n"
         )
     lines.append("    @property")
     lines.append("    def inference_layout(self) -> Any:")
