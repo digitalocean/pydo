@@ -79,10 +79,9 @@ class Client(  # type: ignore
         if token is not None and api_key is not None:
             raise TypeError("Pass only one of token or api_key.")
         resolved: Optional[str] = token if token is not None else api_key
-        if not resolved:
+        if resolved is None:
             raise TypeError(
-                "Client() requires a token or api_key "
-                "(e.g. Client(os.environ['MODEL_ACCESS_KEY']) or Client(api_key=...))."
+                "token or api_key is required (positional, or keyword token= / api_key=)."
             )
 
         logger = kwargs.get("logger")
