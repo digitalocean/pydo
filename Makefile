@@ -47,7 +47,7 @@ generate: install clean dev-dependencies
 		--input-file=$(SPEC_FILE)
 	@poetry run black src
 	@poetry run python scripts/generate_inference_resources.py
-	@poetry run python scripts/generate_inference_types.py
+	@SPEC_FILE=$(SPEC_FILE) poetry run python scripts/generate_inference_types.py
 	@poetry run black src/pydo/resources src/pydo/types
 
 .PHONY: install
