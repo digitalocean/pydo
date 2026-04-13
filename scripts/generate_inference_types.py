@@ -22,6 +22,7 @@ Run after the OpenAPI spec is updated (or alongside ``generate_inference_resourc
 """
 from __future__ import annotations
 
+import os
 import re
 import shutil
 from dataclasses import dataclass
@@ -29,7 +30,8 @@ from pathlib import Path
 from typing import Any, Dict, List, Set, Tuple
 
 ROOT = Path(__file__).resolve().parents[1]
-SPEC_PATH = ROOT / "DigitalOcean-public.v2.yaml"
+_spec_env = os.environ.get("SPEC_FILE", "")
+SPEC_PATH = Path(_spec_env).resolve() if _spec_env else ROOT / "DigitalOcean-public.v2.yaml"
 TYPES_ROOT = ROOT / "src/pydo/types"
 
 INIT_HEADER = (
@@ -433,7 +435,8 @@ def main() -> None:
     if not SPEC_PATH.is_file():
         raise SystemExit(
             f"OpenAPI spec not found at {SPEC_PATH}\n"
-            "Place DigitalOcean-public.v2.yaml in the repo root."
+            "Place DigitalOcean-public.v2.yaml in the repo root,\n"
+            "or set SPEC_FILE=path/to/spec.yaml."
         )
 
     spec_text = SPEC_PATH.read_text(encoding="utf-8")
