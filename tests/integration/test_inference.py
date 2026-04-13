@@ -1,30 +1,22 @@
+# pylint: disable=redefined-outer-name
+# pylint: disable=missing-function-docstring
+# pylint: disable=too-few-public-methods
 """Integration tests for inference endpoints.
 
-These tests hit the live DigitalOcean serverless inference API. They require
-a valid ``DIGITALOCEAN_TOKEN`` (or ``MODEL_ACCESS_KEY``) environment variable
-with inference permissions.
+These tests hit the live DigitalOcean serverless inference API.
+They require a valid ``DIGITALOCEAN_TOKEN`` (or ``MODEL_ACCESS_KEY``)
+environment variable with inference permissions.
 
-All calls use the resource-level method names from ``src/pydo/resources/``:
+All calls use the resource-level method names from
+``src/pydo/resources/``.
 
-* ``client.chat.completions.create(...)``   — inference/chat/completions.py
-* ``client.models.list()``                  — inference/models.py
-* ``client.images.generate(...)``           — inference/images/__init__.py
-* ``client.responses.create(...)``          — inference/responses.py
-* ``client.async_invoke.create(...)``       — inference/async_invoke.py
-* ``client.async_images.generate(...)``     — inference/async_invoke.py (AsyncInvokeImages)
-* ``client.audio.generate(...)``            — inference/async_invoke.py (AsyncInvokeAudio)
-* ``client.audio.speech.create(...)``       — inference/async_invoke.py (AsyncInvokeSpeech)
-* ``client.speech.create(...)``             — client_surface shortcut → audio.speech
-* ``client.agent.chat.completions.create(...)`` — agent_inference/chat/completions.py
-
-Agent inference tests additionally require ``AGENT_ENDPOINT`` and optionally
-``AGENT_INFERENCE_TOKEN``.
+Agent inference tests additionally require ``AGENT_ENDPOINT``
+and optionally ``AGENT_INFERENCE_TOKEN``.
 """
 
 import os
 
 import pytest
-
 from pydo import Client
 
 
@@ -35,10 +27,7 @@ from pydo import Client
 
 @pytest.fixture(scope="module")
 def inference_client() -> Client:
-    """Client configured for serverless inference.
-
-    Prefers ``MODEL_ACCESS_KEY`` but falls back to ``DIGITALOCEAN_TOKEN``.
-    """
+    """Client configured for serverless inference."""
     token = os.environ.get("MODEL_ACCESS_KEY") or os.environ.get("DIGITALOCEAN_TOKEN")
     if not token:
         pytest.skip("MODEL_ACCESS_KEY or DIGITALOCEAN_TOKEN required")
@@ -47,14 +36,10 @@ def inference_client() -> Client:
 
 @pytest.fixture(scope="module")
 def agent_client() -> Client:
-    """Client configured for agent inference.
-
-    Requires ``AGENT_ENDPOINT``; token from ``AGENT_INFERENCE_TOKEN`` or
-    ``MODEL_ACCESS_KEY`` or ``DIGITALOCEAN_TOKEN``.
-    """
+    """Client configured for agent inference."""
     agent_endpoint = os.environ.get("AGENT_ENDPOINT", "")
     if not agent_endpoint:
-        pytest.skip("AGENT_ENDPOINT required for agent inference tests")
+        pytest.skip("AGENT_ENDPOINT required")
 
     token = (
         os.environ.get("AGENT_INFERENCE_TOKEN")
@@ -75,14 +60,14 @@ def agent_client() -> Client:
 class TestModelsList:
     """GET /v1/models via client.models.list()"""
 
-    def test_models_list_returns_data(self, inference_client: Client):
+    def test_models_list_returns_data(self, inference_client):
         resp = inference_client.models.list()
 
         assert resp is not None
         assert resp.data is not None
         assert isinstance(resp.data, list)
 
-    def test_models_list_entries_have_id(self, inference_client: Client):
+    def test_models_list_entries_have_id(self, inference_client):
         resp = inference_client.models.list()
 
         if len(resp.data) == 0:
@@ -93,7 +78,7 @@ class TestModelsList:
         assert isinstance(model.id, str)
         assert len(model.id) > 0
 
-    def test_models_list_dotdict_access(self, inference_client: Client):
+    def test_models_list_dotdict_access(self, inference_client):
         resp = inference_client.models.list()
 
         assert resp.data is not None
@@ -107,12 +92,14 @@ class TestModelsList:
 
 
 class TestChatCompletionsCreate:
-    """POST /v1/chat/completions via client.chat.completions.create()"""
+    """POST /v1/chat/completions"""
 
-    def test_basic_completion(self, inference_client: Client):
+    def test_basic_completion(self, inference_client):
         resp = inference_client.chat.completions.create(
             model="llama3.3-70b-instruct",
-            messages=[{"role": "user", "content": "Say hello in one word."}],
+            messages=[
+                {"role": "user", "content": "Say hello in one word."},
+            ],
         )
 
         assert resp is not None
@@ -120,11 +107,14 @@ class TestChatCompletionsCreate:
         assert resp.choices[0].message.role == "assistant"
         assert len(resp.choices[0].message.content) > 0
 
-    def test_completion_with_system_message(self, inference_client: Client):
+    def test_completion_with_system_message(self, inference_client):
         resp = inference_client.chat.completions.create(
             model="llama3.3-70b-instruct",
             messages=[
-                {"role": "system", "content": "You respond in exactly two words."},
+                {
+                    "role": "system",
+                    "content": "You respond in exactly two words.",
+                },
                 {"role": "user", "content": "Greet me."},
             ],
         )
@@ -133,7 +123,7 @@ class TestChatCompletionsCreate:
         assert len(resp.choices) >= 1
         assert len(resp.choices[0].message.content) > 0
 
-    def test_completion_with_max_tokens(self, inference_client: Client):
+    def test_completion_with_max_tokens(self, inference_client):
         resp = inference_client.chat.completions.create(
             model="llama3.3-70b-instruct",
             messages=[{"role": "user", "content": "Count to 100."}],
@@ -143,7 +133,7 @@ class TestChatCompletionsCreate:
         assert resp is not None
         assert resp.usage is not None
 
-    def test_completion_has_usage(self, inference_client: Client):
+    def test_completion_has_usage(self, inference_client):
         resp = inference_client.chat.completions.create(
             model="llama3.3-70b-instruct",
             messages=[{"role": "user", "content": "Hi"}],
@@ -164,7 +154,7 @@ class TestChatCompletionsCreate:
 class TestChatCompletionsCreateStreaming:
     """POST /v1/chat/completions with stream=True"""
 
-    def test_streaming_chat_completion(self, inference_client: Client):
+    def test_streaming_chat_completion(self, inference_client):
         stream = inference_client.chat.completions.create(
             model="llama3.3-70b-instruct",
             messages=[{"role": "user", "content": "Say yes."}],
@@ -182,15 +172,15 @@ class TestChatCompletionsCreateStreaming:
 
 
 # ---------------------------------------------------------------------------
-# client.images.generate  (inference/images/__init__.py → generations.py)
+# client.images.generate  (inference/images → generations.py)
 # ---------------------------------------------------------------------------
 
 
 class TestImagesGenerate:
-    """POST /v1/images/generations via client.images.generate()"""
+    """POST /v1/images/generations"""
 
     @pytest.mark.real_billing
-    def test_images_generate(self, inference_client: Client):
+    def test_images_generate(self, inference_client):
         resp = inference_client.images.generate(
             model="openai-gpt-image-1",
             prompt="A simple red circle on white background",
@@ -208,9 +198,9 @@ class TestImagesGenerate:
 
 
 class TestResponsesCreate:
-    """POST /v1/responses via client.responses.create()"""
+    """POST /v1/responses"""
 
-    def test_responses_create(self, inference_client: Client):
+    def test_responses_create(self, inference_client):
         resp = inference_client.responses.create(
             model="openai-gpt-oss-20b",
             input="What is 2+2? Reply with just the number.",
@@ -220,7 +210,7 @@ class TestResponsesCreate:
         assert resp.output is not None
         assert len(resp.output) >= 1
 
-    def test_responses_create_with_instructions(self, inference_client: Client):
+    def test_responses_create_with_instructions(self, inference_client):
         resp = inference_client.responses.create(
             model="openai-gpt-oss-20b",
             input="Name a color.",
@@ -230,7 +220,7 @@ class TestResponsesCreate:
         assert resp is not None
         assert resp.output is not None
 
-    def test_responses_create_streaming(self, inference_client: Client):
+    def test_responses_create_streaming(self, inference_client):
         stream = inference_client.responses.create(
             model="openai-gpt-oss-20b",
             input="Say hello.",
@@ -246,15 +236,15 @@ class TestResponsesCreate:
 
 
 # ---------------------------------------------------------------------------
-# client.async_invoke.create  (inference/async_invoke.py → AsyncInvoke)
+# client.async_invoke.create  (inference/async_invoke.py)
 # ---------------------------------------------------------------------------
 
 
 class TestAsyncInvokeCreate:
-    """POST /v1/async-invoke via client.async_invoke.create()"""
+    """POST /v1/async-invoke"""
 
     @pytest.mark.real_billing
-    def test_async_invoke_create(self, inference_client: Client):
+    def test_async_invoke_create(self, inference_client):
         resp = inference_client.async_invoke.create(
             model_id="fal-ai/flux/schnell",
             input={"prompt": "A yellow star"},
@@ -266,18 +256,18 @@ class TestAsyncInvokeCreate:
 
 
 # ---------------------------------------------------------------------------
-# client.async_images.generate  (inference/async_invoke.py → AsyncInvokeImages)
+# client.async_images.generate  (AsyncInvokeImages)
 # ---------------------------------------------------------------------------
 
 
 class TestAsyncImagesGenerate:
-    """POST /v1/async-invoke via client.async_images.generate()"""
+    """POST /v1/async-invoke via async_images.generate"""
 
     @pytest.mark.real_billing
-    def test_async_images_generate(self, inference_client: Client):
+    def test_async_images_generate(self, inference_client):
         resp = inference_client.async_images.generate(
             model_id="fal-ai/flux/schnell",
-            prompt="A green triangle on a white background",
+            prompt="A green triangle on white",
         )
 
         assert resp is not None
@@ -286,15 +276,15 @@ class TestAsyncImagesGenerate:
 
 
 # ---------------------------------------------------------------------------
-# client.audio.generate  (inference/async_invoke.py → AsyncInvokeAudio)
+# client.audio.generate  (AsyncInvokeAudio)
 # ---------------------------------------------------------------------------
 
 
 class TestAudioGenerate:
-    """POST /v1/async-invoke via client.audio.generate()"""
+    """POST /v1/async-invoke via audio.generate"""
 
     @pytest.mark.real_billing
-    def test_audio_generate(self, inference_client: Client):
+    def test_audio_generate(self, inference_client):
         resp = inference_client.audio.generate(
             model_id="fal-ai/stable-audio-25/text-to-audio",
             prompt="A short drum beat",
@@ -307,16 +297,15 @@ class TestAudioGenerate:
 
 
 # ---------------------------------------------------------------------------
-# client.audio.speech.create / client.speech.create
-# (inference/async_invoke.py → AsyncInvokeSpeech)
+# client.audio.speech.create / client.speech.create (AsyncInvokeSpeech)
 # ---------------------------------------------------------------------------
 
 
 class TestAudioSpeechCreate:
-    """POST /v1/async-invoke via client.audio.speech.create() / client.speech.create()"""
+    """POST /v1/async-invoke via audio.speech.create"""
 
     @pytest.mark.real_billing
-    def test_audio_speech_create(self, inference_client: Client):
+    def test_audio_speech_create(self, inference_client):
         resp = inference_client.audio.speech.create(
             input="Hello, this is a test.",
             model_id="fal-ai/elevenlabs/tts/multilingual-v2",
@@ -327,7 +316,7 @@ class TestAudioSpeechCreate:
         assert resp.status in ("QUEUED", "IN_PROGRESS", "COMPLETED")
 
     @pytest.mark.real_billing
-    def test_speech_create_shortcut(self, inference_client: Client):
+    def test_speech_create_shortcut(self, inference_client):
         resp = inference_client.speech.create(
             input="Testing the shortcut.",
             model_id="fal-ai/elevenlabs/tts/multilingual-v2",
@@ -339,23 +328,23 @@ class TestAudioSpeechCreate:
 
 
 # ---------------------------------------------------------------------------
-# client.agent.chat.completions.create
-# (agent_inference/chat/completions.py)
+# client.agent.chat.completions.create (agent_inference)
 # ---------------------------------------------------------------------------
 
 
 class TestAgentChatCompletionsCreate:
-    """Agent inference — POST /api/v1/chat/completions
-    via client.agent.chat.completions.create()
-    """
+    """Agent POST /api/v1/chat/completions"""
 
-    def test_agent_chat_completions_create(self, agent_client: Client):
+    def test_agent_chat_completions_create(self, agent_client):
         model = os.environ.get("AGENT_MODEL", "gpt-4o")
 
         resp = agent_client.agent.chat.completions.create(
             model=model,
             messages=[
-                {"role": "user", "content": "Reply in one word: hello or goodbye?"},
+                {
+                    "role": "user",
+                    "content": "Reply in one word: hello or goodbye?",
+                },
             ],
         )
 
@@ -363,7 +352,7 @@ class TestAgentChatCompletionsCreate:
         assert len(resp.choices) >= 1
         assert len(resp.choices[0].message.content) > 0
 
-    def test_agent_chat_completions_create_multi_turn(self, agent_client: Client):
+    def test_agent_chat_completions_create_multi_turn(self, agent_client):
         model = os.environ.get("AGENT_MODEL", "gpt-4o")
 
         resp = agent_client.agent.chat.completions.create(

@@ -1,20 +1,12 @@
 # pylint: disable=line-too-long
+# pylint: disable=unused-argument
 """Mock tests for inference API endpoints.
 
-All calls use the resource-level method names from ``src/pydo/resources/``:
-
-* ``client.chat.completions.create(...)``   — inference/chat/completions.py
-* ``client.models.list()``                  — inference/models.py
-* ``client.images.generate(...)``           — inference/images/__init__.py
-* ``client.responses.create(...)``          — inference/responses.py
-* ``client.async_invoke.create(...)``       — inference/async_invoke.py
-* ``client.async_images.generate(...)``     — inference/async_invoke.py (AsyncInvokeImages)
-* ``client.audio.generate(...)``            — inference/async_invoke.py (AsyncInvokeAudio)
-* ``client.audio.speech.create(...)``       — inference/async_invoke.py (AsyncInvokeSpeech)
-* ``client.speech.create(...)``             — client_surface shortcut → audio.speech
-* ``client.agent.chat.completions.create(...)`` — agent_inference/chat/completions.py
+All calls use the resource-level method names from
+``src/pydo/resources/``.
 """
 
+import pytest
 import responses
 
 from pydo import Client
@@ -269,7 +261,7 @@ def test_models_list_empty(mock_client: Client, mock_client_url):
 
 
 # ---------------------------------------------------------------------------
-# client.images.generate  (inference/images/__init__.py → generations.py)
+# client.images.generate  (inference/images → generations.py)
 # ---------------------------------------------------------------------------
 
 
@@ -281,7 +273,7 @@ def test_images_generate(mock_client: Client, mock_client_url):
         "object": "list",
         "data": [
             {
-                "b64_json": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNgYPgPAAEDAQAIicLsAAAAASUVORK5CYII=",
+                "b64_json": "aVZCT1J3MEtHZ29B",
                 "revised_prompt": "A futuristic cityscape at sunset",
             }
         ],
@@ -317,8 +309,8 @@ def test_images_generate_multiple(mock_client: Client, mock_client_url):
         "created": 1700001100,
         "object": "list",
         "data": [
-            {"b64_json": "base64encodedimage1==", "revised_prompt": "A red rose"},
-            {"b64_json": "base64encodedimage2==", "revised_prompt": "A red rose"},
+            {"b64_json": "base64img1==", "revised_prompt": "A red rose"},
+            {"b64_json": "base64img2==", "revised_prompt": "A red rose"},
         ],
         "usage": {
             "input_tokens": 10,
@@ -341,8 +333,8 @@ def test_images_generate_multiple(mock_client: Client, mock_client_url):
     )
 
     assert len(resp.data) == 2
-    assert resp.data[0].b64_json == "base64encodedimage1=="
-    assert resp.data[1].b64_json == "base64encodedimage2=="
+    assert resp.data[0].b64_json == "base64img1=="
+    assert resp.data[1].b64_json == "base64img2=="
 
 
 # ---------------------------------------------------------------------------
@@ -366,7 +358,7 @@ def test_responses_create(mock_client: Client, mock_client_url):
                 "content": [
                     {
                         "type": "output_text",
-                        "text": "The ocean covers over 70% of Earth's surface.",
+                        "text": "The ocean covers over 70% of Earth.",
                     }
                 ],
             }
@@ -392,10 +384,7 @@ def test_responses_create(mock_client: Client, mock_client_url):
 
     assert resp.id == "resp-abc123"
     assert resp.output[0].role == "assistant"
-    assert (
-        resp.output[0].content[0].text
-        == "The ocean covers over 70% of Earth's surface."
-    )
+    assert resp.output[0].content[0].text == "The ocean covers over 70% of Earth."
 
 
 @responses.activate
@@ -414,7 +403,7 @@ def test_responses_create_with_instructions(mock_client: Client, mock_client_url
                 "content": [
                     {
                         "type": "output_text",
-                        "text": "In exactly 5 words: Ocean depths remain mysterious always.",
+                        "text": "Ocean depths remain mysterious.",
                     }
                 ],
             }
@@ -444,7 +433,7 @@ def test_responses_create_with_instructions(mock_client: Client, mock_client_url
 
 
 # ---------------------------------------------------------------------------
-# client.async_invoke.create  (inference/async_invoke.py → AsyncInvoke)
+# client.async_invoke.create  (inference/async_invoke.py)
 # ---------------------------------------------------------------------------
 
 
@@ -454,7 +443,6 @@ def test_async_invoke_create(mock_client: Client, mock_client_url):
     expected = {
         "request_id": "req-generic-001",
         "status": "QUEUED",
-        "response_url": f"{INFERENCE_URL}/v1/async-invoke/req-generic-001",
     }
 
     responses.add(
@@ -479,7 +467,6 @@ def test_async_invoke_create_with_tags(mock_client: Client, mock_client_url):
     expected = {
         "request_id": "req-tagged-001",
         "status": "QUEUED",
-        "response_url": f"{INFERENCE_URL}/v1/async-invoke/req-tagged-001",
     }
 
     responses.add(
@@ -526,7 +513,7 @@ def test_async_invoke_create_200_accepted(mock_client: Client, mock_client_url):
 
 
 # ---------------------------------------------------------------------------
-# client.async_images.generate  (inference/async_invoke.py → AsyncInvokeImages)
+# client.async_images.generate  (AsyncInvokeImages)
 # ---------------------------------------------------------------------------
 
 
@@ -536,7 +523,6 @@ def test_async_images_generate(mock_client: Client, mock_client_url):
     expected = {
         "request_id": "req-img-001",
         "status": "QUEUED",
-        "response_url": f"{INFERENCE_URL}/v1/async-invoke/req-img-001",
     }
 
     responses.add(
@@ -580,7 +566,7 @@ def test_async_images_generate_with_tags(mock_client: Client, mock_client_url):
 
 
 # ---------------------------------------------------------------------------
-# client.audio.generate  (inference/async_invoke.py → AsyncInvokeAudio)
+# client.audio.generate  (AsyncInvokeAudio)
 # ---------------------------------------------------------------------------
 
 
@@ -590,7 +576,6 @@ def test_audio_generate(mock_client: Client, mock_client_url):
     expected = {
         "request_id": "req-audio-001",
         "status": "QUEUED",
-        "response_url": f"{INFERENCE_URL}/v1/async-invoke/req-audio-001",
     }
 
     responses.add(
@@ -602,7 +587,7 @@ def test_audio_generate(mock_client: Client, mock_client_url):
 
     resp = mock_client.audio.generate(
         model_id="fal-ai/stable-audio-25/text-to-audio",
-        prompt="A calm lo-fi hip hop beat with vinyl crackle",
+        prompt="A calm lo-fi hip hop beat",
         seconds_total=30,
     )
 
@@ -634,8 +619,7 @@ def test_audio_generate_without_seconds(mock_client: Client, mock_client_url):
 
 
 # ---------------------------------------------------------------------------
-# client.audio.speech.create / client.speech.create
-# (inference/async_invoke.py → AsyncInvokeSpeech)
+# client.audio.speech.create / client.speech.create (AsyncInvokeSpeech)
 # ---------------------------------------------------------------------------
 
 
@@ -645,7 +629,6 @@ def test_audio_speech_create(mock_client: Client, mock_client_url):
     expected = {
         "request_id": "req-tts-001",
         "status": "QUEUED",
-        "response_url": f"{INFERENCE_URL}/v1/async-invoke/req-tts-001",
     }
 
     responses.add(
@@ -666,7 +649,7 @@ def test_audio_speech_create(mock_client: Client, mock_client_url):
 
 @responses.activate
 def test_speech_create(mock_client: Client, mock_client_url):
-    """Mock client.speech.create — shortcut for audio.speech.create."""
+    """Mock client.speech.create shortcut."""
     expected = {
         "request_id": "req-speech-001",
         "status": "QUEUED",
@@ -712,8 +695,7 @@ def test_audio_speech_create_with_tags(mock_client: Client, mock_client_url):
 
 
 # ---------------------------------------------------------------------------
-# client.agent.chat.completions.create
-# (agent_inference/chat/completions.py)
+# client.agent.chat.completions.create (agent_inference)
 # ---------------------------------------------------------------------------
 
 
@@ -743,7 +725,11 @@ def test_agent_chat_completions_create():
                 "finish_reason": "stop",
             }
         ],
-        "usage": {"prompt_tokens": 12, "completion_tokens": 8, "total_tokens": 20},
+        "usage": {
+            "prompt_tokens": 12,
+            "completion_tokens": 8,
+            "total_tokens": 20,
+        },
     }
 
     responses.add(
@@ -791,7 +777,11 @@ def test_agent_chat_completions_create_multi_turn():
                 "finish_reason": "stop",
             }
         ],
-        "usage": {"prompt_tokens": 10, "completion_tokens": 6, "total_tokens": 16},
+        "usage": {
+            "prompt_tokens": 10,
+            "completion_tokens": 6,
+            "total_tokens": 16,
+        },
     }
 
     responses.add(
@@ -823,18 +813,15 @@ def test_chat_completions_create_401(mock_client: Client, mock_client_url):
     responses.add(
         responses.POST,
         f"{INFERENCE_URL}/v1/chat/completions",
-        json={"error": {"message": "Invalid token", "code": "unauthorized"}},
+        json={"error": {"message": "Invalid token"}},
         status=401,
     )
 
-    try:
+    with pytest.raises(Exception, match="Invalid token"):
         mock_client.chat.completions.create(
             model="meta-llama/Meta-Llama-3-8B-Instruct",
             messages=[{"role": "user", "content": "Hello"}],
         )
-        assert False, "Expected an error to be raised"
-    except Exception as exc:
-        assert "401" in str(exc) or "Authentication" in str(type(exc).__name__)
 
 
 @responses.activate
@@ -847,11 +834,8 @@ def test_models_list_404(mock_client: Client, mock_client_url):
         status=404,
     )
 
-    try:
+    with pytest.raises(Exception, match="Not found"):
         mock_client.models.list()
-        assert False, "Expected an error to be raised"
-    except Exception as exc:
-        assert "404" in str(exc) or "NotFound" in str(type(exc).__name__)
 
 
 @responses.activate
@@ -860,18 +844,15 @@ def test_images_generate_422(mock_client: Client, mock_client_url):
     responses.add(
         responses.POST,
         f"{INFERENCE_URL}/v1/images/generations",
-        json={"error": {"message": "Invalid prompt", "code": "invalid_request"}},
+        json={"error": {"message": "Invalid prompt"}},
         status=422,
     )
 
-    try:
+    with pytest.raises(Exception, match="Invalid prompt"):
         mock_client.images.generate(
             model="openai-gpt-image-1",
             prompt="",
         )
-        assert False, "Expected an error to be raised"
-    except Exception:
-        pass
 
 
 @responses.activate
@@ -884,11 +865,8 @@ def test_responses_create_500(mock_client: Client, mock_client_url):
         status=500,
     )
 
-    try:
+    with pytest.raises(Exception, match="Internal server error"):
         mock_client.responses.create(
             model="openai-gpt-oss-20b",
             input="Test",
         )
-        assert False, "Expected an error to be raised"
-    except Exception:
-        pass
