@@ -114,13 +114,14 @@ def test_chat_completions_create_with_system_message(
     )
 
     assert resp.choices[0].message.role == "assistant"
-    assert "Python" in resp.choices[0].message.content or "matey" in resp.choices[0].message.content
+    assert (
+        "Python" in resp.choices[0].message.content
+        or "matey" in resp.choices[0].message.content
+    )
 
 
 @responses.activate
-def test_chat_completions_create_multiple_choices(
-    mock_client: Client, mock_client_url
-):
+def test_chat_completions_create_multiple_choices(mock_client: Client, mock_client_url):
     """Mock chat.completions.create with n > 1."""
     expected = {
         "id": "chatcmpl-multi789",
@@ -391,7 +392,10 @@ def test_responses_create(mock_client: Client, mock_client_url):
 
     assert resp.id == "resp-abc123"
     assert resp.output[0].role == "assistant"
-    assert resp.output[0].content[0].text == "The ocean covers over 70% of Earth's surface."
+    assert (
+        resp.output[0].content[0].text
+        == "The ocean covers over 70% of Earth's surface."
+    )
 
 
 @responses.activate

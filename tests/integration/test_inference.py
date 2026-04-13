@@ -39,9 +39,7 @@ def inference_client() -> Client:
 
     Prefers ``MODEL_ACCESS_KEY`` but falls back to ``DIGITALOCEAN_TOKEN``.
     """
-    token = os.environ.get("MODEL_ACCESS_KEY") or os.environ.get(
-        "DIGITALOCEAN_TOKEN"
-    )
+    token = os.environ.get("MODEL_ACCESS_KEY") or os.environ.get("DIGITALOCEAN_TOKEN")
     if not token:
         pytest.skip("MODEL_ACCESS_KEY or DIGITALOCEAN_TOKEN required")
     return Client(token)
