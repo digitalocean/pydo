@@ -25,6 +25,18 @@ class InferenceClientSurface:
         return self._require_inference_resource_root().chat
 
     @property
+    def embeddings(self) -> Any:
+        """Nested serverless inference API under path segment ``embeddings``."""
+
+        return self._require_inference_resource_root().embeddings
+
+    @property
+    def messages(self) -> Any:
+        """Nested serverless inference API under path segment ``messages``."""
+
+        return self._require_inference_resource_root().messages
+
+    @property
     def models(self) -> Any:
         """Nested serverless inference API under path segment ``models``."""
 

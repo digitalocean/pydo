@@ -13,6 +13,7 @@ from typing import Dict, Type
 from pydo.custom_extensions import DotDict
 
 from pydo.types.chat import ChatCompletion, ChatCompletionChunk
+from pydo.types.embeddings import EmbeddingDataItem
 from pydo.types.models import ListModelsResponse, Model
 from pydo.types.responses import Response, ResponseStreamChunk
 
@@ -20,6 +21,7 @@ from pydo.types.responses import Response, ResponseStreamChunk
 _OBJECT_TYPE_MAP: Dict[str, Type[DotDict]] = {
     "chat.completion": ChatCompletion,
     "chat.completion.chunk": ChatCompletionChunk,
+    "embedding": EmbeddingDataItem,
     "list": ListModelsResponse,
     "model": Model,
     "response": Response,

@@ -9,7 +9,9 @@ from __future__ import annotations
 from pydo import Client
 from .async_invoke import AsyncInvoke
 from .chat import Chat
+from .embeddings import Embeddings
 from .images import Images
+from .messages import Messages
 from .models import Models
 from .responses import Responses
 
@@ -20,7 +22,9 @@ class InferenceResources:
     def __init__(self, client: Client) -> None:
         self.async_invoke = AsyncInvoke(client)
         self.chat = Chat(client)
+        self.embeddings = Embeddings(client)
         self.images = Images(client)
+        self.messages = Messages(client)
         self.models = Models(client)
         self.responses = Responses(client)
 

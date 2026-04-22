@@ -10,6 +10,20 @@
       "facade_method": "create"
     },
     {
+      "op_method": "create_messages",
+      "path_segments": [
+        "messages"
+      ],
+      "facade_method": "create"
+    },
+    {
+      "op_method": "create_embedding",
+      "path_segments": [
+        "embeddings"
+      ],
+      "facade_method": "create"
+    },
+    {
       "op_method": "create_image",
       "path_segments": [
         "images",
