@@ -20,10 +20,18 @@ from pydo.types.chat import ChatCompletion
 from pydo.types.chat import ChatCompletionStreamResponseDelta
 from pydo.types.chat import ChatCompletionTokenLogprob
 from pydo.types.chat import CompletionUsage
+from pydo.types.embeddings import EmbeddingDataItem
+from pydo.types.embeddings import EmbeddingsResponse
+from pydo.types.embeddings import EmbeddingsUsage
 from pydo.types.images import Image
 from pydo.types.images import ImageGenPartialImageEvent
 from pydo.types.images import ImagesResponse
 from pydo.types.images import ImagesUsage
+from pydo.types.messages import MessagesCreateErrorResponse
+from pydo.types.messages import MessagesCreateResponse
+from pydo.types.messages import MessagesResponseContentBlock
+from pydo.types.messages import MessagesStreamEvent
+from pydo.types.messages import MessagesUsage
 from pydo.types.models import ListModelsResponse
 from pydo.types.models import Model
 from pydo.types.responses import Response
@@ -37,10 +45,18 @@ __all__ = [
     "ChatCompletionStreamResponseDelta",
     "ChatCompletionTokenLogprob",
     "CompletionUsage",
+    "EmbeddingDataItem",
+    "EmbeddingsResponse",
+    "EmbeddingsUsage",
     "Image",
     "ImageGenPartialImageEvent",
     "ImagesResponse",
     "ImagesUsage",
+    "MessagesCreateErrorResponse",
+    "MessagesCreateResponse",
+    "MessagesResponseContentBlock",
+    "MessagesStreamEvent",
+    "MessagesUsage",
     "ListModelsResponse",
     "Model",
     "Response",
