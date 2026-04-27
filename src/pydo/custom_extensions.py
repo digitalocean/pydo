@@ -886,17 +886,36 @@ class _FileContent(DotDict):
     that lazily fetch bytes from the presigned URL.
     """
 
+    _URL_KEYS = (
+        "presigned_url",
+        "output_file_url",
+        "output_location",
+        "download_url",
+        "download",
+        "location",
+        "url",
+    )
+    _NESTED_CONTAINER_KEYS = ("download", "output", "result", "data")
+
     def _primary_url(self) -> str:
-        for key in ("output_location", "download_url", "location", "url"):
-            url = self.get(key)
-            if url:
-                return url
-        output = self.get("output")
-        if isinstance(output, dict):
-            for key in ("url", "download_url", "location"):
-                value = output.get(key)
-                if value:
-                    return value
+        for key in self._URL_KEYS:
+            value = self.get(key)
+            if isinstance(value, str) and value:
+                return value
+        for container_key in self._NESTED_CONTAINER_KEYS:
+            container = self.get(container_key)
+            if isinstance(container, dict):
+                for key in self._URL_KEYS:
+                    value = container.get(key)
+                    if isinstance(value, str) and value:
+                        return value
+        if self.get("result_available") is False:
+            message = self.get("message") or "result not yet available"
+            raise RuntimeError(
+                f"batch result is not ready: {message}. "
+                "Poll client.batches.retrieve(batch_id) until "
+                "status is 'completed' before downloading."
+            )
         raise RuntimeError(
             "no downloadable URL in batch result response; "
             f"available keys: {sorted(self.keys())}"
