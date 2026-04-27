@@ -8,21 +8,11 @@ from __future__ import annotations
 from typing import Any
 
 from pydo.aio import Client
-from pydo.custom_extensions import _wrap
-
-_SDK_KWARGS = frozenset(
-    {
-        "cls",
-        "content_type",
-        "continuation_token",
-        "error_map",
-        "form_content_type",
-        "headers",
-        "params",
-        "polling",
-        "raw_request_hook",
-        "raw_response_hook",
-    }
+from pydo.custom_extensions import (
+    _SDK_KWARGS,
+    _prepare_body,
+    _wrap,
+    _wrap_with_id_alias,
 )
 
 
@@ -36,4 +26,8 @@ class Responses:
         """Delegates to ``client.inference.create_response``."""
         body = {k: v for k, v in kwargs.items() if k not in _SDK_KWARGS}
         sdk = {k: v for k, v in kwargs.items() if k in _SDK_KWARGS}
-        return _wrap(await self._client.inference.create_response(body, **sdk))
+        body = _prepare_body("create_response", body)
+        return _wrap_with_id_alias(
+            await self._client.inference.create_response(body, **sdk),
+            primary_id_field="response_id",
+        )
