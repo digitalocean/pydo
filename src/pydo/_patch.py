@@ -45,7 +45,9 @@ class Client(  # type: ignore
 
     :param token: A valid API token / model access key (positional or ``token=``).
     :type token: str
-    :keyword api_key: Same as ``token`` — OpenAI-style alias for a model access key.
+    :keyword api_key: Alternative keyword for the model access key (same
+        semantics as ``token``). Provided for ergonomic parity with other
+        Python inference clients.
     :paramtype api_key: str
     :keyword endpoint: Service URL. Default value is "https://api.digitalocean.com".
     :paramtype endpoint: str

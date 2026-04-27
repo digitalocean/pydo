@@ -34,7 +34,7 @@ import re
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 ROOT = Path(__file__).resolve().parents[1]
 OPS_PATH = ROOT / "src/pydo/operations/_operations.py"
@@ -62,6 +62,11 @@ _SDK_KWARGS = frozenset(
 
 
 def _header(*, async_mode: bool) -> str:
+    """Common prelude for every generated resource module.
+
+    Individual writers append their own ``from pydo.custom_extensions
+    import ...`` block so the imports stay consolidated and explicit.
+    """
     client_import = (
         "from pydo.aio import Client" if async_mode else "from pydo import Client"
     )
@@ -76,7 +81,6 @@ def _header(*, async_mode: bool) -> str:
         "from typing import Any\n"
         "\n"
         f"{client_import}\n"
-        "from pydo.custom_extensions import _wrap\n"
     )
 
 
@@ -90,7 +94,28 @@ INIT_HEADER = (
 )
 
 
-def _path_segments(url: str) -> List[str]:
+URL_PARAM_RE = re.compile(r"^\{([a-zA-Z_][a-zA-Z0-9_]*)\}$")
+
+
+# URL-trailing segments that represent an *action* on the parent resource
+# rather than a sub-resource. For an op whose URL ends in one of these and
+# whose op_method begins with the same verb (e.g. ``cancel_batch`` at
+# ``/v1/batches/{batch_id}/cancel``), the generator drops the trailing
+# segment so the method is emitted on the parent class — matching the
+# idiomatic ``client.batches.cancel(batch_id)`` surface rather than the
+# clunky ``client.batches.cancel.cancel(batch_id)``.
+_ACTION_VERBS = frozenset({"cancel"})
+
+
+def _split_url(url: str) -> Tuple[Tuple[str, ...], Tuple[str, ...]]:
+    """Split a spec URL into ``(non-param segments, path params)``.
+
+    Drops a leading ``/v1`` or ``/api/v1`` prefix.  Returns ``((), ())`` when
+    the URL is not a standard public route (e.g. internal helpers that PUT to
+    a placeholder like ``/<upload_url>`` — these are callable directly on the
+    raw operations group but are intentionally *not* surfaced on the public
+    resource tree).
+    """
     parts = [p for p in url.split("/") if p]
     while parts:
         if parts[0] == "api" and len(parts) >= 2 and parts[1] == "v1":
@@ -99,7 +124,19 @@ def _path_segments(url: str) -> List[str]:
             parts = parts[1:]
         else:
             break
-    return [re.sub(r"[^a-zA-Z0-9_]", "_", s) for s in parts]
+    if not parts:
+        return (), ()
+    if any("<" in p or ">" in p for p in parts):
+        return (), ()
+    segments: List[str] = []
+    params: List[str] = []
+    for part in parts:
+        match = URL_PARAM_RE.match(part)
+        if match:
+            params.append(match.group(1))
+        else:
+            segments.append(re.sub(r"[^a-zA-Z0-9_]", "_", part))
+    return tuple(segments), tuple(params)
 
 
 def _parse_builders(path: Path) -> List[Tuple[str, str, str]]:
@@ -132,28 +169,60 @@ def _client_attr(group: str) -> str:
     return "agent_inference" if group == "agent_inference" else "inference"
 
 
+def _facade_methods_for(spec: "OpSpec") -> List[str]:
+    """Return method names to emit for ``spec`` on its leaf class.
+
+    First entry is the primary method whose body is generated; any
+    subsequent entries are emitted as plain-assignment aliases
+    (e.g. ``retrieve = get``).  Aliases are added when the op looks like a
+    retrieve-by-id (``get_*`` with a trailing path parameter) so that the
+    generated surface stays friendly to callers regardless of naming style.
+    """
+    om = spec.op_method
+    has_path_param = bool(spec.path_params)
+    if om == "create_image":
+        return ["generate"]
+    if om.startswith("list_"):
+        return ["list"]
+    if om.startswith("create_"):
+        return ["create"]
+    if om.startswith("get_"):
+        if has_path_param:
+            return ["get", "retrieve"]
+        return ["get"]
+    if om.startswith("delete_"):
+        return ["delete"]
+    if om.startswith("cancel_"):
+        return ["cancel"]
+    if om.startswith("update_"):
+        return ["update"]
+    if om.startswith("patch_"):
+        return ["patch"]
+    return [om]
+
+
 def _facade_method_name(op_method: str) -> str:
+    """Legacy single-name view (used by the manifest)."""
     if op_method == "create_image":
         return "generate"
-    if op_method.startswith("list_"):
-        return "list"
-    if op_method.startswith("create_"):
-        return "create"
-    if op_method.startswith("get_"):
-        return "get"
-    if op_method.startswith("delete_"):
-        return "delete"
-    if op_method.startswith("update_"):
-        return "update"
-    if op_method.startswith("patch_"):
-        return "patch"
+    for prefix, name in (
+        ("list_", "list"),
+        ("create_", "create"),
+        ("get_", "get"),
+        ("delete_", "delete"),
+        ("cancel_", "cancel"),
+        ("update_", "update"),
+        ("patch_", "patch"),
+    ):
+        if op_method.startswith(prefix):
+            return name
     return op_method
 
 
 def _operation_has_json_body(op_method: str) -> bool:
     if op_method.startswith("list_") or op_method.startswith("get_"):
         return False
-    if op_method.startswith("delete_"):
+    if op_method.startswith("delete_") or op_method.startswith("cancel_"):
         return False
     return True
 
@@ -167,54 +236,156 @@ def _pascal_class_name(segment: str) -> str:
 class OpSpec:
     group: str
     op_method: str
-    segments: List[str]
+    segments: Tuple[str, ...]
+    path_params: Tuple[str, ...] = ()
 
 
-def _write_leaf_class(
+_FACADE_HEADER_EXTRAS = (
+    "from pydo.custom_extensions import (\n"
+    "    _SDK_KWARGS,\n"
+    "    _prepare_body,\n"
+    "    _wrap,\n"
+    "    _wrap_with_id_alias,\n"
+    ")\n"
+)
+
+
+_OP_PREFIXES_WITH_IDENTIFIABLE_RESULT = (
+    "create_",
+    "get_",
+    "update_",
+    "patch_",
+)
+
+
+def _derive_primary_id_field(spec: OpSpec) -> Optional[str]:
+    """Best-effort guess of the spec's primary identifier field name.
+
+    Priority:
+    1. Last path parameter — the most reliable signal for retrieve-by-id
+       ops (``/v1/batches/{batch_id}`` ⇒ ``batch_id``).
+    2. Strip the operation prefix and append ``_id`` (``create_batch`` ⇒
+       ``batch_id``, ``create_batch_file`` ⇒ ``batch_file_id``).
+
+    The resulting field is only *applied* when it is actually present on
+    the response (:func:`pydo.custom_extensions._wrap_with_id_alias`
+    silently skips unknown keys), so this heuristic is safe even for
+    endpoints where the spec already returns a plain ``id``.
+    """
+    if spec.path_params:
+        return spec.path_params[-1]
+    for prefix in _OP_PREFIXES_WITH_IDENTIFIABLE_RESULT:
+        if spec.op_method.startswith(prefix):
+            resource = spec.op_method[len(prefix):]
+            if resource:
+                return f"{resource}_id"
+            break
+    return None
+
+
+def _render_leaf_method(spec: OpSpec, method_name: str, async_mode: bool) -> str:
+    """Render a single method block for a leaf class."""
+    ops_attr = _client_attr(spec.group)
+    async_kw = "async " if async_mode else ""
+    await_kw = "await " if async_mode else ""
+    path_args = list(spec.path_params)
+
+    sig_parts: List[str] = ["self"]
+    for param in path_args:
+        sig_parts.append(f"{param}: str")
+    sig_parts.append("**kwargs: Any")
+    signature = ", ".join(sig_parts)
+
+    path_call_args = ", ".join(f"{p}={p}" for p in path_args)
+    op_head = f"self._client.{ops_attr}.{spec.op_method}("
+
+    lines: List[str] = [
+        f"    {async_kw}def {method_name}(self, {signature[len('self, '):]}) -> Any:",
+        f'        """Delegates to ``client.{ops_attr}.{spec.op_method}``."""',
+    ]
+
+    primary_id = _derive_primary_id_field(spec)
+
+    if _operation_has_json_body(spec.op_method):
+        lines.extend(
+            [
+                "        body = {k: v for k, v in kwargs.items() "
+                "if k not in _SDK_KWARGS}",
+                "        sdk = {k: v for k, v in kwargs.items() "
+                "if k in _SDK_KWARGS}",
+                f"        body = _prepare_body({spec.op_method!r}, body)",
+            ]
+        )
+        if path_call_args:
+            call = f"{op_head}{path_call_args}, body, **sdk)"
+        else:
+            call = f"{op_head}body, **sdk)"
+        if primary_id:
+            lines.append(
+                f"        return _wrap_with_id_alias("
+                f"{await_kw}{call}, "
+                f"primary_id_field={primary_id!r})"
+            )
+        else:
+            lines.append(f"        return _wrap({await_kw}{call})")
+    else:
+        if path_call_args:
+            call = f"{op_head}{path_call_args}, **kwargs)"
+        else:
+            call = f"{op_head}**kwargs)"
+        if spec.op_method.startswith("get_") and primary_id:
+            lines.append(
+                f"        return _wrap_with_id_alias("
+                f"{await_kw}{call}, "
+                f"primary_id_field={primary_id!r})"
+            )
+        else:
+            lines.append(f"        return _wrap({await_kw}{call})")
+    return "\n".join(lines)
+
+
+def _render_leaf_class_body(
+    class_name: str,
+    specs: List[OpSpec],
+    child_segments: List[str],
+    async_mode: bool,
+) -> str:
+    """Render the full ``class ...:`` block for a leaf / leaf+namespace class."""
+    lines: List[str] = [
+        f"class {class_name}:",
+        '    """Inference resource helper (generated)."""',
+        "",
+        "    def __init__(self, client: Client) -> None:",
+        "        self._client = client",
+    ]
+    for seg in child_segments:
+        cls = _pascal_class_name(seg)
+        lines.append(f"        self.{seg} = {cls}(client)")
+    lines.append("")
+
+    for spec in specs:
+        method_names = _facade_methods_for(spec)
+        primary, *aliases = method_names
+        lines.append(_render_leaf_method(spec, primary, async_mode))
+        for alias in aliases:
+            lines.append(f"    {alias} = {primary}")
+        lines.append("")
+    return "\n".join(lines)
+
+
+def _write_leaf_module(
     path: Path,
+    specs: List[OpSpec],
     *,
-    group: str,
-    op_method: str,
-    facade_method: str,
     class_name: str,
     async_mode: bool,
 ) -> None:
-    ops = _client_attr(group)
-    sdk_set = ", ".join(repr(x) for x in sorted(_SDK_KWARGS))
-
-    if _operation_has_json_body(op_method):
-        if async_mode:
-            method_body = f"""        body = {{k: v for k, v in kwargs.items() if k not in _SDK_KWARGS}}
-        sdk = {{k: v for k, v in kwargs.items() if k in _SDK_KWARGS}}
-        return _wrap(await self._client.{ops}.{op_method}(body, **sdk))"""
-        else:
-            method_body = f"""        body = {{k: v for k, v in kwargs.items() if k not in _SDK_KWARGS}}
-        sdk = {{k: v for k, v in kwargs.items() if k in _SDK_KWARGS}}
-        return _wrap(self._client.{ops}.{op_method}(body, **sdk))"""
-    else:
-        if async_mode:
-            method_body = (
-                f"        return _wrap(await self._client.{ops}.{op_method}(**kwargs))"
-            )
-        else:
-            method_body = f"        return _wrap(self._client.{ops}.{op_method}(**kwargs))"
-
-    async_kw = "async " if async_mode else ""
-
+    """Emit a standalone leaf module (no child namespaces)."""
     text = (
         _header(async_mode=async_mode)
-        + "\n"
-        + f"_SDK_KWARGS = frozenset({{{sdk_set}}})\n"
+        + _FACADE_HEADER_EXTRAS
         + "\n\n"
-        + f"class {class_name}:\n"
-        + '    """Inference resource helper (generated)."""\n'
-        + "\n"
-        + "    def __init__(self, client: Client) -> None:\n"
-        + "        self._client = client\n"
-        + "\n"
-        + f"    {async_kw}def {facade_method}(self, **kwargs: Any) -> Any:\n"
-        + f'        """Delegates to ``client.{ops}.{op_method}``."""\n'
-        + method_body
+        + _render_leaf_class_body(class_name, specs, [], async_mode)
         + "\n"
     )
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -246,6 +417,7 @@ def _write_async_invoke_leaf_class(
 
     text = (
         _header(async_mode=async_mode)
+        + "from pydo.custom_extensions import _wrap\n"
         + "\n"
         + f"_SDK_KWARGS = frozenset({{{sdk_set}}})\n"
         + "\n\n"
@@ -401,16 +573,40 @@ def _write_namespace_init(
     init_path.write_text("\n".join(lines), encoding="utf-8")
 
 
+def _normalize_action_segments(
+    segments: Tuple[str, ...], op_method: str
+) -> Tuple[str, ...]:
+    """Drop a trailing action-verb segment when it aligns with ``op_method``.
+
+    Example: ``segments=('batches', 'cancel')`` with ``op_method='cancel_batch'``
+    becomes ``('batches',)`` so the op is emitted as a method on the parent
+    namespace.
+    """
+    if len(segments) >= 2 and segments[-1] in _ACTION_VERBS:
+        if op_method.startswith(f"{segments[-1]}_"):
+            return segments[:-1]
+    return segments
+
+
 def _collect_ops_by_group(
     builders: List[Tuple[str, str, str]],
 ) -> Dict[str, List[OpSpec]]:
     by_group: Dict[str, List[OpSpec]] = {}
     for group, op_method, url in builders:
-        segs = _path_segments(url)
+        segs, params = _split_url(url)
         if not segs:
-            raise RuntimeError(f"no segments for {url!r} ({group}.{op_method})")
+            # Internal helper (e.g. presigned-URL PUT) — still reachable via
+            # ``client.inference.<op_method>`` directly, just not placed on
+            # the public resource tree.
+            continue
+        segs = _normalize_action_segments(segs, op_method)
         by_group.setdefault(group, []).append(
-            OpSpec(group=group, op_method=op_method, segments=segs)
+            OpSpec(
+                group=group,
+                op_method=op_method,
+                segments=segs,
+                path_params=params,
+            )
         )
     return by_group
 
@@ -478,6 +674,179 @@ def _write_empty_package_init(base: Path, *, class_name: str, async_mode: bool) 
     )
 
 
+_FILES_FACADE_DRIVER_OPS = ("create_batch_file", "get_batch_results")
+_FILES_FACADE_OPTIONAL_OPS = ("delete_batch_file",)
+
+
+def _files_facade_driver_ops_present(specs: List[OpSpec]) -> bool:
+    op_names = {spec.op_method for spec in specs}
+    return all(op in op_names for op in _FILES_FACADE_DRIVER_OPS)
+
+
+def _files_facade_optional_op_present(specs: List[OpSpec], op: str) -> bool:
+    return any(spec.op_method == op for spec in specs)
+
+
+def _write_files_facade_module(
+    path: Path, specs: List[OpSpec], *, async_mode: bool
+) -> None:
+    """Emit the cross-resource ``files`` facade module.
+
+    The methods compose two spec operations behind a single, ergonomic
+    surface: ``create`` combines ``create_batch_file`` (intent) with the PUT
+    upload to the returned presigned URL, and ``content`` wraps the result
+    of ``get_batch_results`` so downloaded bytes can be consumed eagerly.
+
+    The module is only emitted when both driver ops are present in the
+    current generation, so existing resource trees remain unaffected when
+    the spec does not define batch file operations.
+    """
+    client_import = (
+        "from pydo.aio import Client" if async_mode else "from pydo import Client"
+    )
+    async_kw = "async " if async_mode else ""
+    await_kw = "await " if async_mode else ""
+    upload_call = (
+        "await asyncio.to_thread(_upload_via_presigned, intent['upload_url'], "
+        "data, content_type)"
+        if async_mode
+        else "_upload_via_presigned(intent['upload_url'], data, content_type)"
+    )
+    asyncio_import = "import asyncio\n" if async_mode else ""
+
+    body = f'''{INIT_HEADER}
+{asyncio_import}from typing import Any
+
+{client_import}
+from pydo.custom_extensions import (
+    _SDK_KWARGS,
+    _FileContent,
+    _read_file_arg,
+    _upload_via_presigned,
+    _wrap,
+    _wrap_file_content,
+)
+
+
+class Files:
+    """Convenience facade for JSONL input upload and output download."""
+
+    def __init__(self, client: Client) -> None:
+        self._client = client
+
+    {async_kw}def create(
+        self,
+        *,
+        file: Any = None,
+        purpose: str = "batch",
+        **kwargs: Any,
+    ) -> Any:
+        """Upload a JSONL input file for use with ``batches.create``.
+
+        Combines two spec operations: creating a file intent
+        (``POST /v1/batches/files``) and uploading bytes to the returned
+        presigned URL.  Returns an object exposing both the canonical
+        spec fields (``file_id``, ``upload_url``, ``expires_at``) and an
+        ``id`` alias.
+
+        :keyword file: File content; accepts a filesystem path, raw bytes,
+            a readable stream, or a ``(name, data)`` tuple. Required.
+        :keyword purpose: Free-form label retained on the returned object
+            (``"batch"`` is the only purpose currently used server-side).
+        """
+        name, data, content_type = _read_file_arg(file)
+        sdk = {{k: v for k, v in kwargs.items() if k in _SDK_KWARGS}}
+        intent = {await_kw}self._client.inference.create_batch_file(
+            {{"file_name": name}}, **sdk
+        )
+        {upload_call}
+        result = dict(intent)
+        result["id"] = result.get("file_id")
+        result["purpose"] = purpose
+        result["filename"] = name
+        result["bytes"] = len(data)
+        return _wrap(result)
+
+    {async_kw}def content(self, file_id: str, **kwargs: Any) -> _FileContent:
+        """Fetch the output of a completed batch job.
+
+        ``file_id`` may be the value read from ``batch.output_file_id`` on
+        a completed batch.  Delegates to ``get_batch_results`` and returns
+        a response object whose ``.read()`` / ``.text`` accessors lazily
+        download the referenced presigned URL.
+        """
+        response = {await_kw}self._client.inference.get_batch_results(
+            batch_id=file_id, **kwargs
+        )
+        return _wrap_file_content(response)
+'''
+
+    if _files_facade_optional_op_present(specs, "delete_batch_file"):
+        body += f'''
+    {async_kw}def delete(self, file_id: str, **kwargs: Any) -> Any:
+        """Delete a previously uploaded batch input file.
+
+        Delegates to ``delete_batch_file`` (``DELETE /v1/batches/files/{{file_id}}``).
+        """
+        return _wrap(
+            {await_kw}self._client.inference.delete_batch_file(
+                file_id=file_id, **kwargs
+            )
+        )
+'''
+
+    body += '''
+
+__all__ = ["Files"]
+'''
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(body, encoding="utf-8")
+
+
+def _write_combined_package_init(
+    init_path: Path,
+    prefix: Tuple[str, ...],
+    specs: List[OpSpec],
+    child_segments: List[str],
+    *,
+    async_mode: bool,
+) -> None:
+    """Emit ``__init__.py`` for a prefix that is BOTH a leaf and a namespace.
+
+    Example: ``/v1/batches`` has its own create/get operations **and** nested
+    routes like ``/v1/batches/files`` and ``/v1/batches/{id}/result``.
+    """
+    parent_class = _pascal_class_name(prefix[-1])
+    client_import = (
+        "from pydo.aio import Client" if async_mode else "from pydo import Client"
+    )
+    lines: List[str] = [
+        INIT_HEADER,
+        "",
+        "from typing import Any",
+        "",
+        client_import,
+        "from pydo.custom_extensions import (",
+        "    _SDK_KWARGS,",
+        "    _prepare_body,",
+        "    _wrap,",
+        "    _wrap_with_id_alias,",
+        ")",
+    ]
+    for child in child_segments:
+        lines.append(f"from .{child} import {_pascal_class_name(child)}")
+    lines.append("")
+    lines.append("")
+    lines.append(
+        _render_leaf_class_body(parent_class, specs, child_segments, async_mode)
+    )
+    lines.append("")
+    lines.append(f'__all__ = ["{parent_class}"]')
+    lines.append("")
+    init_path.parent.mkdir(parents=True, exist_ok=True)
+    init_path.write_text("\n".join(lines), encoding="utf-8")
+
+
 def _emit_group(
     base: Path,
     specs: List[OpSpec],
@@ -490,61 +859,70 @@ def _emit_group(
         _write_empty_package_init(base, class_name=facade_class, async_mode=async_mode)
         return []
 
-    leaf_by_path: Dict[Tuple[str, ...], OpSpec] = {}
-    for s in specs:
-        key = tuple(s.segments)
-        if key in leaf_by_path:
-            raise RuntimeError(
-                f"duplicate inference path {key!r}: "
-                f"{leaf_by_path[key].op_method} vs {s.op_method}"
-            )
-        leaf_by_path[key] = s
+    leaves_by_prefix: Dict[Tuple[str, ...], List[OpSpec]] = {}
+    for spec in specs:
+        leaves_by_prefix.setdefault(tuple(spec.segments), []).append(spec)
 
     tree_keys = _build_tree_keys(specs)
 
-    for path_tuple, spec in leaf_by_path.items():
-        *parents, leaf_seg = path_tuple
+    for prefix in sorted(tree_keys, key=len):
+        leaf_specs = leaves_by_prefix.get(prefix, [])
+        child_segments = _immediate_child_segments(prefix, tree_keys)
+        *parents, leaf_seg = prefix
         leaf_class = _pascal_class_name(leaf_seg)
-        if parents:
-            rel = Path(*parents) / f"{leaf_seg}.py"
-        else:
-            rel = Path(f"{leaf_seg}.py")
-        if (
-            not parents
+
+        is_special_async_invoke = (
+            len(prefix) == 1
             and leaf_seg == "async_invoke"
-            and spec.op_method == "create_async_invoke"
-        ):
+            and leaf_specs
+            and leaf_specs[0].op_method == "create_async_invoke"
+        )
+
+        if is_special_async_invoke:
+            rel = Path(f"{leaf_seg}.py") if not parents else Path(*parents) / f"{leaf_seg}.py"
             _write_async_invoke_leaf_class(
                 base / rel,
-                group=spec.group,
+                group=leaf_specs[0].group,
                 async_mode=async_mode,
             )
-        else:
-            _write_leaf_class(
+            continue
+
+        if leaf_specs and not child_segments:
+            rel = Path(f"{leaf_seg}.py") if not parents else Path(*parents) / f"{leaf_seg}.py"
+            _write_leaf_module(
                 base / rel,
-                group=spec.group,
-                op_method=spec.op_method,
-                facade_method=_facade_method_name(spec.op_method),
+                leaf_specs,
                 class_name=leaf_class,
                 async_mode=async_mode,
             )
-
-    for prefix in sorted(tree_keys, key=lambda x: len(x), reverse=True):
-        if prefix in leaf_by_path:
-            continue
-        children = _immediate_child_segments(prefix, tree_keys)
-        if not children:
-            continue
-        init_dir = base.joinpath(*prefix)
-        init_dir.mkdir(parents=True, exist_ok=True)
-        _write_namespace_init(
-            init_dir / "__init__.py",
-            prefix,
-            children,
-            async_mode=async_mode,
-        )
+        elif leaf_specs and child_segments:
+            init_dir = base.joinpath(*prefix)
+            init_dir.mkdir(parents=True, exist_ok=True)
+            _write_combined_package_init(
+                init_dir / "__init__.py",
+                prefix,
+                leaf_specs,
+                child_segments,
+                async_mode=async_mode,
+            )
+        elif child_segments:
+            init_dir = base.joinpath(*prefix)
+            init_dir.mkdir(parents=True, exist_ok=True)
+            _write_namespace_init(
+                init_dir / "__init__.py",
+                prefix,
+                child_segments,
+                async_mode=async_mode,
+            )
 
     top_segments = sorted({s.segments[0] for s in specs})
+
+    if _files_facade_driver_ops_present(specs):
+        _write_files_facade_module(base / "files.py", specs, async_mode=async_mode)
+        if "files" not in top_segments:
+            top_segments.append("files")
+            top_segments.sort()
+
     _write_package_init_with_facade(
         base / "__init__.py",
         top_segments,
@@ -649,16 +1027,18 @@ def _write_inference_surface_manifest(
         payload["inference"].append(
             {
                 "op_method": spec.op_method,
-                "path_segments": spec.segments,
-                "facade_method": _facade_method_name(spec.op_method),
+                "path_segments": list(spec.segments),
+                "path_params": list(spec.path_params),
+                "facade_methods": _facade_methods_for(spec),
             }
         )
     for spec in by_group.get("agent_inference", []):
         payload["agent_inference"].append(
             {
                 "op_method": spec.op_method,
-                "path_segments": spec.segments,
-                "facade_method": _facade_method_name(spec.op_method),
+                "path_segments": list(spec.segments),
+                "path_params": list(spec.path_params),
+                "facade_methods": _facade_methods_for(spec),
             }
         )
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
