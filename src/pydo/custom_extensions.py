@@ -46,9 +46,13 @@ import asyncio
 import codecs
 import inspect
 import json
+import os
 import random
 import re
 import time
+import urllib.error
+import urllib.request
+import uuid
 from io import IOBase
 from typing import (
     Any,
@@ -58,6 +62,7 @@ from typing import (
     Dict,
     Iterator,
     Optional,
+    Tuple,
 )
 from urllib.parse import urlparse
 
@@ -675,3 +680,252 @@ async def async_iter_sse_with_retry(
             raise
 
     raise SSEStreamRetryExhaustedError("SSE stream failed") from last_exc
+
+
+# ---------------------------------------------------------------------------
+# Generic runtime helpers used by generated inference facades.
+#
+# These tables encode policies that are not expressed in the OpenAPI spec
+# (parameter aliases, per-op defaults, auto-filled idempotency keys).  They
+# are consulted at call time by the generated leaf methods, so that ``make
+# generate`` can keep producing straightforward, spec-driven code without
+# per-endpoint hand-written shims.
+# ---------------------------------------------------------------------------
+
+
+_SDK_KWARGS: frozenset = frozenset(
+    {
+        "headers",
+        "params",
+        "content_type",
+        "cls",
+        "raw_request_hook",
+        "raw_response_hook",
+        "polling",
+        "continuation_token",
+        "form_content_type",
+        "error_map",
+    }
+)
+
+# Drop-in body parameter aliases: maps convenience caller names → canonical
+# spec name.  Applied to every generated ``create_*`` call.
+_BODY_KWARG_ALIASES: Dict[str, str] = {
+    "input_file_id": "file_id",
+}
+
+# Per-op body defaults injected when the caller omits them.
+_BODY_DEFAULTS: Dict[str, Dict[str, Any]] = {
+    "create_batch": {"provider": "openai", "completion_window": "24h"},
+}
+
+# Per-op body fields that default to a random UUID (server idempotency keys).
+_AUTO_UUID_BODY_KEYS: Dict[str, Tuple[str, ...]] = {
+    "create_batch": ("request_id",),
+}
+
+
+def _prepare_body(op_method: str, body: Dict[str, Any]) -> Dict[str, Any]:
+    """Apply spec-agnostic body transforms for a generated create-like op.
+
+    * Rename alias keys to the canonical spec names (``_BODY_KWARG_ALIASES``).
+    * Fill missing idempotency keys with a fresh UUID (``_AUTO_UUID_BODY_KEYS``).
+    * Inject per-op defaults for fields the caller did not set
+      (``_BODY_DEFAULTS``).
+    """
+    out: Dict[str, Any] = {}
+    for key, value in body.items():
+        canonical = _BODY_KWARG_ALIASES.get(key, key)
+        if canonical in out:
+            continue
+        out[canonical] = value
+    for auto_key in _AUTO_UUID_BODY_KEYS.get(op_method, ()):
+        if out.get(auto_key) in (None, ""):
+            out[auto_key] = str(uuid.uuid4())
+    for default_key, default_value in _BODY_DEFAULTS.get(op_method, {}).items():
+        out.setdefault(default_key, default_value)
+    return out
+
+
+def _wrap_with_id_alias(obj: Any, primary_id_field: Optional[str] = None) -> Any:
+    """Wrap ``obj`` via :func:`_wrap` and expose ``.id`` as an alias.
+
+    For dict responses where the primary identifier is a namespaced key
+    (e.g. ``batch_id``), this sets ``id`` to the same value so that
+    downstream code may use the more conventional ``resource.id`` form
+    without breaking the underlying spec key.
+    """
+    wrapped = _wrap(obj)
+    if (
+        primary_id_field
+        and isinstance(wrapped, dict)
+        and primary_id_field in wrapped
+        and "id" not in wrapped
+    ):
+        wrapped["id"] = wrapped[primary_id_field]
+    return wrapped
+
+
+# ---------------------------------------------------------------------------
+# File upload / download helpers (used by the generated ``files`` facade).
+# ---------------------------------------------------------------------------
+
+
+def _read_file_arg(file: Any) -> Tuple[str, bytes, str]:
+    """Coerce a caller-supplied ``file`` value into ``(name, bytes, content_type)``.
+
+    Accepted shapes:
+    * ``str`` / ``os.PathLike`` – path on disk (binary-read).
+    * ``bytes`` / ``bytearray`` – raw payload (default filename used).
+    * file-like object with ``.read()`` – read and use ``.name`` if available.
+    * tuple ``(name, data)`` – explicit pairing.
+    """
+    if file is None:
+        raise TypeError(
+            "create() requires a 'file' argument (path, bytes, or file-like)."
+        )
+
+    if isinstance(file, tuple) and len(file) == 2:
+        name, data = file
+        return _coerce_name_and_bytes(name, data)
+
+    if isinstance(file, (bytes, bytearray)):
+        return "input.jsonl", bytes(file), "application/octet-stream"
+
+    if isinstance(file, (str, os.PathLike)):
+        path = os.fspath(file)
+        with open(path, "rb") as handle:
+            data = handle.read()
+        return (
+            os.path.basename(path) or "input.jsonl",
+            data,
+            "application/octet-stream",
+        )
+
+    if hasattr(file, "read"):
+        data = file.read()
+        if isinstance(data, str):
+            data = data.encode("utf-8")
+        name = getattr(file, "name", None) or "input.jsonl"
+        return (
+            os.path.basename(str(name)) or "input.jsonl",
+            bytes(data),
+            "application/octet-stream",
+        )
+
+    raise TypeError(
+        "unsupported 'file' argument type: "
+        f"{type(file).__name__}; pass a path, bytes, or a readable stream."
+    )
+
+
+def _coerce_name_and_bytes(name: Any, data: Any) -> Tuple[str, bytes, str]:
+    if not isinstance(name, str):
+        raise TypeError("file tuple form: first element must be a filename str.")
+    if isinstance(data, (bytes, bytearray)):
+        return name, bytes(data), "application/octet-stream"
+    if hasattr(data, "read"):
+        chunk = data.read()
+        if isinstance(chunk, str):
+            chunk = chunk.encode("utf-8")
+        return name, bytes(chunk), "application/octet-stream"
+    raise TypeError(
+        "file tuple form: second element must be bytes or a readable stream."
+    )
+
+
+def _upload_via_presigned(
+    upload_url: str,
+    data: bytes,
+    content_type: str = "application/octet-stream",
+    *,
+    timeout: float = 120.0,
+) -> None:
+    """HTTP ``PUT`` ``data`` to a short-lived presigned URL.
+
+    Intentionally uses only the standard library so the upload works in
+    environments where no additional HTTP client is available.
+    """
+    if not upload_url:
+        raise RuntimeError("presigned upload URL is missing from the intent response.")
+    request = urllib.request.Request(
+        url=upload_url,
+        data=data,
+        method="PUT",
+        headers={
+            "Content-Type": content_type,
+            "Content-Length": str(len(data)),
+        },
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            status = getattr(response, "status", response.getcode())
+            if status is not None and not (200 <= int(status) < 300):
+                raise RuntimeError(f"presigned upload rejected with HTTP {status}")
+    except urllib.error.HTTPError as exc:
+        body = exc.read() if hasattr(exc, "read") else b""
+        snippet = body[:512].decode("utf-8", errors="replace") if body else ""
+        raise RuntimeError(
+            f"presigned upload failed: HTTP {exc.code} {exc.reason}"
+            + (f" — {snippet}" if snippet else "")
+        ) from exc
+
+
+def _download_from_url(url: str, *, timeout: float = 120.0) -> bytes:
+    """HTTP ``GET`` ``url`` and return the response body as bytes."""
+    request = urllib.request.Request(url=url, method="GET")
+    with urllib.request.urlopen(request, timeout=timeout) as response:
+        return response.read()
+
+
+class _FileContent(DotDict):
+    """Presigned-download response wrapper returned by ``files.content``.
+
+    Preserves the raw spec fields (e.g. ``output_location``,
+    ``error_location``, ``expires_at``) and offers convenient accessors
+    that lazily fetch bytes from the presigned URL.
+    """
+
+    def _primary_url(self) -> str:
+        for key in ("output_location", "download_url", "location", "url"):
+            url = self.get(key)
+            if url:
+                return url
+        output = self.get("output")
+        if isinstance(output, dict):
+            for key in ("url", "download_url", "location"):
+                value = output.get(key)
+                if value:
+                    return value
+        raise RuntimeError(
+            "no downloadable URL in batch result response; "
+            f"available keys: {sorted(self.keys())}"
+        )
+
+    def read(self, *, timeout: float = 120.0) -> bytes:
+        """Eagerly fetch the output bytes from the presigned URL."""
+        cached = self.get("_cached_bytes")
+        if isinstance(cached, (bytes, bytearray)):
+            return bytes(cached)
+        data = _download_from_url(self._primary_url(), timeout=timeout)
+        self["_cached_bytes"] = data
+        return data
+
+    @property
+    def text(self) -> str:
+        """UTF-8 decoded view of :meth:`read`."""
+        return self.read().decode("utf-8")
+
+    def iter_lines(self, *, timeout: float = 120.0) -> Iterator[str]:
+        """Yield decoded lines of the output file (typical JSONL usage)."""
+        payload = self.read(timeout=timeout).decode("utf-8")
+        for line in payload.splitlines():
+            if line:
+                yield line
+
+
+def _wrap_file_content(obj: Any) -> Any:
+    """Wrap a ``get_batch_result``-style response as :class:`_FileContent`."""
+    if isinstance(obj, dict):
+        return _FileContent({k: _wrap(v) for k, v in obj.items()})
+    return _wrap(obj)
