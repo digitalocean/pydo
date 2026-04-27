@@ -8,21 +8,11 @@ from __future__ import annotations
 from typing import Any
 
 from pydo import Client
-from pydo.custom_extensions import _wrap
-
-_SDK_KWARGS = frozenset(
-    {
-        "cls",
-        "content_type",
-        "continuation_token",
-        "error_map",
-        "form_content_type",
-        "headers",
-        "params",
-        "polling",
-        "raw_request_hook",
-        "raw_response_hook",
-    }
+from pydo.custom_extensions import (
+    _SDK_KWARGS,
+    _prepare_body,
+    _wrap,
+    _wrap_with_id_alias,
 )
 
 
@@ -36,4 +26,8 @@ class Messages:
         """Delegates to ``client.inference.create_messages``."""
         body = {k: v for k, v in kwargs.items() if k not in _SDK_KWARGS}
         sdk = {k: v for k, v in kwargs.items() if k in _SDK_KWARGS}
-        return _wrap(self._client.inference.create_messages(body, **sdk))
+        body = _prepare_body("create_messages", body)
+        return _wrap_with_id_alias(
+            self._client.inference.create_messages(body, **sdk),
+            primary_id_field="messages_id",
+        )

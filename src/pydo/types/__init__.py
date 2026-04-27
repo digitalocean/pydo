@@ -15,11 +15,16 @@ Usage::
 """
 
 from pydo.types.async_invoke import AsyncInvokeResponse
+from pydo.types.batches import BatchFileCreateResponse
+from pydo.types.batches import BatchListResponse
+from pydo.types.batches import BatchResultsResponse
+from pydo.types.batches import Error
 from pydo.types.chat import ChatCompletionChunk
 from pydo.types.chat import ChatCompletion
 from pydo.types.chat import ChatCompletionStreamResponseDelta
 from pydo.types.chat import ChatCompletionTokenLogprob
 from pydo.types.chat import CompletionUsage
+from pydo.types.create import Batch
 from pydo.types.embeddings import EmbeddingDataItem
 from pydo.types.embeddings import EmbeddingsResponse
 from pydo.types.embeddings import EmbeddingsUsage
@@ -40,11 +45,16 @@ from pydo.types.responses import ResponseUsage
 
 __all__ = [
     "AsyncInvokeResponse",
+    "BatchFileCreateResponse",
+    "BatchListResponse",
+    "BatchResultsResponse",
+    "Error",
     "ChatCompletionChunk",
     "ChatCompletion",
     "ChatCompletionStreamResponseDelta",
     "ChatCompletionTokenLogprob",
     "CompletionUsage",
+    "Batch",
     "EmbeddingDataItem",
     "EmbeddingsResponse",
     "EmbeddingsUsage",

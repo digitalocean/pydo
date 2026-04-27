@@ -8,8 +8,10 @@ from __future__ import annotations
 
 from pydo import Client
 from .async_invoke import AsyncInvoke
+from .batches import Batches
 from .chat import Chat
 from .embeddings import Embeddings
+from .files import Files
 from .images import Images
 from .messages import Messages
 from .models import Models
@@ -21,8 +23,10 @@ class InferenceResources:
 
     def __init__(self, client: Client) -> None:
         self.async_invoke = AsyncInvoke(client)
+        self.batches = Batches(client)
         self.chat = Chat(client)
         self.embeddings = Embeddings(client)
+        self.files = Files(client)
         self.images = Images(client)
         self.messages = Messages(client)
         self.models = Models(client)

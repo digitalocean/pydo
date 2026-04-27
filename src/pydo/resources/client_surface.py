@@ -19,6 +19,12 @@ class InferenceClientSurface:
         return self._require_inference_resource_root().async_invoke
 
     @property
+    def batches(self) -> Any:
+        """Nested serverless inference API under path segment ``batches``."""
+
+        return self._require_inference_resource_root().batches
+
+    @property
     def chat(self) -> Any:
         """Nested serverless inference API under path segment ``chat``."""
 
@@ -29,6 +35,12 @@ class InferenceClientSurface:
         """Nested serverless inference API under path segment ``embeddings``."""
 
         return self._require_inference_resource_root().embeddings
+
+    @property
+    def files(self) -> Any:
+        """Nested serverless inference API under path segment ``files``."""
+
+        return self._require_inference_resource_root().files
 
     @property
     def messages(self) -> Any:
