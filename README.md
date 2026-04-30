@@ -91,6 +91,27 @@ while paginated:
         paginated = False
 ```
 
+#### Async Usage
+
+For async, import from `pydo.aio` instead of `pydo`. The surface is identical
+— same constructor, same operation groups — just `await` the calls. Use
+`async with` so the underlying transport closes cleanly.
+
+```python
+import asyncio, os
+from pydo.aio import Client
+
+async def main():
+    async with Client(api_key=os.environ["DIGITALOCEAN_TOKEN"]) as client:
+        resp = await client.chat.completions.create(
+            model="llama3.3-70b-instruct",
+            messages=[{"role": "user", "content": "Hello!"}],
+        )
+        print(resp)
+
+asyncio.run(main())
+```
+
 #### Retries and Backoff
 
 By default the client uses the same retry policy as the [Azure SDK for Python](https://learn.microsoft.com/en-us/python/api/azure-core/azure.core.pipeline.policies.retrypolicy?view=azure-python)
