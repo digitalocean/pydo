@@ -122,4 +122,4 @@ jobs:
           cat pr_body.md
         env:
           GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
-          PR_TITLE: ${{ steps.pr_title_var.outputs.PR_TITLE }}
+          # PR_TITLE: ${{ steps.pr_title_var.outputs.PR_TITLE }}
