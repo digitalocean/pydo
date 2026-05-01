@@ -112,7 +112,7 @@ jobs:
         run: |
           export CURRENT="$(cat DO_OPENAPI_COMMIT_SHA.txt)"
           export TARGET="${{ env.TEST_SHA }}"
-          export TITLE="$PR_TITLE"
+          export TITLE="${{ steps.pr_title_var.outputs.PR_TITLE }}"
           envsubst < scripts/pr_body.md_tmpl > pr_body.md
           cat changelist.md >> pr_body.md
 
