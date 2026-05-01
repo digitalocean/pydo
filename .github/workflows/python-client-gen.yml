@@ -6,9 +6,17 @@ on:
         description: "The short commit sha that triggered the workflow"
         required: true
         type: string
+  # TEST: temporary push trigger so the workflow runs on this branch.
+  # Remove before merging.
+  push:
+    branches:
+      - hotfix/APICLI-3534
 
 env:
-  NEW_BRANCH: openapi-${{ github.event.inputs.openapi_short_sha }}/clientgen
+  # TEST: hardcoded SHA used when triggered by push (no inputs available).
+  # Remove / revert before merging.
+  TEST_SHA: 6cafc08
+  NEW_BRANCH: openapi-6cafc08/clientgen
 
 jobs:
   Generate-Python-Client:
@@ -17,95 +25,101 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: OpenAPI Changelist
-        env:
-          GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
-        run: |
-          current_sha=$(cat DO_OPENAPI_COMMIT_SHA.txt)
-          echo "current_sha=$current_sha" >> $GITHUB_ENV
-          target_sha=${{ github.event.inputs.openapi_short_sha }}
-          scripts/openapi_changelist.sh $current_sha $target_sha > changelist.md
+      # ===== TEST: steps below are commented out for PR_TITLE testing. Restore before merging. =====
+      # - name: OpenAPI Changelist
+      #   env:
+      #     GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+      #   run: |
+      #     current_sha=$(cat DO_OPENAPI_COMMIT_SHA.txt)
+      #     echo "current_sha=$current_sha" >> $GITHUB_ENV
+      #     target_sha=${{ github.event.inputs.openapi_short_sha }}
+      #     scripts/openapi_changelist.sh $current_sha $target_sha > changelist.md
 
-      - name: Removes all generated code
-        run: make clean
+      - name: Stub changelist.md (TEST ONLY)
+        run: echo "_stub changelist content for testing_" > changelist.md
 
-      - name: Download spec file and Update DO_OPENAPI_COMMIT_SHA.txt
-        run: |
-          curl --fail https://api-engineering.nyc3.digitaloceanspaces.com/spec-ci/DigitalOcean-public-${{ github.event.inputs.openapi_short_sha }}.v2.yaml -o DigitalOcean-public.v2.yaml
-          echo ${{ github.event.inputs.openapi_short_sha }} > DO_OPENAPI_COMMIT_SHA.txt
-        env:
-          GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+      # - name: Removes all generated code
+      #   run: make clean
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: DigitalOcean-public.v2
-          path: ./DigitalOcean-public.v2.yaml
+      # - name: Download spec file and Update DO_OPENAPI_COMMIT_SHA.txt
+      #   run: |
+      #     curl --fail https://api-engineering.nyc3.digitaloceanspaces.com/spec-ci/DigitalOcean-public-${{ github.event.inputs.openapi_short_sha }}.v2.yaml -o DigitalOcean-public.v2.yaml
+      #     echo ${{ github.event.inputs.openapi_short_sha }} > DO_OPENAPI_COMMIT_SHA.txt
+      #   env:
+      #     GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
 
-      - name: Checkout new Branch
-        run: git checkout -b ${{ env.NEW_BRANCH }}
-        env:
-          GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+      # - uses: actions/upload-artifact@v4
+      #   with:
+      #     name: DigitalOcean-public.v2
+      #     path: ./DigitalOcean-public.v2.yaml
 
-      - name: Install Poetry
-        uses: snok/install-poetry@v1.3.4
-        with:
-          version: 1.6.1
-          virtualenvs-path: .venv
-          virtualenvs-create: true
-          virtualenvs-in-project: true
-          installer-parallel: false
+      # - name: Checkout new Branch
+      #   run: git checkout -b ${{ env.NEW_BRANCH }}
+      #   env:
+      #     GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
 
-      - name: Generate Python client
-        run: make generate
+      # - name: Install Poetry
+      #   uses: snok/install-poetry@v1.3.4
+      #   with:
+      #     version: 1.6.1
+      #     virtualenvs-path: .venv
+      #     virtualenvs-create: true
+      #     virtualenvs-in-project: true
+      #     installer-parallel: false
 
-      - name: Generate Python client documentation
-        run: make generate-docs
+      # - name: Generate Python client
+      #   run: make generate
 
-      - name: Add and commit changes
-        id: add-commit-changes
-        continue-on-error: true
-        run: |
-          git config --global user.email "api-engineering@digitalocean.com"
-          git config --global user.name "API Engineering"
-          git add .
-          git commit -m "[bot] Updated client based on ${{ env.NEW_BRANCH }}"
-          git push --set-upstream origin ${{ env.NEW_BRANCH }}
-        env:
-          GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+      # - name: Generate Python client documentation
+      #   run: make generate-docs
 
-      - name: Check if branch existed
-        # If steps.create-pr was anything but successful, it's possible that
-        # the branch was created in previous pipeline runs so it should be manually deleted.
-        if: steps.add-commit-changes.outcome != 'success'
-        run: |
-          echo "Add and commit changes step failed. It's possible the branch ${{ env.NEW_BRANCH }} already existed. Please delete the branch and re-run the pipeline."
-          exit 1
+      # - name: Add and commit changes
+      #   id: add-commit-changes
+      #   continue-on-error: true
+      #   run: |
+      #     git config --global user.email "api-engineering@digitalocean.com"
+      #     git config --global user.name "API Engineering"
+      #     git add .
+      #     git commit -m "[bot] Updated client based on ${{ env.NEW_BRANCH }}"
+      #     git push --set-upstream origin ${{ env.NEW_BRANCH }}
+      #   env:
+      #     GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
 
+      # - name: Check if branch existed
+      #   # If steps.create-pr was anything but successful, it's possible that
+      #   # the branch was created in previous pipeline runs so it should be manually deleted.
+      #   if: steps.add-commit-changes.outcome != 'success'
+      #   run: |
+      #     echo "Add and commit changes step failed. It's possible the branch ${{ env.NEW_BRANCH }} already existed. Please delete the branch and re-run the pipeline."
+      #     exit 1
+      # ===== TEST: end of commented-out section =====
+
+      # ===== STEPS UNDER TEST =====
       - name: Set pr_title outputs 
         id: pr_title_var
-        run: echo "PR_TITLE=$(gh pr list --search "${{ github.event.inputs.openapi_short_sha }}" --json title --jq '.[0].title' --repo digitalocean/openapi --state merged)" >> $GITHUB_OUTPUT
+        # TEST: using ${{ env.TEST_SHA }} instead of github.event.inputs.openapi_short_sha
+        run: echo "PR_TITLE=$(gh pr list --search "${{ env.TEST_SHA }}" --json title --jq '.[0].title' --repo digitalocean/openapi --state merged)" >> $GITHUB_OUTPUT
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Check pr_title outputs 
-        run: echo "${{ steps.pr_title_var.outputs.PR_TITLE }}"
+        run: echo "PR_TITLE from env=[$PR_TITLE]"
+        env:
+          PR_TITLE: ${{ steps.pr_title_var.outputs.PR_TITLE }}
 
-      - name: Create Pull Request
+      - name: Create Pull Request (DRY RUN)
         id: create-pr
-        if: steps.add-commit-changes.outcome == 'success'
+        # TEST: gate removed (add-commit-changes is disabled), gh pr create replaced with echo
         run: |
           export CURRENT="$(cat DO_OPENAPI_COMMIT_SHA.txt)"
-          export TARGET="${{ github.event.inputs.openapi_short_sha }}"
-          export TITLE="${{ steps.pr_title_var.outputs.PR_TITLE }}"
+          export TARGET="${{ env.TEST_SHA }}"
+          export TITLE="$PR_TITLE"
           envsubst < scripts/pr_body.md_tmpl > pr_body.md
           cat changelist.md >> pr_body.md
 
-          echo "PR BODY:"
+          echo "===== Final --title would be ====="
+          echo "[bot] $TITLE: Re-Generated From digitalocean/openapi@$TARGET"
+          echo "===== Final --body-file would be ====="
           cat pr_body.md
-
-          gh pr create \
-            --title "[bot] $TITLE: Re-Generated From digitalocean/openapi@$TARGET" \
-            --body-file pr_body.md \
-            --head "${{ env.NEW_BRANCH }}" \
-            -r digitalocean/api-cli
         env:
           GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+          PR_TITLE: ${{ steps.pr_title_var.outputs.PR_TITLE }}
