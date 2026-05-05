@@ -9,6 +9,14 @@ A top priority of this project is to ensure the client abides by the API
 contract. Therefore, the client itself wraps a generated client based
 on the [DigitalOcean OpenAPI Specification](https://github.com/digitalocean/openapi) to support all of DigitalOcean's HTTP APIs.
 
+> **🚀 New in v0.29.0 — AI & Inference support**
+>
+> `pydo` now ships first-class support for DigitalOcean's
+> [Gradient AI Platform](https://www.digitalocean.com/products/gradient): chat
+> completions (with streaming), image generation, audio, batch inference, and
+> model listing — all from the same `Client`. Jump to
+> [**AI & Inference**](#ai--inference) to get started.
+
 # **Getting Started With the Client**
 
 ## Prerequisites
@@ -36,6 +44,30 @@ from pydo import Client
 client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"))
 ```
 
+> **ℹ️ `api_key=` vs `token=` — what's the difference?**
+>
+> They're the same thing. `token=` and `api_key=` are just two names for
+> the same argument, and both work for every API in `pydo` — infrastructure
+> and inference. Use whichever name reads better in your code.
+>
+> What matters is the **credential** you pass in, not the argument name:
+>
+> | What you're calling | What you need |
+> | --- | --- |
+> | Infrastructure APIs (`droplets`, `ssh_keys`, `kubernetes`, `volumes`, …) | A DigitalOcean API token (PAT). |
+> | Inference APIs (`chat`, `images`, `models`, `audio`, `batches`, `files`, `responses`) | A PAT created with **full access** scope, **or** a Gradient **Model Access Key**. |
+>
+> If you only have a limited-scope PAT, infra calls will work but inference
+> calls will fail with a 401. To fix it, create a new PAT with full access,
+> or use a Model Access Key instead.
+>
+> ```python
+> # All three of these work — pick the one you like:
+> client = Client(token=os.environ["DIGITALOCEAN_TOKEN"])    # full-access PAT
+> client = Client(api_key=os.environ["DIGITALOCEAN_TOKEN"])  # same thing, different name
+> client = Client(api_key=os.environ["MODEL_ACCESS_KEY"])    # Gradient model access key
+> ```
+
 #### Example of Using `pydo` to Access DO Resources
 
 Find below a working example for GETting a ssh_key ([per this http request](https://docs.digitalocean.com/reference/api/api-reference/#operation/sshKeys_list)) and printing the ID associated with the ssh key. If you'd like to try out this quick example, you can follow [these instructions](https://docs.digitalocean.com/products/droplets/how-to/add-ssh-keys/) to add ssh keys to your DO account.
@@ -61,6 +93,83 @@ ID: 123457, NAME: my_prod_ssh_key, FINGERPRINT: eb:76:c7:2a:d3:3e:80:5d:ef:2e:ca
 **Consult the full list of supported DigitalOcean API endpoints in [PyDo's documentation](https://docs.digitalocean.com/reference/pydo/).**
 
 **Note**: More working examples can be found [here](https://github.com/digitalocean/pydo/tree/main/examples).
+
+## **AI & Inference**
+
+> Talk to models on DigitalOcean's Gradient AI Platform with the same
+> `pydo.Client`.
+
+The snippets below use a **DigitalOcean PAT created with full access scope**
+(required for inference APIs). A Gradient Model Access Key works too — see
+the [credentials note](#pydo-quickstart) above.
+
+#### Chat completions (streaming)
+
+```python
+import os
+from pydo import Client
+
+client = Client(token=os.environ["DIGITALOCEAN_TOKEN"])  # PAT with full access scope
+
+stream = client.chat.completions.create(
+    model="llama3.3-70b-instruct",
+    messages=[{"role": "user", "content": "Tell me some fun facts about sharks"}],
+    max_tokens=512,
+    stream=True,
+)
+
+for chunk in stream:
+    if not chunk.choices:
+        continue
+    delta = chunk.choices[0].delta
+    piece = delta.get("reasoning_content") or delta.get("content")
+    if piece:
+        print(piece, end="", flush=True)
+print()
+```
+
+#### Image generation
+
+```python
+import os, base64
+from pydo import Client
+
+client = Client(token=os.environ["DIGITALOCEAN_TOKEN"])  # PAT with full access scope
+
+result = client.images.generate(
+    model="openai-gpt-image-1",
+    prompt="A friendly cartoon shark typing on a laptop at a sunny beach",
+    n=1,
+)
+
+with open("output.png", "wb") as f:
+    f.write(base64.b64decode(result.data[0].b64_json))
+
+print("Image saved as output.png")
+```
+
+#### List available models
+
+```python
+import os
+from pydo import Client
+
+client = Client(token=os.environ["DIGITALOCEAN_TOKEN"])  # PAT with full access scope
+
+models = client.models.list()
+for model in models["data"]:
+    print(model["id"])
+```
+
+Runnable versions of the three snippets above live in
+[`examples/inference/`](examples/inference/):
+
+- [`chat_completion_stream.py`](examples/inference/chat_completion_stream.py)
+- [`image_generation.py`](examples/inference/image_generation.py)
+- [`list_models.py`](examples/inference/list_models.py)
+
+For more (audio, batches, agents, async streaming responses, file uploads,
+etc.), see the `inference_*.py` scripts in [`examples/`](examples/).
 
 #### Pagination Example
 
@@ -301,7 +410,13 @@ Short term, we are focused on improving usability and user productivity (part of
 
 Long term:
 
-> Model support, expand on supporting functions
+> Model support, expand on supporting functions, deepen AI/Inference coverage
 
 - The client currently inputs and outputs JSON dictionaries. Adding models would unlock features such as typing and validation.
 - Add supporting functions to elevate customer experience (i.e. adding a funtion that surfaces IP address for a Droplet)
+- **AI & Inference**: continue expanding coverage of the
+  [Gradient AI Platform](https://www.digitalocean.com/products/gradient)
+  alongside the infrastructure APIs — keeping chat, images, audio, batches,
+  responses, agents, and model management feature-complete and idiomatic
+  from the same `pydo.Client`. `pydo` is an
+  infrastructure **and** AI SDK; both surfaces are first-class going forward.
