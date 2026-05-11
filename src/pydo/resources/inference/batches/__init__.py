@@ -27,10 +27,6 @@ class Batches:
         self.files = Files(client)
         self.results = Results(client)
 
-    def list(self, **kwargs: Any) -> Any:
-        """Delegates to ``client.inference.list_batches``."""
-        return _wrap(self._client.inference.list_batches(**kwargs))
-
     def create(self, **kwargs: Any) -> Any:
         """Delegates to ``client.inference.create_batch``."""
         body = {k: v for k, v in kwargs.items() if k not in _SDK_KWARGS}
@@ -40,6 +36,10 @@ class Batches:
             self._client.inference.create_batch(body, **sdk),
             primary_id_field="batch_id",
         )
+
+    def list(self, **kwargs: Any) -> Any:
+        """Delegates to ``client.inference.list_batches``."""
+        return _wrap(self._client.inference.list_batches(**kwargs))
 
     def get(self, batch_id: str, **kwargs: Any) -> Any:
         """Delegates to ``client.inference.get_batch``."""
