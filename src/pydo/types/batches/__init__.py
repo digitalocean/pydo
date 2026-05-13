@@ -10,24 +10,40 @@ from typing import Any, List, Optional
 from pydo.custom_extensions import DotDict
 
 
+class Batch(DotDict):
+    """Typed response for ``batch`` schema."""
+
+    batch_id: str  # Unique identifier for the batch job
+    status: str
+    provider: str
+    endpoint: str  # Inference endpoint each request is dispatched to
+    completion_window: str
+    input_file_id: str  # The uploaded JSONL input file
+    output_file_id: Optional[str]  # Output JSONL file. Populated once the job completes
+    error_file_id: Optional[
+        str
+    ]  # Error sidecar file. Null when no errors were produced
+    request_counts: Any  # Aggregate request counts
+    request_id: str  # The idempotency key supplied at creation
+    metadata: Optional[Any]  # Metadata attached at creation
+    errors: Optional[
+        List[Any]
+    ]  # Top-level errors that prevented the batch from completing
+    created_at: str
+    in_progress_at: Optional[str]
+    finalizing_at: Optional[str]
+    completed_at: Optional[str]
+    expires_at: Optional[str]  # Derived from `created_at` plus `completion_window`
+    cancelled_at: Optional[str]
+    failed_at: Optional[str]
+
+
 class BatchFileCreateResponse(DotDict):
     """Typed response for ``batch_file_create_response`` schema."""
 
     file_id: str  # Pass this value as `file_id` when creating a batch job
     upload_url: str
     expires_at: Optional[str]  # When `upload_url` expires
-
-
-class BatchListResponse(DotDict):
-    """Typed response for ``batch_list_response`` schema."""
-
-    object: str  # The object type, always `list`
-    data: List[Any]  # Batch jobs on this page, ordered newest first
-    first_id: Optional[
-        str
-    ]  # ID of the first batch on this page. Null when the page is empty
-    last_id: Optional[str]
-    has_more: bool  # Whether additional batches exist beyond this page
 
 
 class BatchResultsResponse(DotDict):
@@ -48,9 +64,4 @@ class Error(DotDict):
     request_id: str
 
 
-__all__ = [
-    "BatchFileCreateResponse",
-    "BatchListResponse",
-    "BatchResultsResponse",
-    "Error",
-]
+__all__ = ["Batch", "BatchFileCreateResponse", "BatchResultsResponse", "Error"]
