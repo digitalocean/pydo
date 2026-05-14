@@ -85,16 +85,6 @@
       ]
     },
     {
-      "op_method": "list_batches",
-      "path_segments": [
-        "batches"
-      ],
-      "path_params": [],
-      "facade_methods": [
-        "list"
-      ]
-    },
-    {
       "op_method": "create_batch",
       "path_segments": [
         "batches"
@@ -105,9 +95,33 @@
       ]
     },
     {
+      "op_method": "list_batches",
+      "path_segments": [
+        "batches"
+      ],
+      "path_params": [],
+      "facade_methods": [
+        "list"
+      ]
+    },
+    {
       "op_method": "get_batch",
       "path_segments": [
         "batches"
+      ],
+      "path_params": [
+        "batch_id"
+      ],
+      "facade_methods": [
+        "get",
+        "retrieve"
+      ]
+    },
+    {
+      "op_method": "get_batch_results",
+      "path_segments": [
+        "batches",
+        "results"
       ],
       "path_params": [
         "batch_id"
@@ -127,20 +141,6 @@
       ],
       "facade_methods": [
         "cancel"
-      ]
-    },
-    {
-      "op_method": "get_batch_results",
-      "path_segments": [
-        "batches",
-        "results"
-      ],
-      "path_params": [
-        "batch_id"
-      ],
-      "facade_methods": [
-        "get",
-        "retrieve"
       ]
     }
   ],
