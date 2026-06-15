@@ -1,17 +1,27 @@
 # pylint: disable=line-too-long
+# pylint: disable=duplicate-code
+# pylint: disable=no-member
 """Mock tests for the ``pydo.inference`` namespace entry point.
 
 These tests exercise the same inference endpoints as ``test_inference.py``
 but through ``from pydo.inference import Client`` to confirm the
 namespaced client is a fully integrated drop-in for the core
-:class:`pydo.Client`.
+:class:`pydo.Client`. ``duplicate-code`` is disabled because mock-response
+fixtures unavoidably mirror the shape of those in ``test_inference.py``;
+``no-member`` is disabled because pylint cannot statically see the
+Autorest-generated attributes nor the inference ``generate`` method
+injected onto :class:`ImagesOperations` at runtime.
 """
 
+import pytest
 import responses
 
 import pydo
+import pydo.aio
 import pydo.inference
+import pydo.inference.aio
 from pydo.inference import Client as InferenceClient
+from pydo.inference.aio import Client as AsyncInferenceClient
 
 
 INFERENCE_URL = "https://inference.do-ai.run"
@@ -44,7 +54,6 @@ def test_namespace_client_dir_is_inference_focused():
     client = InferenceClient(token="dummy")
     surface = set(dir(client))
 
-    # Core inference primitives every inference SDK is expected to expose.
     expected_minimum = {
         "chat",
         "models",
@@ -67,14 +76,13 @@ def test_namespace_client_dir_is_inference_focused():
 
 
 def test_namespace_client_repr_is_distinct():
+    """``repr(client)`` identifies the namespaced entry point."""
     client = InferenceClient(token="dummy")
     assert repr(client) == "<pydo.inference.Client>"
 
 
 def test_namespace_client_token_or_api_key_required():
     """Constructor mirrors the core client's auth ergonomics."""
-    import pytest
-
     with pytest.raises(TypeError):
         InferenceClient()  # neither token nor api_key
 
@@ -131,6 +139,7 @@ def test_namespace_chat_completions_create():
 
 @responses.activate
 def test_namespace_models_list():
+    """``client.models.list`` routes to the inference URL."""
     client = InferenceClient(token="dummy", endpoint="https://testing.local")
     expected = {
         "object": "list",
@@ -220,17 +229,13 @@ def test_namespace_agent_chat_completions_create():
 
 def test_async_namespace_module_exports():
     """``pydo.inference.aio`` mirrors the sync namespace."""
-    import pydo.inference.aio as aio_ns
-    import pydo.aio
-
-    assert hasattr(aio_ns, "Client")
-    assert hasattr(aio_ns, "TokenCredentials")
-    assert issubclass(aio_ns.Client, pydo.aio.Client)
+    assert hasattr(pydo.inference.aio, "Client")
+    assert hasattr(pydo.inference.aio, "TokenCredentials")
+    assert issubclass(pydo.inference.aio.Client, pydo.aio.Client)
 
 
 def test_async_namespace_client_dir_and_repr():
-    from pydo.inference.aio import Client as AsyncInferenceClient
-
+    """Async namespace client has the inference surface and a distinct repr."""
     client = AsyncInferenceClient(token="dummy")
     assert repr(client) == "<pydo.inference.aio.Client>"
     surface = set(dir(client))
