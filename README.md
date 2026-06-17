@@ -103,11 +103,15 @@ The snippets below use a **DigitalOcean PAT created with full access scope**
 (required for inference APIs). A Gradient Model Access Key works too — see
 the [credentials note](#pydo-quickstart) above.
 
+There is also a separate namespace for inference: `from pydo.inference
+import Client` (and `from pydo.inference.aio import Client` for async).
+Both are drop-in equivalents — the snippets below use it.
+
 #### Chat completions (streaming)
 
 ```python
 import os
-from pydo import Client
+from pydo.inference import Client
 
 client = Client(token=os.environ["DIGITALOCEAN_TOKEN"])  # PAT with full access scope
 
@@ -132,7 +136,7 @@ print()
 
 ```python
 import os, base64
-from pydo import Client
+from pydo.inference import Client
 
 client = Client(token=os.environ["DIGITALOCEAN_TOKEN"])  # PAT with full access scope
 
@@ -152,7 +156,7 @@ print("Image saved as output.png")
 
 ```python
 import os
-from pydo import Client
+from pydo.inference import Client
 
 client = Client(token=os.environ["DIGITALOCEAN_TOKEN"])  # PAT with full access scope
 
@@ -161,12 +165,14 @@ for model in models["data"]:
     print(model["id"])
 ```
 
-Runnable versions of the three snippets above live in
+Runnable versions of the snippets above live in
 [`examples/inference/`](examples/inference/):
 
 - [`chat_completion_stream.py`](examples/inference/chat_completion_stream.py)
 - [`image_generation.py`](examples/inference/image_generation.py)
 - [`list_models.py`](examples/inference/list_models.py)
+- [`async_chat_completion.py`](examples/inference/async_chat_completion.py)
+  — uses `pydo.inference.aio.Client`
 
 For more (audio, batches, agents, async streaming responses, file uploads,
 etc.), see the `inference_*.py` scripts in [`examples/`](examples/).
@@ -202,13 +208,14 @@ while paginated:
 
 #### Async Usage
 
-For async, import from `pydo.aio` instead of `pydo`. The surface is identical
-— same constructor, same operation groups — just `await` the calls. Use
+For async, import from `pydo.aio` (full surface) or `pydo.inference.aio`
+(inference-focused). The surface is identical to the sync counterpart —
+same constructor, same operation groups — just `await` the calls. Use
 `async with` so the underlying transport closes cleanly.
 
 ```python
 import asyncio, os
-from pydo.aio import Client
+from pydo.inference.aio import Client  # or: from pydo.aio import Client
 
 async def main():
     async with Client(api_key=os.environ["DIGITALOCEAN_TOKEN"]) as client:

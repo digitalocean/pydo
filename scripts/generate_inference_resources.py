@@ -39,6 +39,13 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 ROOT = Path(__file__).resolve().parents[1]
 OPS_PATH = ROOT / "src/pydo/operations/_operations.py"
 OUT_ROOT = ROOT / "src/pydo/resources"
+NAMESPACE_ROOT = ROOT / "src/pydo/inference"
+
+# Cross-resource shortcuts that ``_write_client_surface`` adds to
+# :class:`InferenceClientSurface` on top of the spec-discovered top-level
+# segments. Kept in sync with the generator's emission rules below.
+_INFERENCE_SURFACE_EXTRAS = ("audio", "speech", "async_images", "inference_layout")
+_AGENT_SURFACE_EXTRAS = ("agent",)
 
 BUILD_RE = re.compile(
     r"^def build_(?P<group>inference|agent_inference)_(?P<op>.+)_request\b"
@@ -276,7 +283,7 @@ def _derive_primary_id_field(spec: OpSpec) -> Optional[str]:
         return spec.path_params[-1]
     for prefix in _OP_PREFIXES_WITH_IDENTIFIABLE_RESULT:
         if spec.op_method.startswith(prefix):
-            resource = spec.op_method[len(prefix):]
+            resource = spec.op_method[len(prefix) :]
             if resource:
                 return f"{resource}_id"
             break
@@ -421,7 +428,7 @@ def _write_async_invoke_leaf_class(
         + "\n"
         + f"_SDK_KWARGS = frozenset({{{sdk_set}}})\n"
         + "\n\n"
-        + 'class AsyncInvokeImages:\n'
+        + "class AsyncInvokeImages:\n"
         + '    """Async image generation helper."""\n'
         + "\n"
         + '    def __init__(self, parent: "AsyncInvoke") -> None:\n'
@@ -439,12 +446,12 @@ def _write_async_invoke_leaf_class(
         + "        sdk = {k: v for k, v in kwargs.items() if k in _SDK_KWARGS}\n"
         + "        rest = {k: v for k, v in kwargs.items() if k not in _SDK_KWARGS}\n"
         + '        inp = {**rest, "prompt": prompt}\n'
-        + "        payload = {\"model_id\": model_id, \"input\": inp}\n"
+        + '        payload = {"model_id": model_id, "input": inp}\n'
         + "        if tags is not None:\n"
         + '            payload["tags"] = tags\n'
         + f"        return {await_kw}self._parent.create(**payload, **sdk)\n"
         + "\n\n"
-        + 'class AsyncInvokeSpeech:\n'
+        + "class AsyncInvokeSpeech:\n"
         + '    """Text-to-speech helper."""\n'
         + "\n"
         + '    def __init__(self, parent: "AsyncInvoke") -> None:\n'
@@ -462,12 +469,12 @@ def _write_async_invoke_leaf_class(
         + "        sdk = {k: v for k, v in kwargs.items() if k in _SDK_KWARGS}\n"
         + "        rest = {k: v for k, v in kwargs.items() if k not in _SDK_KWARGS}\n"
         + '        inp = {**rest, "text": input}\n'
-        + "        payload = {\"model_id\": model_id, \"input\": inp}\n"
+        + '        payload = {"model_id": model_id, "input": inp}\n'
         + "        if tags is not None:\n"
         + '            payload["tags"] = tags\n'
         + f"        return {await_kw}self._parent.create(**payload, **sdk)\n"
         + "\n\n"
-        + 'class AsyncInvokeAudio:\n'
+        + "class AsyncInvokeAudio:\n"
         + '    """Audio namespace (generation + ``speech`` for TTS)."""\n'
         + "\n"
         + '    def __init__(self, parent: "AsyncInvoke") -> None:\n'
@@ -489,7 +496,7 @@ def _write_async_invoke_leaf_class(
         + '        inp = {**rest, "prompt": prompt}\n'
         + "        if seconds_total is not None:\n"
         + '            inp["seconds_total"] = seconds_total\n'
-        + "        payload = {\"model_id\": model_id, \"input\": inp}\n"
+        + '        payload = {"model_id": model_id, "input": inp}\n'
         + "        if tags is not None:\n"
         + '            payload["tags"] = tags\n'
         + f"        return {await_kw}self._root.create(**payload, **sdk)\n"
@@ -564,9 +571,7 @@ def _write_namespace_init(
             '        """Alias for ``images.generations.generate`` '
             '(``POST /v1/images/generations``)."""'
         )
-        lines.append(
-            f"        return {ret_kw}self.generations.generate(**kwargs)\n"
-        )
+        lines.append(f"        return {ret_kw}self.generations.generate(**kwargs)\n")
     lines.append("")
     lines.append(f'__all__ = ["{parent_class}"]')
     lines.append("")
@@ -795,10 +800,10 @@ class Files:
         )
 '''
 
-    body += '''
+    body += """
 
 __all__ = ["Files"]
-'''
+"""
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(body, encoding="utf-8")
 
@@ -879,7 +884,11 @@ def _emit_group(
         )
 
         if is_special_async_invoke:
-            rel = Path(f"{leaf_seg}.py") if not parents else Path(*parents) / f"{leaf_seg}.py"
+            rel = (
+                Path(f"{leaf_seg}.py")
+                if not parents
+                else Path(*parents) / f"{leaf_seg}.py"
+            )
             _write_async_invoke_leaf_class(
                 base / rel,
                 group=leaf_specs[0].group,
@@ -888,7 +897,11 @@ def _emit_group(
             continue
 
         if leaf_specs and not child_segments:
-            rel = Path(f"{leaf_seg}.py") if not parents else Path(*parents) / f"{leaf_seg}.py"
+            rel = (
+                Path(f"{leaf_seg}.py")
+                if not parents
+                else Path(*parents) / f"{leaf_seg}.py"
+            )
             _write_leaf_module(
                 base / rel,
                 leaf_specs,
@@ -1044,6 +1057,169 @@ def _write_inference_surface_manifest(
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
 
+_NAMESPACE_HEADER = (
+    "# ------------------------------------\n"
+    "# Copyright (c) DigitalOcean.\n"
+    "# Licensed under the Apache-2.0 License.\n"
+    "# ------------------------------------\n"
+    "# Generated by scripts/generate_inference_resources.py — do not edit.\n"
+)
+
+
+def _render_namespace_client(
+    *,
+    namespaces: List[str],
+    async_mode: bool,
+) -> str:
+    """Render the ``pydo.inference[.aio].Client`` shim.
+
+    The list of ``namespaces`` is the union of spec-discovered inference
+    top-level segments and the cross-resource shortcuts the generator
+    attaches to :class:`InferenceClientSurface` / :class:`AgentClientSurface`.
+    """
+    base_module = "pydo.aio" if async_mode else "pydo"
+    repr_label = "pydo.inference.aio.Client" if async_mode else "pydo.inference.Client"
+    docstring_title = (
+        (
+            '"""Async inference-focused entry point: ``from pydo.inference.aio import Client``.\n\n'
+            "Asynchronous twin of :class:`pydo.inference.Client`. Same surface,\n"
+            "``await``-friendly. See :mod:`pydo.inference` for usage details.\n"
+            '"""\n'
+        )
+        if async_mode
+        else (
+            '"""Inference-focused entry point: ``from pydo.inference import Client``.\n\n'
+            "This namespace gives serverless-inference and agent-inference callers a\n"
+            "purpose-built ``Client`` that mirrors the conventions used by other\n"
+            "LLM SDKs (``Client(token=...)`` / ``Client(api_key=...)``) while staying\n"
+            "fully integrated with :mod:`pydo` — the same authentication, transport\n"
+            "pipeline, retry, logging and response wrappers are reused under the hood.\n\n"
+            "The list of top-level namespaces exposed on this client\n"
+            "(``chat``, ``models``, ``embeddings``, ``images``, ``responses``,\n"
+            "``batches``, ``audio``, ``speech``, ``files``, ``agent`` …) is derived\n"
+            "from the OpenAPI spec at code-generation time, so any inference endpoint\n"
+            "added to the spec in the future surfaces here automatically — no manual\n"
+            "edits to this module are required.\n\n"
+            "Example::\n\n"
+            "    import os\n"
+            "    from pydo.inference import Client\n\n"
+            '    client = Client(token=os.environ["DIGITALOCEAN_TOKEN"])\n\n'
+            "    resp = client.chat.completions.create(\n"
+            '        model="llama3.3-70b-instruct",\n'
+            '        messages=[{"role": "user", "content": "Hello!"}],\n'
+            "    )\n"
+            '"""\n'
+        )
+    )
+    class_doc = (
+        (
+            '    """Inference-focused DigitalOcean async client.\n\n'
+            "    Asynchronous counterpart to :class:`pydo.inference.Client`. Every\n"
+            "    inference / agent-inference surface is exposed as an awaitable\n"
+            "    method, while the underlying :class:`pydo.aio.Client` machinery\n"
+            "    (authentication, transport pipeline, multi-base-URL routing, SSE\n"
+            "    streaming) is reused unchanged.\n"
+            '    """\n'
+        )
+        if async_mode
+        else (
+            '    """Inference-focused DigitalOcean Python client.\n\n'
+            "    A drop-in entry point under ``pydo.inference`` for callers whose\n"
+            "    workload is serverless inference (chat completions, embeddings,\n"
+            "    image / audio generation, batch inference, agent inference, …).\n\n"
+            "    Inherits the full :class:`pydo.Client` machinery — authentication,\n"
+            "    transport pipeline, multi-base-URL routing and SSE streaming — so\n"
+            "    every inference surface that works on ``pydo.Client`` also works\n"
+            "    here. The top-level attribute surface, however, is narrowed to the\n"
+            "    inference and agent-inference namespaces so editor autocomplete\n"
+            "    (and ``dir(client)``) stay focused on inference primitives.\n"
+            '    """\n'
+        )
+    )
+
+    namespaces_literal = (
+        "(\n" + "".join(f"    {name!r},\n" for name in namespaces) + ")"
+    )
+
+    return (
+        _NAMESPACE_HEADER
+        + docstring_title
+        + "from __future__ import annotations\n\n"
+        + "from typing import List, Optional\n\n"
+        + f"from {base_module} import Client as _DigitalOceanClient\n"
+        + f"from {base_module}._patch import TokenCredentials\n"
+        + "from pydo.custom_extensions import INFERENCE_BASE_URL\n\n\n"
+        + "# Top-level attributes that the namespaced ``Client`` advertises via\n"
+        + "# ``dir()``. Populated by ``scripts/generate_inference_resources.py``\n"
+        + "# from the discovered OpenAPI surface plus cross-resource shortcuts.\n"
+        + f"_INFERENCE_NAMESPACES: tuple = {namespaces_literal}\n\n\n"
+        + "class Client(_DigitalOceanClient):\n"
+        + class_doc
+        + "\n"
+        + "    def __init__(\n"
+        + "        self,\n"
+        + "        token: Optional[str] = None,\n"
+        + "        *,\n"
+        + "        api_key: Optional[str] = None,\n"
+        + "        timeout: int = 120,\n"
+        + "        inference_endpoint: str = INFERENCE_BASE_URL,\n"
+        + '        agent_endpoint: str = "",\n'
+        + "        **kwargs,\n"
+        + "    ) -> None:\n"
+        + "        super().__init__(\n"
+        + "            token=token,\n"
+        + "            api_key=api_key,\n"
+        + "            timeout=timeout,\n"
+        + "            inference_endpoint=inference_endpoint,\n"
+        + "            agent_endpoint=agent_endpoint,\n"
+        + "            **kwargs,\n"
+        + "        )\n\n"
+        + "    def __dir__(self) -> List[str]:\n"
+        + "        return sorted(set(_INFERENCE_NAMESPACES))\n\n"
+        + "    def __repr__(self) -> str:\n"
+        + f'        return "<{repr_label}>"\n\n\n'
+        + '__all__ = ["Client", "TokenCredentials"]\n'
+    )
+
+
+def _discover_namespaces(
+    inference_top_segments: List[str], agent_top_segments: List[str]
+) -> List[str]:
+    """Compute the union of top-level segments + cross-resource shortcuts.
+
+    ``images`` is intentionally included even though the surface mixin
+    skips it — :class:`pydo.Client` re-attaches inference ``generate`` /
+    ``generations`` onto the v2 ``images`` object, so ``client.images``
+    is still a valid inference entry point on this namespace.
+    """
+    discovered = set(inference_top_segments)
+    discovered.update(_INFERENCE_SURFACE_EXTRAS)
+    if agent_top_segments:
+        discovered.update(_AGENT_SURFACE_EXTRAS)
+    return sorted(discovered)
+
+
+def _write_namespace_clients(
+    inference_top_segments: List[str],
+    agent_top_segments: List[str],
+) -> None:
+    """Emit ``src/pydo/inference/__init__.py`` and its async twin."""
+    namespaces = _discover_namespaces(inference_top_segments, agent_top_segments)
+
+    NAMESPACE_ROOT.mkdir(parents=True, exist_ok=True)
+    (NAMESPACE_ROOT / "__init__.py").write_text(
+        _render_namespace_client(namespaces=namespaces, async_mode=False),
+        encoding="utf-8",
+    )
+
+    aio_dir = NAMESPACE_ROOT / "aio"
+    aio_dir.mkdir(parents=True, exist_ok=True)
+    (aio_dir / "__init__.py").write_text(
+        _render_namespace_client(namespaces=namespaces, async_mode=True),
+        encoding="utf-8",
+    )
+
+
 def main() -> None:
     if not OPS_PATH.is_file():
         raise SystemExit(f"missing {OPS_PATH}")
@@ -1062,7 +1238,7 @@ def main() -> None:
         facade_class="InferenceResources",
         async_mode=False,
     )
-    _emit_group(
+    agent_top = _emit_group(
         OUT_ROOT / "agent_inference",
         by_group.get("agent_inference", []),
         facade_class="AgentInferenceResources",
@@ -1070,6 +1246,7 @@ def main() -> None:
     )
     _write_client_surface(OUT_ROOT / "client_surface.py", inference_top)
     _write_inference_surface_manifest(OUT_ROOT / "inference_surface.json", by_group)
+    _write_namespace_clients(inference_top, agent_top)
 
     aio_root = OUT_ROOT / "aio"
     aio_root.mkdir(parents=True, exist_ok=True)

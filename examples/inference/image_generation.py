@@ -1,5 +1,8 @@
 """Generate an image with the Gradient AI Platform and save it to disk.
 
+Uses the inference-focused ``pydo.inference.Client`` entry point so the
+top-level surface (``dir(client)``, IDE autocomplete) stays focused on
+inference primitives.
 Usage:
     # The PAT must be created with FULL ACCESS scope to call inference APIs.
     export DIGITALOCEAN_TOKEN="your-full-access-pat"
@@ -9,7 +12,7 @@ Usage:
 import base64
 import os
 
-from pydo import Client
+from pydo.inference import Client
 
 
 def main() -> None:
