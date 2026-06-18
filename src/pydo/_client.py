@@ -60,6 +60,7 @@ from .operations import (
     SshKeysOperations,
     TagsOperations,
     UptimeOperations,
+    VectorDatabasesOperations,
     VolumeActionsOperations,
     VolumeSnapshotsOperations,
     VolumesOperations,
@@ -160,6 +161,8 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype spaces_key: pydo.operations.SpacesKeyOperations
     :ivar tags: TagsOperations operations
     :vartype tags: pydo.operations.TagsOperations
+    :ivar vector_databases: VectorDatabasesOperations operations
+    :vartype vector_databases: pydo.operations.VectorDatabasesOperations
     :ivar volumes: VolumesOperations operations
     :vartype volumes: pydo.operations.VolumesOperations
     :ivar volume_actions: VolumeActionsOperations operations
@@ -346,6 +349,9 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.tags = TagsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.vector_databases = VectorDatabasesOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.volumes = VolumesOperations(
