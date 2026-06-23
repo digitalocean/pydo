@@ -5,6 +5,7 @@ POETRY_VERSION:=$(shell poetry version)
 PACKAGE_VERSION:=$(lastword $(POETRY_VERSION))
 ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 ORIGIN ?= origin
+COMMIT ?= HEAD
 BUMP ?= patch
 
 ifeq (, $(findstring -m,$(PYTEST_ARGS)))
@@ -130,3 +131,9 @@ tag: ## Tags a release
 	@echo "==> ORIGIN=${ORIGIN} COMMIT=${COMMIT} tag"
 	@echo ""
 	@ORIGIN=${ORIGIN} scripts/tag.sh
+
+.PHONY: beta_tag
+beta_tag: 
+	@echo "==> ORIGIN=${ORIGIN} COMMIT=${COMMIT} beta_tag"
+	@echo ""
+	@ORIGIN=${ORIGIN} COMMIT=${COMMIT} scripts/beta_tag.sh

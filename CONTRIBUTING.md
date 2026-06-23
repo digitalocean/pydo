@@ -117,3 +117,11 @@ number vor the tag.
 
 1. Once the release process completes, review the draft release for correctness and publish the release.  
 Ensure the release has been marked `Latest`.
+
+### Cutting a beta pre-release
+
+Betas can be cut from a **feature branch**. Run `make beta_tag` to push the next
+beta tag for the version in `pyproject.toml` (e.g. `v0.37.0-beta.1`, then
+`-beta.2`, ...). This triggers a workflow that publishes a PEP 440 pre-release to
+PyPI (e.g. `0.37.0b1`) and creates a draft GitHub pre-release. It won't be
+installed by `pip install pydo`; pin it explicitly: `pip install pydo==0.37.0b1`.

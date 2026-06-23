@@ -1,0 +1,131 @@
+name: beta-release
+
+# Dedicated pipeline for pre-release beta tags created via `make beta_tag`.
+# This workflow is intentionally separate from the GA release workflow so the
+# GA release flow is not affected in any way. Beta releases are published to
+# PyPI as PEP 440 pre-releases (e.g. 0.37.0b1) which `pip install pydo` will
+# NOT pick up by default, and a draft GitHub pre-release is created for manual
+# review. Betas can be cut from a feature branch.
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+-beta.[0-9]+"
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.5.0
+
+      - name: Parse beta tag
+        id: version
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG#v}
+          BASE_VERSION=${VERSION%-beta.*}
+          BETA_NUMBER=${VERSION##*-beta.}
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "base_version=$BASE_VERSION" >> $GITHUB_OUTPUT
+          echo "beta_number=$BETA_NUMBER" >> $GITHUB_OUTPUT
+          echo "Tag: $TAG | Version: $VERSION | Base: $BASE_VERSION | Beta #: $BETA_NUMBER"
+
+      - name: Verify beta tag format
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          if ! echo "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+-beta\.[0-9]+$'; then
+            echo "Tag $VERSION does not match expected format <major>.<minor>.<patch>-beta.<n>"
+            exit 1
+          fi
+          echo "Beta tag format OK: $VERSION"
+
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install Poetry
+        uses: snok/install-poetry@v1.3.4
+        with:
+          version: 1.6.1
+          virtualenvs-path: .venv
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: false
+
+      - name: Verify base version matches source
+        run: |
+          BASE_VERSION="${{ steps.version.outputs.base_version }}"
+
+          PYPROJECT_VERSION=$(poetry version --short)
+          if [ "$PYPROJECT_VERSION" != "$BASE_VERSION" ]; then
+            echo "Base version mismatch: tag base $BASE_VERSION vs pyproject.toml $PYPROJECT_VERSION"
+            echo "Set the version in pyproject.toml to the target GA version before tagging a beta."
+            exit 1
+          fi
+
+          VERSION_PY=$(grep -E '^VERSION\s*=' src/pydo/_version.py | sed 's/.*"\(.*\)".*/\1/')
+          if [ "$VERSION_PY" != "$BASE_VERSION" ]; then
+            echo "Base version mismatch: tag base $BASE_VERSION vs src/pydo/_version.py $VERSION_PY"
+            echo "Keep pyproject.toml and src/pydo/_version.py in sync at the target GA version."
+            exit 1
+          fi
+          echo "Base version verified: $BASE_VERSION"
+
+      - name: Set beta version
+        run: |
+          # Poetry normalizes "0.37.0-beta.1" to the PEP 440 form "0.37.0b1".
+          poetry version "${{ steps.version.outputs.version }}"
+          echo "Building version: $(poetry version --short)"
+
+      - name: Restore poetry cache
+        if: success() && !env.ACT
+        uses: actions/cache@v3
+        with:
+          path: $(poetry config cache-dir)
+          key: ubuntu-latest-poetry-${{ matrix.python-version }}-${{ hashFiles('**/pyproject.toml') }}
+
+      - name: Build
+        run: poetry build
+
+      - name: Upload a Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish
+        run: poetry publish
+        env:
+          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
+
+  release:
+    runs-on: ubuntu-latest
+
+    needs: build-and-publish
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.5.0
+
+      - name: Download the Build Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Set TAG
+        run: echo "TAG=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+
+      - name: Create release
+        run: |
+          gh release create ${{ env.TAG }} \
+           dist/* \
+           --title "${{ env.TAG }}" \
+           --generate-notes \
+           --prerelease \
+           --draft
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
