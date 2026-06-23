@@ -46,6 +46,7 @@ from ._operations import SizesOperations
 from ._operations import SnapshotsOperations
 from ._operations import SpacesKeyOperations
 from ._operations import TagsOperations
+from ._operations import VectorDatabasesOperations
 from ._operations import VolumesOperations
 from ._operations import VolumeActionsOperations
 from ._operations import VolumeSnapshotsOperations
@@ -104,6 +105,7 @@ __all__ = [
     "SnapshotsOperations",
     "SpacesKeyOperations",
     "TagsOperations",
+    "VectorDatabasesOperations",
     "VolumesOperations",
     "VolumeActionsOperations",
     "VolumeSnapshotsOperations",
