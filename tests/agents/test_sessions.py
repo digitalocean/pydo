@@ -1,4 +1,4 @@
-# pylint: disable=missing-class-docstring,missing-function-docstring,protected-access
+# pylint: disable=line-too-long,missing-class-docstring,missing-function-docstring,protected-access
 # ------------------------------------
 # Copyright (c) DigitalOcean.
 # Licensed under the Apache-2.0 License.
@@ -75,7 +75,9 @@ def _make_resources(responses: List[_FakeResponse]) -> AgentsResources:
     parent = MagicMock()
     parent._client = MagicMock()
     parent._client._pipeline = _FakePipeline(responses)
-    return AgentsResources(parent, agents_endpoint="https://api.stage2.digitalocean.com")
+    return AgentsResources(
+        parent, agents_endpoint="https://api.stage2.digitalocean.com"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -106,7 +108,9 @@ def test_create_session_posts_expected_body():
 
 
 def test_get_session_url_encodes_id():
-    resources = _make_resources([_FakeResponse(200, {"session": {"session_id": "x/y"}})])
+    resources = _make_resources(
+        [_FakeResponse(200, {"session": {"session_id": "x/y"}})]
+    )
     resources.sessions.get("x/y")
 
     call = resources._proxy._original._pipeline.calls[0]
@@ -124,7 +128,9 @@ def test_destroy_session():
 
 
 def test_list_sessions_propagates_query_params():
-    resources = _make_resources([_FakeResponse(200, {"sessions": [], "next_page_token": ""})])
+    resources = _make_resources(
+        [_FakeResponse(200, {"sessions": [], "next_page_token": ""})]
+    )
     resources.sessions.list(page_token="tok", page_size=10, status=SessionStatus.READY)
 
     call = resources._proxy._original._pipeline.calls[0]
@@ -196,9 +202,7 @@ def test_stream_unwraps_spi_canonical_envelope():
         b'data: {"event_id":"e2","type":"run.token_delta","data":{"text":"world"}}\n\n'
         b'data: {"event_id":"e3","type":"run.completed","data":{"run_cost_micros":1234}}\n\n'
     )
-    resources = _make_resources(
-        [_FakeResponse(200, sse_chunks=[sse_payload])]
-    )
+    resources = _make_resources([_FakeResponse(200, sse_chunks=[sse_payload])])
 
     events = list(resources.sessions.stream("s1"))
     assert events[0].type == "run.token_delta"
@@ -214,9 +218,7 @@ def test_stream_unwraps_result_envelope():
         b'data: {"result":{"event_id":"e2","token_chunk":{"text":"world"}}}\n\n'
         b'data: {"result":{"event_id":"e3","run_completed":{"run_cost_micros":1234}}}\n\n'
     )
-    resources = _make_resources(
-        [_FakeResponse(200, sse_chunks=[sse_payload])]
-    )
+    resources = _make_resources([_FakeResponse(200, sse_chunks=[sse_payload])])
 
     events = list(resources.sessions.stream("s1"))
     assert events[0].token_chunk.text == "hello "
@@ -228,9 +230,7 @@ def test_stream_error_envelope_raises():
     sse_payload = (
         b'data: {"error":{"grpc_code":9,"http_code":412,"message":"not ready"}}\n\n'
     )
-    resources = _make_resources(
-        [_FakeResponse(200, sse_chunks=[sse_payload])]
-    )
+    resources = _make_resources([_FakeResponse(200, sse_chunks=[sse_payload])])
 
     with pytest.raises(HarnessStreamError) as excinfo:
         list(resources.sessions.stream("s1"))
@@ -242,9 +242,7 @@ def test_stream_error_envelope_raises():
 
 def test_stream_passes_replay_query_params():
     sse_payload = b""
-    resources = _make_resources(
-        [_FakeResponse(200, sse_chunks=[sse_payload])]
-    )
+    resources = _make_resources([_FakeResponse(200, sse_chunks=[sse_payload])])
 
     stream = resources.sessions.stream("s1", replay_from="evt-42", replay_only=True)
     list(stream)
@@ -255,5 +253,8 @@ def test_stream_passes_replay_query_params():
 
 
 def test_resolve_agents_base_url_adds_https_scheme():
-    assert resolve_agents_base_url("api.digitalocean.com") == "https://api.digitalocean.com"
+    assert (
+        resolve_agents_base_url("api.digitalocean.com")
+        == "https://api.digitalocean.com"
+    )
     assert resolve_agents_base_url("http://127.0.0.1:8080") == "http://127.0.0.1:8080"
