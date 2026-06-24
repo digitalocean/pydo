@@ -23,6 +23,14 @@ from .custom_models import (
     SessionStatus,
 )
 from .custom_sessions import HarnessEventStream, HarnessStreamError, SessionsOperations
+from .session import (
+    AgentEvent,
+    AgentEventType,
+    AgentSession,
+    HITLPolicy,
+    RunResult,
+    RunStream,
+)
 
 DEFAULT_AGENTS_BASE_URL = "https://api.digitalocean.com"
 _ENV_VAR = "PYDO_AGENTS_ENDPOINT"
@@ -48,9 +56,33 @@ class AgentsResources:
     def base_url(self) -> str:
         return self._proxy._base_url
 
+    def start(self, manifest: "str | bytes") -> AgentSession:
+        """Create a session from an ``agents.yaml`` manifest and return a handle.
+
+        Use as a context manager to auto-destroy on exit::
+
+            with client.agents.start(manifest) as agent:
+                print(agent.run("hello").final_output)
+        """
+        resp = self.sessions.create_from_manifest(manifest)
+        get = getattr(resp, "get", None)
+        info = get("session") if get else None
+        session_id = (getattr(info or resp, "get", lambda *_: None))("session_id")
+        return AgentSession(self.sessions, session_id, raw=resp)
+
+    def attach(self, session_id: str) -> AgentSession:
+        """Return an :class:`AgentSession` handle for an existing session."""
+        return AgentSession(self.sessions, session_id)
+
 
 __all__ = [
     "AgentsResources",
+    "AgentSession",
+    "AgentEvent",
+    "AgentEventType",
+    "RunResult",
+    "RunStream",
+    "HITLPolicy",
     "SessionsOperations",
     "HarnessEventStream",
     "HarnessStreamError",
