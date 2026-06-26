@@ -28,6 +28,7 @@ clean: ## Removes all generated code (except _patch.py files)
 	@find src/pydo -type f \
 		! -name "_patch.py" ! -name "custom_*.py" ! -name "exceptions.py" \
 		! -path "*/agents/__init__.py" ! -path "*/aio/agents/__init__.py" \
+		! -path "*/agents/session.py" ! -path "*/aio/agents/session.py" \
 		-exec rm -rf {} +
 
 .PHONY: download-spec
