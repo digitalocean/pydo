@@ -1,41 +1,26 @@
-"""Create a session.
+"""Create a session from an agent manifest (``agents.yaml``).
 
-Set DIGITALOCEAN_TOKEN (and PYDO_AGENTS_ENDPOINT for stage2).
+A session is created entirely from the agent spec — the runtime adapter,
+sandbox template, env vars, etc. are all defined in the manifest. The client
+uploads it verbatim (``Content-Type: application/x-yaml``); the server parses
+and validates it.
 
-Optional PYDO_AGENT_KIND (Private Beta server support):
-  CLAUDE_CODE  → coding-claude-code  (default)
-  OPENCODE     → coding-opencode
-  CODEX_CLI    → coding-codex
-  NONE         → coding-base (requires ops to enable AGENT_KIND_NONE on the server)
+Required env:
+  DIGITALOCEAN_TOKEN
+  PYDO_AGENTS_ENDPOINT  (stage2: https://api.s2r1.internal.digitalocean.com)
+  AGENT_SPEC            path to the agent spec YAML (default: agent-spec.yaml)
 """
 
 import json
 import os
 
 from pydo import Client
-from pydo.agents import AgentKind
 
-_AGENT_KINDS = {
-    "CLAUDE_CODE": AgentKind.CLAUDE_CODE,
-    "OPENCODE": AgentKind.OPENCODE,
-    "CODEX_CLI": AgentKind.CODEX_CLI,
-    "NONE": AgentKind.NONE,
-}
+spec_path = os.environ.get("AGENT_SPEC", "agent-spec.yaml")
+with open(spec_path, "r", encoding="utf-8") as fh:
+    manifest = fh.read()
 
 client = Client(token=os.environ["DIGITALOCEAN_TOKEN"])
-
-kind_name = os.environ.get("PYDO_AGENT_KIND", "CLAUDE_CODE").upper()
-try:
-    agent_kind = _AGENT_KINDS[kind_name]
-except KeyError as exc:
-    raise SystemExit(
-        f"Unknown PYDO_AGENT_KIND={kind_name!r}; "
-        f"use one of: {', '.join(_AGENT_KINDS)}"
-    ) from exc
-
-resp = client.agents.sessions.create(
-    agent_kind=agent_kind,
-    repo_hint="digitalocean/pydo",
-)
+resp = client.agents.sessions.create_from_manifest(manifest)
 
 print(json.dumps(resp, indent=2, default=str))

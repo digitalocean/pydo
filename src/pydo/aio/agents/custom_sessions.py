@@ -3,10 +3,11 @@
 # Licensed under the Apache-2.0 License.
 # ------------------------------------
 """Async Hosted Agents session operations."""
+
 from __future__ import annotations
 
 import json as _json
-from typing import Any, AsyncIterator, Dict, List, Optional
+from typing import Any, AsyncIterator, Dict, List, Optional, Union
 from urllib.parse import quote
 
 from azure.core.exceptions import (
@@ -19,7 +20,13 @@ from azure.core.exceptions import (
 )
 from azure.core.rest import HttpRequest
 
-from pydo.agents.custom_sessions import HarnessStreamError, _raise_agents_http_error, _unwrap_harness_sse_chunk
+from pydo.agents.custom_sessions import (
+    _YAML_MEDIA_TYPE,
+    HarnessStreamError,
+    _manifest_bytes,
+    _raise_agents_http_error,
+    _unwrap_harness_sse_chunk,
+)
 from pydo.custom_extensions import AsyncSSEStream, _wrap
 
 _ERROR_MAP = {
@@ -80,6 +87,8 @@ class AsyncSessionsOperations:
         path: str,
         *,
         body: Optional[Dict[str, Any]] = None,
+        content: Optional[Union[str, bytes]] = None,
+        content_type: Optional[str] = None,
         params: Optional[Dict[str, Any]] = None,
         stream: bool = False,
     ):
@@ -92,6 +101,10 @@ class AsyncSessionsOperations:
         if body is not None:
             headers["Content-Type"] = "application/json"
             kwargs["json"] = body
+        elif content is not None:
+            if content_type:
+                headers["Content-Type"] = content_type
+            kwargs["content"] = content
 
         request = HttpRequest(method, path, **kwargs)
         request.url = self._client.format_url(request.url)
@@ -131,20 +144,24 @@ class AsyncSessionsOperations:
             ),
         )
 
-    async def create(
-        self,
-        *,
-        agent_kind: str,
-        repo_hint: Optional[str] = None,
-        idle_timeout_seconds: Optional[int] = None,
-    ) -> Any:
-        body: Dict[str, Any] = {"agent_kind": agent_kind}
-        if repo_hint is not None:
-            body["repo_hint"] = repo_hint
-        if idle_timeout_seconds is not None:
-            body["idle_timeout_seconds"] = idle_timeout_seconds
+    async def create_from_manifest(self, manifest: Union[str, bytes]) -> Any:
+        """Create a session from an ``agents.yaml`` manifest.
+
+        This is the supported creation path: the manifest defines everything
+        about the session (runtime adapter, sandbox, env vars, egress). It is
+        uploaded verbatim as ``application/x-yaml`` and the server owns parsing
+        and validation. There are no ``agent_kind``/``repo_hint`` arguments.
+
+        :param manifest: The agent spec as a YAML ``str`` or ``bytes`` document.
+        """
+        data = _manifest_bytes(manifest)
         return await self._parse_json(
-            await self._send("POST", _BASE_PATH, body=body),
+            await self._send(
+                "POST",
+                _BASE_PATH,
+                content=data,
+                content_type=_YAML_MEDIA_TYPE,
+            ),
         )
 
     async def get(self, session_id: str) -> Any:

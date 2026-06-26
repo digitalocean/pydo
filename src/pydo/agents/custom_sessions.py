@@ -3,10 +3,11 @@
 # Licensed under the Apache-2.0 License.
 # ------------------------------------
 """Sync Hosted Agents session operations (``/v2/agents/sessions/...``)."""
+
 from __future__ import annotations
 
 import json as _json
-from typing import Any, Dict, Iterator, List, Optional
+from typing import Any, Dict, Iterator, List, Optional, Union
 from urllib.parse import quote
 
 from azure.core.exceptions import (
@@ -29,6 +30,24 @@ _ERROR_MAP = {
 }
 
 _BASE_PATH = "/v2/agents/sessions"
+
+# Private Beta contract: a session is created from an ``agents.yaml`` manifest
+# uploaded verbatim. The server routes on this media type (handlers.go:
+# isYAMLContentType) and parses the body as the agent spec.
+_YAML_MEDIA_TYPE = "application/x-yaml"
+
+
+def _manifest_bytes(manifest: Union[str, bytes]) -> bytes:
+    """Normalize an agents.yaml manifest to non-empty UTF-8 bytes."""
+    if isinstance(manifest, str):
+        data = manifest.encode("utf-8")
+    elif isinstance(manifest, (bytes, bytearray)):
+        data = bytes(manifest)
+    else:
+        raise TypeError("manifest must be a str or bytes YAML document")
+    if not data.strip():
+        raise ValueError("manifest is empty")
+    return data
 
 
 def _unwrap_harness_sse_chunk(chunk: Dict[str, Any]) -> Optional[Any]:
@@ -139,6 +158,8 @@ class SessionsOperations:
         path: str,
         *,
         body: Optional[Dict[str, Any]] = None,
+        content: Optional[Union[str, bytes]] = None,
+        content_type: Optional[str] = None,
         params: Optional[Dict[str, Any]] = None,
         stream: bool = False,
     ):
@@ -151,6 +172,10 @@ class SessionsOperations:
         if body is not None:
             headers["Content-Type"] = "application/json"
             kwargs["json"] = body
+        elif content is not None:
+            if content_type:
+                headers["Content-Type"] = content_type
+            kwargs["content"] = content
 
         request = HttpRequest(method, path, **kwargs)
         request.url = self._client.format_url(request.url)
@@ -190,19 +215,25 @@ class SessionsOperations:
             ),
         )
 
-    def create(
-        self,
-        *,
-        agent_kind: str,
-        repo_hint: Optional[str] = None,
-        idle_timeout_seconds: Optional[int] = None,
-    ) -> Any:
-        body: Dict[str, Any] = {"agent_kind": agent_kind}
-        if repo_hint is not None:
-            body["repo_hint"] = repo_hint
-        if idle_timeout_seconds is not None:
-            body["idle_timeout_seconds"] = idle_timeout_seconds
-        return self._parse_json(self._send("POST", _BASE_PATH, body=body))
+    def create_from_manifest(self, manifest: Union[str, bytes]) -> Any:
+        """Create a session from an ``agents.yaml`` manifest.
+
+        This is the supported creation path: the manifest defines everything
+        about the session (runtime adapter, sandbox, env vars, egress). It is
+        uploaded verbatim as ``application/x-yaml`` and the server owns parsing
+        and validation. There are no ``agent_kind``/``repo_hint`` arguments.
+
+        :param manifest: The agent spec as a YAML ``str`` or ``bytes`` document.
+        """
+        data = _manifest_bytes(manifest)
+        return self._parse_json(
+            self._send(
+                "POST",
+                _BASE_PATH,
+                content=data,
+                content_type=_YAML_MEDIA_TYPE,
+            ),
+        )
 
     def get(self, session_id: str) -> Any:
         return self._parse_json(

@@ -4,6 +4,7 @@
 # Licensed under the Apache-2.0 License.
 # ------------------------------------
 """Unit tests for :mod:`pydo.agents.custom_sessions`."""
+
 from __future__ import annotations
 
 import json
@@ -14,7 +15,6 @@ from unittest.mock import MagicMock
 import pytest
 
 from pydo.agents import (
-    AgentKind,
     AgentsResources,
     HITLOutcome,
     HarnessStreamError,
@@ -23,7 +23,6 @@ from pydo.agents import (
     SessionStatus,
     resolve_agents_base_url,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fake pipeline / response plumbing
@@ -85,26 +84,41 @@ def _make_resources(responses: List[_FakeResponse]) -> AgentsResources:
 # ---------------------------------------------------------------------------
 
 
-def test_create_session_posts_expected_body():
+def test_create_from_manifest_uploads_yaml_verbatim():
     body = {"session": {"session_id": "abc", "status": SessionStatus.PROVISIONING}}
     resources = _make_resources([_FakeResponse(200, body)])
 
-    resp = resources.sessions.create(
-        agent_kind=AgentKind.CLAUDE_CODE,
-        repo_hint="digitalocean/pydo",
-        idle_timeout_seconds=900,
+    manifest = (
+        "apiVersion: agents.digitalocean.com/v1alpha1\n"
+        "kind: Agent\n"
+        "metadata:\n"
+        "  name: harness-demo\n"
     )
+    resp = resources.sessions.create_from_manifest(manifest)
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "POST"
     assert call.request.url.endswith("/v2/agents/sessions")
-    sent = json.loads(call.request.content)
-    assert sent == {
-        "agent_kind": "AGENT_KIND_CLAUDE_CODE",
-        "repo_hint": "digitalocean/pydo",
-        "idle_timeout_seconds": 900,
-    }
+    assert call.request.headers.get("Content-Type") == "application/x-yaml"
+    content = call.request.content
+    if isinstance(content, bytes):
+        content = content.decode("utf-8")
+    assert content == manifest
     assert resp.session.session_id == "abc"
+
+
+def test_create_from_manifest_accepts_bytes():
+    resources = _make_resources([_FakeResponse(200, {"session": {"session_id": "z"}})])
+    resources.sessions.create_from_manifest(b"kind: Agent\n")
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.headers.get("Content-Type") == "application/x-yaml"
+
+
+def test_create_from_manifest_rejects_empty():
+    resources = _make_resources([])
+    with pytest.raises(ValueError):
+        resources.sessions.create_from_manifest("   \n  ")
 
 
 def test_get_session_url_encodes_id():

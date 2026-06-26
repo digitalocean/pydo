@@ -11,6 +11,7 @@ from pydo.agents import resolve_agents_base_url
 from pydo.custom_extensions import _BaseURLProxy
 
 from .custom_sessions import AsyncHarnessEventStream, AsyncSessionsOperations
+from .session import AsyncAgentSession, AsyncRunStream
 
 
 class AsyncAgentsResources:
@@ -25,5 +26,27 @@ class AsyncAgentsResources:
     def base_url(self) -> str:
         return self._proxy._base_url
 
+    async def start(self, manifest: "str | bytes") -> AsyncAgentSession:
+        """Create a session from an ``agents.yaml`` manifest and return a handle.
 
-__all__ = ["AsyncAgentsResources", "AsyncSessionsOperations", "AsyncHarnessEventStream"]
+        Use as ``async with await client.agents.start(manifest) as agent:`` to
+        auto-destroy on exit.
+        """
+        resp = await self.sessions.create_from_manifest(manifest)
+        get = getattr(resp, "get", None)
+        info = get("session") if get else None
+        session_id = (getattr(info or resp, "get", lambda *_: None))("session_id")
+        return AsyncAgentSession(self.sessions, session_id, raw=resp)
+
+    def attach(self, session_id: str) -> AsyncAgentSession:
+        """Return an :class:`AsyncAgentSession` handle for an existing session."""
+        return AsyncAgentSession(self.sessions, session_id)
+
+
+__all__ = [
+    "AsyncAgentsResources",
+    "AsyncAgentSession",
+    "AsyncRunStream",
+    "AsyncSessionsOperations",
+    "AsyncHarnessEventStream",
+]
