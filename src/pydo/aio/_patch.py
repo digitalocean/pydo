@@ -64,6 +64,8 @@ class Client(  # type: ignore
         subdomain (e.g. ``"https://<id>.agents.do-ai.run"``).
         Required only when using agent inference endpoints.
     :paramtype agent_endpoint: str
+    :keyword agents_endpoint: Hosted Agents API base URL (default
+        ``api.digitalocean.com``; override via ``PYDO_AGENTS_ENDPOINT``).
     """
 
     def __init__(
@@ -74,6 +76,7 @@ class Client(  # type: ignore
         timeout: int = 120,
         inference_endpoint: str = INFERENCE_BASE_URL,
         agent_endpoint: str = "",
+        agents_endpoint: Optional[str] = None,
         **kwargs,
     ):
         if token is not None and api_key is not None:
@@ -116,6 +119,13 @@ class Client(  # type: ignore
             inference_images = self._inference_resource_root.images
             self.images.generate = inference_images.generate
             self.images.generations = inference_images.generations
+
+        try:
+            from pydo.aio.agents import AsyncAgentsResources
+        except ImportError:
+            self.agents = None
+        else:
+            self.agents = AsyncAgentsResources(self, agents_endpoint=agents_endpoint)
 
     def _setup_inference_routing(
         self,
