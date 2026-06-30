@@ -277,8 +277,7 @@ class AsyncSessionsOperations:
             raise ValueError("path is required")
         content, size, handle = _coerce_upload_content(data)
         try:
-            # aiohttp does not reliably stream arbitrary sync file objects, so
-            # materialize non-bytes payloads before sending.
+            # aiohttp can't reliably stream sync file objects; materialize them.
             if hasattr(content, "read"):
                 content = content.read()
                 if isinstance(content, str):

@@ -58,21 +58,13 @@ _OCTET_STREAM = "application/octet-stream"
 _SHA256_HEADER = "X-Content-Sha256"
 _IS_ARCHIVE_HEADER = "X-Workspace-Is-Archive"
 _SIZE_HINT_HEADER = "X-Workspace-Size-Bytes"
-# Per-request upload cap enforced by the server (413 beyond this); guarded
-# client-side when the payload size is known to avoid a pointless round trip.
-_MAX_UPLOAD_BYTES = 500 * 1024 * 1024
+_MAX_UPLOAD_BYTES = 500 * 1024 * 1024  # server returns 413 beyond this
 
 UploadData = Union[bytes, bytearray, str, "os.PathLike[str]", BinaryIO]
 
 
 class WorkspaceTransferError(RuntimeError):
-    """A workspace upload/download failed an integrity check.
-
-    Raised on a download when the ``X-Content-Sha256`` trailer does not match
-    the received bytes, when the byte count disagrees with the server's size
-    hint (truncation), or — in strict mode (``require_checksum=True``) — when
-    the trailer cannot be read at all. The output should be discarded.
-    """
+    """A workspace download failed its integrity check (discard the output)."""
 
 
 def _bool_param(value: bool) -> str:
@@ -100,13 +92,7 @@ def _ci_get(mapping: Any, key: str) -> Optional[str]:
 
 
 def _extract_trailer(response: Any, name: str) -> Optional[str]:
-    """Best-effort read of an HTTP trailer that arrives after the body.
-
-    The digest is sent as a chunked-transfer trailer, so it is only available
-    once the body has been fully consumed. Transports surface trailers
-    differently (and some not at all), so check the response headers and the
-    underlying transport's raw response.
-    """
+    """Best-effort read of a chunked-transfer trailer (only valid post-body)."""
     value = _ci_get(getattr(response, "headers", None), name)
     if value:
         return value
@@ -141,19 +127,10 @@ def _verify_download(
 ) -> None:
     """Verify a finished download against whatever integrity signal is readable.
 
-    Per the contract the integrity digest is the ``X-Content-Sha256`` trailer.
-    When it is readable it is authoritative: a mismatch means corruption. But
-    CPython's HTTP stack (``http.client`` under both ``requests`` and
-    ``aiohttp``) reads and *discards* chunked trailers, so on the default
-    transports the trailer is usually unavailable even when the server sent it.
-
-    The check therefore degrades gracefully:
-
-    * trailer readable  -> must match the computed digest, else raise;
-    * else size hint present -> received byte count must match, else raise
-      (catches truncation for known-size single files);
-    * else ``require_checksum`` -> raise (strict mode, for trailer-capable
-      transports); otherwise warn that the digest could not be verified.
+    The ``X-Content-Sha256`` trailer is authoritative when readable, but
+    CPython's HTTP stack discards chunked trailers, so the check degrades: use
+    the trailer if present, else the size hint, else warn (or raise under
+    ``require_checksum``).
     """
     expected = _extract_trailer(response, _SHA256_HEADER)
     if expected:
@@ -193,12 +170,7 @@ def _verify_download(
 
 
 def _coerce_upload_content(data: UploadData) -> "tuple[Any, Optional[int], Any]":
-    """Normalize an upload payload to ``(content, size_or_None, handle_to_close)``.
-
-    ``content`` is suitable to hand to the transport (raw bytes or a readable
-    binary stream). For filesystem paths a handle is opened and returned so the
-    caller can close it after the request.
-    """
+    """Normalize an upload payload to ``(content, size_or_None, handle_to_close)``."""
     if isinstance(data, (bytes, bytearray)):
         payload = bytes(data)
         return payload, len(payload), None
@@ -500,16 +472,10 @@ class SessionsOperations:
     ) -> Any:
         """Upload raw file (or tar) bytes into a session's sandbox workspace.
 
-        ``POST /v2/agents/sessions/{session_id}/workspace/upload``.
-
-        :param path: Destination path, resolved inside the workspace root
-            (``/workspace``). Anything escaping the root is rejected with 403.
-        :param data: Raw bytes, a filesystem path, or a readable binary stream.
-        :param is_archive: When ``True`` the body is a tar archive to extract at
-            ``path``.
-        :param content_sha256: Optional hex digest of the full payload, forwarded
-            via the ``X-Content-Sha256`` header for the guest to verify.
-        :returns: ``{"path": ..., "bytes_written": N}``.
+        ``POST /v2/agents/sessions/{session_id}/workspace/upload``. ``data`` is
+        bytes, a filesystem path, or a readable binary stream. ``is_archive``
+        extracts the body as a tar at ``path``; ``content_sha256`` is forwarded
+        for the guest to verify. Returns ``{"path": ..., "bytes_written": N}``.
         """
         if not path:
             raise ValueError("path is required")
@@ -544,22 +510,11 @@ class SessionsOperations:
     ) -> "WorkspaceDownload":
         """Download a file (or tar-streamed directory) from a session workspace.
 
-        ``GET /v2/agents/sessions/{session_id}/workspace/download``.
-
-        The response is chunked with the SHA-256 digest delivered as an HTTP
-        trailer after the body. The returned :class:`WorkspaceDownload` streams
-        the body and verifies integrity once it is fully consumed. A mismatched
-        trailer (or a byte count that disagrees with the server's size hint)
-        raises :class:`WorkspaceTransferError` and the output should be
-        discarded.
-
-        :param path: Source path, resolved inside the workspace root.
-        :param as_archive: When ``True`` the directory at ``path`` is
-            tar-streamed.
-        :param require_checksum: When ``True``, raise if the SHA-256 trailer
-            cannot be read. The default is ``False`` because CPython's HTTP
-            stack discards chunked trailers, so strict verification only works
-            on a trailer-capable transport.
+        ``GET /v2/agents/sessions/{session_id}/workspace/download``. Returns a
+        :class:`WorkspaceDownload` that streams and verifies the body.
+        ``as_archive`` tar-streams the directory at ``path``. ``require_checksum``
+        raises when the SHA-256 trailer cannot be read (default ``False`` since
+        CPython's HTTP stack discards chunked trailers).
         """
         if not path:
             raise ValueError("path is required")
@@ -581,12 +536,9 @@ class SessionsOperations:
 class WorkspaceDownload:
     """A streaming workspace download with best-effort integrity verification.
 
-    Iterating yields the raw body chunks while the SHA-256 digest is computed
-    incrementally. Once the body is fully consumed, integrity is verified (see
-    :func:`_verify_download`): a mismatched ``X-Content-Sha256`` trailer or a
-    byte count disagreeing with the size hint raises
-    :class:`WorkspaceTransferError`. Always consume the body to completion
-    (via iteration, :meth:`read`, or :meth:`save`) before trusting the output.
+    Iterating yields body chunks while computing the SHA-256; integrity is
+    verified once the body is fully consumed (see :func:`_verify_download`).
+    Consume it fully (iteration, :meth:`read`, or :meth:`save`) before trusting.
     """
 
     def __init__(self, response: Any, *, require_checksum: bool = False):

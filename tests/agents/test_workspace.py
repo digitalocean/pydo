@@ -91,7 +91,9 @@ def _make_resources(responses: List[_FakeResponse]) -> AgentsResources:
     parent = MagicMock()
     parent._client = MagicMock()
     parent._client._pipeline = _FakePipeline(responses)
-    return AgentsResources(parent, agents_endpoint="https://api.stage2.digitalocean.com")
+    return AgentsResources(
+        parent, agents_endpoint="https://api.stage2.digitalocean.com"
+    )
 
 
 def _calls(resources) -> List[Any]:
@@ -108,9 +110,7 @@ def test_upload_bytes_sets_path_params_and_content_type():
         [_FakeResponse(200, body={"path": "/workspace/a.txt", "bytes_written": 5})]
     )
 
-    resp = resources.sessions.workspace_upload(
-        "s1", path="a.txt", data=b"hello"
-    )
+    resp = resources.sessions.workspace_upload("s1", path="a.txt", data=b"hello")
 
     call = _calls(resources)[0]
     assert call.request.method == "POST"
@@ -143,7 +143,9 @@ def test_upload_accepts_filesystem_path(tmp_path):
     payload = b"file-on-disk"
     src = tmp_path / "input.bin"
     src.write_bytes(payload)
-    resources = _make_resources([_FakeResponse(200, body={"bytes_written": len(payload)})])
+    resources = _make_resources(
+        [_FakeResponse(200, body={"bytes_written": len(payload)})]
+    )
 
     resources.sessions.workspace_upload("s1", path="dest.bin", data=str(src))
 
@@ -223,9 +225,7 @@ def test_download_archive_flag_and_header():
         ]
     )
 
-    download = resources.sessions.workspace_download(
-        "s1", path="dir", as_archive=True
-    )
+    download = resources.sessions.workspace_download("s1", path="dir", as_archive=True)
     assert download.read() == payload
     assert download.is_archive is True
     assert "as_archive=true" in _calls(resources)[0].request.url
@@ -287,9 +287,7 @@ def test_download_size_hint_match_is_accepted():
 
 
 def test_download_mismatched_trailer_is_failure():
-    resources = _make_resources(
-        [_FakeResponse(200, chunks=[b"abc"], trailer="0" * 64)]
-    )
+    resources = _make_resources([_FakeResponse(200, chunks=[b"abc"], trailer="0" * 64)])
 
     download = resources.sessions.workspace_download("s1", path="x")
     with pytest.raises(WorkspaceTransferError, match="mismatch"):
@@ -329,9 +327,7 @@ def test_download_save_writes_file_and_discards_on_failure(tmp_path):
 def test_download_non_200_raises():
     from azure.core.exceptions import HttpResponseError
 
-    resources = _make_resources(
-        [_FakeResponse(404, body="path not found")]
-    )
+    resources = _make_resources([_FakeResponse(404, body="path not found")])
     with pytest.raises(HttpResponseError):
         resources.sessions.workspace_download("s1", path="missing")
 
@@ -422,7 +418,9 @@ def _make_async_resources(responses: List[_FakeAsyncResponse]) -> AsyncAgentsRes
 
 @pytest.mark.asyncio
 async def test_async_upload_materializes_and_sets_headers():
-    resources = _make_async_resources([_FakeAsyncResponse(200, body={"bytes_written": 3})])
+    resources = _make_async_resources(
+        [_FakeAsyncResponse(200, body={"bytes_written": 3})]
+    )
 
     resp = await resources.sessions.workspace_upload(
         "s1", path="a.txt", data=b"abc", content_sha256="cafe"
@@ -442,7 +440,9 @@ async def test_async_download_verifies_trailer():
     resources = _make_async_resources(
         [
             _FakeAsyncResponse(
-                200, chunks=[b"async-", b"bytes"], trailer=hashlib.sha256(payload).hexdigest()
+                200,
+                chunks=[b"async-", b"bytes"],
+                trailer=hashlib.sha256(payload).hexdigest(),
             )
         ]
     )
@@ -455,7 +455,9 @@ async def test_async_download_verifies_trailer():
 
 @pytest.mark.asyncio
 async def test_async_download_missing_trailer_strict_fails():
-    resources = _make_async_resources([_FakeAsyncResponse(200, chunks=[b"x"], trailer=None)])
+    resources = _make_async_resources(
+        [_FakeAsyncResponse(200, chunks=[b"x"], trailer=None)]
+    )
 
     download = await resources.sessions.workspace_download(
         "s1", path="o", require_checksum=True

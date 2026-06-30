@@ -1,29 +1,5 @@
 """Upload a file to a session's sandbox workspace and download it back.
 
-Hosted-agents sessions expose a ``/workspace`` sandbox. These two custom REST
-endpoints stream arbitrary bytes in and out of it:
-
-  * ``client.agents.sessions.workspace_upload(...)``    POST .../workspace/upload
-  * ``client.agents.sessions.workspace_download(...)``  GET  .../workspace/download
-
-This script does a full round trip against an *existing* session:
-
-  1. Upload a local file to ``GUEST_PATH`` inside the workspace. The optional
-     ``X-Content-Sha256`` header is sent so the guest can verify the upload.
-  2. Download it back. The download is chunked and the SHA-256 digest arrives as
-     an HTTP *trailer* after the body, so the SDK reads the whole body first,
-     then verifies it. Note: CPython's HTTP stack discards chunked trailers, so
-     the X-Content-Sha256 trailer is usually unreadable from Python — the SDK
-     falls back to the server's size hint (X-Workspace-Size-Bytes) to detect
-     truncation and warns that the checksum could not be confirmed. A real
-     mismatch (trailer or size) raises ``WorkspaceTransferError``; pass
-     require_checksum=True for strict mode on a trailer-capable transport.
-  3. Confirm the bytes survived the round trip.
-
-The high-level handle also offers ``agent.upload_file(...)`` /
-``agent.download_file(...)`` which bind the session id for you; the equivalent
-low-level calls are shown in comments.
-
 Required env:
   DIGITALOCEAN_TOKEN
   PYDO_AGENTS_ENDPOINT   stage2: https://api.s2r1.internal.digitalocean.com
@@ -45,7 +21,6 @@ from pydo.agents import WorkspaceTransferError
 
 
 def _sample_file() -> str:
-    """Create a small throwaway file to upload when LOCAL_FILE is unset."""
     fd, path = tempfile.mkstemp(prefix="pydo-ws-", suffix=".txt")
     with os.fdopen(fd, "w", encoding="utf-8") as fh:
         fh.write("hello from pydo workspace transfer\n" * 4)
@@ -73,25 +48,10 @@ def main() -> int:
         file=sys.stderr,
     )
 
-    # --- upload -----------------------------------------------------------
-    # `data` accepts bytes, a filesystem path, or a readable binary stream.
-    # Passing content_sha256 lets the guest verify what it received.
     up = agent.upload_file(path=guest_path, data=local_file, content_sha256=sha256)
-    # low-level equivalent:
-    #   client.agents.sessions.workspace_upload(
-    #       session_id, path=guest_path, data=local_file, content_sha256=sha256)
     print(f"[uploaded] {dict(up)}", file=sys.stderr)
 
-    # --- download ---------------------------------------------------------
-    # The returned object streams the body; .save()/.read() consume it fully
-    # and then verify integrity (trailer if readable, else the size hint). On a
-    # detected corruption/truncation a partial file written by .save() is
-    # removed and WorkspaceTransferError is raised, so you never keep a corrupt
-    # download. (A "could not verify trailer" warning is expected on CPython.)
     download = agent.download_file(path=guest_path)
-    # low-level equivalent:
-    #   download = client.agents.sessions.workspace_download(
-    #       session_id, path=guest_path)
     try:
         written = download.save(download_to)
     except WorkspaceTransferError as exc:
@@ -104,7 +64,6 @@ def main() -> int:
         file=sys.stderr,
     )
 
-    # --- verify the round trip -------------------------------------------
     with open(download_to, "rb") as fh:
         roundtripped = fh.read()
     ok = roundtripped == original
