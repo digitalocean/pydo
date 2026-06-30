@@ -388,6 +388,40 @@ class AgentSession:
             source=source,
         )
 
+    def upload_file(
+        self,
+        *,
+        path: str,
+        data: Any,
+        is_archive: bool = False,
+        content_sha256: Optional[str] = None,
+    ) -> Any:
+        """Upload bytes/a tar into the session workspace (see
+        :meth:`SessionsOperations.workspace_upload`)."""
+        return self._sessions.workspace_upload(
+            self.session_id,
+            path=path,
+            data=data,
+            is_archive=is_archive,
+            content_sha256=content_sha256,
+        )
+
+    def download_file(
+        self,
+        *,
+        path: str,
+        as_archive: bool = False,
+        require_checksum: bool = False,
+    ) -> Any:
+        """Download a workspace file/tar with integrity verification (see
+        :meth:`SessionsOperations.workspace_download`)."""
+        return self._sessions.workspace_download(
+            self.session_id,
+            path=path,
+            as_archive=as_archive,
+            require_checksum=require_checksum,
+        )
+
     def destroy(self) -> None:
         self._sessions.destroy(self.session_id)
 

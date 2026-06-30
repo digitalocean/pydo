@@ -22,7 +22,13 @@ from .custom_models import (
     RunState,
     SessionStatus,
 )
-from .custom_sessions import HarnessEventStream, HarnessStreamError, SessionsOperations
+from .custom_sessions import (
+    HarnessEventStream,
+    HarnessStreamError,
+    SessionsOperations,
+    WorkspaceDownload,
+    WorkspaceTransferError,
+)
 from .session import (
     AgentEvent,
     AgentEventType,
@@ -86,6 +92,8 @@ __all__ = [
     "SessionsOperations",
     "HarnessEventStream",
     "HarnessStreamError",
+    "WorkspaceDownload",
+    "WorkspaceTransferError",
     "DEFAULT_AGENTS_BASE_URL",
     "resolve_agents_base_url",
     "AgentKind",

@@ -6,8 +6,11 @@
 
 from __future__ import annotations
 
+import hashlib
 import json as _json
-from typing import Any, Dict, Iterator, List, Optional, Union
+import os
+import warnings
+from typing import Any, BinaryIO, Dict, Iterator, List, Optional, Union
 from urllib.parse import quote
 
 from azure.core.exceptions import (
@@ -48,6 +51,175 @@ def _manifest_bytes(manifest: Union[str, bytes]) -> bytes:
     if not data.strip():
         raise ValueError("manifest is empty")
     return data
+
+
+# Workspace file-transfer contract (custom REST handlers, not grpc-gateway).
+_OCTET_STREAM = "application/octet-stream"
+_SHA256_HEADER = "X-Content-Sha256"
+_IS_ARCHIVE_HEADER = "X-Workspace-Is-Archive"
+_SIZE_HINT_HEADER = "X-Workspace-Size-Bytes"
+# Per-request upload cap enforced by the server (413 beyond this); guarded
+# client-side when the payload size is known to avoid a pointless round trip.
+_MAX_UPLOAD_BYTES = 500 * 1024 * 1024
+
+UploadData = Union[bytes, bytearray, str, "os.PathLike[str]", BinaryIO]
+
+
+class WorkspaceTransferError(RuntimeError):
+    """A workspace upload/download failed an integrity check.
+
+    Raised on a download when the ``X-Content-Sha256`` trailer does not match
+    the received bytes, when the byte count disagrees with the server's size
+    hint (truncation), or — in strict mode (``require_checksum=True``) — when
+    the trailer cannot be read at all. The output should be discarded.
+    """
+
+
+def _bool_param(value: bool) -> str:
+    return "true" if value else "false"
+
+
+def _ci_get(mapping: Any, key: str) -> Optional[str]:
+    """Case-insensitive lookup over a header-like mapping."""
+    if not mapping:
+        return None
+    getter = getattr(mapping, "get", None)
+    if getter is not None:
+        value = getter(key)
+        if value is not None:
+            return value
+    lower = key.lower()
+    try:
+        items = mapping.items()
+    except (AttributeError, TypeError):
+        return None
+    for name, value in items:
+        if isinstance(name, str) and name.lower() == lower:
+            return value
+    return None
+
+
+def _extract_trailer(response: Any, name: str) -> Optional[str]:
+    """Best-effort read of an HTTP trailer that arrives after the body.
+
+    The digest is sent as a chunked-transfer trailer, so it is only available
+    once the body has been fully consumed. Transports surface trailers
+    differently (and some not at all), so check the response headers and the
+    underlying transport's raw response.
+    """
+    value = _ci_get(getattr(response, "headers", None), name)
+    if value:
+        return value
+    internal = getattr(response, "internal_response", None)
+    for obj in (internal, getattr(internal, "raw", None)):
+        if obj is None:
+            continue
+        value = _ci_get(getattr(obj, "trailers", None), name)
+        if value:
+            return value
+    return None
+
+
+def _download_is_archive(response: Any) -> bool:
+    value = _ci_get(getattr(response, "headers", None), _IS_ARCHIVE_HEADER)
+    return str(value or "").strip().lower() == "true"
+
+
+def _download_size_hint(response: Any) -> Optional[int]:
+    raw = _ci_get(getattr(response, "headers", None), _SIZE_HINT_HEADER)
+    try:
+        return int(raw) if raw not in (None, "") else None
+    except (TypeError, ValueError):
+        return None
+
+
+def _verify_download(
+    response: Any,
+    computed_hex: str,
+    total_bytes: int,
+    require_checksum: bool,
+) -> None:
+    """Verify a finished download against whatever integrity signal is readable.
+
+    Per the contract the integrity digest is the ``X-Content-Sha256`` trailer.
+    When it is readable it is authoritative: a mismatch means corruption. But
+    CPython's HTTP stack (``http.client`` under both ``requests`` and
+    ``aiohttp``) reads and *discards* chunked trailers, so on the default
+    transports the trailer is usually unavailable even when the server sent it.
+
+    The check therefore degrades gracefully:
+
+    * trailer readable  -> must match the computed digest, else raise;
+    * else size hint present -> received byte count must match, else raise
+      (catches truncation for known-size single files);
+    * else ``require_checksum`` -> raise (strict mode, for trailer-capable
+      transports); otherwise warn that the digest could not be verified.
+    """
+    expected = _extract_trailer(response, _SHA256_HEADER)
+    if expected:
+        if expected.strip().lower() != computed_hex.lower():
+            raise WorkspaceTransferError(
+                "workspace download integrity check failed: SHA-256 mismatch "
+                f"(trailer {expected.strip()!r} != computed {computed_hex!r}) — "
+                "discard the output."
+            )
+        return
+
+    size_hint = _download_size_hint(response)
+    if size_hint is not None and size_hint != total_bytes:
+        raise WorkspaceTransferError(
+            "workspace download is truncated: received "
+            f"{total_bytes} bytes but the server reported {size_hint} — "
+            "discard the output."
+        )
+    if require_checksum:
+        raise WorkspaceTransferError(
+            "workspace download integrity check failed: the X-Content-Sha256 "
+            "trailer is missing or could not be read. Python's HTTP stack "
+            "discards chunked trailers, so strict checksum verification is not "
+            "possible on this transport; pass require_checksum=False to accept "
+            "downloads (verified by size when the server provides a size hint)."
+        )
+    warnings.warn(
+        "workspace download could not verify the X-Content-Sha256 trailer "
+        "(Python's HTTP stack discards chunked trailers); integrity was "
+        + (
+            "confirmed via the size hint."
+            if size_hint is not None
+            else "NOT independently verified."
+        ),
+        stacklevel=2,
+    )
+
+
+def _coerce_upload_content(data: UploadData) -> "tuple[Any, Optional[int], Any]":
+    """Normalize an upload payload to ``(content, size_or_None, handle_to_close)``.
+
+    ``content`` is suitable to hand to the transport (raw bytes or a readable
+    binary stream). For filesystem paths a handle is opened and returned so the
+    caller can close it after the request.
+    """
+    if isinstance(data, (bytes, bytearray)):
+        payload = bytes(data)
+        return payload, len(payload), None
+    if isinstance(data, (str, os.PathLike)):
+        path = os.fspath(data)
+        size = os.path.getsize(path)
+        handle = open(path, "rb")  # pylint: disable=consider-using-with
+        return handle, size, handle
+    if hasattr(data, "read"):
+        size: Optional[int] = None
+        try:
+            current = data.tell()
+            data.seek(0, os.SEEK_END)
+            size = data.tell() - current
+            data.seek(current)
+        except (OSError, AttributeError, ValueError):
+            size = None
+        return data, size, None
+    raise TypeError(
+        "data must be bytes, a filesystem path, or a readable binary stream"
+    )
 
 
 def _unwrap_harness_sse_chunk(chunk: Dict[str, Any]) -> Optional[Any]:
@@ -158,12 +330,13 @@ class SessionsOperations:
         path: str,
         *,
         body: Optional[Dict[str, Any]] = None,
-        content: Optional[Union[str, bytes]] = None,
+        content: Optional[Any] = None,
         content_type: Optional[str] = None,
         params: Optional[Dict[str, Any]] = None,
+        headers: Optional[Dict[str, str]] = None,
         stream: bool = False,
     ):
-        headers = {"Accept": "application/json"}
+        headers = {"Accept": "application/json", **(headers or {})}
         kwargs: Dict[str, Any] = {"headers": headers}
         if params:
             kwargs["params"] = {
@@ -316,5 +489,186 @@ class SessionsOperations:
             _raise_agents_http_error(response)
         return HarnessEventStream(SSEStream(response))
 
+    def workspace_upload(
+        self,
+        session_id: str,
+        *,
+        path: str,
+        data: UploadData,
+        is_archive: bool = False,
+        content_sha256: Optional[str] = None,
+    ) -> Any:
+        """Upload raw file (or tar) bytes into a session's sandbox workspace.
 
-__all__ = ["SessionsOperations", "HarnessEventStream", "HarnessStreamError"]
+        ``POST /v2/agents/sessions/{session_id}/workspace/upload``.
+
+        :param path: Destination path, resolved inside the workspace root
+            (``/workspace``). Anything escaping the root is rejected with 403.
+        :param data: Raw bytes, a filesystem path, or a readable binary stream.
+        :param is_archive: When ``True`` the body is a tar archive to extract at
+            ``path``.
+        :param content_sha256: Optional hex digest of the full payload, forwarded
+            via the ``X-Content-Sha256`` header for the guest to verify.
+        :returns: ``{"path": ..., "bytes_written": N}``.
+        """
+        if not path:
+            raise ValueError("path is required")
+        content, size, handle = _coerce_upload_content(data)
+        try:
+            if size is not None and size > _MAX_UPLOAD_BYTES:
+                raise ValueError(
+                    f"upload of {size} bytes exceeds the 500 MiB per-request limit"
+                )
+            headers = {_SHA256_HEADER: content_sha256} if content_sha256 else None
+            return self._parse_json(
+                self._send(
+                    "POST",
+                    f"{_BASE_PATH}/{_quote(session_id)}/workspace/upload",
+                    content=content,
+                    content_type=_OCTET_STREAM,
+                    params={"path": path, "is_archive": _bool_param(is_archive)},
+                    headers=headers,
+                ),
+            )
+        finally:
+            if handle is not None:
+                handle.close()
+
+    def workspace_download(
+        self,
+        session_id: str,
+        *,
+        path: str,
+        as_archive: bool = False,
+        require_checksum: bool = False,
+    ) -> "WorkspaceDownload":
+        """Download a file (or tar-streamed directory) from a session workspace.
+
+        ``GET /v2/agents/sessions/{session_id}/workspace/download``.
+
+        The response is chunked with the SHA-256 digest delivered as an HTTP
+        trailer after the body. The returned :class:`WorkspaceDownload` streams
+        the body and verifies integrity once it is fully consumed. A mismatched
+        trailer (or a byte count that disagrees with the server's size hint)
+        raises :class:`WorkspaceTransferError` and the output should be
+        discarded.
+
+        :param path: Source path, resolved inside the workspace root.
+        :param as_archive: When ``True`` the directory at ``path`` is
+            tar-streamed.
+        :param require_checksum: When ``True``, raise if the SHA-256 trailer
+            cannot be read. The default is ``False`` because CPython's HTTP
+            stack discards chunked trailers, so strict verification only works
+            on a trailer-capable transport.
+        """
+        if not path:
+            raise ValueError("path is required")
+        request = HttpRequest(
+            "GET",
+            f"{_BASE_PATH}/{_quote(session_id)}/workspace/download",
+            headers={"Accept": _OCTET_STREAM},
+            params={"path": path, "as_archive": _bool_param(as_archive)},
+        )
+        request.url = self._client.format_url(request.url)
+        pipeline_response = self._client._pipeline.run(request, stream=True)
+        response = pipeline_response.http_response
+        if response.status_code != 200:
+            response.read()
+            _raise_agents_http_error(response)
+        return WorkspaceDownload(response, require_checksum=require_checksum)
+
+
+class WorkspaceDownload:
+    """A streaming workspace download with best-effort integrity verification.
+
+    Iterating yields the raw body chunks while the SHA-256 digest is computed
+    incrementally. Once the body is fully consumed, integrity is verified (see
+    :func:`_verify_download`): a mismatched ``X-Content-Sha256`` trailer or a
+    byte count disagreeing with the size hint raises
+    :class:`WorkspaceTransferError`. Always consume the body to completion
+    (via iteration, :meth:`read`, or :meth:`save`) before trusting the output.
+    """
+
+    def __init__(self, response: Any, *, require_checksum: bool = False):
+        self._response = response
+        self._require_checksum = require_checksum
+        self.bytes_read = 0
+
+    @property
+    def is_archive(self) -> bool:
+        """Whether the response is a tar stream (``X-Workspace-Is-Archive``)."""
+        return _download_is_archive(self._response)
+
+    @property
+    def size_hint(self) -> Optional[int]:
+        """Size hint for progress UIs (``X-Workspace-Size-Bytes``); not framing."""
+        return _download_size_hint(self._response)
+
+    def __iter__(self) -> Iterator[bytes]:
+        hasher = hashlib.sha256()
+        total = 0
+        for chunk in self._response.iter_bytes():
+            if not chunk:
+                continue
+            if isinstance(chunk, str):
+                chunk = chunk.encode("utf-8")
+            hasher.update(chunk)
+            total += len(chunk)
+            yield bytes(chunk)
+        self.bytes_read = total
+        _verify_download(
+            self._response, hasher.hexdigest(), total, self._require_checksum
+        )
+
+    def read(self) -> bytes:
+        """Consume the whole body and return the (verified) bytes."""
+        return b"".join(self)
+
+    def save(self, dest: Union[str, "os.PathLike[str]", BinaryIO]) -> int:
+        """Stream the body to *dest* (a path or writable binary file).
+
+        Returns the number of bytes written. If verification fails, a
+        file opened from a path is removed before re-raising.
+        """
+        own = isinstance(dest, (str, os.PathLike))
+        handle = open(os.fspath(dest), "wb") if own else dest  # type: ignore[arg-type]
+        total = 0
+        try:
+            for chunk in self:
+                handle.write(chunk)
+                total += len(chunk)
+        except WorkspaceTransferError:
+            if own:
+                handle.close()
+                try:
+                    os.remove(os.fspath(dest))  # type: ignore[arg-type]
+                except OSError:
+                    pass
+            raise
+        finally:
+            if own and not handle.closed:
+                handle.close()
+        return total
+
+    def close(self) -> None:
+        closer = getattr(self._response, "close", None)
+        if closer is not None:
+            try:
+                closer()
+            except Exception:  # noqa: BLE001 — best-effort cleanup
+                pass
+
+    def __enter__(self) -> "WorkspaceDownload":
+        return self
+
+    def __exit__(self, *args: Any) -> None:
+        self.close()
+
+
+__all__ = [
+    "SessionsOperations",
+    "HarnessEventStream",
+    "HarnessStreamError",
+    "WorkspaceDownload",
+    "WorkspaceTransferError",
+]

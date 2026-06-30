@@ -10,7 +10,11 @@ from typing import Optional
 from pydo.agents import resolve_agents_base_url
 from pydo.custom_extensions import _BaseURLProxy
 
-from .custom_sessions import AsyncHarnessEventStream, AsyncSessionsOperations
+from .custom_sessions import (
+    AsyncHarnessEventStream,
+    AsyncSessionsOperations,
+    AsyncWorkspaceDownload,
+)
 from .session import AsyncAgentSession, AsyncRunStream
 
 
@@ -49,4 +53,5 @@ __all__ = [
     "AsyncRunStream",
     "AsyncSessionsOperations",
     "AsyncHarnessEventStream",
+    "AsyncWorkspaceDownload",
 ]
