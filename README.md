@@ -31,6 +31,44 @@ To install from pip:
     pip install pydo
 ```
 
+## Installing a Beta (Pre-Release)
+
+Beta releases are published to PyPI as [PEP 440](https://peps.python.org/pep-0440/)
+pre-releases. A normal `pip install pydo` will **not** pick these up — pip
+ignores pre-releases by default — so installing a beta is opt-in.
+
+To install the latest pre-release:
+
+```shell
+    pip install --pre pydo
+```
+
+To pin a specific beta version, use its PEP 440 form. A git tag
+`v<major>.<minor>.<patch>-beta.<n>` is normalized to `<major>.<minor>.<patch>b<n>`
+on PyPI (for example, `v1.2.3-beta.4` becomes `1.2.3b4`):
+
+```shell
+    pip install pydo==<major>.<minor>.<patch>b<n>
+```
+
+To include the async extra:
+
+```shell
+    pip install --pre "pydo[aio]"
+```
+
+> **ℹ️ Notes**
+>
+> - Betas may be cut from a feature branch and can contain unreleased,
+>   in-progress changes. Pin an exact version for reproducible installs.
+> - Each beta also has a draft GitHub pre-release with the built wheel/sdist
+>   attached, under the repository's
+>   [Releases](https://github.com/digitalocean/pydo/releases).
+> - To go back to a stable release, run `pip install --upgrade pydo` (without
+>   `--pre`).
+> - See available versions on the
+>   [PyPI release history](https://pypi.org/project/pydo/#history).
+
 ## **`pydo` Quickstart**
 
 > A quick guide to getting started with the client.
