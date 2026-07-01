@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v6.0.1
 
       - name: OpenAPI Changelist
         env:
@@ -36,7 +36,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6.0.0
         with:
           name: DigitalOcean-public.v2
           path: ./DigitalOcean-public.v2.yaml
@@ -47,7 +47,7 @@ jobs:
           GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
 
       - name: Install Poetry
-        uses: snok/install-poetry@v1.3.4
+        uses: snok/install-poetry@v1.4.1
         with:
           version: 1.6.1
           virtualenvs-path: .venv
