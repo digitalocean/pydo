@@ -154,6 +154,48 @@ def test_list_sessions_propagates_query_params():
     assert "status=SESSION_STATUS_READY" in raw
 
 
+def test_list_sessions_filters_by_name():
+    resources = _make_resources([_FakeResponse(200, {"sessions": []})])
+    resources.sessions.list(name="my-session")
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert "name=my-session" in call.request.url
+
+
+def test_attach_by_name_picks_most_recent_match():
+    resources = _make_resources(
+        [
+            _FakeResponse(
+                200,
+                {
+                    "sessions": [
+                        {
+                            "session_id": "old",
+                            "name": "dup",
+                            "created_at": "2026-01-01T00:00:00Z",
+                        },
+                        {
+                            "session_id": "new",
+                            "name": "dup",
+                            "created_at": "2026-07-01T00:00:00Z",
+                        },
+                    ]
+                },
+            )
+        ]
+    )
+    agent = resources.attach_by_name("dup")
+
+    assert "name=dup" in resources._proxy._original._pipeline.calls[0].request.url
+    assert agent.session_id == "new"
+
+
+def test_attach_by_name_raises_when_not_found():
+    resources = _make_resources([_FakeResponse(200, {"sessions": []})])
+    with pytest.raises(LookupError):
+        resources.attach_by_name("missing")
+
+
 def test_send_input_body_shape():
     resources = _make_resources([_FakeResponse(200, {"run_id": "r1"})])
     resp = resources.sessions.send_input("s1", text="hello world")

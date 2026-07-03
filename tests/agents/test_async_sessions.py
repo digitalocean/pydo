@@ -83,3 +83,46 @@ async def test_async_create_from_manifest_rejects_empty():
     resources = _make_async_resources([])
     with pytest.raises(ValueError):
         await resources.sessions.create_from_manifest("")
+
+
+@pytest.mark.asyncio
+async def test_async_list_filters_by_name():
+    resources = _make_async_resources([_FakeAsyncResponse(200, {"sessions": []})])
+    await resources.sessions.list(name="my-session")
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert "name=my-session" in call.request.url
+
+
+@pytest.mark.asyncio
+async def test_async_attach_by_name_picks_most_recent_match():
+    resources = _make_async_resources(
+        [
+            _FakeAsyncResponse(
+                200,
+                {
+                    "sessions": [
+                        {
+                            "session_id": "old",
+                            "name": "dup",
+                            "created_at": "2026-01-01T00:00:00Z",
+                        },
+                        {
+                            "session_id": "new",
+                            "name": "dup",
+                            "created_at": "2026-07-01T00:00:00Z",
+                        },
+                    ]
+                },
+            )
+        ]
+    )
+    agent = await resources.attach_by_name("dup")
+    assert agent.session_id == "new"
+
+
+@pytest.mark.asyncio
+async def test_async_attach_by_name_raises_when_not_found():
+    resources = _make_async_resources([_FakeAsyncResponse(200, {"sessions": []})])
+    with pytest.raises(LookupError):
+        await resources.attach_by_name("missing")

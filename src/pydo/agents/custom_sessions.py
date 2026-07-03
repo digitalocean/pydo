@@ -347,7 +347,13 @@ class SessionsOperations:
         page_token: Optional[str] = None,
         page_size: Optional[int] = None,
         status: Optional[str] = None,
+        name: Optional[str] = None,
     ) -> Any:
+        """List sessions, optionally filtered by ``status`` and/or ``name``.
+
+        ``name`` filters server-side (``GET /v2/agents/sessions?name=...``) and
+        may match more than one session (e.g. a name reused over time).
+        """
         return self._parse_json(
             self._send(
                 "GET",
@@ -356,6 +362,7 @@ class SessionsOperations:
                     "page_token": page_token,
                     "page_size": page_size,
                     "status": status,
+                    "name": name,
                 },
             ),
         )

@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from pydo.agents import resolve_agents_base_url
+from pydo.agents import _select_session_by_name, resolve_agents_base_url
 from pydo.custom_extensions import _BaseURLProxy
 
 from .custom_sessions import (
@@ -45,6 +45,16 @@ class AsyncAgentsResources:
     def attach(self, session_id: str) -> AsyncAgentSession:
         """Return an :class:`AsyncAgentSession` handle for an existing session."""
         return AsyncAgentSession(self.sessions, session_id)
+
+    async def attach_by_name(self, name: str) -> AsyncAgentSession:
+        """Resolve a session by ``name`` and return an :class:`AsyncAgentSession`.
+
+        See :meth:`pydo.agents.AgentsResources.attach_by_name`.
+        """
+        resp = await self.sessions.list(name=name)
+        session = _select_session_by_name(resp, name)
+        session_id = (getattr(session, "get", lambda *_: None))("session_id")
+        return AsyncAgentSession(self.sessions, session_id, raw=session)
 
 
 __all__ = [

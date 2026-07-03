@@ -50,6 +50,21 @@ def resolve_agents_base_url(explicit: Optional[str] = None) -> str:
     return url
 
 
+def _select_session_by_name(list_response, name: str):
+    """Pick the most recently created session from a name-filtered list.
+
+    Raises :class:`LookupError` when the response contains no sessions.
+    """
+    get = getattr(list_response, "get", None)
+    sessions = (get("sessions") if get else None) or []
+    if not sessions:
+        raise LookupError(f"no session found with name {name!r}")
+    return max(
+        sessions,
+        key=lambda s: (getattr(s, "get", lambda *_: "")("created_at") or ""),
+    )
+
+
 class AgentsResources:
     def __init__(self, parent_client, *, agents_endpoint: Optional[str] = None):
         self._proxy = _BaseURLProxy(
@@ -79,6 +94,18 @@ class AgentsResources:
     def attach(self, session_id: str) -> AgentSession:
         """Return an :class:`AgentSession` handle for an existing session."""
         return AgentSession(self.sessions, session_id)
+
+    def attach_by_name(self, name: str) -> AgentSession:
+        """Resolve a session by ``name`` and return an :class:`AgentSession`.
+
+        Looks up ``GET /v2/agents/sessions?name=<name>``. If several sessions
+        share the name (e.g. reused over time), the most recently created one
+        is chosen. Raises :class:`LookupError` when there is no match.
+        """
+        resp = self.sessions.list(name=name)
+        session = _select_session_by_name(resp, name)
+        session_id = (getattr(session, "get", lambda *_: None))("session_id")
+        return AgentSession(self.sessions, session_id, raw=session)
 
 
 __all__ = [
