@@ -395,6 +395,18 @@ class SessionsOperations:
     def destroy(self, session_id: str) -> None:
         self._send("DELETE", f"{_BASE_PATH}/{_quote(session_id)}")
 
+    def pause(self, session_id: str) -> Any:
+        """Pause a running session (``POST .../{session_id}/pause``)."""
+        return self._parse_json(
+            self._send("POST", f"{_BASE_PATH}/{_quote(session_id)}/pause"),
+        )
+
+    def resume(self, session_id: str) -> Any:
+        """Resume a paused session (``POST .../{session_id}/resume``)."""
+        return self._parse_json(
+            self._send("POST", f"{_BASE_PATH}/{_quote(session_id)}/resume"),
+        )
+
     def send_input(self, session_id: str, *, text: str) -> Any:
         return self._parse_json(
             self._send(

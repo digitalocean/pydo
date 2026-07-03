@@ -141,6 +141,28 @@ def test_destroy_session():
     assert call.request.url.endswith("/v2/agents/sessions/abc-123")
 
 
+def test_pause_session():
+    resources = _make_resources(
+        [_FakeResponse(200, {"session": {"session_id": "abc-123"}})]
+    )
+    resources.sessions.pause("abc-123")
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "POST"
+    assert call.request.url.endswith("/v2/agents/sessions/abc-123/pause")
+
+
+def test_resume_session():
+    resources = _make_resources(
+        [_FakeResponse(200, {"session": {"session_id": "abc-123"}})]
+    )
+    resources.sessions.resume("abc-123")
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "POST"
+    assert call.request.url.endswith("/v2/agents/sessions/abc-123/resume")
+
+
 def test_list_sessions_propagates_query_params():
     resources = _make_resources(
         [_FakeResponse(200, {"sessions": [], "next_page_token": ""})]

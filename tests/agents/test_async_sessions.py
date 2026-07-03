@@ -86,6 +86,30 @@ async def test_async_create_from_manifest_rejects_empty():
 
 
 @pytest.mark.asyncio
+async def test_async_pause_session():
+    resources = _make_async_resources(
+        [_FakeAsyncResponse(200, {"session": {"session_id": "abc-123"}})]
+    )
+    await resources.sessions.pause("abc-123")
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "POST"
+    assert call.request.url.endswith("/v2/agents/sessions/abc-123/pause")
+
+
+@pytest.mark.asyncio
+async def test_async_resume_session():
+    resources = _make_async_resources(
+        [_FakeAsyncResponse(200, {"session": {"session_id": "abc-123"}})]
+    )
+    await resources.sessions.resume("abc-123")
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "POST"
+    assert call.request.url.endswith("/v2/agents/sessions/abc-123/resume")
+
+
+@pytest.mark.asyncio
 async def test_async_list_filters_by_name():
     resources = _make_async_resources([_FakeAsyncResponse(200, {"sessions": []})])
     await resources.sessions.list(name="my-session")

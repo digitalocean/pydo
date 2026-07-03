@@ -369,6 +369,12 @@ class AgentSession:
     def send_input(self, text: str) -> Any:
         return self._sessions.send_input(self.session_id, text=text)
 
+    def pause(self) -> Any:
+        return self._sessions.pause(self.session_id)
+
+    def resume(self) -> Any:
+        return self._sessions.resume(self.session_id)
+
     def stream(self, **kwargs: Any) -> Any:
         return self._sessions.stream(self.session_id, **kwargs)
 

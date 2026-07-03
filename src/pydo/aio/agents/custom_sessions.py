@@ -192,6 +192,18 @@ class AsyncSessionsOperations:
     async def destroy(self, session_id: str) -> None:
         await self._send("DELETE", f"{_BASE_PATH}/{_quote(session_id)}")
 
+    async def pause(self, session_id: str) -> Any:
+        """Pause a running session (``POST .../{session_id}/pause``)."""
+        return await self._parse_json(
+            await self._send("POST", f"{_BASE_PATH}/{_quote(session_id)}/pause"),
+        )
+
+    async def resume(self, session_id: str) -> Any:
+        """Resume a paused session (``POST .../{session_id}/resume``)."""
+        return await self._parse_json(
+            await self._send("POST", f"{_BASE_PATH}/{_quote(session_id)}/resume"),
+        )
+
     async def send_input(self, session_id: str, *, text: str) -> Any:
         return await self._parse_json(
             await self._send(
