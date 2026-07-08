@@ -8,19 +8,23 @@ from ._operations import OneClicksOperations
 from ._operations import AccountOperations
 from ._operations import SshKeysOperations
 from ._operations import ActionsOperations
+from ._operations import AddonsOperations
 from ._operations import AppsOperations
 from ._operations import CdnOperations
 from ._operations import CertificatesOperations
 from ._operations import BalanceOperations
 from ._operations import BillingHistoryOperations
 from ._operations import InvoicesOperations
+from ._operations import BillingInsightsOperations
 from ._operations import DatabasesOperations
+from ._operations import DedicatedInferencesOperations
 from ._operations import DomainsOperations
 from ._operations import DropletsOperations
 from ._operations import DropletActionsOperations
 from ._operations import AutoscalepoolsOperations
 from ._operations import FirewallsOperations
 from ._operations import FunctionsOperations
+from ._operations import FunctionsAccessKeyOperations
 from ._operations import ImagesOperations
 from ._operations import ImageActionsOperations
 from ._operations import KubernetesOperations
@@ -37,10 +41,12 @@ from ._operations import ReservedIPsActionsOperations
 from ._operations import ReservedIPv6Operations
 from ._operations import ReservedIPv6ActionsOperations
 from ._operations import ByoipPrefixesOperations
+from ._operations import SecurityOperations
 from ._operations import SizesOperations
 from ._operations import SnapshotsOperations
 from ._operations import SpacesKeyOperations
 from ._operations import TagsOperations
+from ._operations import VectorDatabasesOperations
 from ._operations import VolumesOperations
 from ._operations import VolumeActionsOperations
 from ._operations import VolumeSnapshotsOperations
@@ -49,6 +55,8 @@ from ._operations import VpcPeeringsOperations
 from ._operations import VpcnatgatewaysOperations
 from ._operations import UptimeOperations
 from ._operations import GenaiOperations
+from ._operations import InferenceOperations
+from ._operations import AgentInferenceOperations
 
 from ._patch import __all__ as _patch_all
 from ._patch import *  # pylint: disable=unused-wildcard-import
@@ -59,19 +67,23 @@ __all__ = [
     "AccountOperations",
     "SshKeysOperations",
     "ActionsOperations",
+    "AddonsOperations",
     "AppsOperations",
     "CdnOperations",
     "CertificatesOperations",
     "BalanceOperations",
     "BillingHistoryOperations",
     "InvoicesOperations",
+    "BillingInsightsOperations",
     "DatabasesOperations",
+    "DedicatedInferencesOperations",
     "DomainsOperations",
     "DropletsOperations",
     "DropletActionsOperations",
     "AutoscalepoolsOperations",
     "FirewallsOperations",
     "FunctionsOperations",
+    "FunctionsAccessKeyOperations",
     "ImagesOperations",
     "ImageActionsOperations",
     "KubernetesOperations",
@@ -88,10 +100,12 @@ __all__ = [
     "ReservedIPv6Operations",
     "ReservedIPv6ActionsOperations",
     "ByoipPrefixesOperations",
+    "SecurityOperations",
     "SizesOperations",
     "SnapshotsOperations",
     "SpacesKeyOperations",
     "TagsOperations",
+    "VectorDatabasesOperations",
     "VolumesOperations",
     "VolumeActionsOperations",
     "VolumeSnapshotsOperations",
@@ -100,6 +114,8 @@ __all__ = [
     "VpcnatgatewaysOperations",
     "UptimeOperations",
     "GenaiOperations",
+    "InferenceOperations",
+    "AgentInferenceOperations",
 ]
 __all__.extend([p for p in _patch_all if p not in __all__])
 _patch_sdk()

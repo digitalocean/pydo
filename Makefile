@@ -5,6 +5,7 @@ POETRY_VERSION:=$(shell poetry version)
 PACKAGE_VERSION:=$(lastword $(POETRY_VERSION))
 ROOT_DIR := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 ORIGIN ?= origin
+COMMIT ?= HEAD
 BUMP ?= patch
 
 ifeq (, $(findstring -m,$(PYTEST_ARGS)))
@@ -23,6 +24,8 @@ dev-dependencies: ## Install development tooling
 .PHONY: clean
 clean: ## Removes all generated code (except _patch.py files)
 	@printf "=== Cleaning src directory\n"
+	@rm -rf src/pydo/resources
+	@rm -rf src/pydo/types
 	@find src/pydo -type f ! -name "_patch.py" ! -name "custom_*.py" ! -name "exceptions.py" -exec rm -rf {} +
 
 .PHONY: download-spec
@@ -44,6 +47,9 @@ generate: install clean dev-dependencies
 		--package-version=$(PACKAGE_VERSION) \
 		--input-file=$(SPEC_FILE)
 	@poetry run black src
+	@poetry run python scripts/generate_inference_resources.py
+	@SPEC_FILE=$(SPEC_FILE) poetry run python scripts/generate_inference_types.py
+	@poetry run black src/pydo/resources src/pydo/types src/pydo/inference
 
 .PHONY: install
 install: ## Install test dependencies
@@ -125,3 +131,9 @@ tag: ## Tags a release
 	@echo "==> ORIGIN=${ORIGIN} COMMIT=${COMMIT} tag"
 	@echo ""
 	@ORIGIN=${ORIGIN} scripts/tag.sh
+
+.PHONY: beta_tag
+beta_tag: 
+	@echo "==> ORIGIN=${ORIGIN} COMMIT=${COMMIT} beta_tag"
+	@echo ""
+	@ORIGIN=${ORIGIN} COMMIT=${COMMIT} scripts/beta_tag.sh

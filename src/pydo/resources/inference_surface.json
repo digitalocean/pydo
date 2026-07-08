@@ -1,0 +1,160 @@
+{
+  "source": "operations/_operations.py build_inference_* / build_agent_inference_*",
+  "inference": [
+    {
+      "op_method": "create_chat_completion",
+      "path_segments": [
+        "chat",
+        "completions"
+      ],
+      "path_params": [],
+      "facade_methods": [
+        "create"
+      ]
+    },
+    {
+      "op_method": "create_messages",
+      "path_segments": [
+        "messages"
+      ],
+      "path_params": [],
+      "facade_methods": [
+        "create"
+      ]
+    },
+    {
+      "op_method": "create_embedding",
+      "path_segments": [
+        "embeddings"
+      ],
+      "path_params": [],
+      "facade_methods": [
+        "create"
+      ]
+    },
+    {
+      "op_method": "create_image",
+      "path_segments": [
+        "images",
+        "generations"
+      ],
+      "path_params": [],
+      "facade_methods": [
+        "generate"
+      ]
+    },
+    {
+      "op_method": "list_models",
+      "path_segments": [
+        "models"
+      ],
+      "path_params": [],
+      "facade_methods": [
+        "list"
+      ]
+    },
+    {
+      "op_method": "create_response",
+      "path_segments": [
+        "responses"
+      ],
+      "path_params": [],
+      "facade_methods": [
+        "create"
+      ]
+    },
+    {
+      "op_method": "create_async_invoke",
+      "path_segments": [
+        "async_invoke"
+      ],
+      "path_params": [],
+      "facade_methods": [
+        "create"
+      ]
+    },
+    {
+      "op_method": "create_batch_file",
+      "path_segments": [
+        "batches",
+        "files"
+      ],
+      "path_params": [],
+      "facade_methods": [
+        "create"
+      ]
+    },
+    {
+      "op_method": "create_batch",
+      "path_segments": [
+        "batches"
+      ],
+      "path_params": [],
+      "facade_methods": [
+        "create"
+      ]
+    },
+    {
+      "op_method": "list_batches",
+      "path_segments": [
+        "batches"
+      ],
+      "path_params": [],
+      "facade_methods": [
+        "list"
+      ]
+    },
+    {
+      "op_method": "get_batch",
+      "path_segments": [
+        "batches"
+      ],
+      "path_params": [
+        "batch_id"
+      ],
+      "facade_methods": [
+        "get",
+        "retrieve"
+      ]
+    },
+    {
+      "op_method": "get_batch_results",
+      "path_segments": [
+        "batches",
+        "results"
+      ],
+      "path_params": [
+        "batch_id"
+      ],
+      "facade_methods": [
+        "get",
+        "retrieve"
+      ]
+    },
+    {
+      "op_method": "cancel_batch",
+      "path_segments": [
+        "batches"
+      ],
+      "path_params": [
+        "batch_id"
+      ],
+      "facade_methods": [
+        "cancel"
+      ]
+    }
+  ],
+  "agent_inference": [
+    {
+      "op_method": "create_chat_completion",
+      "path_segments": [
+        "chat",
+        "completions"
+      ],
+      "path_params": [],
+      "facade_methods": [
+        "create"
+      ]
+    }
+  ]
+}

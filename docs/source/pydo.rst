@@ -29,6 +29,14 @@ pydo.exceptions module
    :undoc-members:
    :show-inheritance:
 
+pydo.types module
+-----------------
+
+.. automodule:: pydo.types
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

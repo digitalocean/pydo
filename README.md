@@ -9,6 +9,14 @@ A top priority of this project is to ensure the client abides by the API
 contract. Therefore, the client itself wraps a generated client based
 on the [DigitalOcean OpenAPI Specification](https://github.com/digitalocean/openapi) to support all of DigitalOcean's HTTP APIs.
 
+> **🚀 New in v0.29.0 — AI & Inference support**
+>
+> `pydo` now ships first-class support for DigitalOcean's
+> [Gradient AI Platform](https://www.digitalocean.com/products/gradient): chat
+> completions (with streaming), image generation, audio, batch inference, and
+> model listing — all from the same `Client`. Jump to
+> [**AI & Inference**](#ai--inference) to get started.
+
 # **Getting Started With the Client**
 
 ## Prerequisites
@@ -23,6 +31,44 @@ To install from pip:
     pip install pydo
 ```
 
+## Installing a Beta (Pre-Release)
+
+Beta releases are published to PyPI as [PEP 440](https://peps.python.org/pep-0440/)
+pre-releases. A normal `pip install pydo` will **not** pick these up — pip
+ignores pre-releases by default — so installing a beta is opt-in.
+
+To install the latest pre-release:
+
+```shell
+    pip install --pre pydo
+```
+
+To pin a specific beta version, use its PEP 440 form. A git tag
+`v<major>.<minor>.<patch>-beta.<n>` is normalized to `<major>.<minor>.<patch>b<n>`
+on PyPI (for example, `v1.2.3-beta.4` becomes `1.2.3b4`):
+
+```shell
+    pip install pydo==<major>.<minor>.<patch>b<n>
+```
+
+To include the async extra:
+
+```shell
+    pip install --pre "pydo[aio]"
+```
+
+> **ℹ️ Notes**
+>
+> - Betas may be cut from a feature branch and can contain unreleased,
+>   in-progress changes. Pin an exact version for reproducible installs.
+> - Each beta also has a draft GitHub pre-release with the built wheel/sdist
+>   attached, under the repository's
+>   [Releases](https://github.com/digitalocean/pydo/releases).
+> - To go back to a stable release, run `pip install --upgrade pydo` (without
+>   `--pre`).
+> - See available versions on the
+>   [PyPI release history](https://pypi.org/project/pydo/#history).
+
 ## **`pydo` Quickstart**
 
 > A quick guide to getting started with the client.
@@ -35,6 +81,30 @@ from pydo import Client
 
 client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"))
 ```
+
+> **ℹ️ `api_key=` vs `token=` — what's the difference?**
+>
+> They're the same thing. `token=` and `api_key=` are just two names for
+> the same argument, and both work for every API in `pydo` — infrastructure
+> and inference. Use whichever name reads better in your code.
+>
+> What matters is the **credential** you pass in, not the argument name:
+>
+> | What you're calling | What you need |
+> | --- | --- |
+> | Infrastructure APIs (`droplets`, `ssh_keys`, `kubernetes`, `volumes`, …) | A DigitalOcean API token (PAT). |
+> | Inference APIs (`chat`, `images`, `models`, `audio`, `batches`, `files`, `responses`) | A PAT created with **full access** scope, **or** a Gradient **Model Access Key**. |
+>
+> If you only have a limited-scope PAT, infra calls will work but inference
+> calls will fail with a 401. To fix it, create a new PAT with full access,
+> or use a Model Access Key instead.
+>
+> ```python
+> # All three of these work — pick the one you like:
+> client = Client(token=os.environ["DIGITALOCEAN_TOKEN"])    # full-access PAT
+> client = Client(api_key=os.environ["DIGITALOCEAN_TOKEN"])  # same thing, different name
+> client = Client(api_key=os.environ["MODEL_ACCESS_KEY"])    # Gradient model access key
+> ```
 
 #### Example of Using `pydo` to Access DO Resources
 
@@ -61,6 +131,89 @@ ID: 123457, NAME: my_prod_ssh_key, FINGERPRINT: eb:76:c7:2a:d3:3e:80:5d:ef:2e:ca
 **Consult the full list of supported DigitalOcean API endpoints in [PyDo's documentation](https://docs.digitalocean.com/reference/pydo/).**
 
 **Note**: More working examples can be found [here](https://github.com/digitalocean/pydo/tree/main/examples).
+
+## **AI & Inference**
+
+> Talk to models on DigitalOcean's Gradient AI Platform with the same
+> `pydo.Client`.
+
+The snippets below use a **DigitalOcean PAT created with full access scope**
+(required for inference APIs). A Gradient Model Access Key works too — see
+the [credentials note](#pydo-quickstart) above.
+
+There is also a separate namespace for inference: `from pydo.inference
+import Client` (and `from pydo.inference.aio import Client` for async).
+Both are drop-in equivalents — the snippets below use it.
+
+#### Chat completions (streaming)
+
+```python
+import os
+from pydo.inference import Client
+
+client = Client(token=os.environ["DIGITALOCEAN_TOKEN"])  # PAT with full access scope
+
+stream = client.chat.completions.create(
+    model="llama3.3-70b-instruct",
+    messages=[{"role": "user", "content": "Tell me some fun facts about sharks"}],
+    max_tokens=512,
+    stream=True,
+)
+
+for chunk in stream:
+    if not chunk.choices:
+        continue
+    delta = chunk.choices[0].delta
+    piece = delta.get("reasoning_content") or delta.get("content")
+    if piece:
+        print(piece, end="", flush=True)
+print()
+```
+
+#### Image generation
+
+```python
+import os, base64
+from pydo.inference import Client
+
+client = Client(token=os.environ["DIGITALOCEAN_TOKEN"])  # PAT with full access scope
+
+result = client.images.generate(
+    model="openai-gpt-image-1",
+    prompt="A friendly cartoon shark typing on a laptop at a sunny beach",
+    n=1,
+)
+
+with open("output.png", "wb") as f:
+    f.write(base64.b64decode(result.data[0].b64_json))
+
+print("Image saved as output.png")
+```
+
+#### List available models
+
+```python
+import os
+from pydo.inference import Client
+
+client = Client(token=os.environ["DIGITALOCEAN_TOKEN"])  # PAT with full access scope
+
+models = client.models.list()
+for model in models["data"]:
+    print(model["id"])
+```
+
+Runnable versions of the snippets above live in
+[`examples/inference/`](examples/inference/):
+
+- [`chat_completion_stream.py`](examples/inference/chat_completion_stream.py)
+- [`image_generation.py`](examples/inference/image_generation.py)
+- [`list_models.py`](examples/inference/list_models.py)
+- [`async_chat_completion.py`](examples/inference/async_chat_completion.py)
+  — uses `pydo.inference.aio.Client`
+
+For more (audio, batches, agents, async streaming responses, file uploads,
+etc.), see the `inference_*.py` scripts in [`examples/`](examples/).
 
 #### Pagination Example
 
@@ -91,10 +244,33 @@ while paginated:
         paginated = False
 ```
 
+#### Async Usage
+
+For async, import from `pydo.aio` (full surface) or `pydo.inference.aio`
+(inference-focused). The surface is identical to the sync counterpart —
+same constructor, same operation groups — just `await` the calls. Use
+`async with` so the underlying transport closes cleanly.
+
+```python
+import asyncio, os
+from pydo.inference.aio import Client  # or: from pydo.aio import Client
+
+async def main():
+    async with Client(api_key=os.environ["DIGITALOCEAN_TOKEN"]) as client:
+        resp = await client.chat.completions.create(
+            model="llama3.3-70b-instruct",
+            messages=[{"role": "user", "content": "Hello!"}],
+        )
+        print(resp)
+
+asyncio.run(main())
+```
+
 #### Retries and Backoff
 
-By default the client uses the same retry policy as the [Azure SDK for Python](https://learn.microsoft.com/en-us/python/api/azure-core/azure.core.pipeline.policies.retrypolicy?view=azure-python).
-retry policy. If you'd like to modify any of these values, you can pass them as keywords to your client initialization:
+By default the client uses the same retry policy as the [Azure SDK for Python](https://learn.microsoft.com/en-us/python/api/azure-core/azure.core.pipeline.policies.retrypolicy?view=azure-python)
+retry policy. If you'd like to modify any of these values, you can pass them as
+keywords to your client initialization:
 
 ```python
 client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"), retry_total=3)
@@ -108,13 +284,13 @@ client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"), retry_policy=MyRetryPolic
 
 # **Contributing**
 
->Visit our [Contribuing Guide](CONTRIBUTING.md) for more information on getting
-involved in developing this client.
+> Visit our [Contribuing Guide](CONTRIBUTING.md) for more information on
+> getting involved in developing this client.
 
 # **Tests**
 
->The tests included in this repo are used to validate the generated client.
-We use `pytest` to define and run the tests.
+> The tests included in this repo are used to validate the generated client.
+> We use `pytest` to define and run the tests.
 
 **_Requirements_**
 
@@ -213,11 +389,11 @@ docker run -it --rm --name pydo -v $PWD/tests:/tests pydo:dev pytest tests/mocke
 
 # **Known Issues**
 
->This selection lists the known issues of the client generator.
+> This selection lists the known issues of the client generator.
 
 #### `kubernetes.get_kubeconfig` Does not serialize response content
 
-In the generated python client, when calling client.kubernetes.get_kubeconfig(clust_id), the deserialization logic raises an error when the response content-type is applicaiton/yaml. We need to determine if the spec/schema can be configured such that the generator results in functions that properly handle the content. We will likely need to report the issue upstream to request support for the content-type.
+In the generated Python client, calling client.kubernetes.get_kubeconfig(cluster_id) raises a deserialization error when the response content-type is application/yaml. This occurs because the generator does not correctly handle YAML responses. We should investigate whether the OpenAPI spec or generator configuration can be adjusted to support this content-type. If not, the issue should be reported upstream to improve YAML support in client generation.
 
 Workaround (with std lib httplib):
 
@@ -261,8 +437,8 @@ This is a backend issue with the API endpoint. The API endpoint expects the head
 
 # **Roadmap**
 
->This section lists short-term and long-term goals for the project.
-**Note**: These are goals, not necessarily commitments. The sections are not intended to represent exclusive focus during these terms.
+> This section lists short-term and long-term goals for the project.
+> **Note**: These are goals, not necessarily commitments. The sections are not intended to represent exclusive focus during these terms.
 
 Short term:
 
@@ -279,7 +455,13 @@ Short term, we are focused on improving usability and user productivity (part of
 
 Long term:
 
-> Model support, expand on supporting functions
+> Model support, expand on supporting functions, deepen AI/Inference coverage
 
 - The client currently inputs and outputs JSON dictionaries. Adding models would unlock features such as typing and validation.
 - Add supporting functions to elevate customer experience (i.e. adding a funtion that surfaces IP address for a Droplet)
+- **AI & Inference**: continue expanding coverage of the
+  [Gradient AI Platform](https://www.digitalocean.com/products/gradient)
+  alongside the infrastructure APIs — keeping chat, images, audio, batches,
+  responses, agents, and model management feature-complete and idiomatic
+  from the same `pydo.Client`. `pydo` is an
+  infrastructure **and** AI SDK; both surfaces are first-class going forward.
