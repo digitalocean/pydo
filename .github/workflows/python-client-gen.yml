@@ -47,7 +47,7 @@ jobs:
           GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
 
       - name: Install Poetry
-        uses: snok/install-poetry@v1.4.1
+        uses: snok/install-poetry@v1.4.2
         with:
           version: 1.6.1
           virtualenvs-path: .venv
