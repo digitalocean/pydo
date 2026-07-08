@@ -17,6 +17,7 @@ from pydo.gateway import ChatCompletionsProvider, GatewayToolError
 from .conftest import (
     AsyncFakeResponse,
     call_result,
+    invoke_envelope,
     jsonrpc_result,
     make_async_gateway,
 )
@@ -45,18 +46,7 @@ def test_list_defaults_to_meta():
 
 
 def test_invoke_and_invoke_one():
-    envelope = {
-        "total_count": 1,
-        "success_count": 1,
-        "error_count": 0,
-        "results": [
-            {
-                "index": 0,
-                "tool": "web_search",
-                "result": {"status": "succeeded", "output": {"answer": 7}},
-            }
-        ],
-    }
+    envelope = invoke_envelope(output={"answer": 7})
     gateway = make_async_gateway(
         [AsyncFakeResponse(200, jsonrpc_result(call_result(envelope)))]
     )
@@ -89,18 +79,7 @@ def test_tools_callable_and_handle_tool_calls():
         },
         {"name": "action_code", "description": "d", "inputSchema": {"type": "object"}},
     ]
-    envelope = {
-        "total_count": 1,
-        "success_count": 1,
-        "error_count": 0,
-        "results": [
-            {
-                "index": 0,
-                "tool": "web_search",
-                "result": {"status": "succeeded", "output": {"ok": True}},
-            }
-        ],
-    }
+    envelope = invoke_envelope(output={"ok": True})
     gateway = make_async_gateway(
         [
             AsyncFakeResponse(200, jsonrpc_result({"tools": meta_tools})),

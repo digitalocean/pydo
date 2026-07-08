@@ -1,4 +1,4 @@
-# pylint: disable=missing-function-docstring,protected-access
+# pylint: disable=missing-function-docstring,protected-access,missing-class-docstring,too-few-public-methods
 # ------------------------------------
 # Copyright (c) DigitalOcean.
 # Licensed under the Apache-2.0 License.
@@ -44,7 +44,7 @@ class FakeResponse:
 
 
 class AsyncFakeResponse(FakeResponse):
-    async def read(self) -> bytes:  # type: ignore[override]
+    async def read(self) -> bytes:  # pylint: disable=invalid-overridden-method
         return self._body_bytes
 
 
@@ -89,6 +89,38 @@ def call_result(
     if text:
         result["content"] = [{"type": "text", "text": text}]
     return result
+
+
+def invoke_envelope(
+    results: List[dict] | None = None,
+    *,
+    tool: str = "web_search",
+    output: Any = None,
+    error: Any = None,
+    invocation_id: str | None = None,
+) -> dict:
+    """Build a gateway ``action_invoke`` result envelope for tests."""
+    if results is None:
+        if error is not None:
+            result_body: dict = {"status": "failed", "error": error}
+        else:
+            if output is None:
+                output = {"answer": 1}
+            result_body = {"status": "succeeded", "output": output}
+        entry: dict = {"index": 0, "tool": tool, "result": result_body}
+        if invocation_id is not None:
+            entry["invocation_id"] = invocation_id
+        results = [entry]
+    return {
+        "total_count": len(results),
+        "success_count": sum(
+            1 for item in results if item["result"].get("status") == "succeeded"
+        ),
+        "error_count": sum(
+            1 for item in results if item["result"].get("status") != "succeeded"
+        ),
+        "results": results,
+    }
 
 
 def make_gateway(responses: List[FakeResponse], provider=None) -> GatewayResources:

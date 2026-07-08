@@ -14,6 +14,7 @@ from pydo.gateway import GatewayToolError
 from .conftest import (
     FakeResponse,
     call_result,
+    invoke_envelope,
     jsonrpc_result,
     make_gateway,
     sent_payload,
@@ -36,19 +37,6 @@ _SEARCH_PAYLOAD = {
         }
     ]
 }
-
-
-def _invoke_envelope(results):
-    return {
-        "total_count": len(results),
-        "success_count": sum(
-            1 for r in results if r["result"].get("status") == "succeeded"
-        ),
-        "error_count": sum(
-            1 for r in results if r["result"].get("status") != "succeeded"
-        ),
-        "results": results,
-    }
 
 
 # -- search ------------------------------------------------------------------
@@ -103,7 +91,7 @@ def test_search_rejects_missing_use_case_and_bad_counts():
 
 
 def test_invoke_shapes_arguments_and_returns_envelope():
-    envelope = _invoke_envelope(
+    envelope = invoke_envelope(
         [
             {
                 "index": 0,
@@ -155,7 +143,7 @@ def test_invoke_validates_counts_and_entries():
 
 
 def test_invoke_one_returns_output():
-    envelope = _invoke_envelope(
+    envelope = invoke_envelope(
         [
             {
                 "index": 0,
@@ -170,22 +158,13 @@ def test_invoke_one_returns_output():
 
 
 def test_invoke_one_raises_on_failure():
-    envelope = _invoke_envelope(
-        [
-            {
-                "index": 0,
-                "tool": "web_search",
-                "result": {
-                    "status": "failed",
-                    "error": {
-                        "class": "upstream_error",
-                        "message": "exa is down",
-                        "retriable": True,
-                    },
-                },
-                "invocation_id": "inv_9",
-            }
-        ]
+    envelope = invoke_envelope(
+        error={
+            "class": "upstream_error",
+            "message": "exa is down",
+            "retriable": True,
+        },
+        invocation_id="inv_9",
     )
     gateway = make_gateway([FakeResponse(200, jsonrpc_result(call_result(envelope)))])
     with pytest.raises(GatewayToolError, match="exa is down") as excinfo:

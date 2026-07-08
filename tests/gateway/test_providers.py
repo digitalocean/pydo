@@ -23,6 +23,7 @@ from pydo.gateway import (
 from .conftest import (
     FakeResponse,
     call_result,
+    invoke_envelope,
     jsonrpc_result,
     make_gateway,
     sent_payload,
@@ -238,14 +239,11 @@ def test_responses_extract(wrap):
 
 
 def test_extract_returns_empty_without_tool_calls():
-    assert (
-        ChatCompletionsProvider().extract_tool_calls(
-            {"choices": [{"message": {"content": "hi"}}]}
-        )
-        == []
+    assert not ChatCompletionsProvider().extract_tool_calls(
+        {"choices": [{"message": {"content": "hi"}}]}
     )
-    assert MessagesProvider().extract_tool_calls({"content": []}) == []
-    assert ResponsesProvider().extract_tool_calls({"output": []}) == []
+    assert not MessagesProvider().extract_tool_calls({"content": []})
+    assert not ResponsesProvider().extract_tool_calls({"output": []})
 
 
 # -- format_tool_results ------------------------------------------------------
@@ -353,18 +351,7 @@ def test_tools_callable_via_search():
 
 
 def test_handle_tool_calls_batches_concrete_tools():
-    envelope = {
-        "total_count": 1,
-        "success_count": 1,
-        "error_count": 0,
-        "results": [
-            {
-                "index": 0,
-                "tool": "web_search",
-                "result": {"status": "succeeded", "output": {"answer": 42}},
-            }
-        ],
-    }
+    envelope = invoke_envelope(output={"answer": 42})
     gateway = make_gateway(
         [FakeResponse(200, jsonrpc_result(call_result(envelope)))],
         provider=ChatCompletionsProvider(),
@@ -403,18 +390,7 @@ def test_normalize_invoke_arguments_accepts_chat_function_shape():
 
 
 def test_handle_tool_calls_normalizes_action_invoke_payload():
-    envelope = {
-        "total_count": 1,
-        "success_count": 1,
-        "error_count": 0,
-        "results": [
-            {
-                "index": 0,
-                "tool": "web_search",
-                "result": {"status": "succeeded", "output": {"answer": 1}},
-            }
-        ],
-    }
+    envelope = invoke_envelope(output={"answer": 1})
     gateway = make_gateway(
         [
             FakeResponse(200, jsonrpc_result({"tools": _META_TOOLS})),
@@ -495,21 +471,9 @@ def test_handle_tool_calls_routes_meta_tools_directly():
 
 
 def test_handle_tool_calls_surfaces_failures_as_content():
-    envelope = {
-        "total_count": 1,
-        "success_count": 0,
-        "error_count": 1,
-        "results": [
-            {
-                "index": 0,
-                "tool": "web_search",
-                "result": {
-                    "status": "failed",
-                    "error": {"class": "timeout", "message": "too slow"},
-                },
-            }
-        ],
-    }
+    envelope = invoke_envelope(
+        error={"class": "timeout", "message": "too slow"},
+    )
     gateway = make_gateway(
         [FakeResponse(200, jsonrpc_result(call_result(envelope)))],
         provider=ChatCompletionsProvider(),
