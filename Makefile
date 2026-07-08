@@ -26,7 +26,10 @@ clean: ## Removes all generated code (except _patch.py files)
 	@printf "=== Cleaning src directory\n"
 	@rm -rf src/pydo/resources
 	@rm -rf src/pydo/types
-	@find src/pydo -type f ! -name "_patch.py" ! -name "custom_*.py" ! -name "exceptions.py" -exec rm -rf {} +
+	@find src/pydo -type f \
+		! -name "_patch.py" ! -name "custom_*.py" ! -name "exceptions.py" \
+		! -path "*/gateway/*" \
+		-exec rm -rf {} +
 
 .PHONY: download-spec
 download-spec: ## Download Latest DO Spec
