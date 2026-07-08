@@ -16,6 +16,8 @@ from pydo.gateway import (
     ChatCompletionsProvider,
     MessagesProvider,
     ResponsesProvider,
+    normalize_invoke_arguments,
+    simplify_messages_input_schema,
 )
 
 from .conftest import (
@@ -41,17 +43,17 @@ _CATALOG = [
 
 _META_TOOLS = [
     {
-        "name": "action.search",
+        "name": "action_search",
         "description": "Find tools",
         "inputSchema": {"type": "object"},
     },
     {
-        "name": "action.invoke",
+        "name": "action_invoke",
         "description": "Run tools",
         "inputSchema": {"type": "object"},
     },
     {
-        "name": "action.code",
+        "name": "action_code",
         "description": "Run code",
         "inputSchema": {"type": "object"},
     },
@@ -86,6 +88,59 @@ def test_messages_wrap_tools():
     ]
 
 
+def test_messages_wrap_tools_preserves_meta_tool_names():
+    tools = MessagesProvider().wrap_tools(_META_TOOLS)
+    assert [tool["name"] for tool in tools] == [
+        "action_search",
+        "action_invoke",
+        "action_code",
+    ]
+
+
+def test_simplify_messages_input_schema_strips_top_level_any_of():
+    schema = {
+        "type": "object",
+        "properties": {
+            "code": {"type": "string"},
+            "code_to_execute": {"type": "string"},
+        },
+        "anyOf": [
+            {"required": ["code"]},
+            {"required": ["code_to_execute"]},
+        ],
+    }
+    simplified = simplify_messages_input_schema(schema)
+    assert "anyOf" not in simplified
+    assert simplified["properties"]["code"]["type"] == "string"
+
+
+def test_chat_completions_wrap_tools_strips_any_of_from_code_meta_tool():
+    tools = ChatCompletionsProvider().wrap_tools(
+        [
+            {
+                "name": "action_code",
+                "description": "Run Python",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {"code": {"type": "string"}},
+                    "anyOf": [{"required": ["code"]}],
+                },
+            }
+        ]
+    )
+    assert tools[0]["function"]["name"] == "action_code"
+    assert "anyOf" not in tools[0]["function"]["parameters"]
+
+
+def test_responses_wrap_tools_preserves_meta_tool_names():
+    tools = ResponsesProvider().wrap_tools(_META_TOOLS)
+    assert [tool["name"] for tool in tools] == [
+        "action_search",
+        "action_invoke",
+        "action_code",
+    ]
+
+
 def test_responses_wrap_tools():
     tools = ResponsesProvider().wrap_tools(_CATALOG)
     assert tools == [
@@ -102,7 +157,7 @@ def test_wrap_tools_falls_back_to_title_and_empty_schema():
     tools = ChatCompletionsProvider().wrap_tools([{"name": "t", "title": "T"}])
     function = tools[0]["function"]
     assert function["description"] == "T"
-    assert function["parameters"] == {"type": "object"}
+    assert function["parameters"] == {"type": "object", "properties": {}}
 
 
 # -- extract_tool_calls -------------------------------------------------------
@@ -233,9 +288,22 @@ def test_tools_callable_wraps_meta_tools_by_default():
     )
     tools = gateway.tools()
     assert [t["function"]["name"] for t in tools] == [
-        "action.search",
-        "action.invoke",
-        "action.code",
+        "action_search",
+        "action_invoke",
+        "action_code",
+    ]
+
+
+def test_tools_callable_wraps_meta_tools_for_messages():
+    gateway = make_gateway(
+        [FakeResponse(200, jsonrpc_result({"tools": _META_TOOLS}))],
+        provider=MessagesProvider(),
+    )
+    tools = gateway.tools()
+    assert [t["name"] for t in tools] == [
+        "action_search",
+        "action_invoke",
+        "action_code",
     ]
 
 
@@ -304,7 +372,7 @@ def test_handle_tool_calls_batches_concrete_tools():
     messages = gateway.handle_tool_calls(_chat_response(), rationale="why not")
 
     params = sent_payload(gateway)["params"]
-    assert params["name"] == "action.invoke"
+    assert params["name"] == "action_invoke"
     assert params["arguments"]["rationale"] == "why not"
     assert params["arguments"]["tools"] == [
         {"tool": "web_search", "arguments": {"query": "do"}}
@@ -315,7 +383,94 @@ def test_handle_tool_calls_batches_concrete_tools():
     assert json.loads(messages[0]["content"]) == {"answer": 42}
 
 
+def test_normalize_invoke_arguments_accepts_chat_function_shape():
+    arguments = normalize_invoke_arguments(
+        {
+            "tools": [
+                {
+                    "type": "function",
+                    "function": {
+                        "name": "web_search",
+                        "arguments": '{"query": "digitalocean news"}',
+                    },
+                }
+            ]
+        }
+    )
+    assert arguments["tools"] == [
+        {"tool": "web_search", "arguments": {"query": "digitalocean news"}}
+    ]
+
+
+def test_handle_tool_calls_normalizes_action_invoke_payload():
+    envelope = {
+        "total_count": 1,
+        "success_count": 1,
+        "error_count": 0,
+        "results": [
+            {
+                "index": 0,
+                "tool": "web_search",
+                "result": {"status": "succeeded", "output": {"answer": 1}},
+            }
+        ],
+    }
+    gateway = make_gateway(
+        [
+            FakeResponse(200, jsonrpc_result({"tools": _META_TOOLS})),
+            FakeResponse(200, jsonrpc_result(call_result(envelope))),
+        ],
+        provider=ChatCompletionsProvider(),
+    )
+    gateway.tools()
+    response = {
+        "choices": [
+            {
+                "message": {
+                    "tool_calls": [
+                        {
+                            "id": "call_invoke",
+                            "function": {
+                                "name": "action_invoke",
+                                "arguments": json.dumps(
+                                    {
+                                        "tools": [
+                                            {
+                                                "function": {
+                                                    "name": "web_search",
+                                                    "arguments": {
+                                                        "query": "digitalocean"
+                                                    },
+                                                }
+                                            }
+                                        ]
+                                    }
+                                ),
+                            },
+                        }
+                    ]
+                }
+            }
+        ]
+    }
+    messages = gateway.handle_tool_calls(response)
+    params = sent_payload(gateway, 1)["params"]
+    assert params["name"] == "action_invoke"
+    assert params["arguments"]["tools"] == [
+        {"tool": "web_search", "arguments": {"query": "digitalocean"}}
+    ]
+    assert json.loads(messages[0]["content"]) == envelope
+
+
 def test_handle_tool_calls_routes_meta_tools_directly():
+    gateway = make_gateway(
+        [
+            FakeResponse(200, jsonrpc_result({"tools": _META_TOOLS})),
+            FakeResponse(200, jsonrpc_result(call_result({"results": []}))),
+        ],
+        provider=ChatCompletionsProvider(),
+    )
+    gateway.tools()
     response = {
         "choices": [
             {
@@ -324,7 +479,7 @@ def test_handle_tool_calls_routes_meta_tools_directly():
                         {
                             "id": "call_meta",
                             "function": {
-                                "name": "action.search",
+                                "name": "action_search",
                                 "arguments": '{"queries": [{"use_case": "x"}]}',
                             },
                         }
@@ -333,13 +488,9 @@ def test_handle_tool_calls_routes_meta_tools_directly():
             }
         ]
     }
-    gateway = make_gateway(
-        [FakeResponse(200, jsonrpc_result(call_result({"results": []})))],
-        provider=ChatCompletionsProvider(),
-    )
     messages = gateway.handle_tool_calls(response)
-    params = sent_payload(gateway)["params"]
-    assert params["name"] == "action.search"
+    params = sent_payload(gateway, 1)["params"]
+    assert params["name"] == "action_search"
     assert json.loads(messages[0]["content"]) == {"results": []}
 
 

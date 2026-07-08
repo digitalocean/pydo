@@ -11,6 +11,7 @@ so the public return shapes hold regardless of the underlying wire protocol
 
 from __future__ import annotations
 
+import json as _json
 from typing import Any, Dict, List, Optional, Sequence, Union
 
 from .custom_models import (
@@ -53,19 +54,83 @@ def _normalize_queries(
     return normalized
 
 
+def _decode_json_object(value: Any) -> Dict[str, Any]:
+    if isinstance(value, str):
+        if not value.strip():
+            return {}
+        return _json.loads(value)
+    if isinstance(value, dict):
+        return dict(value)
+    return {}
+
+
+_INVOKE_ENTRY_RESERVED_KEYS = frozenset(
+    {"tool", "tool_slug", "name", "function", "type", "id"}
+)
+
+
+def _normalize_invoke_entry(spec: Any) -> Dict[str, Any]:
+    """Normalize one ``action.invoke`` tool entry to ``{tool, arguments}``.
+
+    Models often emit chat-style ``{"function": {"name", "arguments"}}`` blobs
+    inside ``action.invoke`` even though the gateway expects ``tool`` /
+    ``tool_slug``. This helper accepts both shapes (plus a flat ``name`` key
+    and hoisted argument fields).
+    """
+    if not isinstance(spec, dict):
+        raise TypeError(
+            "each invoke entry must be a dict like "
+            "{'tool': name, 'arguments': {...}}"
+        )
+
+    function = spec.get("function")
+    if isinstance(function, dict):
+        name = (
+            function.get("name")
+            or spec.get("tool")
+            or spec.get("tool_slug")
+            or spec.get("name")
+        )
+        if not name:
+            raise ValueError("each invoke entry requires a tool name")
+        if function.get("arguments") is not None:
+            arguments = _decode_json_object(function.get("arguments"))
+        else:
+            arguments = _decode_json_object(spec.get("arguments"))
+        return {"tool": name, "arguments": arguments}
+
+    name = spec.get("tool") or spec.get("tool_slug") or spec.get("name")
+    if not name:
+        raise ValueError("each invoke entry requires a 'tool' name")
+
+    arguments = spec.get("arguments")
+    if arguments is None:
+        hoisted = {k: v for k, v in spec.items() if k not in _INVOKE_ENTRY_RESERVED_KEYS}
+        arguments = hoisted if hoisted else {}
+    else:
+        arguments = _decode_json_object(arguments)
+    return {"tool": name, "arguments": arguments}
+
+
+def normalize_invoke_arguments(arguments: Any) -> Dict[str, Any]:
+    """Normalize an ``action.invoke`` arguments object before calling the gateway."""
+    if not isinstance(arguments, dict):
+        return {"tools": []}
+    normalized = dict(arguments)
+    tools = normalized.get("tools")
+    if tools is None:
+        return normalized
+    if isinstance(tools, dict):
+        tools = [tools]
+    elif not isinstance(tools, list):
+        tools = [tools]
+    normalized["tools"] = [_normalize_invoke_entry(entry) for entry in tools]
+    return normalized
+
+
 def _normalize_tool_specs(tools: Sequence[ToolSpecInput]) -> List[Dict[str, Any]]:
     """Normalize invoke entries; ``tool_slug`` is accepted as alias for ``tool``."""
-    normalized: List[Dict[str, Any]] = []
-    for spec in tools:
-        if not isinstance(spec, dict):
-            raise TypeError(
-                "each invoke entry must be a dict like "
-                "{'tool': name, 'arguments': {...}}"
-            )
-        name = spec.get("tool") or spec.get("tool_slug")
-        if not name:
-            raise ValueError("each invoke entry requires a 'tool' name")
-        normalized.append({"tool": name, "arguments": spec.get("arguments") or {}})
+    normalized = [_normalize_invoke_entry(spec) for spec in tools]
     if not 1 <= len(normalized) <= _MAX_INVOKE_TOOLS:
         raise ValueError(f"invoke accepts between 1 and {_MAX_INVOKE_TOOLS} tools")
     return normalized
@@ -284,4 +349,5 @@ class CodeOperations:
 __all__ = [
     "ToolsOperations",
     "CodeOperations",
+    "normalize_invoke_arguments",
 ]

@@ -21,7 +21,7 @@ from pydo import Client
 
 client = Client(token=os.environ["DIGITALOCEAN_TOKEN"])
 
-model = os.environ.get("MODEL", "llama3.3-70b-instruct")
+model = os.environ.get("MODEL", "openai-gpt-4o")
 prompt = os.environ.get(
     "PROMPT", "Find the latest news about DigitalOcean and summarize it."
 )

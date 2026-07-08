@@ -9,9 +9,9 @@ from __future__ import annotations
 from typing import Any, Dict, List, Optional
 
 # Meta-tool names exposed on the gateway's ``/mcp/meta`` endpoint.
-META_SEARCH = "action.search"
-META_INVOKE = "action.invoke"
-META_CODE = "action.code"
+META_SEARCH = "action_search"
+META_INVOKE = "action_invoke"
+META_CODE = "action_code"
 META_TOOL_NAMES = frozenset({META_SEARCH, META_INVOKE, META_CODE})
 
 

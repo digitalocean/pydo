@@ -29,7 +29,7 @@ def test_execute_happy_path():
     request = sent_request(gateway)
     assert request.url.endswith("/mcp/meta")
     params = sent_payload(gateway)["params"]
-    assert params["name"] == "action.code"
+    assert params["name"] == "action_code"
     assert params["arguments"] == {
         "code": "print('hello')",
         "thought": "say hello",

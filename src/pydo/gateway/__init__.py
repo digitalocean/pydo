@@ -29,7 +29,7 @@ from .custom_models import (
     ToolErrorClass,
     ToolResultStatus,
 )
-from .custom_operations import CodeOperations, ToolsOperations
+from .custom_operations import CodeOperations, ToolsOperations, normalize_invoke_arguments
 from .providers import (
     BaseProvider,
     ChatCompletionsProvider,
@@ -37,6 +37,8 @@ from .providers import (
     ResponsesProvider,
     default_provider,
     execute_tool_calls,
+    simplify_inference_tool_schema,
+    simplify_messages_input_schema,
 )
 from .transport import MCP_PROTOCOL_VERSION, GatewayTransport, MCPTransport
 
@@ -113,6 +115,7 @@ __all__ = [
     "GatewayResources",
     "ToolsOperations",
     "CodeOperations",
+    "normalize_invoke_arguments",
     "GatewayTransport",
     "MCPTransport",
     "MCP_PROTOCOL_VERSION",
@@ -122,6 +125,8 @@ __all__ = [
     "ResponsesProvider",
     "default_provider",
     "execute_tool_calls",
+    "simplify_inference_tool_schema",
+    "simplify_messages_input_schema",
     "ToolCall",
     "GatewayToolError",
     "GatewayProtocolError",

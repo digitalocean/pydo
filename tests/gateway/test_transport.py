@@ -33,7 +33,7 @@ from .conftest import (
 
 def test_list_tools_posts_jsonrpc_to_meta_endpoint():
     gateway = make_gateway(
-        [FakeResponse(200, jsonrpc_result({"tools": [{"name": "action.search"}]}))]
+        [FakeResponse(200, jsonrpc_result({"tools": [{"name": "action_search"}]}))]
     )
     tools = gateway.tools.list()
 
@@ -49,7 +49,7 @@ def test_list_tools_posts_jsonrpc_to_meta_endpoint():
     assert payload["method"] == "tools/list"
     assert isinstance(payload["id"], int)
 
-    assert tools[0].name == "action.search"
+    assert tools[0].name == "action_search"
 
 
 def test_list_tools_include_all_hits_concrete_endpoint():

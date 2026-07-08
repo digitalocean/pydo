@@ -22,11 +22,13 @@ from pydo.gateway.custom_models import (
 from pydo.gateway.custom_operations import (
     QueryInput,
     ToolSpecInput,
+    _normalize_invoke_entry,
     _normalize_queries,
     _normalize_tool_specs,
     _result_output_or_raise,
     _flatten_search_results,
     _tool_name,
+    normalize_invoke_arguments,
 )
 from pydo.gateway.providers import _error_payload, _get
 from pydo.gateway.transport import (
@@ -229,18 +231,30 @@ async def async_execute_tool_calls(
     for index, call in enumerate(calls):
         if call.name in META_TOOL_NAMES:
             try:
+                arguments = call.arguments
+                if call.name == META_INVOKE:
+                    arguments = normalize_invoke_arguments(arguments)
                 results[index] = await tools_operations._transport.call_tool(
-                    call.name, call.arguments, meta=True
+                    call.name, arguments, meta=True
                 )
-            except GatewayToolError as exc:
+            except (GatewayToolError, TypeError, ValueError) as exc:
                 results[index] = _error_payload(exc)
         else:
             concrete.append(index)
 
     if concrete:
-        batch = [
-            {"tool": calls[i].name, "arguments": calls[i].arguments} for i in concrete
-        ]
+        try:
+            batch = [
+                _normalize_invoke_entry(
+                    {"tool": calls[i].name, "arguments": calls[i].arguments}
+                )
+                for i in concrete
+            ]
+        except (TypeError, ValueError) as exc:
+            error = _error_payload(exc)
+            for index in concrete:
+                results[index] = error
+            return results
         envelope = await tools_operations.invoke(batch, rationale=rationale)
         items = (_get(envelope, "results") or []) if envelope is not None else []
         for position, index in enumerate(concrete):

@@ -25,10 +25,44 @@ Usage::
 
 from __future__ import annotations
 
+import copy
 import json as _json
 from typing import Any, Dict, List, Optional, Sequence
 
 from .custom_models import ToolCall
+from .custom_operations import _normalize_invoke_entry, normalize_invoke_arguments
+
+
+def simplify_inference_tool_schema(schema: Any) -> Dict[str, Any]:
+    """Normalize a gateway tool JSON Schema for inference ``tools=`` parameters.
+
+    DO inference endpoints (chat completions, messages, responses) require a
+    plain top-level ``object`` schema. Gateway meta-tools such as
+    ``action.code`` use top-level combinators (``anyOf`` for Composio alias
+    args). We drop those keywords and keep ``properties``; the gateway still
+    validates aliases server-side.
+    """
+    if not isinstance(schema, dict):
+        return {"type": "object", "properties": {}}
+    simplified = copy.deepcopy(schema)
+    for key in (
+        "oneOf",
+        "allOf",
+        "anyOf",
+        "enum",
+        "const",
+        "not",
+    ):
+        simplified.pop(key, None)
+    if "type" not in simplified:
+        simplified["type"] = "object"
+    if simplified.get("type") == "object" and "properties" not in simplified:
+        simplified["properties"] = {}
+    return simplified
+
+
+# Backward-compatible alias.
+simplify_messages_input_schema = simplify_inference_tool_schema
 
 
 def _get(obj: Any, key: str, default: Any = None) -> Any:
@@ -54,7 +88,9 @@ def _tool_fields(tool: Any) -> Dict[str, Any]:
     return {
         "name": _get(tool, "name"),
         "description": _get(tool, "description") or _get(tool, "title") or "",
-        "parameters": dict(_get(tool, "inputSchema") or {"type": "object"}),
+        "parameters": simplify_inference_tool_schema(
+            _get(tool, "inputSchema") or {"type": "object"}
+        ),
     }
 
 
@@ -238,7 +274,7 @@ def execute_tool_calls(
     ``action.invoke``. Per-tool failures become structured error payloads
     rather than raising, so the model can observe and recover.
     """
-    from .custom_models import META_TOOL_NAMES, GatewayToolError
+    from .custom_models import META_INVOKE, META_TOOL_NAMES, GatewayToolError
 
     results: List[Any] = [None] * len(calls)
     concrete: List[int] = []
@@ -246,18 +282,30 @@ def execute_tool_calls(
     for index, call in enumerate(calls):
         if call.name in META_TOOL_NAMES:
             try:
+                arguments = call.arguments
+                if call.name == META_INVOKE:
+                    arguments = normalize_invoke_arguments(arguments)
                 results[index] = tools_operations._transport.call_tool(
-                    call.name, call.arguments, meta=True
+                    call.name, arguments, meta=True
                 )
-            except GatewayToolError as exc:
+            except (GatewayToolError, TypeError, ValueError, _json.JSONDecodeError) as exc:
                 results[index] = _error_payload(exc)
         else:
             concrete.append(index)
 
     if concrete:
-        batch = [
-            {"tool": calls[i].name, "arguments": calls[i].arguments} for i in concrete
-        ]
+        try:
+            batch = [
+                _normalize_invoke_entry(
+                    {"tool": calls[i].name, "arguments": calls[i].arguments}
+                )
+                for i in concrete
+            ]
+        except (TypeError, ValueError, _json.JSONDecodeError) as exc:
+            error = _error_payload(exc)
+            for index in concrete:
+                results[index] = error
+            return results
         envelope = tools_operations.invoke(batch, rationale=rationale)
         items = (_get(envelope, "results") or []) if envelope is not None else []
         for position, index in enumerate(concrete):
@@ -297,4 +345,6 @@ __all__ = [
     "ResponsesProvider",
     "default_provider",
     "execute_tool_calls",
+    "simplify_inference_tool_schema",
+    "simplify_messages_input_schema",
 ]

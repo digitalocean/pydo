@@ -61,7 +61,7 @@ def test_search_accepts_single_string():
     result = gateway.tools.search("search the web")
 
     params = sent_payload(gateway)["params"]
-    assert params["name"] == "action.search"
+    assert params["name"] == "action_search"
     assert params["arguments"]["queries"] == [{"use_case": "search the web"}]
     assert result.results[0].results[0].name == "web_search"
 
@@ -130,7 +130,7 @@ def test_invoke_shapes_arguments_and_returns_envelope():
     )
 
     params = sent_payload(gateway)["params"]
-    assert params["name"] == "action.invoke"
+    assert params["name"] == "action_invoke"
     assert params["arguments"]["rationale"] == "testing"
     assert params["arguments"]["tools"] == [
         {"tool": "web_search", "arguments": {"query": "do"}},

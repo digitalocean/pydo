@@ -36,10 +36,10 @@ def _sent_payload(gateway, index=0):
 
 def test_list_defaults_to_meta():
     gateway = make_async_gateway(
-        [AsyncFakeResponse(200, jsonrpc_result({"tools": [{"name": "action.search"}]}))]
+        [AsyncFakeResponse(200, jsonrpc_result({"tools": [{"name": "action_search"}]}))]
     )
     tools = _run(gateway.tools.list())
-    assert tools[0].name == "action.search"
+    assert tools[0].name == "action_search"
     pipeline = gateway._transport._client._original._pipeline
     assert pipeline.calls[0].request.url.endswith("/mcp/meta")
 
@@ -63,7 +63,7 @@ def test_invoke_and_invoke_one():
     output = _run(gateway.tools.invoke_one("web_search", {"query": "do"}))
     assert output.answer == 7
     params = _sent_payload(gateway)["params"]
-    assert params["name"] == "action.invoke"
+    assert params["name"] == "action_invoke"
 
 
 def test_code_execute_failure_raises():
@@ -78,16 +78,16 @@ def test_code_execute_failure_raises():
 def test_tools_callable_and_handle_tool_calls():
     meta_tools = [
         {
-            "name": "action.search",
+            "name": "action_search",
             "description": "d",
             "inputSchema": {"type": "object"},
         },
         {
-            "name": "action.invoke",
+            "name": "action_invoke",
             "description": "d",
             "inputSchema": {"type": "object"},
         },
-        {"name": "action.code", "description": "d", "inputSchema": {"type": "object"}},
+        {"name": "action_code", "description": "d", "inputSchema": {"type": "object"}},
     ]
     envelope = {
         "total_count": 1,
@@ -133,9 +133,9 @@ def test_tools_callable_and_handle_tool_calls():
 
     tools, messages = _run(scenario())
     assert [t["function"]["name"] for t in tools] == [
-        "action.search",
-        "action.invoke",
-        "action.code",
+        "action_search",
+        "action_invoke",
+        "action_code",
     ]
     assert messages[0]["role"] == "tool"
     assert json.loads(messages[0]["content"]) == {"ok": True}
