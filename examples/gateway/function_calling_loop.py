@@ -1,34 +1,30 @@
-"""Agentic function-calling loop: chat completions + Action Gateway.
-
-The model is handed the gateway's meta-tools (action.search /
-action.invoke / action.code) so it can discover and execute tools
-itself. handle_tool_calls() runs whatever the model asked for and
-returns ready-to-append tool messages; the loop continues until the
-model answers with plain text.
+"""Agentic function-calling loop: chat completions + Action Gateway session.
 
 Required env:
   DIGITALOCEAN_TOKEN
 
 Optional env:
   PYDO_GATEWAY_ENDPOINT   preview: https://actions.do-ai-test.run
+  END_USER_ID
   MODEL
   PROMPT
 """
 
 import os
 
-from pydo import Client
+from pydo.action_gateway import Client
 
 client = Client(token=os.environ["DIGITALOCEAN_TOKEN"])
+session = client.sessions.create(
+    end_user_id=os.environ.get("END_USER_ID", "example-user"),
+)
 
 model = os.environ.get("MODEL", "openai-gpt-4o")
 prompt = os.environ.get(
     "PROMPT", "Find the latest news about DigitalOcean and summarize it."
 )
 
-# Meta-tools by default; use tools(include_all=True) for the concrete catalog.
-tools = client.gateway.tools()
-
+tools = session.tools()
 messages = [{"role": "user", "content": prompt}]
 
 while True:
@@ -42,7 +38,7 @@ while True:
         break
 
     messages.append(dict(message))
-    tool_messages = client.gateway.handle_tool_calls(response)
+    tool_messages = session.handle_tool_calls(response)
     for tool_message in tool_messages:
         print(f"[tool result] {str(tool_message['content'])[:120]}")
     messages.extend(tool_messages)

@@ -2,24 +2,26 @@
 # Copyright (c) DigitalOcean.
 # Licensed under the Apache-2.0 License.
 # ------------------------------------
+# pylint: disable=duplicate-code
 """Async Action Gateway API — hand-written; preserved across ``make generate``."""
 
 from __future__ import annotations
 
 from typing import Any, List, Optional, Sequence
 
-from pydo.custom_extensions import _BaseURLProxy
-from pydo.gateway import resolve_gateway_base_url
 from pydo.gateway.custom_models import ToolCall
 from pydo.gateway.providers import BaseProvider, default_provider
+from pydo.gateway import resolve_gateway_base_url
 
 from .custom_operations import (
     AsyncCodeOperations,
     AsyncGatewayTransport,
     AsyncMCPTransport,
+    AsyncRESTTransport,
     AsyncToolsOperations,
     async_execute_tool_calls,
 )
+from .session import AsyncSession, AsyncSessionsOperations
 
 
 class AsyncGatewayResources:
@@ -33,21 +35,25 @@ class AsyncGatewayResources:
         provider: Optional[BaseProvider] = None,
         transport: Optional[AsyncGatewayTransport] = None,
     ):
-        if transport is None:
-            proxy = _BaseURLProxy(
-                parent_client._client,
-                resolve_gateway_base_url(gateway_endpoint),
-            )
-            transport = AsyncMCPTransport(proxy)
-        self._transport = transport
+        self._parent = parent_client
+        self._gateway_base_url = resolve_gateway_base_url(gateway_endpoint)
         self.provider = provider or default_provider()
-        self.tools = AsyncToolsOperations(transport, self.provider)
-        self.code = AsyncCodeOperations(transport)
+        self.sessions = AsyncSessionsOperations(
+            parent_client,
+            gateway_endpoint=gateway_endpoint,
+            provider=self.provider,
+        )
+        self._transport = transport
+        if transport is not None:
+            self.tools = AsyncToolsOperations(transport, self.provider)
+            self.code = AsyncCodeOperations(transport)
+        else:
+            self.tools = None
+            self.code = None
 
     @property
-    def base_url(self) -> Optional[str]:
-        proxy = getattr(self._transport, "_client", None)
-        return getattr(proxy, "_base_url", None)
+    def base_url(self) -> str:
+        return self._gateway_base_url
 
     async def handle_tool_calls(
         self,
@@ -55,11 +61,17 @@ class AsyncGatewayResources:
         *,
         rationale: Optional[str] = None,
     ) -> List[Any]:
-        """Async twin of :meth:`pydo.gateway.GatewayResources.handle_tool_calls`."""
+        if self.tools is None:
+            raise RuntimeError(
+                "create a session first: session = await client.sessions.create("
+                "end_user_id=...); then await session.handle_tool_calls(response)"
+            )
         calls = self.provider.extract_tool_calls(response)
         if not calls:
             return []
-        results = await async_execute_tool_calls(calls, self.tools, rationale=rationale)
+        results = await async_execute_tool_calls(
+            calls, self.tools, rationale=rationale
+        )
         return self.provider.format_tool_results(calls, results)
 
     async def execute_tool_calls(
@@ -68,14 +80,21 @@ class AsyncGatewayResources:
         *,
         rationale: Optional[str] = None,
     ) -> List[Any]:
-        """Execute pre-extracted :class:`ToolCall` objects; return raw outputs."""
+        if self.tools is None:
+            raise RuntimeError(
+                "create a session first via await client.sessions.create("
+                "end_user_id=...)"
+            )
         return await async_execute_tool_calls(calls, self.tools, rationale=rationale)
 
 
 __all__ = [
     "AsyncGatewayResources",
+    "AsyncSession",
+    "AsyncSessionsOperations",
     "AsyncGatewayTransport",
     "AsyncMCPTransport",
+    "AsyncRESTTransport",
     "AsyncToolsOperations",
     "AsyncCodeOperations",
     "async_execute_tool_calls",

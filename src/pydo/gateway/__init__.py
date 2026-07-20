@@ -4,18 +4,16 @@
 # ------------------------------------
 """Action Gateway API — hand-written; preserved across ``make generate``.
 
-Exposes tool discovery/invocation and sandboxed code execution over the
-gateway's MCP endpoints, plus Composio-style providers that make gateway
-tools plug directly into pydo's inference surfaces (chat completions,
-messages, responses).
+Session-first surface: create a session on the DigitalOcean API
+(``POST /v2/sessions``), then discover/invoke tools and run code over the
+gateway REST endpoints with ``X-Session-Id``. Composio-style providers make
+session tools plug into pydo inference surfaces (chat completions, messages,
+responses).
 """
 
 from __future__ import annotations
 
-import os
 from typing import Any, List, Optional, Sequence
-
-from pydo.custom_extensions import _BaseURLProxy
 
 from .custom_models import (
     META_CODE,
@@ -40,22 +38,33 @@ from .providers import (
     simplify_inference_tool_schema,
     simplify_messages_input_schema,
 )
-from .transport import MCP_PROTOCOL_VERSION, GatewayTransport, MCPTransport
+from .session import (
+    Session,
+    SessionsOperations,
+    normalize_permissions,
+    serialize_policy_json,
+)
+from .transport import (
+    MCP_PROTOCOL_VERSION,
+    SESSION_ID_HEADER,
+    DEFAULT_GATEWAY_BASE_URL,
+    GatewayTransport,
+    MCPTransport,
+    RESTTransport,
+    resolve_gateway_base_url,
+    session_mcp_url,
+)
 
-DEFAULT_GATEWAY_BASE_URL = "https://actions.do-ai.run"
-_ENV_VAR = "PYDO_GATEWAY_ENDPOINT"
-
-
-def resolve_gateway_base_url(explicit: Optional[str] = None) -> str:
-    url = explicit or os.environ.get(_ENV_VAR) or DEFAULT_GATEWAY_BASE_URL
-    url = url.rstrip("/")
-    if "://" not in url:
-        url = f"https://{url}"
-    return url
+_ENV_VAR = "PYDO_GATEWAY_ENDPOINT"  # kept for docs / discoverability
 
 
 class GatewayResources:
-    """Action Gateway surface attached at ``client.gateway``."""
+    """Action Gateway surface attached at ``client.gateway``.
+
+    Primary entry point is :attr:`sessions` — create a :class:`Session` before
+    invoking tools. Legacy ``tools`` / ``code`` attributes require an explicit
+    session-bound transport and are not usable until a session exists.
+    """
 
     def __init__(
         self,
@@ -65,21 +74,27 @@ class GatewayResources:
         provider: Optional[BaseProvider] = None,
         transport: Optional[GatewayTransport] = None,
     ):
-        if transport is None:
-            proxy = _BaseURLProxy(
-                parent_client._client,
-                resolve_gateway_base_url(gateway_endpoint),
-            )
-            transport = MCPTransport(proxy)
-        self._transport = transport
+        self._parent = parent_client
+        self._gateway_endpoint = gateway_endpoint
+        self._gateway_base_url = resolve_gateway_base_url(gateway_endpoint)
         self.provider = provider or default_provider()
-        self.tools = ToolsOperations(transport, self.provider)
-        self.code = CodeOperations(transport)
+        self.sessions = SessionsOperations(
+            parent_client,
+            gateway_endpoint=gateway_endpoint,
+            provider=self.provider,
+        )
+        # Optional pre-bound transport (tests). Production callers use sessions.
+        self._transport = transport
+        if transport is not None:
+            self.tools = ToolsOperations(transport, self.provider)
+            self.code = CodeOperations(transport)
+        else:
+            self.tools = None
+            self.code = None
 
     @property
-    def base_url(self) -> Optional[str]:
-        proxy = getattr(self._transport, "_client", None)
-        return getattr(proxy, "_base_url", None)
+    def base_url(self) -> str:
+        return self._gateway_base_url
 
     def handle_tool_calls(
         self,
@@ -87,14 +102,12 @@ class GatewayResources:
         *,
         rationale: Optional[str] = None,
     ) -> List[Any]:
-        """Execute the tool calls in an inference response.
-
-        Extracts tool calls using the configured provider, executes them
-        against the gateway (meta-tools directly; concrete tools batched
-        through one ``action.invoke``), and returns vendor-formatted
-        messages/items ready to append to the conversation. Returns an
-        empty list when the response contains no tool calls.
-        """
+        """Deprecated path — prefer ``session.handle_tool_calls(response)``."""
+        if self.tools is None:
+            raise RuntimeError(
+                "create a session first: session = client.sessions.create("
+                "end_user_id=...); then session.handle_tool_calls(response)"
+            )
         calls = self.provider.extract_tool_calls(response)
         if not calls:
             return []
@@ -107,18 +120,28 @@ class GatewayResources:
         *,
         rationale: Optional[str] = None,
     ) -> List[Any]:
-        """Execute pre-extracted :class:`ToolCall` objects; return raw outputs."""
+        if self.tools is None:
+            raise RuntimeError(
+                "create a session first via client.sessions.create(end_user_id=...)"
+            )
         return execute_tool_calls(calls, self.tools, rationale=rationale)
 
 
 __all__ = [
     "GatewayResources",
+    "Session",
+    "SessionsOperations",
+    "normalize_permissions",
+    "serialize_policy_json",
     "ToolsOperations",
     "CodeOperations",
     "normalize_invoke_arguments",
     "GatewayTransport",
+    "RESTTransport",
     "MCPTransport",
     "MCP_PROTOCOL_VERSION",
+    "SESSION_ID_HEADER",
+    "session_mcp_url",
     "BaseProvider",
     "ChatCompletionsProvider",
     "MessagesProvider",

@@ -12,14 +12,15 @@ import json
 
 import pytest
 
-from pydo.gateway import ChatCompletionsProvider, GatewayToolError
+from pydo.gateway import ChatCompletionsProvider, GatewayToolError, SESSION_ID_HEADER
 
 from .conftest import (
+    TEST_SESSION_URN,
     AsyncFakeResponse,
-    call_result,
+    chat_tool_response,
     invoke_envelope,
-    jsonrpc_result,
     make_async_gateway,
+    tool_result,
 )
 
 
@@ -27,87 +28,62 @@ def _run(coro):
     return asyncio.run(coro)
 
 
-def _sent_payload(gateway, index=0):
+def _sent_request(gateway, index=0):
     pipeline = gateway._transport._client._original._pipeline
-    content = pipeline.calls[index].request.content
+    return pipeline.calls[index].request
+
+
+def _sent_payload(gateway, index=0):
+    content = _sent_request(gateway, index).content
     if isinstance(content, bytes):
         content = content.decode("utf-8")
     return json.loads(content)
 
 
 def test_list_defaults_to_meta():
-    gateway = make_async_gateway(
-        [AsyncFakeResponse(200, jsonrpc_result({"tools": [{"name": "action_search"}]}))]
-    )
+    gateway = make_async_gateway([])
     tools = _run(gateway.tools.list())
-    assert tools[0].name == "action_search"
-    pipeline = gateway._transport._client._original._pipeline
-    assert pipeline.calls[0].request.url.endswith("/mcp/meta")
+    assert [t.name for t in tools] == [
+        "action_search",
+        "action_invoke",
+        "action_code",
+    ]
 
 
 def test_invoke_and_invoke_one():
     envelope = invoke_envelope(output={"answer": 7})
-    gateway = make_async_gateway(
-        [AsyncFakeResponse(200, jsonrpc_result(call_result(envelope)))]
-    )
+    gateway = make_async_gateway([AsyncFakeResponse(200, envelope)])
     output = _run(gateway.tools.invoke_one("web_search", {"query": "do"}))
     assert output.answer == 7
-    params = _sent_payload(gateway)["params"]
-    assert params["name"] == "action_invoke"
+    request = _sent_request(gateway)
+    assert request.url.endswith("/tools/invoke")
+    assert request.headers[SESSION_ID_HEADER] == TEST_SESSION_URN
+    assert _sent_payload(gateway)["tools"][0]["tool"] == "web_search"
 
 
 def test_code_execute_failure_raises():
-    structured = {"error": {"class": "execution_failed", "message": "crash"}}
     gateway = make_async_gateway(
-        [AsyncFakeResponse(200, jsonrpc_result(call_result(structured, is_error=True)))]
+        [
+            AsyncFakeResponse(
+                200,
+                tool_result(error={"class": "execution_failed", "message": "crash"}),
+            )
+        ]
     )
     with pytest.raises(GatewayToolError, match="crash"):
         _run(gateway.code.execute("1/0"))
 
 
 def test_tools_callable_and_handle_tool_calls():
-    meta_tools = [
-        {
-            "name": "action_search",
-            "description": "d",
-            "inputSchema": {"type": "object"},
-        },
-        {
-            "name": "action_invoke",
-            "description": "d",
-            "inputSchema": {"type": "object"},
-        },
-        {"name": "action_code", "description": "d", "inputSchema": {"type": "object"}},
-    ]
     envelope = invoke_envelope(output={"ok": True})
     gateway = make_async_gateway(
-        [
-            AsyncFakeResponse(200, jsonrpc_result({"tools": meta_tools})),
-            AsyncFakeResponse(200, jsonrpc_result(call_result(envelope))),
-        ],
+        [AsyncFakeResponse(200, envelope)],
         provider=ChatCompletionsProvider(),
     )
 
     async def scenario():
         tools = await gateway.tools()
-        response = {
-            "choices": [
-                {
-                    "message": {
-                        "tool_calls": [
-                            {
-                                "id": "call_1",
-                                "function": {
-                                    "name": "web_search",
-                                    "arguments": '{"query": "do"}',
-                                },
-                            }
-                        ]
-                    }
-                }
-            ]
-        }
-        messages = await gateway.handle_tool_calls(response)
+        messages = await gateway.handle_tool_calls(chat_tool_response())
         return tools, messages
 
     tools, messages = _run(scenario())

@@ -9,11 +9,16 @@ from __future__ import annotations
 
 import json
 from types import SimpleNamespace
-from typing import Any, List
+from typing import Any, List, Optional
 from unittest.mock import MagicMock
 
-from pydo.gateway import GatewayResources
 from pydo.aio.gateway import AsyncGatewayResources
+from pydo.aio.gateway.custom_operations import AsyncRESTTransport
+from pydo.custom_extensions import _BaseURLProxy
+from pydo.gateway import GatewayResources, RESTTransport
+
+TEST_SESSION_URN = "do:managed_agents_session:test-session"
+TEST_GATEWAY_URL = "https://actions.do-ai-test.run"
 
 
 class FakeResponse:
@@ -83,12 +88,22 @@ def jsonrpc_error(code: int, message: str, *, rpc_id: int = 1) -> dict:
 def call_result(
     structured: Any = None, *, is_error: bool = False, text: str = ""
 ) -> dict:
+    """MCP tools/call result shape (legacy helper for MCP-specific tests)."""
     result: dict = {"isError": is_error}
     if structured is not None:
         result["structuredContent"] = structured
     if text:
         result["content"] = [{"type": "text", "text": text}]
     return result
+
+
+def tool_result(
+    output: Any = None, *, error: Any = None, call_id: str = "call_1"
+) -> dict:
+    """REST ToolResult envelope (search / code)."""
+    if error is not None:
+        return {"status": "failed", "error": error, "call_id": call_id}
+    return {"status": "succeeded", "output": output, "call_id": call_id}
 
 
 def invoke_envelope(
@@ -123,27 +138,102 @@ def invoke_envelope(
     }
 
 
-def make_gateway(responses: List[FakeResponse], provider=None) -> GatewayResources:
+def chat_tool_response(
+    *,
+    name: str = "web_search",
+    arguments: str = '{"query": "do"}',
+    call_id: str = "call_1",
+) -> dict:
+    """Build a chat-completions response containing one tool call."""
+    return {
+        "choices": [
+            {
+                "message": {
+                    "role": "assistant",
+                    "tool_calls": [
+                        {
+                            "id": call_id,
+                            "type": "function",
+                            "function": {
+                                "name": name,
+                                "arguments": arguments,
+                            },
+                        }
+                    ],
+                }
+            }
+        ]
+    }
+
+
+def session_create_response(
+    *,
+    session_urn: str = TEST_SESSION_URN,
+    end_user_id: str = "user-123",
+    name: str = "test-session",
+) -> dict:
+    return {
+        "session": {
+            "sessionUrn": session_urn,
+            "teamId": "42",
+            "name": name,
+            "policyJson": '{"defaultAction":"allow","rules":[]}',
+            "endUserId": end_user_id,
+        }
+    }
+
+
+def make_parent(responses: List[FakeResponse]) -> MagicMock:
     parent = MagicMock()
     parent._client = MagicMock()
     parent._client._pipeline = FakePipeline(responses)
+    parent._client.format_url = lambda url, **_kwargs: (
+        url if str(url).startswith("http") else f"https://api.digitalocean.com{url}"
+    )
+    return parent
+
+
+def make_async_parent(responses: List[AsyncFakeResponse]) -> MagicMock:
+    parent = MagicMock()
+    parent._client = MagicMock()
+    parent._client._pipeline = AsyncFakePipeline(responses)
+    parent._client.format_url = lambda url, **_kwargs: (
+        url if str(url).startswith("http") else f"https://api.digitalocean.com{url}"
+    )
+    return parent
+
+
+def make_gateway(
+    responses: List[FakeResponse],
+    provider=None,
+    *,
+    session_id: str = TEST_SESSION_URN,
+) -> GatewayResources:
+    parent = make_parent(responses)
+    proxy = _BaseURLProxy(parent._client, TEST_GATEWAY_URL)
+    transport = RESTTransport(proxy, session_id=session_id)
     return GatewayResources(
         parent,
-        gateway_endpoint="https://actions.do-ai-test.run",
+        gateway_endpoint=TEST_GATEWAY_URL,
         provider=provider,
+        transport=transport,
     )
 
 
 def make_async_gateway(
-    responses: List[AsyncFakeResponse], provider=None
+    responses: List[AsyncFakeResponse],
+    provider=None,
+    *,
+    session_id: str = TEST_SESSION_URN,
 ) -> AsyncGatewayResources:
-    parent = MagicMock()
-    parent._client = MagicMock()
-    parent._client._pipeline = AsyncFakePipeline(responses)
+    parent = make_async_parent(responses)
+    proxy = _BaseURLProxy(parent._client, TEST_GATEWAY_URL)
+    transport = AsyncRESTTransport(proxy, session_id=session_id)
     return AsyncGatewayResources(
         parent,
-        gateway_endpoint="https://actions.do-ai-test.run",
+        gateway_endpoint=TEST_GATEWAY_URL,
         provider=provider,
+        transport=transport,
     )
 
 
@@ -155,9 +245,13 @@ def sent_request(gateway, index: int = 0) -> Any:
     return pipeline_of(gateway).calls[index].request
 
 
-def sent_payload(gateway, index: int = 0) -> dict:
+def sent_payload(gateway, index: int = 0) -> Optional[dict]:
     request = sent_request(gateway, index)
     content = request.content
+    if content is None:
+        return None
     if isinstance(content, bytes):
         content = content.decode("utf-8")
+    if not content:
+        return None
     return json.loads(content)

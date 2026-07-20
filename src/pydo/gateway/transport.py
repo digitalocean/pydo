@@ -5,21 +5,17 @@
 """Action Gateway wire layer.
 
 The public SDK surface (``ToolsOperations`` / ``CodeOperations``) only talks
-to the small :class:`GatewayTransport` interface. Today the gateway is
-consumed over its MCP JSON-RPC endpoints (``/mcp`` and ``/mcp/meta``); when
-the REST compatibility endpoints ship, a ``RESTTransport`` implementing the
-same two methods can be dropped in without changing any user-facing method
-or return shape.
-
-The gateway's MCP handler runs stateless with JSON responses, so
-:class:`MCPTransport` is a plain JSON-RPC 2.0 POST per request — no
-``initialize`` handshake, no session ids, no SSE parsing.
+to the small :class:`GatewayTransport` interface. The default transport is
+REST (``/tools/search``, ``/tools/invoke``, ``/code/execute``) and requires
+a session id via ``X-Session-Id``. An :class:`MCPTransport` remains available
+for callers that need JSON-RPC over ``/mcp`` / ``/mcp/meta``.
 """
 
 from __future__ import annotations
 
 import itertools
 import json as _json
+import os
 from typing import Any, Dict, List, Optional
 
 from azure.core.exceptions import (
@@ -34,7 +30,25 @@ from azure.core.rest import HttpRequest
 
 from pydo.custom_extensions import _wrap
 
-from .custom_models import GatewayProtocolError, GatewayToolError
+from .custom_models import (
+    META_CODE,
+    META_INVOKE,
+    META_SEARCH,
+    GatewayProtocolError,
+    GatewayToolError,
+    ToolResultStatus,
+)
+
+DEFAULT_GATEWAY_BASE_URL = "https://actions.do-ai.run"
+_ENV_VAR = "PYDO_GATEWAY_ENDPOINT"
+
+
+def resolve_gateway_base_url(explicit: Optional[str] = None) -> str:
+    url = explicit or os.environ.get(_ENV_VAR) or DEFAULT_GATEWAY_BASE_URL
+    url = url.rstrip("/")
+    if "://" not in url:
+        url = f"https://{url}"
+    return url
 
 _ERROR_MAP = {
     401: ClientAuthenticationError,
@@ -44,15 +58,101 @@ _ERROR_MAP = {
 }
 
 MCP_PROTOCOL_VERSION = "2025-06-18"
+SESSION_ID_HEADER = "X-Session-Id"
 
 _MCP_PATH = "/mcp"
 _MCP_META_PATH = "/mcp/meta"
+_REST_TOOLS_PATH = "/tools"
+_REST_SEARCH_PATH = "/tools/search"
+_REST_INVOKE_PATH = "/tools/invoke"
+_REST_CODE_PATH = "/code/execute"
 
 _MCP_HEADERS = {
     "Content-Type": "application/json",
     "MCP-Protocol-Version": MCP_PROTOCOL_VERSION,
     "Accept": "application/json, text/event-stream",
 }
+
+_REST_HEADERS = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+}
+
+# Static meta-tool catalog for REST list(meta=True). Mirrors /mcp/meta.
+_META_TOOL_DEFINITIONS: List[Dict[str, Any]] = [
+    {
+        "name": META_SEARCH,
+        "title": "Action Search",
+        "description": (
+            "Discover the catalog tools needed to satisfy one or more user "
+            "use cases. Call this before action_invoke whenever you need a "
+            "catalog tool you do not already have."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "queries": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 5,
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "use_case": {"type": "string"},
+                            "known_fields": {"type": "string"},
+                        },
+                        "required": ["use_case"],
+                    },
+                },
+                "providers": {"type": "array", "items": {"type": "string"}},
+                "tags": {"type": "array", "items": {"type": "string"}},
+                "limit": {"type": "integer"},
+            },
+            "required": ["queries"],
+        },
+    },
+    {
+        "name": META_INVOKE,
+        "title": "Action Invoke",
+        "description": "Invoke 1–10 catalog tools in parallel.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "tools": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": 10,
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "tool": {"type": "string"},
+                            "tool_slug": {"type": "string"},
+                            "arguments": {"type": "object"},
+                        },
+                    },
+                },
+                "rationale": {"type": "string"},
+            },
+            "required": ["tools"],
+        },
+    },
+    {
+        "name": META_CODE,
+        "title": "Action Code",
+        "description": (
+            "Run Python in an ephemeral sandbox. Use for computation, "
+            "parsing, or data processing — no prior action_search needed."
+        ),
+        "inputSchema": {
+            "type": "object",
+            "properties": {
+                "code": {"type": "string"},
+                "code_to_execute": {"type": "string"},
+                "thought": {"type": "string"},
+            },
+        },
+    },
+]
 
 
 def _response_body_text(response: Any) -> str:
@@ -83,6 +183,13 @@ def _raise_gateway_http_error(response: Any) -> None:
             "team is not enabled for the Action Infra release "
             f"(412 Precondition Failed): {message}"
         )
+    if response.status_code == 404 and "/v2/sessions" in (
+        getattr(getattr(response, "request", None), "url", "") or ""
+    ):
+        message = (
+            "session create returned 404 — is POST /v2/sessions available on "
+            f"this API endpoint? {message}"
+        )
     raise HttpResponseError(message=message, response=response)
 
 
@@ -95,12 +202,7 @@ def _content_text(content: Optional[List[Dict[str, Any]]]) -> str:
 
 
 def _unwrap_call_result(result: Dict[str, Any]) -> Any:
-    """Normalize an MCP ``tools/call`` result to its useful payload.
-
-    Prefers ``structuredContent`` (typed payload); falls back to the joined
-    ``content`` text blocks (parsed as JSON when possible). Raises
-    :class:`GatewayToolError` when the tool reported ``isError``.
-    """
+    """Normalize an MCP ``tools/call`` result to its useful payload."""
     if result.get("isError"):
         structured = result.get("structuredContent")
         error = None
@@ -132,15 +234,21 @@ def _unwrap_call_result(result: Dict[str, Any]) -> Any:
         return text
 
 
-def _parse_jsonrpc(body: Any) -> Dict[str, Any]:
+def _parse_json_body(body: Any) -> Any:
     if isinstance(body, bytes):
         body = body.decode("utf-8", errors="replace")
+    if isinstance(body, (dict, list)):
+        return body
     try:
-        envelope = _json.loads(body)
+        return _json.loads(body)
     except (TypeError, ValueError) as exc:
         raise GatewayProtocolError(
             f"gateway returned a non-JSON response: {body!r}"
         ) from exc
+
+
+def _parse_jsonrpc(body: Any) -> Dict[str, Any]:
+    envelope = _parse_json_body(body)
     if not isinstance(envelope, dict):
         raise GatewayProtocolError(
             f"gateway returned an unexpected JSON-RPC envelope: {envelope!r}"
@@ -160,6 +268,40 @@ def _parse_jsonrpc(body: Any) -> Dict[str, Any]:
     return result
 
 
+def _decode_output(value: Any) -> Any:
+    if isinstance(value, (bytes, bytearray)):
+        value = value.decode("utf-8", errors="replace")
+    if isinstance(value, str):
+        try:
+            return _json.loads(value)
+        except (TypeError, ValueError):
+            return value
+    return value
+
+
+def _unwrap_tool_result(payload: Any) -> Any:
+    """Unwrap a REST ``ToolResult`` envelope; raise on failure."""
+    if not isinstance(payload, dict):
+        return _wrap(payload)
+    status = payload.get("status")
+    if status and status != ToolResultStatus.SUCCEEDED:
+        error = payload.get("error") or {}
+        raise GatewayToolError.from_error_payload(
+            dict(error) if isinstance(error, dict) else {"message": str(error)},
+            invocation_id=payload.get("invocation_id") or payload.get("call_id"),
+        )
+    if "output" in payload:
+        return _wrap(_decode_output(payload.get("output")))
+    return _wrap(payload)
+
+
+def session_mcp_url(gateway_base_url: str, session_urn: str) -> str:
+    """Build the session-pinned MCP URL for external MCP clients."""
+    base = gateway_base_url.rstrip("/")
+    session_id = session_urn.rsplit(":", 1)[-1]
+    return f"{base}/mcp/session/{session_id}"
+
+
 class GatewayTransport:
     """Swappable wire layer; MCP semantics are the lowest common denominator."""
 
@@ -170,20 +312,93 @@ class GatewayTransport:
         raise NotImplementedError
 
 
+class RESTTransport(GatewayTransport):
+    """REST over ``/tools``, ``/tools/search``, ``/tools/invoke``, ``/code/execute``.
+
+    Requires ``session_id`` (session URN) on every request via ``X-Session-Id``.
+    """
+
+    def __init__(self, base_url_proxy: Any, *, session_id: str):
+        if not session_id:
+            raise ValueError("session_id is required for RESTTransport")
+        self._client = base_url_proxy
+        self.session_id = session_id
+
+    def _headers(self) -> Dict[str, str]:
+        headers = dict(_REST_HEADERS)
+        headers[SESSION_ID_HEADER] = self.session_id
+        return headers
+
+    def _request(
+        self,
+        method: str,
+        path: str,
+        payload: Optional[Dict[str, Any]] = None,
+    ) -> Any:
+        kwargs: Dict[str, Any] = {"headers": self._headers()}
+        if payload is not None:
+            kwargs["json"] = payload
+        request = HttpRequest(method, path, **kwargs)
+        request.url = self._client.format_url(request.url)
+        pipeline_response = self._client._pipeline.run(request)
+        response = pipeline_response.http_response
+        if response.status_code != 200:
+            _raise_gateway_http_error(response)
+        body = response.text() if hasattr(response, "text") else response.body()
+        return _parse_json_body(body)
+
+    def list_tools(self, *, meta: bool) -> List[Any]:
+        if meta:
+            return _wrap([dict(tool) for tool in _META_TOOL_DEFINITIONS])
+        catalog = self._request("GET", _REST_TOOLS_PATH)
+        if isinstance(catalog, dict):
+            return _wrap(catalog.get("tools") or [])
+        return _wrap(catalog or [])
+
+    def call_tool(self, name: str, arguments: Dict[str, Any], *, meta: bool) -> Any:
+        arguments = arguments or {}
+        if name == META_SEARCH or (meta and name == META_SEARCH):
+            return _unwrap_tool_result(
+                self._request("POST", _REST_SEARCH_PATH, arguments)
+            )
+        if name == META_INVOKE or (meta and name == META_INVOKE):
+            # Invoke returns the batch envelope directly (not ToolResult).
+            return _wrap(self._request("POST", _REST_INVOKE_PATH, arguments))
+        if name == META_CODE or (meta and name == META_CODE):
+            return _unwrap_tool_result(self._request("POST", _REST_CODE_PATH, arguments))
+        # Concrete catalog tool → single-item invoke.
+        envelope = self._request(
+            "POST",
+            _REST_INVOKE_PATH,
+            {"tools": [{"tool": name, "arguments": arguments}]},
+        )
+        results = (envelope or {}).get("results") or []
+        if not results:
+            raise GatewayToolError(f"invoke of {name!r} returned no results")
+        item = results[0]
+        item_result = item.get("result") if isinstance(item, dict) else item
+        return _unwrap_tool_result(item_result)
+
+
 class MCPTransport(GatewayTransport):
     """JSON-RPC 2.0 over plain HTTP POST to ``/mcp`` and ``/mcp/meta``."""
 
-    def __init__(self, base_url_proxy: Any):
+    def __init__(self, base_url_proxy: Any, *, session_id: Optional[str] = None):
         self._client = base_url_proxy
         self._ids = itertools.count(1)
+        self.session_id = session_id
 
-    # -- wire plumbing ----------------------------------------------------
+    def _headers(self) -> Dict[str, str]:
+        headers = dict(_MCP_HEADERS)
+        if self.session_id:
+            headers[SESSION_ID_HEADER] = self.session_id
+        return headers
 
     def _post(self, path: str, payload: Dict[str, Any]) -> Dict[str, Any]:
         request = HttpRequest(
             "POST",
             path,
-            headers=dict(_MCP_HEADERS),
+            headers=self._headers(),
             json=payload,
         )
         request.url = self._client.format_url(request.url)
@@ -210,8 +425,6 @@ class MCPTransport(GatewayTransport):
             payload["params"] = params
         return self._post(_MCP_META_PATH if meta else _MCP_PATH, payload)
 
-    # -- GatewayTransport -------------------------------------------------
-
     def list_tools(self, *, meta: bool) -> List[Any]:
         result = self._rpc("tools/list", meta=meta)
         return _wrap(result.get("tools") or [])
@@ -227,6 +440,11 @@ class MCPTransport(GatewayTransport):
 
 __all__ = [
     "GatewayTransport",
+    "RESTTransport",
     "MCPTransport",
     "MCP_PROTOCOL_VERSION",
+    "SESSION_ID_HEADER",
+    "session_mcp_url",
+    "DEFAULT_GATEWAY_BASE_URL",
+    "resolve_gateway_base_url",
 ]

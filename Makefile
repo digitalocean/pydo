@@ -29,6 +29,7 @@ clean: ## Removes all generated code (except _patch.py files)
 	@find src/pydo -type f \
 		! -name "_patch.py" ! -name "custom_*.py" ! -name "exceptions.py" \
 		! -path "*/gateway/*" \
+		! -path "*/action_gateway/*" \
 		-exec rm -rf {} +
 
 .PHONY: download-spec

@@ -22,11 +22,12 @@ from pydo.gateway import (
 
 from .conftest import (
     FakeResponse,
-    call_result,
+    chat_tool_response,
     invoke_envelope,
-    jsonrpc_result,
     make_gateway,
     sent_payload,
+    sent_request,
+    tool_result,
 )
 
 _CATALOG = [
@@ -165,25 +166,7 @@ def test_wrap_tools_falls_back_to_title_and_empty_schema():
 
 
 def _chat_response(arguments='{"query": "do"}'):
-    return {
-        "choices": [
-            {
-                "message": {
-                    "role": "assistant",
-                    "tool_calls": [
-                        {
-                            "id": "call_1",
-                            "type": "function",
-                            "function": {
-                                "name": "web_search",
-                                "arguments": arguments,
-                            },
-                        }
-                    ],
-                }
-            }
-        ]
-    }
+    return chat_tool_response(arguments=arguments)
 
 
 def _messages_response():
@@ -280,10 +263,7 @@ def test_format_results_per_provider():
 
 
 def test_tools_callable_wraps_meta_tools_by_default():
-    gateway = make_gateway(
-        [FakeResponse(200, jsonrpc_result({"tools": _META_TOOLS}))],
-        provider=ChatCompletionsProvider(),
-    )
+    gateway = make_gateway([], provider=ChatCompletionsProvider())
     tools = gateway.tools()
     assert [t["function"]["name"] for t in tools] == [
         "action_search",
@@ -293,10 +273,7 @@ def test_tools_callable_wraps_meta_tools_by_default():
 
 
 def test_tools_callable_wraps_meta_tools_for_messages():
-    gateway = make_gateway(
-        [FakeResponse(200, jsonrpc_result({"tools": _META_TOOLS}))],
-        provider=MessagesProvider(),
-    )
+    gateway = make_gateway([], provider=MessagesProvider())
     tools = gateway.tools()
     assert [t["name"] for t in tools] == [
         "action_search",
@@ -307,7 +284,7 @@ def test_tools_callable_wraps_meta_tools_for_messages():
 
 def test_tools_callable_include_all_wraps_catalog():
     gateway = make_gateway(
-        [FakeResponse(200, jsonrpc_result({"tools": _CATALOG}))],
+        [FakeResponse(200, {"tools": _CATALOG})],
         provider=ChatCompletionsProvider(),
     )
     tools = gateway.tools(include_all=True)
@@ -317,8 +294,8 @@ def test_tools_callable_include_all_wraps_catalog():
 def test_tools_callable_names_filter_and_missing():
     gateway = make_gateway(
         [
-            FakeResponse(200, jsonrpc_result({"tools": _CATALOG})),
-            FakeResponse(200, jsonrpc_result({"tools": _CATALOG})),
+            FakeResponse(200, {"tools": _CATALOG}),
+            FakeResponse(200, {"tools": _CATALOG}),
         ],
         provider=ChatCompletionsProvider(),
     )
@@ -339,7 +316,7 @@ def test_tools_callable_via_search():
         ]
     }
     gateway = make_gateway(
-        [FakeResponse(200, jsonrpc_result(call_result(search_payload)))],
+        [FakeResponse(200, tool_result(search_payload))],
         provider=ChatCompletionsProvider(),
     )
     tools = gateway.tools(search="search the web", limit=2)
@@ -353,15 +330,15 @@ def test_tools_callable_via_search():
 def test_handle_tool_calls_batches_concrete_tools():
     envelope = invoke_envelope(output={"answer": 42})
     gateway = make_gateway(
-        [FakeResponse(200, jsonrpc_result(call_result(envelope)))],
+        [FakeResponse(200, envelope)],
         provider=ChatCompletionsProvider(),
     )
     messages = gateway.handle_tool_calls(_chat_response(), rationale="why not")
 
-    params = sent_payload(gateway)["params"]
-    assert params["name"] == "action_invoke"
-    assert params["arguments"]["rationale"] == "why not"
-    assert params["arguments"]["tools"] == [
+    assert sent_request(gateway).url.endswith("/tools/invoke")
+    payload = sent_payload(gateway)
+    assert payload["rationale"] == "why not"
+    assert payload["tools"] == [
         {"tool": "web_search", "arguments": {"query": "do"}}
     ]
 
@@ -392,13 +369,9 @@ def test_normalize_invoke_arguments_accepts_chat_function_shape():
 def test_handle_tool_calls_normalizes_action_invoke_payload():
     envelope = invoke_envelope(output={"answer": 1})
     gateway = make_gateway(
-        [
-            FakeResponse(200, jsonrpc_result({"tools": _META_TOOLS})),
-            FakeResponse(200, jsonrpc_result(call_result(envelope))),
-        ],
+        [FakeResponse(200, envelope)],
         provider=ChatCompletionsProvider(),
     )
-    gateway.tools()
     response = {
         "choices": [
             {
@@ -430,9 +403,9 @@ def test_handle_tool_calls_normalizes_action_invoke_payload():
         ]
     }
     messages = gateway.handle_tool_calls(response)
-    params = sent_payload(gateway, 1)["params"]
-    assert params["name"] == "action_invoke"
-    assert params["arguments"]["tools"] == [
+    assert sent_request(gateway).url.endswith("/tools/invoke")
+    payload = sent_payload(gateway)
+    assert payload["tools"] == [
         {"tool": "web_search", "arguments": {"query": "digitalocean"}}
     ]
     assert json.loads(messages[0]["content"]) == envelope
@@ -440,13 +413,9 @@ def test_handle_tool_calls_normalizes_action_invoke_payload():
 
 def test_handle_tool_calls_routes_meta_tools_directly():
     gateway = make_gateway(
-        [
-            FakeResponse(200, jsonrpc_result({"tools": _META_TOOLS})),
-            FakeResponse(200, jsonrpc_result(call_result({"results": []}))),
-        ],
+        [FakeResponse(200, tool_result({"results": []}))],
         provider=ChatCompletionsProvider(),
     )
-    gateway.tools()
     response = {
         "choices": [
             {
@@ -465,8 +434,7 @@ def test_handle_tool_calls_routes_meta_tools_directly():
         ]
     }
     messages = gateway.handle_tool_calls(response)
-    params = sent_payload(gateway, 1)["params"]
-    assert params["name"] == "action_search"
+    assert sent_request(gateway).url.endswith("/tools/search")
     assert json.loads(messages[0]["content"]) == {"results": []}
 
 
@@ -475,7 +443,7 @@ def test_handle_tool_calls_surfaces_failures_as_content():
         error={"class": "timeout", "message": "too slow"},
     )
     gateway = make_gateway(
-        [FakeResponse(200, jsonrpc_result(call_result(envelope)))],
+        [FakeResponse(200, envelope)],
         provider=ChatCompletionsProvider(),
     )
     messages = gateway.handle_tool_calls(_chat_response())

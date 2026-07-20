@@ -2,6 +2,7 @@
 # Copyright (c) DigitalOcean.
 # Licensed under the Apache-2.0 License.
 # ------------------------------------
+# pylint: disable=duplicate-code
 """Async Action Gateway operations (mirror of :mod:`pydo.gateway`)."""
 
 from __future__ import annotations
@@ -32,12 +33,21 @@ from pydo.gateway.custom_operations import (
 )
 from pydo.gateway.providers import _error_payload, _get
 from pydo.gateway.transport import (
+    SESSION_ID_HEADER,
     _MCP_HEADERS,
     _MCP_META_PATH,
     _MCP_PATH,
+    _META_TOOL_DEFINITIONS,
+    _REST_CODE_PATH,
+    _REST_HEADERS,
+    _REST_INVOKE_PATH,
+    _REST_SEARCH_PATH,
+    _REST_TOOLS_PATH,
+    _parse_json_body,
     _parse_jsonrpc,
     _raise_gateway_http_error,
     _unwrap_call_result,
+    _unwrap_tool_result,
 )
 
 
@@ -56,15 +66,22 @@ class AsyncGatewayTransport:
 class AsyncMCPTransport(AsyncGatewayTransport):
     """Async JSON-RPC 2.0 over plain HTTP POST to ``/mcp`` and ``/mcp/meta``."""
 
-    def __init__(self, base_url_proxy: Any):
+    def __init__(self, base_url_proxy: Any, *, session_id: Optional[str] = None):
         self._client = base_url_proxy
         self._ids = itertools.count(1)
+        self.session_id = session_id
+
+    def _headers(self) -> Dict[str, str]:
+        headers = dict(_MCP_HEADERS)
+        if self.session_id:
+            headers[SESSION_ID_HEADER] = self.session_id
+        return headers
 
     async def _post(self, path: str, payload: Dict[str, Any]) -> Dict[str, Any]:
         request = HttpRequest(
             "POST",
             path,
-            headers=dict(_MCP_HEADERS),
+            headers=self._headers(),
             json=payload,
         )
         request.url = self._client.format_url(request.url)
@@ -108,6 +125,77 @@ class AsyncMCPTransport(AsyncGatewayTransport):
             meta=meta,
         )
         return _unwrap_call_result(result)
+
+
+class AsyncRESTTransport(AsyncGatewayTransport):
+    """Async REST transport; requires ``session_id`` via ``X-Session-Id``."""
+
+    def __init__(self, base_url_proxy: Any, *, session_id: str):
+        if not session_id:
+            raise ValueError("session_id is required for AsyncRESTTransport")
+        self._client = base_url_proxy
+        self.session_id = session_id
+
+    def _headers(self) -> Dict[str, str]:
+        headers = dict(_REST_HEADERS)
+        headers[SESSION_ID_HEADER] = self.session_id
+        return headers
+
+    async def _request(
+        self,
+        method: str,
+        path: str,
+        payload: Optional[Dict[str, Any]] = None,
+    ) -> Any:
+        kwargs: Dict[str, Any] = {"headers": self._headers()}
+        if payload is not None:
+            kwargs["json"] = payload
+        request = HttpRequest(method, path, **kwargs)
+        request.url = self._client.format_url(request.url)
+        pipeline_response = await self._client._pipeline.run(request)
+        response = pipeline_response.http_response
+        if response.status_code != 200:
+            try:
+                await response.read()
+            except Exception:  # noqa: BLE001
+                pass
+            _raise_gateway_http_error(response)
+        body = await response.read()
+        return _parse_json_body(body)
+
+    async def list_tools(self, *, meta: bool) -> List[Any]:
+        if meta:
+            return _wrap([dict(tool) for tool in _META_TOOL_DEFINITIONS])
+        catalog = await self._request("GET", _REST_TOOLS_PATH)
+        if isinstance(catalog, dict):
+            return _wrap(catalog.get("tools") or [])
+        return _wrap(catalog or [])
+
+    async def call_tool(
+        self, name: str, arguments: Dict[str, Any], *, meta: bool
+    ) -> Any:
+        arguments = arguments or {}
+        if name == META_SEARCH:
+            return _unwrap_tool_result(
+                await self._request("POST", _REST_SEARCH_PATH, arguments)
+            )
+        if name == META_INVOKE:
+            return _wrap(await self._request("POST", _REST_INVOKE_PATH, arguments))
+        if name == META_CODE:
+            return _unwrap_tool_result(
+                await self._request("POST", _REST_CODE_PATH, arguments)
+            )
+        envelope = await self._request(
+            "POST",
+            _REST_INVOKE_PATH,
+            {"tools": [{"tool": name, "arguments": arguments}]},
+        )
+        results = (envelope or {}).get("results") or []
+        if not results:
+            raise GatewayToolError(f"invoke of {name!r} returned no results")
+        item = results[0]
+        item_result = item.get("result") if isinstance(item, dict) else item
+        return _unwrap_tool_result(item_result)
 
 
 class AsyncToolsOperations:
@@ -279,6 +367,7 @@ async def async_execute_tool_calls(
 __all__ = [
     "AsyncGatewayTransport",
     "AsyncMCPTransport",
+    "AsyncRESTTransport",
     "AsyncToolsOperations",
     "AsyncCodeOperations",
     "async_execute_tool_calls",

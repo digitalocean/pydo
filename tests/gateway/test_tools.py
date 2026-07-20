@@ -13,11 +13,11 @@ from pydo.gateway import GatewayToolError
 
 from .conftest import (
     FakeResponse,
-    call_result,
     invoke_envelope,
-    jsonrpc_result,
     make_gateway,
     sent_payload,
+    sent_request,
+    tool_result,
 )
 
 _SEARCH_PAYLOAD = {
@@ -43,21 +43,16 @@ _SEARCH_PAYLOAD = {
 
 
 def test_search_accepts_single_string():
-    gateway = make_gateway(
-        [FakeResponse(200, jsonrpc_result(call_result(_SEARCH_PAYLOAD)))]
-    )
+    gateway = make_gateway([FakeResponse(200, tool_result(_SEARCH_PAYLOAD))])
     result = gateway.tools.search("search the web")
 
-    params = sent_payload(gateway)["params"]
-    assert params["name"] == "action_search"
-    assert params["arguments"]["queries"] == [{"use_case": "search the web"}]
+    assert sent_request(gateway).url.endswith("/tools/search")
+    assert sent_payload(gateway)["queries"] == [{"use_case": "search the web"}]
     assert result.results[0].results[0].name == "web_search"
 
 
 def test_search_accepts_dicts_and_filters():
-    gateway = make_gateway(
-        [FakeResponse(200, jsonrpc_result(call_result(_SEARCH_PAYLOAD)))]
-    )
+    gateway = make_gateway([FakeResponse(200, tool_result(_SEARCH_PAYLOAD))])
     gateway.tools.search(
         [
             {"use_case": "find stuff", "known_fields": "site:example.com"},
@@ -67,7 +62,7 @@ def test_search_accepts_dicts_and_filters():
         tags=["web"],
         limit=3,
     )
-    arguments = sent_payload(gateway)["params"]["arguments"]
+    arguments = sent_payload(gateway)
     assert arguments["queries"] == [
         {"use_case": "find stuff", "known_fields": "site:example.com"},
         {"use_case": "another use case"},
@@ -108,7 +103,7 @@ def test_invoke_shapes_arguments_and_returns_envelope():
             },
         ]
     )
-    gateway = make_gateway([FakeResponse(200, jsonrpc_result(call_result(envelope)))])
+    gateway = make_gateway([FakeResponse(200, envelope)])
     result = gateway.tools.invoke(
         [
             {"tool": "web_search", "arguments": {"query": "do"}},
@@ -117,15 +112,14 @@ def test_invoke_shapes_arguments_and_returns_envelope():
         rationale="testing",
     )
 
-    params = sent_payload(gateway)["params"]
-    assert params["name"] == "action_invoke"
-    assert params["arguments"]["rationale"] == "testing"
-    assert params["arguments"]["tools"] == [
+    assert sent_request(gateway).url.endswith("/tools/invoke")
+    payload = sent_payload(gateway)
+    assert payload["rationale"] == "testing"
+    assert payload["tools"] == [
         {"tool": "web_search", "arguments": {"query": "do"}},
         {"tool": "missing_tool", "arguments": {}},
     ]
 
-    # per-item failures stay in the envelope — no raise
     assert result.error_count == 1
     assert result.results[1].result.status == "failed"
 
@@ -152,7 +146,7 @@ def test_invoke_one_returns_output():
             }
         ]
     )
-    gateway = make_gateway([FakeResponse(200, jsonrpc_result(call_result(envelope)))])
+    gateway = make_gateway([FakeResponse(200, envelope)])
     output = gateway.tools.invoke_one("web_search", {"query": "do"})
     assert output.answer == 42
 
@@ -166,21 +160,8 @@ def test_invoke_one_raises_on_failure():
         },
         invocation_id="inv_9",
     )
-    gateway = make_gateway([FakeResponse(200, jsonrpc_result(call_result(envelope)))])
+    gateway = make_gateway([FakeResponse(200, envelope)])
     with pytest.raises(GatewayToolError, match="exa is down") as excinfo:
         gateway.tools.invoke_one("web_search", {"query": "do"})
     assert excinfo.value.error_class == "upstream_error"
     assert excinfo.value.retriable is True
-
-
-# -- concrete call -----------------------------------------------------------
-
-
-def test_call_hits_concrete_endpoint():
-    gateway = make_gateway(
-        [FakeResponse(200, jsonrpc_result(call_result({"provider": "exa"})))]
-    )
-    result = gateway.tools.call("web_search", {"query": "do"})
-    payload = sent_payload(gateway)
-    assert payload["params"]["name"] == "web_search"
-    assert result.provider == "exa"
