@@ -20,9 +20,11 @@ from pydo.gateway import (
     GatewayResources,
     GatewayToolError,
     MCPTransport,
+    RecoveryHint,
     SESSION_ID_HEADER,
+    ToolErrorClass,
 )
-from pydo.gateway.transport import session_mcp_url
+from pydo.gateway.transport import _META_TOOL_DEFINITIONS, session_mcp_url
 
 from .conftest import (
     TEST_GATEWAY_URL,
@@ -49,6 +51,29 @@ def test_list_meta_tools_is_local_no_network():
         "action_code",
     ]
     assert pipeline_calls(gateway) == 0
+
+
+def test_gateway_constants_match_server_contract():
+    assert ToolErrorClass.NOT_FOUND == "not_found"
+    assert ToolErrorClass.CANCELED == "canceled"
+    assert RecoveryHint.REFRESH_AUTH == "refresh_auth"
+    assert RecoveryHint.RETRY_LATER == "retry_later"
+    assert RecoveryHint.NARROW_OUTPUT == "narrow_output"
+    assert RecoveryHint.CONTACT_SUPPORT == "contact_support"
+
+
+def test_meta_schemas_match_server_constraints():
+    definitions = {tool["name"]: tool for tool in _META_TOOL_DEFINITIONS}
+    invoke_schema = definitions["action_invoke"]["inputSchema"]
+    assert invoke_schema["properties"]["rationale"]["maxLength"] == 512
+    assert invoke_schema["properties"]["tools"]["items"]["anyOf"] == [
+        {"required": ["tool"]},
+        {"required": ["tool_slug"]},
+    ]
+    assert definitions["action_code"]["inputSchema"]["anyOf"] == [
+        {"required": ["code"]},
+        {"required": ["code_to_execute"]},
+    ]
 
 
 def pipeline_calls(gateway) -> int:
@@ -120,7 +145,7 @@ def test_failed_tool_result_raises():
                         "class": "rate_limited",
                         "message": "slow down",
                         "retriable": True,
-                        "recovery_hint": "backoff",
+                        "recovery_hint": "retry_later",
                     }
                 ),
             )
@@ -131,7 +156,7 @@ def test_failed_tool_result_raises():
     err = excinfo.value
     assert err.error_class == "rate_limited"
     assert err.retriable is True
-    assert err.recovery_hint == "backoff"
+    assert err.recovery_hint == "retry_later"
 
 
 def test_non_json_body_raises_protocol_error():
@@ -188,6 +213,26 @@ def test_mcp_transport_still_works_with_session_header():
     assert tools[0].name == "action_search"
 
 
+def test_mcp_transport_parses_sse_response():
+    response = (
+        ": heartbeat\n\n"
+        "event: message\n"
+        'data: {"jsonrpc":"2.0","method":"notifications/progress"}\n\n'
+        "event: message\n"
+        'data: {"jsonrpc":"2.0","id":1,"result":{"tools":'
+        '[{"name":"action_search"}]}}\n\n'
+        "data: [DONE]\n\n"
+    )
+    parent = make_parent([FakeResponse(200, response)])
+    proxy = _BaseURLProxy(parent._client, TEST_GATEWAY_URL)
+    gateway = GatewayResources(
+        parent,
+        gateway_endpoint=TEST_GATEWAY_URL,
+        transport=MCPTransport(proxy, session_id=TEST_SESSION_URN),
+    )
+    assert gateway.tools.list()[0].name == "action_search"
+
+
 def test_mcp_jsonrpc_error_raises_protocol_error():
     parent = make_parent([FakeResponse(200, jsonrpc_error(-32601, "method not found"))])
     proxy = _BaseURLProxy(parent._client, TEST_GATEWAY_URL)
@@ -207,7 +252,7 @@ def test_mcp_is_error_raises_gateway_tool_error():
             "class": "rate_limited",
             "message": "slow down",
             "retriable": True,
-            "recovery_hint": "backoff",
+            "recovery_hint": "retry_later",
         },
     }
     parent = make_parent(

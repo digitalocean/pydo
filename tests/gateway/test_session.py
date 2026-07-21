@@ -8,8 +8,10 @@
 from __future__ import annotations
 
 import json
+from types import SimpleNamespace
 
 import pytest
+from azure.core.exceptions import ResourceNotFoundError
 
 from pydo.gateway import (
     SESSION_ID_HEADER,
@@ -65,6 +67,19 @@ def test_sessions_create_requires_end_user_id():
     ops = SessionsOperations(make_parent([]), gateway_endpoint=TEST_GATEWAY_URL)
     with pytest.raises(ValueError, match="end_user_id"):
         ops.create("")
+
+
+def test_sessions_create_404_has_route_diagnostic():
+    response = FakeResponse(
+        404,
+        {"id": "not_found", "message": "Your request could not be routed."},
+    )
+    response.request = SimpleNamespace(
+        url="https://api.digitalocean.com/v2/action-gateway/sessions"
+    )
+    ops = SessionsOperations(make_parent([response]), gateway_endpoint=TEST_GATEWAY_URL)
+    with pytest.raises(ResourceNotFoundError, match="session create returned 404"):
+        ops.create("user-123")
 
 
 def test_sessions_create_posts_to_do_api_and_binds_rest():

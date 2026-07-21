@@ -11,15 +11,20 @@ import asyncio
 import json
 
 import pytest
+from azure.core.exceptions import HttpResponseError
 
+from pydo.aio.gateway import AsyncGatewayResources, AsyncMCPTransport
+from pydo.custom_extensions import _BaseURLProxy
 from pydo.gateway import ChatCompletionsProvider, GatewayToolError, SESSION_ID_HEADER
 
 from .conftest import (
+    TEST_GATEWAY_URL,
     TEST_SESSION_URN,
     AsyncFakeResponse,
     chat_tool_response,
     invoke_envelope,
     make_async_gateway,
+    make_async_parent,
     tool_result,
 )
 
@@ -72,6 +77,30 @@ def test_code_execute_failure_raises():
     )
     with pytest.raises(GatewayToolError, match="crash"):
         _run(gateway.code.execute("1/0"))
+
+
+def test_http_error_reads_async_response_once():
+    response = AsyncFakeResponse(400, "bad request")
+    gateway = make_async_gateway([response])
+    with pytest.raises(HttpResponseError, match="bad request"):
+        _run(gateway.tools.list(include_all=True))
+    assert response.read_calls == 1
+
+
+def test_mcp_transport_parses_sse_response():
+    response = (
+        "event: message\n"
+        'data: {"jsonrpc":"2.0","id":1,"result":{"tools":'
+        '[{"name":"action_search"}]}}\n\n'
+    )
+    parent = make_async_parent([AsyncFakeResponse(200, response)])
+    proxy = _BaseURLProxy(parent._client, TEST_GATEWAY_URL)
+    gateway = AsyncGatewayResources(
+        parent,
+        gateway_endpoint=TEST_GATEWAY_URL,
+        transport=AsyncMCPTransport(proxy, session_id=TEST_SESSION_URN),
+    )
+    assert _run(gateway.tools.list())[0].name == "action_search"
 
 
 def test_tools_callable_and_handle_tool_calls():

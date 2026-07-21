@@ -29,20 +29,23 @@ class ToolErrorClass:
     UNAUTHORIZED = "unauthorized"
     FORBIDDEN = "forbidden"
     RATE_LIMITED = "rate_limited"
+    NOT_FOUND = "not_found"
     TIMEOUT = "timeout"
     UPSTREAM_ERROR = "upstream_error"
     OUTPUT_TOO_LARGE = "output_too_large"
     EXECUTION_FAILED = "execution_failed"
     UNAVAILABLE = "unavailable"
+    CANCELED = "canceled"
 
 
 class RecoveryHint:
     """Machine-routable hint on how a caller should recover from a failure."""
 
     FIX_ARGS = "fix_args"
-    RETRY = "retry"
-    BACKOFF = "backoff"
-    ESCALATE = "escalate"
+    REFRESH_AUTH = "refresh_auth"
+    RETRY_LATER = "retry_later"
+    NARROW_OUTPUT = "narrow_output"
+    CONTACT_SUPPORT = "contact_support"
 
 
 class GatewayToolError(RuntimeError):

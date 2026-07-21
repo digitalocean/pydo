@@ -24,7 +24,6 @@ from azure.core.exceptions import (
     ResourceExistsError,
     ResourceNotFoundError,
     ResourceNotModifiedError,
-    map_error,
 )
 from azure.core.rest import HttpRequest
 
@@ -49,6 +48,7 @@ def resolve_gateway_base_url(explicit: Optional[str] = None) -> str:
     if "://" not in url:
         url = f"https://{url}"
     return url
+
 
 _ERROR_MAP = {
     401: ClientAuthenticationError,
@@ -129,9 +129,13 @@ _META_TOOL_DEFINITIONS: List[Dict[str, Any]] = [
                             "tool_slug": {"type": "string"},
                             "arguments": {"type": "object"},
                         },
+                        "anyOf": [
+                            {"required": ["tool"]},
+                            {"required": ["tool_slug"]},
+                        ],
                     },
                 },
-                "rationale": {"type": "string"},
+                "rationale": {"type": "string", "maxLength": 512},
             },
             "required": ["tools"],
         },
@@ -150,6 +154,10 @@ _META_TOOL_DEFINITIONS: List[Dict[str, Any]] = [
                 "code_to_execute": {"type": "string"},
                 "thought": {"type": "string"},
             },
+            "anyOf": [
+                {"required": ["code"]},
+                {"required": ["code_to_execute"]},
+            ],
         },
     },
 ]
@@ -157,11 +165,6 @@ _META_TOOL_DEFINITIONS: List[Dict[str, Any]] = [
 
 def _response_body_text(response: Any) -> str:
     try:
-        if hasattr(response, "read"):
-            try:
-                response.read()
-            except Exception:  # noqa: BLE001
-                pass
         body = response.text() if hasattr(response, "text") else response.body()
         if isinstance(body, bytes):
             body = body.decode("utf-8", errors="replace")
@@ -172,11 +175,6 @@ def _response_body_text(response: Any) -> str:
 
 def _raise_gateway_http_error(response: Any) -> None:
     body = _response_body_text(response)
-    map_error(
-        status_code=response.status_code,
-        response=response,
-        error_map=_ERROR_MAP,
-    )
     message = body.strip() or getattr(response, "reason", None) or "request failed"
     if response.status_code == 412:
         message = (
@@ -189,6 +187,13 @@ def _raise_gateway_http_error(response: Any) -> None:
         message = (
             "session create returned 404 — is POST /v2/action-gateway/sessions "
             f"available on this API endpoint? {message}"
+        )
+    error_type = _ERROR_MAP.get(response.status_code)
+    if error_type:
+        raise error_type(
+            message=message,
+            response=response,
+            error_format=lambda _body: None,
         )
     raise HttpResponseError(message=message, response=response)
 
@@ -248,6 +253,33 @@ def _parse_json_body(body: Any) -> Any:
 
 
 def _parse_jsonrpc(body: Any) -> Dict[str, Any]:
+    if isinstance(body, bytes):
+        body = body.decode("utf-8", errors="replace")
+    if isinstance(body, str) and any(
+        line.startswith("data:") for line in body.splitlines()
+    ):
+        events = []
+        data_lines = []
+        for line in body.splitlines():
+            if not line:
+                if data_lines:
+                    events.append("\n".join(data_lines))
+                    data_lines = []
+                continue
+            if line.startswith("data:"):
+                data_lines.append(line[5:].lstrip())
+        if data_lines:
+            events.append("\n".join(data_lines))
+        for event in events:
+            try:
+                candidate = _parse_json_body(event)
+            except GatewayProtocolError:
+                continue
+            if isinstance(candidate, dict) and (
+                "result" in candidate or "error" in candidate
+            ):
+                body = candidate
+                break
     envelope = _parse_json_body(body)
     if not isinstance(envelope, dict):
         raise GatewayProtocolError(
@@ -365,7 +397,9 @@ class RESTTransport(GatewayTransport):
             # Invoke returns the batch envelope directly (not ToolResult).
             return _wrap(self._request("POST", _REST_INVOKE_PATH, arguments))
         if name == META_CODE or (meta and name == META_CODE):
-            return _unwrap_tool_result(self._request("POST", _REST_CODE_PATH, arguments))
+            return _unwrap_tool_result(
+                self._request("POST", _REST_CODE_PATH, arguments)
+            )
         # Concrete catalog tool → single-item invoke.
         envelope = self._request(
             "POST",

@@ -49,7 +49,12 @@ class FakeResponse:
 
 
 class AsyncFakeResponse(FakeResponse):
+    def __init__(self, status_code: int, body: Any = None):
+        super().__init__(status_code, body)
+        self.read_calls = 0
+
     async def read(self) -> bytes:  # pylint: disable=invalid-overridden-method
+        self.read_calls += 1
         return self._body_bytes
 
 
