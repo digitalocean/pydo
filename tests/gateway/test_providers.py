@@ -338,9 +338,7 @@ def test_handle_tool_calls_batches_concrete_tools():
     assert sent_request(gateway).url.endswith("/tools/invoke")
     payload = sent_payload(gateway)
     assert payload["rationale"] == "why not"
-    assert payload["tools"] == [
-        {"tool": "web_search", "arguments": {"query": "do"}}
-    ]
+    assert payload["tools"] == [{"tool": "web_search", "arguments": {"query": "do"}}]
 
     assert messages[0]["role"] == "tool"
     assert messages[0]["tool_call_id"] == "call_1"

@@ -56,9 +56,7 @@ def pipeline_calls(gateway) -> int:
 
 
 def test_list_tools_include_all_hits_rest_catalog():
-    gateway = make_gateway(
-        [FakeResponse(200, {"tools": [{"name": "web_search"}]})]
-    )
+    gateway = make_gateway([FakeResponse(200, {"tools": [{"name": "web_search"}]})])
     tools = gateway.tools.list(include_all=True)
     request = sent_request(gateway)
     assert request.method == "GET"
@@ -106,9 +104,7 @@ def test_code_execute_posts_rest():
 
 
 def test_concrete_call_routes_through_invoke():
-    gateway = make_gateway(
-        [FakeResponse(200, invoke_envelope(output={"answer": 42}))]
-    )
+    gateway = make_gateway([FakeResponse(200, invoke_envelope(output={"answer": 42}))])
     result = gateway.tools.call("web_search", {"query": "x"})
     assert sent_request(gateway).url.endswith("/tools/invoke")
     assert result.answer == 42

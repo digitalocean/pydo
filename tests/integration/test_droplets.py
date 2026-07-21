@@ -41,7 +41,6 @@ def test_droplet_attach_volume(integration_client: Client, public_key: bytes):
         }
 
         with shared.with_test_volume(integration_client, **volume_req) as volume:
-
             vol_attach_resp = integration_client.volume_actions.post_by_id(
                 volume["volume"]["id"],
                 {"type": "attach", "droplet_id": droplet["droplet"]["id"]},
