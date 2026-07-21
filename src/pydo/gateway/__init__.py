@@ -5,8 +5,8 @@
 """Action Gateway API — hand-written; preserved across ``make generate``.
 
 Session-first surface: create a session on the DigitalOcean API
-(``POST /v2/sessions``), then discover/invoke tools and run code over the
-gateway REST endpoints with ``X-Session-Id``. Composio-style providers make
+(``POST /v2/action-gateway/sessions``), then discover/invoke tools and run code
+over the gateway REST endpoints with ``X-Session-Id``. Composio-style providers make
 session tools plug into pydo inference surfaces (chat completions, messages,
 responses).
 """

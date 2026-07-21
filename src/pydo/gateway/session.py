@@ -26,7 +26,7 @@ from .transport import (
     session_mcp_url,
 )
 
-_SESSIONS_PATH = "/v2/sessions"
+_SESSIONS_PATH = "/v2/action-gateway/sessions"
 _DEFAULT_POLICY: Dict[str, Any] = {"defaultAction": "allow", "rules": []}
 
 
@@ -137,7 +137,7 @@ class Session:
 
 
 class SessionsOperations:
-    """Create Action Gateway sessions via ``POST /v2/sessions`` on the DO API."""
+    """Create sessions via ``POST /v2/action-gateway/sessions`` on the DO API."""
 
     def __init__(
         self,

@@ -183,12 +183,12 @@ def _raise_gateway_http_error(response: Any) -> None:
             "team is not enabled for the Action Infra release "
             f"(412 Precondition Failed): {message}"
         )
-    if response.status_code == 404 and "/v2/sessions" in (
+    if response.status_code == 404 and "/v2/action-gateway/sessions" in (
         getattr(getattr(response, "request", None), "url", "") or ""
     ):
         message = (
-            "session create returned 404 — is POST /v2/sessions available on "
-            f"this API endpoint? {message}"
+            "session create returned 404 — is POST /v2/action-gateway/sessions "
+            f"available on this API endpoint? {message}"
         )
     raise HttpResponseError(message=message, response=response)
 

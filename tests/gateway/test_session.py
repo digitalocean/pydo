@@ -79,7 +79,7 @@ def test_sessions_create_posts_to_do_api_and_binds_rest():
 
     create_req = parent._client._pipeline.calls[0].request
     assert create_req.method == "POST"
-    assert create_req.url.endswith("/v2/sessions")
+    assert create_req.url.endswith("/v2/action-gateway/sessions")
     body = json.loads(create_req.content)
     assert body["end_user_id"] == "user-123"
     assert json.loads(body["policy_json"]) == {

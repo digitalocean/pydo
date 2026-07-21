@@ -31,7 +31,7 @@ from .custom_operations import (
     async_execute_tool_calls,
 )
 
-_SESSIONS_PATH = "/v2/sessions"
+_SESSIONS_PATH = "/v2/action-gateway/sessions"
 
 
 def _pick(data: Dict[str, Any], *keys: str) -> Any:
@@ -102,7 +102,7 @@ class AsyncSession:
 
 
 class AsyncSessionsOperations:
-    """Async create via ``POST /v2/sessions`` on the DO API."""
+    """Async create via ``POST /v2/action-gateway/sessions`` on the DO API."""
 
     def __init__(
         self,

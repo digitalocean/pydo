@@ -40,7 +40,7 @@ session = client.sessions.create(
 )
 ```
 
-Session create hits `POST /v2/sessions` on `api.digitalocean.com`. Tool calls go to the gateway host (`https://actions.do-ai.run` by default; override with `gateway_endpoint=` or `PYDO_GATEWAY_ENDPOINT`).
+Session create hits `POST /v2/action-gateway/sessions` on `api.digitalocean.com`. Tool calls go to the gateway host (`https://actions.do-ai.run` by default; override with `gateway_endpoint=` or `PYDO_GATEWAY_ENDPOINT`).
 
 `session.url` is the session-pinned MCP URL for external MCP clients:
 
