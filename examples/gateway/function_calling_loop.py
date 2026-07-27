@@ -10,7 +10,6 @@ Optional env:
   PROMPT
 """
 
-import json
 import os
 
 from pydo.action_gateway import ActionGatewayClient
@@ -39,29 +38,12 @@ while True:
         break
 
     messages.append(dict(message))
-    tool_names = {}
-    for tool_call in message["tool_calls"]:
-        function = tool_call["function"]
-        tool_names[tool_call["id"]] = function["name"]
-        print(f"\n[tool call: {function['name']} id={tool_call['id']}]")
-        try:
-            arguments = json.loads(function["arguments"])
-            print(json.dumps(arguments, indent=2))
-        except (TypeError, ValueError):
-            print(function["arguments"])
-
     tool_messages = session.handle_tool_calls(response)
-    if any(name != "action_search" for name in tool_names.values()):
+    if any(
+        tool_call["function"]["name"] != "action_search"
+        for tool_call in message["tool_calls"]
+    ):
         tool_choice = "auto"
-    for tool_message in tool_messages:
-        tool_call_id = tool_message.get("tool_call_id", "unknown")
-        tool_name = tool_names.get(tool_call_id, "unknown")
-        print(f"[tool result: {tool_name} id={tool_call_id}]")
-        try:
-            result = json.loads(tool_message["content"])
-            print(json.dumps(result, indent=2))
-        except (TypeError, ValueError):
-            print(tool_message["content"])
     messages.extend(tool_messages)
 
 print("\nFinal answer:\n")
