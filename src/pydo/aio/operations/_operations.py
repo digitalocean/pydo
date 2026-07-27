@@ -369,6 +369,7 @@ from ...operations._operations import (
     build_genai_update_knowledge_base_data_source_request,
     build_genai_update_knowledge_base_request,
     build_genai_update_model_api_key_request,
+    build_genai_update_model_evaluation_run_request,
     build_genai_update_model_router_request,
     build_genai_update_openai_api_key_request,
     build_genai_update_workspace_request,
@@ -208123,8 +208124,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "user_id": "str",  # Optional. Id of user that created the
                               agent.
                             "uuid": "str",  # Optional. Unique agent id.
-                            "version_hash": "str"  # Optional. The latest version of the
+                            "version_hash": "str",  # Optional. The latest version of the
                               agent.
+                            "web_fetch_enabled": bool,  # Optional. Whether this agent
+                              can use the built-in web_fetch tool to retrieve content from public web
+                              pages.
+                            "web_search_enabled": bool  # Optional. Whether this agent
+                              can use the built-in web_search tool to search the public web for current
+                              information.
                         }
                     ],
                     "links": {
@@ -208306,6 +208313,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                         "str"  # Optional. Agent tag to organize related resources.
                     ],
                     "thinking_token_budget": 0,  # Optional.
+                    "web_fetch_enabled": bool,  # Optional. Whether the agent can use the
+                      built-in web_fetch tool to retrieve content from public web pages.
+                    "web_search_enabled": bool,  # Optional. Whether the agent can use the
+                      built-in web_search tool to search the public web for current information.
                     "workspace_uuid": "str"  # Optional. Identifier for the workspace.
                 }
 
@@ -209336,6 +209347,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "str"  # Optional. VPC Egress IPs.
                         ],
                         "vpc_uuid": "str",  # Optional. An Agent.
+                        "web_fetch_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_fetch tool.
+                        "web_search_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_search tool.
                         "workspace": {
                             "agents": [
                                 ...
@@ -209412,14 +209427,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_MODEL_FIT".
                                             "custom_eval_config": {
                                                 "created_at":
-                                                  "2020-02-20 00:00:00",  # Optional. Timestamp when
-                                                  the custom metric was created. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00",  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                                 "deleted_at":
                                                   "2020-02-20 00:00:00",  # Optional. When set, the
-                                                  custom metric has been deleted and is no longer
-                                                  available for use in evaluations. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  custom metric is soft-deleted and must not appear in
+                                                  pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                   true, each row must provide ground truth and it is
                                                   included in the judge context. When false, ground
@@ -209428,9 +209443,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
                                                 "updated_at":
-                                                  "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                                                  custom metric was last updated. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00"  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                             },
                                             "description": "str",  #
                                               Optional. Evaluations.
@@ -210579,6 +210595,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "str"  # Optional. VPC Egress IPs.
                         ],
                         "vpc_uuid": "str",  # Optional. An Agent.
+                        "web_fetch_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_fetch tool.
+                        "web_search_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_search tool.
                         "workspace": {
                             "agents": [
                                 ...
@@ -210655,14 +210675,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_MODEL_FIT".
                                             "custom_eval_config": {
                                                 "created_at":
-                                                  "2020-02-20 00:00:00",  # Optional. Timestamp when
-                                                  the custom metric was created. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00",  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                                 "deleted_at":
                                                   "2020-02-20 00:00:00",  # Optional. When set, the
-                                                  custom metric has been deleted and is no longer
-                                                  available for use in evaluations. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  custom metric is soft-deleted and must not appear in
+                                                  pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                   true, each row must provide ground truth and it is
                                                   included in the judge context. When false, ground
@@ -210671,9 +210691,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
                                                 "updated_at":
-                                                  "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                                                  custom metric was last updated. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00"  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                             },
                                             "description": "str",  #
                                               Optional. Evaluations.
@@ -210835,6 +210856,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                         "str"  # Optional. Agent tag to organize related resources.
                     ],
                     "thinking_token_budget": 0,  # Optional.
+                    "web_fetch_enabled": bool,  # Optional. Whether the agent can use the
+                      built-in web_fetch tool to retrieve content from public web pages.
+                    "web_search_enabled": bool,  # Optional. Whether the agent can use the
+                      built-in web_search tool to search the public web for current information.
                     "workspace_uuid": "str"  # Optional. Identifier for the workspace.
                 }
 
@@ -211865,6 +211890,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "str"  # Optional. VPC Egress IPs.
                         ],
                         "vpc_uuid": "str",  # Optional. An Agent.
+                        "web_fetch_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_fetch tool.
+                        "web_search_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_search tool.
                         "workspace": {
                             "agents": [
                                 ...
@@ -211941,14 +211970,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_MODEL_FIT".
                                             "custom_eval_config": {
                                                 "created_at":
-                                                  "2020-02-20 00:00:00",  # Optional. Timestamp when
-                                                  the custom metric was created. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00",  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                                 "deleted_at":
                                                   "2020-02-20 00:00:00",  # Optional. When set, the
-                                                  custom metric has been deleted and is no longer
-                                                  available for use in evaluations. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  custom metric is soft-deleted and must not appear in
+                                                  pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                   true, each row must provide ground truth and it is
                                                   included in the judge context. When false, ground
@@ -211957,9 +211986,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
                                                 "updated_at":
-                                                  "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                                                  custom metric was last updated. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00"  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                             },
                                             "description": "str",  #
                                               Optional. Evaluations.
@@ -214141,6 +214171,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "str"  # Optional. VPC Egress IPs.
                         ],
                         "vpc_uuid": "str",  # Optional. An Agent.
+                        "web_fetch_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_fetch tool.
+                        "web_search_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_search tool.
                         "workspace": {
                             "agents": [
                                 ...
@@ -214217,14 +214251,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_MODEL_FIT".
                                             "custom_eval_config": {
                                                 "created_at":
-                                                  "2020-02-20 00:00:00",  # Optional. Timestamp when
-                                                  the custom metric was created. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00",  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                                 "deleted_at":
                                                   "2020-02-20 00:00:00",  # Optional. When set, the
-                                                  custom metric has been deleted and is no longer
-                                                  available for use in evaluations. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  custom metric is soft-deleted and must not appear in
+                                                  pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                   true, each row must provide ground truth and it is
                                                   included in the judge context. When false, ground
@@ -214233,9 +214267,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
                                                 "updated_at":
-                                                  "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                                                  custom metric was last updated. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00"  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                             },
                                             "description": "str",  #
                                               Optional. Evaluations.
@@ -215387,6 +215422,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "str"  # Optional. VPC Egress IPs.
                         ],
                         "vpc_uuid": "str",  # Optional. An Agent.
+                        "web_fetch_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_fetch tool.
+                        "web_search_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_search tool.
                         "workspace": {
                             "agents": [
                                 ...
@@ -215463,14 +215502,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_MODEL_FIT".
                                             "custom_eval_config": {
                                                 "created_at":
-                                                  "2020-02-20 00:00:00",  # Optional. Timestamp when
-                                                  the custom metric was created. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00",  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                                 "deleted_at":
                                                   "2020-02-20 00:00:00",  # Optional. When set, the
-                                                  custom metric has been deleted and is no longer
-                                                  available for use in evaluations. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  custom metric is soft-deleted and must not appear in
+                                                  pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                   true, each row must provide ground truth and it is
                                                   included in the judge context. When false, ground
@@ -215479,9 +215518,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
                                                 "updated_at":
-                                                  "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                                                  custom metric was last updated. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00"  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                             },
                                             "description": "str",  #
                                               Optional. Evaluations.
@@ -216643,6 +216683,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "str"  # Optional. VPC Egress IPs.
                         ],
                         "vpc_uuid": "str",  # Optional. An Agent.
+                        "web_fetch_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_fetch tool.
+                        "web_search_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_search tool.
                         "workspace": {
                             "agents": [
                                 ...
@@ -216719,14 +216763,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_MODEL_FIT".
                                             "custom_eval_config": {
                                                 "created_at":
-                                                  "2020-02-20 00:00:00",  # Optional. Timestamp when
-                                                  the custom metric was created. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00",  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                                 "deleted_at":
                                                   "2020-02-20 00:00:00",  # Optional. When set, the
-                                                  custom metric has been deleted and is no longer
-                                                  available for use in evaluations. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  custom metric is soft-deleted and must not appear in
+                                                  pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                   true, each row must provide ground truth and it is
                                                   included in the judge context. When false, ground
@@ -216735,9 +216779,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
                                                 "updated_at":
-                                                  "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                                                  custom metric was last updated. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00"  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                             },
                                             "description": "str",  #
                                               Optional. Evaluations.
@@ -218002,6 +218047,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "str"  # Optional. VPC Egress IPs.
                         ],
                         "vpc_uuid": "str",  # Optional. An Agent.
+                        "web_fetch_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_fetch tool.
+                        "web_search_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_search tool.
                         "workspace": {
                             "agents": [
                                 ...
@@ -218078,14 +218127,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_MODEL_FIT".
                                             "custom_eval_config": {
                                                 "created_at":
-                                                  "2020-02-20 00:00:00",  # Optional. Timestamp when
-                                                  the custom metric was created. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00",  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                                 "deleted_at":
                                                   "2020-02-20 00:00:00",  # Optional. When set, the
-                                                  custom metric has been deleted and is no longer
-                                                  available for use in evaluations. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  custom metric is soft-deleted and must not appear in
+                                                  pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                   true, each row must provide ground truth and it is
                                                   included in the judge context. When false, ground
@@ -218094,9 +218143,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
                                                 "updated_at":
-                                                  "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                                                  custom metric was last updated. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00"  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                             },
                                             "description": "str",  #
                                               Optional. Evaluations.
@@ -219251,6 +219301,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "str"  # Optional. VPC Egress IPs.
                         ],
                         "vpc_uuid": "str",  # Optional. An Agent.
+                        "web_fetch_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_fetch tool.
+                        "web_search_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_search tool.
                         "workspace": {
                             "agents": [
                                 ...
@@ -219327,14 +219381,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_MODEL_FIT".
                                             "custom_eval_config": {
                                                 "created_at":
-                                                  "2020-02-20 00:00:00",  # Optional. Timestamp when
-                                                  the custom metric was created. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00",  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                                 "deleted_at":
                                                   "2020-02-20 00:00:00",  # Optional. When set, the
-                                                  custom metric has been deleted and is no longer
-                                                  available for use in evaluations. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  custom metric is soft-deleted and must not appear in
+                                                  pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                   true, each row must provide ground truth and it is
                                                   included in the judge context. When false, ground
@@ -219343,9 +219397,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
                                                 "updated_at":
-                                                  "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                                                  custom metric was last updated. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00"  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                             },
                                             "description": "str",  #
                                               Optional. Evaluations.
@@ -220511,6 +220566,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "str"  # Optional. VPC Egress IPs.
                         ],
                         "vpc_uuid": "str",  # Optional. An Agent.
+                        "web_fetch_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_fetch tool.
+                        "web_search_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_search tool.
                         "workspace": {
                             "agents": [
                                 ...
@@ -220587,14 +220646,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_MODEL_FIT".
                                             "custom_eval_config": {
                                                 "created_at":
-                                                  "2020-02-20 00:00:00",  # Optional. Timestamp when
-                                                  the custom metric was created. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00",  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                                 "deleted_at":
                                                   "2020-02-20 00:00:00",  # Optional. When set, the
-                                                  custom metric has been deleted and is no longer
-                                                  available for use in evaluations. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  custom metric is soft-deleted and must not appear in
+                                                  pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                   true, each row must provide ground truth and it is
                                                   included in the judge context. When false, ground
@@ -220603,9 +220662,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
                                                 "updated_at":
-                                                  "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                                                  custom metric was last updated. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00"  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                             },
                                             "description": "str",  #
                                               Optional. Evaluations.
@@ -221845,6 +221905,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "str"  # Optional. VPC Egress IPs.
                         ],
                         "vpc_uuid": "str",  # Optional. An Agent.
+                        "web_fetch_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_fetch tool.
+                        "web_search_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_search tool.
                         "workspace": {
                             "agents": [
                                 ...
@@ -221921,14 +221985,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_MODEL_FIT".
                                             "custom_eval_config": {
                                                 "created_at":
-                                                  "2020-02-20 00:00:00",  # Optional. Timestamp when
-                                                  the custom metric was created. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00",  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                                 "deleted_at":
                                                   "2020-02-20 00:00:00",  # Optional. When set, the
-                                                  custom metric has been deleted and is no longer
-                                                  available for use in evaluations. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  custom metric is soft-deleted and must not appear in
+                                                  pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                   true, each row must provide ground truth and it is
                                                   included in the judge context. When false, ground
@@ -221937,9 +222001,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
                                                 "updated_at":
-                                                  "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                                                  custom metric was last updated. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00"  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                             },
                                             "description": "str",  #
                                               Optional. Evaluations.
@@ -223180,6 +223245,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "str"  # Optional. VPC Egress IPs.
                         ],
                         "vpc_uuid": "str",  # Optional. An Agent.
+                        "web_fetch_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_fetch tool.
+                        "web_search_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_search tool.
                         "workspace": {
                             "agents": [
                                 ...
@@ -223256,14 +223325,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_MODEL_FIT".
                                             "custom_eval_config": {
                                                 "created_at":
-                                                  "2020-02-20 00:00:00",  # Optional. Timestamp when
-                                                  the custom metric was created. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00",  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                                 "deleted_at":
                                                   "2020-02-20 00:00:00",  # Optional. When set, the
-                                                  custom metric has been deleted and is no longer
-                                                  available for use in evaluations. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  custom metric is soft-deleted and must not appear in
+                                                  pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                   true, each row must provide ground truth and it is
                                                   included in the judge context. When false, ground
@@ -223272,9 +223341,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
                                                 "updated_at":
-                                                  "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                                                  custom metric was last updated. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00"  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                             },
                                             "description": "str",  #
                                               Optional. Evaluations.
@@ -224426,6 +224496,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "str"  # Optional. VPC Egress IPs.
                         ],
                         "vpc_uuid": "str",  # Optional. An Agent.
+                        "web_fetch_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_fetch tool.
+                        "web_search_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_search tool.
                         "workspace": {
                             "agents": [
                                 ...
@@ -224502,14 +224576,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_MODEL_FIT".
                                             "custom_eval_config": {
                                                 "created_at":
-                                                  "2020-02-20 00:00:00",  # Optional. Timestamp when
-                                                  the custom metric was created. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00",  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                                 "deleted_at":
                                                   "2020-02-20 00:00:00",  # Optional. When set, the
-                                                  custom metric has been deleted and is no longer
-                                                  available for use in evaluations. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  custom metric is soft-deleted and must not appear in
+                                                  pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                   true, each row must provide ground truth and it is
                                                   included in the judge context. When false, ground
@@ -224518,9 +224592,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
                                                 "updated_at":
-                                                  "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                                                  custom metric was last updated. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00"  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                             },
                                             "description": "str",  #
                                               Optional. Evaluations.
@@ -225678,6 +225753,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "str"  # Optional. VPC Egress IPs.
                         ],
                         "vpc_uuid": "str",  # Optional. An Agent.
+                        "web_fetch_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_fetch tool.
+                        "web_search_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_search tool.
                         "workspace": {
                             "agents": [
                                 ...
@@ -225754,14 +225833,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_MODEL_FIT".
                                             "custom_eval_config": {
                                                 "created_at":
-                                                  "2020-02-20 00:00:00",  # Optional. Timestamp when
-                                                  the custom metric was created. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00",  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                                 "deleted_at":
                                                   "2020-02-20 00:00:00",  # Optional. When set, the
-                                                  custom metric has been deleted and is no longer
-                                                  available for use in evaluations. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  custom metric is soft-deleted and must not appear in
+                                                  pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                   true, each row must provide ground truth and it is
                                                   included in the judge context. When false, ground
@@ -225770,9 +225849,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
                                                 "updated_at":
-                                                  "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                                                  custom metric was last updated. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00"  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                             },
                                             "description": "str",  #
                                               Optional. Evaluations.
@@ -227010,6 +227090,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "str"  # Optional. VPC Egress IPs.
                         ],
                         "vpc_uuid": "str",  # Optional. An Agent.
+                        "web_fetch_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_fetch tool.
+                        "web_search_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_search tool.
                         "workspace": {
                             "agents": [
                                 ...
@@ -227086,14 +227170,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_MODEL_FIT".
                                             "custom_eval_config": {
                                                 "created_at":
-                                                  "2020-02-20 00:00:00",  # Optional. Timestamp when
-                                                  the custom metric was created. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00",  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                                 "deleted_at":
                                                   "2020-02-20 00:00:00",  # Optional. When set, the
-                                                  custom metric has been deleted and is no longer
-                                                  available for use in evaluations. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  custom metric is soft-deleted and must not appear in
+                                                  pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                   true, each row must provide ground truth and it is
                                                   included in the judge context. When false, ground
@@ -227102,9 +227186,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
                                                 "updated_at":
-                                                  "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                                                  custom metric was last updated. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00"  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                             },
                                             "description": "str",  #
                                               Optional. Evaluations.
@@ -228322,6 +228407,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "str"  # Optional. VPC Egress IPs.
                         ],
                         "vpc_uuid": "str",  # Optional. An Agent.
+                        "web_fetch_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_fetch tool.
+                        "web_search_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_search tool.
                         "workspace": {
                             "agents": [
                                 ...
@@ -228398,14 +228487,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_MODEL_FIT".
                                             "custom_eval_config": {
                                                 "created_at":
-                                                  "2020-02-20 00:00:00",  # Optional. Timestamp when
-                                                  the custom metric was created. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00",  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                                 "deleted_at":
                                                   "2020-02-20 00:00:00",  # Optional. When set, the
-                                                  custom metric has been deleted and is no longer
-                                                  available for use in evaluations. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  custom metric is soft-deleted and must not appear in
+                                                  pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                   true, each row must provide ground truth and it is
                                                   included in the judge context. When false, ground
@@ -228414,9 +228503,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
                                                 "updated_at":
-                                                  "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                                                  custom metric was last updated. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00"  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                             },
                                             "description": "str",  #
                                               Optional. Evaluations.
@@ -229637,6 +229727,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "str"  # Optional. VPC Egress IPs.
                         ],
                         "vpc_uuid": "str",  # Optional. An Agent.
+                        "web_fetch_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_fetch tool.
+                        "web_search_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_search tool.
                         "workspace": {
                             "agents": [
                                 ...
@@ -229713,14 +229807,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_MODEL_FIT".
                                             "custom_eval_config": {
                                                 "created_at":
-                                                  "2020-02-20 00:00:00",  # Optional. Timestamp when
-                                                  the custom metric was created. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00",  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                                 "deleted_at":
                                                   "2020-02-20 00:00:00",  # Optional. When set, the
-                                                  custom metric has been deleted and is no longer
-                                                  available for use in evaluations. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  custom metric is soft-deleted and must not appear in
+                                                  pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                   true, each row must provide ground truth and it is
                                                   included in the judge context. When false, ground
@@ -229729,9 +229823,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
                                                 "updated_at":
-                                                  "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                                                  custom metric was last updated. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00"  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                             },
                                             "description": "str",  #
                                               Optional. Evaluations.
@@ -230953,6 +231048,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "str"  # Optional. VPC Egress IPs.
                         ],
                         "vpc_uuid": "str",  # Optional. An Agent.
+                        "web_fetch_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_fetch tool.
+                        "web_search_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_search tool.
                         "workspace": {
                             "agents": [
                                 ...
@@ -231029,14 +231128,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_MODEL_FIT".
                                             "custom_eval_config": {
                                                 "created_at":
-                                                  "2020-02-20 00:00:00",  # Optional. Timestamp when
-                                                  the custom metric was created. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00",  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                                 "deleted_at":
                                                   "2020-02-20 00:00:00",  # Optional. When set, the
-                                                  custom metric has been deleted and is no longer
-                                                  available for use in evaluations. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  custom metric is soft-deleted and must not appear in
+                                                  pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                   true, each row must provide ground truth and it is
                                                   included in the judge context. When false, ground
@@ -231045,9 +231144,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
                                                 "updated_at":
-                                                  "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                                                  custom metric was last updated. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00"  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                             },
                                             "description": "str",  #
                                               Optional. Evaluations.
@@ -232914,6 +233014,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "str"  # Optional. VPC Egress IPs.
                         ],
                         "vpc_uuid": "str",  # Optional. An Agent.
+                        "web_fetch_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_fetch tool.
+                        "web_search_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_search tool.
                         "workspace": {
                             "agents": [
                                 ...
@@ -232990,14 +233094,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_MODEL_FIT".
                                             "custom_eval_config": {
                                                 "created_at":
-                                                  "2020-02-20 00:00:00",  # Optional. Timestamp when
-                                                  the custom metric was created. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00",  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                                 "deleted_at":
                                                   "2020-02-20 00:00:00",  # Optional. When set, the
-                                                  custom metric has been deleted and is no longer
-                                                  available for use in evaluations. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  custom metric is soft-deleted and must not appear in
+                                                  pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                   true, each row must provide ground truth and it is
                                                   included in the judge context. When false, ground
@@ -233006,9 +233110,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
                                                 "updated_at":
-                                                  "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                                                  custom metric was last updated. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00"  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                             },
                                             "description": "str",  #
                                               Optional. Evaluations.
@@ -233281,7 +233386,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                     "top_p": 0.0,  # Optional. Defines the cumulative probability threshold for
                       word selection, specified as a number between 0 and 1. Higher values allow for
                       more diverse outputs, while lower values ensure focused and coherent responses.
-                    "uuid": "str"  # Optional. Unique agent id.
+                    "uuid": "str",  # Optional. Unique agent id.
+                    "web_fetch_enabled": bool,  # Optional. Optional. Set to true to let the
+                      agent use the built-in web_fetch tool to retrieve content from public web pages,
+                      or false to disable it.
+                    "web_search_enabled": bool  # Optional. Optional. Set to true to let the
+                      agent use the built-in web_search tool to search the public web for current
+                      information, or false to disable it.
                 }
 
                 # response body for status code(s): 200
@@ -234311,6 +234422,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "str"  # Optional. VPC Egress IPs.
                         ],
                         "vpc_uuid": "str",  # Optional. An Agent.
+                        "web_fetch_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_fetch tool.
+                        "web_search_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_search tool.
                         "workspace": {
                             "agents": [
                                 ...
@@ -234387,14 +234502,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_MODEL_FIT".
                                             "custom_eval_config": {
                                                 "created_at":
-                                                  "2020-02-20 00:00:00",  # Optional. Timestamp when
-                                                  the custom metric was created. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00",  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                                 "deleted_at":
                                                   "2020-02-20 00:00:00",  # Optional. When set, the
-                                                  custom metric has been deleted and is no longer
-                                                  available for use in evaluations. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  custom metric is soft-deleted and must not appear in
+                                                  pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                   true, each row must provide ground truth and it is
                                                   included in the judge context. When false, ground
@@ -234403,9 +234518,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
                                                 "updated_at":
-                                                  "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                                                  custom metric was last updated. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00"  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                             },
                                             "description": "str",  #
                                               Optional. Evaluations.
@@ -235557,6 +235673,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "str"  # Optional. VPC Egress IPs.
                         ],
                         "vpc_uuid": "str",  # Optional. An Agent.
+                        "web_fetch_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_fetch tool.
+                        "web_search_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_search tool.
                         "workspace": {
                             "agents": [
                                 ...
@@ -235633,14 +235753,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_MODEL_FIT".
                                             "custom_eval_config": {
                                                 "created_at":
-                                                  "2020-02-20 00:00:00",  # Optional. Timestamp when
-                                                  the custom metric was created. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00",  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                                 "deleted_at":
                                                   "2020-02-20 00:00:00",  # Optional. When set, the
-                                                  custom metric has been deleted and is no longer
-                                                  available for use in evaluations. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  custom metric is soft-deleted and must not appear in
+                                                  pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                   true, each row must provide ground truth and it is
                                                   included in the judge context. When false, ground
@@ -235649,9 +235769,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
                                                 "updated_at":
-                                                  "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                                                  custom metric was last updated. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00"  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                             },
                                             "description": "str",  #
                                               Optional. Evaluations.
@@ -235839,7 +235960,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                     "top_p": 0.0,  # Optional. Defines the cumulative probability threshold for
                       word selection, specified as a number between 0 and 1. Higher values allow for
                       more diverse outputs, while lower values ensure focused and coherent responses.
-                    "uuid": "str"  # Optional. Unique agent id.
+                    "uuid": "str",  # Optional. Unique agent id.
+                    "web_fetch_enabled": bool,  # Optional. Optional. Set to true to let the
+                      agent use the built-in web_fetch tool to retrieve content from public web pages,
+                      or false to disable it.
+                    "web_search_enabled": bool  # Optional. Optional. Set to true to let the
+                      agent use the built-in web_search tool to search the public web for current
+                      information, or false to disable it.
                 }
 
                 # response body for status code(s): 200
@@ -236869,6 +236996,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "str"  # Optional. VPC Egress IPs.
                         ],
                         "vpc_uuid": "str",  # Optional. An Agent.
+                        "web_fetch_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_fetch tool.
+                        "web_search_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_search tool.
                         "workspace": {
                             "agents": [
                                 ...
@@ -236945,14 +237076,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_MODEL_FIT".
                                             "custom_eval_config": {
                                                 "created_at":
-                                                  "2020-02-20 00:00:00",  # Optional. Timestamp when
-                                                  the custom metric was created. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00",  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                                 "deleted_at":
                                                   "2020-02-20 00:00:00",  # Optional. When set, the
-                                                  custom metric has been deleted and is no longer
-                                                  available for use in evaluations. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  custom metric is soft-deleted and must not appear in
+                                                  pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                   true, each row must provide ground truth and it is
                                                   included in the judge context. When false, ground
@@ -236961,9 +237092,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
                                                 "updated_at":
-                                                  "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                                                  custom metric was last updated. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00"  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                             },
                                             "description": "str",  #
                                               Optional. Evaluations.
@@ -238196,6 +238328,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "str"  # Optional. VPC Egress IPs.
                         ],
                         "vpc_uuid": "str",  # Optional. An Agent.
+                        "web_fetch_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_fetch tool.
+                        "web_search_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_search tool.
                         "workspace": {
                             "agents": [
                                 ...
@@ -238272,14 +238408,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_MODEL_FIT".
                                             "custom_eval_config": {
                                                 "created_at":
-                                                  "2020-02-20 00:00:00",  # Optional. Timestamp when
-                                                  the custom metric was created. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00",  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                                 "deleted_at":
                                                   "2020-02-20 00:00:00",  # Optional. When set, the
-                                                  custom metric has been deleted and is no longer
-                                                  available for use in evaluations. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  custom metric is soft-deleted and must not appear in
+                                                  pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                   true, each row must provide ground truth and it is
                                                   included in the judge context. When false, ground
@@ -238288,9 +238424,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
                                                 "updated_at":
-                                                  "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                                                  custom metric was last updated. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00"  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                             },
                                             "description": "str",  #
                                               Optional. Evaluations.
@@ -239569,6 +239706,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                 "str"  # Optional. VPC Egress IPs.
                             ],
                             "vpc_uuid": "str",  # Optional. Child agents.
+                            "web_fetch_enabled": bool,  # Optional. Whether this agent
+                              can use the built-in web_fetch tool.
+                            "web_search_enabled": bool,  # Optional. Whether this agent
+                              can use the built-in web_search tool.
                             "workspace": {
                                 "agents": [
                                     ...
@@ -239646,16 +239787,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "custom_eval_config":
                                                   {
                                                     "created_at":
-                                                      "2020-02-20 00:00:00",  # Optional. Timestamp
-                                                      when the custom metric was created.
-                                                      Server-assigned; ignored on create/update
-                                                      requests.
+                                                      "2020-02-20 00:00:00",  # Optional. Configuration
+                                                      for a custom model-evaluation metric scored by an
+                                                      LLM judge. Prompt and model response are always
+                                                      included in the judge context.
                                                     "deleted_at":
                                                       "2020-02-20 00:00:00",  # Optional. When set, the
-                                                      custom metric has been deleted and is no longer
-                                                      available for use in evaluations.
-                                                      Server-assigned; ignored on create/update
-                                                      requests.
+                                                      custom metric is soft-deleted and must not appear
+                                                      in pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                       true, each row must provide ground truth and it
                                                       is included in the judge context. When false,
@@ -239664,10 +239803,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                 "scoring_prompt": "str",  # Optional.
                                                       Instructions for the judge model (multi-line).
                                                     "updated_at":
-                                                      "2020-02-20 00:00:00"  # Optional. Timestamp when
-                                                      the custom metric was last updated.
-                                                      Server-assigned; ignored on create/update
-                                                      requests.
+                                                      "2020-02-20 00:00:00"  # Optional. Configuration
+                                                      for a custom model-evaluation metric scored by an
+                                                      LLM judge. Prompt and model response are always
+                                                      included in the judge context.
                                                 },
                                                 "description": "str",
                                                   # Optional. Evaluations.
@@ -240919,6 +241058,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "str"  # Optional. VPC Egress IPs.
                         ],
                         "vpc_uuid": "str",  # Optional. An Agent.
+                        "web_fetch_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_fetch tool.
+                        "web_search_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_search tool.
                         "workspace": {
                             "agents": [
                                 ...
@@ -240995,14 +241138,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_MODEL_FIT".
                                             "custom_eval_config": {
                                                 "created_at":
-                                                  "2020-02-20 00:00:00",  # Optional. Timestamp when
-                                                  the custom metric was created. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00",  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                                 "deleted_at":
                                                   "2020-02-20 00:00:00",  # Optional. When set, the
-                                                  custom metric has been deleted and is no longer
-                                                  available for use in evaluations. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  custom metric is soft-deleted and must not appear in
+                                                  pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                   true, each row must provide ground truth and it is
                                                   included in the judge context. When false, ground
@@ -241011,9 +241154,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
                                                 "updated_at":
-                                                  "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                                                  custom metric was last updated. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00"  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                             },
                                             "description": "str",  #
                                               Optional. Evaluations.
@@ -242165,6 +242309,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "str"  # Optional. VPC Egress IPs.
                         ],
                         "vpc_uuid": "str",  # Optional. An Agent.
+                        "web_fetch_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_fetch tool.
+                        "web_search_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_search tool.
                         "workspace": {
                             "agents": [
                                 ...
@@ -242241,14 +242389,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_MODEL_FIT".
                                             "custom_eval_config": {
                                                 "created_at":
-                                                  "2020-02-20 00:00:00",  # Optional. Timestamp when
-                                                  the custom metric was created. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00",  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                                 "deleted_at":
                                                   "2020-02-20 00:00:00",  # Optional. When set, the
-                                                  custom metric has been deleted and is no longer
-                                                  available for use in evaluations. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  custom metric is soft-deleted and must not appear in
+                                                  pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                   true, each row must provide ground truth and it is
                                                   included in the judge context. When false, ground
@@ -242257,9 +242405,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
                                                 "updated_at":
-                                                  "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                                                  custom metric was last updated. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00"  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                             },
                                             "description": "str",  #
                                               Optional. Evaluations.
@@ -243417,6 +243566,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "str"  # Optional. VPC Egress IPs.
                         ],
                         "vpc_uuid": "str",  # Optional. An Agent.
+                        "web_fetch_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_fetch tool.
+                        "web_search_enabled": bool,  # Optional. Whether this agent can use
+                          the built-in web_search tool.
                         "workspace": {
                             "agents": [
                                 ...
@@ -243493,14 +243646,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_MODEL_FIT".
                                             "custom_eval_config": {
                                                 "created_at":
-                                                  "2020-02-20 00:00:00",  # Optional. Timestamp when
-                                                  the custom metric was created. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00",  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                                 "deleted_at":
                                                   "2020-02-20 00:00:00",  # Optional. When set, the
-                                                  custom metric has been deleted and is no longer
-                                                  available for use in evaluations. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  custom metric is soft-deleted and must not appear in
+                                                  pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                   true, each row must provide ground truth and it is
                                                   included in the judge context. When false, ground
@@ -243509,9 +243662,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
                                                 "updated_at":
-                                                  "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                                                  custom metric was last updated. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00"  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                             },
                                             "description": "str",  #
                                               Optional. Evaluations.
@@ -246370,6 +246524,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                 "str"  # Optional. VPC Egress IPs.
                             ],
                             "vpc_uuid": "str",  # Optional.
+                            "web_fetch_enabled": bool,  # Optional. Whether this agent
+                              can use the built-in web_fetch tool.
+                            "web_search_enabled": bool,  # Optional. Whether this agent
+                              can use the built-in web_search tool.
                             "workspace": {
                                 "agents": [
                                     ...
@@ -246447,16 +246605,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "custom_eval_config":
                                                   {
                                                     "created_at":
-                                                      "2020-02-20 00:00:00",  # Optional. Timestamp
-                                                      when the custom metric was created.
-                                                      Server-assigned; ignored on create/update
-                                                      requests.
+                                                      "2020-02-20 00:00:00",  # Optional. Configuration
+                                                      for a custom model-evaluation metric scored by an
+                                                      LLM judge. Prompt and model response are always
+                                                      included in the judge context.
                                                     "deleted_at":
                                                       "2020-02-20 00:00:00",  # Optional. When set, the
-                                                      custom metric has been deleted and is no longer
-                                                      available for use in evaluations.
-                                                      Server-assigned; ignored on create/update
-                                                      requests.
+                                                      custom metric is soft-deleted and must not appear
+                                                      in pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                       true, each row must provide ground truth and it
                                                       is included in the judge context. When false,
@@ -246465,10 +246621,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                 "scoring_prompt": "str",  # Optional.
                                                       Instructions for the judge model (multi-line).
                                                     "updated_at":
-                                                      "2020-02-20 00:00:00"  # Optional. Timestamp when
-                                                      the custom metric was last updated.
-                                                      Server-assigned; ignored on create/update
-                                                      requests.
+                                                      "2020-02-20 00:00:00"  # Optional. Configuration
+                                                      for a custom model-evaluation metric scored by an
+                                                      LLM judge. Prompt and model response are always
+                                                      included in the judge context.
                                                 },
                                                 "description": "str",
                                                   # Optional. Evaluations.
@@ -246751,8 +246907,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               when the model was created.
                             "description": "str",  # Optional. Description of the custom
                               model.
-                            "error_message": "str",  # Optional. Error message if the
-                              custom model import or processing failed.
+                            "error_message": "str",  # Optional. User-facing reason the
+                              most recent import failed; empty otherwise.
                             "file_count": 0,  # Optional. Number of files in the model.
                             "input_modalities": [
                                 "str"  # Optional. Input modalities supported (e.g.,
@@ -246930,6 +247086,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
 
                 # JSON input template you can fill out and use as your body input.
                 body = {
+                    "accept_hf_token_storage": bool,  # Optional. Whether the caller accepts
+                      storage of their HuggingFace token for gated model access.
                     "accept_terms_and_conditions": bool,  # Optional. Whether the caller accepts
                       the terms and conditions for importing this model.
                     "description": "str",  # Optional. Description of the model.
@@ -247016,8 +247174,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                         "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp when the
                           model was created.
                         "description": "str",  # Optional. Description of the custom model.
-                        "error_message": "str",  # Optional. Error message if the custom
-                          model import or processing failed.
+                        "error_message": "str",  # Optional. User-facing reason the most
+                          recent import failed; empty otherwise.
                         "file_count": 0,  # Optional. Number of files in the model.
                         "input_modalities": [
                             "str"  # Optional. Input modalities supported (e.g., text,
@@ -247172,8 +247330,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                         "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp when the
                           model was created.
                         "description": "str",  # Optional. Description of the custom model.
-                        "error_message": "str",  # Optional. Error message if the custom
-                          model import or processing failed.
+                        "error_message": "str",  # Optional. User-facing reason the most
+                          recent import failed; empty otherwise.
                         "file_count": 0,  # Optional. Number of files in the model.
                         "input_modalities": [
                             "str"  # Optional. Input modalities supported (e.g., text,
@@ -247269,6 +247427,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
 
                 # JSON input template you can fill out and use as your body input.
                 body = {
+                    "accept_hf_token_storage": bool,  # Optional. Whether the caller accepts
+                      storage of their HuggingFace token for gated model access.
                     "accept_terms_and_conditions": bool,  # Optional. Whether the caller accepts
                       the terms and conditions for importing this model.
                     "description": "str",  # Optional. Description of the model.
@@ -247355,8 +247515,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                         "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp when the
                           model was created.
                         "description": "str",  # Optional. Description of the custom model.
-                        "error_message": "str",  # Optional. Error message if the custom
-                          model import or processing failed.
+                        "error_message": "str",  # Optional. User-facing reason the most
+                          recent import failed; empty otherwise.
                         "file_count": 0,  # Optional. Number of files in the model.
                         "input_modalities": [
                             "str"  # Optional. Input modalities supported (e.g., text,
@@ -247579,8 +247739,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                         "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp when the
                           model was created.
                         "description": "str",  # Optional. Description of the custom model.
-                        "error_message": "str",  # Optional. Error message if the custom
-                          model import or processing failed.
+                        "error_message": "str",  # Optional. User-facing reason the most
+                          recent import failed; empty otherwise.
                         "file_count": 0,  # Optional. Number of files in the model.
                         "input_modalities": [
                             "str"  # Optional. Input modalities supported (e.g., text,
@@ -247871,14 +248031,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                 body = {
                     "description": "str",  # Optional.
                     "input_modalities": [
-                        "str"  # Optional. Input modalities supported (e.g., text, image).
+                        "str"  # Optional. Optional new input modalities for the model
+                          (replaces existing list when non-empty). Spaces-imported models only.
                     ],
-                    "license": "str",  # Optional. License under which the model is distributed.
+                    "license": "str",  # Optional.
                     "name": "str",  # Optional.
                     "output_modalities": [
-                        "str"  # Optional. Output modalities supported (e.g., text, image).
+                        "str"  # Optional. Optional new output modalities for the model
+                          (replaces existing list when non-empty). Spaces-imported models only.
                     ],
-                    "parameters": "str",  # Optional. Number of parameters in the model.
+                    "parameters": "str",  # Optional.
                     "tags": {
                         "tags": [
                             "str"  # Optional. List of tag strings.
@@ -247924,8 +248086,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                         "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp when the
                           model was created.
                         "description": "str",  # Optional. Description of the custom model.
-                        "error_message": "str",  # Optional. Error message if the custom
-                          model import or processing failed.
+                        "error_message": "str",  # Optional. User-facing reason the most
+                          recent import failed; empty otherwise.
                         "file_count": 0,  # Optional. Number of files in the model.
                         "input_modalities": [
                             "str"  # Optional. Input modalities supported (e.g., text,
@@ -248058,8 +248220,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                         "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp when the
                           model was created.
                         "description": "str",  # Optional. Description of the custom model.
-                        "error_message": "str",  # Optional. Error message if the custom
-                          model import or processing failed.
+                        "error_message": "str",  # Optional. User-facing reason the most
+                          recent import failed; empty otherwise.
                         "file_count": 0,  # Optional. Number of files in the model.
                         "input_modalities": [
                             "str"  # Optional. Input modalities supported (e.g., text,
@@ -248151,14 +248313,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                 body = {
                     "description": "str",  # Optional.
                     "input_modalities": [
-                        "str"  # Optional. Input modalities supported (e.g., text, image).
+                        "str"  # Optional. Optional new input modalities for the model
+                          (replaces existing list when non-empty). Spaces-imported models only.
                     ],
-                    "license": "str",  # Optional. License under which the model is distributed.
+                    "license": "str",  # Optional.
                     "name": "str",  # Optional.
                     "output_modalities": [
-                        "str"  # Optional. Output modalities supported (e.g., text, image).
+                        "str"  # Optional. Optional new output modalities for the model
+                          (replaces existing list when non-empty). Spaces-imported models only.
                     ],
-                    "parameters": "str",  # Optional. Number of parameters in the model.
+                    "parameters": "str",  # Optional.
                     "tags": {
                         "tags": [
                             "str"  # Optional. List of tag strings.
@@ -248204,8 +248368,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                         "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp when the
                           model was created.
                         "description": "str",  # Optional. Description of the custom model.
-                        "error_message": "str",  # Optional. Error message if the custom
-                          model import or processing failed.
+                        "error_message": "str",  # Optional. User-facing reason the most
+                          recent import failed; empty otherwise.
                         "file_count": 0,  # Optional. Number of files in the model.
                         "input_modalities": [
                             "str"  # Optional. Input modalities supported (e.g., text,
@@ -249275,12 +249439,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               "METRIC_CATEGORY_CONTEXT_QUALITY", and "METRIC_CATEGORY_MODEL_FIT".
                             "custom_eval_config": {
                                 "created_at": "2020-02-20 00:00:00",  # Optional.
-                                  Timestamp when the custom metric was created. Server-assigned;
-                                  ignored on create/update requests.
+                                  Configuration for a custom model-evaluation metric scored by an LLM
+                                  judge. Prompt and model response are always included in the judge
+                                  context.
                                 "deleted_at": "2020-02-20 00:00:00",  # Optional.
-                                  When set, the custom metric has been deleted and is no longer
-                                  available for use in evaluations. Server-assigned; ignored on
-                                  create/update requests.
+                                  When set, the custom metric is soft-deleted and must not appear in
+                                  pickers.
                                 "requires_ground_truth": bool,  # Optional. When
                                   true, each row must provide ground truth and it is included in the
                                   judge context. When false, ground truth is not required and is not
@@ -249288,8 +249452,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                 "scoring_prompt": "str",  # Optional. Instructions
                                   for the judge model (multi-line).
                                 "updated_at": "2020-02-20 00:00:00"  # Optional.
-                                  Timestamp when the custom metric was last updated. Server-assigned;
-                                  ignored on create/update requests.
+                                  Configuration for a custom model-evaluation metric scored by an LLM
+                                  judge. Prompt and model response are always included in the judge
+                                  context.
                             },
                             "description": "str",  # Optional.
                             "evaluation_scope": "EVALUATION_SCOPE_UNSPECIFIED",  #
@@ -249445,20 +249610,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                 # JSON input template you can fill out and use as your body input.
                 body = {
                     "config": {
-                        "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp when the
-                          custom metric was created. Server-assigned; ignored on create/update
-                          requests.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Configuration for a
+                          custom model-evaluation metric scored by an LLM judge. Prompt and model
+                          response are always included in the judge context.
                         "deleted_at": "2020-02-20 00:00:00",  # Optional. When set, the
-                          custom metric has been deleted and is no longer available for use in
-                          evaluations. Server-assigned; ignored on create/update requests.
+                          custom metric is soft-deleted and must not appear in pickers.
                         "requires_ground_truth": bool,  # Optional. When true, each row must
                           provide ground truth and it is included in the judge context. When false,
                           ground truth is not required and is not sent to the judge.
                         "scoring_prompt": "str",  # Optional. Instructions for the judge
                           model (multi-line).
-                        "updated_at": "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                          custom metric was last updated. Server-assigned; ignored on create/update
-                          requests.
+                        "updated_at": "2020-02-20 00:00:00"  # Optional. Configuration for a
+                          custom model-evaluation metric scored by an LLM judge. Prompt and model
+                          response are always included in the judge context.
                     },
                     "description": "str",  # Optional.
                     "metric_name": "str"  # Optional.
@@ -249482,20 +249646,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           "METRIC_CATEGORY_USER_OUTCOMES", "METRIC_CATEGORY_SAFETY_AND_SECURITY",
                           "METRIC_CATEGORY_CONTEXT_QUALITY", and "METRIC_CATEGORY_MODEL_FIT".
                         "custom_eval_config": {
-                            "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp
-                              when the custom metric was created. Server-assigned; ignored on
-                              create/update requests.
+                            "created_at": "2020-02-20 00:00:00",  # Optional.
+                              Configuration for a custom model-evaluation metric scored by an LLM
+                              judge. Prompt and model response are always included in the judge
+                              context.
                             "deleted_at": "2020-02-20 00:00:00",  # Optional. When set,
-                              the custom metric has been deleted and is no longer available for use in
-                              evaluations. Server-assigned; ignored on create/update requests.
+                              the custom metric is soft-deleted and must not appear in pickers.
                             "requires_ground_truth": bool,  # Optional. When true, each
                               row must provide ground truth and it is included in the judge context.
                               When false, ground truth is not required and is not sent to the judge.
                             "scoring_prompt": "str",  # Optional. Instructions for the
                               judge model (multi-line).
-                            "updated_at": "2020-02-20 00:00:00"  # Optional. Timestamp
-                              when the custom metric was last updated. Server-assigned; ignored on
-                              create/update requests.
+                            "updated_at": "2020-02-20 00:00:00"  # Optional.
+                              Configuration for a custom model-evaluation metric scored by an LLM
+                              judge. Prompt and model response are always included in the judge
+                              context.
                         },
                         "description": "str",  # Optional.
                         "evaluation_scope": "EVALUATION_SCOPE_UNSPECIFIED",  # Optional.
@@ -249584,20 +249749,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           "METRIC_CATEGORY_USER_OUTCOMES", "METRIC_CATEGORY_SAFETY_AND_SECURITY",
                           "METRIC_CATEGORY_CONTEXT_QUALITY", and "METRIC_CATEGORY_MODEL_FIT".
                         "custom_eval_config": {
-                            "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp
-                              when the custom metric was created. Server-assigned; ignored on
-                              create/update requests.
+                            "created_at": "2020-02-20 00:00:00",  # Optional.
+                              Configuration for a custom model-evaluation metric scored by an LLM
+                              judge. Prompt and model response are always included in the judge
+                              context.
                             "deleted_at": "2020-02-20 00:00:00",  # Optional. When set,
-                              the custom metric has been deleted and is no longer available for use in
-                              evaluations. Server-assigned; ignored on create/update requests.
+                              the custom metric is soft-deleted and must not appear in pickers.
                             "requires_ground_truth": bool,  # Optional. When true, each
                               row must provide ground truth and it is included in the judge context.
                               When false, ground truth is not required and is not sent to the judge.
                             "scoring_prompt": "str",  # Optional. Instructions for the
                               judge model (multi-line).
-                            "updated_at": "2020-02-20 00:00:00"  # Optional. Timestamp
-                              when the custom metric was last updated. Server-assigned; ignored on
-                              create/update requests.
+                            "updated_at": "2020-02-20 00:00:00"  # Optional.
+                              Configuration for a custom model-evaluation metric scored by an LLM
+                              judge. Prompt and model response are always included in the judge
+                              context.
                         },
                         "description": "str",  # Optional.
                         "evaluation_scope": "EVALUATION_SCOPE_UNSPECIFIED",  # Optional.
@@ -249664,20 +249830,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                 # JSON input template you can fill out and use as your body input.
                 body = {
                     "config": {
-                        "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp when the
-                          custom metric was created. Server-assigned; ignored on create/update
-                          requests.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Configuration for a
+                          custom model-evaluation metric scored by an LLM judge. Prompt and model
+                          response are always included in the judge context.
                         "deleted_at": "2020-02-20 00:00:00",  # Optional. When set, the
-                          custom metric has been deleted and is no longer available for use in
-                          evaluations. Server-assigned; ignored on create/update requests.
+                          custom metric is soft-deleted and must not appear in pickers.
                         "requires_ground_truth": bool,  # Optional. When true, each row must
                           provide ground truth and it is included in the judge context. When false,
                           ground truth is not required and is not sent to the judge.
                         "scoring_prompt": "str",  # Optional. Instructions for the judge
                           model (multi-line).
-                        "updated_at": "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                          custom metric was last updated. Server-assigned; ignored on create/update
-                          requests.
+                        "updated_at": "2020-02-20 00:00:00"  # Optional. Configuration for a
+                          custom model-evaluation metric scored by an LLM judge. Prompt and model
+                          response are always included in the judge context.
                     },
                     "description": "str",  # Optional.
                     "metric_name": "str"  # Optional.
@@ -249701,20 +249866,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           "METRIC_CATEGORY_USER_OUTCOMES", "METRIC_CATEGORY_SAFETY_AND_SECURITY",
                           "METRIC_CATEGORY_CONTEXT_QUALITY", and "METRIC_CATEGORY_MODEL_FIT".
                         "custom_eval_config": {
-                            "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp
-                              when the custom metric was created. Server-assigned; ignored on
-                              create/update requests.
+                            "created_at": "2020-02-20 00:00:00",  # Optional.
+                              Configuration for a custom model-evaluation metric scored by an LLM
+                              judge. Prompt and model response are always included in the judge
+                              context.
                             "deleted_at": "2020-02-20 00:00:00",  # Optional. When set,
-                              the custom metric has been deleted and is no longer available for use in
-                              evaluations. Server-assigned; ignored on create/update requests.
+                              the custom metric is soft-deleted and must not appear in pickers.
                             "requires_ground_truth": bool,  # Optional. When true, each
                               row must provide ground truth and it is included in the judge context.
                               When false, ground truth is not required and is not sent to the judge.
                             "scoring_prompt": "str",  # Optional. Instructions for the
                               judge model (multi-line).
-                            "updated_at": "2020-02-20 00:00:00"  # Optional. Timestamp
-                              when the custom metric was last updated. Server-assigned; ignored on
-                              create/update requests.
+                            "updated_at": "2020-02-20 00:00:00"  # Optional.
+                              Configuration for a custom model-evaluation metric scored by an LLM
+                              judge. Prompt and model response are always included in the judge
+                              context.
                         },
                         "description": "str",  # Optional.
                         "evaluation_scope": "EVALUATION_SCOPE_UNSPECIFIED",  # Optional.
@@ -249884,20 +250050,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                 # JSON input template you can fill out and use as your body input.
                 body = {
                     "config": {
-                        "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp when the
-                          custom metric was created. Server-assigned; ignored on create/update
-                          requests.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Configuration for a
+                          custom model-evaluation metric scored by an LLM judge. Prompt and model
+                          response are always included in the judge context.
                         "deleted_at": "2020-02-20 00:00:00",  # Optional. When set, the
-                          custom metric has been deleted and is no longer available for use in
-                          evaluations. Server-assigned; ignored on create/update requests.
+                          custom metric is soft-deleted and must not appear in pickers.
                         "requires_ground_truth": bool,  # Optional. When true, each row must
                           provide ground truth and it is included in the judge context. When false,
                           ground truth is not required and is not sent to the judge.
                         "scoring_prompt": "str",  # Optional. Instructions for the judge
                           model (multi-line).
-                        "updated_at": "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                          custom metric was last updated. Server-assigned; ignored on create/update
-                          requests.
+                        "updated_at": "2020-02-20 00:00:00"  # Optional. Configuration for a
+                          custom model-evaluation metric scored by an LLM judge. Prompt and model
+                          response are always included in the judge context.
                     },
                     "description": "str",  # Optional.
                     "metric_name": "str",  # Optional.
@@ -249922,20 +250087,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           "METRIC_CATEGORY_USER_OUTCOMES", "METRIC_CATEGORY_SAFETY_AND_SECURITY",
                           "METRIC_CATEGORY_CONTEXT_QUALITY", and "METRIC_CATEGORY_MODEL_FIT".
                         "custom_eval_config": {
-                            "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp
-                              when the custom metric was created. Server-assigned; ignored on
-                              create/update requests.
+                            "created_at": "2020-02-20 00:00:00",  # Optional.
+                              Configuration for a custom model-evaluation metric scored by an LLM
+                              judge. Prompt and model response are always included in the judge
+                              context.
                             "deleted_at": "2020-02-20 00:00:00",  # Optional. When set,
-                              the custom metric has been deleted and is no longer available for use in
-                              evaluations. Server-assigned; ignored on create/update requests.
+                              the custom metric is soft-deleted and must not appear in pickers.
                             "requires_ground_truth": bool,  # Optional. When true, each
                               row must provide ground truth and it is included in the judge context.
                               When false, ground truth is not required and is not sent to the judge.
                             "scoring_prompt": "str",  # Optional. Instructions for the
                               judge model (multi-line).
-                            "updated_at": "2020-02-20 00:00:00"  # Optional. Timestamp
-                              when the custom metric was last updated. Server-assigned; ignored on
-                              create/update requests.
+                            "updated_at": "2020-02-20 00:00:00"  # Optional.
+                              Configuration for a custom model-evaluation metric scored by an LLM
+                              judge. Prompt and model response are always included in the judge
+                              context.
                         },
                         "description": "str",  # Optional.
                         "evaluation_scope": "EVALUATION_SCOPE_UNSPECIFIED",  # Optional.
@@ -250027,20 +250193,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           "METRIC_CATEGORY_USER_OUTCOMES", "METRIC_CATEGORY_SAFETY_AND_SECURITY",
                           "METRIC_CATEGORY_CONTEXT_QUALITY", and "METRIC_CATEGORY_MODEL_FIT".
                         "custom_eval_config": {
-                            "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp
-                              when the custom metric was created. Server-assigned; ignored on
-                              create/update requests.
+                            "created_at": "2020-02-20 00:00:00",  # Optional.
+                              Configuration for a custom model-evaluation metric scored by an LLM
+                              judge. Prompt and model response are always included in the judge
+                              context.
                             "deleted_at": "2020-02-20 00:00:00",  # Optional. When set,
-                              the custom metric has been deleted and is no longer available for use in
-                              evaluations. Server-assigned; ignored on create/update requests.
+                              the custom metric is soft-deleted and must not appear in pickers.
                             "requires_ground_truth": bool,  # Optional. When true, each
                               row must provide ground truth and it is included in the judge context.
                               When false, ground truth is not required and is not sent to the judge.
                             "scoring_prompt": "str",  # Optional. Instructions for the
                               judge model (multi-line).
-                            "updated_at": "2020-02-20 00:00:00"  # Optional. Timestamp
-                              when the custom metric was last updated. Server-assigned; ignored on
-                              create/update requests.
+                            "updated_at": "2020-02-20 00:00:00"  # Optional.
+                              Configuration for a custom model-evaluation metric scored by an LLM
+                              judge. Prompt and model response are always included in the judge
+                              context.
                         },
                         "description": "str",  # Optional.
                         "evaluation_scope": "EVALUATION_SCOPE_UNSPECIFIED",  # Optional.
@@ -250112,20 +250279,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                 # JSON input template you can fill out and use as your body input.
                 body = {
                     "config": {
-                        "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp when the
-                          custom metric was created. Server-assigned; ignored on create/update
-                          requests.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Configuration for a
+                          custom model-evaluation metric scored by an LLM judge. Prompt and model
+                          response are always included in the judge context.
                         "deleted_at": "2020-02-20 00:00:00",  # Optional. When set, the
-                          custom metric has been deleted and is no longer available for use in
-                          evaluations. Server-assigned; ignored on create/update requests.
+                          custom metric is soft-deleted and must not appear in pickers.
                         "requires_ground_truth": bool,  # Optional. When true, each row must
                           provide ground truth and it is included in the judge context. When false,
                           ground truth is not required and is not sent to the judge.
                         "scoring_prompt": "str",  # Optional. Instructions for the judge
                           model (multi-line).
-                        "updated_at": "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                          custom metric was last updated. Server-assigned; ignored on create/update
-                          requests.
+                        "updated_at": "2020-02-20 00:00:00"  # Optional. Configuration for a
+                          custom model-evaluation metric scored by an LLM judge. Prompt and model
+                          response are always included in the judge context.
                     },
                     "description": "str",  # Optional.
                     "metric_name": "str",  # Optional.
@@ -250150,20 +250316,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           "METRIC_CATEGORY_USER_OUTCOMES", "METRIC_CATEGORY_SAFETY_AND_SECURITY",
                           "METRIC_CATEGORY_CONTEXT_QUALITY", and "METRIC_CATEGORY_MODEL_FIT".
                         "custom_eval_config": {
-                            "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp
-                              when the custom metric was created. Server-assigned; ignored on
-                              create/update requests.
+                            "created_at": "2020-02-20 00:00:00",  # Optional.
+                              Configuration for a custom model-evaluation metric scored by an LLM
+                              judge. Prompt and model response are always included in the judge
+                              context.
                             "deleted_at": "2020-02-20 00:00:00",  # Optional. When set,
-                              the custom metric has been deleted and is no longer available for use in
-                              evaluations. Server-assigned; ignored on create/update requests.
+                              the custom metric is soft-deleted and must not appear in pickers.
                             "requires_ground_truth": bool,  # Optional. When true, each
                               row must provide ground truth and it is included in the judge context.
                               When false, ground truth is not required and is not sent to the judge.
                             "scoring_prompt": "str",  # Optional. Instructions for the
                               judge model (multi-line).
-                            "updated_at": "2020-02-20 00:00:00"  # Optional. Timestamp
-                              when the custom metric was last updated. Server-assigned; ignored on
-                              create/update requests.
+                            "updated_at": "2020-02-20 00:00:00"  # Optional.
+                              Configuration for a custom model-evaluation metric scored by an LLM
+                              judge. Prompt and model response are always included in the judge
+                              context.
                         },
                         "description": "str",  # Optional.
                         "evaluation_scope": "EVALUATION_SCOPE_UNSPECIFIED",  # Optional.
@@ -250699,6 +250866,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                 "error_description": "str",  # Optional. Error
                                   description if the metric could not be calculated.
                                 "metric_name": "str",  # Optional. Metric name.
+                                "metric_uuid": "str",  # Optional. Metric UUID
+                                  (built-in or custom); stable key for results UI and aggregation.
                                 "metric_value_type": "METRIC_VALUE_TYPE_UNSPECIFIED",
                                   # Optional. Default value is "METRIC_VALUE_TYPE_UNSPECIFIED". Known
                                   values are: "METRIC_VALUE_TYPE_UNSPECIFIED",
@@ -250708,6 +250877,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   metric as a number.
                                 "reasoning": "str",  # Optional. Reasoning of the
                                   metric result.
+                                "status":
+                                  "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",  # Optional. Default
+                                  value is "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED". Outcome of
+                                  scoring a single metric for one prompt or span. Known values are:
+                                  "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",
+                                  "EVALUATION_METRIC_RESULT_STATUS_COMPLETED",
+                                  "EVALUATION_METRIC_RESULT_STATUS_FAILED", and
+                                  "EVALUATION_METRIC_RESULT_STATUS_SKIPPED".
                                 "string_value": "str"  # Optional. The value of the
                                   metric as a string.
                             }
@@ -250717,6 +250894,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "error_description": "str",  # Optional. Error description if
                               the metric could not be calculated.
                             "metric_name": "str",  # Optional. Metric name.
+                            "metric_uuid": "str",  # Optional. Metric UUID (built-in or
+                              custom); stable key for results UI and aggregation.
                             "metric_value_type": "METRIC_VALUE_TYPE_UNSPECIFIED",  #
                               Optional. Default value is "METRIC_VALUE_TYPE_UNSPECIFIED". Known values
                               are: "METRIC_VALUE_TYPE_UNSPECIFIED", "METRIC_VALUE_TYPE_NUMBER",
@@ -250725,6 +250904,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               a number.
                             "reasoning": "str",  # Optional. Reasoning of the metric
                               result.
+                            "status": "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",  #
+                              Optional. Default value is "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED".
+                              Outcome of scoring a single metric for one prompt or span. Known values
+                              are: "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",
+                              "EVALUATION_METRIC_RESULT_STATUS_COMPLETED",
+                              "EVALUATION_METRIC_RESULT_STATUS_FAILED", and
+                              "EVALUATION_METRIC_RESULT_STATUS_SKIPPED".
                             "string_value": "str"  # Optional. The value of the metric as
                               a string.
                         },
@@ -250885,6 +251071,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                 "error_description": "str",  # Optional. Error
                                   description if the metric could not be calculated.
                                 "metric_name": "str",  # Optional. Metric name.
+                                "metric_uuid": "str",  # Optional. Metric UUID
+                                  (built-in or custom); stable key for results UI and aggregation.
                                 "metric_value_type": "METRIC_VALUE_TYPE_UNSPECIFIED",
                                   # Optional. Default value is "METRIC_VALUE_TYPE_UNSPECIFIED". Known
                                   values are: "METRIC_VALUE_TYPE_UNSPECIFIED",
@@ -250894,6 +251082,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   metric as a number.
                                 "reasoning": "str",  # Optional. Reasoning of the
                                   metric result.
+                                "status":
+                                  "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",  # Optional. Default
+                                  value is "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED". Outcome of
+                                  scoring a single metric for one prompt or span. Known values are:
+                                  "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",
+                                  "EVALUATION_METRIC_RESULT_STATUS_COMPLETED",
+                                  "EVALUATION_METRIC_RESULT_STATUS_FAILED", and
+                                  "EVALUATION_METRIC_RESULT_STATUS_SKIPPED".
                                 "string_value": "str"  # Optional. The value of the
                                   metric as a string.
                             }
@@ -250903,6 +251099,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "error_description": "str",  # Optional. Error description if
                               the metric could not be calculated.
                             "metric_name": "str",  # Optional. Metric name.
+                            "metric_uuid": "str",  # Optional. Metric UUID (built-in or
+                              custom); stable key for results UI and aggregation.
                             "metric_value_type": "METRIC_VALUE_TYPE_UNSPECIFIED",  #
                               Optional. Default value is "METRIC_VALUE_TYPE_UNSPECIFIED". Known values
                               are: "METRIC_VALUE_TYPE_UNSPECIFIED", "METRIC_VALUE_TYPE_NUMBER",
@@ -250911,6 +251109,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               a number.
                             "reasoning": "str",  # Optional. Reasoning of the metric
                               result.
+                            "status": "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",  #
+                              Optional. Default value is "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED".
+                              Outcome of scoring a single metric for one prompt or span. Known values
+                              are: "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",
+                              "EVALUATION_METRIC_RESULT_STATUS_COMPLETED",
+                              "EVALUATION_METRIC_RESULT_STATUS_FAILED", and
+                              "EVALUATION_METRIC_RESULT_STATUS_SKIPPED".
                             "string_value": "str"  # Optional. The value of the metric as
                               a string.
                         },
@@ -250974,6 +251179,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               calculated.
                                             "metric_name": "str",  #
                                               Optional. Metric name.
+                                            "metric_uuid": "str",  #
+                                              Optional. Metric UUID (built-in or custom); stable key
+                                              for results UI and aggregation.
                                             "metric_value_type":
                                               "METRIC_VALUE_TYPE_UNSPECIFIED",  # Optional. Default
                                               value is "METRIC_VALUE_TYPE_UNSPECIFIED". Known values
@@ -250984,6 +251192,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               Optional. The value of the metric as a number.
                                             "reasoning": "str",  #
                                               Optional. Reasoning of the metric result.
+                                            "status":
+                                              "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",  #
+                                              Optional. Default value is
+                                              "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED". Outcome of
+                                              scoring a single metric for one prompt or span. Known
+                                              values are:
+                                              "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",
+                                              "EVALUATION_METRIC_RESULT_STATUS_COMPLETED",
+                                              "EVALUATION_METRIC_RESULT_STATUS_FAILED", and
+                                              "EVALUATION_METRIC_RESULT_STATUS_SKIPPED".
                                             "string_value": "str"  #
                                               Optional. The value of the metric as a string.
                                         }
@@ -251186,6 +251404,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       Error description if the metric could not be calculated.
                                     "metric_name": "str",  # Optional. Metric
                                       name.
+                                    "metric_uuid": "str",  # Optional. Metric
+                                      UUID (built-in or custom); stable key for results UI and
+                                      aggregation.
                                     "metric_value_type":
                                       "METRIC_VALUE_TYPE_UNSPECIFIED",  # Optional. Default value is
                                       "METRIC_VALUE_TYPE_UNSPECIFIED". Known values are:
@@ -251195,6 +251416,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       of the metric as a number.
                                     "reasoning": "str",  # Optional. Reasoning of
                                       the metric result.
+                                    "status":
+                                      "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",  # Optional.
+                                      Default value is "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED".
+                                      Outcome of scoring a single metric for one prompt or span. Known
+                                      values are: "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",
+                                      "EVALUATION_METRIC_RESULT_STATUS_COMPLETED",
+                                      "EVALUATION_METRIC_RESULT_STATUS_FAILED", and
+                                      "EVALUATION_METRIC_RESULT_STATUS_SKIPPED".
                                     "string_value": "str"  # Optional. The value
                                       of the metric as a string.
                                 }
@@ -251351,6 +251580,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           calculated.
                                         "metric_name": "str",  # Optional.
                                           Metric name.
+                                        "metric_uuid": "str",  # Optional.
+                                          Metric UUID (built-in or custom); stable key for results UI
+                                          and aggregation.
                                         "metric_value_type":
                                           "METRIC_VALUE_TYPE_UNSPECIFIED",  # Optional. Default value
                                           is "METRIC_VALUE_TYPE_UNSPECIFIED". Known values are:
@@ -251361,6 +251593,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           value of the metric as a number.
                                         "reasoning": "str",  # Optional.
                                           Reasoning of the metric result.
+                                        "status":
+                                          "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",  # Optional.
+                                          Default value is
+                                          "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED". Outcome of
+                                          scoring a single metric for one prompt or span. Known values
+                                          are: "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",
+                                          "EVALUATION_METRIC_RESULT_STATUS_COMPLETED",
+                                          "EVALUATION_METRIC_RESULT_STATUS_FAILED", and
+                                          "EVALUATION_METRIC_RESULT_STATUS_SKIPPED".
                                         "string_value": "str"  # Optional.
                                           The value of the metric as a string.
                                     }
@@ -251564,6 +251805,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                 "error_description": "str",  # Optional. Error
                                   description if the metric could not be calculated.
                                 "metric_name": "str",  # Optional. Metric name.
+                                "metric_uuid": "str",  # Optional. Metric UUID
+                                  (built-in or custom); stable key for results UI and aggregation.
                                 "metric_value_type": "METRIC_VALUE_TYPE_UNSPECIFIED",
                                   # Optional. Default value is "METRIC_VALUE_TYPE_UNSPECIFIED". Known
                                   values are: "METRIC_VALUE_TYPE_UNSPECIFIED",
@@ -251573,6 +251816,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   metric as a number.
                                 "reasoning": "str",  # Optional. Reasoning of the
                                   metric result.
+                                "status":
+                                  "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",  # Optional. Default
+                                  value is "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED". Outcome of
+                                  scoring a single metric for one prompt or span. Known values are:
+                                  "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",
+                                  "EVALUATION_METRIC_RESULT_STATUS_COMPLETED",
+                                  "EVALUATION_METRIC_RESULT_STATUS_FAILED", and
+                                  "EVALUATION_METRIC_RESULT_STATUS_SKIPPED".
                                 "string_value": "str"  # Optional. The value of the
                                   metric as a string.
                             }
@@ -251752,12 +252003,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       "METRIC_CATEGORY_MODEL_FIT".
                                     "custom_eval_config": {
                                         "created_at": "2020-02-20 00:00:00",
-                                          # Optional. Timestamp when the custom metric was created.
-                                          Server-assigned; ignored on create/update requests.
+                                          # Optional. Configuration for a custom model-evaluation
+                                          metric scored by an LLM judge. Prompt and model response are
+                                          always included in the judge context.
                                         "deleted_at": "2020-02-20 00:00:00",
-                                          # Optional. When set, the custom metric has been deleted and
-                                          is no longer available for use in evaluations.
-                                          Server-assigned; ignored on create/update requests.
+                                          # Optional. When set, the custom metric is soft-deleted and
+                                          must not appear in pickers.
                                         "requires_ground_truth": bool,  #
                                           Optional. When true, each row must provide ground truth and
                                           it is included in the judge context. When false, ground truth
@@ -251765,8 +252016,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "scoring_prompt": "str",  # Optional.
                                           Instructions for the judge model (multi-line).
                                         "updated_at": "2020-02-20 00:00:00"
-                                          # Optional. Timestamp when the custom metric was last
-                                          updated. Server-assigned; ignored on create/update requests.
+                                          # Optional. Configuration for a custom model-evaluation
+                                          metric scored by an LLM judge. Prompt and model response are
+                                          always included in the judge context.
                                     },
                                     "description": "str",  # Optional.
                                       Alternative way of authentication for internal usage only -
@@ -252256,6 +252508,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       Error description if the metric could not be calculated.
                                     "metric_name": "str",  # Optional. Metric
                                       name.
+                                    "metric_uuid": "str",  # Optional. Metric
+                                      UUID (built-in or custom); stable key for results UI and
+                                      aggregation.
                                     "metric_value_type":
                                       "METRIC_VALUE_TYPE_UNSPECIFIED",  # Optional. Default value is
                                       "METRIC_VALUE_TYPE_UNSPECIFIED". Known values are:
@@ -252265,6 +252520,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       of the metric as a number.
                                     "reasoning": "str",  # Optional. Reasoning of
                                       the metric result.
+                                    "status":
+                                      "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",  # Optional.
+                                      Default value is "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED".
+                                      Outcome of scoring a single metric for one prompt or span. Known
+                                      values are: "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",
+                                      "EVALUATION_METRIC_RESULT_STATUS_COMPLETED",
+                                      "EVALUATION_METRIC_RESULT_STATUS_FAILED", and
+                                      "EVALUATION_METRIC_RESULT_STATUS_SKIPPED".
                                     "string_value": "str"  # Optional. The value
                                       of the metric as a string.
                                 }
@@ -252274,6 +252537,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                 "error_description": "str",  # Optional. Error
                                   description if the metric could not be calculated.
                                 "metric_name": "str",  # Optional. Metric name.
+                                "metric_uuid": "str",  # Optional. Metric UUID
+                                  (built-in or custom); stable key for results UI and aggregation.
                                 "metric_value_type": "METRIC_VALUE_TYPE_UNSPECIFIED",
                                   # Optional. Default value is "METRIC_VALUE_TYPE_UNSPECIFIED". Known
                                   values are: "METRIC_VALUE_TYPE_UNSPECIFIED",
@@ -252283,6 +252548,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   metric as a number.
                                 "reasoning": "str",  # Optional. Reasoning of the
                                   metric result.
+                                "status":
+                                  "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",  # Optional. Default
+                                  value is "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED". Outcome of
+                                  scoring a single metric for one prompt or span. Known values are:
+                                  "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",
+                                  "EVALUATION_METRIC_RESULT_STATUS_COMPLETED",
+                                  "EVALUATION_METRIC_RESULT_STATUS_FAILED", and
+                                  "EVALUATION_METRIC_RESULT_STATUS_SKIPPED".
                                 "string_value": "str"  # Optional. The value of the
                                   metric as a string.
                             },
@@ -252465,12 +252738,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   "METRIC_CATEGORY_CONTEXT_QUALITY", and "METRIC_CATEGORY_MODEL_FIT".
                                 "custom_eval_config": {
                                     "created_at": "2020-02-20 00:00:00",  #
-                                      Optional. Timestamp when the custom metric was created.
-                                      Server-assigned; ignored on create/update requests.
+                                      Optional. Configuration for a custom model-evaluation metric
+                                      scored by an LLM judge. Prompt and model response are always
+                                      included in the judge context.
                                     "deleted_at": "2020-02-20 00:00:00",  #
-                                      Optional. When set, the custom metric has been deleted and is no
-                                      longer available for use in evaluations. Server-assigned; ignored
-                                      on create/update requests.
+                                      Optional. When set, the custom metric is soft-deleted and must
+                                      not appear in pickers.
                                     "requires_ground_truth": bool,  # Optional.
                                       When true, each row must provide ground truth and it is included
                                       in the judge context. When false, ground truth is not required
@@ -252478,8 +252751,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                     "scoring_prompt": "str",  # Optional.
                                       Instructions for the judge model (multi-line).
                                     "updated_at": "2020-02-20 00:00:00"  #
-                                      Optional. Timestamp when the custom metric was last updated.
-                                      Server-assigned; ignored on create/update requests.
+                                      Optional. Configuration for a custom model-evaluation metric
+                                      scored by an LLM judge. Prompt and model response are always
+                                      included in the judge context.
                                 },
                                 "description": "str",  # Optional.
                                 "evaluation_scope": "EVALUATION_SCOPE_UNSPECIFIED",
@@ -258684,12 +258958,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               "METRIC_CATEGORY_CONTEXT_QUALITY", and "METRIC_CATEGORY_MODEL_FIT".
                             "custom_eval_config": {
                                 "created_at": "2020-02-20 00:00:00",  # Optional.
-                                  Timestamp when the custom metric was created. Server-assigned;
-                                  ignored on create/update requests.
+                                  Configuration for a custom model-evaluation metric scored by an LLM
+                                  judge. Prompt and model response are always included in the judge
+                                  context.
                                 "deleted_at": "2020-02-20 00:00:00",  # Optional.
-                                  When set, the custom metric has been deleted and is no longer
-                                  available for use in evaluations. Server-assigned; ignored on
-                                  create/update requests.
+                                  When set, the custom metric is soft-deleted and must not appear in
+                                  pickers.
                                 "requires_ground_truth": bool,  # Optional. When
                                   true, each row must provide ground truth and it is included in the
                                   judge context. When false, ground truth is not required and is not
@@ -258697,8 +258971,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                 "scoring_prompt": "str",  # Optional. Instructions
                                   for the judge model (multi-line).
                                 "updated_at": "2020-02-20 00:00:00"  # Optional.
-                                  Timestamp when the custom metric was last updated. Server-assigned;
-                                  ignored on create/update requests.
+                                  Configuration for a custom model-evaluation metric scored by an LLM
+                                  judge. Prompt and model response are always included in the judge
+                                  context.
                             },
                             "description": "str",  # Optional. List of model evaluation
                               metrics.
@@ -258849,18 +259124,48 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                 response == {
                     "presets": [
                         {
+                            "candidate_inference_config": {
+                                "max_tokens": 0,  # Optional. Inference configuration
+                                  for the candidate model during evaluation.
+                                "stop_token": "str",  # Optional. Inference
+                                  configuration for the candidate model during evaluation.
+                                "system_prompt": "str",  # Optional. Inference
+                                  configuration for the candidate model during evaluation.
+                                "temperature": 0.0  # Optional. Inference
+                                  configuration for the candidate model during evaluation.
+                            },
+                            "candidate_model_name": "str",  # Optional. Model slug used
+                              to call the candidate model API. Empty when the CANDIDATE section was not
+                              saved.
+                            "candidate_model_source":
+                              "CANDIDATE_MODEL_SOURCE_SERVERLESS",  # Optional. Default value is
+                              "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether inference runs against the
+                              serverless platform, a dedicated deployment, or a model router. Known
+                              values are: "CANDIDATE_MODEL_SOURCE_SERVERLESS",
+                              "CANDIDATE_MODEL_SOURCE_DEDICATED", and "CANDIDATE_MODEL_SOURCE_ROUTER".
+                            "candidate_model_uuid": "str",  # Optional. UUID of the
+                              candidate model stored on this preset. Empty when the CANDIDATE section
+                              was not saved. For DEDICATED candidates this is the dedicated inference
+                              deployment UUID.
+                            "candidate_system_prompt": "str",  # Optional. System prompt
+                              / instructions to send to the candidate model. Empty when the
+                              SYSTEM_PROMPT section was not saved (check ``saved_sections``"" ).
                             "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp
                               when the preset was created.
-                            "dataset_name": "str",  # Optional. List of explicitly saved
-                              evaluation presets (reusable configs).
-                            "dataset_uuid": "str",  # Optional. Dataset used for
-                              evaluation.
+                            "dataset_name": "str",  # Optional. Display name of the
+                              dataset stored on this preset. Empty when the DATASET section was not
+                              saved or the dataset no longer exists.
+                            "dataset_uuid": "str",  # Optional. UUID of the dataset
+                              stored on this preset. Empty when the DATASET section was not saved
+                              (check ``saved_sections``"" ).
                             "eval_preset_uuid": "str",  # Optional. UUID of the
                               evaluation preset.
-                            "judge_model_name": "str",  # Optional. List of explicitly
-                              saved evaluation presets (reusable configs).
-                            "judge_model_uuid": "str",  # Optional. Judge model used to
-                              score responses.
+                            "judge_model_name": "str",  # Optional. Display name of the
+                              judge model stored on this preset. Empty when the JUDGE section was not
+                              saved or the model no longer exists.
+                            "judge_model_uuid": "str",  # Optional. UUID of the judge
+                              model stored on this preset. Empty when the JUDGE section was not saved
+                              (check ``saved_sections``"" ).
                             "metrics": [
                                 {
                                     "associated_presets": [
@@ -258881,12 +259186,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       "METRIC_CATEGORY_MODEL_FIT".
                                     "custom_eval_config": {
                                         "created_at": "2020-02-20 00:00:00",
-                                          # Optional. Timestamp when the custom metric was created.
-                                          Server-assigned; ignored on create/update requests.
+                                          # Optional. Configuration for a custom model-evaluation
+                                          metric scored by an LLM judge. Prompt and model response are
+                                          always included in the judge context.
                                         "deleted_at": "2020-02-20 00:00:00",
-                                          # Optional. When set, the custom metric has been deleted and
-                                          is no longer available for use in evaluations.
-                                          Server-assigned; ignored on create/update requests.
+                                          # Optional. When set, the custom metric is soft-deleted and
+                                          must not appear in pickers.
                                         "requires_ground_truth": bool,  #
                                           Optional. When true, each row must provide ground truth and
                                           it is included in the judge context. When false, ground truth
@@ -258894,11 +259199,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "scoring_prompt": "str",  # Optional.
                                           Instructions for the judge model (multi-line).
                                         "updated_at": "2020-02-20 00:00:00"
-                                          # Optional. Timestamp when the custom metric was last
-                                          updated. Server-assigned; ignored on create/update requests.
+                                          # Optional. Configuration for a custom model-evaluation
+                                          metric scored by an LLM judge. Prompt and model response are
+                                          always included in the judge context.
                                     },
                                     "description": "str",  # Optional. Metrics
-                                      selected for this preset.
+                                      selected for this preset. Empty when the METRICS section was not
+                                      saved.
                                     "evaluation_scope":
                                       "EVALUATION_SCOPE_UNSPECIFIED",  # Optional. Default value is
                                       "EVALUATION_SCOPE_UNSPECIFIED". Scope that determines whether a
@@ -258910,18 +259217,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                     "inverted": bool,  # Optional. If true, the
                                       metric is inverted, meaning that a lower value is better.
                                     "is_metric_goal": bool,  # Optional. Metrics
-                                      selected for this preset.
+                                      selected for this preset. Empty when the METRICS section was not
+                                      saved.
                                     "metric_name": "str",  # Optional. Metrics
-                                      selected for this preset.
+                                      selected for this preset. Empty when the METRICS section was not
+                                      saved.
                                     "metric_rank": 0,  # Optional. Metrics
-                                      selected for this preset.
+                                      selected for this preset. Empty when the METRICS section was not
+                                      saved.
                                     "metric_type": "METRIC_TYPE_UNSPECIFIED",  #
                                       Optional. Default value is "METRIC_TYPE_UNSPECIFIED". Known
                                       values are: "METRIC_TYPE_UNSPECIFIED",
                                       "METRIC_TYPE_GENERAL_QUALITY", "METRIC_TYPE_RAG_AND_TOOL",
                                       "METRIC_TYPE_MODEL_QUALITY", and "METRIC_TYPE_MODEL_SAFETY".
                                     "metric_uuid": "str",  # Optional. Metrics
-                                      selected for this preset.
+                                      selected for this preset. Empty when the METRICS section was not
+                                      saved.
                                     "metric_value_type":
                                       "METRIC_VALUE_TYPE_UNSPECIFIED",  # Optional. Default value is
                                       "METRIC_VALUE_TYPE_UNSPECIFIED". Known values are:
@@ -258941,6 +259252,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                 }
                             ],
                             "name": "str",  # Optional. Name of the evaluation preset.
+                            "saved_sections": [
+                                "str"  # Optional. Sections of the inline evaluation
+                                  config that were persisted when this preset was created. Use this to
+                                  tell "section was saved with an empty value" apart from "section was
+                                  not saved" "u2014 scalar fields like ``dataset_uuid`` or
+                                  ``candidate_system_prompt`` are always emitted as the empty string
+                                  when the section was not saved.
+                            ],
                             "star_metric": {
                                 "metric_uuid": "str",  # Optional. List of explicitly
                                   saved evaluation presets (reusable configs).
@@ -259067,17 +259386,45 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                 # response body for status code(s): 200
                 response == {
                     "preset": {
+                        "candidate_inference_config": {
+                            "max_tokens": 0,  # Optional. Inference configuration for the
+                              candidate model during evaluation.
+                            "stop_token": "str",  # Optional. Inference configuration for
+                              the candidate model during evaluation.
+                            "system_prompt": "str",  # Optional. Inference configuration
+                              for the candidate model during evaluation.
+                            "temperature": 0.0  # Optional. Inference configuration for
+                              the candidate model during evaluation.
+                        },
+                        "candidate_model_name": "str",  # Optional. Model slug used to call
+                          the candidate model API. Empty when the CANDIDATE section was not saved.
+                        "candidate_model_source": "CANDIDATE_MODEL_SOURCE_SERVERLESS",  #
+                          Optional. Default value is "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether
+                          inference runs against the serverless platform, a dedicated deployment, or a
+                          model router. Known values are: "CANDIDATE_MODEL_SOURCE_SERVERLESS",
+                          "CANDIDATE_MODEL_SOURCE_DEDICATED", and "CANDIDATE_MODEL_SOURCE_ROUTER".
+                        "candidate_model_uuid": "str",  # Optional. UUID of the candidate
+                          model stored on this preset. Empty when the CANDIDATE section was not saved.
+                          For DEDICATED candidates this is the dedicated inference deployment UUID.
+                        "candidate_system_prompt": "str",  # Optional. System prompt /
+                          instructions to send to the candidate model. Empty when the SYSTEM_PROMPT
+                          section was not saved (check ``saved_sections``"" ).
                         "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp when the
                           preset was created.
-                        "dataset_name": "str",  # Optional. Model Evaluation Preset - a
-                          saved, reusable configuration for model evaluation runs.
-                        "dataset_uuid": "str",  # Optional. Dataset used for evaluation.
+                        "dataset_name": "str",  # Optional. Display name of the dataset
+                          stored on this preset. Empty when the DATASET section was not saved or the
+                          dataset no longer exists.
+                        "dataset_uuid": "str",  # Optional. UUID of the dataset stored on
+                          this preset. Empty when the DATASET section was not saved (check
+                          ``saved_sections``"" ).
                         "eval_preset_uuid": "str",  # Optional. UUID of the evaluation
                           preset.
-                        "judge_model_name": "str",  # Optional. Model Evaluation Preset - a
-                          saved, reusable configuration for model evaluation runs.
-                        "judge_model_uuid": "str",  # Optional. Judge model used to score
-                          responses.
+                        "judge_model_name": "str",  # Optional. Display name of the judge
+                          model stored on this preset. Empty when the JUDGE section was not saved or
+                          the model no longer exists.
+                        "judge_model_uuid": "str",  # Optional. UUID of the judge model
+                          stored on this preset. Empty when the JUDGE section was not saved (check
+                          ``saved_sections``"" ).
                         "metrics": [
                             {
                                 "associated_presets": [
@@ -259097,12 +259444,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   "METRIC_CATEGORY_CONTEXT_QUALITY", and "METRIC_CATEGORY_MODEL_FIT".
                                 "custom_eval_config": {
                                     "created_at": "2020-02-20 00:00:00",  #
-                                      Optional. Timestamp when the custom metric was created.
-                                      Server-assigned; ignored on create/update requests.
+                                      Optional. Configuration for a custom model-evaluation metric
+                                      scored by an LLM judge. Prompt and model response are always
+                                      included in the judge context.
                                     "deleted_at": "2020-02-20 00:00:00",  #
-                                      Optional. When set, the custom metric has been deleted and is no
-                                      longer available for use in evaluations. Server-assigned; ignored
-                                      on create/update requests.
+                                      Optional. When set, the custom metric is soft-deleted and must
+                                      not appear in pickers.
                                     "requires_ground_truth": bool,  # Optional.
                                       When true, each row must provide ground truth and it is included
                                       in the judge context. When false, ground truth is not required
@@ -259110,11 +259457,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                     "scoring_prompt": "str",  # Optional.
                                       Instructions for the judge model (multi-line).
                                     "updated_at": "2020-02-20 00:00:00"  #
-                                      Optional. Timestamp when the custom metric was last updated.
-                                      Server-assigned; ignored on create/update requests.
+                                      Optional. Configuration for a custom model-evaluation metric
+                                      scored by an LLM judge. Prompt and model response are always
+                                      included in the judge context.
                                 },
                                 "description": "str",  # Optional. Metrics selected
-                                  for this preset.
+                                  for this preset. Empty when the METRICS section was not saved.
                                 "evaluation_scope": "EVALUATION_SCOPE_UNSPECIFIED",
                                   # Optional. Default value is "EVALUATION_SCOPE_UNSPECIFIED". Scope
                                   that determines whether a metric belongs to agent evaluation or model
@@ -259125,18 +259473,18 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                 "inverted": bool,  # Optional. If true, the metric is
                                   inverted, meaning that a lower value is better.
                                 "is_metric_goal": bool,  # Optional. Metrics selected
-                                  for this preset.
+                                  for this preset. Empty when the METRICS section was not saved.
                                 "metric_name": "str",  # Optional. Metrics selected
-                                  for this preset.
+                                  for this preset. Empty when the METRICS section was not saved.
                                 "metric_rank": 0,  # Optional. Metrics selected for
-                                  this preset.
+                                  this preset. Empty when the METRICS section was not saved.
                                 "metric_type": "METRIC_TYPE_UNSPECIFIED",  #
                                   Optional. Default value is "METRIC_TYPE_UNSPECIFIED". Known values
                                   are: "METRIC_TYPE_UNSPECIFIED", "METRIC_TYPE_GENERAL_QUALITY",
                                   "METRIC_TYPE_RAG_AND_TOOL", "METRIC_TYPE_MODEL_QUALITY", and
                                   "METRIC_TYPE_MODEL_SAFETY".
                                 "metric_uuid": "str",  # Optional. Metrics selected
-                                  for this preset.
+                                  for this preset. Empty when the METRICS section was not saved.
                                 "metric_value_type": "METRIC_VALUE_TYPE_UNSPECIFIED",
                                   # Optional. Default value is "METRIC_VALUE_TYPE_UNSPECIFIED". Known
                                   values are: "METRIC_VALUE_TYPE_UNSPECIFIED",
@@ -259155,11 +259503,29 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             }
                         ],
                         "name": "str",  # Optional. Name of the evaluation preset.
+                        "saved_sections": [
+                            "str"  # Optional. Sections of the inline evaluation config
+                              that were persisted when this preset was created. Use this to tell
+                              "section was saved with an empty value" apart from "section was not
+                              saved" "u2014 scalar fields like ``dataset_uuid`` or
+                              ``candidate_system_prompt`` are always emitted as the empty string when
+                              the section was not saved.
+                        ],
                         "star_metric": {
                             "metric_uuid": "str",  # Optional. Model Evaluation Preset -
-                              a saved, reusable configuration for model evaluation runs.
+                              a saved, reusable configuration for model evaluation runs. Each section
+                              (dataset, judge, metrics, candidate, system prompt) is independent and
+                              may be empty; sections the preset omits must be supplied inline on the
+                              run that references it. Use ``saved_sections`` to tell "section saved
+                              with empty value" apart from "section not saved at all" "u2014 each
+                              section's scalar fields are left empty when the section was not saved.
                             "name": "str",  # Optional. Model Evaluation Preset - a
-                              saved, reusable configuration for model evaluation runs.
+                              saved, reusable configuration for model evaluation runs. Each section
+                              (dataset, judge, metrics, candidate, system prompt) is independent and
+                              may be empty; sections the preset omits must be supplied inline on the
+                              run that references it. Use ``saved_sections`` to tell "section saved
+                              with empty value" apart from "section not saved at all" "u2014 each
+                              section's scalar fields are left empty when the section was not saved.
                             "success_threshold": 0.0,  # Optional. The success threshold
                               for the star metric. This is a value that the metric must reach to be
                               considered successful.
@@ -259653,6 +260019,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                     ],
                     "name": "str",  # Optional.
                     "preset_name": "str",  # Optional.
+                    "preset_save_sections": [
+                        "str"  # Optional. Which sections of this run's resolved
+                          configuration to persist as a reusable preset. Each selected section saves
+                          only its own fields; the remaining sections stay empty on the preset and must
+                          be supplied inline on future runs that reference it. Empty means do not save
+                          a preset (unless the deprecated ``save_as_preset`` boolean is true, in which
+                          case all sections are saved). Ignored when ``eval_preset_uuid`` is set. Use
+                          ``preset_name`` to label the saved preset.
+                    ],
+                    "save_as_preset": bool,  # Optional. Deprecated: use
+                      ``preset_save_sections``. When ``true`` and ``preset_save_sections`` is empty,
+                      all five sections of the resolved configuration are saved as a reusable preset
+                      (legacy behavior). Ignored when ``eval_preset_uuid`` is set.
                     "source": "str",  # Optional. Source of the run creation (api, sdk, cli).
                     "star_metric": {
                         "metric_uuid": "str",  # Optional.
@@ -259775,6 +260154,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                     ],
                     "name": "str",  # Optional.
                     "preset_name": "str",  # Optional.
+                    "preset_save_sections": [
+                        "str"  # Optional. Which sections of this run's resolved
+                          configuration to persist as a reusable preset. Each selected section saves
+                          only its own fields; the remaining sections stay empty on the preset and must
+                          be supplied inline on future runs that reference it. Empty means do not save
+                          a preset (unless the deprecated ``save_as_preset`` boolean is true, in which
+                          case all sections are saved). Ignored when ``eval_preset_uuid`` is set. Use
+                          ``preset_name`` to label the saved preset.
+                    ],
+                    "save_as_preset": bool,  # Optional. Deprecated: use
+                      ``preset_save_sections``. When ``true`` and ``preset_save_sections`` is empty,
+                      all five sections of the resolved configuration are saved as a reusable preset
+                      (legacy behavior). Ignored when ``eval_preset_uuid`` is set.
                     "source": "str",  # Optional. Source of the run creation (api, sdk, cli).
                     "star_metric": {
                         "metric_uuid": "str",  # Optional.
@@ -259947,6 +260339,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               per-prompt evaluation results.
                             "candidate_model_uuid": "str",  # Optional. Paginated
                               per-prompt evaluation results.
+                            "candidate_routed_task": "str",  # Optional. Paginated
+                              per-prompt evaluation results.
                             "ground_truth": "str",  # Optional. Paginated per-prompt
                               evaluation results.
                             "input": "str",  # Optional. The input query sent to the
@@ -259957,6 +260351,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       Error description if the metric could not be calculated.
                                     "metric_name": "str",  # Optional. Metric
                                       name.
+                                    "metric_uuid": "str",  # Optional. Metric
+                                      UUID (built-in or custom); stable key for results UI and
+                                      aggregation.
                                     "metric_value_type":
                                       "METRIC_VALUE_TYPE_UNSPECIFIED",  # Optional. Default value is
                                       "METRIC_VALUE_TYPE_UNSPECIFIED". Known values are:
@@ -259966,6 +260363,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       of the metric as a number.
                                     "reasoning": "str",  # Optional. Reasoning of
                                       the metric result.
+                                    "status":
+                                      "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",  # Optional.
+                                      Default value is "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED".
+                                      Outcome of scoring a single metric for one prompt or span. Known
+                                      values are: "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",
+                                      "EVALUATION_METRIC_RESULT_STATUS_COMPLETED",
+                                      "EVALUATION_METRIC_RESULT_STATUS_FAILED", and
+                                      "EVALUATION_METRIC_RESULT_STATUS_SKIPPED".
                                     "string_value": "str"  # Optional. The value
                                       of the metric as a string.
                                 }
@@ -260031,12 +260436,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   "METRIC_CATEGORY_CONTEXT_QUALITY", and "METRIC_CATEGORY_MODEL_FIT".
                                 "custom_eval_config": {
                                     "created_at": "2020-02-20 00:00:00",  #
-                                      Optional. Timestamp when the custom metric was created.
-                                      Server-assigned; ignored on create/update requests.
+                                      Optional. Configuration for a custom model-evaluation metric
+                                      scored by an LLM judge. Prompt and model response are always
+                                      included in the judge context.
                                     "deleted_at": "2020-02-20 00:00:00",  #
-                                      Optional. When set, the custom metric has been deleted and is no
-                                      longer available for use in evaluations. Server-assigned; ignored
-                                      on create/update requests.
+                                      Optional. When set, the custom metric is soft-deleted and must
+                                      not appear in pickers.
                                     "requires_ground_truth": bool,  # Optional.
                                       When true, each row must provide ground truth and it is included
                                       in the judge context. When false, ground truth is not required
@@ -260044,8 +260449,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                     "scoring_prompt": "str",  # Optional.
                                       Instructions for the judge model (multi-line).
                                     "updated_at": "2020-02-20 00:00:00"  #
-                                      Optional. Timestamp when the custom metric was last updated.
-                                      Server-assigned; ignored on create/update requests.
+                                      Optional. Configuration for a custom model-evaluation metric
+                                      scored by an LLM judge. Prompt and model response are always
+                                      included in the judge context.
                                 },
                                 "description": "str",  # Optional. Metrics selected
                                   for this evaluation.
@@ -260105,14 +260511,24 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                 {
                                     "description": "str",  # Optional. Per-metric
                                       aggregated pass/fail statistics.
+                                    "fail_count": 0,  # Optional. Rows where the
+                                      metric failed to score or completed below the threshold.
                                     "fail_percent": 0.0,  # Optional. Per-metric
                                       aggregated pass/fail statistics.
                                     "metric_name": "str",  # Optional. Per-metric
                                       aggregated pass/fail statistics.
                                     "metric_uuid": "str",  # Optional. Per-metric
                                       aggregated pass/fail statistics.
-                                    "pass_percent": 0.0  # Optional. Per-metric
+                                    "pass_count": 0,  # Optional. Rows where the
+                                      metric completed and passed the configured threshold.
+                                    "pass_percent": 0.0,  # Optional. Per-metric
                                       aggregated pass/fail statistics.
+                                    "skip_percent": 0.0,  # Optional. Percentage
+                                      of rows that were skipped for this metric, computed as
+                                      skipped_count divided by the total rows the metric saw
+                                      (pass_count + fail_count + skipped_count).
+                                    "skipped_count": 0  # Optional. Rows where
+                                      the metric was not evaluated for this prompt.
                                 }
                             ],
                             "overall_score_percent": 0.0,  # Optional. Aggregated result
@@ -260123,24 +260539,39 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "metric_summaries": [
                                             {
                                                 "description": "str",
-                                                  # Optional. Per-metric pass/fail for only this
-                                                  model's prompts.
+                                                  # Optional. Pass/fail rate for each metric, computed
+                                                  over only the prompts routed to this model.
+                                                "fail_count": 0,  #
+                                                  Optional. Rows where the metric failed to score or
+                                                  completed below the threshold.
                                                 "fail_percent": 0.0,
-                                                  # Optional. Per-metric pass/fail for only this
-                                                  model's prompts.
+                                                  # Optional. Pass/fail rate for each metric, computed
+                                                  over only the prompts routed to this model.
                                                 "metric_name": "str",
-                                                  # Optional. Per-metric pass/fail for only this
-                                                  model's prompts.
+                                                  # Optional. Pass/fail rate for each metric, computed
+                                                  over only the prompts routed to this model.
                                                 "metric_uuid": "str",
-                                                  # Optional. Per-metric pass/fail for only this
-                                                  model's prompts.
-                                                "pass_percent": 0.0
-                                                  # Optional. Per-metric pass/fail for only this
-                                                  model's prompts.
+                                                  # Optional. Pass/fail rate for each metric, computed
+                                                  over only the prompts routed to this model.
+                                                "pass_count": 0,  #
+                                                  Optional. Rows where the metric completed and passed
+                                                  the configured threshold.
+                                                "pass_percent": 0.0,
+                                                  # Optional. Pass/fail rate for each metric, computed
+                                                  over only the prompts routed to this model.
+                                                "skip_percent": 0.0,
+                                                  # Optional. Percentage of rows that were skipped for
+                                                  this metric, computed as skipped_count divided by the
+                                                  total rows the metric saw (pass_count + fail_count +
+                                                  skipped_count).
+                                                "skipped_count": 0  #
+                                                  Optional. Rows where the metric was not evaluated for
+                                                  this prompt.
                                             }
                                         ],
-                                        "model_name": "str",  # Optional.
-                                          Name/slug of the model (matches routed_model from results).
+                                        "model_name": "str",  # Optional. The
+                                          underlying model these results are for, such as ``Llama 3.3
+                                          Instruct (70B)``.
                                         "performance_metrics": {
                                             "candidate_latency": {
                                                 "avg_e2e_latency_ms":
@@ -260181,7 +260612,91 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             }
                                         },
                                         "prompt_count": 0  # Optional. Number
-                                          of prompts routed to this model.
+                                          of prompts in the run that were routed to this model.
+                                    }
+                                ]
+                            },
+                            "per_task_summaries": {
+                                "summaries": [
+                                    {
+                                        "metric_summaries": [
+                                            {
+                                                "description": "str",
+                                                  # Optional. Pass/fail rate for each metric, computed
+                                                  over only the prompts in this task category.
+                                                "fail_count": 0,  #
+                                                  Optional. Rows where the metric failed to score or
+                                                  completed below the threshold.
+                                                "fail_percent": 0.0,
+                                                  # Optional. Pass/fail rate for each metric, computed
+                                                  over only the prompts in this task category.
+                                                "metric_name": "str",
+                                                  # Optional. Pass/fail rate for each metric, computed
+                                                  over only the prompts in this task category.
+                                                "metric_uuid": "str",
+                                                  # Optional. Pass/fail rate for each metric, computed
+                                                  over only the prompts in this task category.
+                                                "pass_count": 0,  #
+                                                  Optional. Rows where the metric completed and passed
+                                                  the configured threshold.
+                                                "pass_percent": 0.0,
+                                                  # Optional. Pass/fail rate for each metric, computed
+                                                  over only the prompts in this task category.
+                                                "skip_percent": 0.0,
+                                                  # Optional. Percentage of rows that were skipped for
+                                                  this metric, computed as skipped_count divided by the
+                                                  total rows the metric saw (pass_count + fail_count +
+                                                  skipped_count).
+                                                "skipped_count": 0  #
+                                                  Optional. Rows where the metric was not evaluated for
+                                                  this prompt.
+                                            }
+                                        ],
+                                        "performance_metrics": {
+                                            "candidate_latency": {
+                                                "avg_e2e_latency_ms":
+                                                  0.0,  # Optional. Average end-to-end latency across
+                                                  all invocations.
+                                                "max_e2e_latency_ms":
+                                                  0.0,  # Optional. Maximum end-to-end latency
+                                                  observed.
+                                                "min_e2e_latency_ms":
+                                                  0.0,  # Optional. Minimum end-to-end latency
+                                                  observed.
+                                                "p50_latency_ms":
+                                                  0.0,  # Optional. P50 (median) latency.
+                                                "p90_latency_ms":
+                                                  0.0,  # Optional. P90 latency.
+                                                "p95_latency_ms": 0.0
+                                                  # Optional. P95 latency.
+                                            },
+                                            "token_usage": {
+                "total_candidate_input_tokens": "str",  # Optional.
+                                                  All performance metrics are for the candidate model
+                                                  unless noted otherwise.
+                "total_candidate_output_tokens": "str",  # Optional.
+                                                  All performance metrics are for the candidate model
+                                                  unless noted otherwise.
+                "total_candidate_tokens": "str",  # Optional. All
+                                                  performance metrics are for the candidate model
+                                                  unless noted otherwise.
+                "total_judge_input_tokens": "str",  # Optional. All
+                                                  performance metrics are for the candidate model
+                                                  unless noted otherwise.
+                "total_judge_output_tokens": "str",  # Optional. All
+                                                  performance metrics are for the candidate model
+                                                  unless noted otherwise.
+                                                "total_judge_tokens":
+                                                  "str"  # Optional. All performance metrics are for
+                                                  the candidate model unless noted otherwise.
+                                            }
+                                        },
+                                        "prompt_count": 0,  # Optional.
+                                          Number of prompts in the run that were classified into this
+                                          task category.
+                                        "task_name": "str"  # Optional. The
+                                          routing task category these results are for, such as ``Coding
+                                          & brainstorming`` or ``Summarization``.
                                     }
                                 ]
                             },
@@ -260448,6 +260963,374 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
 
         _request = build_genai_delete_model_evaluation_run_request(
             eval_run_uuid=eval_run_uuid,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def update_model_evaluation_run(
+        self,
+        eval_run_uuid: str,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Model Evaluation Run.
+
+        To update a model evaluation run's display name, send a PATCH request to
+        ``/v2/gen-ai/model_evaluation_runs/{eval_run_uuid}``.
+
+        :param eval_run_uuid: UUID of the model evaluation run to update. Returned by
+         ``CreateModelEvaluationRun``
+         and listed via ``ListModelEvaluationRuns``. Required.
+        :type eval_run_uuid: str
+        :param body: Default value is None.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "eval_run_uuid": "str",  # Optional. UUID of the model evaluation run to
+                      update. Returned by ``CreateModelEvaluationRun`` and listed via
+                      ``ListModelEvaluationRuns``.
+                    "name": "str"  # Optional. Optional new display name for the evaluation run
+                      (max 255 characters).
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "run": {
+                        "candidate_model_name": "str",  # Optional. Name of the candidate
+                          model being evaluated.
+                        "candidate_model_source": "CANDIDATE_MODEL_SOURCE_SERVERLESS",  #
+                          Optional. Default value is "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether
+                          inference runs against the serverless platform, a dedicated deployment, or a
+                          model router. Known values are: "CANDIDATE_MODEL_SOURCE_SERVERLESS",
+                          "CANDIDATE_MODEL_SOURCE_DEDICATED", and "CANDIDATE_MODEL_SOURCE_ROUTER".
+                        "candidate_model_uuid": "str",  # Optional. UUID of the candidate
+                          model being evaluated.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp when the
+                          run was created.
+                        "dataset_name": "str",  # Optional. Name of the dataset used for
+                          evaluation.
+                        "dataset_uuid": "str",  # Optional. UUID of the dataset used for
+                          evaluation.
+                        "eval_run_uuid": "str",  # Optional. UUID of the evaluation run.
+                        "judge_model_name": "str",  # Optional. Model Evaluation Run Summary
+                          - lightweight view used in run history list.
+                        "judge_model_uuid": "str",  # Optional. Judge model used to score
+                          responses.
+                        "name": "str",  # Optional. Name of the evaluation run.
+                        "progress": {
+                            "candidate_rows_evaluated": 0,  # Optional. Dataset rows
+                              whose candidate model call has completed (success or failure).
+                            "judge_rows_evaluated": 0,  # Optional. Candidate-success
+                              rows the judge has finished (scored or skipped). Caps at the number of
+                              candidate successes, which may be below total_rows.
+                            "total_rows": 0  # Optional. Total dataset rows for the run,
+                              sourced from the evaluation dataset.
+                        },
+                        "status": "MODEL_EVALUATION_RUN_STATUS_UNSPECIFIED"  # Optional.
+                          Default value is "MODEL_EVALUATION_RUN_STATUS_UNSPECIFIED". Model Evaluation
+                          Run Statuses. Known values are: "MODEL_EVALUATION_RUN_STATUS_UNSPECIFIED",
+                          "MODEL_EVALUATION_RUN_QUEUED", "MODEL_EVALUATION_RUN_RUNNING_DATASET",
+                          "MODEL_EVALUATION_RUN_EVALUATING_RESULTS", "MODEL_EVALUATION_RUN_CANCELLING",
+                          "MODEL_EVALUATION_RUN_CANCELLED", "MODEL_EVALUATION_RUN_SUCCESSFUL",
+                          "MODEL_EVALUATION_RUN_PARTIALLY_SUCCESSFUL", and
+                          "MODEL_EVALUATION_RUN_FAILED".
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def update_model_evaluation_run(
+        self,
+        eval_run_uuid: str,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Model Evaluation Run.
+
+        To update a model evaluation run's display name, send a PATCH request to
+        ``/v2/gen-ai/model_evaluation_runs/{eval_run_uuid}``.
+
+        :param eval_run_uuid: UUID of the model evaluation run to update. Returned by
+         ``CreateModelEvaluationRun``
+         and listed via ``ListModelEvaluationRuns``. Required.
+        :type eval_run_uuid: str
+        :param body: Default value is None.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "run": {
+                        "candidate_model_name": "str",  # Optional. Name of the candidate
+                          model being evaluated.
+                        "candidate_model_source": "CANDIDATE_MODEL_SOURCE_SERVERLESS",  #
+                          Optional. Default value is "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether
+                          inference runs against the serverless platform, a dedicated deployment, or a
+                          model router. Known values are: "CANDIDATE_MODEL_SOURCE_SERVERLESS",
+                          "CANDIDATE_MODEL_SOURCE_DEDICATED", and "CANDIDATE_MODEL_SOURCE_ROUTER".
+                        "candidate_model_uuid": "str",  # Optional. UUID of the candidate
+                          model being evaluated.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp when the
+                          run was created.
+                        "dataset_name": "str",  # Optional. Name of the dataset used for
+                          evaluation.
+                        "dataset_uuid": "str",  # Optional. UUID of the dataset used for
+                          evaluation.
+                        "eval_run_uuid": "str",  # Optional. UUID of the evaluation run.
+                        "judge_model_name": "str",  # Optional. Model Evaluation Run Summary
+                          - lightweight view used in run history list.
+                        "judge_model_uuid": "str",  # Optional. Judge model used to score
+                          responses.
+                        "name": "str",  # Optional. Name of the evaluation run.
+                        "progress": {
+                            "candidate_rows_evaluated": 0,  # Optional. Dataset rows
+                              whose candidate model call has completed (success or failure).
+                            "judge_rows_evaluated": 0,  # Optional. Candidate-success
+                              rows the judge has finished (scored or skipped). Caps at the number of
+                              candidate successes, which may be below total_rows.
+                            "total_rows": 0  # Optional. Total dataset rows for the run,
+                              sourced from the evaluation dataset.
+                        },
+                        "status": "MODEL_EVALUATION_RUN_STATUS_UNSPECIFIED"  # Optional.
+                          Default value is "MODEL_EVALUATION_RUN_STATUS_UNSPECIFIED". Model Evaluation
+                          Run Statuses. Known values are: "MODEL_EVALUATION_RUN_STATUS_UNSPECIFIED",
+                          "MODEL_EVALUATION_RUN_QUEUED", "MODEL_EVALUATION_RUN_RUNNING_DATASET",
+                          "MODEL_EVALUATION_RUN_EVALUATING_RESULTS", "MODEL_EVALUATION_RUN_CANCELLING",
+                          "MODEL_EVALUATION_RUN_CANCELLED", "MODEL_EVALUATION_RUN_SUCCESSFUL",
+                          "MODEL_EVALUATION_RUN_PARTIALLY_SUCCESSFUL", and
+                          "MODEL_EVALUATION_RUN_FAILED".
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def update_model_evaluation_run(
+        self,
+        eval_run_uuid: str,
+        body: Optional[Union[JSON, IO[bytes]]] = None,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Model Evaluation Run.
+
+        To update a model evaluation run's display name, send a PATCH request to
+        ``/v2/gen-ai/model_evaluation_runs/{eval_run_uuid}``.
+
+        :param eval_run_uuid: UUID of the model evaluation run to update. Returned by
+         ``CreateModelEvaluationRun``
+         and listed via ``ListModelEvaluationRuns``. Required.
+        :type eval_run_uuid: str
+        :param body: Is either a JSON type or a IO[bytes] type. Default value is None.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "eval_run_uuid": "str",  # Optional. UUID of the model evaluation run to
+                      update. Returned by ``CreateModelEvaluationRun`` and listed via
+                      ``ListModelEvaluationRuns``.
+                    "name": "str"  # Optional. Optional new display name for the evaluation run
+                      (max 255 characters).
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "run": {
+                        "candidate_model_name": "str",  # Optional. Name of the candidate
+                          model being evaluated.
+                        "candidate_model_source": "CANDIDATE_MODEL_SOURCE_SERVERLESS",  #
+                          Optional. Default value is "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether
+                          inference runs against the serverless platform, a dedicated deployment, or a
+                          model router. Known values are: "CANDIDATE_MODEL_SOURCE_SERVERLESS",
+                          "CANDIDATE_MODEL_SOURCE_DEDICATED", and "CANDIDATE_MODEL_SOURCE_ROUTER".
+                        "candidate_model_uuid": "str",  # Optional. UUID of the candidate
+                          model being evaluated.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp when the
+                          run was created.
+                        "dataset_name": "str",  # Optional. Name of the dataset used for
+                          evaluation.
+                        "dataset_uuid": "str",  # Optional. UUID of the dataset used for
+                          evaluation.
+                        "eval_run_uuid": "str",  # Optional. UUID of the evaluation run.
+                        "judge_model_name": "str",  # Optional. Model Evaluation Run Summary
+                          - lightweight view used in run history list.
+                        "judge_model_uuid": "str",  # Optional. Judge model used to score
+                          responses.
+                        "name": "str",  # Optional. Name of the evaluation run.
+                        "progress": {
+                            "candidate_rows_evaluated": 0,  # Optional. Dataset rows
+                              whose candidate model call has completed (success or failure).
+                            "judge_rows_evaluated": 0,  # Optional. Candidate-success
+                              rows the judge has finished (scored or skipped). Caps at the number of
+                              candidate successes, which may be below total_rows.
+                            "total_rows": 0  # Optional. Total dataset rows for the run,
+                              sourced from the evaluation dataset.
+                        },
+                        "status": "MODEL_EVALUATION_RUN_STATUS_UNSPECIFIED"  # Optional.
+                          Default value is "MODEL_EVALUATION_RUN_STATUS_UNSPECIFIED". Model Evaluation
+                          Run Statuses. Known values are: "MODEL_EVALUATION_RUN_STATUS_UNSPECIFIED",
+                          "MODEL_EVALUATION_RUN_QUEUED", "MODEL_EVALUATION_RUN_RUNNING_DATASET",
+                          "MODEL_EVALUATION_RUN_EVALUATING_RESULTS", "MODEL_EVALUATION_RUN_CANCELLING",
+                          "MODEL_EVALUATION_RUN_CANCELLED", "MODEL_EVALUATION_RUN_SUCCESSFUL",
+                          "MODEL_EVALUATION_RUN_PARTIALLY_SUCCESSFUL", and
+                          "MODEL_EVALUATION_RUN_FAILED".
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            if body is not None:
+                _json = body
+            else:
+                _json = None
+
+        _request = build_genai_update_model_evaluation_run_request(
+            eval_run_uuid=eval_run_uuid,
+            content_type=content_type,
+            json=_json,
+            content=_content,
             headers=_headers,
             params=_params,
         )
@@ -261105,6 +261988,27 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "parent_uuid": "str",  # Optional. Unique id of the model,
                               this model is based on.
                             "pricing": {
+                                "cache_read_input_price_per_million": 0.0,  #
+                                  Optional. Per-million cache read rate for standard chat models
+                                  (token_type "cache read input"). Multimodal models use
+                                  text_cache_read_input_price_per_million /
+                                  image_cache_read_input_price_per_million instead.
+                                "cache_write_1h_input_price_per_million": 0.0,  #
+                                  Optional. Price per million tokens written to the prompt cache with a
+                                  1-hour lifetime.
+                                "cache_write_5m_input_price_per_million": 0.0,  #
+                                  Optional. Price per million tokens written to the prompt cache with a
+                                  5-minute lifetime.
+                                "image_cache_read_input_price_per_million": 0.0,  #
+                                  Optional. Pricing per million tokens (aligns with existing ModelPrice
+                                  pattern).
+                                "image_input_price_per_million": 0.0,  # Optional.
+                                  Pricing per million tokens (aligns with existing ModelPrice pattern).
+                                "image_output_price_per_million": 0.0,  # Optional.
+                                  Pricing per million tokens (aligns with existing ModelPrice pattern).
+                                "input_cache_read": 0.0,  # Optional. Cache read
+                                  input price per single token. Equivalent to
+                                  cache_read_input_price_per_million.
                                 "input_price_per_million": 0.0,  # Optional. Pricing
                                   per million tokens (aligns with existing ModelPrice pattern).
                                 "output_price_per_million": 0.0,  # Optional. Pricing
@@ -261123,8 +262027,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   million tokens (aligns with existing ModelPrice pattern).
                                 "price_per_thousand_characters": 0.0,  # Optional.
                                   Pricing per million tokens (aligns with existing ModelPrice pattern).
-                                "price_per_video": 0.0  # Optional. Pricing per
+                                "price_per_video": 0.0,  # Optional. Pricing per
                                   million tokens (aligns with existing ModelPrice pattern).
+                                "reasoning_price_per_million": 0.0,  # Optional.
+                                  Price per million reasoning tokens. 0 if the model does not charge
+                                  separately for reasoning tokens.
+                                "text_cache_read_input_price_per_million": 0.0,  #
+                                  Optional. Pricing per million tokens (aligns with existing ModelPrice
+                                  pattern).
+                                "text_input_price_per_million": 0.0,  # Optional.
+                                  Per-million token rates for models that bill text vs image tokens
+                                  separately (e.g. OpenAI gpt-image-2). Standard chat models leave
+                                  these at 0 and use input_price_per_million / output_price_per_million
+                                  instead. Values align with usage token_type / internal/usage.Type
+                                  string values for each meter.
+                                "text_output_price_per_million": 0.0  # Optional.
+                                  Pricing per million tokens (aligns with existing ModelPrice pattern).
                             },
                             "provider": "MODEL_PROVIDER_DIGITALOCEAN",  # Optional.
                               Default value is "MODEL_PROVIDER_DIGITALOCEAN". Known values are:
@@ -262144,20 +263062,52 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "availability": [
                                 "str"  # Optional.
                             ],
+                            "badges": [
+                                "str"  # Optional. Badges for models.
+                            ],
                             "benchmark_score": {},  # Optional. Benchmark scores for this
                               model, stored as arbitrary JSON.
                             "capabilities": [
                                 "str"  # Optional.
                             ],
                             "context_window": "str",  # Optional. Specs (flat).
+                            "created_at": "2020-02-20 00:00:00",  # Optional. RFC 3339
+                              timestamp indicating when the model was added to the catalog.
                             "creator": "str",  # Optional. Model creator/developer (e.g.,
                               "Meta", "Anthropic", "OpenAI").
+                            "hugging_face_id": "str",  # Optional. The Hugging Face
+                              repository ID (e.g. "meta-llama/Llama-3.3-70B-Instruct") the model is
+                              based on, when applicable. Omitted for models not sourced from Hugging
+                              Face.
                             "id": "str",  # Optional. Identity.
+                            "max_output_tokens": "str",  # Optional. The maximum number
+                              of output tokens the model can generate in a single response.
                             "model_id": "str",  # Optional. Model identifier used for API
                               calls (e.g., "llama3.1-70b-instruct").
                             "name": "str",  # Optional.
                             "parameter_count": 0.0,  # Optional.
                             "pricing": {
+                                "cache_read_input_price_per_million": 0.0,  #
+                                  Optional. Per-million cache read rate for standard chat models
+                                  (token_type "cache read input"). Multimodal models use
+                                  text_cache_read_input_price_per_million /
+                                  image_cache_read_input_price_per_million instead.
+                                "cache_write_1h_input_price_per_million": 0.0,  #
+                                  Optional. Price per million tokens written to the prompt cache with a
+                                  1-hour lifetime.
+                                "cache_write_5m_input_price_per_million": 0.0,  #
+                                  Optional. Price per million tokens written to the prompt cache with a
+                                  5-minute lifetime.
+                                "image_cache_read_input_price_per_million": 0.0,  #
+                                  Optional. Pricing per million tokens (aligns with existing ModelPrice
+                                  pattern).
+                                "image_input_price_per_million": 0.0,  # Optional.
+                                  Pricing per million tokens (aligns with existing ModelPrice pattern).
+                                "image_output_price_per_million": 0.0,  # Optional.
+                                  Pricing per million tokens (aligns with existing ModelPrice pattern).
+                                "input_cache_read": 0.0,  # Optional. Cache read
+                                  input price per single token. Equivalent to
+                                  cache_read_input_price_per_million.
                                 "input_price_per_million": 0.0,  # Optional. Pricing
                                   per million tokens (aligns with existing ModelPrice pattern).
                                 "output_price_per_million": 0.0,  # Optional. Pricing
@@ -262176,13 +263126,30 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   million tokens (aligns with existing ModelPrice pattern).
                                 "price_per_thousand_characters": 0.0,  # Optional.
                                   Pricing per million tokens (aligns with existing ModelPrice pattern).
-                                "price_per_video": 0.0  # Optional. Pricing per
+                                "price_per_video": 0.0,  # Optional. Pricing per
                                   million tokens (aligns with existing ModelPrice pattern).
+                                "reasoning_price_per_million": 0.0,  # Optional.
+                                  Price per million reasoning tokens. 0 if the model does not charge
+                                  separately for reasoning tokens.
+                                "text_cache_read_input_price_per_million": 0.0,  #
+                                  Optional. Pricing per million tokens (aligns with existing ModelPrice
+                                  pattern).
+                                "text_input_price_per_million": 0.0,  # Optional.
+                                  Per-million token rates for models that bill text vs image tokens
+                                  separately (e.g. OpenAI gpt-image-2). Standard chat models leave
+                                  these at 0 and use input_price_per_million / output_price_per_million
+                                  instead. Values align with usage token_type / internal/usage.Type
+                                  string values for each meter.
+                                "text_output_price_per_million": 0.0  # Optional.
+                                  Pricing per million tokens (aligns with existing ModelPrice pattern).
                             },
                             "provider": "MODEL_PROVIDER_DIGITALOCEAN",  # Optional.
                               Default value is "MODEL_PROVIDER_DIGITALOCEAN". Known values are:
                               "MODEL_PROVIDER_DIGITALOCEAN", "MODEL_PROVIDER_ANTHROPIC", and
                               "MODEL_PROVIDER_OPENAI".
+                            "scaled_pricing_enabled": bool,  # Optional. True when this
+                              model's pricing varies over time. Retrieve the model's details for the
+                              full pricing schedule. False for models with fixed pricing.
                             "short_description": "str",  # Optional.
                             "type": "str"  # Optional.
                         }
@@ -262312,6 +263279,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                         "availability": [
                             "str"  # Optional. Detail view for GetModelCatalogCard.
                         ],
+                        "badges": [
+                            "str"  # Optional. Badges for models.
+                        ],
                         "benchmark_score": {},  # Optional. Benchmark scores for this model,
                           stored as arbitrary JSON.
                         "capabilities": [
@@ -262330,7 +263300,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                         "creator": "str",  # Optional. Model creator/developer (e.g., "Meta",
                           "Anthropic", "OpenAI").
                         "description": "str",  # Optional. Card-specific.
+                        "hugging_face_id": "str",  # Optional. The Hugging Face repository ID
+                          (e.g. "meta-llama/Llama-3.3-70B-Instruct") the model is based on, when
+                          applicable. Omitted for models not sourced from Hugging Face.
                         "id": "str",  # Optional. Identity (same as Entry).
+                        "max_output_tokens": "str",  # Optional. The maximum number of output
+                          tokens the model can generate in a single response.
                         "modalities": {
                             "input": [
                                 "str"  # Optional. Input/output modalities.
@@ -262345,6 +263320,25 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                         "parameter_count": 0.0,  # Optional. Detail view for
                           GetModelCatalogCard.
                         "pricing": {
+                            "cache_read_input_price_per_million": 0.0,  # Optional.
+                              Per-million cache read rate for standard chat models (token_type "cache
+                              read input"). Multimodal models use
+                              text_cache_read_input_price_per_million /
+                              image_cache_read_input_price_per_million instead.
+                            "cache_write_1h_input_price_per_million": 0.0,  # Optional.
+                              Price per million tokens written to the prompt cache with a 1-hour
+                              lifetime.
+                            "cache_write_5m_input_price_per_million": 0.0,  # Optional.
+                              Price per million tokens written to the prompt cache with a 5-minute
+                              lifetime.
+                            "image_cache_read_input_price_per_million": 0.0,  # Optional.
+                              Pricing per million tokens (aligns with existing ModelPrice pattern).
+                            "image_input_price_per_million": 0.0,  # Optional. Pricing
+                              per million tokens (aligns with existing ModelPrice pattern).
+                            "image_output_price_per_million": 0.0,  # Optional. Pricing
+                              per million tokens (aligns with existing ModelPrice pattern).
+                            "input_cache_read": 0.0,  # Optional. Cache read input price
+                              per single token. Equivalent to cache_read_input_price_per_million.
                             "input_price_per_million": 0.0,  # Optional. Pricing per
                               million tokens (aligns with existing ModelPrice pattern).
                             "output_price_per_million": 0.0,  # Optional. Pricing per
@@ -262362,8 +263356,344 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               tokens (aligns with existing ModelPrice pattern).
                             "price_per_thousand_characters": 0.0,  # Optional. Pricing
                               per million tokens (aligns with existing ModelPrice pattern).
-                            "price_per_video": 0.0  # Optional. Pricing per million
+                            "price_per_video": 0.0,  # Optional. Pricing per million
                               tokens (aligns with existing ModelPrice pattern).
+                            "reasoning_price_per_million": 0.0,  # Optional. Price per
+                              million reasoning tokens. 0 if the model does not charge separately for
+                              reasoning tokens.
+                            "text_cache_read_input_price_per_million": 0.0,  # Optional.
+                              Pricing per million tokens (aligns with existing ModelPrice pattern).
+                            "text_input_price_per_million": 0.0,  # Optional. Per-million
+                              token rates for models that bill text vs image tokens separately (e.g.
+                              OpenAI gpt-image-2). Standard chat models leave these at 0 and use
+                              input_price_per_million / output_price_per_million instead. Values align
+                              with usage token_type / internal/usage.Type string values for each meter.
+                            "text_output_price_per_million": 0.0  # Optional. Pricing per
+                              million tokens (aligns with existing ModelPrice pattern).
+                        },
+                        "pricing_detail": {
+                            "variants": [
+                                {
+                                    "currency": "str",  # Optional. Currency code
+                                      for this variant's rates (e.g. ``USD``"" ).
+                                    "label": "str",  # Optional. Display name for
+                                      the variant (e.g. ``Standard``"" , ``Fast Mode``"" , ``1M
+                                      Context``"" ).
+                                    "mode": "MODEL_BILLING_MODE_UNSPECIFIED",  #
+                                      Optional. Default value is "MODEL_BILLING_MODE_UNSPECIFIED".
+                                      Whether rates apply to real-time or batch requests.   *
+                                      MODEL_BILLING_MODE_INTERACTIVE: Real-time request pricing. *
+                                      MODEL_BILLING_MODE_BATCH: Discounted pricing for asynchronous
+                                      batch requests. Known values are:
+                                      "MODEL_BILLING_MODE_UNSPECIFIED",
+                                      "MODEL_BILLING_MODE_INTERACTIVE", and "MODEL_BILLING_MODE_BATCH".
+                                    "prices": {
+                                        "cache_read_input_price_per_million":
+                                          0.0,  # Optional. Per-million cache read rate for standard
+                                          chat models (token_type "cache read input"). Multimodal
+                                          models use text_cache_read_input_price_per_million /
+                                          image_cache_read_input_price_per_million instead.
+                "cache_write_1h_input_price_per_million": 0.0,  # Optional.
+                                          Price per million tokens written to the prompt cache with a
+                                          1-hour lifetime.
+                "cache_write_5m_input_price_per_million": 0.0,  # Optional.
+                                          Price per million tokens written to the prompt cache with a
+                                          5-minute lifetime.
+                "image_cache_read_input_price_per_million": 0.0,  # Optional.
+                                          Pricing per million tokens (aligns with existing ModelPrice
+                                          pattern).
+                                        "image_input_price_per_million": 0.0,
+                                          # Optional. Pricing per million tokens (aligns with existing
+                                          ModelPrice pattern).
+                                        "image_output_price_per_million":
+                                          0.0,  # Optional. Pricing per million tokens (aligns with
+                                          existing ModelPrice pattern).
+                                        "input_cache_read": 0.0,  # Optional.
+                                          Cache read input price per single token. Equivalent to
+                                          cache_read_input_price_per_million.
+                                        "input_price_per_million": 0.0,  #
+                                          Optional. Pricing per million tokens (aligns with existing
+                                          ModelPrice pattern).
+                                        "output_price_per_million": 0.0,  #
+                                          Optional. Pricing per million tokens (aligns with existing
+                                          ModelPrice pattern).
+                                        "price_per_audio": 0.0,  # Optional.
+                                          Pricing per million tokens (aligns with existing ModelPrice
+                                          pattern).
+                                        "price_per_image": 0.0,  # Optional.
+                                          Unit-based pricing for non-token models (e.g., Fal AI
+                                          image/video/audio generation, speech models). At most one of
+                                          these is typically populated per model. Token-based models
+                                          (chat, embeddings) leave all of these at 0 and populate
+                                          input_price_per_million / output_price_per_million instead.
+                                        "price_per_megapixel": 0.0,  #
+                                          Optional. Pricing per million tokens (aligns with existing
+                                          ModelPrice pattern).
+                                        "price_per_second": 0.0,  # Optional.
+                                          Pricing per million tokens (aligns with existing ModelPrice
+                                          pattern).
+                                        "price_per_thousand_characters": 0.0,
+                                          # Optional. Pricing per million tokens (aligns with existing
+                                          ModelPrice pattern).
+                                        "price_per_video": 0.0,  # Optional.
+                                          Pricing per million tokens (aligns with existing ModelPrice
+                                          pattern).
+                                        "reasoning_price_per_million": 0.0,
+                                          # Optional. Price per million reasoning tokens. 0 if the
+                                          model does not charge separately for reasoning tokens.
+                "text_cache_read_input_price_per_million": 0.0,  # Optional.
+                                          Pricing per million tokens (aligns with existing ModelPrice
+                                          pattern).
+                                        "text_input_price_per_million": 0.0,
+                                          # Optional. Per-million token rates for models that bill text
+                                          vs image tokens separately (e.g. OpenAI gpt-image-2).
+                                          Standard chat models leave these at 0 and use
+                                          input_price_per_million / output_price_per_million instead.
+                                          Values align with usage token_type / internal/usage.Type
+                                          string values for each meter.
+                                        "text_output_price_per_million": 0.0
+                                          # Optional. Pricing per million tokens (aligns with existing
+                                          ModelPrice pattern).
+                                    },
+                                    "scaled_pricing": {
+                                        "intervals": [
+                                            {
+                                                "end_time":
+                                                  "2020-02-20 00:00:00",  # Optional. End of the
+                                                  interval, exclusive. Always on the hour.
+                                                "prices": {
+                "cache_read_input_price_per_million": 0.0,  #
+                                                      Optional. Per-million cache read rate for
+                                                      standard chat models (token_type "cache read
+                                                      input"). Multimodal models use
+                                                      text_cache_read_input_price_per_million /
+                                                      image_cache_read_input_price_per_million instead.
+                "cache_write_1h_input_price_per_million": 0.0,  #
+                                                      Optional. Price per million tokens written to the
+                                                      prompt cache with a 1-hour lifetime.
+                "cache_write_5m_input_price_per_million": 0.0,  #
+                                                      Optional. Price per million tokens written to the
+                                                      prompt cache with a 5-minute lifetime.
+                "image_cache_read_input_price_per_million": 0.0,
+                                                      # Optional. Pricing per million tokens (aligns
+                                                      with existing ModelPrice pattern).
+                "image_input_price_per_million": 0.0,  #
+                                                      Optional. Pricing per million tokens (aligns with
+                                                      existing ModelPrice pattern).
+                "image_output_price_per_million": 0.0,  #
+                                                      Optional. Pricing per million tokens (aligns with
+                                                      existing ModelPrice pattern).
+                "input_cache_read": 0.0,  # Optional. Cache read
+                                                      input price per single token. Equivalent to
+                                                      cache_read_input_price_per_million.
+                "input_price_per_million": 0.0,  # Optional.
+                                                      Pricing per million tokens (aligns with existing
+                                                      ModelPrice pattern).
+                "output_price_per_million": 0.0,  # Optional.
+                                                      Pricing per million tokens (aligns with existing
+                                                      ModelPrice pattern).
+                "price_per_audio": 0.0,  # Optional. Pricing per
+                                                      million tokens (aligns with existing ModelPrice
+                                                      pattern).
+                "price_per_image": 0.0,  # Optional. Unit-based
+                                                      pricing for non-token models (e.g., Fal AI
+                                                      image/video/audio generation, speech models). At
+                                                      most one of these is typically populated per
+                                                      model. Token-based models (chat, embeddings)
+                                                      leave all of these at 0 and populate
+                                                      input_price_per_million /
+                                                      output_price_per_million instead.
+                "price_per_megapixel": 0.0,  # Optional. Pricing
+                                                      per million tokens (aligns with existing
+                                                      ModelPrice pattern).
+                "price_per_second": 0.0,  # Optional. Pricing per
+                                                      million tokens (aligns with existing ModelPrice
+                                                      pattern).
+                "price_per_thousand_characters": 0.0,  #
+                                                      Optional. Pricing per million tokens (aligns with
+                                                      existing ModelPrice pattern).
+                "price_per_video": 0.0,  # Optional. Pricing per
+                                                      million tokens (aligns with existing ModelPrice
+                                                      pattern).
+                "reasoning_price_per_million": 0.0,  # Optional.
+                                                      Price per million reasoning tokens. 0 if the
+                                                      model does not charge separately for reasoning
+                                                      tokens.
+                "text_cache_read_input_price_per_million": 0.0,
+                                                      # Optional. Pricing per million tokens (aligns
+                                                      with existing ModelPrice pattern).
+                "text_input_price_per_million": 0.0,  # Optional.
+                                                      Per-million token rates for models that bill text
+                                                      vs image tokens separately (e.g. OpenAI
+                                                      gpt-image-2). Standard chat models leave these at
+                                                      0 and use input_price_per_million /
+                                                      output_price_per_million instead. Values align
+                                                      with usage token_type / internal/usage.Type
+                                                      string values for each meter.
+                "text_output_price_per_million": 0.0  # Optional.
+                                                      Pricing per million tokens (aligns with existing
+                                                      ModelPrice pattern).
+                                                },
+                                                "start_time":
+                                                  "2020-02-20 00:00:00"  # Optional. Start of the
+                                                  interval, inclusive. Always on the hour.
+                                            }
+                                        ],
+                                        "max_prices": {
+                "cache_read_input_price_per_million": 0.0,  # Optional.
+                                              Per-million cache read rate for standard chat models
+                                              (token_type "cache read input"). Multimodal models use
+                                              text_cache_read_input_price_per_million /
+                                              image_cache_read_input_price_per_million instead.
+                "cache_write_1h_input_price_per_million": 0.0,  #
+                                              Optional. Price per million tokens written to the prompt
+                                              cache with a 1-hour lifetime.
+                "cache_write_5m_input_price_per_million": 0.0,  #
+                                              Optional. Price per million tokens written to the prompt
+                                              cache with a 5-minute lifetime.
+                "image_cache_read_input_price_per_million": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "image_input_price_per_million": 0.0,  # Optional.
+                                              Pricing per million tokens (aligns with existing
+                                              ModelPrice pattern).
+                "image_output_price_per_million": 0.0,  # Optional.
+                                              Pricing per million tokens (aligns with existing
+                                              ModelPrice pattern).
+                                            "input_cache_read": 0.0,  #
+                                              Optional. Cache read input price per single token.
+                                              Equivalent to cache_read_input_price_per_million.
+                                            "input_price_per_million":
+                                              0.0,  # Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "output_price_per_million":
+                                              0.0,  # Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "price_per_audio": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "price_per_image": 0.0,  #
+                                              Optional. Unit-based pricing for non-token models (e.g.,
+                                              Fal AI image/video/audio generation, speech models). At
+                                              most one of these is typically populated per model.
+                                              Token-based models (chat, embeddings) leave all of these
+                                              at 0 and populate input_price_per_million /
+                                              output_price_per_million instead.
+                                            "price_per_megapixel": 0.0,
+                                              # Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "price_per_second": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "price_per_thousand_characters": 0.0,  # Optional.
+                                              Pricing per million tokens (aligns with existing
+                                              ModelPrice pattern).
+                                            "price_per_video": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "reasoning_price_per_million": 0.0,  # Optional. Price
+                                              per million reasoning tokens. 0 if the model does not
+                                              charge separately for reasoning tokens.
+                "text_cache_read_input_price_per_million": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "text_input_price_per_million": 0.0,  # Optional.
+                                              Per-million token rates for models that bill text vs
+                                              image tokens separately (e.g. OpenAI gpt-image-2).
+                                              Standard chat models leave these at 0 and use
+                                              input_price_per_million / output_price_per_million
+                                              instead. Values align with usage token_type /
+                                              internal/usage.Type string values for each meter.
+                "text_output_price_per_million": 0.0  # Optional. Pricing
+                                              per million tokens (aligns with existing ModelPrice
+                                              pattern).
+                                        },
+                                        "min_prices": {
+                "cache_read_input_price_per_million": 0.0,  # Optional.
+                                              Per-million cache read rate for standard chat models
+                                              (token_type "cache read input"). Multimodal models use
+                                              text_cache_read_input_price_per_million /
+                                              image_cache_read_input_price_per_million instead.
+                "cache_write_1h_input_price_per_million": 0.0,  #
+                                              Optional. Price per million tokens written to the prompt
+                                              cache with a 1-hour lifetime.
+                "cache_write_5m_input_price_per_million": 0.0,  #
+                                              Optional. Price per million tokens written to the prompt
+                                              cache with a 5-minute lifetime.
+                "image_cache_read_input_price_per_million": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "image_input_price_per_million": 0.0,  # Optional.
+                                              Pricing per million tokens (aligns with existing
+                                              ModelPrice pattern).
+                "image_output_price_per_million": 0.0,  # Optional.
+                                              Pricing per million tokens (aligns with existing
+                                              ModelPrice pattern).
+                                            "input_cache_read": 0.0,  #
+                                              Optional. Cache read input price per single token.
+                                              Equivalent to cache_read_input_price_per_million.
+                                            "input_price_per_million":
+                                              0.0,  # Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "output_price_per_million":
+                                              0.0,  # Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "price_per_audio": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "price_per_image": 0.0,  #
+                                              Optional. Unit-based pricing for non-token models (e.g.,
+                                              Fal AI image/video/audio generation, speech models). At
+                                              most one of these is typically populated per model.
+                                              Token-based models (chat, embeddings) leave all of these
+                                              at 0 and populate input_price_per_million /
+                                              output_price_per_million instead.
+                                            "price_per_megapixel": 0.0,
+                                              # Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "price_per_second": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "price_per_thousand_characters": 0.0,  # Optional.
+                                              Pricing per million tokens (aligns with existing
+                                              ModelPrice pattern).
+                                            "price_per_video": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "reasoning_price_per_million": 0.0,  # Optional. Price
+                                              per million reasoning tokens. 0 if the model does not
+                                              charge separately for reasoning tokens.
+                "text_cache_read_input_price_per_million": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "text_input_price_per_million": 0.0,  # Optional.
+                                              Per-million token rates for models that bill text vs
+                                              image tokens separately (e.g. OpenAI gpt-image-2).
+                                              Standard chat models leave these at 0 and use
+                                              input_price_per_million / output_price_per_million
+                                              instead. Values align with usage token_type /
+                                              internal/usage.Type string values for each meter.
+                "text_output_price_per_million": 0.0  # Optional. Pricing
+                                              per million tokens (aligns with existing ModelPrice
+                                              pattern).
+                                        }
+                                    },
+                                    "tier": "MODEL_PRICING_TIER_UNSPECIFIED"  #
+                                      Optional. Default value is "MODEL_PRICING_TIER_UNSPECIFIED". A
+                                      pricing variant of a model, such as a faster serving option or a
+                                      larger context window.   * MODEL_PRICING_TIER_STANDARD: Default
+                                      pricing. * MODEL_PRICING_TIER_FAST_MODE: Faster, higher-priority
+                                      serving at a premium price. * MODEL_PRICING_TIER_EXTENDED_1M:
+                                      Pricing for the 1M-token context window. *
+                                      MODEL_PRICING_TIER_EXTENDED_272K: Pricing for the 272K-token
+                                      context window. * MODEL_PRICING_TIER_BYOK: Pricing when using
+                                      your own model API key. Known values are:
+                                      "MODEL_PRICING_TIER_UNSPECIFIED", "MODEL_PRICING_TIER_STANDARD",
+                                      "MODEL_PRICING_TIER_FAST_MODE", "MODEL_PRICING_TIER_EXTENDED_1M",
+                                      "MODEL_PRICING_TIER_EXTENDED_272K", and
+                                      "MODEL_PRICING_TIER_BYOK".
+                                }
+                            ]
                         },
                         "provider": "MODEL_PROVIDER_DIGITALOCEAN",  # Optional. Default value
                           is "MODEL_PROVIDER_DIGITALOCEAN". Known values are:
@@ -262665,9 +263995,11 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                 body = {
                     "description": "str",  # Optional. Model router description.
                     "fallback_models": [
-                        "str"  # Optional. Fallback models.
+                        "str"  # Optional. At least one fallback model is required; order
+                          defines failover priority.
                     ],
-                    "name": "str",  # Optional. Model router name.
+                    "name": "str",  # Optional. Model router name: lowercase, at most 255
+                      characters, only a-z, 0-9, and hyphens.
                     "policies": [
                         {
                             "custom_task": {
@@ -262686,7 +264018,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                         }
                     ],
                     "regions": [
-                        "str"  # Optional. Target regions for the router.
+                        "str"  # Optional. DEPRECATED: this field does not affect deployment
+                          and model routers are always deployed to all regions. Must be omitted or set
+                          to ["all"].
                     ]
                 }
 
@@ -262837,9 +264171,11 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                 body = {
                     "description": "str",  # Optional. Model router description.
                     "fallback_models": [
-                        "str"  # Optional. Fallback models.
+                        "str"  # Optional. At least one fallback model is required; order
+                          defines failover priority.
                     ],
-                    "name": "str",  # Optional. Model router name.
+                    "name": "str",  # Optional. Model router name: lowercase, at most 255
+                      characters, only a-z, 0-9, and hyphens.
                     "policies": [
                         {
                             "custom_task": {
@@ -262858,7 +264194,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                         }
                     ],
                     "regions": [
-                        "str"  # Optional. Target regions for the router.
+                        "str"  # Optional. DEPRECATED: this field does not affect deployment
+                          and model routers are always deployed to all regions. Must be omitted or set
+                          to ["all"].
                     ]
                 }
 
@@ -263503,7 +264841,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                     "fallback_models": [
                         {}  # Optional.
                     ],
-                    "name": "str",  # Optional. Model router name.
+                    "name": "str",  # Optional. Model router name: lowercase, at most 255
+                      characters, only a-z, 0-9, and hyphens.
                     "policies": [
                         {
                             "custom_task": {
@@ -263522,7 +264861,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                         }
                     ],
                     "regions": [
-                        "str"  # Optional. Target regions for the router.
+                        "str"  # Optional. DEPRECATED: this field does not affect deployment
+                          and model routers are always deployed to all regions. Must be omitted or set
+                          to ["all"].
                     ],
                     "uuid": "str"  # Optional. Model router id.
                 }
@@ -263681,7 +265022,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                     "fallback_models": [
                         {}  # Optional.
                     ],
-                    "name": "str",  # Optional. Model router name.
+                    "name": "str",  # Optional. Model router name: lowercase, at most 255
+                      characters, only a-z, 0-9, and hyphens.
                     "policies": [
                         {
                             "custom_task": {
@@ -263700,7 +265042,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                         }
                     ],
                     "regions": [
-                        "str"  # Optional. Target regions for the router.
+                        "str"  # Optional. DEPRECATED: this field does not affect deployment
+                          and model routers are always deployed to all regions. Must be omitted or set
+                          to ["all"].
                     ],
                     "uuid": "str"  # Optional. Model router id.
                 }
@@ -267370,6 +268714,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                 "str"  # Optional. VPC Egress IPs.
                             ],
                             "vpc_uuid": "str",  # Optional.
+                            "web_fetch_enabled": bool,  # Optional. Whether this agent
+                              can use the built-in web_fetch tool.
+                            "web_search_enabled": bool,  # Optional. Whether this agent
+                              can use the built-in web_search tool.
                             "workspace": {
                                 "agents": [
                                     ...
@@ -267447,16 +268795,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "custom_eval_config":
                                                   {
                                                     "created_at":
-                                                      "2020-02-20 00:00:00",  # Optional. Timestamp
-                                                      when the custom metric was created.
-                                                      Server-assigned; ignored on create/update
-                                                      requests.
+                                                      "2020-02-20 00:00:00",  # Optional. Configuration
+                                                      for a custom model-evaluation metric scored by an
+                                                      LLM judge. Prompt and model response are always
+                                                      included in the judge context.
                                                     "deleted_at":
                                                       "2020-02-20 00:00:00",  # Optional. When set, the
-                                                      custom metric has been deleted and is no longer
-                                                      available for use in evaluations.
-                                                      Server-assigned; ignored on create/update
-                                                      requests.
+                                                      custom metric is soft-deleted and must not appear
+                                                      in pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                       true, each row must provide ground truth and it
                                                       is included in the judge context. When false,
@@ -267465,10 +268811,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                 "scoring_prompt": "str",  # Optional.
                                                       Instructions for the judge model (multi-line).
                                                     "updated_at":
-                                                      "2020-02-20 00:00:00"  # Optional. Timestamp when
-                                                      the custom metric was last updated.
-                                                      Server-assigned; ignored on create/update
-                                                      requests.
+                                                      "2020-02-20 00:00:00"  # Optional. Configuration
+                                                      for a custom model-evaluation metric scored by an
+                                                      LLM judge. Prompt and model response are always
+                                                      included in the judge context.
                                                 },
                                                 "description": "str",
                                                   # Optional. Evaluations.
@@ -269581,6 +270927,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "str"  # Optional. VPC Egress IPs.
                                     ],
                                     "vpc_uuid": "str",  # Optional. Agents.
+                                    "web_fetch_enabled": bool,  # Optional.
+                                      Whether this agent can use the built-in web_fetch tool.
+                                    "web_search_enabled": bool,  # Optional.
+                                      Whether this agent can use the built-in web_search tool.
                                     "workspace": ...
                                 }
                             ],
@@ -269656,14 +271006,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_MODEL_FIT".
                                             "custom_eval_config": {
                                                 "created_at":
-                                                  "2020-02-20 00:00:00",  # Optional. Timestamp when
-                                                  the custom metric was created. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00",  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                                 "deleted_at":
                                                   "2020-02-20 00:00:00",  # Optional. When set, the
-                                                  custom metric has been deleted and is no longer
-                                                  available for use in evaluations. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  custom metric is soft-deleted and must not appear in
+                                                  pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                   true, each row must provide ground truth and it is
                                                   included in the judge context. When false, ground
@@ -269672,9 +271022,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
                                                 "updated_at":
-                                                  "2020-02-20 00:00:00"  # Optional. Timestamp when the
-                                                  custom metric was last updated. Server-assigned;
-                                                  ignored on create/update requests.
+                                                  "2020-02-20 00:00:00"  # Optional. Configuration for
+                                                  a custom model-evaluation metric scored by an LLM
+                                                  judge. Prompt and model response are always included
+                                                  in the judge context.
                                             },
                                             "description": "str",  #
                                               Optional. Evaluations.
@@ -271028,6 +272379,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                     "str"  # Optional. VPC Egress IPs.
                                 ],
                                 "vpc_uuid": "str",  # Optional. Agents.
+                                "web_fetch_enabled": bool,  # Optional. Whether this
+                                  agent can use the built-in web_fetch tool.
+                                "web_search_enabled": bool,  # Optional. Whether this
+                                  agent can use the built-in web_search tool.
                                 "workspace": ...
                             }
                         ],
@@ -271095,14 +272450,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           "METRIC_CATEGORY_MODEL_FIT".
                                         "custom_eval_config": {
                                             "created_at": "2020-02-20
-                                              00:00:00",  # Optional. Timestamp when the custom metric
-                                              was created. Server-assigned; ignored on create/update
-                                              requests.
+                                              00:00:00",  # Optional. Configuration for a custom
+                                              model-evaluation metric scored by an LLM judge. Prompt
+                                              and model response are always included in the judge
+                                              context.
                                             "deleted_at": "2020-02-20
-                                              00:00:00",  # Optional. When set, the custom metric has
-                                              been deleted and is no longer available for use in
-                                              evaluations. Server-assigned; ignored on create/update
-                                              requests.
+                                              00:00:00",  # Optional. When set, the custom metric is
+                                              soft-deleted and must not appear in pickers.
                                             "requires_ground_truth":
                                               bool,  # Optional. When true, each row must provide
                                               ground truth and it is included in the judge context.
@@ -271111,9 +272465,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
                                             "updated_at": "2020-02-20
-                                              00:00:00"  # Optional. Timestamp when the custom metric
-                                              was last updated. Server-assigned; ignored on
-                                              create/update requests.
+                                              00:00:00"  # Optional. Configuration for a custom
+                                              model-evaluation metric scored by an LLM judge. Prompt
+                                              and model response are always included in the judge
+                                              context.
                                         },
                                         "description": "str",  # Optional.
                                           Evaluations.
@@ -272376,6 +273731,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                     "str"  # Optional. VPC Egress IPs.
                                 ],
                                 "vpc_uuid": "str",  # Optional. Agents.
+                                "web_fetch_enabled": bool,  # Optional. Whether this
+                                  agent can use the built-in web_fetch tool.
+                                "web_search_enabled": bool,  # Optional. Whether this
+                                  agent can use the built-in web_search tool.
                                 "workspace": ...
                             }
                         ],
@@ -272443,14 +273802,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           "METRIC_CATEGORY_MODEL_FIT".
                                         "custom_eval_config": {
                                             "created_at": "2020-02-20
-                                              00:00:00",  # Optional. Timestamp when the custom metric
-                                              was created. Server-assigned; ignored on create/update
-                                              requests.
+                                              00:00:00",  # Optional. Configuration for a custom
+                                              model-evaluation metric scored by an LLM judge. Prompt
+                                              and model response are always included in the judge
+                                              context.
                                             "deleted_at": "2020-02-20
-                                              00:00:00",  # Optional. When set, the custom metric has
-                                              been deleted and is no longer available for use in
-                                              evaluations. Server-assigned; ignored on create/update
-                                              requests.
+                                              00:00:00",  # Optional. When set, the custom metric is
+                                              soft-deleted and must not appear in pickers.
                                             "requires_ground_truth":
                                               bool,  # Optional. When true, each row must provide
                                               ground truth and it is included in the judge context.
@@ -272459,9 +273817,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
                                             "updated_at": "2020-02-20
-                                              00:00:00"  # Optional. Timestamp when the custom metric
-                                              was last updated. Server-assigned; ignored on
-                                              create/update requests.
+                                              00:00:00"  # Optional. Configuration for a custom
+                                              model-evaluation metric scored by an LLM judge. Prompt
+                                              and model response are always included in the judge
+                                              context.
                                         },
                                         "description": "str",  # Optional.
                                           Evaluations.
@@ -273726,6 +275085,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                     "str"  # Optional. VPC Egress IPs.
                                 ],
                                 "vpc_uuid": "str",  # Optional. Agents.
+                                "web_fetch_enabled": bool,  # Optional. Whether this
+                                  agent can use the built-in web_fetch tool.
+                                "web_search_enabled": bool,  # Optional. Whether this
+                                  agent can use the built-in web_search tool.
                                 "workspace": ...
                             }
                         ],
@@ -273793,14 +275156,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           "METRIC_CATEGORY_MODEL_FIT".
                                         "custom_eval_config": {
                                             "created_at": "2020-02-20
-                                              00:00:00",  # Optional. Timestamp when the custom metric
-                                              was created. Server-assigned; ignored on create/update
-                                              requests.
+                                              00:00:00",  # Optional. Configuration for a custom
+                                              model-evaluation metric scored by an LLM judge. Prompt
+                                              and model response are always included in the judge
+                                              context.
                                             "deleted_at": "2020-02-20
-                                              00:00:00",  # Optional. When set, the custom metric has
-                                              been deleted and is no longer available for use in
-                                              evaluations. Server-assigned; ignored on create/update
-                                              requests.
+                                              00:00:00",  # Optional. When set, the custom metric is
+                                              soft-deleted and must not appear in pickers.
                                             "requires_ground_truth":
                                               bool,  # Optional. When true, each row must provide
                                               ground truth and it is included in the judge context.
@@ -273809,9 +275171,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
                                             "updated_at": "2020-02-20
-                                              00:00:00"  # Optional. Timestamp when the custom metric
-                                              was last updated. Server-assigned; ignored on
-                                              create/update requests.
+                                              00:00:00"  # Optional. Configuration for a custom
+                                              model-evaluation metric scored by an LLM judge. Prompt
+                                              and model response are always included in the judge
+                                              context.
                                         },
                                         "description": "str",  # Optional.
                                           Evaluations.
@@ -275158,6 +276521,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                     "str"  # Optional. VPC Egress IPs.
                                 ],
                                 "vpc_uuid": "str",  # Optional. Agents.
+                                "web_fetch_enabled": bool,  # Optional. Whether this
+                                  agent can use the built-in web_fetch tool.
+                                "web_search_enabled": bool,  # Optional. Whether this
+                                  agent can use the built-in web_search tool.
                                 "workspace": ...
                             }
                         ],
@@ -275225,14 +276592,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           "METRIC_CATEGORY_MODEL_FIT".
                                         "custom_eval_config": {
                                             "created_at": "2020-02-20
-                                              00:00:00",  # Optional. Timestamp when the custom metric
-                                              was created. Server-assigned; ignored on create/update
-                                              requests.
+                                              00:00:00",  # Optional. Configuration for a custom
+                                              model-evaluation metric scored by an LLM judge. Prompt
+                                              and model response are always included in the judge
+                                              context.
                                             "deleted_at": "2020-02-20
-                                              00:00:00",  # Optional. When set, the custom metric has
-                                              been deleted and is no longer available for use in
-                                              evaluations. Server-assigned; ignored on create/update
-                                              requests.
+                                              00:00:00",  # Optional. When set, the custom metric is
+                                              soft-deleted and must not appear in pickers.
                                             "requires_ground_truth":
                                               bool,  # Optional. When true, each row must provide
                                               ground truth and it is included in the judge context.
@@ -275241,9 +276607,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
                                             "updated_at": "2020-02-20
-                                              00:00:00"  # Optional. Timestamp when the custom metric
-                                              was last updated. Server-assigned; ignored on
-                                              create/update requests.
+                                              00:00:00"  # Optional. Configuration for a custom
+                                              model-evaluation metric scored by an LLM judge. Prompt
+                                              and model response are always included in the judge
+                                              context.
                                         },
                                         "description": "str",  # Optional.
                                           Evaluations.
@@ -276593,6 +277960,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                     "str"  # Optional. VPC Egress IPs.
                                 ],
                                 "vpc_uuid": "str",  # Optional. Agents.
+                                "web_fetch_enabled": bool,  # Optional. Whether this
+                                  agent can use the built-in web_fetch tool.
+                                "web_search_enabled": bool,  # Optional. Whether this
+                                  agent can use the built-in web_search tool.
                                 "workspace": ...
                             }
                         ],
@@ -276660,14 +278031,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           "METRIC_CATEGORY_MODEL_FIT".
                                         "custom_eval_config": {
                                             "created_at": "2020-02-20
-                                              00:00:00",  # Optional. Timestamp when the custom metric
-                                              was created. Server-assigned; ignored on create/update
-                                              requests.
+                                              00:00:00",  # Optional. Configuration for a custom
+                                              model-evaluation metric scored by an LLM judge. Prompt
+                                              and model response are always included in the judge
+                                              context.
                                             "deleted_at": "2020-02-20
-                                              00:00:00",  # Optional. When set, the custom metric has
-                                              been deleted and is no longer available for use in
-                                              evaluations. Server-assigned; ignored on create/update
-                                              requests.
+                                              00:00:00",  # Optional. When set, the custom metric is
+                                              soft-deleted and must not appear in pickers.
                                             "requires_ground_truth":
                                               bool,  # Optional. When true, each row must provide
                                               ground truth and it is included in the judge context.
@@ -276676,9 +278046,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
                                             "updated_at": "2020-02-20
-                                              00:00:00"  # Optional. Timestamp when the custom metric
-                                              was last updated. Server-assigned; ignored on
-                                              create/update requests.
+                                              00:00:00"  # Optional. Configuration for a custom
+                                              model-evaluation metric scored by an LLM judge. Prompt
+                                              and model response are always included in the judge
+                                              context.
                                         },
                                         "description": "str",  # Optional.
                                           Evaluations.
@@ -277944,6 +279315,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                     "str"  # Optional. VPC Egress IPs.
                                 ],
                                 "vpc_uuid": "str",  # Optional. Agents.
+                                "web_fetch_enabled": bool,  # Optional. Whether this
+                                  agent can use the built-in web_fetch tool.
+                                "web_search_enabled": bool,  # Optional. Whether this
+                                  agent can use the built-in web_search tool.
                                 "workspace": ...
                             }
                         ],
@@ -278011,14 +279386,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           "METRIC_CATEGORY_MODEL_FIT".
                                         "custom_eval_config": {
                                             "created_at": "2020-02-20
-                                              00:00:00",  # Optional. Timestamp when the custom metric
-                                              was created. Server-assigned; ignored on create/update
-                                              requests.
+                                              00:00:00",  # Optional. Configuration for a custom
+                                              model-evaluation metric scored by an LLM judge. Prompt
+                                              and model response are always included in the judge
+                                              context.
                                             "deleted_at": "2020-02-20
-                                              00:00:00",  # Optional. When set, the custom metric has
-                                              been deleted and is no longer available for use in
-                                              evaluations. Server-assigned; ignored on create/update
-                                              requests.
+                                              00:00:00",  # Optional. When set, the custom metric is
+                                              soft-deleted and must not appear in pickers.
                                             "requires_ground_truth":
                                               bool,  # Optional. When true, each row must provide
                                               ground truth and it is included in the judge context.
@@ -278027,9 +279401,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
                                             "updated_at": "2020-02-20
-                                              00:00:00"  # Optional. Timestamp when the custom metric
-                                              was last updated. Server-assigned; ignored on
-                                              create/update requests.
+                                              00:00:00"  # Optional. Configuration for a custom
+                                              model-evaluation metric scored by an LLM judge. Prompt
+                                              and model response are always included in the judge
+                                              context.
                                         },
                                         "description": "str",  # Optional.
                                           Evaluations.
@@ -279297,6 +280672,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                     "str"  # Optional. VPC Egress IPs.
                                 ],
                                 "vpc_uuid": "str",  # Optional. Agents.
+                                "web_fetch_enabled": bool,  # Optional. Whether this
+                                  agent can use the built-in web_fetch tool.
+                                "web_search_enabled": bool,  # Optional. Whether this
+                                  agent can use the built-in web_search tool.
                                 "workspace": ...
                             }
                         ],
@@ -279364,14 +280743,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           "METRIC_CATEGORY_MODEL_FIT".
                                         "custom_eval_config": {
                                             "created_at": "2020-02-20
-                                              00:00:00",  # Optional. Timestamp when the custom metric
-                                              was created. Server-assigned; ignored on create/update
-                                              requests.
+                                              00:00:00",  # Optional. Configuration for a custom
+                                              model-evaluation metric scored by an LLM judge. Prompt
+                                              and model response are always included in the judge
+                                              context.
                                             "deleted_at": "2020-02-20
-                                              00:00:00",  # Optional. When set, the custom metric has
-                                              been deleted and is no longer available for use in
-                                              evaluations. Server-assigned; ignored on create/update
-                                              requests.
+                                              00:00:00",  # Optional. When set, the custom metric is
+                                              soft-deleted and must not appear in pickers.
                                             "requires_ground_truth":
                                               bool,  # Optional. When true, each row must provide
                                               ground truth and it is included in the judge context.
@@ -279380,9 +280758,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
                                             "updated_at": "2020-02-20
-                                              00:00:00"  # Optional. Timestamp when the custom metric
-                                              was last updated. Server-assigned; ignored on
-                                              create/update requests.
+                                              00:00:00"  # Optional. Configuration for a custom
+                                              model-evaluation metric scored by an LLM judge. Prompt
+                                              and model response are always included in the judge
+                                              context.
                                         },
                                         "description": "str",  # Optional.
                                           Evaluations.
@@ -280794,6 +282173,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                 "str"  # Optional. VPC Egress IPs.
                             ],
                             "vpc_uuid": "str",  # Optional.
+                            "web_fetch_enabled": bool,  # Optional. Whether this agent
+                              can use the built-in web_fetch tool.
+                            "web_search_enabled": bool,  # Optional. Whether this agent
+                              can use the built-in web_search tool.
                             "workspace": {
                                 "agents": [
                                     ...
@@ -280871,16 +282254,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "custom_eval_config":
                                                   {
                                                     "created_at":
-                                                      "2020-02-20 00:00:00",  # Optional. Timestamp
-                                                      when the custom metric was created.
-                                                      Server-assigned; ignored on create/update
-                                                      requests.
+                                                      "2020-02-20 00:00:00",  # Optional. Configuration
+                                                      for a custom model-evaluation metric scored by an
+                                                      LLM judge. Prompt and model response are always
+                                                      included in the judge context.
                                                     "deleted_at":
                                                       "2020-02-20 00:00:00",  # Optional. When set, the
-                                                      custom metric has been deleted and is no longer
-                                                      available for use in evaluations.
-                                                      Server-assigned; ignored on create/update
-                                                      requests.
+                                                      custom metric is soft-deleted and must not appear
+                                                      in pickers.
                 "requires_ground_truth": bool,  # Optional. When
                                                       true, each row must provide ground truth and it
                                                       is included in the judge context. When false,
@@ -280889,10 +282270,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                 "scoring_prompt": "str",  # Optional.
                                                       Instructions for the judge model (multi-line).
                                                     "updated_at":
-                                                      "2020-02-20 00:00:00"  # Optional. Timestamp when
-                                                      the custom metric was last updated.
-                                                      Server-assigned; ignored on create/update
-                                                      requests.
+                                                      "2020-02-20 00:00:00"  # Optional. Configuration
+                                                      for a custom model-evaluation metric scored by an
+                                                      LLM judge. Prompt and model response are always
+                                                      included in the judge context.
                                                 },
                                                 "description": "str",
                                                   # Optional. Evaluations.
@@ -282274,6 +283655,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                     "str"  # Optional. VPC Egress IPs.
                                 ],
                                 "vpc_uuid": "str",  # Optional. Agents.
+                                "web_fetch_enabled": bool,  # Optional. Whether this
+                                  agent can use the built-in web_fetch tool.
+                                "web_search_enabled": bool,  # Optional. Whether this
+                                  agent can use the built-in web_search tool.
                                 "workspace": ...
                             }
                         ],
@@ -282341,14 +283726,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           "METRIC_CATEGORY_MODEL_FIT".
                                         "custom_eval_config": {
                                             "created_at": "2020-02-20
-                                              00:00:00",  # Optional. Timestamp when the custom metric
-                                              was created. Server-assigned; ignored on create/update
-                                              requests.
+                                              00:00:00",  # Optional. Configuration for a custom
+                                              model-evaluation metric scored by an LLM judge. Prompt
+                                              and model response are always included in the judge
+                                              context.
                                             "deleted_at": "2020-02-20
-                                              00:00:00",  # Optional. When set, the custom metric has
-                                              been deleted and is no longer available for use in
-                                              evaluations. Server-assigned; ignored on create/update
-                                              requests.
+                                              00:00:00",  # Optional. When set, the custom metric is
+                                              soft-deleted and must not appear in pickers.
                                             "requires_ground_truth":
                                               bool,  # Optional. When true, each row must provide
                                               ground truth and it is included in the judge context.
@@ -282357,9 +283741,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
                                             "updated_at": "2020-02-20
-                                              00:00:00"  # Optional. Timestamp when the custom metric
-                                              was last updated. Server-assigned; ignored on
-                                              create/update requests.
+                                              00:00:00"  # Optional. Configuration for a custom
+                                              model-evaluation metric scored by an LLM judge. Prompt
+                                              and model response are always included in the judge
+                                              context.
                                         },
                                         "description": "str",  # Optional.
                                           Evaluations.
@@ -283625,6 +285010,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                     "str"  # Optional. VPC Egress IPs.
                                 ],
                                 "vpc_uuid": "str",  # Optional. Agents.
+                                "web_fetch_enabled": bool,  # Optional. Whether this
+                                  agent can use the built-in web_fetch tool.
+                                "web_search_enabled": bool,  # Optional. Whether this
+                                  agent can use the built-in web_search tool.
                                 "workspace": ...
                             }
                         ],
@@ -283692,14 +285081,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           "METRIC_CATEGORY_MODEL_FIT".
                                         "custom_eval_config": {
                                             "created_at": "2020-02-20
-                                              00:00:00",  # Optional. Timestamp when the custom metric
-                                              was created. Server-assigned; ignored on create/update
-                                              requests.
+                                              00:00:00",  # Optional. Configuration for a custom
+                                              model-evaluation metric scored by an LLM judge. Prompt
+                                              and model response are always included in the judge
+                                              context.
                                             "deleted_at": "2020-02-20
-                                              00:00:00",  # Optional. When set, the custom metric has
-                                              been deleted and is no longer available for use in
-                                              evaluations. Server-assigned; ignored on create/update
-                                              requests.
+                                              00:00:00",  # Optional. When set, the custom metric is
+                                              soft-deleted and must not appear in pickers.
                                             "requires_ground_truth":
                                               bool,  # Optional. When true, each row must provide
                                               ground truth and it is included in the judge context.
@@ -283708,9 +285096,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
                                             "updated_at": "2020-02-20
-                                              00:00:00"  # Optional. Timestamp when the custom metric
-                                              was last updated. Server-assigned; ignored on
-                                              create/update requests.
+                                              00:00:00"  # Optional. Configuration for a custom
+                                              model-evaluation metric scored by an LLM judge. Prompt
+                                              and model response are always included in the judge
+                                              context.
                                         },
                                         "description": "str",  # Optional.
                                           Evaluations.
@@ -284979,6 +286368,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                     "str"  # Optional. VPC Egress IPs.
                                 ],
                                 "vpc_uuid": "str",  # Optional. Agents.
+                                "web_fetch_enabled": bool,  # Optional. Whether this
+                                  agent can use the built-in web_fetch tool.
+                                "web_search_enabled": bool,  # Optional. Whether this
+                                  agent can use the built-in web_search tool.
                                 "workspace": ...
                             }
                         ],
@@ -285046,14 +286439,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           "METRIC_CATEGORY_MODEL_FIT".
                                         "custom_eval_config": {
                                             "created_at": "2020-02-20
-                                              00:00:00",  # Optional. Timestamp when the custom metric
-                                              was created. Server-assigned; ignored on create/update
-                                              requests.
+                                              00:00:00",  # Optional. Configuration for a custom
+                                              model-evaluation metric scored by an LLM judge. Prompt
+                                              and model response are always included in the judge
+                                              context.
                                             "deleted_at": "2020-02-20
-                                              00:00:00",  # Optional. When set, the custom metric has
-                                              been deleted and is no longer available for use in
-                                              evaluations. Server-assigned; ignored on create/update
-                                              requests.
+                                              00:00:00",  # Optional. When set, the custom metric is
+                                              soft-deleted and must not appear in pickers.
                                             "requires_ground_truth":
                                               bool,  # Optional. When true, each row must provide
                                               ground truth and it is included in the judge context.
@@ -285062,9 +286454,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
                                             "updated_at": "2020-02-20
-                                              00:00:00"  # Optional. Timestamp when the custom metric
-                                              was last updated. Server-assigned; ignored on
-                                              create/update requests.
+                                              00:00:00"  # Optional. Configuration for a custom
+                                              model-evaluation metric scored by an LLM judge. Prompt
+                                              and model response are always included in the judge
+                                              context.
                                         },
                                         "description": "str",  # Optional.
                                           Evaluations.
@@ -285318,12 +286711,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       "METRIC_CATEGORY_MODEL_FIT".
                                     "custom_eval_config": {
                                         "created_at": "2020-02-20 00:00:00",
-                                          # Optional. Timestamp when the custom metric was created.
-                                          Server-assigned; ignored on create/update requests.
+                                          # Optional. Configuration for a custom model-evaluation
+                                          metric scored by an LLM judge. Prompt and model response are
+                                          always included in the judge context.
                                         "deleted_at": "2020-02-20 00:00:00",
-                                          # Optional. When set, the custom metric has been deleted and
-                                          is no longer available for use in evaluations.
-                                          Server-assigned; ignored on create/update requests.
+                                          # Optional. When set, the custom metric is soft-deleted and
+                                          must not appear in pickers.
                                         "requires_ground_truth": bool,  #
                                           Optional. When true, each row must provide ground truth and
                                           it is included in the judge context. When false, ground truth
@@ -285331,8 +286724,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "scoring_prompt": "str",  # Optional.
                                           Instructions for the judge model (multi-line).
                                         "updated_at": "2020-02-20 00:00:00"
-                                          # Optional. Timestamp when the custom metric was last
-                                          updated. Server-assigned; ignored on create/update requests.
+                                          # Optional. Configuration for a custom model-evaluation
+                                          metric scored by an LLM judge. Prompt and model response are
+                                          always included in the judge context.
                                     },
                                     "description": "str",  # Optional.
                                     "evaluation_scope":
