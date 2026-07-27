@@ -146,6 +146,30 @@ def test_session_create_uses_public_api_and_actor_header():
     assert session.actor_id == "actor-123"
 
 
+def test_session_approve_posts_to_gateway():
+    parent = make_async_parent(
+        [
+            AsyncFakeResponse(201, session_create_response()),
+            AsyncFakeResponse(200, {"status": "approved"}),
+        ]
+    )
+    operations = AsyncSessionsOperations(parent, gateway_endpoint=TEST_GATEWAY_URL)
+
+    async def scenario():
+        session = await operations.create("actor-123")
+        result = await session.approve("approval-123")
+        return session, result
+
+    session, result = _run(scenario())
+    request = parent._client._pipeline.calls[1].request
+    assert request.url == f"{TEST_GATEWAY_URL}/approvals/approval-123"
+    assert request.headers[SESSION_ID_HEADER] == "test-session"
+    assert request.headers[ACTOR_ID_HEADER] == "actor-123"
+    assert json.loads(request.content) == {"decision": "approve"}
+    assert result.status == "approved"
+    assert session.actor_id == "actor-123"
+
+
 def test_tools_callable_and_handle_tool_calls():
     envelope = invoke_envelope(output={"ok": True})
     gateway = make_async_gateway(

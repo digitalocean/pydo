@@ -71,6 +71,14 @@ result = session.code.execute("print(sum(range(10)))")
 
 These calls use JSON-RPC over the `mcpUrl` returned by session creation, with `X-Session-Id` and `X-Actor-Id`.
 
+For policies that require approval, approve a pending invocation by ID:
+
+```python
+session.approve(approval_id)
+```
+
+See `examples/gateway/approval_flow.py` for a complete request, approval, and retry flow.
+
 ---
 
 ## 3. Using tools with a model

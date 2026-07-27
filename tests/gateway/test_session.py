@@ -151,3 +151,24 @@ def test_sessions_create_with_permissions_and_name():
         "rules": [{"tool": "web_search", "action": "allow"}],
     }
     assert session.name == "named"
+
+
+def test_session_approve_posts_to_gateway():
+    parent = make_parent(
+        [
+            FakeResponse(200, session_create_response()),
+            FakeResponse(200, {"status": "approved"}),
+        ]
+    )
+    session = SessionsOperations(parent, gateway_endpoint=TEST_GATEWAY_URL).create(
+        "user-123"
+    )
+
+    result = session.approve("approval-123")
+
+    request = parent._client._pipeline.calls[1].request
+    assert request.url == f"{TEST_GATEWAY_URL}/approvals/approval-123"
+    assert request.headers[SESSION_ID_HEADER] == "test-session"
+    assert request.headers[ACTOR_ID_HEADER] == "user-123"
+    assert json.loads(request.content) == {"decision": "approve"}
+    assert result.status == "approved"

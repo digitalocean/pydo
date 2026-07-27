@@ -104,6 +104,7 @@ class Session:
         self._mcp_url = mcp_url
         self.tools = tools
         self.code = code
+        self._transport = tools._transport
         self.provider = provider
         self.raw = raw or {}
 
@@ -133,6 +134,10 @@ class Session:
     ) -> List[Any]:
         """Execute pre-extracted tool calls; return raw outputs."""
         return execute_tool_calls(calls, self.tools, rationale=rationale)
+
+    def approve(self, approval_id: str) -> Any:
+        """Approve a pending tool invocation for this session."""
+        return self._transport.approve(approval_id)
 
     def __repr__(self) -> str:  # pragma: no cover - debug aid
         return f"<Session id={self.session_urn!r} actor_id={self.actor_id!r}>"

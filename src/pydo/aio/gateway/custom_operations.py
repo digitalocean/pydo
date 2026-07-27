@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import itertools
 from typing import Any, Dict, List, Optional, Sequence, Union
+from urllib.parse import quote, urlsplit
 
 from azure.core.rest import HttpRequest
 
@@ -62,6 +63,9 @@ class AsyncGatewayTransport:
     async def call_tool(
         self, name: str, arguments: Dict[str, Any], *, meta: bool
     ) -> Any:
+        raise NotImplementedError
+
+    async def approve(self, approval_id: str) -> Any:
         raise NotImplementedError
 
 
@@ -137,6 +141,25 @@ class AsyncMCPTransport(AsyncGatewayTransport):
             meta=meta,
         )
         return _unwrap_call_result(result)
+
+    async def approve(self, approval_id: str) -> Any:
+        if not approval_id or not str(approval_id).strip():
+            raise ValueError("approval_id is required")
+        endpoint = urlsplit(self.endpoint_url or self._client._base_url)
+        approval_id = quote(str(approval_id).strip(), safe="")
+        url = f"{endpoint.scheme}://{endpoint.netloc}/approvals/{approval_id}"
+        request = HttpRequest(
+            "POST",
+            url,
+            headers={**self._headers(), "Accept": "application/json"},
+            json={"decision": "approve"},
+        )
+        pipeline_response = await self._client._pipeline.run(request)
+        response = pipeline_response.http_response
+        body = await response.read()
+        if response.status_code not in (200, 201, 202, 204):
+            _raise_gateway_http_error(response)
+        return _wrap(_parse_json_body(body)) if body else None
 
 
 class AsyncRESTTransport(AsyncGatewayTransport):
