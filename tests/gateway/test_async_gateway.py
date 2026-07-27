@@ -13,18 +13,29 @@ import json
 import pytest
 from azure.core.exceptions import HttpResponseError
 
-from pydo.aio.gateway import AsyncGatewayResources, AsyncMCPTransport
+from pydo.aio.gateway import (
+    AsyncGatewayResources,
+    AsyncMCPTransport,
+    AsyncSessionsOperations,
+)
 from pydo.custom_extensions import _BaseURLProxy
-from pydo.gateway import ChatCompletionsProvider, GatewayToolError, SESSION_ID_HEADER
+from pydo.gateway import (
+    ACTOR_ID_HEADER,
+    SESSION_ID_HEADER,
+    ChatCompletionsProvider,
+    GatewayToolError,
+)
 
 from .conftest import (
     TEST_GATEWAY_URL,
     TEST_SESSION_URN,
     AsyncFakeResponse,
+    jsonrpc_result,
     chat_tool_response,
     invoke_envelope,
     make_async_gateway,
     make_async_parent,
+    session_create_response,
     tool_result,
 )
 
@@ -62,7 +73,8 @@ def test_invoke_and_invoke_one():
     assert output.answer == 7
     request = _sent_request(gateway)
     assert request.url.endswith("/tools/invoke")
-    assert request.headers[SESSION_ID_HEADER] == TEST_SESSION_URN
+    assert request.headers[SESSION_ID_HEADER] == "test-session"
+    assert request.headers[ACTOR_ID_HEADER] == "actor-123"
     assert _sent_payload(gateway)["tools"][0]["tool"] == "web_search"
 
 
@@ -98,9 +110,40 @@ def test_mcp_transport_parses_sse_response():
     gateway = AsyncGatewayResources(
         parent,
         gateway_endpoint=TEST_GATEWAY_URL,
-        transport=AsyncMCPTransport(proxy, session_id=TEST_SESSION_URN),
+        transport=AsyncMCPTransport(
+            proxy, session_id=TEST_SESSION_URN, actor_id="actor-123"
+        ),
     )
     assert _run(gateway.tools.list())[0].name == "action_search"
+
+
+def test_session_create_uses_public_api_and_actor_header():
+    parent = make_async_parent(
+        [
+            AsyncFakeResponse(201, session_create_response()),
+            AsyncFakeResponse(200, jsonrpc_result({"tools": []})),
+        ]
+    )
+    operations = AsyncSessionsOperations(parent, gateway_endpoint=TEST_GATEWAY_URL)
+
+    async def scenario():
+        session = await operations.create("actor-123", name="named")
+        await session.tools.list(include_all=True)
+        return session
+
+    session = _run(scenario())
+    create_request = parent._client._pipeline.calls[0].request
+    assert create_request.url.endswith("/v2/action-gateway/sessions")
+    assert json.loads(create_request.content) == {
+        "actor_id": "actor-123",
+        "name": "named",
+        "policy": {"defaultAction": "allow"},
+    }
+    tool_request = parent._client._pipeline.calls[1].request
+    assert tool_request.url == session.url
+    assert tool_request.headers[SESSION_ID_HEADER] == "test-session"
+    assert tool_request.headers[ACTOR_ID_HEADER] == "actor-123"
+    assert session.actor_id == "actor-123"
 
 
 def test_tools_callable_and_handle_tool_calls():

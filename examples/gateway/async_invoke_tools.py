@@ -5,19 +5,19 @@ Required env:
 
 Optional env:
   PYDO_GATEWAY_ENDPOINT   preview: https://actions.do-ai-test.run
-  END_USER_ID
+  ACTOR_ID
 """
 
 import asyncio
 import os
 
-from pydo.action_gateway.aio import Client
+from pydo.action_gateway.aio import ActionGatewayClient
 
 
 async def main() -> None:
-    client = Client(token=os.environ["DIGITALOCEAN_TOKEN"])
-    session = await client.sessions.create(
-        end_user_id=os.environ.get("END_USER_ID", "example-user"),
+    client = ActionGatewayClient(token=os.environ["DIGITALOCEAN_TOKEN"])
+    session = await client.session.create(
+        actor_id=os.environ.get("ACTOR_ID", "example-user"),
     )
 
     tools = await session.tools.list(include_all=True)

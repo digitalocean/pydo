@@ -105,7 +105,9 @@ def _normalize_invoke_entry(spec: Any) -> Dict[str, Any]:
 
     arguments = spec.get("arguments")
     if arguments is None:
-        hoisted = {k: v for k, v in spec.items() if k not in _INVOKE_ENTRY_RESERVED_KEYS}
+        hoisted = {
+            k: v for k, v in spec.items() if k not in _INVOKE_ENTRY_RESERVED_KEYS
+        }
         arguments = hoisted if hoisted else {}
     else:
         arguments = _decode_json_object(arguments)

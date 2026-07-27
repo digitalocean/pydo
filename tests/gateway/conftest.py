@@ -38,6 +38,13 @@ class FakeResponse:
     def text(self) -> str:
         return self._body_bytes.decode("utf-8")
 
+    @property
+    def content(self) -> bytes:
+        return self._body_bytes
+
+    def json(self) -> Any:
+        return json.loads(self._body_bytes)
+
     def body(self) -> bytes:
         return self._body_bytes
 
@@ -174,7 +181,6 @@ def chat_tool_response(
 def session_create_response(
     *,
     session_urn: str = TEST_SESSION_URN,
-    end_user_id: str = "user-123",
     name: str = "test-session",
 ) -> dict:
     return {
@@ -183,8 +189,9 @@ def session_create_response(
             "teamId": "42",
             "name": name,
             "policyJson": '{"defaultAction":"allow","rules":[]}',
-            "endUserId": end_user_id,
-        }
+        },
+        "mcpUrl": f"{TEST_GATEWAY_URL}/mcp/session/test-session",
+        "tools": [],
     }
 
 
@@ -213,10 +220,11 @@ def make_gateway(
     provider=None,
     *,
     session_id: str = TEST_SESSION_URN,
+    actor_id: str = "actor-123",
 ) -> GatewayResources:
     parent = make_parent(responses)
     proxy = _BaseURLProxy(parent._client, TEST_GATEWAY_URL)
-    transport = RESTTransport(proxy, session_id=session_id)
+    transport = RESTTransport(proxy, session_id=session_id, actor_id=actor_id)
     return GatewayResources(
         parent,
         gateway_endpoint=TEST_GATEWAY_URL,
@@ -230,10 +238,11 @@ def make_async_gateway(
     provider=None,
     *,
     session_id: str = TEST_SESSION_URN,
+    actor_id: str = "actor-123",
 ) -> AsyncGatewayResources:
     parent = make_async_parent(responses)
     proxy = _BaseURLProxy(parent._client, TEST_GATEWAY_URL)
-    transport = AsyncRESTTransport(proxy, session_id=session_id)
+    transport = AsyncRESTTransport(proxy, session_id=session_id, actor_id=actor_id)
     return AsyncGatewayResources(
         parent,
         gateway_endpoint=TEST_GATEWAY_URL,

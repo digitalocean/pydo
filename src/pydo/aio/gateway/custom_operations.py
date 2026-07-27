@@ -33,6 +33,7 @@ from pydo.gateway.custom_operations import (
 )
 from pydo.gateway.providers import _error_payload, _get
 from pydo.gateway.transport import (
+    ACTOR_ID_HEADER,
     SESSION_ID_HEADER,
     _MCP_HEADERS,
     _MCP_META_PATH,
@@ -43,6 +44,7 @@ from pydo.gateway.transport import (
     _REST_INVOKE_PATH,
     _REST_SEARCH_PATH,
     _REST_TOOLS_PATH,
+    _external_session_id,
     _parse_json_body,
     _parse_jsonrpc,
     _raise_gateway_http_error,
@@ -66,18 +68,32 @@ class AsyncGatewayTransport:
 class AsyncMCPTransport(AsyncGatewayTransport):
     """Async JSON-RPC 2.0 over plain HTTP POST to ``/mcp`` and ``/mcp/meta``."""
 
-    def __init__(self, base_url_proxy: Any, *, session_id: Optional[str] = None):
+    def __init__(
+        self,
+        base_url_proxy: Any,
+        *,
+        session_id: Optional[str] = None,
+        actor_id: str,
+        endpoint_url: Optional[str] = None,
+    ):
+        if not actor_id or not str(actor_id).strip():
+            raise ValueError("actor_id is required for AsyncMCPTransport")
         self._client = base_url_proxy
         self._ids = itertools.count(1)
-        self.session_id = session_id
+        self.session_id = _external_session_id(session_id) if session_id else None
+        self.actor_id = str(actor_id).strip()
+        self.endpoint_url = endpoint_url
 
     def _headers(self) -> Dict[str, str]:
         headers = dict(_MCP_HEADERS)
         if self.session_id:
             headers[SESSION_ID_HEADER] = self.session_id
+        headers[ACTOR_ID_HEADER] = self.actor_id
         return headers
 
     async def _post(self, path: str, payload: Dict[str, Any]) -> Dict[str, Any]:
+        if self.endpoint_url:
+            path = self.endpoint_url
         request = HttpRequest(
             "POST",
             path,
@@ -87,13 +103,9 @@ class AsyncMCPTransport(AsyncGatewayTransport):
         request.url = self._client.format_url(request.url)
         pipeline_response = await self._client._pipeline.run(request)
         response = pipeline_response.http_response
-        if response.status_code != 200:
-            try:
-                await response.read()
-            except Exception:  # noqa: BLE001
-                pass
-            _raise_gateway_http_error(response)
         body = await response.read()
+        if response.status_code != 200:
+            _raise_gateway_http_error(response)
         return _parse_jsonrpc(body)
 
     async def _rpc(
@@ -130,15 +142,19 @@ class AsyncMCPTransport(AsyncGatewayTransport):
 class AsyncRESTTransport(AsyncGatewayTransport):
     """Async REST transport; requires ``session_id`` via ``X-Session-Id``."""
 
-    def __init__(self, base_url_proxy: Any, *, session_id: str):
+    def __init__(self, base_url_proxy: Any, *, session_id: str, actor_id: str):
         if not session_id:
             raise ValueError("session_id is required for AsyncRESTTransport")
+        if not actor_id or not str(actor_id).strip():
+            raise ValueError("actor_id is required for AsyncRESTTransport")
         self._client = base_url_proxy
-        self.session_id = session_id
+        self.session_id = _external_session_id(session_id)
+        self.actor_id = str(actor_id).strip()
 
     def _headers(self) -> Dict[str, str]:
         headers = dict(_REST_HEADERS)
         headers[SESSION_ID_HEADER] = self.session_id
+        headers[ACTOR_ID_HEADER] = self.actor_id
         return headers
 
     async def _request(
@@ -154,13 +170,9 @@ class AsyncRESTTransport(AsyncGatewayTransport):
         request.url = self._client.format_url(request.url)
         pipeline_response = await self._client._pipeline.run(request)
         response = pipeline_response.http_response
-        if response.status_code != 200:
-            try:
-                await response.read()
-            except Exception:  # noqa: BLE001
-                pass
-            _raise_gateway_http_error(response)
         body = await response.read()
+        if response.status_code != 200:
+            _raise_gateway_http_error(response)
         return _parse_json_body(body)
 
     async def list_tools(self, *, meta: bool) -> List[Any]:

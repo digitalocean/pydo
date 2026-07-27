@@ -2,7 +2,7 @@
 # Copyright (c) DigitalOcean.
 # Licensed under the Apache-2.0 License.
 # ------------------------------------
-"""Action Gateway entry point: ``from pydo.action_gateway import Client``.
+"""Action Gateway entry point: ``from pydo.action_gateway import ActionGatewayClient``.
 
 Purpose-built client for the Action Gateway. Create a session first, then
 use ``session.tools`` / ``session.code`` / ``session.handle_tool_calls``.
@@ -12,10 +12,10 @@ Inference surfaces inherited from :class:`pydo.Client` (``chat``,
 Example::
 
     import os
-    from pydo.action_gateway import Client
+    from pydo.action_gateway import ActionGatewayClient
 
-    client = Client(token=os.environ["DIGITALOCEAN_TOKEN"])
-    session = client.sessions.create(end_user_id="user-123")
+    client = ActionGatewayClient(token=os.environ["DIGITALOCEAN_TOKEN"])
+    session = client.session.create(actor_id="user-123")
 
     tools = session.tools()
     response = client.chat.completions.create(
@@ -44,6 +44,7 @@ from pydo.gateway import (
     ResponsesProvider,
     Session,
     SessionsOperations,
+    Toolbelt,
     ToolCall,
     normalize_permissions,
     resolve_gateway_base_url,
@@ -53,10 +54,13 @@ from pydo.gateway import (
 _GATEWAY_SURFACE: tuple = (
     "base_url",
     "chat",
+    "create_toolbelt",
     "messages",
     "provider",
     "responses",
+    "session",
     "sessions",
+    "toolbelts",
 )
 
 
@@ -65,7 +69,7 @@ class Client(_DigitalOceanClient):
 
     Primary surface:
 
-    * ``client.sessions.create(end_user_id=...)`` → :class:`Session`
+    * ``client.session.create(actor_id=...)`` → :class:`Session`
     * ``session.tools`` / ``session.tools()`` — discover and wrap tools
     * ``session.code`` — sandboxed Python execution
     * ``session.handle_tool_calls(response)`` — run model tool calls
@@ -101,7 +105,16 @@ class Client(_DigitalOceanClient):
                 "ensure pydo.gateway is installed"
             )
         self.sessions = gateway.sessions
+        self.session = self.sessions
         self.provider = gateway.provider
+
+    def create_toolbelt(self, name: str, tools, **kwargs) -> Toolbelt:
+        """Create a versioned collection of Action Gateway tools."""
+        if isinstance(tools, (str, bytes)):
+            raise TypeError("tools must be an iterable of tool names")
+        body = {"name": name, "tools": list(tools), **kwargs}
+        response = self.toolbelts.create(body=body)
+        return Toolbelt(response["toolbelt"])
 
     @property
     def base_url(self) -> Optional[str]:
@@ -116,11 +129,16 @@ class Client(_DigitalOceanClient):
         return "<pydo.action_gateway.Client>"
 
 
+ActionGatewayClient = Client
+
+
 __all__ = [
     "Client",
+    "ActionGatewayClient",
     "TokenCredentials",
     "Session",
     "SessionsOperations",
+    "Toolbelt",
     "ChatCompletionsProvider",
     "MessagesProvider",
     "ResponsesProvider",

@@ -5,14 +5,14 @@ Required env:
 
 Optional env:
   PYDO_GATEWAY_ENDPOINT   preview: https://actions.do-ai-test.run
-  END_USER_ID
+  ACTOR_ID
   MODEL
   PROMPT
 """
 
 import os
 
-from pydo.action_gateway import Client, MessagesProvider
+from pydo.action_gateway import ActionGatewayClient, MessagesProvider
 
 
 def _assistant_content(response) -> list:
@@ -41,12 +41,12 @@ def _print_final_message(response) -> None:
         print(response)
 
 
-client = Client(
+client = ActionGatewayClient(
     token=os.environ["DIGITALOCEAN_TOKEN"],
     gateway_provider=MessagesProvider(),
 )
-session = client.sessions.create(
-    end_user_id=os.environ.get("END_USER_ID", "example-user"),
+session = client.session.create(
+    actor_id=os.environ.get("ACTOR_ID", "example-user"),
 )
 
 model = os.environ.get("MODEL", "claude-opus-4-6")

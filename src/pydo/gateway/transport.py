@@ -7,8 +7,9 @@
 The public SDK surface (``ToolsOperations`` / ``CodeOperations``) only talks
 to the small :class:`GatewayTransport` interface. The default transport is
 REST (``/tools/search``, ``/tools/invoke``, ``/code/execute``) and requires
-a session id via ``X-Session-Id``. An :class:`MCPTransport` remains available
-for callers that need JSON-RPC over ``/mcp`` / ``/mcp/meta``.
+a session id via ``X-Session-Id`` and actor id via ``X-Actor-Id``. An
+:class:`MCPTransport` remains available for callers that need JSON-RPC over
+``/mcp`` / ``/mcp/meta``.
 """
 
 from __future__ import annotations
@@ -59,6 +60,7 @@ _ERROR_MAP = {
 
 MCP_PROTOCOL_VERSION = "2025-06-18"
 SESSION_ID_HEADER = "X-Session-Id"
+ACTOR_ID_HEADER = "X-Actor-Id"
 
 _MCP_PATH = "/mcp"
 _MCP_META_PATH = "/mcp/meta"
@@ -330,8 +332,13 @@ def _unwrap_tool_result(payload: Any) -> Any:
 def session_mcp_url(gateway_base_url: str, session_urn: str) -> str:
     """Build the session-pinned MCP URL for external MCP clients."""
     base = gateway_base_url.rstrip("/")
-    session_id = session_urn.rsplit(":", 1)[-1]
+    session_id = _external_session_id(session_urn)
     return f"{base}/mcp/session/{session_id}"
+
+
+def _external_session_id(session_urn: str) -> str:
+    """Return the bare session ID accepted by Action Gateway ingress."""
+    return session_urn.rsplit(":", 1)[-1]
 
 
 class GatewayTransport:
@@ -347,18 +354,22 @@ class GatewayTransport:
 class RESTTransport(GatewayTransport):
     """REST over ``/tools``, ``/tools/search``, ``/tools/invoke``, ``/code/execute``.
 
-    Requires ``session_id`` (session URN) on every request via ``X-Session-Id``.
+    Requires a session URN or ID and actor ID on every request.
     """
 
-    def __init__(self, base_url_proxy: Any, *, session_id: str):
+    def __init__(self, base_url_proxy: Any, *, session_id: str, actor_id: str):
         if not session_id:
             raise ValueError("session_id is required for RESTTransport")
+        if not actor_id or not str(actor_id).strip():
+            raise ValueError("actor_id is required for RESTTransport")
         self._client = base_url_proxy
-        self.session_id = session_id
+        self.session_id = _external_session_id(session_id)
+        self.actor_id = str(actor_id).strip()
 
     def _headers(self) -> Dict[str, str]:
         headers = dict(_REST_HEADERS)
         headers[SESSION_ID_HEADER] = self.session_id
+        headers[ACTOR_ID_HEADER] = self.actor_id
         return headers
 
     def _request(
@@ -374,9 +385,9 @@ class RESTTransport(GatewayTransport):
         request.url = self._client.format_url(request.url)
         pipeline_response = self._client._pipeline.run(request)
         response = pipeline_response.http_response
+        body = response.text() if hasattr(response, "text") else response.body()
         if response.status_code != 200:
             _raise_gateway_http_error(response)
-        body = response.text() if hasattr(response, "text") else response.body()
         return _parse_json_body(body)
 
     def list_tools(self, *, meta: bool) -> List[Any]:
@@ -417,18 +428,32 @@ class RESTTransport(GatewayTransport):
 class MCPTransport(GatewayTransport):
     """JSON-RPC 2.0 over plain HTTP POST to ``/mcp`` and ``/mcp/meta``."""
 
-    def __init__(self, base_url_proxy: Any, *, session_id: Optional[str] = None):
+    def __init__(
+        self,
+        base_url_proxy: Any,
+        *,
+        session_id: Optional[str] = None,
+        actor_id: str,
+        endpoint_url: Optional[str] = None,
+    ):
+        if not actor_id or not str(actor_id).strip():
+            raise ValueError("actor_id is required for MCPTransport")
         self._client = base_url_proxy
         self._ids = itertools.count(1)
-        self.session_id = session_id
+        self.session_id = _external_session_id(session_id) if session_id else None
+        self.actor_id = str(actor_id).strip()
+        self.endpoint_url = endpoint_url
 
     def _headers(self) -> Dict[str, str]:
         headers = dict(_MCP_HEADERS)
         if self.session_id:
             headers[SESSION_ID_HEADER] = self.session_id
+        headers[ACTOR_ID_HEADER] = self.actor_id
         return headers
 
     def _post(self, path: str, payload: Dict[str, Any]) -> Dict[str, Any]:
+        if self.endpoint_url:
+            path = self.endpoint_url
         request = HttpRequest(
             "POST",
             path,
@@ -438,9 +463,9 @@ class MCPTransport(GatewayTransport):
         request.url = self._client.format_url(request.url)
         pipeline_response = self._client._pipeline.run(request)
         response = pipeline_response.http_response
+        body = response.text() if hasattr(response, "text") else response.body()
         if response.status_code != 200:
             _raise_gateway_http_error(response)
-        body = response.text() if hasattr(response, "text") else response.body()
         return _parse_jsonrpc(body)
 
     def _rpc(

@@ -24,10 +24,15 @@ from .custom_models import (
     GatewayToolError,
     RecoveryHint,
     ToolCall,
+    Toolbelt,
     ToolErrorClass,
     ToolResultStatus,
 )
-from .custom_operations import CodeOperations, ToolsOperations, normalize_invoke_arguments
+from .custom_operations import (
+    CodeOperations,
+    ToolsOperations,
+    normalize_invoke_arguments,
+)
 from .providers import (
     BaseProvider,
     ChatCompletionsProvider,
@@ -45,6 +50,7 @@ from .session import (
     serialize_policy_json,
 )
 from .transport import (
+    ACTOR_ID_HEADER,
     MCP_PROTOCOL_VERSION,
     SESSION_ID_HEADER,
     DEFAULT_GATEWAY_BASE_URL,
@@ -106,7 +112,7 @@ class GatewayResources:
         if self.tools is None:
             raise RuntimeError(
                 "create a session first: session = client.sessions.create("
-                "end_user_id=...); then session.handle_tool_calls(response)"
+                "actor_id=...); then session.handle_tool_calls(response)"
             )
         calls = self.provider.extract_tool_calls(response)
         if not calls:
@@ -122,7 +128,7 @@ class GatewayResources:
     ) -> List[Any]:
         if self.tools is None:
             raise RuntimeError(
-                "create a session first via client.sessions.create(end_user_id=...)"
+                "create a session first via client.sessions.create(actor_id=...)"
             )
         return execute_tool_calls(calls, self.tools, rationale=rationale)
 
@@ -140,6 +146,7 @@ __all__ = [
     "RESTTransport",
     "MCPTransport",
     "MCP_PROTOCOL_VERSION",
+    "ACTOR_ID_HEADER",
     "SESSION_ID_HEADER",
     "session_mcp_url",
     "BaseProvider",
@@ -151,6 +158,7 @@ __all__ = [
     "simplify_inference_tool_schema",
     "simplify_messages_input_schema",
     "ToolCall",
+    "Toolbelt",
     "GatewayToolError",
     "GatewayProtocolError",
     "ToolErrorClass",

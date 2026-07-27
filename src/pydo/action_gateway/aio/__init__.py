@@ -3,7 +3,7 @@
 # Licensed under the Apache-2.0 License.
 # ------------------------------------
 # pylint: disable=duplicate-code
-"""Async Action Gateway entry point: ``from pydo.action_gateway.aio import Client``.
+"""Async Action Gateway entry point: ``ActionGatewayClient``.
 
 Asynchronous twin of :class:`pydo.action_gateway.Client`. Same surface,
 ``await``-friendly. See :mod:`pydo.action_gateway` for usage details.
@@ -14,7 +14,10 @@ from typing import List, Optional
 
 from pydo.aio import Client as _DigitalOceanClient
 from pydo.aio._patch import TokenCredentials
-from pydo.aio.gateway import AsyncSession, AsyncSessionsOperations
+from pydo.aio.gateway import (
+    AsyncSession,
+    AsyncSessionsOperations,
+)
 from pydo.gateway import (
     META_CODE,
     META_INVOKE,
@@ -26,6 +29,7 @@ from pydo.gateway import (
     GatewayToolError,
     MessagesProvider,
     ResponsesProvider,
+    Toolbelt,
     ToolCall,
     normalize_permissions,
     resolve_gateway_base_url,
@@ -35,10 +39,13 @@ from pydo.gateway import (
 _GATEWAY_SURFACE: tuple = (
     "base_url",
     "chat",
+    "create_toolbelt",
     "messages",
     "provider",
     "responses",
+    "session",
     "sessions",
+    "toolbelts",
 )
 
 
@@ -46,7 +53,7 @@ class Client(_DigitalOceanClient):
     """Action Gateway–focused DigitalOcean async client.
 
     Asynchronous counterpart to :class:`pydo.action_gateway.Client`.
-    Create a session with ``await client.sessions.create(end_user_id=...)``,
+    Create a session with ``await client.session.create(actor_id=...)``,
     then use ``session.tools`` / ``session.code`` /
     ``await session.handle_tool_calls(...)``.
     """
@@ -76,7 +83,16 @@ class Client(_DigitalOceanClient):
                 "ensure pydo.aio.gateway is installed"
             )
         self.sessions = gateway.sessions
+        self.session = self.sessions
         self.provider = gateway.provider
+
+    async def create_toolbelt(self, name: str, tools, **kwargs) -> Toolbelt:
+        """Create a versioned collection of Action Gateway tools."""
+        if isinstance(tools, (str, bytes)):
+            raise TypeError("tools must be an iterable of tool names")
+        body = {"name": name, "tools": list(tools), **kwargs}
+        response = await self.toolbelts.create(body=body)
+        return Toolbelt(response["toolbelt"])
 
     @property
     def base_url(self) -> Optional[str]:
@@ -91,11 +107,16 @@ class Client(_DigitalOceanClient):
         return "<pydo.action_gateway.aio.Client>"
 
 
+ActionGatewayClient = Client
+
+
 __all__ = [
     "Client",
+    "ActionGatewayClient",
     "TokenCredentials",
     "AsyncSession",
     "AsyncSessionsOperations",
+    "Toolbelt",
     "ChatCompletionsProvider",
     "MessagesProvider",
     "ResponsesProvider",

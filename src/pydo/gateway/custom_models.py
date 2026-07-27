@@ -129,6 +129,18 @@ class ToolCall:
         )
 
 
+class Toolbelt(dict):
+    """A generated toolbelt response with a concise ``ref`` alias."""
+
+    def __getattr__(self, name: str) -> Any:
+        if name == "ref":
+            return self.get("reference")
+        try:
+            return self[name]
+        except KeyError:
+            raise AttributeError(name) from None
+
+
 __all__: List[str] = [
     "META_SEARCH",
     "META_INVOKE",
@@ -140,4 +152,5 @@ __all__: List[str] = [
     "GatewayToolError",
     "GatewayProtocolError",
     "ToolCall",
+    "Toolbelt",
 ]

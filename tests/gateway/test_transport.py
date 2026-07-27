@@ -16,6 +16,7 @@ from azure.core.exceptions import (
 
 from pydo.custom_extensions import _BaseURLProxy
 from pydo.gateway import (
+    ACTOR_ID_HEADER,
     GatewayProtocolError,
     GatewayResources,
     GatewayToolError,
@@ -86,7 +87,8 @@ def test_list_tools_include_all_hits_rest_catalog():
     request = sent_request(gateway)
     assert request.method == "GET"
     assert request.url.endswith("/tools")
-    assert request.headers[SESSION_ID_HEADER] == TEST_SESSION_URN
+    assert request.headers[SESSION_ID_HEADER] == "test-session"
+    assert request.headers[ACTOR_ID_HEADER] == "actor-123"
     assert tools[0].name == "web_search"
 
 
@@ -103,7 +105,8 @@ def test_search_posts_rest_and_unwraps_tool_result():
     request = sent_request(gateway)
     assert request.method == "POST"
     assert request.url.endswith("/tools/search")
-    assert request.headers[SESSION_ID_HEADER] == TEST_SESSION_URN
+    assert request.headers[SESSION_ID_HEADER] == "test-session"
+    assert request.headers[ACTOR_ID_HEADER] == "actor-123"
     payload = sent_payload(gateway)
     assert payload["queries"] == [{"use_case": "search the web"}]
     assert result.results[0].use_case == "x"
@@ -200,7 +203,7 @@ def test_mcp_transport_still_works_with_session_header():
         [FakeResponse(200, jsonrpc_result({"tools": [{"name": "action_search"}]}))]
     )
     proxy = _BaseURLProxy(parent._client, TEST_GATEWAY_URL)
-    transport = MCPTransport(proxy, session_id=TEST_SESSION_URN)
+    transport = MCPTransport(proxy, session_id=TEST_SESSION_URN, actor_id="actor-123")
     gateway = GatewayResources(
         parent,
         gateway_endpoint=TEST_GATEWAY_URL,
@@ -209,7 +212,8 @@ def test_mcp_transport_still_works_with_session_header():
     tools = gateway.tools.list()
     request = sent_request(gateway)
     assert request.url.endswith("/mcp/meta")
-    assert request.headers[SESSION_ID_HEADER] == TEST_SESSION_URN
+    assert request.headers[SESSION_ID_HEADER] == "test-session"
+    assert request.headers[ACTOR_ID_HEADER] == "actor-123"
     assert tools[0].name == "action_search"
 
 
@@ -228,7 +232,9 @@ def test_mcp_transport_parses_sse_response():
     gateway = GatewayResources(
         parent,
         gateway_endpoint=TEST_GATEWAY_URL,
-        transport=MCPTransport(proxy, session_id=TEST_SESSION_URN),
+        transport=MCPTransport(
+            proxy, session_id=TEST_SESSION_URN, actor_id="actor-123"
+        ),
     )
     assert gateway.tools.list()[0].name == "action_search"
 
@@ -236,7 +242,7 @@ def test_mcp_transport_parses_sse_response():
 def test_mcp_jsonrpc_error_raises_protocol_error():
     parent = make_parent([FakeResponse(200, jsonrpc_error(-32601, "method not found"))])
     proxy = _BaseURLProxy(parent._client, TEST_GATEWAY_URL)
-    transport = MCPTransport(proxy, session_id=TEST_SESSION_URN)
+    transport = MCPTransport(proxy, session_id=TEST_SESSION_URN, actor_id="actor-123")
     gateway = GatewayResources(
         parent, gateway_endpoint=TEST_GATEWAY_URL, transport=transport
     )
@@ -259,7 +265,7 @@ def test_mcp_is_error_raises_gateway_tool_error():
         [FakeResponse(200, jsonrpc_result(call_result(structured, is_error=True)))]
     )
     proxy = _BaseURLProxy(parent._client, TEST_GATEWAY_URL)
-    transport = MCPTransport(proxy, session_id=TEST_SESSION_URN)
+    transport = MCPTransport(proxy, session_id=TEST_SESSION_URN, actor_id="actor-123")
     gateway = GatewayResources(
         parent, gateway_endpoint=TEST_GATEWAY_URL, transport=transport
     )

@@ -288,7 +288,12 @@ def execute_tool_calls(
                 results[index] = tools_operations._transport.call_tool(
                     call.name, arguments, meta=True
                 )
-            except (GatewayToolError, TypeError, ValueError, _json.JSONDecodeError) as exc:
+            except (
+                GatewayToolError,
+                TypeError,
+                ValueError,
+                _json.JSONDecodeError,
+            ) as exc:
                 results[index] = _error_payload(exc)
         else:
             concrete.append(index)

@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-import json as _json
 import uuid
 from typing import Any, Dict, List, Optional, Sequence
 
@@ -21,12 +20,11 @@ from pydo.gateway.transport import (
     _parse_json_body,
     _raise_gateway_http_error,
     resolve_gateway_base_url,
-    session_mcp_url,
 )
 
 from .custom_operations import (
     AsyncCodeOperations,
-    AsyncRESTTransport,
+    AsyncMCPTransport,
     AsyncToolsOperations,
     async_execute_tool_calls,
 )
@@ -48,10 +46,10 @@ class AsyncSession:
         self,
         *,
         session_urn: str,
-        end_user_id: str,
+        actor_id: str,
         name: str,
         policy: Dict[str, Any],
-        gateway_base_url: str,
+        mcp_url: str,
         tools: AsyncToolsOperations,
         code: AsyncCodeOperations,
         provider: BaseProvider,
@@ -59,10 +57,10 @@ class AsyncSession:
     ):
         self.session_urn = session_urn
         self.id = session_urn
-        self.end_user_id = end_user_id
+        self.actor_id = actor_id
         self.name = name
         self.policy = policy
-        self._gateway_base_url = gateway_base_url.rstrip("/")
+        self._mcp_url = mcp_url
         self.tools = tools
         self.code = code
         self.provider = provider
@@ -70,7 +68,7 @@ class AsyncSession:
 
     @property
     def url(self) -> str:
-        return session_mcp_url(self._gateway_base_url, self.session_urn)
+        return self._mcp_url
 
     async def handle_tool_calls(
         self,
@@ -81,9 +79,7 @@ class AsyncSession:
         calls = self.provider.extract_tool_calls(response)
         if not calls:
             return []
-        results = await async_execute_tool_calls(
-            calls, self.tools, rationale=rationale
-        )
+        results = await async_execute_tool_calls(calls, self.tools, rationale=rationale)
         return self.provider.format_tool_results(calls, results)
 
     async def execute_tool_calls(
@@ -95,10 +91,7 @@ class AsyncSession:
         return await async_execute_tool_calls(calls, self.tools, rationale=rationale)
 
     def __repr__(self) -> str:  # pragma: no cover
-        return (
-            f"<AsyncSession id={self.session_urn!r} "
-            f"end_user_id={self.end_user_id!r}>"
-        )
+        return f"<AsyncSession id={self.session_urn!r} " f"actor_id={self.actor_id!r}>"
 
 
 class AsyncSessionsOperations:
@@ -117,20 +110,20 @@ class AsyncSessionsOperations:
 
     async def create(
         self,
-        end_user_id: str,
+        actor_id: str,
         *,
         name: Optional[str] = None,
         permissions: Optional[Dict[str, Any]] = None,
     ) -> AsyncSession:
-        if not end_user_id or not str(end_user_id).strip():
-            raise ValueError("end_user_id is required")
+        if not actor_id or not str(actor_id).strip():
+            raise ValueError("actor_id is required")
 
         session_name = name or f"pydo-session-{uuid.uuid4().hex[:8]}"
         policy = normalize_permissions(permissions)
         body = {
             "name": session_name,
-            "policy_json": _json.dumps(policy, separators=(",", ":")),
-            "end_user_id": str(end_user_id).strip(),
+            "policy": policy,
+            "actor_id": str(actor_id).strip(),
         }
 
         raw_session = await self._post_create(body)
@@ -140,19 +133,26 @@ class AsyncSessionsOperations:
                 f"session create response missing sessionUrn: {raw_session!r}"
             )
 
-        transport = AsyncRESTTransport(
+        mcp_url = _pick(raw_session, "mcpUrl", "mcp_url")
+        if not mcp_url:
+            raise GatewayProtocolError(
+                f"session create response missing mcpUrl: {raw_session!r}"
+            )
+
+        transport = AsyncMCPTransport(
             _BaseURLProxy(self._parent._client, self._gateway_base_url),
             session_id=session_urn,
+            actor_id=actor_id,
+            endpoint_url=mcp_url,
         )
         tools = AsyncToolsOperations(transport, self._provider)
         code = AsyncCodeOperations(transport)
         return AsyncSession(
             session_urn=session_urn,
-            end_user_id=_pick(raw_session, "endUserId", "end_user_id")
-            or str(end_user_id).strip(),
+            actor_id=str(actor_id).strip(),
             name=_pick(raw_session, "name") or session_name,
             policy=policy,
-            gateway_base_url=self._gateway_base_url,
+            mcp_url=mcp_url,
             tools=tools,
             code=code,
             provider=self._provider,
@@ -173,13 +173,9 @@ class AsyncSessionsOperations:
         request.url = client.format_url(request.url)
         pipeline_response = await client._pipeline.run(request)
         response = pipeline_response.http_response
-        if response.status_code not in (200, 201):
-            try:
-                await response.read()
-            except Exception:  # noqa: BLE001
-                pass
-            _raise_gateway_http_error(response)
         body_bytes = await response.read()
+        if response.status_code not in (200, 201):
+            _raise_gateway_http_error(response)
         payload = _parse_json_body(body_bytes)
         if not isinstance(payload, dict):
             raise GatewayProtocolError(
@@ -190,7 +186,11 @@ class AsyncSessionsOperations:
             raise GatewayProtocolError(
                 f"session create response missing session object: {payload!r}"
             )
-        return dict(session)
+        result = dict(session)
+        mcp_url = _pick(payload, "mcpUrl", "mcp_url")
+        if mcp_url:
+            result["mcpUrl"] = mcp_url
+        return result
 
 
 __all__ = ["AsyncSession", "AsyncSessionsOperations"]

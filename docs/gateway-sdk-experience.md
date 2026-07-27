@@ -15,32 +15,32 @@ export DIGITALOCEAN_TOKEN=...
 ```
 
 ```python
-from pydo.action_gateway import Client
+from pydo.action_gateway import ActionGatewayClient
 
-client = Client(token=os.environ["DIGITALOCEAN_TOKEN"])
+client = ActionGatewayClient(token=os.environ["DIGITALOCEAN_TOKEN"])
 
-session = client.sessions.create(
-    end_user_id="user-123",   # required
+session = client.session.create(
+    actor_id="user-123",   # required
     # permissions optional — defaults to allow-all
 )
 ```
 
-`end_user_id` is required. If you omit `permissions`, the SDK creates a default policy of `{"defaultAction": "allow", "rules": []}`. Optional permissions:
+`actor_id` is required. If you omit `permissions`, the SDK creates a default policy of `{"defaultAction": "allow"}`. Optional permissions:
 
 ```python
-session = client.sessions.create(
-    end_user_id="user-123",
+session = client.session.create(
+    actor_id="user-123",
     permissions={
         "default_action": "ask",
         "rules": [
-            {"toolbelt": "read-only@1.2.3", "action": "allow"},
+            {"tool": "toolbelt:read-only@1.2.3", "action": "allow"},
             {"tool": "gmail", "action": "allow"},
         ],
     },
 )
 ```
 
-Session create hits `POST /v2/action-gateway/sessions` on `api.digitalocean.com`. Tool calls go to the gateway host (`https://actions.do-ai.run` by default; override with `gateway_endpoint=` or `PYDO_GATEWAY_ENDPOINT`).
+Session create hits `POST /v2/action-gateway/sessions` on `api.digitalocean.com` with `name`, `policy`, and `actor_id`. The same actor is sent as `X-Actor-Id` on gateway requests. Tool calls go to the gateway host (`https://actions.do-ai.run` by default; override with `gateway_endpoint=` or `PYDO_GATEWAY_ENDPOINT`).
 
 `session.url` is the session-pinned MCP URL for external MCP clients:
 
@@ -57,19 +57,19 @@ results = session.tools.search("search the web for recent news")
 catalog = session.tools.list(include_all=True)
 
 output = session.tools.invoke_one(
-    "EXA_SEARCH",
-    {"query": "DigitalOcean news", "num_results": 5},
+    "exa_web_search",
+    {"query": "DigitalOcean news", "max_results": 5},
 )
 
 envelope = session.tools.invoke([
-    {"tool": "EXA_SEARCH", "arguments": {"query": "DigitalOcean news"}},
-    {"tool": "HACKERNEWS_GET_TODAY_STORIES", "arguments": {}},
+    {"tool": "exa_web_search", "arguments": {"query": "DigitalOcean news"}},
+    {"tool": "exa_web_fetch", "arguments": {"url": "https://www.digitalocean.com"}},
 ])
 
 result = session.code.execute("print(sum(range(10)))")
 ```
 
-These map to REST: `POST /tools/search`, `POST /tools/invoke`, `POST /code/execute`, always with `X-Session-Id`.
+These calls use JSON-RPC over the `mcpUrl` returned by session creation, with `X-Session-Id` and `X-Actor-Id`.
 
 ---
 
@@ -81,10 +81,10 @@ These map to REST: `POST /tools/search`, `POST /tools/invoke`, `POST /code/execu
 ### Chat Completions
 
 ```python
-from pydo.action_gateway import Client
+from pydo.action_gateway import ActionGatewayClient
 
-client = Client(token=os.environ["DIGITALOCEAN_TOKEN"])
-session = client.sessions.create(end_user_id="user-123")
+client = ActionGatewayClient(token=os.environ["DIGITALOCEAN_TOKEN"])
+session = client.session.create(actor_id="user-123")
 
 tools = session.tools()
 messages = [{"role": "user", "content":
@@ -109,13 +109,13 @@ print(message["content"])
 ### Messages API
 
 ```python
-from pydo.action_gateway import Client, MessagesProvider
+from pydo.action_gateway import ActionGatewayClient, MessagesProvider
 
-client = Client(
+client = ActionGatewayClient(
     token=os.environ["DIGITALOCEAN_TOKEN"],
     gateway_provider=MessagesProvider(),
 )
-session = client.sessions.create(end_user_id="user-123")
+session = client.session.create(actor_id="user-123")
 
 tools = session.tools()
 # ... same loop with client.messages.create and session.handle_tool_calls
@@ -129,19 +129,83 @@ tools = session.tools()
 
 ```python
 tools = session.tools(include_all=True)
-tools = session.tools(names=["EXA_SEARCH"])
+tools = session.tools(names=["exa_web_search"])
 tools = session.tools(search="post a message to slack", limit=5)
 ```
 
 ---
 
-## 5. Async
+## 5. Toolbelts and policies
+
+Create a versioned toolbelt from provider-qualified tool names:
 
 ```python
-from pydo.action_gateway.aio import Client
+toolbelt = client.create_toolbelt(
+    name="search-toolbelt",
+    tools=["exa_web_search", "exa_web_fetch"],
+)
+print(toolbelt.ref)  # search-toolbelt@1
+```
 
-async with Client(token=token) as client:
-    session = await client.sessions.create(end_user_id="user-123")
+Toolbelts are public DigitalOcean API resources, so the base CRUD surface is
+generated from the public OpenAPI specification under `client.toolbelts`:
+
+```python
+client.toolbelts.list(status="active")
+client.toolbelts.get("search-toolbelt", version="1")
+client.toolbelts.add_tools("search-toolbelt", {"tools": ["jira_create_issue"]})
+client.toolbelts.delete_tools("search-toolbelt", {"tools": ["exa_web_fetch"]})
+client.toolbelts.delete("search-toolbelt")
+```
+
+`client.create_toolbelt(...)` is the Action Gateway convenience wrapper around
+the generated `client.toolbelts.create(body=...)` operation.
+
+Pin that version in a session policy:
+
+```python
+session = client.session.create(
+    actor_id="user-123",
+    permissions={
+        "default_action": "ask",
+        "rules": [
+            {"tool": f"toolbelt:{toolbelt.ref}", "action": "allow"},
+        ],
+    },
+)
+```
+
+Toolbelt creation maps to `POST /v2/action-gateway/toolbelts`. The response exposes both `toolbelt.reference` and the shorter `toolbelt.ref` alias.
+
+---
+
+## 6. Responses API
+
+```python
+from pydo.action_gateway import ActionGatewayClient, ResponsesProvider
+
+client = ActionGatewayClient(
+    token=os.environ["DIGITALOCEAN_TOKEN"],
+    gateway_provider=ResponsesProvider(),
+)
+session = client.session.create(actor_id="user-123")
+response = client.responses.create(
+    model="openai-gpt-4o",
+    input="What DigitalOcean Droplet sizes are available in NYC3?",
+    tools=session.tools(),
+)
+tool_outputs = session.handle_tool_calls(response)
+```
+
+---
+
+## 7. Async
+
+```python
+from pydo.action_gateway.aio import ActionGatewayClient
+
+async with ActionGatewayClient(token=token) as client:
+    session = await client.session.create(actor_id="user-123")
     tools = await session.tools()
     response = await client.chat.completions.create(..., tools=tools)
     messages.extend(await session.handle_tool_calls(response))
@@ -149,7 +213,7 @@ async with Client(token=token) as client:
 
 ---
 
-## 6. Design notes
+## 8. Design notes
 
 - **Session-first.** Bare gateway calls without a session are unsupported.
 - **REST for SDK execution.** MCP remains available via `session.url` for external clients.

@@ -64,14 +64,12 @@ class AsyncGatewayResources:
         if self.tools is None:
             raise RuntimeError(
                 "create a session first: session = await client.sessions.create("
-                "end_user_id=...); then await session.handle_tool_calls(response)"
+                "actor_id=...); then await session.handle_tool_calls(response)"
             )
         calls = self.provider.extract_tool_calls(response)
         if not calls:
             return []
-        results = await async_execute_tool_calls(
-            calls, self.tools, rationale=rationale
-        )
+        results = await async_execute_tool_calls(calls, self.tools, rationale=rationale)
         return self.provider.format_tool_results(calls, results)
 
     async def execute_tool_calls(
@@ -83,7 +81,7 @@ class AsyncGatewayResources:
         if self.tools is None:
             raise RuntimeError(
                 "create a session first via await client.sessions.create("
-                "end_user_id=...)"
+                "actor_id=...)"
             )
         return await async_execute_tool_calls(calls, self.tools, rationale=rationale)
 

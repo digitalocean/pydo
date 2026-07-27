@@ -638,6 +638,12 @@ from ...operations._operations import (
     build_tags_get_request,
     build_tags_list_request,
     build_tags_unassign_resources_request,
+    build_toolbelts_add_tools_request,
+    build_toolbelts_create_request,
+    build_toolbelts_delete_request,
+    build_toolbelts_delete_tools_request,
+    build_toolbelts_get_request,
+    build_toolbelts_list_request,
     build_uptime_create_alert_request,
     build_uptime_create_check_request,
     build_uptime_delete_alert_request,
@@ -704,6 +710,1264 @@ T = TypeVar("T")
 ClsType = Optional[
     Callable[[PipelineResponse[HttpRequest, AsyncHttpResponse], T, Dict[str, Any]], Any]
 ]
+
+
+class ToolbeltsOperations:
+    """
+    .. warning::
+        **DO NOT** instantiate this class directly.
+
+        Instead, you should access the following operations through
+        :class:`~pydo.aio.GeneratedClient`'s
+        :attr:`toolbelts` attribute.
+    """
+
+    def __init__(self, *args, **kwargs) -> None:
+        input_args = list(args)
+        self._client = input_args.pop(0) if input_args else kwargs.pop("client")
+        self._config = input_args.pop(0) if input_args else kwargs.pop("config")
+        self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
+        self._deserialize = (
+            input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        )
+
+    @distributed_trace_async
+    async def list(
+        self,
+        *,
+        status: str = "active",
+        page: int = 1,
+        per_page: int = 20,
+        **kwargs: Any
+    ) -> JSON:
+        """List Toolbelts.
+
+        Lists the latest version of each toolbelt owned by the authenticated team.
+
+        :keyword status: Filter toolbelts by status. Known values are: "active", "deprecated", and
+         "all". Default value is "active".
+        :paramtype status: str
+        :keyword page: Which 'page' of paginated results to return. Default value is 1.
+        :paramtype page: int
+        :keyword per_page: Number of items returned per page. Default value is 20.
+        :paramtype per_page: int
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "pagination": {
+                        "page": 0,  # Required.
+                        "per_page": 0,  # Required.
+                        "total": 0  # Required.
+                    },
+                    "toolbelts": [
+                        {
+                            "latest_version": "str",  # Required.
+                            "name": "str",  # Required.
+                            "reference_latest": "str",  # Required.
+                            "status": "str",  # Required. Known values are: "active" and
+                              "deprecated".
+                            "tool_count": 0,  # Required.
+                            "updated_at": "2020-02-20 00:00:00",  # Required.
+                            "version_count": 0,  # Required.
+                            "description": "str",  # Optional. Required.
+                            "display_name": "str"  # Optional. Required.
+                        }
+                    ]
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_toolbelts_list_request(
+            status=status,
+            page=page,
+            per_page=per_page,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        response_headers["ratelimit-limit"] = self._deserialize(
+            "int", response.headers.get("ratelimit-limit")
+        )
+        response_headers["ratelimit-remaining"] = self._deserialize(
+            "int", response.headers.get("ratelimit-remaining")
+        )
+        response_headers["ratelimit-reset"] = self._deserialize(
+            "int", response.headers.get("ratelimit-reset")
+        )
+
+        if response.content:
+            deserialized = response.json()
+        else:
+            deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def create(
+        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Toolbelt.
+
+        Creates a versioned collection of provider-qualified Action Gateway tool names.
+
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "name": "str",  # Required.
+                    "tools": [
+                        "str"  # Required.
+                    ],
+                    "description": "str",  # Optional.
+                    "display_name": "str",  # Optional.
+                    "version": "1"  # Optional. Default value is "1".
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "toolbelt": {
+                        "created_at": "2020-02-20 00:00:00",  # Required.
+                        "name": "str",  # Required.
+                        "reference": "str",  # A reference pinned to this immutable toolbelt
+                          version. Required.
+                        "reference_latest": "str",  # An unversioned reference to the latest
+                          active version. Required.
+                        "status": "str",  # Required. Known values are: "active" and
+                          "deprecated".
+                        "tool_count": 0,  # Required.
+                        "tools": [
+                            "str"  # Required.
+                        ],
+                        "updated_at": "2020-02-20 00:00:00",  # Required.
+                        "version": "str",  # Required.
+                        "description": "str",  # Optional. Required.
+                        "display_name": "str"  # Optional. Required.
+                    }
+                }
+                # response body for status code(s): 400, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def create(
+        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Toolbelt.
+
+        Creates a versioned collection of provider-qualified Action Gateway tool names.
+
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "toolbelt": {
+                        "created_at": "2020-02-20 00:00:00",  # Required.
+                        "name": "str",  # Required.
+                        "reference": "str",  # A reference pinned to this immutable toolbelt
+                          version. Required.
+                        "reference_latest": "str",  # An unversioned reference to the latest
+                          active version. Required.
+                        "status": "str",  # Required. Known values are: "active" and
+                          "deprecated".
+                        "tool_count": 0,  # Required.
+                        "tools": [
+                            "str"  # Required.
+                        ],
+                        "updated_at": "2020-02-20 00:00:00",  # Required.
+                        "version": "str",  # Required.
+                        "description": "str",  # Optional. Required.
+                        "display_name": "str"  # Optional. Required.
+                    }
+                }
+                # response body for status code(s): 400, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def create(self, body: Union[JSON, IO[bytes]], **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Toolbelt.
+
+        Creates a versioned collection of provider-qualified Action Gateway tool names.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "name": "str",  # Required.
+                    "tools": [
+                        "str"  # Required.
+                    ],
+                    "description": "str",  # Optional.
+                    "display_name": "str",  # Optional.
+                    "version": "1"  # Optional. Default value is "1".
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "toolbelt": {
+                        "created_at": "2020-02-20 00:00:00",  # Required.
+                        "name": "str",  # Required.
+                        "reference": "str",  # A reference pinned to this immutable toolbelt
+                          version. Required.
+                        "reference_latest": "str",  # An unversioned reference to the latest
+                          active version. Required.
+                        "status": "str",  # Required. Known values are: "active" and
+                          "deprecated".
+                        "tool_count": 0,  # Required.
+                        "tools": [
+                            "str"  # Required.
+                        ],
+                        "updated_at": "2020-02-20 00:00:00",  # Required.
+                        "version": "str",  # Required.
+                        "description": "str",  # Optional. Required.
+                        "display_name": "str"  # Optional. Required.
+                    }
+                }
+                # response body for status code(s): 400, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_toolbelts_create_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 409]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get(
+        self, name: str, *, version: Optional[str] = None, **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve a Toolbelt.
+
+        Retrieves the latest active version or a specified immutable version of a toolbelt.
+
+        :param name: The natural key identifying the toolbelt. Required.
+        :type name: str
+        :keyword version: An immutable numeric toolbelt version. Omit to retrieve the latest active
+         version. Default value is None.
+        :paramtype version: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "toolbelt": {
+                        "created_at": "2020-02-20 00:00:00",  # Required.
+                        "name": "str",  # Required.
+                        "reference": "str",  # A reference pinned to this immutable toolbelt
+                          version. Required.
+                        "reference_latest": "str",  # An unversioned reference to the latest
+                          active version. Required.
+                        "status": "str",  # Required. Known values are: "active" and
+                          "deprecated".
+                        "tool_count": 0,  # Required.
+                        "tools": [
+                            "str"  # Required.
+                        ],
+                        "updated_at": "2020-02-20 00:00:00",  # Required.
+                        "version": "str",  # Required.
+                        "description": "str",  # Optional. Required.
+                        "display_name": "str"  # Optional. Required.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_toolbelts_get_request(
+            name=name,
+            version=version,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def delete(self, name: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Delete a Toolbelt.
+
+        Deprecates the latest active version of a toolbelt.
+
+        :param name: The natural key identifying the toolbelt. Required.
+        :type name: str
+        :return: JSON or JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_toolbelts_delete_request(
+            name=name,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def add_tools(
+        self,
+        name: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Add Tools to a Toolbelt.
+
+        Adds provider-qualified tool names and creates a new immutable toolbelt version.
+
+        :param name: The natural key identifying the toolbelt. Required.
+        :type name: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "tools": [
+                        "str"  # Required.
+                    ]
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "toolbelt": {
+                        "created_at": "2020-02-20 00:00:00",  # Required.
+                        "name": "str",  # Required.
+                        "reference": "str",  # A reference pinned to this immutable toolbelt
+                          version. Required.
+                        "reference_latest": "str",  # An unversioned reference to the latest
+                          active version. Required.
+                        "status": "str",  # Required. Known values are: "active" and
+                          "deprecated".
+                        "tool_count": 0,  # Required.
+                        "tools": [
+                            "str"  # Required.
+                        ],
+                        "updated_at": "2020-02-20 00:00:00",  # Required.
+                        "version": "str",  # Required.
+                        "description": "str",  # Optional. Required.
+                        "display_name": "str"  # Optional. Required.
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def add_tools(
+        self,
+        name: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Add Tools to a Toolbelt.
+
+        Adds provider-qualified tool names and creates a new immutable toolbelt version.
+
+        :param name: The natural key identifying the toolbelt. Required.
+        :type name: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "toolbelt": {
+                        "created_at": "2020-02-20 00:00:00",  # Required.
+                        "name": "str",  # Required.
+                        "reference": "str",  # A reference pinned to this immutable toolbelt
+                          version. Required.
+                        "reference_latest": "str",  # An unversioned reference to the latest
+                          active version. Required.
+                        "status": "str",  # Required. Known values are: "active" and
+                          "deprecated".
+                        "tool_count": 0,  # Required.
+                        "tools": [
+                            "str"  # Required.
+                        ],
+                        "updated_at": "2020-02-20 00:00:00",  # Required.
+                        "version": "str",  # Required.
+                        "description": "str",  # Optional. Required.
+                        "display_name": "str"  # Optional. Required.
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def add_tools(
+        self, name: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Add Tools to a Toolbelt.
+
+        Adds provider-qualified tool names and creates a new immutable toolbelt version.
+
+        :param name: The natural key identifying the toolbelt. Required.
+        :type name: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "tools": [
+                        "str"  # Required.
+                    ]
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "toolbelt": {
+                        "created_at": "2020-02-20 00:00:00",  # Required.
+                        "name": "str",  # Required.
+                        "reference": "str",  # A reference pinned to this immutable toolbelt
+                          version. Required.
+                        "reference_latest": "str",  # An unversioned reference to the latest
+                          active version. Required.
+                        "status": "str",  # Required. Known values are: "active" and
+                          "deprecated".
+                        "tool_count": 0,  # Required.
+                        "tools": [
+                            "str"  # Required.
+                        ],
+                        "updated_at": "2020-02-20 00:00:00",  # Required.
+                        "version": "str",  # Required.
+                        "description": "str",  # Optional. Required.
+                        "display_name": "str"  # Optional. Required.
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_toolbelts_add_tools_request(
+            name=name,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def delete_tools(
+        self,
+        name: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Remove Tools from a Toolbelt.
+
+        Removes tool names and creates a new immutable toolbelt version.
+
+        :param name: The natural key identifying the toolbelt. Required.
+        :type name: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "tools": [
+                        "str"  # Required.
+                    ]
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "toolbelt": {
+                        "created_at": "2020-02-20 00:00:00",  # Required.
+                        "name": "str",  # Required.
+                        "reference": "str",  # A reference pinned to this immutable toolbelt
+                          version. Required.
+                        "reference_latest": "str",  # An unversioned reference to the latest
+                          active version. Required.
+                        "status": "str",  # Required. Known values are: "active" and
+                          "deprecated".
+                        "tool_count": 0,  # Required.
+                        "tools": [
+                            "str"  # Required.
+                        ],
+                        "updated_at": "2020-02-20 00:00:00",  # Required.
+                        "version": "str",  # Required.
+                        "description": "str",  # Optional. Required.
+                        "display_name": "str"  # Optional. Required.
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def delete_tools(
+        self,
+        name: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Remove Tools from a Toolbelt.
+
+        Removes tool names and creates a new immutable toolbelt version.
+
+        :param name: The natural key identifying the toolbelt. Required.
+        :type name: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "toolbelt": {
+                        "created_at": "2020-02-20 00:00:00",  # Required.
+                        "name": "str",  # Required.
+                        "reference": "str",  # A reference pinned to this immutable toolbelt
+                          version. Required.
+                        "reference_latest": "str",  # An unversioned reference to the latest
+                          active version. Required.
+                        "status": "str",  # Required. Known values are: "active" and
+                          "deprecated".
+                        "tool_count": 0,  # Required.
+                        "tools": [
+                            "str"  # Required.
+                        ],
+                        "updated_at": "2020-02-20 00:00:00",  # Required.
+                        "version": "str",  # Required.
+                        "description": "str",  # Optional. Required.
+                        "display_name": "str"  # Optional. Required.
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def delete_tools(
+        self, name: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Remove Tools from a Toolbelt.
+
+        Removes tool names and creates a new immutable toolbelt version.
+
+        :param name: The natural key identifying the toolbelt. Required.
+        :type name: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "tools": [
+                        "str"  # Required.
+                    ]
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "toolbelt": {
+                        "created_at": "2020-02-20 00:00:00",  # Required.
+                        "name": "str",  # Required.
+                        "reference": "str",  # A reference pinned to this immutable toolbelt
+                          version. Required.
+                        "reference_latest": "str",  # An unversioned reference to the latest
+                          active version. Required.
+                        "status": "str",  # Required. Known values are: "active" and
+                          "deprecated".
+                        "tool_count": 0,  # Required.
+                        "tools": [
+                            "str"  # Required.
+                        ],
+                        "updated_at": "2020-02-20 00:00:00",  # Required.
+                        "version": "str",  # Required.
+                        "description": "str",  # Optional. Required.
+                        "display_name": "str"  # Optional. Required.
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_toolbelts_delete_tools_request(
+            name=name,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
 
 
 class OneClicksOperations:
