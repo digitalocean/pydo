@@ -9,9 +9,12 @@ from __future__ import annotations
 import hashlib
 import json as _json
 import os
+import time
 import warnings
 from typing import Any, BinaryIO, Dict, Iterator, List, Optional, Union
+from urllib.error import HTTPError, URLError
 from urllib.parse import quote
+from urllib.request import Request, urlopen
 
 from azure.core.exceptions import (
     ClientAuthenticationError,
@@ -33,6 +36,7 @@ _ERROR_MAP = {
 }
 
 _BASE_PATH = "/v2/agents/sessions"
+_OK_STATUS = (200, 201, 202, 204)
 
 # Private Beta contract: a session is created from an ``agents.yaml`` manifest
 # uploaded verbatim. The server routes on this media type (handlers.go:
@@ -53,124 +57,36 @@ def _manifest_bytes(manifest: Union[str, bytes]) -> bytes:
     return data
 
 
-# Workspace file-transfer contract (custom REST handlers, not grpc-gateway).
+# Staged workspace transfers (``.../workspace/transfers``). Prefer these over
+# the older streaming upload/download routes for all payload sizes.
 _OCTET_STREAM = "application/octet-stream"
-_SHA256_HEADER = "X-Content-Sha256"
-_IS_ARCHIVE_HEADER = "X-Workspace-Is-Archive"
-_SIZE_HINT_HEADER = "X-Workspace-Size-Bytes"
-_MAX_UPLOAD_BYTES = 500 * 1024 * 1024  # server returns 413 beyond this
+_TRANSFERS_SUFFIX = "workspace/transfers"
+_MAX_TRANSFER_BYTES = 50 * 1024 * 1024 * 1024  # 50 GiB
+_DEFAULT_POLL_INTERVAL = 1.0
+_DEFAULT_POLL_TIMEOUT = 600.0
+_DOWNLOAD_CHUNK = 1024 * 1024
 
 UploadData = Union[bytes, bytearray, str, "os.PathLike[str]", BinaryIO]
 
 
 class WorkspaceTransferError(RuntimeError):
-    """A workspace download failed its integrity check (discard the output)."""
+    """A workspace transfer failed (integrity check, timeout, or server error)."""
 
 
-def _bool_param(value: bool) -> str:
-    return "true" if value else "false"
-
-
-def _ci_get(mapping: Any, key: str) -> Optional[str]:
-    """Case-insensitive lookup over a header-like mapping."""
-    if not mapping:
-        return None
-    getter = getattr(mapping, "get", None)
+def _field(obj: Any, key: str, default: Any = None) -> Any:
+    if obj is None:
+        return default
+    getter = getattr(obj, "get", None)
     if getter is not None:
-        value = getter(key)
-        if value is not None:
-            return value
-    lower = key.lower()
-    try:
-        items = mapping.items()
-    except (AttributeError, TypeError):
-        return None
-    for name, value in items:
-        if isinstance(name, str) and name.lower() == lower:
-            return value
-    return None
+        return getter(key, default)
+    return getattr(obj, key, default)
 
 
-def _extract_trailer(response: Any, name: str) -> Optional[str]:
-    """Best-effort read of a chunked-transfer trailer (only valid post-body)."""
-    value = _ci_get(getattr(response, "headers", None), name)
-    if value:
-        return value
-    internal = getattr(response, "internal_response", None)
-    for obj in (internal, getattr(internal, "raw", None)):
-        if obj is None:
-            continue
-        value = _ci_get(getattr(obj, "trailers", None), name)
-        if value:
-            return value
-    return None
+def _coerce_upload_content(data: UploadData) -> "tuple[Any, int, Any]":
+    """Normalize an upload payload to ``(content, size, handle_to_close)``.
 
-
-def _download_is_archive(response: Any) -> bool:
-    value = _ci_get(getattr(response, "headers", None), _IS_ARCHIVE_HEADER)
-    return str(value or "").strip().lower() == "true"
-
-
-def _download_size_hint(response: Any) -> Optional[int]:
-    raw = _ci_get(getattr(response, "headers", None), _SIZE_HINT_HEADER)
-    try:
-        return int(raw) if raw not in (None, "") else None
-    except (TypeError, ValueError):
-        return None
-
-
-def _verify_download(
-    response: Any,
-    computed_hex: str,
-    total_bytes: int,
-    require_checksum: bool,
-) -> None:
-    """Verify a finished download against whatever integrity signal is readable.
-
-    The ``X-Content-Sha256`` trailer is authoritative when readable, but
-    CPython's HTTP stack discards chunked trailers, so the check degrades: use
-    the trailer if present, else the size hint, else warn (or raise under
-    ``require_checksum``).
+    Size is required by the staged transfer API.
     """
-    expected = _extract_trailer(response, _SHA256_HEADER)
-    if expected:
-        if expected.strip().lower() != computed_hex.lower():
-            raise WorkspaceTransferError(
-                "workspace download integrity check failed: SHA-256 mismatch "
-                f"(trailer {expected.strip()!r} != computed {computed_hex!r}) — "
-                "discard the output."
-            )
-        return
-
-    size_hint = _download_size_hint(response)
-    if size_hint is not None and size_hint != total_bytes:
-        raise WorkspaceTransferError(
-            "workspace download is truncated: received "
-            f"{total_bytes} bytes but the server reported {size_hint} — "
-            "discard the output."
-        )
-    if require_checksum:
-        raise WorkspaceTransferError(
-            "workspace download integrity check failed: the X-Content-Sha256 "
-            "trailer is missing or could not be read. Python's HTTP stack "
-            "discards chunked trailers, so strict checksum verification is not "
-            "possible on this transport; pass require_checksum=False to accept "
-            "downloads (verified by size when the server provides a size hint)."
-        )
-    warnings.warn(
-        "workspace download could not verify the X-Content-Sha256 trailer "
-        "(Python's HTTP stack discards chunked trailers); integrity was "
-        + (
-            "confirmed via the size hint."
-            if size_hint is not None
-            else "NOT independently verified."
-        ),
-        stacklevel=2,
-    )
-
-
-def _coerce_upload_content(data: UploadData) -> "tuple[Any, Optional[int], Any]":
-    """Normalize an upload payload to ``(content, size_or_None, handle_to_close)``."""
     if isinstance(data, (bytes, bytearray)):
         payload = bytes(data)
         return payload, len(payload), None
@@ -180,17 +96,132 @@ def _coerce_upload_content(data: UploadData) -> "tuple[Any, Optional[int], Any]"
         handle = open(path, "rb")  # pylint: disable=consider-using-with
         return handle, size, handle
     if hasattr(data, "read"):
-        size: Optional[int] = None
         try:
             current = data.tell()
             data.seek(0, os.SEEK_END)
             size = data.tell() - current
             data.seek(current)
-        except (OSError, AttributeError, ValueError):
-            size = None
-        return data, size, None
+        except (OSError, AttributeError, ValueError) as exc:
+            raise ValueError(
+                "upload streams must support seek/tell so size_bytes can be "
+                "determined; pass bytes or a filesystem path instead"
+            ) from exc
+        return data, int(size), None
     raise TypeError(
         "data must be bytes, a filesystem path, or a readable binary stream"
+    )
+
+
+def _read_exact(source: Any, size: int) -> bytes:
+    if isinstance(source, (bytes, bytearray)):
+        raise TypeError("use slicing for bytes payloads")
+    chunks: List[bytes] = []
+    remaining = size
+    while remaining > 0:
+        chunk = source.read(remaining)
+        if not chunk:
+            raise WorkspaceTransferError(
+                f"unexpected EOF while reading upload part "
+                f"({size - remaining} of {size} bytes read)"
+            )
+        if isinstance(chunk, str):
+            chunk = chunk.encode("utf-8")
+        chunks.append(chunk)
+        remaining -= len(chunk)
+    return b"".join(chunks)
+
+
+def _http_put_bytes(url: str, data: bytes) -> None:
+    """PUT part bytes to a presigned Spaces URL (not via OHS)."""
+    request = Request(
+        url,
+        data=data,
+        method="PUT",
+        headers={"Content-Type": _OCTET_STREAM},
+    )
+    try:
+        with urlopen(request) as resp:  # noqa: S310 — caller-supplied Spaces URL
+            body = resp.read()
+            status = getattr(resp, "status", None) or resp.getcode()
+    except HTTPError as exc:
+        detail = exc.read().decode("utf-8", errors="replace") if exc.fp else ""
+        raise WorkspaceTransferError(
+            f"part upload failed: HTTP {exc.code}"
+            + (f": {detail.strip()}" if detail.strip() else "")
+        ) from exc
+    except URLError as exc:
+        raise WorkspaceTransferError(f"part upload failed: {exc.reason}") from exc
+    if status not in (200, 201, 204):
+        raise WorkspaceTransferError(
+            f"part upload failed: HTTP {status}"
+            + (f": {body[:200]!r}" if body else "")
+        )
+
+
+def _http_get_iter(url: str) -> Iterator[bytes]:
+    """Stream bytes from a presigned download URL (not via OHS)."""
+    request = Request(url, method="GET")
+    try:
+        resp = urlopen(request)  # noqa: S310 — caller-supplied Spaces URL
+    except HTTPError as exc:
+        detail = exc.read().decode("utf-8", errors="replace") if exc.fp else ""
+        raise WorkspaceTransferError(
+            f"download failed: HTTP {exc.code}"
+            + (f": {detail.strip()}" if detail.strip() else "")
+        ) from exc
+    except URLError as exc:
+        raise WorkspaceTransferError(f"download failed: {exc.reason}") from exc
+    try:
+        status = getattr(resp, "status", None) or resp.getcode()
+        if status != 200:
+            raise WorkspaceTransferError(f"download failed: HTTP {status}")
+        while True:
+            chunk = resp.read(_DOWNLOAD_CHUNK)
+            if not chunk:
+                break
+            yield chunk
+    finally:
+        try:
+            resp.close()
+        except Exception:  # noqa: BLE001
+            pass
+
+
+def _verify_transfer_sha256(
+    computed_hex: str,
+    expected: Optional[str],
+    *,
+    total_bytes: int,
+    size_hint: Optional[int],
+    require_checksum: bool,
+) -> None:
+    if expected:
+        if expected.strip().lower() != computed_hex.lower():
+            raise WorkspaceTransferError(
+                "workspace download integrity check failed: SHA-256 mismatch "
+                f"(expected {expected.strip()!r} != computed {computed_hex!r}) — "
+                "discard the output."
+            )
+        return
+    if size_hint is not None and size_hint != total_bytes:
+        raise WorkspaceTransferError(
+            "workspace download is truncated: received "
+            f"{total_bytes} bytes but the server reported {size_hint} — "
+            "discard the output."
+        )
+    if require_checksum:
+        raise WorkspaceTransferError(
+            "workspace download integrity check failed: sha256 was missing "
+            "from the completed transfer response."
+        )
+    warnings.warn(
+        "workspace download completed without a sha256 digest; integrity was "
+        + (
+            "confirmed via bytes_written."
+            if size_hint is not None
+            else "NOT independently verified."
+        ),
+        stacklevel=2,
     )
 
 
@@ -327,7 +358,7 @@ class SessionsOperations:
         pipeline_response = self._client._pipeline.run(request, stream=stream)
         response = pipeline_response.http_response
 
-        if response.status_code not in (200, 204):
+        if response.status_code not in _OK_STATUS:
             _raise_agents_http_error(response)
         return pipeline_response
 
@@ -480,6 +511,161 @@ class SessionsOperations:
             _raise_agents_http_error(response)
         return HarnessEventStream(SSEStream(response))
 
+    def _transfers_path(self, session_id: str, *parts: str) -> str:
+        path = f"{_BASE_PATH}/{_quote(session_id)}/{_TRANSFERS_SUFFIX}"
+        for part in parts:
+            path = f"{path}/{_quote(part)}"
+        return path
+
+    def create_transfer(
+        self,
+        session_id: str,
+        *,
+        direction: str,
+        path: str,
+        is_archive: bool = False,
+        as_archive: bool = False,
+        size_bytes: Optional[int] = None,
+        sha256: Optional[str] = None,
+    ) -> Any:
+        """Start a staged workspace transfer (``POST .../workspace/transfers``).
+
+        ``direction`` is ``"upload"`` or ``"download"``. Upload responses are
+        ``201`` and include ``part_size``; download responses are ``202``.
+        """
+        if not path:
+            raise ValueError("path is required")
+        if direction not in ("upload", "download"):
+            raise ValueError('direction must be "upload" or "download"')
+        body: Dict[str, Any] = {"direction": direction, "path": path}
+        if direction == "upload":
+            body["is_archive"] = bool(is_archive)
+            if size_bytes is not None:
+                body["size_bytes"] = int(size_bytes)
+            if sha256 is not None:
+                body["sha256"] = sha256
+        else:
+            body["as_archive"] = bool(as_archive)
+        return self._parse_json(
+            self._send("POST", self._transfers_path(session_id), body=body),
+        )
+
+    def create_part_upload_urls(
+        self,
+        session_id: str,
+        transfer_id: str,
+        *,
+        part_numbers: List[int],
+    ) -> Any:
+        """Get presigned URLs for one or more upload parts (upload only).
+
+        Request body is ``{"part_numbers": [1, 2, ...]}``. The response includes
+        ``part_urls``: ``[{"part_number": N, "upload_url": "..."}, ...]``.
+        """
+        numbers = [int(n) for n in part_numbers]
+        if not numbers or any(n < 1 for n in numbers):
+            raise ValueError("part_numbers must be a non-empty list of integers >= 1")
+        return self._parse_json(
+            self._send(
+                "POST",
+                self._transfers_path(session_id, transfer_id, "part-upload-urls"),
+                body={"part_numbers": numbers},
+            ),
+        )
+
+    def create_part_upload_url(
+        self,
+        session_id: str,
+        transfer_id: str,
+        *,
+        part_number: int,
+    ) -> Any:
+        """Convenience wrapper: request a single part URL via the batch endpoint.
+
+        Returns the matching ``part_urls`` entry (``part_number`` + ``upload_url``).
+        """
+        resp = self.create_part_upload_urls(
+            session_id, transfer_id, part_numbers=[part_number]
+        )
+        urls = _field(resp, "part_urls") or []
+        for entry in urls:
+            if int(_field(entry, "part_number") or 0) == int(part_number):
+                return entry
+        if len(urls) == 1:
+            return urls[0]
+        raise WorkspaceTransferError(
+            f"CreatePartUploadURL response missing part_number={part_number}"
+        )
+
+    def commit_upload(
+        self,
+        session_id: str,
+        transfer_id: str,
+        *,
+        sha256: Optional[str] = None,
+    ) -> Any:
+        """Finalize uploaded parts and start applying them into the workspace."""
+        body: Dict[str, Any] = {}
+        if sha256 is not None:
+            body["sha256"] = sha256
+        return self._parse_json(
+            self._send(
+                "POST",
+                self._transfers_path(session_id, transfer_id, "commit"),
+                body=body,
+            ),
+        )
+
+    def get_transfer(self, session_id: str, transfer_id: str) -> Any:
+        """Poll transfer status; downloads expose ``download_url`` + ``sha256``."""
+        return self._parse_json(
+            self._send("GET", self._transfers_path(session_id, transfer_id)),
+        )
+
+    def cancel_transfer(
+        self,
+        session_id: str,
+        transfer_id: str,
+        *,
+        reason: Optional[str] = None,
+    ) -> Any:
+        """Abort an in-flight transfer (idempotent)."""
+        body: Dict[str, Any] = {}
+        if reason is not None:
+            body["reason"] = reason
+        return self._parse_json(
+            self._send(
+                "POST",
+                self._transfers_path(session_id, transfer_id, "cancel"),
+                body=body,
+            ),
+        )
+
+    def wait_transfer(
+        self,
+        session_id: str,
+        transfer_id: str,
+        *,
+        poll_interval: float = _DEFAULT_POLL_INTERVAL,
+        timeout: float = _DEFAULT_POLL_TIMEOUT,
+    ) -> Any:
+        """Poll :meth:`get_transfer` until ``completed`` or ``failed``."""
+        deadline = time.monotonic() + timeout
+        while True:
+            info = self.get_transfer(session_id, transfer_id)
+            status = _field(info, "status")
+            if status in ("completed", "failed"):
+                if status == "failed":
+                    message = _field(info, "error_message") or "transfer failed"
+                    raise WorkspaceTransferError(str(message))
+                return info
+            if time.monotonic() >= deadline:
+                raise WorkspaceTransferError(
+                    f"transfer {transfer_id!r} timed out after {timeout:g}s "
+                    f"(last status={status!r})"
+                )
+            time.sleep(max(poll_interval, 0.05))
+
     def workspace_upload(
         self,
         session_id: str,
@@ -488,33 +674,101 @@ class SessionsOperations:
         data: UploadData,
         is_archive: bool = False,
         content_sha256: Optional[str] = None,
+        poll_interval: float = _DEFAULT_POLL_INTERVAL,
+        timeout: float = _DEFAULT_POLL_TIMEOUT,
     ) -> Any:
-        """Upload raw file (or tar) bytes into a session's sandbox workspace.
+        """Upload a file/tar into the workspace via staged transfers.
 
-        ``POST /v2/agents/sessions/{session_id}/workspace/upload``. ``data`` is
-        bytes, a filesystem path, or a readable binary stream. ``is_archive``
-        extracts the body as a tar at ``path``; ``content_sha256`` is forwarded
-        for the guest to verify. Returns ``{"path": ..., "bytes_written": N}``.
+        Uses ``CreateTransfer`` → part PUTs to Spaces → ``CommitUpload`` →
+        poll ``GetTransfer`` for all sizes (up to 50 GiB). ``data`` is bytes, a
+        filesystem path, or a seekable binary stream. Returns the completed
+        transfer record (includes ``bytes_written`` / ``sha256`` when present).
         """
         if not path:
             raise ValueError("path is required")
         content, size, handle = _coerce_upload_content(data)
         try:
-            if size is not None and size > _MAX_UPLOAD_BYTES:
+            if size > _MAX_TRANSFER_BYTES:
                 raise ValueError(
-                    f"upload of {size} bytes exceeds the 500 MiB per-request limit"
+                    f"upload of {size} bytes exceeds the 50 GiB transfer limit"
                 )
-            headers = {_SHA256_HEADER: content_sha256} if content_sha256 else None
-            return self._parse_json(
-                self._send(
-                    "POST",
-                    f"{_BASE_PATH}/{_quote(session_id)}/workspace/upload",
-                    content=content,
-                    content_type=_OCTET_STREAM,
-                    params={"path": path, "is_archive": _bool_param(is_archive)},
-                    headers=headers,
-                ),
+            created = self.create_transfer(
+                session_id,
+                direction="upload",
+                path=path,
+                is_archive=is_archive,
+                size_bytes=size,
+                sha256=content_sha256,
             )
+            transfer_id = _field(created, "transfer_id")
+            part_size = int(_field(created, "part_size") or 0)
+            if not transfer_id:
+                raise WorkspaceTransferError("CreateTransfer response missing transfer_id")
+            if part_size < 1:
+                raise WorkspaceTransferError(
+                    "CreateTransfer response missing a positive part_size"
+                )
+
+            hasher = hashlib.sha256()
+            if size == 0:
+                # Still need at least one empty part URL? Skip parts; commit only.
+                part_url_by_number: Dict[int, str] = {}
+            else:
+                num_parts = (size + part_size - 1) // part_size
+                part_numbers = list(range(1, num_parts + 1))
+                batch = self.create_part_upload_urls(
+                    session_id, transfer_id, part_numbers=part_numbers
+                )
+                part_url_by_number = {}
+                for entry in _field(batch, "part_urls") or []:
+                    n = int(_field(entry, "part_number") or 0)
+                    url = _field(entry, "upload_url")
+                    if n and url:
+                        part_url_by_number[n] = str(url)
+                missing = [n for n in part_numbers if n not in part_url_by_number]
+                if missing:
+                    raise WorkspaceTransferError(
+                        f"CreatePartUploadURL missing upload_url for parts {missing}"
+                    )
+
+            offset = 0
+            part_number = 1
+            while offset < size:
+                length = min(part_size, size - offset)
+                if isinstance(content, (bytes, bytearray)):
+                    chunk = bytes(content[offset : offset + length])
+                else:
+                    chunk = _read_exact(content, length)
+                hasher.update(chunk)
+                upload_url = part_url_by_number[part_number]
+                _http_put_bytes(upload_url, chunk)
+                offset += length
+                part_number += 1
+
+            digest = content_sha256 or hasher.hexdigest()
+            self.commit_upload(session_id, transfer_id, sha256=digest)
+            completed = self.wait_transfer(
+                session_id,
+                transfer_id,
+                poll_interval=poll_interval,
+                timeout=timeout,
+            )
+            if _field(completed, "path") is None and hasattr(completed, "__setitem__"):
+                completed["path"] = path
+            if _field(completed, "bytes_written") is None and hasattr(
+                completed, "__setitem__"
+            ):
+                completed["bytes_written"] = size
+            return completed
+        except Exception:
+            # Best-effort cancel if we already created a transfer.
+            transfer_id = locals().get("transfer_id")
+            if transfer_id:
+                try:
+                    self.cancel_transfer(session_id, transfer_id, reason="client_error")
+                except Exception:  # noqa: BLE001
+                    pass
+            raise
         finally:
             if handle is not None:
                 handle.close()
@@ -526,69 +780,114 @@ class SessionsOperations:
         path: str,
         as_archive: bool = False,
         require_checksum: bool = False,
+        poll_interval: float = _DEFAULT_POLL_INTERVAL,
+        timeout: float = _DEFAULT_POLL_TIMEOUT,
     ) -> "WorkspaceDownload":
-        """Download a file (or tar-streamed directory) from a session workspace.
+        """Download a workspace file/tar via staged transfers.
 
-        ``GET /v2/agents/sessions/{session_id}/workspace/download``. Returns a
-        :class:`WorkspaceDownload` that streams and verifies the body.
-        ``as_archive`` tar-streams the directory at ``path``. ``require_checksum``
-        raises when the SHA-256 trailer cannot be read (default ``False`` since
-        CPython's HTTP stack discards chunked trailers).
+        Uses ``CreateTransfer`` (download) → poll ``GetTransfer`` → GET the
+        presigned ``download_url``, verifying ``sha256`` from the JSON status.
         """
         if not path:
             raise ValueError("path is required")
-        request = HttpRequest(
-            "GET",
-            f"{_BASE_PATH}/{_quote(session_id)}/workspace/download",
-            headers={"Accept": _OCTET_STREAM},
-            params={"path": path, "as_archive": _bool_param(as_archive)},
+        created = self.create_transfer(
+            session_id,
+            direction="download",
+            path=path,
+            as_archive=as_archive,
         )
-        request.url = self._client.format_url(request.url)
-        pipeline_response = self._client._pipeline.run(request, stream=True)
-        response = pipeline_response.http_response
-        if response.status_code != 200:
-            response.read()
-            _raise_agents_http_error(response)
-        return WorkspaceDownload(response, require_checksum=require_checksum)
+        transfer_id = _field(created, "transfer_id")
+        if not transfer_id:
+            raise WorkspaceTransferError("CreateTransfer response missing transfer_id")
+        try:
+            completed = self.wait_transfer(
+                session_id,
+                transfer_id,
+                poll_interval=poll_interval,
+                timeout=timeout,
+            )
+        except Exception:
+            try:
+                self.cancel_transfer(session_id, transfer_id, reason="client_error")
+            except Exception:  # noqa: BLE001
+                pass
+            raise
+        download_url = _field(completed, "download_url")
+        if not download_url:
+            raise WorkspaceTransferError(
+                "completed download transfer is missing download_url"
+            )
+        size_hint = _field(completed, "bytes_written")
+        try:
+            size_hint = int(size_hint) if size_hint is not None else None
+        except (TypeError, ValueError):
+            size_hint = None
+        return WorkspaceDownload(
+            download_url=str(download_url),
+            expected_sha256=_field(completed, "sha256"),
+            size_hint=size_hint,
+            is_archive=as_archive,
+            require_checksum=require_checksum,
+            transfer_id=str(transfer_id),
+        )
 
 
 class WorkspaceDownload:
-    """A streaming workspace download with best-effort integrity verification.
+    """Streaming download from a completed staged transfer's ``download_url``.
 
-    Iterating yields body chunks while computing the SHA-256; integrity is
-    verified once the body is fully consumed (see :func:`_verify_download`).
-    Consume it fully (iteration, :meth:`read`, or :meth:`save`) before trusting.
+    Iterating yields body chunks while computing SHA-256; integrity is verified
+    against the digest from :meth:`SessionsOperations.get_transfer` once the
+    body is fully consumed. Consume fully (iteration, :meth:`read`, or
+    :meth:`save`) before trusting the output.
     """
 
-    def __init__(self, response: Any, *, require_checksum: bool = False):
-        self._response = response
+    def __init__(
+        self,
+        *,
+        download_url: str,
+        expected_sha256: Optional[str] = None,
+        size_hint: Optional[int] = None,
+        is_archive: bool = False,
+        require_checksum: bool = False,
+        transfer_id: Optional[str] = None,
+    ):
+        self._download_url = download_url
+        self._expected_sha256 = expected_sha256
+        self._size_hint = size_hint
+        self._is_archive = bool(is_archive)
         self._require_checksum = require_checksum
+        self.transfer_id = transfer_id
         self.bytes_read = 0
 
     @property
     def is_archive(self) -> bool:
-        """Whether the response is a tar stream (``X-Workspace-Is-Archive``)."""
-        return _download_is_archive(self._response)
+        """Whether the caller requested a tar archive download."""
+        return self._is_archive
 
     @property
     def size_hint(self) -> Optional[int]:
-        """Size hint for progress UIs (``X-Workspace-Size-Bytes``); not framing."""
-        return _download_size_hint(self._response)
+        """``bytes_written`` from the completed transfer, when known."""
+        return self._size_hint
+
+    @property
+    def expected_sha256(self) -> Optional[str]:
+        """SHA-256 from the completed transfer response (verify after download)."""
+        return self._expected_sha256
 
     def __iter__(self) -> Iterator[bytes]:
         hasher = hashlib.sha256()
         total = 0
-        for chunk in self._response.iter_bytes():
-            if not chunk:
-                continue
-            if isinstance(chunk, str):
-                chunk = chunk.encode("utf-8")
+        for chunk in _http_get_iter(self._download_url):
             hasher.update(chunk)
             total += len(chunk)
-            yield bytes(chunk)
+            yield chunk
         self.bytes_read = total
-        _verify_download(
-            self._response, hasher.hexdigest(), total, self._require_checksum
+        _verify_transfer_sha256(
+            hasher.hexdigest(),
+            self._expected_sha256,
+            total_bytes=total,
+            size_hint=self._size_hint,
+            require_checksum=self._require_checksum,
         )
 
     def read(self) -> bytes:
@@ -622,12 +921,7 @@ class WorkspaceDownload:
         return total
 
     def close(self) -> None:
-        closer = getattr(self._response, "close", None)
-        if closer is not None:
-            try:
-                closer()
-            except Exception:  # noqa: BLE001 — best-effort cleanup
-                pass
+        return None
 
     def __enter__(self) -> "WorkspaceDownload":
         return self
@@ -642,4 +936,5 @@ __all__ = [
     "HarnessStreamError",
     "WorkspaceDownload",
     "WorkspaceTransferError",
+    "UploadData",
 ]

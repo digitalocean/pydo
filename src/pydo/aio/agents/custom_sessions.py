@@ -6,53 +6,90 @@
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import json as _json
 import os
+import time
 from typing import Any, AsyncIterator, BinaryIO, Dict, List, Optional, Union
 from urllib.parse import quote
 
-from azure.core.exceptions import (
-    ClientAuthenticationError,
-    HttpResponseError,
-    ResourceExistsError,
-    ResourceNotFoundError,
-    ResourceNotModifiedError,
-    map_error,
-)
 from azure.core.rest import HttpRequest
 
 from pydo.agents.custom_sessions import (
-    _MAX_UPLOAD_BYTES,
+    _DEFAULT_POLL_INTERVAL,
+    _DEFAULT_POLL_TIMEOUT,
+    _DOWNLOAD_CHUNK,
+    _MAX_TRANSFER_BYTES,
     _OCTET_STREAM,
-    _SHA256_HEADER,
+    _OK_STATUS,
+    _TRANSFERS_SUFFIX,
     _YAML_MEDIA_TYPE,
     HarnessStreamError,
     UploadData,
     WorkspaceTransferError,
-    _bool_param,
     _coerce_upload_content,
-    _download_is_archive,
-    _download_size_hint,
+    _field,
+    _http_get_iter,
+    _http_put_bytes,
     _manifest_bytes,
     _raise_agents_http_error,
     _unwrap_harness_sse_chunk,
-    _verify_download,
+    _verify_transfer_sha256,
 )
 from pydo.custom_extensions import AsyncSSEStream, _wrap
-
-_ERROR_MAP = {
-    401: ClientAuthenticationError,
-    404: ResourceNotFoundError,
-    409: ResourceExistsError,
-    304: ResourceNotModifiedError,
-}
 
 _BASE_PATH = "/v2/agents/sessions"
 
 
 def _quote(value: str) -> str:
     return quote(str(value), safe="")
+
+
+async def _run_sync(func, *args):
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(None, lambda: func(*args))
+
+
+async def _aio_http_put_bytes(url: str, data: bytes) -> None:
+    try:
+        import aiohttp
+    except ImportError:
+        # Fallback for environments without the aio extra.
+        await _run_sync(_http_put_bytes, url, data)
+        return
+    async with aiohttp.ClientSession() as session:
+        async with session.put(
+            url, data=data, headers={"Content-Type": _OCTET_STREAM}
+        ) as resp:
+            body = await resp.read()
+            if resp.status not in (200, 201, 204):
+                detail = body.decode("utf-8", errors="replace").strip()
+                raise WorkspaceTransferError(
+                    f"part upload failed: HTTP {resp.status}"
+                    + (f": {detail}" if detail else "")
+                )
+
+
+async def _aio_http_get_iter(url: str) -> AsyncIterator[bytes]:
+    try:
+        import aiohttp
+    except ImportError:
+        chunks = await _run_sync(lambda: list(_http_get_iter(url)))
+        for chunk in chunks:
+            yield chunk
+        return
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url) as resp:
+            if resp.status != 200:
+                detail = (await resp.text()).strip()
+                raise WorkspaceTransferError(
+                    f"download failed: HTTP {resp.status}"
+                    + (f": {detail}" if detail else "")
+                )
+            async for chunk in resp.content.iter_chunked(_DOWNLOAD_CHUNK):
+                if chunk:
+                    yield chunk
 
 
 class AsyncHarnessEventStream:
@@ -124,7 +161,7 @@ class AsyncSessionsOperations:
         pipeline_response = await self._client._pipeline.run(request, stream=stream)
         response = pipeline_response.http_response
 
-        if response.status_code not in (200, 204):
+        if response.status_code not in _OK_STATUS:
             await response.read()
             _raise_agents_http_error(response)
         return pipeline_response
@@ -278,6 +315,150 @@ class AsyncSessionsOperations:
             _raise_agents_http_error(response)
         return AsyncHarnessEventStream(AsyncSSEStream(response))
 
+    def _transfers_path(self, session_id: str, *parts: str) -> str:
+        path = f"{_BASE_PATH}/{_quote(session_id)}/{_TRANSFERS_SUFFIX}"
+        for part in parts:
+            path = f"{path}/{_quote(part)}"
+        return path
+
+    async def create_transfer(
+        self,
+        session_id: str,
+        *,
+        direction: str,
+        path: str,
+        is_archive: bool = False,
+        as_archive: bool = False,
+        size_bytes: Optional[int] = None,
+        sha256: Optional[str] = None,
+    ) -> Any:
+        """Start a staged workspace transfer (``POST .../workspace/transfers``)."""
+        if not path:
+            raise ValueError("path is required")
+        if direction not in ("upload", "download"):
+            raise ValueError('direction must be "upload" or "download"')
+        body: Dict[str, Any] = {"direction": direction, "path": path}
+        if direction == "upload":
+            body["is_archive"] = bool(is_archive)
+            if size_bytes is not None:
+                body["size_bytes"] = int(size_bytes)
+            if sha256 is not None:
+                body["sha256"] = sha256
+        else:
+            body["as_archive"] = bool(as_archive)
+        return await self._parse_json(
+            await self._send("POST", self._transfers_path(session_id), body=body),
+        )
+
+    async def create_part_upload_urls(
+        self,
+        session_id: str,
+        transfer_id: str,
+        *,
+        part_numbers: List[int],
+    ) -> Any:
+        """Get presigned URLs for one or more upload parts (upload only)."""
+        numbers = [int(n) for n in part_numbers]
+        if not numbers or any(n < 1 for n in numbers):
+            raise ValueError("part_numbers must be a non-empty list of integers >= 1")
+        return await self._parse_json(
+            await self._send(
+                "POST",
+                self._transfers_path(session_id, transfer_id, "part-upload-urls"),
+                body={"part_numbers": numbers},
+            ),
+        )
+
+    async def create_part_upload_url(
+        self,
+        session_id: str,
+        transfer_id: str,
+        *,
+        part_number: int,
+    ) -> Any:
+        """Convenience wrapper for a single part URL via the batch endpoint."""
+        resp = await self.create_part_upload_urls(
+            session_id, transfer_id, part_numbers=[part_number]
+        )
+        urls = _field(resp, "part_urls") or []
+        for entry in urls:
+            if int(_field(entry, "part_number") or 0) == int(part_number):
+                return entry
+        if len(urls) == 1:
+            return urls[0]
+        raise WorkspaceTransferError(
+            f"CreatePartUploadURL response missing part_number={part_number}"
+        )
+
+    async def commit_upload(
+        self,
+        session_id: str,
+        transfer_id: str,
+        *,
+        sha256: Optional[str] = None,
+    ) -> Any:
+        """Finalize uploaded parts and start applying them into the workspace."""
+        body: Dict[str, Any] = {}
+        if sha256 is not None:
+            body["sha256"] = sha256
+        return await self._parse_json(
+            await self._send(
+                "POST",
+                self._transfers_path(session_id, transfer_id, "commit"),
+                body=body,
+            ),
+        )
+
+    async def get_transfer(self, session_id: str, transfer_id: str) -> Any:
+        """Poll transfer status; downloads expose ``download_url`` + ``sha256``."""
+        return await self._parse_json(
+            await self._send("GET", self._transfers_path(session_id, transfer_id)),
+        )
+
+    async def cancel_transfer(
+        self,
+        session_id: str,
+        transfer_id: str,
+        *,
+        reason: Optional[str] = None,
+    ) -> Any:
+        """Abort an in-flight transfer (idempotent)."""
+        body: Dict[str, Any] = {}
+        if reason is not None:
+            body["reason"] = reason
+        return await self._parse_json(
+            await self._send(
+                "POST",
+                self._transfers_path(session_id, transfer_id, "cancel"),
+                body=body,
+            ),
+        )
+
+    async def wait_transfer(
+        self,
+        session_id: str,
+        transfer_id: str,
+        *,
+        poll_interval: float = _DEFAULT_POLL_INTERVAL,
+        timeout: float = _DEFAULT_POLL_TIMEOUT,
+    ) -> Any:
+        """Poll :meth:`get_transfer` until ``completed`` or ``failed``."""
+        deadline = time.monotonic() + timeout
+        while True:
+            info = await self.get_transfer(session_id, transfer_id)
+            status = _field(info, "status")
+            if status in ("completed", "failed"):
+                if status == "failed":
+                    message = _field(info, "error_message") or "transfer failed"
+                    raise WorkspaceTransferError(str(message))
+                return info
+            if time.monotonic() >= deadline:
+                raise WorkspaceTransferError(
+                    f"transfer {transfer_id!r} timed out after {timeout:g}s "
+                    f"(last status={status!r})"
+                )
+            await asyncio.sleep(max(poll_interval, 0.05))
+
     async def workspace_upload(
         self,
         session_id: str,
@@ -286,8 +467,10 @@ class AsyncSessionsOperations:
         data: UploadData,
         is_archive: bool = False,
         content_sha256: Optional[str] = None,
+        poll_interval: float = _DEFAULT_POLL_INTERVAL,
+        timeout: float = _DEFAULT_POLL_TIMEOUT,
     ) -> Any:
-        """Upload raw file (or tar) bytes into a session's sandbox workspace.
+        """Upload a file/tar via staged transfers (async).
 
         Async counterpart of
         :meth:`pydo.agents.custom_sessions.SessionsOperations.workspace_upload`.
@@ -296,7 +479,7 @@ class AsyncSessionsOperations:
             raise ValueError("path is required")
         content, size, handle = _coerce_upload_content(data)
         try:
-            # aiohttp can't reliably stream sync file objects; materialize them.
+            # Materialize non-bytes payloads; aiohttp/part PUTs need concrete bytes.
             if hasattr(content, "read"):
                 content = content.read()
                 if isinstance(content, str):
@@ -305,21 +488,88 @@ class AsyncSessionsOperations:
         finally:
             if handle is not None:
                 handle.close()
-        if size is not None and size > _MAX_UPLOAD_BYTES:
+
+        if size > _MAX_TRANSFER_BYTES:
             raise ValueError(
-                f"upload of {size} bytes exceeds the 500 MiB per-request limit"
+                f"upload of {size} bytes exceeds the 50 GiB transfer limit"
             )
-        headers = {_SHA256_HEADER: content_sha256} if content_sha256 else None
-        return await self._parse_json(
-            await self._send(
-                "POST",
-                f"{_BASE_PATH}/{_quote(session_id)}/workspace/upload",
-                content=content,
-                content_type=_OCTET_STREAM,
-                params={"path": path, "is_archive": _bool_param(is_archive)},
-                headers=headers,
-            ),
-        )
+
+        transfer_id = None
+        try:
+            created = await self.create_transfer(
+                session_id,
+                direction="upload",
+                path=path,
+                is_archive=is_archive,
+                size_bytes=size,
+                sha256=content_sha256,
+            )
+            transfer_id = _field(created, "transfer_id")
+            part_size = int(_field(created, "part_size") or 0)
+            if not transfer_id:
+                raise WorkspaceTransferError(
+                    "CreateTransfer response missing transfer_id"
+                )
+            if part_size < 1:
+                raise WorkspaceTransferError(
+                    "CreateTransfer response missing a positive part_size"
+                )
+
+            hasher = hashlib.sha256()
+            if size == 0:
+                part_url_by_number: Dict[int, str] = {}
+            else:
+                num_parts = (size + part_size - 1) // part_size
+                part_numbers = list(range(1, num_parts + 1))
+                batch = await self.create_part_upload_urls(
+                    session_id, transfer_id, part_numbers=part_numbers
+                )
+                part_url_by_number = {}
+                for entry in _field(batch, "part_urls") or []:
+                    n = int(_field(entry, "part_number") or 0)
+                    url = _field(entry, "upload_url")
+                    if n and url:
+                        part_url_by_number[n] = str(url)
+                missing = [n for n in part_numbers if n not in part_url_by_number]
+                if missing:
+                    raise WorkspaceTransferError(
+                        f"CreatePartUploadURL missing upload_url for parts {missing}"
+                    )
+
+            offset = 0
+            part_number = 1
+            while offset < size:
+                length = min(part_size, size - offset)
+                chunk = bytes(content[offset : offset + length])
+                hasher.update(chunk)
+                await _aio_http_put_bytes(part_url_by_number[part_number], chunk)
+                offset += length
+                part_number += 1
+
+            digest = content_sha256 or hasher.hexdigest()
+            await self.commit_upload(session_id, transfer_id, sha256=digest)
+            completed = await self.wait_transfer(
+                session_id,
+                transfer_id,
+                poll_interval=poll_interval,
+                timeout=timeout,
+            )
+            if _field(completed, "path") is None and hasattr(completed, "__setitem__"):
+                completed["path"] = path
+            if _field(completed, "bytes_written") is None and hasattr(
+                completed, "__setitem__"
+            ):
+                completed["bytes_written"] = size
+            return completed
+        except Exception:
+            if transfer_id:
+                try:
+                    await self.cancel_transfer(
+                        session_id, transfer_id, reason="client_error"
+                    )
+                except Exception:  # noqa: BLE001
+                    pass
+            raise
 
     async def workspace_download(
         self,
@@ -328,49 +578,88 @@ class AsyncSessionsOperations:
         path: str,
         as_archive: bool = False,
         require_checksum: bool = False,
+        poll_interval: float = _DEFAULT_POLL_INTERVAL,
+        timeout: float = _DEFAULT_POLL_TIMEOUT,
     ) -> "AsyncWorkspaceDownload":
-        """Download a file (or tar-streamed directory) from a session workspace.
-
-        Async counterpart of
-        :meth:`pydo.agents.custom_sessions.SessionsOperations.workspace_download`.
-        """
+        """Download a workspace file/tar via staged transfers (async)."""
         if not path:
             raise ValueError("path is required")
-        request = HttpRequest(
-            "GET",
-            f"{_BASE_PATH}/{_quote(session_id)}/workspace/download",
-            headers={"Accept": _OCTET_STREAM},
-            params={"path": path, "as_archive": _bool_param(as_archive)},
+        created = await self.create_transfer(
+            session_id,
+            direction="download",
+            path=path,
+            as_archive=as_archive,
         )
-        request.url = self._client.format_url(request.url)
-        pipeline_response = await self._client._pipeline.run(request, stream=True)
-        response = pipeline_response.http_response
-        if response.status_code != 200:
-            await response.read()
-            _raise_agents_http_error(response)
-        return AsyncWorkspaceDownload(response, require_checksum=require_checksum)
+        transfer_id = _field(created, "transfer_id")
+        if not transfer_id:
+            raise WorkspaceTransferError("CreateTransfer response missing transfer_id")
+        try:
+            completed = await self.wait_transfer(
+                session_id,
+                transfer_id,
+                poll_interval=poll_interval,
+                timeout=timeout,
+            )
+        except Exception:
+            try:
+                await self.cancel_transfer(
+                    session_id, transfer_id, reason="client_error"
+                )
+            except Exception:  # noqa: BLE001
+                pass
+            raise
+        download_url = _field(completed, "download_url")
+        if not download_url:
+            raise WorkspaceTransferError(
+                "completed download transfer is missing download_url"
+            )
+        size_hint = _field(completed, "bytes_written")
+        try:
+            size_hint = int(size_hint) if size_hint is not None else None
+        except (TypeError, ValueError):
+            size_hint = None
+        return AsyncWorkspaceDownload(
+            download_url=str(download_url),
+            expected_sha256=_field(completed, "sha256"),
+            size_hint=size_hint,
+            is_archive=as_archive,
+            require_checksum=require_checksum,
+            transfer_id=str(transfer_id),
+        )
 
 
 class AsyncWorkspaceDownload:
-    """Async streaming workspace download with best-effort integrity verification.
+    """Async streaming download from a completed staged transfer."""
 
-    Async counterpart of :class:`pydo.agents.custom_sessions.WorkspaceDownload`;
-    see that class and :func:`pydo.agents.custom_sessions._verify_download` for
-    the verification semantics.
-    """
-
-    def __init__(self, response: Any, *, require_checksum: bool = False):
-        self._response = response
+    def __init__(
+        self,
+        *,
+        download_url: str,
+        expected_sha256: Optional[str] = None,
+        size_hint: Optional[int] = None,
+        is_archive: bool = False,
+        require_checksum: bool = False,
+        transfer_id: Optional[str] = None,
+    ):
+        self._download_url = download_url
+        self._expected_sha256 = expected_sha256
+        self._size_hint = size_hint
+        self._is_archive = bool(is_archive)
         self._require_checksum = require_checksum
+        self.transfer_id = transfer_id
         self.bytes_read = 0
 
     @property
     def is_archive(self) -> bool:
-        return _download_is_archive(self._response)
+        return self._is_archive
 
     @property
     def size_hint(self) -> Optional[int]:
-        return _download_size_hint(self._response)
+        return self._size_hint
+
+    @property
+    def expected_sha256(self) -> Optional[str]:
+        return self._expected_sha256
 
     def __aiter__(self) -> AsyncIterator[bytes]:
         return self._iter()
@@ -378,17 +667,17 @@ class AsyncWorkspaceDownload:
     async def _iter(self) -> AsyncIterator[bytes]:
         hasher = hashlib.sha256()
         total = 0
-        async for chunk in self._response.iter_bytes():
-            if not chunk:
-                continue
-            if isinstance(chunk, str):
-                chunk = chunk.encode("utf-8")
+        async for chunk in _aio_http_get_iter(self._download_url):
             hasher.update(chunk)
             total += len(chunk)
             yield bytes(chunk)
         self.bytes_read = total
-        _verify_download(
-            self._response, hasher.hexdigest(), total, self._require_checksum
+        _verify_transfer_sha256(
+            hasher.hexdigest(),
+            self._expected_sha256,
+            total_bytes=total,
+            size_hint=self._size_hint,
+            require_checksum=self._require_checksum,
         )
 
     async def read(self) -> bytes:
@@ -417,15 +706,7 @@ class AsyncWorkspaceDownload:
         return total
 
     async def close(self) -> None:
-        closer = getattr(self._response, "close", None)
-        if closer is None:
-            return
-        try:
-            result = closer()
-            if hasattr(result, "__await__"):
-                await result
-        except Exception:  # noqa: BLE001 — best-effort cleanup
-            pass
+        return None
 
     async def __aenter__(self) -> "AsyncWorkspaceDownload":
         return self

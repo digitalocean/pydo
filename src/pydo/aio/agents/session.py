@@ -239,14 +239,18 @@ class AsyncAgentSession:
         data: Any,
         is_archive: bool = False,
         content_sha256: Optional[str] = None,
+        poll_interval: float = 1.0,
+        timeout: float = 600.0,
     ) -> Any:
-        """Upload bytes/a tar into the session workspace."""
+        """Upload bytes/a tar into the session workspace via staged transfers."""
         return await self._sessions.workspace_upload(
             self.session_id,
             path=path,
             data=data,
             is_archive=is_archive,
             content_sha256=content_sha256,
+            poll_interval=poll_interval,
+            timeout=timeout,
         )
 
     async def download_file(
@@ -255,13 +259,17 @@ class AsyncAgentSession:
         path: str,
         as_archive: bool = False,
         require_checksum: bool = False,
+        poll_interval: float = 1.0,
+        timeout: float = 600.0,
     ) -> Any:
-        """Download a workspace file/tar with integrity verification."""
+        """Download a workspace file/tar via staged transfers."""
         return await self._sessions.workspace_download(
             self.session_id,
             path=path,
             as_archive=as_archive,
             require_checksum=require_checksum,
+            poll_interval=poll_interval,
+            timeout=timeout,
         )
 
     async def destroy(self) -> None:

@@ -1,5 +1,7 @@
 """Upload a file to a session's sandbox workspace and download it back.
 
+Uses the staged transfer APIs (``.../workspace/transfers``) for all sizes.
+
 Required env:
   DIGITALOCEAN_TOKEN
   PYDO_AGENTS_ENDPOINT   stage2: https://api.s2r1.internal.digitalocean.com
@@ -60,7 +62,8 @@ def main() -> int:
 
     print(
         f"[downloaded] {written} bytes -> {download_to} "
-        f"(is_archive={download.is_archive}, size_hint={download.size_hint})",
+        f"(is_archive={download.is_archive}, size_hint={download.size_hint}, "
+        f"sha256={download.expected_sha256})",
         file=sys.stderr,
     )
 
