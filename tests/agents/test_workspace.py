@@ -142,7 +142,11 @@ def test_create_transfer_download():
         [
             _FakeResponse(
                 202,
-                body={"transfer_id": "t2", "direction": "download", "status": "pending"},
+                body={
+                    "transfer_id": "t2",
+                    "direction": "download",
+                    "status": "pending",
+                },
             )
         ]
     )
@@ -174,10 +178,12 @@ def test_create_part_upload_url_commit_get_cancel():
                 },
             ),
             _FakeResponse(
-                202, body={"transfer_id": "t1", "status": "in_progress", "size_bytes": 5}
+                202,
+                body={"transfer_id": "t1", "status": "in_progress", "size_bytes": 5},
             ),
             _FakeResponse(
-                200, body={"transfer_id": "t1", "status": "completed", "bytes_written": 5}
+                200,
+                body={"transfer_id": "t1", "status": "completed", "bytes_written": 5},
             ),
             _FakeResponse(
                 200, body={"transfer_id": "t1", "aborted": True, "status": "failed"}
@@ -216,9 +222,7 @@ def test_create_part_upload_urls_batch():
             )
         ]
     )
-    resp = resources.sessions.create_part_upload_urls(
-        "s1", "t1", part_numbers=[1, 2]
-    )
+    resp = resources.sessions.create_part_upload_urls("s1", "t1", part_numbers=[1, 2])
     assert _request_json(_calls(resources)[0]) == {"part_numbers": [1, 2]}
     assert len(resp.part_urls) == 2
     assert resp.part_urls[0].upload_url == "https://spaces/p1"
@@ -279,7 +283,10 @@ def test_workspace_upload_multipart_flow():
     assert resp.status == "completed"
     assert resp.bytes_written == len(payload)
     assert resp.path == "a.bin"
-    assert puts == [("https://spaces/p1", b"abcdefgh"), ("https://spaces/p2", b"ijklmnop")]
+    assert puts == [
+        ("https://spaces/p1", b"abcdefgh"),
+        ("https://spaces/p2", b"ijklmnop"),
+    ]
 
     urls = [c.request.url for c in _calls(resources)]
     assert urls[0].endswith("/workspace/transfers")
@@ -373,11 +380,13 @@ def test_workspace_download_polls_and_fetches_url():
         [
             _FakeResponse(
                 202,
-                body={"transfer_id": "td", "direction": "download", "status": "pending"},
+                body={
+                    "transfer_id": "td",
+                    "direction": "download",
+                    "status": "pending",
+                },
             ),
-            _FakeResponse(
-                200, body={"transfer_id": "td", "status": "pending"}
-            ),
+            _FakeResponse(200, body={"transfer_id": "td", "status": "pending"}),
             _FakeResponse(
                 200,
                 body={
@@ -420,7 +429,12 @@ def test_workspace_download_archive_flag():
     resources = _make_resources(
         [
             _FakeResponse(
-                202, body={"transfer_id": "td", "direction": "download", "status": "pending"}
+                202,
+                body={
+                    "transfer_id": "td",
+                    "direction": "download",
+                    "status": "pending",
+                },
             ),
             _FakeResponse(
                 200,
@@ -449,7 +463,12 @@ def test_workspace_download_sha_mismatch():
     resources = _make_resources(
         [
             _FakeResponse(
-                202, body={"transfer_id": "td", "direction": "download", "status": "pending"}
+                202,
+                body={
+                    "transfer_id": "td",
+                    "direction": "download",
+                    "status": "pending",
+                },
             ),
             _FakeResponse(
                 200,
@@ -477,7 +496,12 @@ def test_workspace_download_missing_sha_strict():
     resources = _make_resources(
         [
             _FakeResponse(
-                202, body={"transfer_id": "td", "direction": "download", "status": "pending"}
+                202,
+                body={
+                    "transfer_id": "td",
+                    "direction": "download",
+                    "status": "pending",
+                },
             ),
             _FakeResponse(
                 200,
@@ -490,9 +514,7 @@ def test_workspace_download_missing_sha_strict():
             ),
         ]
     )
-    with patch(
-        "pydo.agents.custom_sessions._http_get_iter", return_value=iter([b"x"])
-    ):
+    with patch("pydo.agents.custom_sessions._http_get_iter", return_value=iter([b"x"])):
         download = resources.sessions.workspace_download(
             "s1", path="x", require_checksum=True, poll_interval=0.01
         )
@@ -507,7 +529,12 @@ def test_workspace_download_save_discards_on_failure(tmp_path):
     resources = _make_resources(
         [
             _FakeResponse(
-                202, body={"transfer_id": "td", "direction": "download", "status": "pending"}
+                202,
+                body={
+                    "transfer_id": "td",
+                    "direction": "download",
+                    "status": "pending",
+                },
             ),
             _FakeResponse(
                 200,
@@ -534,7 +561,12 @@ def test_workspace_download_save_discards_on_failure(tmp_path):
     resources = _make_resources(
         [
             _FakeResponse(
-                202, body={"transfer_id": "td", "direction": "download", "status": "pending"}
+                202,
+                body={
+                    "transfer_id": "td",
+                    "direction": "download",
+                    "status": "pending",
+                },
             ),
             _FakeResponse(
                 200,
@@ -562,7 +594,12 @@ def test_workspace_download_failed_transfer():
     resources = _make_resources(
         [
             _FakeResponse(
-                202, body={"transfer_id": "td", "direction": "download", "status": "pending"}
+                202,
+                body={
+                    "transfer_id": "td",
+                    "direction": "download",
+                    "status": "pending",
+                },
             ),
             _FakeResponse(
                 200,
@@ -616,7 +653,11 @@ def test_agent_session_upload_download_passthrough():
             ),
             _FakeResponse(
                 202,
-                body={"transfer_id": "td", "direction": "download", "status": "pending"},
+                body={
+                    "transfer_id": "td",
+                    "direction": "download",
+                    "status": "pending",
+                },
             ),
             _FakeResponse(
                 200,
@@ -636,9 +677,7 @@ def test_agent_session_upload_download_passthrough():
     ):
         up = agent.upload_file(path="f.bin", data=payload, poll_interval=0.01)
         assert up.bytes_written == len(payload)
-        assert (
-            agent.download_file(path="f.bin", poll_interval=0.01).read() == payload
-        )
+        assert agent.download_file(path="f.bin", poll_interval=0.01).read() == payload
 
 
 # ---------------------------------------------------------------------------
@@ -736,7 +775,10 @@ async def test_async_workspace_upload():
     put.assert_awaited_once()
     create_body = _request_json(resources._proxy._original._pipeline.calls[0])
     assert create_body["sha256"] == "cafe"
-    assert "/workspace/transfers" in resources._proxy._original._pipeline.calls[0].request.url
+    assert (
+        "/workspace/transfers"
+        in resources._proxy._original._pipeline.calls[0].request.url
+    )
     assert _request_json(resources._proxy._original._pipeline.calls[1]) == {
         "part_numbers": [1]
     }
@@ -750,7 +792,11 @@ async def test_async_workspace_download():
         [
             _FakeAsyncResponse(
                 202,
-                body={"transfer_id": "td", "direction": "download", "status": "pending"},
+                body={
+                    "transfer_id": "td",
+                    "direction": "download",
+                    "status": "pending",
+                },
             ),
             _FakeAsyncResponse(
                 200,
@@ -788,7 +834,11 @@ async def test_async_download_save_discards_on_failure(tmp_path):
         [
             _FakeAsyncResponse(
                 202,
-                body={"transfer_id": "td", "direction": "download", "status": "pending"},
+                body={
+                    "transfer_id": "td",
+                    "direction": "download",
+                    "status": "pending",
+                },
             ),
             _FakeAsyncResponse(
                 200,
