@@ -13446,7 +13446,7 @@ class AppsOperations:  # pylint: disable=too-many-public-methods
                     },
                     "project_id": "str"  # Optional. The ID of the project the app should be
                       assigned to. If omitted, it will be assigned to your default project.
-                      :code:`<br>`:code:`<br>`Requires ``project:update`` scope.
+                      :code:`<br>`:code:`<br>`Requires ``project:assign_resource`` scope.
                 }
 
                 # response body for status code(s): 200
@@ -30169,7 +30169,7 @@ class AppsOperations:  # pylint: disable=too-many-public-methods
                     },
                     "project_id": "str"  # Optional. The ID of the project the app should be
                       assigned to. If omitted, it will be assigned to your default project.
-                      :code:`<br>`:code:`<br>`Requires ``project:update`` scope.
+                      :code:`<br>`:code:`<br>`Requires ``project:assign_resource`` scope.
                 }
 
                 # response body for status code(s): 200
@@ -111450,8 +111450,10 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                             }
                                         ],
                                         "pg_allow_replication": bool  #
-                                          Optional. For Postgres clusters, set to ``true`` for a user
-                                          with replication rights. This option is not currently
+                                          Optional. For PostgreSQL clusters, set to ``true`` to grant
+                                          the user replication privileges. When omitted on create or
+                                          update, the value defaults to ``false`` and replication
+                                          privileges are not granted. This option is not currently
                                           supported for other database engines.
                                     }
                                 }
@@ -111727,7 +111729,7 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                     "project_id": "str",  # Optional. The ID of the project that the database
                       cluster is assigned to. If excluded when creating a new database cluster, it will
                       be assigned to your default project.:code:`<br>`:code:`<br>`Requires
-                      ``project:update`` scope.
+                      ``project:assign_resource`` scope.
                     "rules": [
                         {
                             "type": "str",  # The type of resource that the firewall rule
@@ -111904,9 +111906,10 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                     }
                                 ],
                                 "pg_allow_replication": bool  # Optional. For
-                                  Postgres clusters, set to ``true`` for a user with replication
-                                  rights. This option is not currently supported for other database
-                                  engines.
+                                  PostgreSQL clusters, set to ``true`` to grant the user replication
+                                  privileges. When omitted on create or update, the value defaults to
+                                  ``false`` and replication privileges are not granted. This option is
+                                  not currently supported for other database engines.
                             }
                         }
                     ],
@@ -112208,9 +112211,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                         }
                                     ],
                                     "pg_allow_replication": bool  # Optional. For
-                                      Postgres clusters, set to ``true`` for a user with replication
-                                      rights. This option is not currently supported for other database
-                                      engines.
+                                      PostgreSQL clusters, set to ``true`` to grant the user
+                                      replication privileges. When omitted on create or update, the
+                                      value defaults to ``false`` and replication privileges are not
+                                      granted. This option is not currently supported for other
+                                      database engines.
                                 }
                             }
                         ],
@@ -112581,9 +112586,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                         }
                                     ],
                                     "pg_allow_replication": bool  # Optional. For
-                                      Postgres clusters, set to ``true`` for a user with replication
-                                      rights. This option is not currently supported for other database
-                                      engines.
+                                      PostgreSQL clusters, set to ``true`` to grant the user
+                                      replication privileges. When omitted on create or update, the
+                                      value defaults to ``false`` and replication privileges are not
+                                      granted. This option is not currently supported for other
+                                      database engines.
                                 }
                             }
                         ],
@@ -112775,7 +112782,7 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                     "project_id": "str",  # Optional. The ID of the project that the database
                       cluster is assigned to. If excluded when creating a new database cluster, it will
                       be assigned to your default project.:code:`<br>`:code:`<br>`Requires
-                      ``project:update`` scope.
+                      ``project:assign_resource`` scope.
                     "rules": [
                         {
                             "type": "str",  # The type of resource that the firewall rule
@@ -112952,9 +112959,10 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                     }
                                 ],
                                 "pg_allow_replication": bool  # Optional. For
-                                  Postgres clusters, set to ``true`` for a user with replication
-                                  rights. This option is not currently supported for other database
-                                  engines.
+                                  PostgreSQL clusters, set to ``true`` to grant the user replication
+                                  privileges. When omitted on create or update, the value defaults to
+                                  ``false`` and replication privileges are not granted. This option is
+                                  not currently supported for other database engines.
                             }
                         }
                     ],
@@ -113256,9 +113264,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                         }
                                     ],
                                     "pg_allow_replication": bool  # Optional. For
-                                      Postgres clusters, set to ``true`` for a user with replication
-                                      rights. This option is not currently supported for other database
-                                      engines.
+                                      PostgreSQL clusters, set to ``true`` to grant the user
+                                      replication privileges. When omitted on create or update, the
+                                      value defaults to ``false`` and replication privileges are not
+                                      granted. This option is not currently supported for other
+                                      database engines.
                                 }
                             }
                         ],
@@ -113692,9 +113702,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                         }
                                     ],
                                     "pg_allow_replication": bool  # Optional. For
-                                      Postgres clusters, set to ``true`` for a user with replication
-                                      rights. This option is not currently supported for other database
-                                      engines.
+                                      PostgreSQL clusters, set to ``true`` to grant the user
+                                      replication privileges. When omitted on create or update, the
+                                      value defaults to ``false`` and replication privileges are not
+                                      granted. This option is not currently supported for other
+                                      database engines.
                                 }
                             }
                         ],
@@ -115506,10 +115518,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         resources should be able to open connections to the database. You may limit connections to
         specific Droplets, Kubernetes clusters, or IP addresses. When a tag is provided, any Droplet or
         Kubernetes node with that tag applied to it will have access. The firewall is limited to 100
-        rules (or trusted sources). When possible, we recommend `placing your databases into a VPC
-        network <https://docs.digitalocean.com/products/networking/vpc/>`_ to limit access to them
-        instead of using a firewall.
-        A successful.
+        rules (or trusted sources). You cannot add IPv6 addresses as trusted sources. For additional
+        limits, see your database engine's limits page. When possible, we recommend `placing your
+        databases into a VPC network <https://docs.digitalocean.com/products/networking/vpc/>`_ to
+        limit access to them instead of using a firewall.
+        A successful request returns a 204 status code with no content.
 
         :param database_cluster_uuid: A unique identifier for a database cluster. Required.
         :type database_cluster_uuid: str
@@ -115578,10 +115591,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         resources should be able to open connections to the database. You may limit connections to
         specific Droplets, Kubernetes clusters, or IP addresses. When a tag is provided, any Droplet or
         Kubernetes node with that tag applied to it will have access. The firewall is limited to 100
-        rules (or trusted sources). When possible, we recommend `placing your databases into a VPC
-        network <https://docs.digitalocean.com/products/networking/vpc/>`_ to limit access to them
-        instead of using a firewall.
-        A successful.
+        rules (or trusted sources). You cannot add IPv6 addresses as trusted sources. For additional
+        limits, see your database engine's limits page. When possible, we recommend `placing your
+        databases into a VPC network <https://docs.digitalocean.com/products/networking/vpc/>`_ to
+        limit access to them instead of using a firewall.
+        A successful request returns a 204 status code with no content.
 
         :param database_cluster_uuid: A unique identifier for a database cluster. Required.
         :type database_cluster_uuid: str
@@ -115622,10 +115636,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         resources should be able to open connections to the database. You may limit connections to
         specific Droplets, Kubernetes clusters, or IP addresses. When a tag is provided, any Droplet or
         Kubernetes node with that tag applied to it will have access. The firewall is limited to 100
-        rules (or trusted sources). When possible, we recommend `placing your databases into a VPC
-        network <https://docs.digitalocean.com/products/networking/vpc/>`_ to limit access to them
-        instead of using a firewall.
-        A successful.
+        rules (or trusted sources). You cannot add IPv6 addresses as trusted sources. For additional
+        limits, see your database engine's limits page. When possible, we recommend `placing your
+        databases into a VPC network <https://docs.digitalocean.com/products/networking/vpc/>`_ to
+        limit access to them instead of using a firewall.
+        A successful request returns a 204 status code with no content.
 
         :param database_cluster_uuid: A unique identifier for a database cluster. Required.
         :type database_cluster_uuid: str
@@ -118038,6 +118053,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
 
         For MySQL clusters, additional options will be contained in the mysql_settings object.
 
+        For PostgreSQL clusters, additional options will be contained in the ``settings``
+        object (for example, ``pg_allow_replication``\\ ).
+
+        For Kafka clusters, additional options will be contained in the ``settings`` object.
+
         For MongoDB clusters, additional information will be contained in the mongo_user_settings
         object.
 
@@ -118128,9 +118148,10 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                     }
                                 ],
                                 "pg_allow_replication": bool  # Optional. For
-                                  Postgres clusters, set to ``true`` for a user with replication
-                                  rights. This option is not currently supported for other database
-                                  engines.
+                                  PostgreSQL clusters, set to ``true`` to grant the user replication
+                                  privileges. When omitted on create or update, the value defaults to
+                                  ``false`` and replication privileges are not granted. This option is
+                                  not currently supported for other database engines.
                             }
                         }
                     ]
@@ -118245,10 +118266,14 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         When adding a user to a MySQL cluster, additional options can be configured in the
         ``mysql_settings`` object.
 
+        When adding a user to a PostgreSQL cluster, additional options can be configured in
+        the ``settings`` object (for example, ``pg_allow_replication``\\ ). When
+        ``pg_allow_replication`` is omitted, it defaults to ``false``.
+
         When adding a user to a Kafka cluster, additional options can be configured in
         the ``settings`` object.
 
-         When adding a user to a MongoDB cluster, additional options can be configured in
+        When adding a user to a MongoDB cluster, additional options can be configured in
         the ``settings.mongo_user_settings`` object.
 
         The response will be a JSON object with a key called ``user``. The value of this will be an
@@ -118340,9 +118365,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                   values are: "deny", "admin", "read", "readwrite", and "write".
                             }
                         ],
-                        "pg_allow_replication": bool  # Optional. For Postgres clusters, set
-                          to ``true`` for a user with replication rights. This option is not currently
-                          supported for other database engines.
+                        "pg_allow_replication": bool  # Optional. For PostgreSQL clusters,
+                          set to ``true`` to grant the user replication privileges. When omitted on
+                          create or update, the value defaults to ``false`` and replication privileges
+                          are not granted. This option is not currently supported for other database
+                          engines.
                     }
                 }
 
@@ -118417,9 +118444,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -118456,10 +118485,14 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         When adding a user to a MySQL cluster, additional options can be configured in the
         ``mysql_settings`` object.
 
+        When adding a user to a PostgreSQL cluster, additional options can be configured in
+        the ``settings`` object (for example, ``pg_allow_replication``\\ ). When
+        ``pg_allow_replication`` is omitted, it defaults to ``false``.
+
         When adding a user to a Kafka cluster, additional options can be configured in
         the ``settings`` object.
 
-         When adding a user to a MongoDB cluster, additional options can be configured in
+        When adding a user to a MongoDB cluster, additional options can be configured in
         the ``settings.mongo_user_settings`` object.
 
         The response will be a JSON object with a key called ``user``. The value of this will be an
@@ -118551,9 +118584,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -118585,10 +118620,14 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         When adding a user to a MySQL cluster, additional options can be configured in the
         ``mysql_settings`` object.
 
+        When adding a user to a PostgreSQL cluster, additional options can be configured in
+        the ``settings`` object (for example, ``pg_allow_replication``\\ ). When
+        ``pg_allow_replication`` is omitted, it defaults to ``false``.
+
         When adding a user to a Kafka cluster, additional options can be configured in
         the ``settings`` object.
 
-         When adding a user to a MongoDB cluster, additional options can be configured in
+        When adding a user to a MongoDB cluster, additional options can be configured in
         the ``settings.mongo_user_settings`` object.
 
         The response will be a JSON object with a key called ``user``. The value of this will be an
@@ -118677,9 +118716,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                   values are: "deny", "admin", "read", "readwrite", and "write".
                             }
                         ],
-                        "pg_allow_replication": bool  # Optional. For Postgres clusters, set
-                          to ``true`` for a user with replication rights. This option is not currently
-                          supported for other database engines.
+                        "pg_allow_replication": bool  # Optional. For PostgreSQL clusters,
+                          set to ``true`` to grant the user replication privileges. When omitted on
+                          create or update, the value defaults to ``false`` and replication privileges
+                          are not granted. This option is not currently supported for other database
+                          engines.
                     }
                 }
 
@@ -118754,9 +118795,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -118883,6 +118926,9 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         For MySQL clusters, additional options will be contained in the ``mysql_settings``
         object.
 
+        For PostgreSQL clusters, additional options will be contained in the ``settings``
+        object (for example, ``pg_allow_replication``\\ ).
+
         For Kafka clusters, additional options will be contained in the ``settings`` object.
 
         For MongoDB clusters, additional information will be contained in the mongo_user_settings
@@ -118970,9 +119016,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -119201,8 +119249,14 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         the name of a user,
         you must recreate a new user.
 
+        For PostgreSQL clusters, you can update ``settings.pg_allow_replication`` to enable or
+        disable replication privileges for the user. When omitted, the value defaults to ``false``.
+
+        For Kafka and OpenSearch clusters, additional options can be configured in the
+        ``settings`` object (for example, topic or index ACLs).
+
         The response will be a JSON object with a key called ``user``. The value of this will be an
-        object that contains the name of the update database user, along with the ``settings`` object
+        object that contains the name of the updated database user, along with the ``settings`` object
         that
         has been updated.
 
@@ -119271,9 +119325,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                   values are: "deny", "admin", "read", "readwrite", and "write".
                             }
                         ],
-                        "pg_allow_replication": bool  # Optional. For Postgres clusters, set
-                          to ``true`` for a user with replication rights. This option is not currently
-                          supported for other database engines.
+                        "pg_allow_replication": bool  # Optional. For PostgreSQL clusters,
+                          set to ``true`` to grant the user replication privileges. When omitted on
+                          create or update, the value defaults to ``false`` and replication privileges
+                          are not granted. This option is not currently supported for other database
+                          engines.
                     }
                 }
 
@@ -119348,9 +119404,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -119388,8 +119446,14 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         the name of a user,
         you must recreate a new user.
 
+        For PostgreSQL clusters, you can update ``settings.pg_allow_replication`` to enable or
+        disable replication privileges for the user. When omitted, the value defaults to ``false``.
+
+        For Kafka and OpenSearch clusters, additional options can be configured in the
+        ``settings`` object (for example, topic or index ACLs).
+
         The response will be a JSON object with a key called ``user``. The value of this will be an
-        object that contains the name of the update database user, along with the ``settings`` object
+        object that contains the name of the updated database user, along with the ``settings`` object
         that
         has been updated.
 
@@ -119480,9 +119544,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -119518,8 +119584,14 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         the name of a user,
         you must recreate a new user.
 
+        For PostgreSQL clusters, you can update ``settings.pg_allow_replication`` to enable or
+        disable replication privileges for the user. When omitted, the value defaults to ``false``.
+
+        For Kafka and OpenSearch clusters, additional options can be configured in the
+        ``settings`` object (for example, topic or index ACLs).
+
         The response will be a JSON object with a key called ``user``. The value of this will be an
-        object that contains the name of the update database user, along with the ``settings`` object
+        object that contains the name of the updated database user, along with the ``settings`` object
         that
         has been updated.
 
@@ -119585,9 +119657,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                   values are: "deny", "admin", "read", "readwrite", and "write".
                             }
                         ],
-                        "pg_allow_replication": bool  # Optional. For Postgres clusters, set
-                          to ``true`` for a user with replication rights. This option is not currently
-                          supported for other database engines.
+                        "pg_allow_replication": bool  # Optional. For PostgreSQL clusters,
+                          set to ``true`` to grant the user replication privileges. When omitted on
+                          create or update, the value defaults to ``false`` and replication privileges
+                          are not granted. This option is not currently supported for other database
+                          engines.
                     }
                 }
 
@@ -119662,9 +119736,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -119895,9 +119971,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -120024,9 +120102,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -120160,9 +120240,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -133724,9 +133806,10 @@ class DropletsOperations:
                                               The unit of measure for the disk size.
                                         },
                                         "type": "str"  # Optional. The type
-                                          of disk. All Droplets contain a ``local`` disk. Additionally,
-                                          GPU Droplets can also have a ``scratch`` disk for
-                                          non-persistent data. Known values are: "local" and "scratch".
+                                          of disk. All Droplets contain a ``local`` or ``remote`` disk.
+                                          Additionally, GPU Droplets can also have a ``scratch`` disk
+                                          for non-persistent data. Known values are: "local", "remote",
+                                          and "scratch".
                                     }
                                 ],
                                 "gpu_info": {
@@ -133771,9 +133854,10 @@ class DropletsOperations:
                                           of measure for the disk size.
                                     },
                                     "type": "str"  # Optional. The type of disk.
-                                      All Droplets contain a ``local`` disk. Additionally, GPU Droplets
-                                      can also have a ``scratch`` disk for non-persistent data. Known
-                                      values are: "local" and "scratch".
+                                      All Droplets contain a ``local`` or ``remote`` disk.
+                                      Additionally, GPU Droplets can also have a ``scratch`` disk for
+                                      non-persistent data. Known values are: "local", "remote", and
+                                      "scratch".
                                 }
                             ],
                             "gpu_info": {
@@ -134397,9 +134481,10 @@ class DropletsOperations:
                                           of measure for the disk size.
                                     },
                                     "type": "str"  # Optional. The type of disk.
-                                      All Droplets contain a ``local`` disk. Additionally, GPU Droplets
-                                      can also have a ``scratch`` disk for non-persistent data. Known
-                                      values are: "local" and "scratch".
+                                      All Droplets contain a ``local`` or ``remote`` disk.
+                                      Additionally, GPU Droplets can also have a ``scratch`` disk for
+                                      non-persistent data. Known values are: "local", "remote", and
+                                      "scratch".
                                 }
                             ],
                             "gpu_info": {
@@ -134442,9 +134527,9 @@ class DropletsOperations:
                                       measure for the disk size.
                                 },
                                 "type": "str"  # Optional. The type of disk. All
-                                  Droplets contain a ``local`` disk. Additionally, GPU Droplets can
-                                  also have a ``scratch`` disk for non-persistent data. Known values
-                                  are: "local" and "scratch".
+                                  Droplets contain a ``local`` or ``remote`` disk. Additionally, GPU
+                                  Droplets can also have a ``scratch`` disk for non-persistent data.
+                                  Known values are: "local", "remote", and "scratch".
                             }
                         ],
                         "gpu_info": {
@@ -135970,9 +136055,10 @@ class DropletsOperations:
                                               The unit of measure for the disk size.
                                         },
                                         "type": "str"  # Optional. The type
-                                          of disk. All Droplets contain a ``local`` disk. Additionally,
-                                          GPU Droplets can also have a ``scratch`` disk for
-                                          non-persistent data. Known values are: "local" and "scratch".
+                                          of disk. All Droplets contain a ``local`` or ``remote`` disk.
+                                          Additionally, GPU Droplets can also have a ``scratch`` disk
+                                          for non-persistent data. Known values are: "local", "remote",
+                                          and "scratch".
                                     }
                                 ],
                                 "gpu_info": {
@@ -136017,9 +136103,10 @@ class DropletsOperations:
                                           of measure for the disk size.
                                     },
                                     "type": "str"  # Optional. The type of disk.
-                                      All Droplets contain a ``local`` disk. Additionally, GPU Droplets
-                                      can also have a ``scratch`` disk for non-persistent data. Known
-                                      values are: "local" and "scratch".
+                                      All Droplets contain a ``local`` or ``remote`` disk.
+                                      Additionally, GPU Droplets can also have a ``scratch`` disk for
+                                      non-persistent data. Known values are: "local", "remote", and
+                                      "scratch".
                                 }
                             ],
                             "gpu_info": {
@@ -150188,6 +150275,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                                 "enabled": bool  # Optional. Indicates whether the
                                   Nvidia GPU Device Plugin is enabled.
                             },
+                            "p2p_oci_registry_plugin": {
+                                "enabled": bool  # Optional. Indicates whether the
+                                  Peer-to-peer OCI registry component is enabled.
+                            },
                             "rdma_shared_dev_plugin": {
                                 "enabled": bool  # Optional. Indicates whether the
                                   RDMA shared device plugin is enabled.
@@ -150500,6 +150591,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "enabled": bool  # Optional. Indicates whether the Nvidia GPU Device
                           Plugin is enabled.
                     },
+                    "p2p_oci_registry_plugin": {
+                        "enabled": bool  # Optional. Indicates whether the Peer-to-peer OCI
+                          registry component is enabled.
+                    },
                     "rdma_shared_dev_plugin": {
                         "enabled": bool  # Optional. Indicates whether the RDMA shared device
                           plugin is enabled.
@@ -150718,6 +150813,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "nvidia_gpu_device_plugin": {
                             "enabled": bool  # Optional. Indicates whether the Nvidia GPU
                               Device Plugin is enabled.
+                        },
+                        "p2p_oci_registry_plugin": {
+                            "enabled": bool  # Optional. Indicates whether the
+                              Peer-to-peer OCI registry component is enabled.
                         },
                         "rdma_shared_dev_plugin": {
                             "enabled": bool  # Optional. Indicates whether the RDMA
@@ -150971,6 +151070,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                             "enabled": bool  # Optional. Indicates whether the Nvidia GPU
                               Device Plugin is enabled.
                         },
+                        "p2p_oci_registry_plugin": {
+                            "enabled": bool  # Optional. Indicates whether the
+                              Peer-to-peer OCI registry component is enabled.
+                        },
                         "rdma_shared_dev_plugin": {
                             "enabled": bool  # Optional. Indicates whether the RDMA
                               shared device plugin is enabled.
@@ -151209,6 +151312,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "enabled": bool  # Optional. Indicates whether the Nvidia GPU Device
                           Plugin is enabled.
                     },
+                    "p2p_oci_registry_plugin": {
+                        "enabled": bool  # Optional. Indicates whether the Peer-to-peer OCI
+                          registry component is enabled.
+                    },
                     "rdma_shared_dev_plugin": {
                         "enabled": bool  # Optional. Indicates whether the RDMA shared device
                           plugin is enabled.
@@ -151427,6 +151534,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "nvidia_gpu_device_plugin": {
                             "enabled": bool  # Optional. Indicates whether the Nvidia GPU
                               Device Plugin is enabled.
+                        },
+                        "p2p_oci_registry_plugin": {
+                            "enabled": bool  # Optional. Indicates whether the
+                              Peer-to-peer OCI registry component is enabled.
                         },
                         "rdma_shared_dev_plugin": {
                             "enabled": bool  # Optional. Indicates whether the RDMA
@@ -151741,6 +151852,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                             "enabled": bool  # Optional. Indicates whether the Nvidia GPU
                               Device Plugin is enabled.
                         },
+                        "p2p_oci_registry_plugin": {
+                            "enabled": bool  # Optional. Indicates whether the
+                              Peer-to-peer OCI registry component is enabled.
+                        },
                         "rdma_shared_dev_plugin": {
                             "enabled": bool  # Optional. Indicates whether the RDMA
                               shared device plugin is enabled.
@@ -151983,6 +152098,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "enabled": bool  # Optional. Indicates whether the Nvidia GPU Device
                           Plugin is enabled.
                     },
+                    "p2p_oci_registry_plugin": {
+                        "enabled": bool  # Optional. Indicates whether the Peer-to-peer OCI
+                          registry component is enabled.
+                    },
                     "rdma_shared_dev_plugin": {
                         "enabled": bool  # Optional. Indicates whether the RDMA shared device
                           plugin is enabled.
@@ -152178,6 +152297,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "nvidia_gpu_device_plugin": {
                             "enabled": bool  # Optional. Indicates whether the Nvidia GPU
                               Device Plugin is enabled.
+                        },
+                        "p2p_oci_registry_plugin": {
+                            "enabled": bool  # Optional. Indicates whether the
+                              Peer-to-peer OCI registry component is enabled.
                         },
                         "rdma_shared_dev_plugin": {
                             "enabled": bool  # Optional. Indicates whether the RDMA
@@ -152443,6 +152566,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                             "enabled": bool  # Optional. Indicates whether the Nvidia GPU
                               Device Plugin is enabled.
                         },
+                        "p2p_oci_registry_plugin": {
+                            "enabled": bool  # Optional. Indicates whether the
+                              Peer-to-peer OCI registry component is enabled.
+                        },
                         "rdma_shared_dev_plugin": {
                             "enabled": bool  # Optional. Indicates whether the RDMA
                               shared device plugin is enabled.
@@ -152599,6 +152726,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                     "nvidia_gpu_device_plugin": {
                         "enabled": bool  # Optional. Indicates whether the Nvidia GPU Device
                           Plugin is enabled.
+                    },
+                    "p2p_oci_registry_plugin": {
+                        "enabled": bool  # Optional. Indicates whether the Peer-to-peer OCI
+                          registry component is enabled.
                     },
                     "rdma_shared_dev_plugin": {
                         "enabled": bool  # Optional. Indicates whether the RDMA shared device
@@ -152795,6 +152926,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "nvidia_gpu_device_plugin": {
                             "enabled": bool  # Optional. Indicates whether the Nvidia GPU
                               Device Plugin is enabled.
+                        },
+                        "p2p_oci_registry_plugin": {
+                            "enabled": bool  # Optional. Indicates whether the
+                              Peer-to-peer OCI registry component is enabled.
                         },
                         "rdma_shared_dev_plugin": {
                             "enabled": bool  # Optional. Indicates whether the RDMA
@@ -178398,9 +178533,10 @@ class ProjectsOperations:
         To assign resources to a project, send a POST request to
         ``/v2/projects/$PROJECT_ID/resources``.
 
-        You must have both ``project:update`` and ``<resource>:read`` scopes to assign new resources.
-        For example, to assign a Droplet to a project, include both the ``project:update`` and
-        ``droplet:read`` scopes.
+        You must have both ``project:assign_resource`` and ``<resource>:read`` scopes to assign new
+        resources. For example, to assign a Droplet to a project, include both the
+        ``project:assign_resource`` and ``droplet:read`` scopes. The ``project:update`` scope also
+        grants ``project:assign_resource``.
 
         :param project_id: A unique identifier for a project. Required.
         :type project_id: str
@@ -178472,9 +178608,10 @@ class ProjectsOperations:
         To assign resources to a project, send a POST request to
         ``/v2/projects/$PROJECT_ID/resources``.
 
-        You must have both ``project:update`` and ``<resource>:read`` scopes to assign new resources.
-        For example, to assign a Droplet to a project, include both the ``project:update`` and
-        ``droplet:read`` scopes.
+        You must have both ``project:assign_resource`` and ``<resource>:read`` scopes to assign new
+        resources. For example, to assign a Droplet to a project, include both the
+        ``project:assign_resource`` and ``droplet:read`` scopes. The ``project:update`` scope also
+        grants ``project:assign_resource``.
 
         :param project_id: A unique identifier for a project. Required.
         :type project_id: str
@@ -178532,9 +178669,10 @@ class ProjectsOperations:
         To assign resources to a project, send a POST request to
         ``/v2/projects/$PROJECT_ID/resources``.
 
-        You must have both ``project:update`` and ``<resource>:read`` scopes to assign new resources.
-        For example, to assign a Droplet to a project, include both the ``project:update`` and
-        ``droplet:read`` scopes.
+        You must have both ``project:assign_resource`` and ``<resource>:read`` scopes to assign new
+        resources. For example, to assign a Droplet to a project, include both the
+        ``project:assign_resource`` and ``droplet:read`` scopes. The ``project:update`` scope also
+        grants ``project:assign_resource``.
 
         :param project_id: A unique identifier for a project. Required.
         :type project_id: str
@@ -178821,9 +178959,10 @@ class ProjectsOperations:
         To assign resources to your default project, send a POST request to
         ``/v2/projects/default/resources``.
 
-        You must have both project:update and :code:`<resource>`:read scopes to assign new resources.
-        For example, to assign a Droplet to the default project, include both the ``project:update``
-        and ``droplet:read`` scopes.
+        You must have both ``project:assign_resource`` and ``<resource>:read`` scopes to assign new
+        resources. For example, to assign a Droplet to the default project, include both the
+        ``project:assign_resource`` and ``droplet:read`` scopes. The ``project:update`` scope also
+        grants ``project:assign_resource``.
 
         :param body: Required.
         :type body: JSON
@@ -178888,9 +179027,10 @@ class ProjectsOperations:
         To assign resources to your default project, send a POST request to
         ``/v2/projects/default/resources``.
 
-        You must have both project:update and :code:`<resource>`:read scopes to assign new resources.
-        For example, to assign a Droplet to the default project, include both the ``project:update``
-        and ``droplet:read`` scopes.
+        You must have both ``project:assign_resource`` and ``<resource>:read`` scopes to assign new
+        resources. For example, to assign a Droplet to the default project, include both the
+        ``project:assign_resource`` and ``droplet:read`` scopes. The ``project:update`` scope also
+        grants ``project:assign_resource``.
 
         :param body: Required.
         :type body: IO[bytes]
@@ -178946,9 +179086,10 @@ class ProjectsOperations:
         To assign resources to your default project, send a POST request to
         ``/v2/projects/default/resources``.
 
-        You must have both project:update and :code:`<resource>`:read scopes to assign new resources.
-        For example, to assign a Droplet to the default project, include both the ``project:update``
-        and ``droplet:read`` scopes.
+        You must have both ``project:assign_resource`` and ``<resource>:read`` scopes to assign new
+        resources. For example, to assign a Droplet to the default project, include both the
+        ``project:assign_resource`` and ``droplet:read`` scopes. The ``project:update`` scope also
+        grants ``project:assign_resource``.
 
         :param body: Is either a JSON type or a IO[bytes] type. Required.
         :type body: JSON or IO[bytes]
@@ -192237,9 +192378,10 @@ class SizesOperations:
                                           of measure for the disk size.
                                     },
                                     "type": "str"  # Optional. The type of disk.
-                                      All Droplets contain a ``local`` disk. Additionally, GPU Droplets
-                                      can also have a ``scratch`` disk for non-persistent data. Known
-                                      values are: "local" and "scratch".
+                                      All Droplets contain a ``local`` or ``remote`` disk.
+                                      Additionally, GPU Droplets can also have a ``scratch`` disk for
+                                      non-persistent data. Known values are: "local", "remote", and
+                                      "scratch".
                                 }
                             ],
                             "gpu_info": {
