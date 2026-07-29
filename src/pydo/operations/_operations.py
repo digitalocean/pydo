@@ -64,7 +64,7 @@ def build_tools_list_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/tools"
+    _url = "/v2/action-gateway/tools"
 
     # Construct parameters
     if toolkit_id is not None:
@@ -90,7 +90,7 @@ def build_tools_list_toolkits_request(**kwargs: Any) -> HttpRequest:
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/tools/toolkits"
+    _url = "/v2/action-gateway/tools/toolkits"
 
     # Construct headers
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
@@ -104,7 +104,7 @@ def build_tools_list_providers_request(**kwargs: Any) -> HttpRequest:
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/tools/providers"
+    _url = "/v2/action-gateway/tools/providers"
 
     # Construct headers
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
@@ -125,7 +125,7 @@ def build_tools_get_definition_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/tools/{name}/definition"
+    _url = "/v2/action-gateway/tools/{name}/definition"
     path_format_arguments = {
         "name": _SERIALIZER.url("name", name, "str"),
     }
@@ -155,7 +155,7 @@ def build_toolbelts_list_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/toolbelts"
+    _url = "/v2/action-gateway/toolbelts"
 
     # Construct parameters
     if status is not None:
@@ -184,7 +184,7 @@ def build_toolbelts_create_request(**kwargs: Any) -> HttpRequest:
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/toolbelts"
+    _url = "/v2/action-gateway/toolbelts"
 
     # Construct headers
     if content_type is not None:
@@ -205,7 +205,7 @@ def build_toolbelts_get_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/toolbelts/{name}"
+    _url = "/v2/action-gateway/toolbelts/{name}"
     path_format_arguments = {
         "name": _SERIALIZER.url(
             "name", name, "str", pattern=r"^[a-z][a-z0-9_-]{0,63}$"
@@ -234,7 +234,7 @@ def build_toolbelts_delete_request(name: str, **kwargs: Any) -> HttpRequest:
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/toolbelts/{name}"
+    _url = "/v2/action-gateway/toolbelts/{name}"
     path_format_arguments = {
         "name": _SERIALIZER.url(
             "name", name, "str", pattern=r"^[a-z][a-z0-9_-]{0,63}$"
@@ -258,7 +258,7 @@ def build_toolbelts_add_tools_request(name: str, **kwargs: Any) -> HttpRequest:
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/toolbelts/{name}/tools/add"
+    _url = "/v2/action-gateway/toolbelts/{name}/tools/add"
     path_format_arguments = {
         "name": _SERIALIZER.url(
             "name", name, "str", pattern=r"^[a-z][a-z0-9_-]{0,63}$"
@@ -286,7 +286,7 @@ def build_toolbelts_delete_tools_request(name: str, **kwargs: Any) -> HttpReques
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/toolbelts/{name}/tools/remove"
+    _url = "/v2/action-gateway/toolbelts/{name}/tools/remove"
     path_format_arguments = {
         "name": _SERIALIZER.url(
             "name", name, "str", pattern=r"^[a-z][a-z0-9_-]{0,63}$"
@@ -322,7 +322,7 @@ def build_connections_list_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/connections"
+    _url = "/v2/action-gateway/connections"
 
     # Construct parameters
     if provider is not None:
@@ -361,7 +361,7 @@ def build_connections_create_request(**kwargs: Any) -> HttpRequest:
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/connections"
+    _url = "/v2/action-gateway/connections"
 
     # Construct headers
     if content_type is not None:
@@ -379,7 +379,7 @@ def build_connections_get_request(id: str, **kwargs: Any) -> HttpRequest:
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/connections/{id}"
+    _url = "/v2/action-gateway/connections/{id}"
     path_format_arguments = {
         "id": _SERIALIZER.url("id", id, "str"),
     }
@@ -401,7 +401,7 @@ def build_connections_update_request(id: str, **kwargs: Any) -> HttpRequest:
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/connections/{id}"
+    _url = "/v2/action-gateway/connections/{id}"
     path_format_arguments = {
         "id": _SERIALIZER.url("id", id, "str"),
     }
@@ -424,7 +424,7 @@ def build_connections_delete_request(id: str, **kwargs: Any) -> HttpRequest:
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/connections/{id}"
+    _url = "/v2/action-gateway/connections/{id}"
     path_format_arguments = {
         "id": _SERIALIZER.url("id", id, "str"),
     }
@@ -446,7 +446,7 @@ def build_users_list_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/users"
+    _url = "/v2/action-gateway/users"
 
     # Construct parameters
     if page is not None:
@@ -470,7 +470,7 @@ def build_users_get_request(user_id: str, **kwargs: Any) -> HttpRequest:
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/users/{user_id}"
+    _url = "/v2/action-gateway/users/{user_id}"
     path_format_arguments = {
         "user_id": _SERIALIZER.url("user_id", user_id, "str"),
     }
@@ -496,7 +496,7 @@ def build_sessions_list_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/sessions"
+    _url = "/v2/action-gateway/sessions"
 
     # Construct parameters
     if end_user_id is not None:
@@ -525,7 +525,7 @@ def build_sessions_create_request(**kwargs: Any) -> HttpRequest:
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/sessions"
+    _url = "/v2/action-gateway/sessions"
 
     # Construct headers
     if content_type is not None:
@@ -543,7 +543,7 @@ def build_sessions_delete_request(session_urn: str, **kwargs: Any) -> HttpReques
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/sessions/{session_urn}"
+    _url = "/v2/action-gateway/sessions/{session_urn}"
     path_format_arguments = {
         "session_urn": _SERIALIZER.url("session_urn", session_urn, "str"),
     }

@@ -100,7 +100,7 @@ class AsyncSession:
 
 
 class AsyncSessionsOperations:
-    """Create sessions through the generated async ``/v2/sessions`` operation."""
+    """Create sessions through the generated async Action Gateway operation."""
 
     def __init__(
         self,

@@ -140,7 +140,7 @@ class Session:
 
 
 class SessionsOperations:
-    """Create sessions through the generated ``/v2/sessions`` operation."""
+    """Create sessions through the generated Action Gateway operation."""
 
     def __init__(
         self,

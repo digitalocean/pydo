@@ -77,7 +77,9 @@ def test_sessions_create_404_uses_generated_error_mapping():
         404,
         {"id": "not_found", "message": "Your request could not be routed."},
     )
-    response.request = SimpleNamespace(url="https://api.digitalocean.com/v2/sessions")
+    response.request = SimpleNamespace(
+        url="https://api.digitalocean.com/v2/action-gateway/sessions"
+    )
     ops = SessionsOperations(make_parent([response]), gateway_endpoint=TEST_GATEWAY_URL)
     with pytest.raises(ResourceNotFoundError):
         ops.create("user-123")
@@ -96,7 +98,7 @@ def test_sessions_create_posts_to_do_api_and_binds_returned_mcp_url():
 
     create_req = parent._client._pipeline.calls[0].request
     assert create_req.method == "POST"
-    assert create_req.url.endswith("/v2/sessions")
+    assert create_req.url.endswith("/v2/action-gateway/sessions")
     body = json.loads(create_req.content)
     assert body["actor_id"] == "user-123"
     assert "end_user_id" not in body

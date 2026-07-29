@@ -126,7 +126,7 @@ def test_create_toolbelt_convenience_method(monkeypatch):
 
     assert toolbelt.ref == "search-toolbelt@1"
     request = client._client._pipeline.calls[0]
-    assert request.url.endswith("/v2/toolbelts")
+    assert request.url.endswith("/v2/action-gateway/toolbelts")
     assert json.loads(request.content) == {
         "name": "search-toolbelt",
         "tools": ["exa_web_search"],
