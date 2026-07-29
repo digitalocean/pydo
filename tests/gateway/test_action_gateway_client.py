@@ -51,6 +51,8 @@ def test_namespace_client_dir_is_gateway_focused():
     surface = set(dir(client))
     expected = {
         "sessions",
+        "sessions_api",
+        "connections",
         "provider",
         "base_url",
         "chat",
@@ -59,9 +61,11 @@ def test_namespace_client_dir_is_gateway_focused():
         "responses",
         "session",
         "toolbelts",
+        "tools",
+        "users",
     }
     assert expected <= surface
-    for attr in ("tools", "code", "handle_tool_calls", "droplets"):
+    for attr in ("code", "handle_tool_calls", "droplets"):
         assert attr not in surface
 
 
@@ -74,7 +78,11 @@ def test_sessions_delegate_to_gateway():
     client = ActionGatewayClient(token="dummy")
     assert client.sessions is client.gateway.sessions
     assert client.session is client.sessions
+    assert client.sessions_api is not client.sessions
+    assert client.connections is not None
+    assert client.tools is not None
     assert client.toolbelts is not None
+    assert client.users is not None
     assert client.provider is client.gateway.provider
 
 
@@ -176,4 +184,8 @@ def test_async_namespace_mirrors_sync():
     assert repr(client) == "<pydo.action_gateway.aio.Client>"
     assert client.sessions is client.gateway.sessions
     assert client.session is client.sessions
+    assert client.sessions_api is not client.sessions
+    assert client.connections is not None
+    assert client.tools is not None
     assert client.toolbelts is not None
+    assert client.users is not None

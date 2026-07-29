@@ -208,6 +208,14 @@ def make_parent(responses: List[FakeResponse]) -> MagicMock:
     parent._client.format_url = lambda url, **_kwargs: (
         url if str(url).startswith("http") else f"https://api.digitalocean.com{url}"
     )
+    from pydo.operations import SessionsOperations
+
+    parent.sessions = SessionsOperations(
+        parent._client,
+        MagicMock(),
+        MagicMock(),
+        MagicMock(),
+    )
     return parent
 
 
@@ -217,6 +225,14 @@ def make_async_parent(responses: List[AsyncFakeResponse]) -> MagicMock:
     parent._client._pipeline = AsyncFakePipeline(responses)
     parent._client.format_url = lambda url, **_kwargs: (
         url if str(url).startswith("http") else f"https://api.digitalocean.com{url}"
+    )
+    from pydo.aio.operations import SessionsOperations
+
+    parent.sessions = SessionsOperations(
+        parent._client,
+        MagicMock(),
+        MagicMock(),
+        MagicMock(),
     )
     return parent
 

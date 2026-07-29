@@ -60,7 +60,11 @@ _GATEWAY_SURFACE: tuple = (
     "responses",
     "session",
     "sessions",
+    "sessions_api",
+    "connections",
+    "tools",
     "toolbelts",
+    "users",
 )
 
 
@@ -104,6 +108,7 @@ class Client(_DigitalOceanClient):
                 "Action Gateway package is unavailable; "
                 "ensure pydo.gateway is installed"
             )
+        self.sessions_api = self.sessions
         self.sessions = gateway.sessions
         self.session = self.sessions
         self.provider = gateway.provider

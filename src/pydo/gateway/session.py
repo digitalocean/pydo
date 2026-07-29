@@ -10,8 +10,6 @@ from __future__ import annotations
 import uuid
 from typing import Any, Dict, List, Optional, Sequence
 
-from azure.core.rest import HttpRequest
-
 from pydo.custom_extensions import _BaseURLProxy
 
 from .custom_models import GatewayProtocolError
@@ -19,12 +17,9 @@ from .custom_operations import CodeOperations, ToolsOperations
 from .providers import BaseProvider, default_provider, execute_tool_calls
 from .transport import (
     MCPTransport,
-    _parse_json_body,
-    _raise_gateway_http_error,
     resolve_gateway_base_url,
 )
 
-_SESSIONS_PATH = "/v2/action-gateway/sessions"
 _DEFAULT_POLICY: Dict[str, Any] = {"defaultAction": "ask"}
 
 
@@ -145,7 +140,7 @@ class Session:
 
 
 class SessionsOperations:
-    """Create sessions via ``POST /v2/action-gateway/sessions`` on the DO API."""
+    """Create sessions through the generated ``/v2/sessions`` operation."""
 
     def __init__(
         self,
@@ -155,6 +150,7 @@ class SessionsOperations:
         provider: Optional[BaseProvider] = None,
     ):
         self._parent = parent_client
+        self._sessions_api = parent_client.sessions
         self._gateway_base_url = resolve_gateway_base_url(gateway_endpoint)
         self._provider = provider or default_provider()
 
@@ -232,25 +228,7 @@ class SessionsOperations:
         )
 
     def _post_create(self, body: Dict[str, Any]) -> Dict[str, Any]:
-        client = self._parent._client
-        request = HttpRequest(
-            "POST",
-            _SESSIONS_PATH,
-            headers={
-                "Content-Type": "application/json",
-                "Accept": "application/json",
-            },
-            json=body,
-        )
-        request.url = client.format_url(request.url)
-        pipeline_response = client._pipeline.run(request)
-        response = pipeline_response.http_response
-        response_body = (
-            response.text() if hasattr(response, "text") else response.body()
-        )
-        if response.status_code not in (200, 201):
-            _raise_gateway_http_error(response)
-        payload = _parse_json_body(response_body)
+        payload = self._sessions_api.create(body=body)
         if not isinstance(payload, dict):
             raise GatewayProtocolError(
                 f"unexpected session create response: {payload!r}"

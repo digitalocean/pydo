@@ -19,3 +19,15 @@ toolbelt = client.create_toolbelt(
 )
 
 print(toolbelt.ref)
+
+# Public Tool Registry APIs are generated from DigitalOcean's OpenAPI spec.
+print(client.toolbelts.list(status="active"))
+print(client.toolbelts.get("search-toolbelt", version="1"))
+client.toolbelts.add_tools(
+    "search-toolbelt",
+    body={"tools": ["jira_create_issue"]},
+)
+client.toolbelts.delete_tools(
+    "search-toolbelt",
+    body={"tools": ["exa_web_fetch"]},
+)

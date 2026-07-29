@@ -113,6 +113,11 @@ from ...operations._operations import (
     build_certificates_delete_request,
     build_certificates_get_request,
     build_certificates_list_request,
+    build_connections_create_request,
+    build_connections_delete_request,
+    build_connections_get_request,
+    build_connections_list_request,
+    build_connections_update_request,
     build_databases_add_connection_pool_request,
     build_databases_add_request,
     build_databases_add_user_request,
@@ -617,6 +622,9 @@ from ...operations._operations import (
     build_security_post_restore_secret_request,
     build_security_update_secret_request,
     build_security_update_settings_plan_request,
+    build_sessions_create_request,
+    build_sessions_delete_request,
+    build_sessions_list_request,
     build_sizes_list_request,
     build_snapshots_delete_request,
     build_snapshots_get_request,
@@ -644,6 +652,10 @@ from ...operations._operations import (
     build_toolbelts_delete_tools_request,
     build_toolbelts_get_request,
     build_toolbelts_list_request,
+    build_tools_get_definition_request,
+    build_tools_list_providers_request,
+    build_tools_list_request,
+    build_tools_list_toolkits_request,
     build_uptime_create_alert_request,
     build_uptime_create_check_request,
     build_uptime_delete_alert_request,
@@ -655,6 +667,8 @@ from ...operations._operations import (
     build_uptime_list_checks_request,
     build_uptime_update_alert_request,
     build_uptime_update_check_request,
+    build_users_get_request,
+    build_users_list_request,
     build_vector_databases_create_request,
     build_vector_databases_delete_request,
     build_vector_databases_get_credentials_request,
@@ -710,6 +724,976 @@ T = TypeVar("T")
 ClsType = Optional[
     Callable[[PipelineResponse[HttpRequest, AsyncHttpResponse], T, Dict[str, Any]], Any]
 ]
+
+
+class ToolsOperations:
+    """
+    .. warning::
+        **DO NOT** instantiate this class directly.
+
+        Instead, you should access the following operations through
+        :class:`~pydo.aio.GeneratedClient`'s
+        :attr:`tools` attribute.
+    """
+
+    def __init__(self, *args, **kwargs) -> None:
+        input_args = list(args)
+        self._client = input_args.pop(0) if input_args else kwargs.pop("client")
+        self._config = input_args.pop(0) if input_args else kwargs.pop("config")
+        self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
+        self._deserialize = (
+            input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        )
+
+    @distributed_trace_async
+    async def list(
+        self,
+        *,
+        toolkit_id: Optional[str] = None,
+        page: int = 1,
+        per_page: int = 20,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Tools.
+
+        Lists active Action Gateway tools visible to the authenticated team.
+
+        :keyword toolkit_id: Filter tools by toolkit identifier. Default value is None.
+        :paramtype toolkit_id: str
+        :keyword page: Which 'page' of paginated results to return. Default value is 1.
+        :paramtype page: int
+        :keyword per_page: Number of items returned per page. Default value is 20.
+        :paramtype per_page: int
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "definitions": [
+                        {
+                            "annotations": {
+                                "destructiveHint": bool,  # Optional.
+                                "idempotentHint": bool,  # Optional.
+                                "openWorldHint": bool,  # Optional.
+                                "readOnlyHint": bool,  # Optional.
+                                "title": "str"  # Optional.
+                            },
+                            "auth": {
+                                "baseUrlResolution": {
+                                    "httpLookup": {
+                                        "baseUrlTemplate": "str",  #
+                                          Optional. HTTPLookupSpec resolves a base_url by calling url
+                                          (bearer-authenticated with the just-exchanged access token),
+                                          selecting an entry in the JSON array, extracting
+                                          extract_field from that entry, and substituting it for
+                                          "{value}" in base_url_template. When match_field and
+                                          match_value are both set, they select the entry. When both
+                                          are empty, exactly one entry whose own "scopes" array
+                                          contains required_scopes must exist. Configuring only one
+                                          match field is invalid. Resolution fails fast on zero or
+                                          multiple compatible entries.
+                                        "caseInsensitive": bool,  # Optional.
+                                          HTTPLookupSpec resolves a base_url by calling url
+                                          (bearer-authenticated with the just-exchanged access token),
+                                          selecting an entry in the JSON array, extracting
+                                          extract_field from that entry, and substituting it for
+                                          "{value}" in base_url_template. When match_field and
+                                          match_value are both set, they select the entry. When both
+                                          are empty, exactly one entry whose own "scopes" array
+                                          contains required_scopes must exist. Configuring only one
+                                          match field is invalid. Resolution fails fast on zero or
+                                          multiple compatible entries.
+                                        "extractField": "str",  # Optional.
+                                          HTTPLookupSpec resolves a base_url by calling url
+                                          (bearer-authenticated with the just-exchanged access token),
+                                          selecting an entry in the JSON array, extracting
+                                          extract_field from that entry, and substituting it for
+                                          "{value}" in base_url_template. When match_field and
+                                          match_value are both set, they select the entry. When both
+                                          are empty, exactly one entry whose own "scopes" array
+                                          contains required_scopes must exist. Configuring only one
+                                          match field is invalid. Resolution fails fast on zero or
+                                          multiple compatible entries.
+                                        "matchField": "str",  # Optional.
+                                          HTTPLookupSpec resolves a base_url by calling url
+                                          (bearer-authenticated with the just-exchanged access token),
+                                          selecting an entry in the JSON array, extracting
+                                          extract_field from that entry, and substituting it for
+                                          "{value}" in base_url_template. When match_field and
+                                          match_value are both set, they select the entry. When both
+                                          are empty, exactly one entry whose own "scopes" array
+                                          contains required_scopes must exist. Configuring only one
+                                          match field is invalid. Resolution fails fast on zero or
+                                          multiple compatible entries.
+                                        "matchValue": "str",  # Optional.
+                                          HTTPLookupSpec resolves a base_url by calling url
+                                          (bearer-authenticated with the just-exchanged access token),
+                                          selecting an entry in the JSON array, extracting
+                                          extract_field from that entry, and substituting it for
+                                          "{value}" in base_url_template. When match_field and
+                                          match_value are both set, they select the entry. When both
+                                          are empty, exactly one entry whose own "scopes" array
+                                          contains required_scopes must exist. Configuring only one
+                                          match field is invalid. Resolution fails fast on zero or
+                                          multiple compatible entries.
+                                        "match_value_parameter": "str",  #
+                                          Optional. HTTPLookupSpec resolves a base_url by calling url
+                                          (bearer-authenticated with the just-exchanged access token),
+                                          selecting an entry in the JSON array, extracting
+                                          extract_field from that entry, and substituting it for
+                                          "{value}" in base_url_template. When match_field and
+                                          match_value are both set, they select the entry. When both
+                                          are empty, exactly one entry whose own "scopes" array
+                                          contains required_scopes must exist. Configuring only one
+                                          match field is invalid. Resolution fails fast on zero or
+                                          multiple compatible entries.
+                                        "method": "str",  # Optional.
+                                          HTTPLookupSpec resolves a base_url by calling url
+                                          (bearer-authenticated with the just-exchanged access token),
+                                          selecting an entry in the JSON array, extracting
+                                          extract_field from that entry, and substituting it for
+                                          "{value}" in base_url_template. When match_field and
+                                          match_value are both set, they select the entry. When both
+                                          are empty, exactly one entry whose own "scopes" array
+                                          contains required_scopes must exist. Configuring only one
+                                          match field is invalid. Resolution fails fast on zero or
+                                          multiple compatible entries.
+                                        "requiredScopes": [
+                                            "str"  # Optional.
+                                              HTTPLookupSpec resolves a base_url by calling url
+                                              (bearer-authenticated with the just-exchanged access
+                                              token), selecting an entry in the JSON array, extracting
+                                              extract_field from that entry, and substituting it for
+                                              "{value}" in base_url_template. When match_field and
+                                              match_value are both set, they select the entry. When
+                                              both are empty, exactly one entry whose own "scopes"
+                                              array contains required_scopes must exist. Configuring
+                                              only one match field is invalid. Resolution fails fast on
+                                              zero or multiple compatible entries.
+                                        ],
+                                        "trimTrailingSlash": bool,  #
+                                          Optional. HTTPLookupSpec resolves a base_url by calling url
+                                          (bearer-authenticated with the just-exchanged access token),
+                                          selecting an entry in the JSON array, extracting
+                                          extract_field from that entry, and substituting it for
+                                          "{value}" in base_url_template. When match_field and
+                                          match_value are both set, they select the entry. When both
+                                          are empty, exactly one entry whose own "scopes" array
+                                          contains required_scopes must exist. Configuring only one
+                                          match field is invalid. Resolution fails fast on zero or
+                                          multiple compatible entries.
+                                        "url": "str"  # Optional.
+                                          HTTPLookupSpec resolves a base_url by calling url
+                                          (bearer-authenticated with the just-exchanged access token),
+                                          selecting an entry in the JSON array, extracting
+                                          extract_field from that entry, and substituting it for
+                                          "{value}" in base_url_template. When match_field and
+                                          match_value are both set, they select the entry. When both
+                                          are empty, exactly one entry whose own "scopes" array
+                                          contains required_scopes must exist. Configuring only one
+                                          match field is invalid. Resolution fails fast on zero or
+                                          multiple compatible entries.
+                                    }
+                                },
+                                "credentialBinding": "str",  # Optional.
+                                "credentialRefSource": "str",  # Optional.
+                                "doManagedCredentialRef": "str",  # Optional.
+                                "injection": {
+                                    "location": "str",  # Optional.
+                                    "name": "str",  # Optional.
+                                    "scheme": "str"  # Optional.
+                                },
+                                "modes": [
+                                    "str"  # Optional.
+                                ],
+                                "provider": "str",  # Optional.
+                                "scopes": [
+                                    "str"  # Optional.
+                                ]
+                            },
+                            "classification": {
+                                "dataClasses": [
+                                    "str"  # Optional.
+                                ],
+                                "operation": "str",  # Optional.
+                                "risk": "str"  # Optional.
+                            },
+                            "description": "str",  # Optional.
+                            "execution": {
+                                "adapterVersion": "str",  # Optional.
+                                "configRef": "str",  # Optional.
+                                "http": {
+                                    "allowedHosts": [
+                                        "str"  # Optional.
+                                    ],
+                                    "baseUrl": "str",  # Optional.
+                                    "method": "str",  # Optional.
+                                    "path": "str",  # Optional.
+                                    "requestEncoding": "str",  # Optional.
+                                    "responseFormat": "str"  # Optional.
+                                },
+                                "mcp": {
+                                    "allowedHosts": [
+                                        "str"  # Optional. MCPExecution
+                                          describes how to invoke a tool that is fronted by a remote
+                                          MCP server (as opposed to a plain HTTP endpoint). endpoint is
+                                          the remote MCP server's URL, tool_name is the name the remote
+                                          server expects on tools/call (may differ from this tool's
+                                          registry name), transport selects the wire protocol
+                                          ("streamable_http" is the only kind implemented today), and
+                                          server_ref is an opaque label identifying the remote server
+                                          for logging/metrics/allowlisting.
+                                    ],
+                                    "endpoint": "str",  # Optional. MCPExecution
+                                      describes how to invoke a tool that is fronted by a remote MCP
+                                      server (as opposed to a plain HTTP endpoint). endpoint is the
+                                      remote MCP server's URL, tool_name is the name the remote server
+                                      expects on tools/call (may differ from this tool's registry
+                                      name), transport selects the wire protocol ("streamable_http" is
+                                      the only kind implemented today), and server_ref is an opaque
+                                      label identifying the remote server for
+                                      logging/metrics/allowlisting.
+                                    "serverRef": "str",  # Optional. MCPExecution
+                                      describes how to invoke a tool that is fronted by a remote MCP
+                                      server (as opposed to a plain HTTP endpoint). endpoint is the
+                                      remote MCP server's URL, tool_name is the name the remote server
+                                      expects on tools/call (may differ from this tool's registry
+                                      name), transport selects the wire protocol ("streamable_http" is
+                                      the only kind implemented today), and server_ref is an opaque
+                                      label identifying the remote server for
+                                      logging/metrics/allowlisting.
+                                    "toolName": "str",  # Optional. MCPExecution
+                                      describes how to invoke a tool that is fronted by a remote MCP
+                                      server (as opposed to a plain HTTP endpoint). endpoint is the
+                                      remote MCP server's URL, tool_name is the name the remote server
+                                      expects on tools/call (may differ from this tool's registry
+                                      name), transport selects the wire protocol ("streamable_http" is
+                                      the only kind implemented today), and server_ref is an opaque
+                                      label identifying the remote server for
+                                      logging/metrics/allowlisting.
+                                    "transport": "str"  # Optional. MCPExecution
+                                      describes how to invoke a tool that is fronted by a remote MCP
+                                      server (as opposed to a plain HTTP endpoint). endpoint is the
+                                      remote MCP server's URL, tool_name is the name the remote server
+                                      expects on tools/call (may differ from this tool's registry
+                                      name), transport selects the wire protocol ("streamable_http" is
+                                      the only kind implemented today), and server_ref is an opaque
+                                      label identifying the remote server for
+                                      logging/metrics/allowlisting.
+                                },
+                                "type": "str"  # Optional.
+                            },
+                            "flipperName": "str",  # Optional.
+                            "hooks": {
+                                "usage": {
+                                    "billable": bool,  # Optional. When usage
+                                      metadata is present, false prevents billing. Omitting usage
+                                      metadata leaves consumers' legacy billing classification
+                                      unchanged.
+                                    "meters": [
+                                        {
+                                            "quantitySource": "str",  #
+                                              Optional.
+                                            "sku": "str",  # Optional.
+                                            "unit": "str"  # Optional.
+                                        }
+                                    ]
+                                }
+                            },
+                            "inputSchema": {},  # Optional. Any object.
+                            "name": "str",  # Optional.
+                            "outputSchema": {},  # Optional. Any object.
+                            "parallelizable": bool,  # Optional.
+                            "policy": {
+                                "permission": "str"  # Optional.
+                            },
+                            "reliability": {
+                                "maxOutputBytes": "str",  # Optional.
+                                "retry": {
+                                    "backoff": "str",  # Optional.
+                                    "maxAttempts": 0,  # Optional.
+                                    "retryOn": [
+                                        "str"  # Optional.
+                                    ]
+                                },
+                                "timeoutMs": 0  # Optional.
+                            },
+                            "schemaVersion": "str",  # Optional.
+                            "status": "str",  # Optional.
+                            "streamingSafe": bool,  # Optional.
+                            "tags": [
+                                "str"  # Optional.
+                            ],
+                            "title": "str",  # Optional.
+                            "toolId": "str",  # Optional.
+                            "toolSlug": "str",  # Optional. tool_slug is the
+                              provider-qualified, stable tool identifier
+                              ":code:`<toolkit_id>`_:code:`<name>`". Pass this value back verbatim to
+                              the toolbelt add/remove endpoints; clients should treat it as opaque.
+                            "toolkitId": "str",  # Optional.
+                            "transform": {
+                                "input": {},  # Optional. Any object.
+                                "language": "str",  # Optional.
+                                "output": {}  # Optional. Any object.
+                            },
+                            "version": "str"  # Optional.
+                        }
+                    ],
+                    "pagination": {
+                        "page": 0,  # Required.
+                        "per_page": 0,  # Required.
+                        "total": 0  # Required.
+                    },
+                    "tools": [
+                        {
+                            "annotations": {
+                                "destructiveHint": bool,  # Optional.
+                                "idempotentHint": bool,  # Optional.
+                                "openWorldHint": bool,  # Optional.
+                                "readOnlyHint": bool,  # Optional.
+                                "title": "str"  # Optional.
+                            },
+                            "description": "str",  # Optional.
+                            "inputSchema": {},  # Optional. Any object.
+                            "name": "str",  # Optional.
+                            "outputSchema": {},  # Optional. Any object.
+                            "parallelizable": bool,  # Optional.
+                            "streamingSafe": bool,  # Optional.
+                            "title": "str",  # Optional.
+                            "toolSlug": "str",  # Optional. tool_slug is the
+                              provider-qualified, stable tool identifier
+                              ":code:`<toolkit_id>`_:code:`<name>`". Pass this value back verbatim to
+                              the toolbelt add/remove endpoints; clients should treat it as opaque
+                              rather than reconstructing it from toolkit_id and name.
+                            "toolkitId": "str",  # Optional.
+                            "version": "str"  # Optional.
+                        }
+                    ],
+                    "version": "str"  # Optional.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_tools_list_request(
+            toolkit_id=toolkit_id,
+            page=page,
+            per_page=per_page,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        response_headers["ratelimit-limit"] = self._deserialize(
+            "int", response.headers.get("ratelimit-limit")
+        )
+        response_headers["ratelimit-remaining"] = self._deserialize(
+            "int", response.headers.get("ratelimit-remaining")
+        )
+        response_headers["ratelimit-reset"] = self._deserialize(
+            "int", response.headers.get("ratelimit-reset")
+        )
+
+        if response.content:
+            deserialized = response.json()
+        else:
+            deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def list_toolkits(self, **kwargs: Any) -> JSON:
+        """List Toolkits.
+
+        Lists the toolkits that group Action Gateway tools.
+
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "toolkits": [
+                        {
+                            "description": "str",  # Optional.
+                            "id": "str",  # Optional.
+                            "name": "str"  # Optional.
+                        }
+                    ],
+                    "version": "str"  # Optional.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_tools_list_toolkits_request(
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        response_headers["ratelimit-limit"] = self._deserialize(
+            "int", response.headers.get("ratelimit-limit")
+        )
+        response_headers["ratelimit-remaining"] = self._deserialize(
+            "int", response.headers.get("ratelimit-remaining")
+        )
+        response_headers["ratelimit-reset"] = self._deserialize(
+            "int", response.headers.get("ratelimit-reset")
+        )
+
+        if response.content:
+            deserialized = response.json()
+        else:
+            deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def list_providers(self, **kwargs: Any) -> JSON:
+        """List Tool Providers.
+
+        Lists Action Gateway providers and their connection requirements.
+
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "providers": [
+                        {
+                            "auth_type": "str",  # Optional.
+                            "connection_parameters": [
+                                {
+                                    "allowed_host_suffixes": [
+                                        "str"  # Optional.
+                                    ],
+                                    "allowed_values": [
+                                        "str"  # Optional.
+                                    ],
+                                    "description": "str",  # Optional.
+                                    "input_kind": "str",  # Optional.
+                                    "key": "str",  # Optional.
+                                    "label": "str",  # Optional.
+                                    "max_length": 0,  # Optional.
+                                    "normalization": "str",  # Optional.
+                                    "required": bool  # Optional.
+                                }
+                            ],
+                            "description": "str",  # Optional.
+                            "display_name": "str",  # Optional.
+                            "name": "str",  # Optional.
+                            "scopes": [
+                                "str"  # Optional.
+                            ]
+                        }
+                    ]
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_tools_list_providers_request(
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        response_headers["ratelimit-limit"] = self._deserialize(
+            "int", response.headers.get("ratelimit-limit")
+        )
+        response_headers["ratelimit-remaining"] = self._deserialize(
+            "int", response.headers.get("ratelimit-remaining")
+        )
+        response_headers["ratelimit-reset"] = self._deserialize(
+            "int", response.headers.get("ratelimit-reset")
+        )
+
+        if response.content:
+            deserialized = response.json()
+        else:
+            deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_definition(
+        self,
+        name: str,
+        *,
+        version: Optional[str] = None,
+        toolkit_id: Optional[str] = None,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve a Tool Definition.
+
+        Retrieves the executable definition for an active Action Gateway tool.
+
+        :param name: The provider-qualified tool name. Required.
+        :type name: str
+        :keyword version: The tool version. Omit to retrieve the current version. Default value is
+         None.
+        :paramtype version: str
+        :keyword toolkit_id: The toolkit identifier used to disambiguate a bare tool name. Default
+         value is None.
+        :paramtype toolkit_id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "annotations": {
+                        "destructiveHint": bool,  # Optional.
+                        "idempotentHint": bool,  # Optional.
+                        "openWorldHint": bool,  # Optional.
+                        "readOnlyHint": bool,  # Optional.
+                        "title": "str"  # Optional.
+                    },
+                    "auth": {
+                        "baseUrlResolution": {
+                            "httpLookup": {
+                                "baseUrlTemplate": "str",  # Optional. HTTPLookupSpec
+                                  resolves a base_url by calling url (bearer-authenticated with the
+                                  just-exchanged access token), selecting an entry in the JSON array,
+                                  extracting extract_field from that entry, and substituting it for
+                                  "{value}" in base_url_template. When match_field and match_value are
+                                  both set, they select the entry. When both are empty, exactly one
+                                  entry whose own "scopes" array contains required_scopes must exist.
+                                  Configuring only one match field is invalid. Resolution fails fast on
+                                  zero or multiple compatible entries.
+                                "caseInsensitive": bool,  # Optional. HTTPLookupSpec
+                                  resolves a base_url by calling url (bearer-authenticated with the
+                                  just-exchanged access token), selecting an entry in the JSON array,
+                                  extracting extract_field from that entry, and substituting it for
+                                  "{value}" in base_url_template. When match_field and match_value are
+                                  both set, they select the entry. When both are empty, exactly one
+                                  entry whose own "scopes" array contains required_scopes must exist.
+                                  Configuring only one match field is invalid. Resolution fails fast on
+                                  zero or multiple compatible entries.
+                                "extractField": "str",  # Optional. HTTPLookupSpec
+                                  resolves a base_url by calling url (bearer-authenticated with the
+                                  just-exchanged access token), selecting an entry in the JSON array,
+                                  extracting extract_field from that entry, and substituting it for
+                                  "{value}" in base_url_template. When match_field and match_value are
+                                  both set, they select the entry. When both are empty, exactly one
+                                  entry whose own "scopes" array contains required_scopes must exist.
+                                  Configuring only one match field is invalid. Resolution fails fast on
+                                  zero or multiple compatible entries.
+                                "matchField": "str",  # Optional. HTTPLookupSpec
+                                  resolves a base_url by calling url (bearer-authenticated with the
+                                  just-exchanged access token), selecting an entry in the JSON array,
+                                  extracting extract_field from that entry, and substituting it for
+                                  "{value}" in base_url_template. When match_field and match_value are
+                                  both set, they select the entry. When both are empty, exactly one
+                                  entry whose own "scopes" array contains required_scopes must exist.
+                                  Configuring only one match field is invalid. Resolution fails fast on
+                                  zero or multiple compatible entries.
+                                "matchValue": "str",  # Optional. HTTPLookupSpec
+                                  resolves a base_url by calling url (bearer-authenticated with the
+                                  just-exchanged access token), selecting an entry in the JSON array,
+                                  extracting extract_field from that entry, and substituting it for
+                                  "{value}" in base_url_template. When match_field and match_value are
+                                  both set, they select the entry. When both are empty, exactly one
+                                  entry whose own "scopes" array contains required_scopes must exist.
+                                  Configuring only one match field is invalid. Resolution fails fast on
+                                  zero or multiple compatible entries.
+                                "match_value_parameter": "str",  # Optional.
+                                  HTTPLookupSpec resolves a base_url by calling url
+                                  (bearer-authenticated with the just-exchanged access token),
+                                  selecting an entry in the JSON array, extracting extract_field from
+                                  that entry, and substituting it for "{value}" in base_url_template.
+                                  When match_field and match_value are both set, they select the entry.
+                                  When both are empty, exactly one entry whose own "scopes" array
+                                  contains required_scopes must exist. Configuring only one match field
+                                  is invalid. Resolution fails fast on zero or multiple compatible
+                                  entries.
+                                "method": "str",  # Optional. HTTPLookupSpec resolves
+                                  a base_url by calling url (bearer-authenticated with the
+                                  just-exchanged access token), selecting an entry in the JSON array,
+                                  extracting extract_field from that entry, and substituting it for
+                                  "{value}" in base_url_template. When match_field and match_value are
+                                  both set, they select the entry. When both are empty, exactly one
+                                  entry whose own "scopes" array contains required_scopes must exist.
+                                  Configuring only one match field is invalid. Resolution fails fast on
+                                  zero or multiple compatible entries.
+                                "requiredScopes": [
+                                    "str"  # Optional. HTTPLookupSpec resolves a
+                                      base_url by calling url (bearer-authenticated with the
+                                      just-exchanged access token), selecting an entry in the JSON
+                                      array, extracting extract_field from that entry, and substituting
+                                      it for "{value}" in base_url_template. When match_field and
+                                      match_value are both set, they select the entry. When both are
+                                      empty, exactly one entry whose own "scopes" array contains
+                                      required_scopes must exist. Configuring only one match field is
+                                      invalid. Resolution fails fast on zero or multiple compatible
+                                      entries.
+                                ],
+                                "trimTrailingSlash": bool,  # Optional.
+                                  HTTPLookupSpec resolves a base_url by calling url
+                                  (bearer-authenticated with the just-exchanged access token),
+                                  selecting an entry in the JSON array, extracting extract_field from
+                                  that entry, and substituting it for "{value}" in base_url_template.
+                                  When match_field and match_value are both set, they select the entry.
+                                  When both are empty, exactly one entry whose own "scopes" array
+                                  contains required_scopes must exist. Configuring only one match field
+                                  is invalid. Resolution fails fast on zero or multiple compatible
+                                  entries.
+                                "url": "str"  # Optional. HTTPLookupSpec resolves a
+                                  base_url by calling url (bearer-authenticated with the just-exchanged
+                                  access token), selecting an entry in the JSON array, extracting
+                                  extract_field from that entry, and substituting it for "{value}" in
+                                  base_url_template. When match_field and match_value are both set,
+                                  they select the entry. When both are empty, exactly one entry whose
+                                  own "scopes" array contains required_scopes must exist. Configuring
+                                  only one match field is invalid. Resolution fails fast on zero or
+                                  multiple compatible entries.
+                            }
+                        },
+                        "credentialBinding": "str",  # Optional.
+                        "credentialRefSource": "str",  # Optional.
+                        "doManagedCredentialRef": "str",  # Optional.
+                        "injection": {
+                            "location": "str",  # Optional.
+                            "name": "str",  # Optional.
+                            "scheme": "str"  # Optional.
+                        },
+                        "modes": [
+                            "str"  # Optional.
+                        ],
+                        "provider": "str",  # Optional.
+                        "scopes": [
+                            "str"  # Optional.
+                        ]
+                    },
+                    "classification": {
+                        "dataClasses": [
+                            "str"  # Optional.
+                        ],
+                        "operation": "str",  # Optional.
+                        "risk": "str"  # Optional.
+                    },
+                    "description": "str",  # Optional.
+                    "execution": {
+                        "adapterVersion": "str",  # Optional.
+                        "configRef": "str",  # Optional.
+                        "http": {
+                            "allowedHosts": [
+                                "str"  # Optional.
+                            ],
+                            "baseUrl": "str",  # Optional.
+                            "method": "str",  # Optional.
+                            "path": "str",  # Optional.
+                            "requestEncoding": "str",  # Optional.
+                            "responseFormat": "str"  # Optional.
+                        },
+                        "mcp": {
+                            "allowedHosts": [
+                                "str"  # Optional. MCPExecution describes how to
+                                  invoke a tool that is fronted by a remote MCP server (as opposed to a
+                                  plain HTTP endpoint). endpoint is the remote MCP server's URL,
+                                  tool_name is the name the remote server expects on tools/call (may
+                                  differ from this tool's registry name), transport selects the wire
+                                  protocol ("streamable_http" is the only kind implemented today), and
+                                  server_ref is an opaque label identifying the remote server for
+                                  logging/metrics/allowlisting.
+                            ],
+                            "endpoint": "str",  # Optional. MCPExecution describes how to
+                              invoke a tool that is fronted by a remote MCP server (as opposed to a
+                              plain HTTP endpoint). endpoint is the remote MCP server's URL, tool_name
+                              is the name the remote server expects on tools/call (may differ from this
+                              tool's registry name), transport selects the wire protocol
+                              ("streamable_http" is the only kind implemented today), and server_ref is
+                              an opaque label identifying the remote server for
+                              logging/metrics/allowlisting.
+                            "serverRef": "str",  # Optional. MCPExecution describes how
+                              to invoke a tool that is fronted by a remote MCP server (as opposed to a
+                              plain HTTP endpoint). endpoint is the remote MCP server's URL, tool_name
+                              is the name the remote server expects on tools/call (may differ from this
+                              tool's registry name), transport selects the wire protocol
+                              ("streamable_http" is the only kind implemented today), and server_ref is
+                              an opaque label identifying the remote server for
+                              logging/metrics/allowlisting.
+                            "toolName": "str",  # Optional. MCPExecution describes how to
+                              invoke a tool that is fronted by a remote MCP server (as opposed to a
+                              plain HTTP endpoint). endpoint is the remote MCP server's URL, tool_name
+                              is the name the remote server expects on tools/call (may differ from this
+                              tool's registry name), transport selects the wire protocol
+                              ("streamable_http" is the only kind implemented today), and server_ref is
+                              an opaque label identifying the remote server for
+                              logging/metrics/allowlisting.
+                            "transport": "str"  # Optional. MCPExecution describes how to
+                              invoke a tool that is fronted by a remote MCP server (as opposed to a
+                              plain HTTP endpoint). endpoint is the remote MCP server's URL, tool_name
+                              is the name the remote server expects on tools/call (may differ from this
+                              tool's registry name), transport selects the wire protocol
+                              ("streamable_http" is the only kind implemented today), and server_ref is
+                              an opaque label identifying the remote server for
+                              logging/metrics/allowlisting.
+                        },
+                        "type": "str"  # Optional.
+                    },
+                    "flipperName": "str",  # Optional.
+                    "hooks": {
+                        "usage": {
+                            "billable": bool,  # Optional. When usage metadata is
+                              present, false prevents billing. Omitting usage metadata leaves
+                              consumers' legacy billing classification unchanged.
+                            "meters": [
+                                {
+                                    "quantitySource": "str",  # Optional.
+                                    "sku": "str",  # Optional.
+                                    "unit": "str"  # Optional.
+                                }
+                            ]
+                        }
+                    },
+                    "inputSchema": {},  # Optional. Any object.
+                    "name": "str",  # Optional.
+                    "outputSchema": {},  # Optional. Any object.
+                    "parallelizable": bool,  # Optional.
+                    "policy": {
+                        "permission": "str"  # Optional.
+                    },
+                    "reliability": {
+                        "maxOutputBytes": "str",  # Optional.
+                        "retry": {
+                            "backoff": "str",  # Optional.
+                            "maxAttempts": 0,  # Optional.
+                            "retryOn": [
+                                "str"  # Optional.
+                            ]
+                        },
+                        "timeoutMs": 0  # Optional.
+                    },
+                    "schemaVersion": "str",  # Optional.
+                    "status": "str",  # Optional.
+                    "streamingSafe": bool,  # Optional.
+                    "tags": [
+                        "str"  # Optional.
+                    ],
+                    "title": "str",  # Optional.
+                    "toolId": "str",  # Optional.
+                    "toolSlug": "str",  # Optional. tool_slug is the provider-qualified, stable
+                      tool identifier ":code:`<toolkit_id>`_:code:`<name>`". Pass this value back
+                      verbatim to the toolbelt add/remove endpoints; clients should treat it as opaque.
+                    "toolkitId": "str",  # Optional.
+                    "transform": {
+                        "input": {},  # Optional. Any object.
+                        "language": "str",  # Optional.
+                        "output": {}  # Optional. Any object.
+                    },
+                    "version": "str"  # Optional.
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_tools_get_definition_request(
+            name=name,
+            version=version,
+            toolkit_id=toolkit_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
 
 
 class ToolbeltsOperations:
@@ -1274,13 +2258,34 @@ class ToolbeltsOperations:
 
         :param name: The natural key identifying the toolbelt. Required.
         :type name: str
-        :return: JSON or JSON object
+        :return: JSON object
         :rtype: JSON
         :raises ~azure.core.exceptions.HttpResponseError:
 
         Example:
             .. code-block:: python
 
+                # response body for status code(s): 200
+                response == {
+                    "toolbelt": {
+                        "created_at": "2020-02-20 00:00:00",  # Required.
+                        "name": "str",  # Required.
+                        "reference": "str",  # A reference pinned to this immutable toolbelt
+                          version. Required.
+                        "reference_latest": "str",  # An unversioned reference to the latest
+                          active version. Required.
+                        "status": "str",  # Required. Known values are: "active" and
+                          "deprecated".
+                        "tool_count": 0,  # Required.
+                        "tools": [
+                            "str"  # Required.
+                        ],
+                        "updated_at": "2020-02-20 00:00:00",  # Required.
+                        "version": "str",  # Required.
+                        "description": "str",  # Optional. Required.
+                        "display_name": "str"  # Optional. Required.
+                    }
+                }
                 # response body for status code(s): 404
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
@@ -1933,6 +2938,2366 @@ class ToolbeltsOperations:
                 deserialized = None
 
         if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+
+class ConnectionsOperations:
+    """
+    .. warning::
+        **DO NOT** instantiate this class directly.
+
+        Instead, you should access the following operations through
+        :class:`~pydo.aio.GeneratedClient`'s
+        :attr:`connections` attribute.
+    """
+
+    def __init__(self, *args, **kwargs) -> None:
+        input_args = list(args)
+        self._client = input_args.pop(0) if input_args else kwargs.pop("client")
+        self._config = input_args.pop(0) if input_args else kwargs.pop("config")
+        self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
+        self._deserialize = (
+            input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        )
+
+    @distributed_trace_async
+    async def list(
+        self,
+        *,
+        provider: Optional[str] = None,
+        user_id: Optional[str] = None,
+        status: Optional[str] = None,
+        sort: Optional[str] = None,
+        sort_direction: Optional[str] = None,
+        page: int = 1,
+        per_page: int = 20,
+        **kwargs: Any
+    ) -> JSON:
+        """List Connections.
+
+        Lists OAuth connections owned by the authenticated team.
+
+        :keyword provider: Filter by provider name. Default value is None.
+        :paramtype provider: str
+        :keyword user_id: Filter by end-user identifier. Default value is None.
+        :paramtype user_id: str
+        :keyword status: Filter by connection status. Default value is None.
+        :paramtype status: str
+        :keyword sort: Field used to sort results. Default value is None.
+        :paramtype sort: str
+        :keyword sort_direction: Sort direction. Default value is None.
+        :paramtype sort_direction: str
+        :keyword page: Which 'page' of paginated results to return. Default value is 1.
+        :paramtype page: int
+        :keyword per_page: Number of items returned per page. Default value is 20.
+        :paramtype per_page: int
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "connections": [
+                        {
+                            "connection_parameters": {},  # Optional. Any object.
+                            "created_at": "2020-02-20 00:00:00",  # Optional.
+                            "granted_at": "2020-02-20 00:00:00",  # Optional.
+                            "id": "str",  # Optional.
+                            "provider": "str",  # Optional.
+                            "provider_display_name": "str",  # Optional.
+                            "revoked_at": "2020-02-20 00:00:00",  # Optional.
+                            "scopes": [
+                                "str"  # Optional.
+                            ],
+                            "status": "str",  # Optional.
+                            "updated_at": "2020-02-20 00:00:00",  # Optional.
+                            "user_id": "str"  # Optional.
+                        }
+                    ],
+                    "pagination": {
+                        "page": 0,  # Required.
+                        "per_page": 0,  # Required.
+                        "total": 0  # Required.
+                    }
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_connections_list_request(
+            provider=provider,
+            user_id=user_id,
+            status=status,
+            sort=sort,
+            sort_direction=sort_direction,
+            page=page,
+            per_page=per_page,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        response_headers["ratelimit-limit"] = self._deserialize(
+            "int", response.headers.get("ratelimit-limit")
+        )
+        response_headers["ratelimit-remaining"] = self._deserialize(
+            "int", response.headers.get("ratelimit-remaining")
+        )
+        response_headers["ratelimit-reset"] = self._deserialize(
+            "int", response.headers.get("ratelimit-reset")
+        )
+
+        if response.content:
+            deserialized = response.json()
+        else:
+            deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def create(
+        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Connection.
+
+        Creates or begins authorization for an OAuth connection to an Action Gateway provider.
+
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "connection_parameters": {},  # Optional. Any object.
+                    "provider": "str",  # Optional.
+                    "scopes": [
+                        "str"  # Optional.
+                    ],
+                    "user_id": "str"  # Optional.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "authorization": {
+                        "connect_url": "str",  # Optional. ConnectionAuthorization is present
+                          only while a connection is pending. The UI sends the user to connect_url and
+                          polls GetConnection until the connection becomes active or expires. The
+                          Secrets Manager poll URL is never exposed.
+                        "expires_at": "2020-02-20 00:00:00",  # Optional.
+                          ConnectionAuthorization is present only while a connection is pending. The UI
+                          sends the user to connect_url and polls GetConnection until the connection
+                          becomes active or expires. The Secrets Manager poll URL is never exposed.
+                        "status": "str",  # Optional. ConnectionAuthorization is present only
+                          while a connection is pending. The UI sends the user to connect_url and polls
+                          GetConnection until the connection becomes active or expires. The Secrets
+                          Manager poll URL is never exposed.
+                        "verification_code": "str"  # Optional. ConnectionAuthorization is
+                          present only while a connection is pending. The UI sends the user to
+                          connect_url and polls GetConnection until the connection becomes active or
+                          expires. The Secrets Manager poll URL is never exposed.
+                    },
+                    "connection": {
+                        "connection_parameters": {},  # Optional. Any object.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "granted_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "id": "str",  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                        "provider": "str",  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                        "provider_display_name": "str",  # Optional. ----  OAuth connection
+                          resources --------------------------  OAuthConnection is the public,
+                          team-scoped connection metadata returned to the UI. It deliberately excludes
+                          the team ID, Secrets Manager assignment, actor identifiers, poll URL, and
+                          authorization handle.
+                        "revoked_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "scopes": [
+                            "str"  # Optional. ----  OAuth connection resources
+                              --------------------------  OAuthConnection is the public, team-scoped
+                              connection metadata returned to the UI. It deliberately excludes the team
+                              ID, Secrets Manager assignment, actor identifiers, poll URL, and
+                              authorization handle.
+                        ],
+                        "status": "str",  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "user_id": "str"  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                    }
+                }
+                # response body for status code(s): 400, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def create(
+        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Connection.
+
+        Creates or begins authorization for an OAuth connection to an Action Gateway provider.
+
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "authorization": {
+                        "connect_url": "str",  # Optional. ConnectionAuthorization is present
+                          only while a connection is pending. The UI sends the user to connect_url and
+                          polls GetConnection until the connection becomes active or expires. The
+                          Secrets Manager poll URL is never exposed.
+                        "expires_at": "2020-02-20 00:00:00",  # Optional.
+                          ConnectionAuthorization is present only while a connection is pending. The UI
+                          sends the user to connect_url and polls GetConnection until the connection
+                          becomes active or expires. The Secrets Manager poll URL is never exposed.
+                        "status": "str",  # Optional. ConnectionAuthorization is present only
+                          while a connection is pending. The UI sends the user to connect_url and polls
+                          GetConnection until the connection becomes active or expires. The Secrets
+                          Manager poll URL is never exposed.
+                        "verification_code": "str"  # Optional. ConnectionAuthorization is
+                          present only while a connection is pending. The UI sends the user to
+                          connect_url and polls GetConnection until the connection becomes active or
+                          expires. The Secrets Manager poll URL is never exposed.
+                    },
+                    "connection": {
+                        "connection_parameters": {},  # Optional. Any object.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "granted_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "id": "str",  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                        "provider": "str",  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                        "provider_display_name": "str",  # Optional. ----  OAuth connection
+                          resources --------------------------  OAuthConnection is the public,
+                          team-scoped connection metadata returned to the UI. It deliberately excludes
+                          the team ID, Secrets Manager assignment, actor identifiers, poll URL, and
+                          authorization handle.
+                        "revoked_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "scopes": [
+                            "str"  # Optional. ----  OAuth connection resources
+                              --------------------------  OAuthConnection is the public, team-scoped
+                              connection metadata returned to the UI. It deliberately excludes the team
+                              ID, Secrets Manager assignment, actor identifiers, poll URL, and
+                              authorization handle.
+                        ],
+                        "status": "str",  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "user_id": "str"  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                    }
+                }
+                # response body for status code(s): 400, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def create(self, body: Union[JSON, IO[bytes]], **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Connection.
+
+        Creates or begins authorization for an OAuth connection to an Action Gateway provider.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "connection_parameters": {},  # Optional. Any object.
+                    "provider": "str",  # Optional.
+                    "scopes": [
+                        "str"  # Optional.
+                    ],
+                    "user_id": "str"  # Optional.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "authorization": {
+                        "connect_url": "str",  # Optional. ConnectionAuthorization is present
+                          only while a connection is pending. The UI sends the user to connect_url and
+                          polls GetConnection until the connection becomes active or expires. The
+                          Secrets Manager poll URL is never exposed.
+                        "expires_at": "2020-02-20 00:00:00",  # Optional.
+                          ConnectionAuthorization is present only while a connection is pending. The UI
+                          sends the user to connect_url and polls GetConnection until the connection
+                          becomes active or expires. The Secrets Manager poll URL is never exposed.
+                        "status": "str",  # Optional. ConnectionAuthorization is present only
+                          while a connection is pending. The UI sends the user to connect_url and polls
+                          GetConnection until the connection becomes active or expires. The Secrets
+                          Manager poll URL is never exposed.
+                        "verification_code": "str"  # Optional. ConnectionAuthorization is
+                          present only while a connection is pending. The UI sends the user to
+                          connect_url and polls GetConnection until the connection becomes active or
+                          expires. The Secrets Manager poll URL is never exposed.
+                    },
+                    "connection": {
+                        "connection_parameters": {},  # Optional. Any object.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "granted_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "id": "str",  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                        "provider": "str",  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                        "provider_display_name": "str",  # Optional. ----  OAuth connection
+                          resources --------------------------  OAuthConnection is the public,
+                          team-scoped connection metadata returned to the UI. It deliberately excludes
+                          the team ID, Secrets Manager assignment, actor identifiers, poll URL, and
+                          authorization handle.
+                        "revoked_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "scopes": [
+                            "str"  # Optional. ----  OAuth connection resources
+                              --------------------------  OAuthConnection is the public, team-scoped
+                              connection metadata returned to the UI. It deliberately excludes the team
+                              ID, Secrets Manager assignment, actor identifiers, poll URL, and
+                              authorization handle.
+                        ],
+                        "status": "str",  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "user_id": "str"  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                    }
+                }
+                # response body for status code(s): 400, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_connections_create_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 409]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get(self, id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve a Connection.
+
+        Retrieves an OAuth connection owned by the authenticated team.
+
+        :param id: The connection UUID. Required.
+        :type id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "authorization": {
+                        "connect_url": "str",  # Optional. ConnectionAuthorization is present
+                          only while a connection is pending. The UI sends the user to connect_url and
+                          polls GetConnection until the connection becomes active or expires. The
+                          Secrets Manager poll URL is never exposed.
+                        "expires_at": "2020-02-20 00:00:00",  # Optional.
+                          ConnectionAuthorization is present only while a connection is pending. The UI
+                          sends the user to connect_url and polls GetConnection until the connection
+                          becomes active or expires. The Secrets Manager poll URL is never exposed.
+                        "status": "str",  # Optional. ConnectionAuthorization is present only
+                          while a connection is pending. The UI sends the user to connect_url and polls
+                          GetConnection until the connection becomes active or expires. The Secrets
+                          Manager poll URL is never exposed.
+                        "verification_code": "str"  # Optional. ConnectionAuthorization is
+                          present only while a connection is pending. The UI sends the user to
+                          connect_url and polls GetConnection until the connection becomes active or
+                          expires. The Secrets Manager poll URL is never exposed.
+                    },
+                    "connection": {
+                        "connection_parameters": {},  # Optional. Any object.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "granted_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "id": "str",  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                        "provider": "str",  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                        "provider_display_name": "str",  # Optional. ----  OAuth connection
+                          resources --------------------------  OAuthConnection is the public,
+                          team-scoped connection metadata returned to the UI. It deliberately excludes
+                          the team ID, Secrets Manager assignment, actor identifiers, poll URL, and
+                          authorization handle.
+                        "revoked_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "scopes": [
+                            "str"  # Optional. ----  OAuth connection resources
+                              --------------------------  OAuthConnection is the public, team-scoped
+                              connection metadata returned to the UI. It deliberately excludes the team
+                              ID, Secrets Manager assignment, actor identifiers, poll URL, and
+                              authorization handle.
+                        ],
+                        "status": "str",  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "user_id": "str"  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_connections_get_request(
+            id=id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def update(
+        self,
+        id: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Connection Parameters.
+
+        Updates non-sensitive connection parameters for an OAuth connection.
+
+        :param id: The connection UUID. Required.
+        :type id: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "connection_parameters": {},  # Optional. Any object.
+                    "id": "str"  # Optional.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "connection": {
+                        "connection_parameters": {},  # Optional. Any object.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "granted_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "id": "str",  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                        "provider": "str",  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                        "provider_display_name": "str",  # Optional. ----  OAuth connection
+                          resources --------------------------  OAuthConnection is the public,
+                          team-scoped connection metadata returned to the UI. It deliberately excludes
+                          the team ID, Secrets Manager assignment, actor identifiers, poll URL, and
+                          authorization handle.
+                        "revoked_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "scopes": [
+                            "str"  # Optional. ----  OAuth connection resources
+                              --------------------------  OAuthConnection is the public, team-scoped
+                              connection metadata returned to the UI. It deliberately excludes the team
+                              ID, Secrets Manager assignment, actor identifiers, poll URL, and
+                              authorization handle.
+                        ],
+                        "status": "str",  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "user_id": "str"  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def update(
+        self,
+        id: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Connection Parameters.
+
+        Updates non-sensitive connection parameters for an OAuth connection.
+
+        :param id: The connection UUID. Required.
+        :type id: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "connection": {
+                        "connection_parameters": {},  # Optional. Any object.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "granted_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "id": "str",  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                        "provider": "str",  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                        "provider_display_name": "str",  # Optional. ----  OAuth connection
+                          resources --------------------------  OAuthConnection is the public,
+                          team-scoped connection metadata returned to the UI. It deliberately excludes
+                          the team ID, Secrets Manager assignment, actor identifiers, poll URL, and
+                          authorization handle.
+                        "revoked_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "scopes": [
+                            "str"  # Optional. ----  OAuth connection resources
+                              --------------------------  OAuthConnection is the public, team-scoped
+                              connection metadata returned to the UI. It deliberately excludes the team
+                              ID, Secrets Manager assignment, actor identifiers, poll URL, and
+                              authorization handle.
+                        ],
+                        "status": "str",  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "user_id": "str"  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def update(
+        self, id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Connection Parameters.
+
+        Updates non-sensitive connection parameters for an OAuth connection.
+
+        :param id: The connection UUID. Required.
+        :type id: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "connection_parameters": {},  # Optional. Any object.
+                    "id": "str"  # Optional.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "connection": {
+                        "connection_parameters": {},  # Optional. Any object.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "granted_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "id": "str",  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                        "provider": "str",  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                        "provider_display_name": "str",  # Optional. ----  OAuth connection
+                          resources --------------------------  OAuthConnection is the public,
+                          team-scoped connection metadata returned to the UI. It deliberately excludes
+                          the team ID, Secrets Manager assignment, actor identifiers, poll URL, and
+                          authorization handle.
+                        "revoked_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "scopes": [
+                            "str"  # Optional. ----  OAuth connection resources
+                              --------------------------  OAuthConnection is the public, team-scoped
+                              connection metadata returned to the UI. It deliberately excludes the team
+                              ID, Secrets Manager assignment, actor identifiers, poll URL, and
+                              authorization handle.
+                        ],
+                        "status": "str",  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "user_id": "str"  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_connections_update_request(
+            id=id,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def delete(self, id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Delete a Connection.
+
+        Revokes and deletes an OAuth connection owned by the authenticated team.
+
+        :param id: The connection UUID. Required.
+        :type id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "connection": {
+                        "connection_parameters": {},  # Optional. Any object.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "granted_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "id": "str",  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                        "provider": "str",  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                        "provider_display_name": "str",  # Optional. ----  OAuth connection
+                          resources --------------------------  OAuthConnection is the public,
+                          team-scoped connection metadata returned to the UI. It deliberately excludes
+                          the team ID, Secrets Manager assignment, actor identifiers, poll URL, and
+                          authorization handle.
+                        "revoked_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "scopes": [
+                            "str"  # Optional. ----  OAuth connection resources
+                              --------------------------  OAuthConnection is the public, team-scoped
+                              connection metadata returned to the UI. It deliberately excludes the team
+                              ID, Secrets Manager assignment, actor identifiers, poll URL, and
+                              authorization handle.
+                        ],
+                        "status": "str",  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
+                          connection resources --------------------------  OAuthConnection is the
+                          public, team-scoped connection metadata returned to the UI. It deliberately
+                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
+                          URL, and authorization handle.
+                        "user_id": "str"  # Optional. ----  OAuth connection resources
+                          --------------------------  OAuthConnection is the public, team-scoped
+                          connection metadata returned to the UI. It deliberately excludes the team ID,
+                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
+                          handle.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_connections_delete_request(
+            id=id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+
+class UsersOperations:
+    """
+    .. warning::
+        **DO NOT** instantiate this class directly.
+
+        Instead, you should access the following operations through
+        :class:`~pydo.aio.GeneratedClient`'s
+        :attr:`users` attribute.
+    """
+
+    def __init__(self, *args, **kwargs) -> None:
+        input_args = list(args)
+        self._client = input_args.pop(0) if input_args else kwargs.pop("client")
+        self._config = input_args.pop(0) if input_args else kwargs.pop("config")
+        self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
+        self._deserialize = (
+            input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        )
+
+    @distributed_trace_async
+    async def list(self, *, page: int = 1, per_page: int = 20, **kwargs: Any) -> JSON:
+        """List Action Gateway Users.
+
+        Lists end-user identifiers derived from sessions and OAuth connections for the authenticated
+        team.
+
+        :keyword page: Which 'page' of paginated results to return. Default value is 1.
+        :paramtype page: int
+        :keyword per_page: Number of items returned per page. Default value is 20.
+        :paramtype per_page: int
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "pagination": {
+                        "page": 0,  # Required.
+                        "per_page": 0,  # Required.
+                        "total": 0  # Required.
+                    },
+                    "user_ids": [
+                        "str"  # Optional.
+                    ]
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_users_list_request(
+            page=page,
+            per_page=per_page,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        response_headers["ratelimit-limit"] = self._deserialize(
+            "int", response.headers.get("ratelimit-limit")
+        )
+        response_headers["ratelimit-remaining"] = self._deserialize(
+            "int", response.headers.get("ratelimit-remaining")
+        )
+        response_headers["ratelimit-reset"] = self._deserialize(
+            "int", response.headers.get("ratelimit-reset")
+        )
+
+        if response.content:
+            deserialized = response.json()
+        else:
+            deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get(self, user_id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve an Action Gateway User.
+
+        Retrieves a derived end-user view containing its sessions and OAuth connections.
+
+        :param user_id: The end-user identifier. Required.
+        :type user_id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "user": {
+                        "connections": [
+                            {
+                                "connection_parameters": {},  # Optional. Any object.
+                                "created_at": "2020-02-20 00:00:00",  # Optional.
+                                  User is a derived, team-scoped view across sessions and OAuth
+                                  connections.
+                                "granted_at": "2020-02-20 00:00:00",  # Optional.
+                                  User is a derived, team-scoped view across sessions and OAuth
+                                  connections.
+                                "id": "str",  # Optional. User is a derived,
+                                  team-scoped view across sessions and OAuth connections.
+                                "provider": "str",  # Optional. User is a derived,
+                                  team-scoped view across sessions and OAuth connections.
+                                "provider_display_name": "str",  # Optional. User is
+                                  a derived, team-scoped view across sessions and OAuth connections.
+                                "revoked_at": "2020-02-20 00:00:00",  # Optional.
+                                  User is a derived, team-scoped view across sessions and OAuth
+                                  connections.
+                                "scopes": [
+                                    "str"  # Optional. User is a derived,
+                                      team-scoped view across sessions and OAuth connections.
+                                ],
+                                "status": "str",  # Optional. User is a derived,
+                                  team-scoped view across sessions and OAuth connections.
+                                "updated_at": "2020-02-20 00:00:00",  # Optional.
+                                  User is a derived, team-scoped view across sessions and OAuth
+                                  connections.
+                                "user_id": "str"  # Optional. User is a derived,
+                                  team-scoped view across sessions and OAuth connections.
+                            }
+                        ],
+                        "sessions": [
+                            {
+                                "created_at": "2020-02-20 00:00:00",  # Optional.
+                                  User is a derived, team-scoped view across sessions and OAuth
+                                  connections.
+                                "name": "str",  # Optional. User is a derived,
+                                  team-scoped view across sessions and OAuth connections.
+                                "session_urn": "str",  # Optional. User is a derived,
+                                  team-scoped view across sessions and OAuth connections.
+                                "updated_at": "2020-02-20 00:00:00"  # Optional. User
+                                  is a derived, team-scoped view across sessions and OAuth connections.
+                            }
+                        ],
+                        "user_id": "str"  # Optional. User is a derived, team-scoped view
+                          across sessions and OAuth connections.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_users_get_request(
+            user_id=user_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+
+class SessionsOperations:
+    """
+    .. warning::
+        **DO NOT** instantiate this class directly.
+
+        Instead, you should access the following operations through
+        :class:`~pydo.aio.GeneratedClient`'s
+        :attr:`sessions` attribute.
+    """
+
+    def __init__(self, *args, **kwargs) -> None:
+        input_args = list(args)
+        self._client = input_args.pop(0) if input_args else kwargs.pop("client")
+        self._config = input_args.pop(0) if input_args else kwargs.pop("config")
+        self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
+        self._deserialize = (
+            input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        )
+
+    @distributed_trace_async
+    async def list(
+        self,
+        *,
+        end_user_id: Optional[str] = None,
+        page: int = 1,
+        per_page: int = 20,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Action Gateway Sessions.
+
+        Lists Action Gateway sessions owned by the authenticated team.
+
+        :keyword end_user_id: Filter sessions by actor identifier. Default value is None.
+        :paramtype end_user_id: str
+        :keyword page: Which 'page' of paginated results to return. Default value is 1.
+        :paramtype page: int
+        :keyword per_page: Number of items returned per page. Default value is 20.
+        :paramtype per_page: int
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "pagination": {
+                        "page": 0,  # Required.
+                        "per_page": 0,  # Required.
+                        "total": 0  # Required.
+                    },
+                    "sessions": [
+                        {
+                            "actorId": "str",  # Optional. actor_id is empty when the
+                              session is not bound to an actor.
+                            "config": {},  # Optional. Preserved as an opaque object.
+                              Gateway currently interprets config.preloadTools to add selected direct
+                              tools to the session MCP.
+                            "createdAt": "2020-02-20 00:00:00",  # Optional.
+                            "name": "str",  # Optional. name is the required
+                              human-readable session name.
+                            "policy": {
+                                "defaultAction": "ask",  # Optional. Default value is
+                                  "ask". SessionPolicyAction is the disposition applied to a tool call.
+                                  Lowercase values are canonical so ProtoJSON matches the public REST
+                                  vocabulary; the prefixed aliases preserve compatibility for existing
+                                  protobuf clients. Known values are: "allow", "ask", and "deny".
+                                "rules": [
+                                    {
+                                        "action": "ask",  # Optional. Default
+                                          value is "ask". SessionPolicyAction is the disposition
+                                          applied to a tool call. Lowercase values are canonical so
+                                          ProtoJSON matches the public REST vocabulary; the prefixed
+                                          aliases preserve compatibility for existing protobuf clients.
+                                          Known values are: "allow", "ask", and "deny".
+                                        "match": {
+                                            "str": "str"  # Optional.
+                                              Dictionary of :code:`<string>`.
+                                        },
+                                        "tool": "str"  # Optional.
+                                          SessionPolicySpec is the Gateway-relevant subset of a
+                                          session's permission policy. Filesystem and network policy
+                                          remain enforced by the sandbox.
+                                    }
+                                ]
+                            },
+                            "sessionUrn": "str",  # Optional.
+                            "tools": {
+                                "references": [
+                                    {
+                                        "kind": "str",  # Optional. Known
+                                          values are: "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                        "name": "str",  # Optional. Omitted
+                                          when the request omitted tools (all tools). A present
+                                          selection with no references represents tools: [].
+                                        "version": "str"  # Optional. Omitted
+                                          when the request omitted tools (all tools). A present
+                                          selection with no references represents tools: [].
+                                    }
+                                ]
+                            },
+                            "updatedAt": "2020-02-20 00:00:00"  # Optional.
+                        }
+                    ]
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_sessions_list_request(
+            end_user_id=end_user_id,
+            page=page,
+            per_page=per_page,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        response_headers["ratelimit-limit"] = self._deserialize(
+            "int", response.headers.get("ratelimit-limit")
+        )
+        response_headers["ratelimit-remaining"] = self._deserialize(
+            "int", response.headers.get("ratelimit-remaining")
+        )
+        response_headers["ratelimit-reset"] = self._deserialize(
+            "int", response.headers.get("ratelimit-reset")
+        )
+
+        if response.content:
+            deserialized = response.json()
+        else:
+            deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def create(
+        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create an Action Gateway Session.
+
+        Creates a session with a tool selection, invocation policy, and optional direct-tool preload
+        configuration.
+
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "actor_id": "str",  # Required.
+                    "name": "str",  # Required.
+                    "config": {
+                        "preloadTools": [
+                            "str"  # Optional. Concrete tools or pinned toolbelts to
+                              expose directly beside the session meta-tools.
+                        ]
+                    },
+                    "policy": {
+                        "defaultAction": "ask",  # Optional. Default value is "ask".
+                          SessionPolicyAction is the disposition applied to a tool call. Lowercase
+                          values are canonical so ProtoJSON matches the public REST vocabulary; the
+                          prefixed aliases preserve compatibility for existing protobuf clients. Known
+                          values are: "allow", "ask", and "deny".
+                        "rules": [
+                            {
+                                "action": "ask",  # Optional. Default value is "ask".
+                                  SessionPolicyAction is the disposition applied to a tool call.
+                                  Lowercase values are canonical so ProtoJSON matches the public REST
+                                  vocabulary; the prefixed aliases preserve compatibility for existing
+                                  protobuf clients. Known values are: "allow", "ask", and "deny".
+                                "match": {
+                                    "str": "str"  # Optional. Dictionary of
+                                      :code:`<string>`.
+                                },
+                                "tool": "str"  # Optional. Invocation policy. Omit to
+                                  use a default action of ask.
+                            }
+                        ]
+                    },
+                    "tools": [
+                        "str"  # Optional. Omitted enables every tool. An explicit empty
+                          array enables no tools. Direct tools may be :code:`<tool>` or
+                          <tool>@:code:`<version>`; toolbelt references must be version-pinned as
+                          toolbelt::code:`<belt-name>`@:code:`<version>`.
+                    ]
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "mcpUrl": "str",  # Public session-pinned MCP URL. Required.
+                    "session": {
+                        "actorId": "str",  # Optional. actor_id is empty when the session is
+                          not bound to an actor.
+                        "config": {},  # Optional. Preserved as an opaque object. Gateway
+                          currently interprets config.preloadTools to add selected direct tools to the
+                          session MCP.
+                        "createdAt": "2020-02-20 00:00:00",  # Optional. A session and the
+                          tool-permission policy bound to it. Required.
+                        "name": "str",  # Optional. name is the required human-readable
+                          session name.
+                        "policy": {
+                            "defaultAction": "ask",  # Optional. Default value is "ask".
+                              SessionPolicyAction is the disposition applied to a tool call. Lowercase
+                              values are canonical so ProtoJSON matches the public REST vocabulary; the
+                              prefixed aliases preserve compatibility for existing protobuf clients.
+                              Known values are: "allow", "ask", and "deny".
+                            "rules": [
+                                {
+                                    "action": "ask",  # Optional. Default value
+                                      is "ask". SessionPolicyAction is the disposition applied to a
+                                      tool call. Lowercase values are canonical so ProtoJSON matches
+                                      the public REST vocabulary; the prefixed aliases preserve
+                                      compatibility for existing protobuf clients. Known values are:
+                                      "allow", "ask", and "deny".
+                                    "match": {
+                                        "str": "str"  # Optional. Dictionary
+                                          of :code:`<string>`.
+                                    },
+                                    "tool": "str"  # Optional. SessionPolicySpec
+                                      is the Gateway-relevant subset of a session's permission policy.
+                                      Filesystem and network policy remain enforced by the sandbox.
+                                }
+                            ]
+                        },
+                        "sessionUrn": "str",  # Optional. A session and the tool-permission
+                          policy bound to it. Required.
+                        "tools": {
+                            "references": [
+                                {
+                                    "kind": "str",  # Optional. Known values are:
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                    "name": "str",  # Optional. Omitted when the
+                                      request omitted tools (all tools). A present selection with no
+                                      references represents tools: [].
+                                    "version": "str"  # Optional. Omitted when
+                                      the request omitted tools (all tools). A present selection with
+                                      no references represents tools: [].
+                                }
+                            ]
+                        },
+                        "updatedAt": "2020-02-20 00:00:00"  # Optional. A session and the
+                          tool-permission policy bound to it. Required.
+                    },
+                    "tools": [
+                        "str"  # Canonical, version-pinned selected tool references.
+                          Required.
+                    ]
+                }
+                # response body for status code(s): 400
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def create(
+        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create an Action Gateway Session.
+
+        Creates a session with a tool selection, invocation policy, and optional direct-tool preload
+        configuration.
+
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "mcpUrl": "str",  # Public session-pinned MCP URL. Required.
+                    "session": {
+                        "actorId": "str",  # Optional. actor_id is empty when the session is
+                          not bound to an actor.
+                        "config": {},  # Optional. Preserved as an opaque object. Gateway
+                          currently interprets config.preloadTools to add selected direct tools to the
+                          session MCP.
+                        "createdAt": "2020-02-20 00:00:00",  # Optional. A session and the
+                          tool-permission policy bound to it. Required.
+                        "name": "str",  # Optional. name is the required human-readable
+                          session name.
+                        "policy": {
+                            "defaultAction": "ask",  # Optional. Default value is "ask".
+                              SessionPolicyAction is the disposition applied to a tool call. Lowercase
+                              values are canonical so ProtoJSON matches the public REST vocabulary; the
+                              prefixed aliases preserve compatibility for existing protobuf clients.
+                              Known values are: "allow", "ask", and "deny".
+                            "rules": [
+                                {
+                                    "action": "ask",  # Optional. Default value
+                                      is "ask". SessionPolicyAction is the disposition applied to a
+                                      tool call. Lowercase values are canonical so ProtoJSON matches
+                                      the public REST vocabulary; the prefixed aliases preserve
+                                      compatibility for existing protobuf clients. Known values are:
+                                      "allow", "ask", and "deny".
+                                    "match": {
+                                        "str": "str"  # Optional. Dictionary
+                                          of :code:`<string>`.
+                                    },
+                                    "tool": "str"  # Optional. SessionPolicySpec
+                                      is the Gateway-relevant subset of a session's permission policy.
+                                      Filesystem and network policy remain enforced by the sandbox.
+                                }
+                            ]
+                        },
+                        "sessionUrn": "str",  # Optional. A session and the tool-permission
+                          policy bound to it. Required.
+                        "tools": {
+                            "references": [
+                                {
+                                    "kind": "str",  # Optional. Known values are:
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                    "name": "str",  # Optional. Omitted when the
+                                      request omitted tools (all tools). A present selection with no
+                                      references represents tools: [].
+                                    "version": "str"  # Optional. Omitted when
+                                      the request omitted tools (all tools). A present selection with
+                                      no references represents tools: [].
+                                }
+                            ]
+                        },
+                        "updatedAt": "2020-02-20 00:00:00"  # Optional. A session and the
+                          tool-permission policy bound to it. Required.
+                    },
+                    "tools": [
+                        "str"  # Canonical, version-pinned selected tool references.
+                          Required.
+                    ]
+                }
+                # response body for status code(s): 400
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def create(self, body: Union[JSON, IO[bytes]], **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Create an Action Gateway Session.
+
+        Creates a session with a tool selection, invocation policy, and optional direct-tool preload
+        configuration.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "actor_id": "str",  # Required.
+                    "name": "str",  # Required.
+                    "config": {
+                        "preloadTools": [
+                            "str"  # Optional. Concrete tools or pinned toolbelts to
+                              expose directly beside the session meta-tools.
+                        ]
+                    },
+                    "policy": {
+                        "defaultAction": "ask",  # Optional. Default value is "ask".
+                          SessionPolicyAction is the disposition applied to a tool call. Lowercase
+                          values are canonical so ProtoJSON matches the public REST vocabulary; the
+                          prefixed aliases preserve compatibility for existing protobuf clients. Known
+                          values are: "allow", "ask", and "deny".
+                        "rules": [
+                            {
+                                "action": "ask",  # Optional. Default value is "ask".
+                                  SessionPolicyAction is the disposition applied to a tool call.
+                                  Lowercase values are canonical so ProtoJSON matches the public REST
+                                  vocabulary; the prefixed aliases preserve compatibility for existing
+                                  protobuf clients. Known values are: "allow", "ask", and "deny".
+                                "match": {
+                                    "str": "str"  # Optional. Dictionary of
+                                      :code:`<string>`.
+                                },
+                                "tool": "str"  # Optional. Invocation policy. Omit to
+                                  use a default action of ask.
+                            }
+                        ]
+                    },
+                    "tools": [
+                        "str"  # Optional. Omitted enables every tool. An explicit empty
+                          array enables no tools. Direct tools may be :code:`<tool>` or
+                          <tool>@:code:`<version>`; toolbelt references must be version-pinned as
+                          toolbelt::code:`<belt-name>`@:code:`<version>`.
+                    ]
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "mcpUrl": "str",  # Public session-pinned MCP URL. Required.
+                    "session": {
+                        "actorId": "str",  # Optional. actor_id is empty when the session is
+                          not bound to an actor.
+                        "config": {},  # Optional. Preserved as an opaque object. Gateway
+                          currently interprets config.preloadTools to add selected direct tools to the
+                          session MCP.
+                        "createdAt": "2020-02-20 00:00:00",  # Optional. A session and the
+                          tool-permission policy bound to it. Required.
+                        "name": "str",  # Optional. name is the required human-readable
+                          session name.
+                        "policy": {
+                            "defaultAction": "ask",  # Optional. Default value is "ask".
+                              SessionPolicyAction is the disposition applied to a tool call. Lowercase
+                              values are canonical so ProtoJSON matches the public REST vocabulary; the
+                              prefixed aliases preserve compatibility for existing protobuf clients.
+                              Known values are: "allow", "ask", and "deny".
+                            "rules": [
+                                {
+                                    "action": "ask",  # Optional. Default value
+                                      is "ask". SessionPolicyAction is the disposition applied to a
+                                      tool call. Lowercase values are canonical so ProtoJSON matches
+                                      the public REST vocabulary; the prefixed aliases preserve
+                                      compatibility for existing protobuf clients. Known values are:
+                                      "allow", "ask", and "deny".
+                                    "match": {
+                                        "str": "str"  # Optional. Dictionary
+                                          of :code:`<string>`.
+                                    },
+                                    "tool": "str"  # Optional. SessionPolicySpec
+                                      is the Gateway-relevant subset of a session's permission policy.
+                                      Filesystem and network policy remain enforced by the sandbox.
+                                }
+                            ]
+                        },
+                        "sessionUrn": "str",  # Optional. A session and the tool-permission
+                          policy bound to it. Required.
+                        "tools": {
+                            "references": [
+                                {
+                                    "kind": "str",  # Optional. Known values are:
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                    "name": "str",  # Optional. Omitted when the
+                                      request omitted tools (all tools). A present selection with no
+                                      references represents tools: [].
+                                    "version": "str"  # Optional. Omitted when
+                                      the request omitted tools (all tools). A present selection with
+                                      no references represents tools: [].
+                                }
+                            ]
+                        },
+                        "updatedAt": "2020-02-20 00:00:00"  # Optional. A session and the
+                          tool-permission policy bound to it. Required.
+                    },
+                    "tools": [
+                        "str"  # Canonical, version-pinned selected tool references.
+                          Required.
+                    ]
+                }
+                # response body for status code(s): 400
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_sessions_create_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def delete(self, session_urn: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Delete an Action Gateway Session.
+
+        Deletes an Action Gateway session owned by the authenticated team.
+
+        :param session_urn: The URL-encoded managed agents session URN. Required.
+        :type session_urn: str
+        :return: JSON or JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_sessions_delete_request(
+            session_urn=session_urn,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
             response_headers["ratelimit-limit"] = self._deserialize(
                 "int", response.headers.get("ratelimit-limit")
             )
@@ -14710,7 +18075,7 @@ class AppsOperations:  # pylint: disable=too-many-public-methods
                     },
                     "project_id": "str"  # Optional. The ID of the project the app should be
                       assigned to. If omitted, it will be assigned to your default project.
-                      :code:`<br>`:code:`<br>`Requires ``project:update`` scope.
+                      :code:`<br>`:code:`<br>`Requires ``project:assign_resource`` scope.
                 }
 
                 # response body for status code(s): 200
@@ -31433,7 +34798,7 @@ class AppsOperations:  # pylint: disable=too-many-public-methods
                     },
                     "project_id": "str"  # Optional. The ID of the project the app should be
                       assigned to. If omitted, it will be assigned to your default project.
-                      :code:`<br>`:code:`<br>`Requires ``project:update`` scope.
+                      :code:`<br>`:code:`<br>`Requires ``project:assign_resource`` scope.
                 }
 
                 # response body for status code(s): 200
@@ -112714,8 +116079,10 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                             }
                                         ],
                                         "pg_allow_replication": bool  #
-                                          Optional. For Postgres clusters, set to ``true`` for a user
-                                          with replication rights. This option is not currently
+                                          Optional. For PostgreSQL clusters, set to ``true`` to grant
+                                          the user replication privileges. When omitted on create or
+                                          update, the value defaults to ``false`` and replication
+                                          privileges are not granted. This option is not currently
                                           supported for other database engines.
                                     }
                                 }
@@ -112991,7 +116358,7 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                     "project_id": "str",  # Optional. The ID of the project that the database
                       cluster is assigned to. If excluded when creating a new database cluster, it will
                       be assigned to your default project.:code:`<br>`:code:`<br>`Requires
-                      ``project:update`` scope.
+                      ``project:assign_resource`` scope.
                     "rules": [
                         {
                             "type": "str",  # The type of resource that the firewall rule
@@ -113168,9 +116535,10 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                     }
                                 ],
                                 "pg_allow_replication": bool  # Optional. For
-                                  Postgres clusters, set to ``true`` for a user with replication
-                                  rights. This option is not currently supported for other database
-                                  engines.
+                                  PostgreSQL clusters, set to ``true`` to grant the user replication
+                                  privileges. When omitted on create or update, the value defaults to
+                                  ``false`` and replication privileges are not granted. This option is
+                                  not currently supported for other database engines.
                             }
                         }
                     ],
@@ -113472,9 +116840,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                         }
                                     ],
                                     "pg_allow_replication": bool  # Optional. For
-                                      Postgres clusters, set to ``true`` for a user with replication
-                                      rights. This option is not currently supported for other database
-                                      engines.
+                                      PostgreSQL clusters, set to ``true`` to grant the user
+                                      replication privileges. When omitted on create or update, the
+                                      value defaults to ``false`` and replication privileges are not
+                                      granted. This option is not currently supported for other
+                                      database engines.
                                 }
                             }
                         ],
@@ -113845,9 +117215,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                         }
                                     ],
                                     "pg_allow_replication": bool  # Optional. For
-                                      Postgres clusters, set to ``true`` for a user with replication
-                                      rights. This option is not currently supported for other database
-                                      engines.
+                                      PostgreSQL clusters, set to ``true`` to grant the user
+                                      replication privileges. When omitted on create or update, the
+                                      value defaults to ``false`` and replication privileges are not
+                                      granted. This option is not currently supported for other
+                                      database engines.
                                 }
                             }
                         ],
@@ -114039,7 +117411,7 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                     "project_id": "str",  # Optional. The ID of the project that the database
                       cluster is assigned to. If excluded when creating a new database cluster, it will
                       be assigned to your default project.:code:`<br>`:code:`<br>`Requires
-                      ``project:update`` scope.
+                      ``project:assign_resource`` scope.
                     "rules": [
                         {
                             "type": "str",  # The type of resource that the firewall rule
@@ -114216,9 +117588,10 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                     }
                                 ],
                                 "pg_allow_replication": bool  # Optional. For
-                                  Postgres clusters, set to ``true`` for a user with replication
-                                  rights. This option is not currently supported for other database
-                                  engines.
+                                  PostgreSQL clusters, set to ``true`` to grant the user replication
+                                  privileges. When omitted on create or update, the value defaults to
+                                  ``false`` and replication privileges are not granted. This option is
+                                  not currently supported for other database engines.
                             }
                         }
                     ],
@@ -114520,9 +117893,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                         }
                                     ],
                                     "pg_allow_replication": bool  # Optional. For
-                                      Postgres clusters, set to ``true`` for a user with replication
-                                      rights. This option is not currently supported for other database
-                                      engines.
+                                      PostgreSQL clusters, set to ``true`` to grant the user
+                                      replication privileges. When omitted on create or update, the
+                                      value defaults to ``false`` and replication privileges are not
+                                      granted. This option is not currently supported for other
+                                      database engines.
                                 }
                             }
                         ],
@@ -114956,9 +118331,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                         }
                                     ],
                                     "pg_allow_replication": bool  # Optional. For
-                                      Postgres clusters, set to ``true`` for a user with replication
-                                      rights. This option is not currently supported for other database
-                                      engines.
+                                      PostgreSQL clusters, set to ``true`` to grant the user
+                                      replication privileges. When omitted on create or update, the
+                                      value defaults to ``false`` and replication privileges are not
+                                      granted. This option is not currently supported for other
+                                      database engines.
                                 }
                             }
                         ],
@@ -116770,10 +120147,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         resources should be able to open connections to the database. You may limit connections to
         specific Droplets, Kubernetes clusters, or IP addresses. When a tag is provided, any Droplet or
         Kubernetes node with that tag applied to it will have access. The firewall is limited to 100
-        rules (or trusted sources). When possible, we recommend `placing your databases into a VPC
-        network <https://docs.digitalocean.com/products/networking/vpc/>`_ to limit access to them
-        instead of using a firewall.
-        A successful.
+        rules (or trusted sources). You cannot add IPv6 addresses as trusted sources. For additional
+        limits, see your database engine's limits page. When possible, we recommend `placing your
+        databases into a VPC network <https://docs.digitalocean.com/products/networking/vpc/>`_ to
+        limit access to them instead of using a firewall.
+        A successful request returns a 204 status code with no content.
 
         :param database_cluster_uuid: A unique identifier for a database cluster. Required.
         :type database_cluster_uuid: str
@@ -116842,10 +120220,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         resources should be able to open connections to the database. You may limit connections to
         specific Droplets, Kubernetes clusters, or IP addresses. When a tag is provided, any Droplet or
         Kubernetes node with that tag applied to it will have access. The firewall is limited to 100
-        rules (or trusted sources). When possible, we recommend `placing your databases into a VPC
-        network <https://docs.digitalocean.com/products/networking/vpc/>`_ to limit access to them
-        instead of using a firewall.
-        A successful.
+        rules (or trusted sources). You cannot add IPv6 addresses as trusted sources. For additional
+        limits, see your database engine's limits page. When possible, we recommend `placing your
+        databases into a VPC network <https://docs.digitalocean.com/products/networking/vpc/>`_ to
+        limit access to them instead of using a firewall.
+        A successful request returns a 204 status code with no content.
 
         :param database_cluster_uuid: A unique identifier for a database cluster. Required.
         :type database_cluster_uuid: str
@@ -116886,10 +120265,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         resources should be able to open connections to the database. You may limit connections to
         specific Droplets, Kubernetes clusters, or IP addresses. When a tag is provided, any Droplet or
         Kubernetes node with that tag applied to it will have access. The firewall is limited to 100
-        rules (or trusted sources). When possible, we recommend `placing your databases into a VPC
-        network <https://docs.digitalocean.com/products/networking/vpc/>`_ to limit access to them
-        instead of using a firewall.
-        A successful.
+        rules (or trusted sources). You cannot add IPv6 addresses as trusted sources. For additional
+        limits, see your database engine's limits page. When possible, we recommend `placing your
+        databases into a VPC network <https://docs.digitalocean.com/products/networking/vpc/>`_ to
+        limit access to them instead of using a firewall.
+        A successful request returns a 204 status code with no content.
 
         :param database_cluster_uuid: A unique identifier for a database cluster. Required.
         :type database_cluster_uuid: str
@@ -119302,6 +122682,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
 
         For MySQL clusters, additional options will be contained in the mysql_settings object.
 
+        For PostgreSQL clusters, additional options will be contained in the ``settings``
+        object (for example, ``pg_allow_replication``\\ ).
+
+        For Kafka clusters, additional options will be contained in the ``settings`` object.
+
         For MongoDB clusters, additional information will be contained in the mongo_user_settings
         object.
 
@@ -119392,9 +122777,10 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                     }
                                 ],
                                 "pg_allow_replication": bool  # Optional. For
-                                  Postgres clusters, set to ``true`` for a user with replication
-                                  rights. This option is not currently supported for other database
-                                  engines.
+                                  PostgreSQL clusters, set to ``true`` to grant the user replication
+                                  privileges. When omitted on create or update, the value defaults to
+                                  ``false`` and replication privileges are not granted. This option is
+                                  not currently supported for other database engines.
                             }
                         }
                     ]
@@ -119509,10 +122895,14 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         When adding a user to a MySQL cluster, additional options can be configured in the
         ``mysql_settings`` object.
 
+        When adding a user to a PostgreSQL cluster, additional options can be configured in
+        the ``settings`` object (for example, ``pg_allow_replication``\\ ). When
+        ``pg_allow_replication`` is omitted, it defaults to ``false``.
+
         When adding a user to a Kafka cluster, additional options can be configured in
         the ``settings`` object.
 
-         When adding a user to a MongoDB cluster, additional options can be configured in
+        When adding a user to a MongoDB cluster, additional options can be configured in
         the ``settings.mongo_user_settings`` object.
 
         The response will be a JSON object with a key called ``user``. The value of this will be an
@@ -119604,9 +122994,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                   values are: "deny", "admin", "read", "readwrite", and "write".
                             }
                         ],
-                        "pg_allow_replication": bool  # Optional. For Postgres clusters, set
-                          to ``true`` for a user with replication rights. This option is not currently
-                          supported for other database engines.
+                        "pg_allow_replication": bool  # Optional. For PostgreSQL clusters,
+                          set to ``true`` to grant the user replication privileges. When omitted on
+                          create or update, the value defaults to ``false`` and replication privileges
+                          are not granted. This option is not currently supported for other database
+                          engines.
                     }
                 }
 
@@ -119681,9 +123073,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -119720,10 +123114,14 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         When adding a user to a MySQL cluster, additional options can be configured in the
         ``mysql_settings`` object.
 
+        When adding a user to a PostgreSQL cluster, additional options can be configured in
+        the ``settings`` object (for example, ``pg_allow_replication``\\ ). When
+        ``pg_allow_replication`` is omitted, it defaults to ``false``.
+
         When adding a user to a Kafka cluster, additional options can be configured in
         the ``settings`` object.
 
-         When adding a user to a MongoDB cluster, additional options can be configured in
+        When adding a user to a MongoDB cluster, additional options can be configured in
         the ``settings.mongo_user_settings`` object.
 
         The response will be a JSON object with a key called ``user``. The value of this will be an
@@ -119815,9 +123213,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -119849,10 +123249,14 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         When adding a user to a MySQL cluster, additional options can be configured in the
         ``mysql_settings`` object.
 
+        When adding a user to a PostgreSQL cluster, additional options can be configured in
+        the ``settings`` object (for example, ``pg_allow_replication``\\ ). When
+        ``pg_allow_replication`` is omitted, it defaults to ``false``.
+
         When adding a user to a Kafka cluster, additional options can be configured in
         the ``settings`` object.
 
-         When adding a user to a MongoDB cluster, additional options can be configured in
+        When adding a user to a MongoDB cluster, additional options can be configured in
         the ``settings.mongo_user_settings`` object.
 
         The response will be a JSON object with a key called ``user``. The value of this will be an
@@ -119941,9 +123345,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                   values are: "deny", "admin", "read", "readwrite", and "write".
                             }
                         ],
-                        "pg_allow_replication": bool  # Optional. For Postgres clusters, set
-                          to ``true`` for a user with replication rights. This option is not currently
-                          supported for other database engines.
+                        "pg_allow_replication": bool  # Optional. For PostgreSQL clusters,
+                          set to ``true`` to grant the user replication privileges. When omitted on
+                          create or update, the value defaults to ``false`` and replication privileges
+                          are not granted. This option is not currently supported for other database
+                          engines.
                     }
                 }
 
@@ -120018,9 +123424,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -120147,6 +123555,9 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         For MySQL clusters, additional options will be contained in the ``mysql_settings``
         object.
 
+        For PostgreSQL clusters, additional options will be contained in the ``settings``
+        object (for example, ``pg_allow_replication``\\ ).
+
         For Kafka clusters, additional options will be contained in the ``settings`` object.
 
         For MongoDB clusters, additional information will be contained in the mongo_user_settings
@@ -120234,9 +123645,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -120465,8 +123878,14 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         the name of a user,
         you must recreate a new user.
 
+        For PostgreSQL clusters, you can update ``settings.pg_allow_replication`` to enable or
+        disable replication privileges for the user. When omitted, the value defaults to ``false``.
+
+        For Kafka and OpenSearch clusters, additional options can be configured in the
+        ``settings`` object (for example, topic or index ACLs).
+
         The response will be a JSON object with a key called ``user``. The value of this will be an
-        object that contains the name of the update database user, along with the ``settings`` object
+        object that contains the name of the updated database user, along with the ``settings`` object
         that
         has been updated.
 
@@ -120535,9 +123954,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                   values are: "deny", "admin", "read", "readwrite", and "write".
                             }
                         ],
-                        "pg_allow_replication": bool  # Optional. For Postgres clusters, set
-                          to ``true`` for a user with replication rights. This option is not currently
-                          supported for other database engines.
+                        "pg_allow_replication": bool  # Optional. For PostgreSQL clusters,
+                          set to ``true`` to grant the user replication privileges. When omitted on
+                          create or update, the value defaults to ``false`` and replication privileges
+                          are not granted. This option is not currently supported for other database
+                          engines.
                     }
                 }
 
@@ -120612,9 +124033,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -120652,8 +124075,14 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         the name of a user,
         you must recreate a new user.
 
+        For PostgreSQL clusters, you can update ``settings.pg_allow_replication`` to enable or
+        disable replication privileges for the user. When omitted, the value defaults to ``false``.
+
+        For Kafka and OpenSearch clusters, additional options can be configured in the
+        ``settings`` object (for example, topic or index ACLs).
+
         The response will be a JSON object with a key called ``user``. The value of this will be an
-        object that contains the name of the update database user, along with the ``settings`` object
+        object that contains the name of the updated database user, along with the ``settings`` object
         that
         has been updated.
 
@@ -120744,9 +124173,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -120782,8 +124213,14 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         the name of a user,
         you must recreate a new user.
 
+        For PostgreSQL clusters, you can update ``settings.pg_allow_replication`` to enable or
+        disable replication privileges for the user. When omitted, the value defaults to ``false``.
+
+        For Kafka and OpenSearch clusters, additional options can be configured in the
+        ``settings`` object (for example, topic or index ACLs).
+
         The response will be a JSON object with a key called ``user``. The value of this will be an
-        object that contains the name of the update database user, along with the ``settings`` object
+        object that contains the name of the updated database user, along with the ``settings`` object
         that
         has been updated.
 
@@ -120849,9 +124286,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                   values are: "deny", "admin", "read", "readwrite", and "write".
                             }
                         ],
-                        "pg_allow_replication": bool  # Optional. For Postgres clusters, set
-                          to ``true`` for a user with replication rights. This option is not currently
-                          supported for other database engines.
+                        "pg_allow_replication": bool  # Optional. For PostgreSQL clusters,
+                          set to ``true`` to grant the user replication privileges. When omitted on
+                          create or update, the value defaults to ``false`` and replication privileges
+                          are not granted. This option is not currently supported for other database
+                          engines.
                     }
                 }
 
@@ -120926,9 +124365,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -121159,9 +124600,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -121288,9 +124731,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -121424,9 +124869,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -134988,9 +138435,10 @@ class DropletsOperations:
                                               The unit of measure for the disk size.
                                         },
                                         "type": "str"  # Optional. The type
-                                          of disk. All Droplets contain a ``local`` disk. Additionally,
-                                          GPU Droplets can also have a ``scratch`` disk for
-                                          non-persistent data. Known values are: "local" and "scratch".
+                                          of disk. All Droplets contain a ``local`` or ``remote`` disk.
+                                          Additionally, GPU Droplets can also have a ``scratch`` disk
+                                          for non-persistent data. Known values are: "local", "remote",
+                                          and "scratch".
                                     }
                                 ],
                                 "gpu_info": {
@@ -135035,9 +138483,10 @@ class DropletsOperations:
                                           of measure for the disk size.
                                     },
                                     "type": "str"  # Optional. The type of disk.
-                                      All Droplets contain a ``local`` disk. Additionally, GPU Droplets
-                                      can also have a ``scratch`` disk for non-persistent data. Known
-                                      values are: "local" and "scratch".
+                                      All Droplets contain a ``local`` or ``remote`` disk.
+                                      Additionally, GPU Droplets can also have a ``scratch`` disk for
+                                      non-persistent data. Known values are: "local", "remote", and
+                                      "scratch".
                                 }
                             ],
                             "gpu_info": {
@@ -135661,9 +139110,10 @@ class DropletsOperations:
                                           of measure for the disk size.
                                     },
                                     "type": "str"  # Optional. The type of disk.
-                                      All Droplets contain a ``local`` disk. Additionally, GPU Droplets
-                                      can also have a ``scratch`` disk for non-persistent data. Known
-                                      values are: "local" and "scratch".
+                                      All Droplets contain a ``local`` or ``remote`` disk.
+                                      Additionally, GPU Droplets can also have a ``scratch`` disk for
+                                      non-persistent data. Known values are: "local", "remote", and
+                                      "scratch".
                                 }
                             ],
                             "gpu_info": {
@@ -135706,9 +139156,9 @@ class DropletsOperations:
                                       measure for the disk size.
                                 },
                                 "type": "str"  # Optional. The type of disk. All
-                                  Droplets contain a ``local`` disk. Additionally, GPU Droplets can
-                                  also have a ``scratch`` disk for non-persistent data. Known values
-                                  are: "local" and "scratch".
+                                  Droplets contain a ``local`` or ``remote`` disk. Additionally, GPU
+                                  Droplets can also have a ``scratch`` disk for non-persistent data.
+                                  Known values are: "local", "remote", and "scratch".
                             }
                         ],
                         "gpu_info": {
@@ -137234,9 +140684,10 @@ class DropletsOperations:
                                               The unit of measure for the disk size.
                                         },
                                         "type": "str"  # Optional. The type
-                                          of disk. All Droplets contain a ``local`` disk. Additionally,
-                                          GPU Droplets can also have a ``scratch`` disk for
-                                          non-persistent data. Known values are: "local" and "scratch".
+                                          of disk. All Droplets contain a ``local`` or ``remote`` disk.
+                                          Additionally, GPU Droplets can also have a ``scratch`` disk
+                                          for non-persistent data. Known values are: "local", "remote",
+                                          and "scratch".
                                     }
                                 ],
                                 "gpu_info": {
@@ -137281,9 +140732,10 @@ class DropletsOperations:
                                           of measure for the disk size.
                                     },
                                     "type": "str"  # Optional. The type of disk.
-                                      All Droplets contain a ``local`` disk. Additionally, GPU Droplets
-                                      can also have a ``scratch`` disk for non-persistent data. Known
-                                      values are: "local" and "scratch".
+                                      All Droplets contain a ``local`` or ``remote`` disk.
+                                      Additionally, GPU Droplets can also have a ``scratch`` disk for
+                                      non-persistent data. Known values are: "local", "remote", and
+                                      "scratch".
                                 }
                             ],
                             "gpu_info": {
@@ -151452,6 +154904,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                                 "enabled": bool  # Optional. Indicates whether the
                                   Nvidia GPU Device Plugin is enabled.
                             },
+                            "p2p_oci_registry_plugin": {
+                                "enabled": bool  # Optional. Indicates whether the
+                                  Peer-to-peer OCI registry component is enabled.
+                            },
                             "rdma_shared_dev_plugin": {
                                 "enabled": bool  # Optional. Indicates whether the
                                   RDMA shared device plugin is enabled.
@@ -151764,6 +155220,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "enabled": bool  # Optional. Indicates whether the Nvidia GPU Device
                           Plugin is enabled.
                     },
+                    "p2p_oci_registry_plugin": {
+                        "enabled": bool  # Optional. Indicates whether the Peer-to-peer OCI
+                          registry component is enabled.
+                    },
                     "rdma_shared_dev_plugin": {
                         "enabled": bool  # Optional. Indicates whether the RDMA shared device
                           plugin is enabled.
@@ -151982,6 +155442,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "nvidia_gpu_device_plugin": {
                             "enabled": bool  # Optional. Indicates whether the Nvidia GPU
                               Device Plugin is enabled.
+                        },
+                        "p2p_oci_registry_plugin": {
+                            "enabled": bool  # Optional. Indicates whether the
+                              Peer-to-peer OCI registry component is enabled.
                         },
                         "rdma_shared_dev_plugin": {
                             "enabled": bool  # Optional. Indicates whether the RDMA
@@ -152235,6 +155699,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                             "enabled": bool  # Optional. Indicates whether the Nvidia GPU
                               Device Plugin is enabled.
                         },
+                        "p2p_oci_registry_plugin": {
+                            "enabled": bool  # Optional. Indicates whether the
+                              Peer-to-peer OCI registry component is enabled.
+                        },
                         "rdma_shared_dev_plugin": {
                             "enabled": bool  # Optional. Indicates whether the RDMA
                               shared device plugin is enabled.
@@ -152473,6 +155941,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "enabled": bool  # Optional. Indicates whether the Nvidia GPU Device
                           Plugin is enabled.
                     },
+                    "p2p_oci_registry_plugin": {
+                        "enabled": bool  # Optional. Indicates whether the Peer-to-peer OCI
+                          registry component is enabled.
+                    },
                     "rdma_shared_dev_plugin": {
                         "enabled": bool  # Optional. Indicates whether the RDMA shared device
                           plugin is enabled.
@@ -152691,6 +156163,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "nvidia_gpu_device_plugin": {
                             "enabled": bool  # Optional. Indicates whether the Nvidia GPU
                               Device Plugin is enabled.
+                        },
+                        "p2p_oci_registry_plugin": {
+                            "enabled": bool  # Optional. Indicates whether the
+                              Peer-to-peer OCI registry component is enabled.
                         },
                         "rdma_shared_dev_plugin": {
                             "enabled": bool  # Optional. Indicates whether the RDMA
@@ -153005,6 +156481,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                             "enabled": bool  # Optional. Indicates whether the Nvidia GPU
                               Device Plugin is enabled.
                         },
+                        "p2p_oci_registry_plugin": {
+                            "enabled": bool  # Optional. Indicates whether the
+                              Peer-to-peer OCI registry component is enabled.
+                        },
                         "rdma_shared_dev_plugin": {
                             "enabled": bool  # Optional. Indicates whether the RDMA
                               shared device plugin is enabled.
@@ -153247,6 +156727,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "enabled": bool  # Optional. Indicates whether the Nvidia GPU Device
                           Plugin is enabled.
                     },
+                    "p2p_oci_registry_plugin": {
+                        "enabled": bool  # Optional. Indicates whether the Peer-to-peer OCI
+                          registry component is enabled.
+                    },
                     "rdma_shared_dev_plugin": {
                         "enabled": bool  # Optional. Indicates whether the RDMA shared device
                           plugin is enabled.
@@ -153442,6 +156926,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "nvidia_gpu_device_plugin": {
                             "enabled": bool  # Optional. Indicates whether the Nvidia GPU
                               Device Plugin is enabled.
+                        },
+                        "p2p_oci_registry_plugin": {
+                            "enabled": bool  # Optional. Indicates whether the
+                              Peer-to-peer OCI registry component is enabled.
                         },
                         "rdma_shared_dev_plugin": {
                             "enabled": bool  # Optional. Indicates whether the RDMA
@@ -153707,6 +157195,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                             "enabled": bool  # Optional. Indicates whether the Nvidia GPU
                               Device Plugin is enabled.
                         },
+                        "p2p_oci_registry_plugin": {
+                            "enabled": bool  # Optional. Indicates whether the
+                              Peer-to-peer OCI registry component is enabled.
+                        },
                         "rdma_shared_dev_plugin": {
                             "enabled": bool  # Optional. Indicates whether the RDMA
                               shared device plugin is enabled.
@@ -153863,6 +157355,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                     "nvidia_gpu_device_plugin": {
                         "enabled": bool  # Optional. Indicates whether the Nvidia GPU Device
                           Plugin is enabled.
+                    },
+                    "p2p_oci_registry_plugin": {
+                        "enabled": bool  # Optional. Indicates whether the Peer-to-peer OCI
+                          registry component is enabled.
                     },
                     "rdma_shared_dev_plugin": {
                         "enabled": bool  # Optional. Indicates whether the RDMA shared device
@@ -154059,6 +157555,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "nvidia_gpu_device_plugin": {
                             "enabled": bool  # Optional. Indicates whether the Nvidia GPU
                               Device Plugin is enabled.
+                        },
+                        "p2p_oci_registry_plugin": {
+                            "enabled": bool  # Optional. Indicates whether the
+                              Peer-to-peer OCI registry component is enabled.
                         },
                         "rdma_shared_dev_plugin": {
                             "enabled": bool  # Optional. Indicates whether the RDMA
@@ -179662,9 +183162,10 @@ class ProjectsOperations:
         To assign resources to a project, send a POST request to
         ``/v2/projects/$PROJECT_ID/resources``.
 
-        You must have both ``project:update`` and ``<resource>:read`` scopes to assign new resources.
-        For example, to assign a Droplet to a project, include both the ``project:update`` and
-        ``droplet:read`` scopes.
+        You must have both ``project:assign_resource`` and ``<resource>:read`` scopes to assign new
+        resources. For example, to assign a Droplet to a project, include both the
+        ``project:assign_resource`` and ``droplet:read`` scopes. The ``project:update`` scope also
+        grants ``project:assign_resource``.
 
         :param project_id: A unique identifier for a project. Required.
         :type project_id: str
@@ -179736,9 +183237,10 @@ class ProjectsOperations:
         To assign resources to a project, send a POST request to
         ``/v2/projects/$PROJECT_ID/resources``.
 
-        You must have both ``project:update`` and ``<resource>:read`` scopes to assign new resources.
-        For example, to assign a Droplet to a project, include both the ``project:update`` and
-        ``droplet:read`` scopes.
+        You must have both ``project:assign_resource`` and ``<resource>:read`` scopes to assign new
+        resources. For example, to assign a Droplet to a project, include both the
+        ``project:assign_resource`` and ``droplet:read`` scopes. The ``project:update`` scope also
+        grants ``project:assign_resource``.
 
         :param project_id: A unique identifier for a project. Required.
         :type project_id: str
@@ -179796,9 +183298,10 @@ class ProjectsOperations:
         To assign resources to a project, send a POST request to
         ``/v2/projects/$PROJECT_ID/resources``.
 
-        You must have both ``project:update`` and ``<resource>:read`` scopes to assign new resources.
-        For example, to assign a Droplet to a project, include both the ``project:update`` and
-        ``droplet:read`` scopes.
+        You must have both ``project:assign_resource`` and ``<resource>:read`` scopes to assign new
+        resources. For example, to assign a Droplet to a project, include both the
+        ``project:assign_resource`` and ``droplet:read`` scopes. The ``project:update`` scope also
+        grants ``project:assign_resource``.
 
         :param project_id: A unique identifier for a project. Required.
         :type project_id: str
@@ -180085,9 +183588,10 @@ class ProjectsOperations:
         To assign resources to your default project, send a POST request to
         ``/v2/projects/default/resources``.
 
-        You must have both project:update and :code:`<resource>`:read scopes to assign new resources.
-        For example, to assign a Droplet to the default project, include both the ``project:update``
-        and ``droplet:read`` scopes.
+        You must have both ``project:assign_resource`` and ``<resource>:read`` scopes to assign new
+        resources. For example, to assign a Droplet to the default project, include both the
+        ``project:assign_resource`` and ``droplet:read`` scopes. The ``project:update`` scope also
+        grants ``project:assign_resource``.
 
         :param body: Required.
         :type body: JSON
@@ -180152,9 +183656,10 @@ class ProjectsOperations:
         To assign resources to your default project, send a POST request to
         ``/v2/projects/default/resources``.
 
-        You must have both project:update and :code:`<resource>`:read scopes to assign new resources.
-        For example, to assign a Droplet to the default project, include both the ``project:update``
-        and ``droplet:read`` scopes.
+        You must have both ``project:assign_resource`` and ``<resource>:read`` scopes to assign new
+        resources. For example, to assign a Droplet to the default project, include both the
+        ``project:assign_resource`` and ``droplet:read`` scopes. The ``project:update`` scope also
+        grants ``project:assign_resource``.
 
         :param body: Required.
         :type body: IO[bytes]
@@ -180210,9 +183715,10 @@ class ProjectsOperations:
         To assign resources to your default project, send a POST request to
         ``/v2/projects/default/resources``.
 
-        You must have both project:update and :code:`<resource>`:read scopes to assign new resources.
-        For example, to assign a Droplet to the default project, include both the ``project:update``
-        and ``droplet:read`` scopes.
+        You must have both ``project:assign_resource`` and ``<resource>:read`` scopes to assign new
+        resources. For example, to assign a Droplet to the default project, include both the
+        ``project:assign_resource`` and ``droplet:read`` scopes. The ``project:update`` scope also
+        grants ``project:assign_resource``.
 
         :param body: Is either a JSON type or a IO[bytes] type. Required.
         :type body: JSON or IO[bytes]
@@ -193501,9 +197007,10 @@ class SizesOperations:
                                           of measure for the disk size.
                                     },
                                     "type": "str"  # Optional. The type of disk.
-                                      All Droplets contain a ``local`` disk. Additionally, GPU Droplets
-                                      can also have a ``scratch`` disk for non-persistent data. Known
-                                      values are: "local" and "scratch".
+                                      All Droplets contain a ``local`` or ``remote`` disk.
+                                      Additionally, GPU Droplets can also have a ``scratch`` disk for
+                                      non-persistent data. Known values are: "local", "remote", and
+                                      "scratch".
                                 }
                             ],
                             "gpu_info": {

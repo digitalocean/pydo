@@ -120,7 +120,7 @@ def test_mcp_transport_parses_sse_response():
 def test_session_create_uses_public_api_and_actor_header():
     parent = make_async_parent(
         [
-            AsyncFakeResponse(201, session_create_response()),
+            AsyncFakeResponse(200, session_create_response()),
             AsyncFakeResponse(200, jsonrpc_result({"tools": []})),
         ]
     )
@@ -138,7 +138,7 @@ def test_session_create_uses_public_api_and_actor_header():
 
     session = _run(scenario())
     create_request = parent._client._pipeline.calls[0].request
-    assert create_request.url.endswith("/v2/action-gateway/sessions")
+    assert create_request.url.endswith("/v2/sessions")
     assert json.loads(create_request.content) == {
         "actor_id": "actor-123",
         "name": "named",
@@ -157,7 +157,7 @@ def test_session_create_uses_public_api_and_actor_header():
 def test_session_approve_posts_to_gateway():
     parent = make_async_parent(
         [
-            AsyncFakeResponse(201, session_create_response()),
+            AsyncFakeResponse(200, session_create_response()),
             AsyncFakeResponse(200, {"status": "approved"}),
         ]
     )
@@ -181,7 +181,7 @@ def test_session_approve_posts_to_gateway():
 def test_session_deny_posts_to_gateway():
     parent = make_async_parent(
         [
-            AsyncFakeResponse(201, session_create_response()),
+            AsyncFakeResponse(200, session_create_response()),
             AsyncFakeResponse(200, {"status": "denied"}),
         ]
     )
