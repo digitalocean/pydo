@@ -14,8 +14,10 @@ from unittest.mock import MagicMock
 
 from pydo.aio.gateway import AsyncGatewayResources
 from pydo.aio.gateway.custom_operations import AsyncRESTTransport
+from pydo.aio.operations import SessionsOperations as AsyncSessionsOperations
 from pydo.custom_extensions import _BaseURLProxy
 from pydo.gateway import GatewayResources, RESTTransport
+from pydo.operations import SessionsOperations
 
 TEST_SESSION_URN = "do:managed_agents_session:test-session"
 TEST_GATEWAY_URL = "https://actions.do-ai-test.run"
@@ -208,8 +210,6 @@ def make_parent(responses: List[FakeResponse]) -> MagicMock:
     parent._client.format_url = lambda url, **_kwargs: (
         url if str(url).startswith("http") else f"https://api.digitalocean.com{url}"
     )
-    from pydo.operations import SessionsOperations
-
     parent.sessions = SessionsOperations(
         parent._client,
         MagicMock(),
@@ -226,9 +226,7 @@ def make_async_parent(responses: List[AsyncFakeResponse]) -> MagicMock:
     parent._client.format_url = lambda url, **_kwargs: (
         url if str(url).startswith("http") else f"https://api.digitalocean.com{url}"
     )
-    from pydo.aio.operations import SessionsOperations
-
-    parent.sessions = SessionsOperations(
+    parent.sessions = AsyncSessionsOperations(
         parent._client,
         MagicMock(),
         MagicMock(),

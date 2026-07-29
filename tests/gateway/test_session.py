@@ -159,7 +159,7 @@ def test_sessions_create_sends_tool_selection_and_config():
     body = json.loads(parent._client._pipeline.calls[0].request.content)
     assert body["tools"] == ["web_search@v1", "toolbelt:read-only@2"]
     assert body["config"] == {"preloadTools": ["web_search@v1"]}
-    assert session.selected_tools == []
+    assert not session.selected_tools
 
 
 def test_session_approve_posts_to_gateway():
