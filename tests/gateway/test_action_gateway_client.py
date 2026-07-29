@@ -8,15 +8,22 @@
 from __future__ import annotations
 
 import json
+from unittest.mock import AsyncMock
 
 import pytest
+from azure.core.exceptions import ResourceExistsError
 
 import pydo
 import pydo.action_gateway
 import pydo.aio
 from pydo.action_gateway import ActionGatewayClient
 from pydo.gateway.transport import _META_TOOL_DEFINITIONS
-from pydo.gateway import ChatCompletionsProvider, MessagesProvider
+from pydo.gateway import (
+    ChatCompletionsProvider,
+    GatewayProtocolError,
+    MessagesProvider,
+    Toolbelt,
+)
 
 from .conftest import (
     FakeResponse,
@@ -133,6 +140,56 @@ def test_create_toolbelt_convenience_method(monkeypatch):
     }
 
 
+def test_create_toolbelt_accepts_flat_api_response(monkeypatch):
+    client = ActionGatewayClient(token="dummy")
+    monkeypatch.setattr(
+        client.toolbelts,
+        "create",
+        lambda **_kwargs: {
+            "name": "search-toolbelt",
+            "version": "1",
+            "reference": "search-toolbelt@1",
+            "tools": ["exa_web_search"],
+        },
+    )
+
+    toolbelt = client.create_toolbelt(
+        name="search-toolbelt",
+        tools=["exa_web_search"],
+    )
+
+    assert toolbelt.ref == "search-toolbelt@1"
+
+
+def test_create_toolbelt_raises_generated_conflict(monkeypatch):
+    client = ActionGatewayClient(token="dummy")
+    response = FakeResponse(
+        409,
+        {
+            "id": "conflict",
+            "message": "A toolbelt with this name already exists.",
+        },
+    )
+
+    class Pipeline:
+        def run(self, request, **_kwargs):
+            response.request = request
+            return type("R", (), {"http_response": response})()
+
+    monkeypatch.setattr(client._client, "_pipeline", Pipeline())
+
+    with pytest.raises(ResourceExistsError):
+        client.create_toolbelt(
+            name="search-toolbelt",
+            tools=["exa_web_search"],
+        )
+
+
+def test_toolbelt_rejects_unexpected_create_response():
+    with pytest.raises(GatewayProtocolError, match="missing toolbelt reference"):
+        Toolbelt.from_response({"name": "search-toolbelt"})
+
+
 def test_create_toolbelt_rejects_string_tools():
     client = ActionGatewayClient(token="dummy")
     with pytest.raises(TypeError, match="iterable of tool names"):
@@ -189,3 +246,30 @@ def test_async_namespace_mirrors_sync():
     assert client.tools is not None
     assert client.toolbelts is not None
     assert client.users is not None
+
+
+@pytest.mark.skipif(not _HAS_AIO, reason="aiohttp extra not installed")
+def test_async_create_toolbelt_accepts_flat_api_response(monkeypatch):
+    from pydo.action_gateway.aio import ActionGatewayClient as AsyncActionGatewayClient
+
+    client = AsyncActionGatewayClient(token="dummy")
+    create = AsyncMock(
+        return_value={
+            "name": "search-toolbelt",
+            "version": "1",
+            "reference": "search-toolbelt@1",
+            "tools": ["exa_web_search"],
+        }
+    )
+    monkeypatch.setattr(client.toolbelts, "create", create)
+
+    async def scenario():
+        return await client.create_toolbelt(
+            name="search-toolbelt",
+            tools=["exa_web_search"],
+        )
+
+    import asyncio
+
+    toolbelt = asyncio.run(scenario())
+    assert toolbelt.ref == "search-toolbelt@1"

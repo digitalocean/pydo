@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
+from azure.core.exceptions import HttpResponseError, ResourceExistsError
+
 # Meta-tool names exposed on the gateway's ``/mcp/meta`` endpoint.
 META_SEARCH = "action_search"
 META_INVOKE = "action_invoke"
@@ -135,6 +137,32 @@ class ToolCall:
 
 class Toolbelt(dict):
     """A generated toolbelt response with a concise ``ref`` alias."""
+
+    @classmethod
+    def from_response(cls, response: Any) -> "Toolbelt":
+        """Accept the documented envelope and legacy flat API response."""
+        if not isinstance(response, dict):
+            raise GatewayProtocolError(
+                f"unexpected toolbelt create response: {response!r}"
+            )
+        data = response.get("toolbelt", response)
+        if not isinstance(data, dict) or not data.get("reference"):
+            raise GatewayProtocolError(
+                f"toolbelt create response missing toolbelt reference: {response!r}"
+            )
+        return cls(data)
+
+    @staticmethod
+    def validate_create_response(
+        pipeline_response: Any, response: Any, _headers: Any
+    ) -> Any:
+        """Raise for generated error responses before returning the body."""
+        http_response = pipeline_response.http_response
+        if http_response.status_code == 409:
+            raise ResourceExistsError(response=http_response)
+        if http_response.status_code != 200:
+            raise HttpResponseError(response=http_response)
+        return response
 
     def __getattr__(self, name: str) -> Any:
         if name == "ref":

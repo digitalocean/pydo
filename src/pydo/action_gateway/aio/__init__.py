@@ -8,6 +8,7 @@
 Asynchronous twin of :class:`pydo.action_gateway.Client`. Same surface,
 ``await``-friendly. See :mod:`pydo.action_gateway` for usage details.
 """
+
 from __future__ import annotations
 
 from typing import List, Optional
@@ -96,8 +97,11 @@ class Client(_DigitalOceanClient):
         if isinstance(tools, (str, bytes)):
             raise TypeError("tools must be an iterable of tool names")
         body = {"name": name, "tools": list(tools), **kwargs}
-        response = await self.toolbelts.create(body=body)
-        return Toolbelt(response["toolbelt"])
+        response = await self.toolbelts.create(
+            body=body,
+            cls=Toolbelt.validate_create_response,
+        )
+        return Toolbelt.from_response(response)
 
     @property
     def base_url(self) -> Optional[str]:
