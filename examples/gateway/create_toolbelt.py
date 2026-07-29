@@ -31,3 +31,6 @@ client.toolbelts.delete_tools(
     "search-toolbelt",
     body={"tools": ["exa_web_fetch"]},
 )
+
+# Delete the toolbelt when it is no longer needed.
+# client.toolbelts.delete("search-toolbelt")
