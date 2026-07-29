@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 from types import SimpleNamespace
+from unittest.mock import MagicMock
 
 import pytest
 from azure.core.exceptions import ResourceNotFoundError
@@ -70,6 +71,27 @@ def test_sessions_create_requires_actor_id():
     ops = SessionsOperations(make_parent([]), gateway_endpoint=TEST_GATEWAY_URL)
     with pytest.raises(ValueError, match="actor_id"):
         ops.create("")
+
+
+def test_sessions_create_delegates_to_generated_operation():
+    parent = MagicMock()
+    parent.sessions.create.return_value = session_create_response(name="named")
+    operations = SessionsOperations(parent, gateway_endpoint=TEST_GATEWAY_URL)
+
+    session = operations.create(
+        "actor-123",
+        name="named",
+        tools=["web_search@v1"],
+        config={"preloadTools": ["web_search@v1"]},
+    )
+
+    parent.sessions.create.assert_called_once()
+    body = parent.sessions.create.call_args.kwargs["body"]
+    assert body["actor_id"] == "actor-123"
+    assert body["name"] == "named"
+    assert body["tools"] == ["web_search@v1"]
+    assert body["config"] == {"preloadTools": ["web_search@v1"]}
+    assert session.name == "named"
 
 
 def test_sessions_create_404_uses_generated_error_mapping():

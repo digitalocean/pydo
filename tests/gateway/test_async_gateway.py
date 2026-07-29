@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 from azure.core.exceptions import HttpResponseError
@@ -115,6 +116,31 @@ def test_mcp_transport_parses_sse_response():
         ),
     )
     assert _run(gateway.tools.list())[0].name == "action_search"
+
+
+def test_session_create_delegates_to_generated_operation():
+    parent = MagicMock()
+    parent.sessions.create = AsyncMock(
+        return_value=session_create_response(name="named")
+    )
+    operations = AsyncSessionsOperations(parent, gateway_endpoint=TEST_GATEWAY_URL)
+
+    session = _run(
+        operations.create(
+            "actor-123",
+            name="named",
+            tools=["web_search@v1"],
+            config={"preloadTools": ["web_search@v1"]},
+        )
+    )
+
+    parent.sessions.create.assert_awaited_once()
+    body = parent.sessions.create.await_args.kwargs["body"]
+    assert body["actor_id"] == "actor-123"
+    assert body["name"] == "named"
+    assert body["policy"]["defaultAction"] == "ask"
+    assert body["config"]["preloadTools"] == ["web_search@v1"]
+    assert session.name == "named"
 
 
 def test_session_create_uses_public_api_and_actor_header():
