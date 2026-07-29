@@ -16,23 +16,23 @@ index b8c29b4..6bbe488 100644
        - Serverless Inference
  
  paths:
-+  /v2/action-gateway/toolbelts:
++  /v2/toolbelts:
 +    get:
 +      $ref: "resources/action_gateway/toolbelts_list.yml"
 +    post:
 +      $ref: "resources/action_gateway/toolbelts_create.yml"
 +
-+  /v2/action-gateway/toolbelts/{name}:
++  /v2/toolbelts/{name}:
 +    get:
 +      $ref: "resources/action_gateway/toolbelts_get.yml"
 +    delete:
 +      $ref: "resources/action_gateway/toolbelts_delete.yml"
 +
-+  /v2/action-gateway/toolbelts/{name}/tools/add:
++  /v2/toolbelts/{name}/tools/add:
 +    post:
 +      $ref: "resources/action_gateway/toolbelts_add_tools.yml"
 +
-+  /v2/action-gateway/toolbelts/{name}/tools/remove:
++  /v2/toolbelts/{name}/tools/remove:
 +    post:
 +      $ref: "resources/action_gateway/toolbelts_remove_tools.yml"
 +
@@ -392,7 +392,7 @@ index 0000000..ea6a984
 +    content:
 +      application/json:
 +        schema:
-+          type: object
++          $ref: 'models.yml#/toolbelt_response'
 +  '401':
 +    $ref: '../../shared/responses/unauthorized.yml'
 +  '404':

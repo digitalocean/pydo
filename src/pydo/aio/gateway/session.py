@@ -53,6 +53,7 @@ class AsyncSession:
         tools: AsyncToolsOperations,
         code: AsyncCodeOperations,
         provider: BaseProvider,
+        selected_tools: Optional[Sequence[str]] = None,
         raw: Optional[Dict[str, Any]] = None,
     ):
         self.session_urn = session_urn
@@ -65,6 +66,7 @@ class AsyncSession:
         self.code = code
         self._transport = tools._transport
         self.provider = provider
+        self.selected_tools = list(selected_tools or [])
         self.raw = raw or {}
 
     @property
@@ -93,7 +95,11 @@ class AsyncSession:
 
     async def approve(self, approval_id: str) -> Any:
         """Approve a pending tool invocation for this session."""
-        return await self._transport.approve(approval_id)
+        return await self._transport.decide_approval(approval_id, "approve")
+
+    async def deny(self, approval_id: str) -> Any:
+        """Deny a pending tool invocation for this session."""
+        return await self._transport.decide_approval(approval_id, "deny")
 
     def __repr__(self) -> str:  # pragma: no cover
         return f"<AsyncSession id={self.session_urn!r} " f"actor_id={self.actor_id!r}>"
@@ -119,6 +125,8 @@ class AsyncSessionsOperations:
         *,
         name: Optional[str] = None,
         permissions: Optional[Dict[str, Any]] = None,
+        tools: Optional[Sequence[str]] = None,
+        config: Optional[Dict[str, Any]] = None,
     ) -> AsyncSession:
         if not actor_id or not str(actor_id).strip():
             raise ValueError("actor_id is required")
@@ -130,6 +138,14 @@ class AsyncSessionsOperations:
             "policy": policy,
             "actor_id": str(actor_id).strip(),
         }
+        if tools is not None:
+            if isinstance(tools, (str, bytes)):
+                raise TypeError("tools must be a sequence of tool references")
+            body["tools"] = list(tools)
+        if config is not None:
+            if not isinstance(config, dict):
+                raise TypeError("config must be a dict")
+            body["config"] = config
 
         raw_session = await self._post_create(body)
         session_urn = _pick(raw_session, "sessionUrn", "session_urn")
@@ -161,6 +177,7 @@ class AsyncSessionsOperations:
             tools=tools,
             code=code,
             provider=self._provider,
+            selected_tools=_pick(raw_session, "selectedTools") or [],
             raw=raw_session,
         )
 
@@ -195,6 +212,8 @@ class AsyncSessionsOperations:
         mcp_url = _pick(payload, "mcpUrl", "mcp_url")
         if mcp_url:
             result["mcpUrl"] = mcp_url
+        if "tools" in payload:
+            result["selectedTools"] = payload["tools"]
         return result
 
 

@@ -19,7 +19,6 @@ from pydo.gateway import (
     SessionsOperations,
     normalize_permissions,
 )
-from pydo.gateway.session import serialize_policy_json
 from pydo.gateway.transport import _META_TOOL_DEFINITIONS
 
 from .conftest import (
@@ -34,8 +33,8 @@ from .conftest import (
 )
 
 
-def test_normalize_permissions_defaults_to_allow():
-    assert normalize_permissions(None) == {"defaultAction": "allow"}
+def test_normalize_permissions_defaults_to_ask():
+    assert normalize_permissions(None) == {"defaultAction": "ask"}
 
 
 def test_normalize_permissions_accepts_snake_case():
@@ -65,10 +64,6 @@ def test_normalize_permissions_requires_tool():
 def test_normalize_permissions_rejects_legacy_toolbelt_key():
     with pytest.raises(ValueError, match="toolbelt permissions are no longer"):
         normalize_permissions({"rules": [{"toolbelt": "read-only@1.2.3"}]})
-
-
-def test_serialize_policy_json():
-    assert json.loads(serialize_policy_json(None))["defaultAction"] == "allow"
 
 
 def test_sessions_create_requires_actor_id():
@@ -107,7 +102,7 @@ def test_sessions_create_posts_to_do_api_and_binds_returned_mcp_url():
     body = json.loads(create_req.content)
     assert body["actor_id"] == "user-123"
     assert "end_user_id" not in body
-    assert body["policy"] == {"defaultAction": "allow"}
+    assert body["policy"] == {"defaultAction": "ask"}
     assert body["name"].startswith("pydo-session-")
 
     assert session.session_urn == TEST_SESSION_URN
@@ -153,6 +148,20 @@ def test_sessions_create_with_permissions_and_name():
     assert session.name == "named"
 
 
+def test_sessions_create_sends_tool_selection_and_config():
+    parent = make_parent([FakeResponse(200, session_create_response())])
+    session = SessionsOperations(parent, gateway_endpoint=TEST_GATEWAY_URL).create(
+        "u1",
+        tools=["web_search@v1", "toolbelt:read-only@2"],
+        config={"preloadTools": ["web_search@v1"]},
+    )
+
+    body = json.loads(parent._client._pipeline.calls[0].request.content)
+    assert body["tools"] == ["web_search@v1", "toolbelt:read-only@2"]
+    assert body["config"] == {"preloadTools": ["web_search@v1"]}
+    assert session.selected_tools == []
+
+
 def test_session_approve_posts_to_gateway():
     parent = make_parent(
         [
@@ -172,3 +181,58 @@ def test_session_approve_posts_to_gateway():
     assert request.headers[ACTOR_ID_HEADER] == "user-123"
     assert json.loads(request.content) == {"decision": "approve"}
     assert result.status == "approved"
+
+
+def test_session_deny_posts_to_gateway():
+    parent = make_parent(
+        [
+            FakeResponse(200, session_create_response()),
+            FakeResponse(200, {"status": "denied"}),
+        ]
+    )
+    session = SessionsOperations(parent, gateway_endpoint=TEST_GATEWAY_URL).create(
+        "user-123"
+    )
+
+    result = session.deny("approval-123")
+
+    request = parent._client._pipeline.calls[1].request
+    assert json.loads(request.content) == {"decision": "deny"}
+    assert result.status == "denied"
+
+
+def test_handle_tool_calls_preserves_approval_metadata():
+    parent = make_parent(
+        [
+            FakeResponse(200, session_create_response()),
+            FakeResponse(
+                200,
+                jsonrpc_result(
+                    call_result(
+                        structured={
+                            "results": [
+                                {
+                                    "tool": "exa_web_search",
+                                    "result": {
+                                        "status": "failed",
+                                        "error": {"message": "approval required"},
+                                        "_meta": {
+                                            "status": "requires_approval",
+                                            "approval_id": "approval-123",
+                                        },
+                                    },
+                                }
+                            ]
+                        },
+                    )
+                ),
+            ),
+        ]
+    )
+    session = SessionsOperations(parent, gateway_endpoint=TEST_GATEWAY_URL).create(
+        "user-123"
+    )
+
+    messages = session.handle_tool_calls(chat_tool_response(name="exa_web_search"))
+    content = json.loads(messages[0]["content"])
+    assert content["_meta"]["approval_id"] == "approval-123"

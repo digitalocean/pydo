@@ -19,13 +19,17 @@ client = ActionGatewayClient(
 )
 session = client.session.create(
     actor_id=os.environ.get("ACTOR_ID", "example-user"),
+    permissions={
+        "default_action": "ask",
+        "rules": [{"tool": "exa_web_search", "action": "allow"}],
+    },
 )
 
 response = client.responses.create(
     model=os.environ.get("MODEL", "openai-gpt-4o"),
     input=os.environ.get(
         "PROMPT",
-        "What DigitalOcean Droplet sizes are available in NYC3?",
+        "Find the latest DigitalOcean news and summarize it.",
     ),
     tools=session.tools(),
 )

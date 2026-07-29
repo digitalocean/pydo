@@ -19,7 +19,7 @@ session = client.session.create(
         "default_action": "ask",
         "rules": [
             {"tool": "toolbelt:search-toolbelt@1", "action": "allow"},
-            {"tool": "digitalocean_size-list", "action": "allow"},
+            {"tool": "exa_web_search", "action": "allow"},
         ],
     },
 )

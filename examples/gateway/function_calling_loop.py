@@ -17,6 +17,13 @@ from pydo.action_gateway import ActionGatewayClient
 client = ActionGatewayClient(token=os.environ["DIGITALOCEAN_TOKEN"])
 session = client.session.create(
     actor_id=os.environ.get("ACTOR_ID", "example-user"),
+    permissions={
+        "default_action": "ask",
+        "rules": [
+            {"tool": "exa_web_search", "action": "allow"},
+            {"tool": "exa_web_fetch", "action": "allow"},
+        ],
+    },
 )
 
 model = os.environ.get("MODEL", "openai-gpt-5.4")

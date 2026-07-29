@@ -60,7 +60,7 @@ def build_toolbelts_list_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/action-gateway/toolbelts"
+    _url = "/v2/toolbelts"
 
     # Construct parameters
     if status is not None:
@@ -89,7 +89,7 @@ def build_toolbelts_create_request(**kwargs: Any) -> HttpRequest:
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/action-gateway/toolbelts"
+    _url = "/v2/toolbelts"
 
     # Construct headers
     if content_type is not None:
@@ -110,7 +110,7 @@ def build_toolbelts_get_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/action-gateway/toolbelts/{name}"
+    _url = "/v2/toolbelts/{name}"
     path_format_arguments = {
         "name": _SERIALIZER.url(
             "name", name, "str", pattern=r"^[a-z][a-z0-9_-]{0,63}$"
@@ -139,7 +139,7 @@ def build_toolbelts_delete_request(name: str, **kwargs: Any) -> HttpRequest:
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/action-gateway/toolbelts/{name}"
+    _url = "/v2/toolbelts/{name}"
     path_format_arguments = {
         "name": _SERIALIZER.url(
             "name", name, "str", pattern=r"^[a-z][a-z0-9_-]{0,63}$"
@@ -163,7 +163,7 @@ def build_toolbelts_add_tools_request(name: str, **kwargs: Any) -> HttpRequest:
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/action-gateway/toolbelts/{name}/tools/add"
+    _url = "/v2/toolbelts/{name}/tools/add"
     path_format_arguments = {
         "name": _SERIALIZER.url(
             "name", name, "str", pattern=r"^[a-z][a-z0-9_-]{0,63}$"
@@ -191,7 +191,7 @@ def build_toolbelts_delete_tools_request(name: str, **kwargs: Any) -> HttpReques
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/action-gateway/toolbelts/{name}/tools/remove"
+    _url = "/v2/toolbelts/{name}/tools/remove"
     path_format_arguments = {
         "name": _SERIALIZER.url(
             "name", name, "str", pattern=r"^[a-z][a-z0-9_-]{0,63}$"

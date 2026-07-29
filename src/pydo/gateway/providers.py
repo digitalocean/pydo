@@ -319,10 +319,14 @@ def execute_tool_calls(
                 item_result = _get(item, "result") or item
                 status = _get(item_result, "status")
                 if status and status != "succeeded":
-                    results[index] = {
+                    error_result = {
                         "error": _get(item_result, "error")
                         or {"message": f"tool {calls[index].name!r} failed"}
                     }
+                    meta = _get(item_result, "_meta")
+                    if meta:
+                        error_result["_meta"] = meta
+                    results[index] = error_result
                 else:
                     results[index] = _get(item_result, "output")
             else:
@@ -333,7 +337,7 @@ def execute_tool_calls(
 
 
 def _error_payload(exc: Any) -> Dict[str, Any]:
-    return {
+    payload = {
         "error": {
             "message": str(exc),
             "class": getattr(exc, "error_class", None),
@@ -341,6 +345,10 @@ def _error_payload(exc: Any) -> Dict[str, Any]:
             "recovery_hint": getattr(exc, "recovery_hint", None),
         }
     }
+    meta = getattr(exc, "meta", None)
+    if isinstance(meta, dict) and meta:
+        payload["_meta"] = meta
+    return payload
 
 
 __all__ = [

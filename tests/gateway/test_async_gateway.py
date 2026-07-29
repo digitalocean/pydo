@@ -127,7 +127,12 @@ def test_session_create_uses_public_api_and_actor_header():
     operations = AsyncSessionsOperations(parent, gateway_endpoint=TEST_GATEWAY_URL)
 
     async def scenario():
-        session = await operations.create("actor-123", name="named")
+        session = await operations.create(
+            "actor-123",
+            name="named",
+            tools=["web_search@v1"],
+            config={"preloadTools": ["web_search@v1"]},
+        )
         await session.tools.list(include_all=True)
         return session
 
@@ -137,13 +142,16 @@ def test_session_create_uses_public_api_and_actor_header():
     assert json.loads(create_request.content) == {
         "actor_id": "actor-123",
         "name": "named",
-        "policy": {"defaultAction": "allow"},
+        "policy": {"defaultAction": "ask"},
+        "tools": ["web_search@v1"],
+        "config": {"preloadTools": ["web_search@v1"]},
     }
     tool_request = parent._client._pipeline.calls[1].request
     assert tool_request.url == session.url
     assert tool_request.headers[SESSION_ID_HEADER] == "test-session"
     assert tool_request.headers[ACTOR_ID_HEADER] == "actor-123"
     assert session.actor_id == "actor-123"
+    assert session.selected_tools == []
 
 
 def test_session_approve_posts_to_gateway():
@@ -168,6 +176,25 @@ def test_session_approve_posts_to_gateway():
     assert json.loads(request.content) == {"decision": "approve"}
     assert result.status == "approved"
     assert session.actor_id == "actor-123"
+
+
+def test_session_deny_posts_to_gateway():
+    parent = make_async_parent(
+        [
+            AsyncFakeResponse(201, session_create_response()),
+            AsyncFakeResponse(200, {"status": "denied"}),
+        ]
+    )
+    operations = AsyncSessionsOperations(parent, gateway_endpoint=TEST_GATEWAY_URL)
+
+    async def scenario():
+        session = await operations.create("actor-123")
+        return await session.deny("approval-123")
+
+    result = _run(scenario())
+    request = parent._client._pipeline.calls[1].request
+    assert json.loads(request.content) == {"decision": "deny"}
+    assert result.status == "denied"
 
 
 def test_tools_callable_and_handle_tool_calls():

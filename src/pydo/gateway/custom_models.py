@@ -66,6 +66,7 @@ class GatewayToolError(RuntimeError):
         recovery_hint: Optional[str] = None,
         invocation_id: Optional[str] = None,
         details: Optional[Any] = None,
+        meta: Optional[Dict[str, Any]] = None,
     ):
         super().__init__(message)
         self.message = message
@@ -74,6 +75,7 @@ class GatewayToolError(RuntimeError):
         self.recovery_hint = recovery_hint
         self.invocation_id = invocation_id
         self.details = details
+        self.meta = meta
 
     @classmethod
     def from_error_payload(
@@ -81,6 +83,7 @@ class GatewayToolError(RuntimeError):
         error: Dict[str, Any],
         *,
         invocation_id: Optional[str] = None,
+        meta: Optional[Dict[str, Any]] = None,
     ) -> "GatewayToolError":
         return cls(
             error.get("message") or "tool invocation failed",
@@ -89,6 +92,7 @@ class GatewayToolError(RuntimeError):
             recovery_hint=error.get("recovery_hint"),
             invocation_id=invocation_id,
             details=error,
+            meta=meta,
         )
 
 

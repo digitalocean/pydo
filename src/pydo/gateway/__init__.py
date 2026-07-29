@@ -6,9 +6,8 @@
 
 Session-first surface: create a session on the DigitalOcean API
 (``POST /v2/action-gateway/sessions``), then discover/invoke tools and run code
-over the gateway REST endpoints with ``X-Session-Id``. Composio-style providers make
-session tools plug into pydo inference surfaces (chat completions, messages,
-responses).
+through the API-returned MCP endpoint. Composio-style providers make session
+tools plug into pydo inference surfaces (chat completions, messages, responses).
 """
 
 from __future__ import annotations
@@ -47,7 +46,6 @@ from .session import (
     Session,
     SessionsOperations,
     normalize_permissions,
-    serialize_policy_json,
 )
 from .transport import (
     ACTOR_ID_HEADER,
@@ -138,7 +136,6 @@ __all__ = [
     "Session",
     "SessionsOperations",
     "normalize_permissions",
-    "serialize_policy_json",
     "ToolsOperations",
     "CodeOperations",
     "normalize_invoke_arguments",

@@ -3,7 +3,7 @@
 **Audience:** internal alignment on the developer experience of the Action Gateway surface in `pydo`.
 **Status:** proposal / preview. Feedback welcome — nothing here is final.
 
-The Action Gateway gives models access to a large catalog of third-party tools plus a sandboxed Python runtime. Usage is **session-first**: create a session on the DigitalOcean API, then call tools over REST on `actions.do-ai.run` with that session.
+The Action Gateway gives models access to a large catalog of third-party tools plus a sandboxed Python runtime. Usage is **session-first**: create a session on the DigitalOcean API, then call tools through the returned MCP URL.
 
 ---
 
@@ -21,11 +21,11 @@ client = ActionGatewayClient(token=os.environ["DIGITALOCEAN_TOKEN"])
 
 session = client.session.create(
     actor_id="user-123",   # required
-    # permissions optional — defaults to allow-all
+    # permissions optional — defaults to ask
 )
 ```
 
-`actor_id` is required. If you omit `permissions`, the SDK creates a default policy of `{"defaultAction": "allow"}`. Optional permissions:
+`actor_id` is required. If you omit `permissions`, the SDK creates a default policy of `{"defaultAction": "ask"}`. Optional permissions:
 
 ```python
 session = client.session.create(
@@ -33,14 +33,26 @@ session = client.session.create(
     permissions={
         "default_action": "ask",
         "rules": [
-            {"tool": "toolbelt:read-only@1.2.3", "action": "allow"},
+            {"tool": "toolbelt:read-only@1", "action": "allow"},
             {"tool": "gmail", "action": "allow"},
         ],
     },
 )
 ```
 
-Session create hits `POST /v2/action-gateway/sessions` on `api.digitalocean.com` with `name`, `policy`, and `actor_id`. The same actor is sent as `X-Actor-Id` on gateway requests. Tool calls go to the gateway host (`https://actions.do-ai.run` by default; override with `gateway_endpoint=` or `PYDO_GATEWAY_ENDPOINT`).
+Session create hits `POST /v2/action-gateway/sessions` on `api.digitalocean.com` with `name`, `policy`, and `actor_id`. It can also send `tools` (omitted means all, an empty list means none) and opaque `config`, including `preloadTools`. Tool calls use the `mcpUrl` returned by the API. The same actor is sent as `X-Actor-Id` on gateway requests.
+
+```python
+session = client.session.create(
+    actor_id="user-123",
+    tools=["exa_web_search@v1"],
+    config={"preloadTools": ["exa_web_search@v1"]},
+    permissions={
+        "default_action": "ask",
+        "rules": [{"tool": "exa_web_search", "action": "allow"}],
+    },
+)
+```
 
 `session.url` is the session-pinned MCP URL for external MCP clients:
 
@@ -54,7 +66,7 @@ https://actions.do-ai.run/mcp/session/<session-uuid>
 
 ```python
 results = session.tools.search("search the web for recent news")
-catalog = session.tools.list(include_all=True)
+session_tools = session.tools.list(include_all=True)
 
 output = session.tools.invoke_one(
     "exa_web_search",
@@ -133,7 +145,7 @@ tools = session.tools()
 
 ## 4. Meta-tools vs. concrete tools
 
-`session.tools()` defaults to the three meta-tools (`action_search`, `action_invoke`, `action_code`). For a fixed surface:
+`session.tools()` defaults to the three meta-tools (`action_search`, `action_invoke`, `action_code`). With `config.preloadTools`, request every tool exposed on this session MCP endpoint or select by name:
 
 ```python
 tools = session.tools(include_all=True)
@@ -183,7 +195,7 @@ session = client.session.create(
 )
 ```
 
-Toolbelt creation maps to `POST /v2/action-gateway/toolbelts`. The response exposes both `toolbelt.reference` and the shorter `toolbelt.ref` alias.
+Toolbelt creation maps to `POST /v2/toolbelts`. The response exposes both `toolbelt.reference` and the shorter `toolbelt.ref` alias.
 
 ---
 
@@ -205,6 +217,11 @@ response = client.responses.create(
 tool_outputs = session.handle_tool_calls(response)
 ```
 
+The Responses API can also connect to `session.url` directly when its MCP tool
+surface supports remote MCP servers. Gateway policy approval remains separate
+from model-provider approval: use `session.approve(approval_id)` or
+`session.deny(approval_id)`, then retry the tool call.
+
 ---
 
 ## 7. Async
@@ -224,6 +241,6 @@ async with ActionGatewayClient(token=token) as client:
 ## 8. Design notes
 
 - **Session-first.** Bare gateway calls without a session are unsupported.
-- **REST for SDK execution.** MCP remains available via `session.url` for external clients.
+- **MCP for SDK execution.** `session.url` is the same returned MCP endpoint used by the SDK.
 - **Provider pattern.** Chat Completions / Messages / Responses formatting stays in small provider classes.
-- **Same DO token** for session create (public API) and gateway REST (actions host).
+- **Same DO token** for session create and the returned MCP endpoint.

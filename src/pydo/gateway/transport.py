@@ -5,11 +5,9 @@
 """Action Gateway wire layer.
 
 The public SDK surface (``ToolsOperations`` / ``CodeOperations``) only talks
-to the small :class:`GatewayTransport` interface. The default transport is
-REST (``/tools/search``, ``/tools/invoke``, ``/code/execute``) and requires
-a session id via ``X-Session-Id`` and actor id via ``X-Actor-Id``. An
-:class:`MCPTransport` remains available for callers that need JSON-RPC over
-``/mcp`` / ``/mcp/meta``.
+to the small :class:`GatewayTransport` interface. Sessions use MCP JSON-RPC at
+the endpoint returned by the create API. REST transports remain available for
+the compatibility routes and focused testing.
 """
 
 from __future__ import annotations
@@ -213,6 +211,7 @@ def _unwrap_call_result(result: Dict[str, Any]) -> Any:
     """Normalize an MCP ``tools/call`` result to its useful payload."""
     if result.get("isError"):
         structured = result.get("structuredContent")
+        meta = result.get("_meta")
         error = None
         if isinstance(structured, dict):
             error = structured.get("error") or (
@@ -226,9 +225,11 @@ def _unwrap_call_result(result: Dict[str, Any]) -> Any:
                     if isinstance(structured, dict)
                     else None
                 ),
+                meta=meta if isinstance(meta, dict) else None,
             )
         raise GatewayToolError(
-            _content_text(result.get("content")) or "tool call failed"
+            _content_text(result.get("content")) or "tool call failed",
+            meta=meta if isinstance(meta, dict) else None,
         )
 
     structured = result.get("structuredContent")
@@ -351,8 +352,11 @@ class GatewayTransport:
     def call_tool(self, name: str, arguments: Dict[str, Any], *, meta: bool) -> Any:
         raise NotImplementedError
 
-    def approve(self, approval_id: str) -> Any:
+    def decide_approval(self, approval_id: str, decision: str) -> Any:
         raise NotImplementedError
+
+    def approve(self, approval_id: str) -> Any:
+        return self.decide_approval(approval_id, "approve")
 
 
 class RESTTransport(GatewayTransport):
@@ -428,6 +432,18 @@ class RESTTransport(GatewayTransport):
         item_result = item.get("result") if isinstance(item, dict) else item
         return _unwrap_tool_result(item_result)
 
+    def decide_approval(self, approval_id: str, decision: str) -> Any:
+        if not approval_id or not str(approval_id).strip():
+            raise ValueError("approval_id is required")
+        if decision not in ("approve", "deny"):
+            raise ValueError("decision must be 'approve' or 'deny'")
+        approval_id = quote(str(approval_id).strip(), safe="")
+        return self._request(
+            "POST",
+            f"/approvals/{approval_id}",
+            {"decision": decision},
+        )
+
 
 class MCPTransport(GatewayTransport):
     """JSON-RPC 2.0 over plain HTTP POST to ``/mcp`` and ``/mcp/meta``."""
@@ -500,9 +516,11 @@ class MCPTransport(GatewayTransport):
         )
         return _unwrap_call_result(result)
 
-    def approve(self, approval_id: str) -> Any:
+    def decide_approval(self, approval_id: str, decision: str) -> Any:
         if not approval_id or not str(approval_id).strip():
             raise ValueError("approval_id is required")
+        if decision not in ("approve", "deny"):
+            raise ValueError("decision must be 'approve' or 'deny'")
         endpoint = urlsplit(self.endpoint_url or self._client._base_url)
         approval_id = quote(str(approval_id).strip(), safe="")
         url = f"{endpoint.scheme}://{endpoint.netloc}/approvals/{approval_id}"
@@ -510,7 +528,7 @@ class MCPTransport(GatewayTransport):
             "POST",
             url,
             headers={**self._headers(), "Accept": "application/json"},
-            json={"decision": "approve"},
+            json={"decision": decision},
         )
         pipeline_response = self._client._pipeline.run(request)
         response = pipeline_response.http_response

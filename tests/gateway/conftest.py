@@ -98,7 +98,11 @@ def jsonrpc_error(code: int, message: str, *, rpc_id: int = 1) -> dict:
 
 
 def call_result(
-    structured: Any = None, *, is_error: bool = False, text: str = ""
+    structured: Any = None,
+    *,
+    is_error: bool = False,
+    text: str = "",
+    meta: Any = None,
 ) -> dict:
     """MCP tools/call result shape (legacy helper for MCP-specific tests)."""
     result: dict = {"isError": is_error}
@@ -106,6 +110,8 @@ def call_result(
         result["structuredContent"] = structured
     if text:
         result["content"] = [{"type": "text", "text": text}]
+    if meta is not None:
+        result["_meta"] = meta
     return result
 
 
@@ -186,9 +192,9 @@ def session_create_response(
     return {
         "session": {
             "sessionUrn": session_urn,
-            "teamId": "42",
             "name": name,
-            "policyJson": '{"defaultAction":"allow","rules":[]}',
+            "actorId": "actor-123",
+            "policy": {"defaultAction": "ask", "rules": []},
         },
         "mcpUrl": f"{TEST_GATEWAY_URL}/mcp/session/test-session",
         "tools": [],

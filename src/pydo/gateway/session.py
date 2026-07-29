@@ -7,7 +7,6 @@
 
 from __future__ import annotations
 
-import json as _json
 import uuid
 from typing import Any, Dict, List, Optional, Sequence
 
@@ -26,7 +25,7 @@ from .transport import (
 )
 
 _SESSIONS_PATH = "/v2/action-gateway/sessions"
-_DEFAULT_POLICY: Dict[str, Any] = {"defaultAction": "allow"}
+_DEFAULT_POLICY: Dict[str, Any] = {"defaultAction": "ask"}
 
 
 def _pick(data: Dict[str, Any], *keys: str) -> Any:
@@ -40,7 +39,7 @@ def normalize_permissions(permissions: Optional[Dict[str, Any]]) -> Dict[str, An
     """Normalize SDK permissions into the wire policy object.
 
     Accepts snake_case ``default_action`` or wire ``defaultAction``. When
-    omitted, returns ``{"defaultAction": "allow"}``.
+    omitted, returns ``{"defaultAction": "ask"}``.
     """
     if permissions is None:
         return dict(_DEFAULT_POLICY)
@@ -48,7 +47,7 @@ def normalize_permissions(permissions: Optional[Dict[str, Any]]) -> Dict[str, An
     default_action = (
         permissions.get("default_action")
         if "default_action" in permissions
-        else permissions.get("defaultAction", "allow")
+        else permissions.get("defaultAction", "ask")
     )
     rules_in = permissions.get("rules") or []
     rules: List[Dict[str, Any]] = []
@@ -71,16 +70,12 @@ def normalize_permissions(permissions: Optional[Dict[str, Any]]) -> Dict[str, An
     return {"defaultAction": default_action, "rules": rules}
 
 
-def serialize_policy_json(permissions: Optional[Dict[str, Any]]) -> str:
-    return _json.dumps(normalize_permissions(permissions), separators=(",", ":"))
-
-
 class Session:
     """A gateway session bound to an ``actor_id`` and tool policy.
 
     Create via :meth:`SessionsOperations.create`. Use ``url`` for external
     MCP clients, ``tools()`` for inference ``tools=``, and
-    ``handle_tool_calls`` to execute model tool calls over REST.
+    ``handle_tool_calls`` to execute model tool calls over MCP.
     """
 
     def __init__(
@@ -94,6 +89,7 @@ class Session:
         tools: ToolsOperations,
         code: CodeOperations,
         provider: BaseProvider,
+        selected_tools: Optional[Sequence[str]] = None,
         raw: Optional[Dict[str, Any]] = None,
     ):
         self.session_urn = session_urn
@@ -106,6 +102,7 @@ class Session:
         self.code = code
         self._transport = tools._transport
         self.provider = provider
+        self.selected_tools = list(selected_tools or [])
         self.raw = raw or {}
 
     @property
@@ -137,7 +134,11 @@ class Session:
 
     def approve(self, approval_id: str) -> Any:
         """Approve a pending tool invocation for this session."""
-        return self._transport.approve(approval_id)
+        return self._transport.decide_approval(approval_id, "approve")
+
+    def deny(self, approval_id: str) -> Any:
+        """Deny a pending tool invocation for this session."""
+        return self._transport.decide_approval(approval_id, "deny")
 
     def __repr__(self) -> str:  # pragma: no cover - debug aid
         return f"<Session id={self.session_urn!r} actor_id={self.actor_id!r}>"
@@ -163,13 +164,19 @@ class SessionsOperations:
         *,
         name: Optional[str] = None,
         permissions: Optional[Dict[str, Any]] = None,
+        tools: Optional[Sequence[str]] = None,
+        config: Optional[Dict[str, Any]] = None,
     ) -> Session:
         """Create a session.
 
         :param actor_id: Required actor identifier used to evaluate the policy.
         :param name: Optional display name (auto-generated when omitted).
         :param permissions: Optional policy. When omitted, defaults to
-            ``{"defaultAction": "allow"}``.
+            ``{"defaultAction": "ask"}``.
+        :param tools: Optional tool or version-pinned toolbelt references.
+            Omit for all tools; pass an empty sequence for no tools.
+        :param config: Optional session configuration, including
+            ``preloadTools``.
         """
         if not actor_id or not str(actor_id).strip():
             raise ValueError("actor_id is required")
@@ -181,6 +188,14 @@ class SessionsOperations:
             "policy": policy,
             "actor_id": str(actor_id).strip(),
         }
+        if tools is not None:
+            if isinstance(tools, (str, bytes)):
+                raise TypeError("tools must be a sequence of tool references")
+            body["tools"] = list(tools)
+        if config is not None:
+            if not isinstance(config, dict):
+                raise TypeError("config must be a dict")
+            body["config"] = config
 
         raw_session = self._post_create(body)
         session_urn = _pick(raw_session, "sessionUrn", "session_urn")
@@ -212,6 +227,7 @@ class SessionsOperations:
             tools=tools,
             code=code,
             provider=self._provider,
+            selected_tools=_pick(raw_session, "selectedTools") or [],
             raw=raw_session,
         )
 
@@ -229,7 +245,9 @@ class SessionsOperations:
         request.url = client.format_url(request.url)
         pipeline_response = client._pipeline.run(request)
         response = pipeline_response.http_response
-        response_body = response.text() if hasattr(response, "text") else response.body()
+        response_body = (
+            response.text() if hasattr(response, "text") else response.body()
+        )
         if response.status_code not in (200, 201):
             _raise_gateway_http_error(response)
         payload = _parse_json_body(response_body)
@@ -246,6 +264,8 @@ class SessionsOperations:
         mcp_url = _pick(payload, "mcpUrl", "mcp_url")
         if mcp_url:
             result["mcpUrl"] = mcp_url
+        if "tools" in payload:
+            result["selectedTools"] = payload["tools"]
         return result
 
 
@@ -253,5 +273,4 @@ __all__ = [
     "Session",
     "SessionsOperations",
     "normalize_permissions",
-    "serialize_policy_json",
 ]

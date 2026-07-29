@@ -172,7 +172,8 @@ class ToolsOperations:
 
         By default returns the three meta-tools (``action.search``,
         ``action.invoke``, ``action.code``) — the intended agent workflow.
-        Pass ``include_all=True`` for the full concrete tool catalog.
+        Pass ``include_all=True`` for every tool exposed on the session MCP
+        endpoint, including configured ``preloadTools``.
         """
         return self._transport.list_tools(meta=not include_all)
 
@@ -267,7 +268,7 @@ class ToolsOperations:
 
         By default wraps the three meta-tools so the model drives the
         search → invoke → code workflow itself. Pass ``include_all=True``,
-        ``names=``, or ``search=`` to wrap concrete catalog tools instead.
+        ``names=``, or ``search=`` to wrap selected tools instead.
         """
         if self._provider is None:
             raise RuntimeError(

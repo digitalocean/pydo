@@ -65,8 +65,11 @@ class AsyncGatewayTransport:
     ) -> Any:
         raise NotImplementedError
 
-    async def approve(self, approval_id: str) -> Any:
+    async def decide_approval(self, approval_id: str, decision: str) -> Any:
         raise NotImplementedError
+
+    async def approve(self, approval_id: str) -> Any:
+        return await self.decide_approval(approval_id, "approve")
 
 
 class AsyncMCPTransport(AsyncGatewayTransport):
@@ -142,9 +145,11 @@ class AsyncMCPTransport(AsyncGatewayTransport):
         )
         return _unwrap_call_result(result)
 
-    async def approve(self, approval_id: str) -> Any:
+    async def decide_approval(self, approval_id: str, decision: str) -> Any:
         if not approval_id or not str(approval_id).strip():
             raise ValueError("approval_id is required")
+        if decision not in ("approve", "deny"):
+            raise ValueError("decision must be 'approve' or 'deny'")
         endpoint = urlsplit(self.endpoint_url or self._client._base_url)
         approval_id = quote(str(approval_id).strip(), safe="")
         url = f"{endpoint.scheme}://{endpoint.netloc}/approvals/{approval_id}"
@@ -152,7 +157,7 @@ class AsyncMCPTransport(AsyncGatewayTransport):
             "POST",
             url,
             headers={**self._headers(), "Accept": "application/json"},
-            json={"decision": "approve"},
+            json={"decision": decision},
         )
         pipeline_response = await self._client._pipeline.run(request)
         response = pipeline_response.http_response
@@ -231,6 +236,18 @@ class AsyncRESTTransport(AsyncGatewayTransport):
         item = results[0]
         item_result = item.get("result") if isinstance(item, dict) else item
         return _unwrap_tool_result(item_result)
+
+    async def decide_approval(self, approval_id: str, decision: str) -> Any:
+        if not approval_id or not str(approval_id).strip():
+            raise ValueError("approval_id is required")
+        if decision not in ("approve", "deny"):
+            raise ValueError("decision must be 'approve' or 'deny'")
+        approval_id = quote(str(approval_id).strip(), safe="")
+        return await self._request(
+            "POST",
+            f"/approvals/{approval_id}",
+            {"decision": decision},
+        )
 
 
 class AsyncToolsOperations:
@@ -386,10 +403,14 @@ async def async_execute_tool_calls(
                 item_result = _get(item, "result") or item
                 status = _get(item_result, "status")
                 if status and status != "succeeded":
-                    results[index] = {
+                    error_result = {
                         "error": _get(item_result, "error")
                         or {"message": f"tool {calls[index].name!r} failed"}
                     }
+                    meta = _get(item_result, "_meta")
+                    if meta:
+                        error_result["_meta"] = meta
+                    results[index] = error_result
                 else:
                     results[index] = _get(item_result, "output")
             else:

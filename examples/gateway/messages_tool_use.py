@@ -47,6 +47,13 @@ client = ActionGatewayClient(
 )
 session = client.session.create(
     actor_id=os.environ.get("ACTOR_ID", "example-user"),
+    permissions={
+        "default_action": "ask",
+        "rules": [
+            {"tool": "exa_web_search", "action": "allow"},
+            {"tool": "exa_web_fetch", "action": "allow"},
+        ],
+    },
 )
 
 model = os.environ.get("MODEL", "claude-opus-4-6")
