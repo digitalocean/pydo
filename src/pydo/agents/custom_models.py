@@ -110,6 +110,64 @@ class ProviderAuthState:
     EXPIRED = "PROVIDER_AUTH_STATE_EXPIRED"
 
 
+# ---------------------------------------------------------------------------
+# Triggers (harness-trigger / OHS)
+# ---------------------------------------------------------------------------
+
+
+class TriggerKind:
+    """How a trigger fires: on an event (webhook) or on a schedule (cron)."""
+
+    WEBHOOK = "webhook"
+    CRON = "cron"
+
+
+class TriggerStatus:
+    """Trigger lifecycle state. Soft-deleted triggers are never returned."""
+
+    ACTIVE = "active"
+    PAUSED = "paused"
+
+
+class TriggerSessionMode:
+    """Whether each firing creates a new session or reuses a paused one."""
+
+    FRESH = "fresh"
+    REUSE = "reuse"
+
+
+class TriggerOutputMode:
+    """Where collected run output is delivered after a firing."""
+
+    NONE = "none"
+    EMAIL = "email"
+    SLACK = "slack"
+
+
+class WebhookProviderKey:
+    """Signature-verification scheme for webhook deliveries."""
+
+    GITHUB = "github"
+    GITLAB = "gitlab"
+    CUSTOM = "custom"
+
+
+class TriggerExecutionStatus:
+    """Per-firing outcome for a trigger execution."""
+
+    PENDING = "pending"
+    RUNNING = "running"
+    SUCCEEDED = "succeeded"
+    FAILED = "failed"
+
+
+class SignatureScheme:
+    """How an external system authenticates a webhook delivery."""
+
+    HMAC_SHA256 = "hmac-sha256"
+    PLAINTEXT = "plaintext"
+
+
 __all__ = [
     "AgentKind",
     "SessionStatus",
@@ -121,4 +179,11 @@ __all__ = [
     "OAuthProvider",
     "OAuthFlowKind",
     "ProviderAuthState",
+    "TriggerKind",
+    "TriggerStatus",
+    "TriggerSessionMode",
+    "TriggerOutputMode",
+    "WebhookProviderKey",
+    "TriggerExecutionStatus",
+    "SignatureScheme",
 ]

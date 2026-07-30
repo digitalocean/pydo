@@ -21,6 +21,13 @@ from .custom_models import (
     RunFailureCode,
     RunState,
     SessionStatus,
+    SignatureScheme,
+    TriggerExecutionStatus,
+    TriggerKind,
+    TriggerOutputMode,
+    TriggerSessionMode,
+    TriggerStatus,
+    WebhookProviderKey,
 )
 from .custom_sessions import (
     HarnessEventStream,
@@ -29,6 +36,7 @@ from .custom_sessions import (
     WorkspaceDownload,
     WorkspaceTransferError,
 )
+from .custom_triggers import TriggersOperations
 from .session import (
     AgentEvent,
     AgentEventType,
@@ -72,6 +80,7 @@ class AgentsResources:
             resolve_agents_base_url(agents_endpoint),
         )
         self.sessions = SessionsOperations(self._proxy)
+        self.triggers = TriggersOperations(self._proxy)
 
     @property
     def base_url(self) -> str:
@@ -117,6 +126,7 @@ __all__ = [
     "RunStream",
     "HITLPolicy",
     "SessionsOperations",
+    "TriggersOperations",
     "HarnessEventStream",
     "HarnessStreamError",
     "WorkspaceDownload",
@@ -133,4 +143,11 @@ __all__ = [
     "OAuthProvider",
     "OAuthFlowKind",
     "ProviderAuthState",
+    "TriggerKind",
+    "TriggerStatus",
+    "TriggerSessionMode",
+    "TriggerOutputMode",
+    "WebhookProviderKey",
+    "TriggerExecutionStatus",
+    "SignatureScheme",
 ]

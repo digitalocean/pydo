@@ -15,6 +15,7 @@ from .custom_sessions import (
     AsyncSessionsOperations,
     AsyncWorkspaceDownload,
 )
+from .custom_triggers import AsyncTriggersOperations
 from .session import AsyncAgentSession, AsyncRunStream
 
 
@@ -25,6 +26,7 @@ class AsyncAgentsResources:
             resolve_agents_base_url(agents_endpoint),
         )
         self.sessions = AsyncSessionsOperations(self._proxy)
+        self.triggers = AsyncTriggersOperations(self._proxy)
 
     @property
     def base_url(self) -> str:
@@ -62,6 +64,7 @@ __all__ = [
     "AsyncAgentSession",
     "AsyncRunStream",
     "AsyncSessionsOperations",
+    "AsyncTriggersOperations",
     "AsyncHarnessEventStream",
     "AsyncWorkspaceDownload",
 ]
