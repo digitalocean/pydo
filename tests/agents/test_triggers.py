@@ -220,9 +220,7 @@ def test_list_executions():
     }
     resources = _make_resources([_FakeResponse(200, body)])
 
-    resp = resources.triggers.list_executions(
-        "t1", page_size=5, status="succeeded"
-    )
+    resp = resources.triggers.list_executions("t1", page_size=5, status="succeeded")
 
     call = _last_call(resources)
     assert call.request.method == "GET"
@@ -321,8 +319,6 @@ def test_404_maps_to_resource_not_found():
 
 
 def test_500_raises_http_response_error():
-    resources = _make_resources(
-        [_FakeResponse(500, {"error": {"message": "boom"}})]
-    )
+    resources = _make_resources([_FakeResponse(500, {"error": {"message": "boom"}})])
     with pytest.raises(HttpResponseError):
         resources.triggers.list()

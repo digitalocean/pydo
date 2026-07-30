@@ -112,7 +112,8 @@ async def test_async_update_delete_rotate_and_executions():
                 200, {"executions": [{"execution_id": "e1"}], "next_page_token": ""}
             ),
             _FakeAsyncResponse(
-                200, {"execution": {"execution_id": "e1", "payload": "{}"}},
+                200,
+                {"execution": {"execution_id": "e1", "payload": "{}"}},
             ),
             _FakeAsyncResponse(200, {"trigger": {"trigger_id": "t1"}}),
             _FakeAsyncResponse(200, {"sessions": []}),
