@@ -30,6 +30,8 @@ clean: ## Removes all generated code (except _patch.py files)
 		! -name "_patch.py" ! -name "custom_*.py" ! -name "exceptions.py" \
 		! -path "*/agents/__init__.py" ! -path "*/aio/agents/__init__.py" \
 		! -path "*/agents/session.py" ! -path "*/aio/agents/session.py" \
+		! -path "*/gateway/*" \
+		! -path "*/action_gateway/*" \
 		-exec rm -rf {} +
 
 .PHONY: download-spec
