@@ -528,6 +528,8 @@ from ...operations._operations import (
     build_nfs_list_snapshot_request,
     build_one_clicks_install_kubernetes_request,
     build_one_clicks_list_request,
+    build_organizations_create_team_request,
+    build_organizations_list_teams_request,
     build_partner_attachments_create_request,
     build_partner_attachments_create_service_key_request,
     build_partner_attachments_delete_request,
@@ -602,20 +604,13 @@ from ...operations._operations import (
     build_reserved_ipv6_list_request,
     build_security_create_scan_request,
     build_security_create_scan_rule_request,
-    build_security_create_secret_request,
     build_security_create_suppression_request,
-    build_security_delete_secret_request,
     build_security_delete_suppression_request,
     build_security_get_latest_scan_request,
     build_security_get_scan_request,
-    build_security_get_secret_request,
     build_security_list_scan_finding_affected_resources_request,
     build_security_list_scans_request,
-    build_security_list_secret_versions_request,
-    build_security_list_secrets_request,
     build_security_list_settings_request,
-    build_security_post_restore_secret_request,
-    build_security_update_secret_request,
     build_security_update_settings_plan_request,
     build_sizes_list_request,
     build_snapshots_delete_request,
@@ -13446,7 +13441,7 @@ class AppsOperations:  # pylint: disable=too-many-public-methods
                     },
                     "project_id": "str"  # Optional. The ID of the project the app should be
                       assigned to. If omitted, it will be assigned to your default project.
-                      :code:`<br>`:code:`<br>`Requires ``project:update`` scope.
+                      :code:`<br>`:code:`<br>`Requires ``project:assign_resource`` scope.
                 }
 
                 # response body for status code(s): 200
@@ -30169,7 +30164,7 @@ class AppsOperations:  # pylint: disable=too-many-public-methods
                     },
                     "project_id": "str"  # Optional. The ID of the project the app should be
                       assigned to. If omitted, it will be assigned to your default project.
-                      :code:`<br>`:code:`<br>`Requires ``project:update`` scope.
+                      :code:`<br>`:code:`<br>`Requires ``project:assign_resource`` scope.
                 }
 
                 # response body for status code(s): 200
@@ -111450,8 +111445,10 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                             }
                                         ],
                                         "pg_allow_replication": bool  #
-                                          Optional. For Postgres clusters, set to ``true`` for a user
-                                          with replication rights. This option is not currently
+                                          Optional. For PostgreSQL clusters, set to ``true`` to grant
+                                          the user replication privileges. When omitted on create or
+                                          update, the value defaults to ``false`` and replication
+                                          privileges are not granted. This option is not currently
                                           supported for other database engines.
                                     }
                                 }
@@ -111727,7 +111724,7 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                     "project_id": "str",  # Optional. The ID of the project that the database
                       cluster is assigned to. If excluded when creating a new database cluster, it will
                       be assigned to your default project.:code:`<br>`:code:`<br>`Requires
-                      ``project:update`` scope.
+                      ``project:assign_resource`` scope.
                     "rules": [
                         {
                             "type": "str",  # The type of resource that the firewall rule
@@ -111904,9 +111901,10 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                     }
                                 ],
                                 "pg_allow_replication": bool  # Optional. For
-                                  Postgres clusters, set to ``true`` for a user with replication
-                                  rights. This option is not currently supported for other database
-                                  engines.
+                                  PostgreSQL clusters, set to ``true`` to grant the user replication
+                                  privileges. When omitted on create or update, the value defaults to
+                                  ``false`` and replication privileges are not granted. This option is
+                                  not currently supported for other database engines.
                             }
                         }
                     ],
@@ -112208,9 +112206,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                         }
                                     ],
                                     "pg_allow_replication": bool  # Optional. For
-                                      Postgres clusters, set to ``true`` for a user with replication
-                                      rights. This option is not currently supported for other database
-                                      engines.
+                                      PostgreSQL clusters, set to ``true`` to grant the user
+                                      replication privileges. When omitted on create or update, the
+                                      value defaults to ``false`` and replication privileges are not
+                                      granted. This option is not currently supported for other
+                                      database engines.
                                 }
                             }
                         ],
@@ -112581,9 +112581,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                         }
                                     ],
                                     "pg_allow_replication": bool  # Optional. For
-                                      Postgres clusters, set to ``true`` for a user with replication
-                                      rights. This option is not currently supported for other database
-                                      engines.
+                                      PostgreSQL clusters, set to ``true`` to grant the user
+                                      replication privileges. When omitted on create or update, the
+                                      value defaults to ``false`` and replication privileges are not
+                                      granted. This option is not currently supported for other
+                                      database engines.
                                 }
                             }
                         ],
@@ -112775,7 +112777,7 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                     "project_id": "str",  # Optional. The ID of the project that the database
                       cluster is assigned to. If excluded when creating a new database cluster, it will
                       be assigned to your default project.:code:`<br>`:code:`<br>`Requires
-                      ``project:update`` scope.
+                      ``project:assign_resource`` scope.
                     "rules": [
                         {
                             "type": "str",  # The type of resource that the firewall rule
@@ -112952,9 +112954,10 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                     }
                                 ],
                                 "pg_allow_replication": bool  # Optional. For
-                                  Postgres clusters, set to ``true`` for a user with replication
-                                  rights. This option is not currently supported for other database
-                                  engines.
+                                  PostgreSQL clusters, set to ``true`` to grant the user replication
+                                  privileges. When omitted on create or update, the value defaults to
+                                  ``false`` and replication privileges are not granted. This option is
+                                  not currently supported for other database engines.
                             }
                         }
                     ],
@@ -113256,9 +113259,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                         }
                                     ],
                                     "pg_allow_replication": bool  # Optional. For
-                                      Postgres clusters, set to ``true`` for a user with replication
-                                      rights. This option is not currently supported for other database
-                                      engines.
+                                      PostgreSQL clusters, set to ``true`` to grant the user
+                                      replication privileges. When omitted on create or update, the
+                                      value defaults to ``false`` and replication privileges are not
+                                      granted. This option is not currently supported for other
+                                      database engines.
                                 }
                             }
                         ],
@@ -113692,9 +113697,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                         }
                                     ],
                                     "pg_allow_replication": bool  # Optional. For
-                                      Postgres clusters, set to ``true`` for a user with replication
-                                      rights. This option is not currently supported for other database
-                                      engines.
+                                      PostgreSQL clusters, set to ``true`` to grant the user
+                                      replication privileges. When omitted on create or update, the
+                                      value defaults to ``false`` and replication privileges are not
+                                      granted. This option is not currently supported for other
+                                      database engines.
                                 }
                             }
                         ],
@@ -115506,10 +115513,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         resources should be able to open connections to the database. You may limit connections to
         specific Droplets, Kubernetes clusters, or IP addresses. When a tag is provided, any Droplet or
         Kubernetes node with that tag applied to it will have access. The firewall is limited to 100
-        rules (or trusted sources). When possible, we recommend `placing your databases into a VPC
-        network <https://docs.digitalocean.com/products/networking/vpc/>`_ to limit access to them
-        instead of using a firewall.
-        A successful.
+        rules (or trusted sources). You cannot add IPv6 addresses as trusted sources. For additional
+        limits, see your database engine's limits page. When possible, we recommend `placing your
+        databases into a VPC network <https://docs.digitalocean.com/products/networking/vpc/>`_ to
+        limit access to them instead of using a firewall.
+        A successful request returns a 204 status code with no content.
 
         :param database_cluster_uuid: A unique identifier for a database cluster. Required.
         :type database_cluster_uuid: str
@@ -115578,10 +115586,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         resources should be able to open connections to the database. You may limit connections to
         specific Droplets, Kubernetes clusters, or IP addresses. When a tag is provided, any Droplet or
         Kubernetes node with that tag applied to it will have access. The firewall is limited to 100
-        rules (or trusted sources). When possible, we recommend `placing your databases into a VPC
-        network <https://docs.digitalocean.com/products/networking/vpc/>`_ to limit access to them
-        instead of using a firewall.
-        A successful.
+        rules (or trusted sources). You cannot add IPv6 addresses as trusted sources. For additional
+        limits, see your database engine's limits page. When possible, we recommend `placing your
+        databases into a VPC network <https://docs.digitalocean.com/products/networking/vpc/>`_ to
+        limit access to them instead of using a firewall.
+        A successful request returns a 204 status code with no content.
 
         :param database_cluster_uuid: A unique identifier for a database cluster. Required.
         :type database_cluster_uuid: str
@@ -115622,10 +115631,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         resources should be able to open connections to the database. You may limit connections to
         specific Droplets, Kubernetes clusters, or IP addresses. When a tag is provided, any Droplet or
         Kubernetes node with that tag applied to it will have access. The firewall is limited to 100
-        rules (or trusted sources). When possible, we recommend `placing your databases into a VPC
-        network <https://docs.digitalocean.com/products/networking/vpc/>`_ to limit access to them
-        instead of using a firewall.
-        A successful.
+        rules (or trusted sources). You cannot add IPv6 addresses as trusted sources. For additional
+        limits, see your database engine's limits page. When possible, we recommend `placing your
+        databases into a VPC network <https://docs.digitalocean.com/products/networking/vpc/>`_ to
+        limit access to them instead of using a firewall.
+        A successful request returns a 204 status code with no content.
 
         :param database_cluster_uuid: A unique identifier for a database cluster. Required.
         :type database_cluster_uuid: str
@@ -118038,6 +118048,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
 
         For MySQL clusters, additional options will be contained in the mysql_settings object.
 
+        For PostgreSQL clusters, additional options will be contained in the ``settings``
+        object (for example, ``pg_allow_replication``\\ ).
+
+        For Kafka clusters, additional options will be contained in the ``settings`` object.
+
         For MongoDB clusters, additional information will be contained in the mongo_user_settings
         object.
 
@@ -118128,9 +118143,10 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                     }
                                 ],
                                 "pg_allow_replication": bool  # Optional. For
-                                  Postgres clusters, set to ``true`` for a user with replication
-                                  rights. This option is not currently supported for other database
-                                  engines.
+                                  PostgreSQL clusters, set to ``true`` to grant the user replication
+                                  privileges. When omitted on create or update, the value defaults to
+                                  ``false`` and replication privileges are not granted. This option is
+                                  not currently supported for other database engines.
                             }
                         }
                     ]
@@ -118245,10 +118261,14 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         When adding a user to a MySQL cluster, additional options can be configured in the
         ``mysql_settings`` object.
 
+        When adding a user to a PostgreSQL cluster, additional options can be configured in
+        the ``settings`` object (for example, ``pg_allow_replication``\\ ). When
+        ``pg_allow_replication`` is omitted, it defaults to ``false``.
+
         When adding a user to a Kafka cluster, additional options can be configured in
         the ``settings`` object.
 
-         When adding a user to a MongoDB cluster, additional options can be configured in
+        When adding a user to a MongoDB cluster, additional options can be configured in
         the ``settings.mongo_user_settings`` object.
 
         The response will be a JSON object with a key called ``user``. The value of this will be an
@@ -118340,9 +118360,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                   values are: "deny", "admin", "read", "readwrite", and "write".
                             }
                         ],
-                        "pg_allow_replication": bool  # Optional. For Postgres clusters, set
-                          to ``true`` for a user with replication rights. This option is not currently
-                          supported for other database engines.
+                        "pg_allow_replication": bool  # Optional. For PostgreSQL clusters,
+                          set to ``true`` to grant the user replication privileges. When omitted on
+                          create or update, the value defaults to ``false`` and replication privileges
+                          are not granted. This option is not currently supported for other database
+                          engines.
                     }
                 }
 
@@ -118417,9 +118439,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -118456,10 +118480,14 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         When adding a user to a MySQL cluster, additional options can be configured in the
         ``mysql_settings`` object.
 
+        When adding a user to a PostgreSQL cluster, additional options can be configured in
+        the ``settings`` object (for example, ``pg_allow_replication``\\ ). When
+        ``pg_allow_replication`` is omitted, it defaults to ``false``.
+
         When adding a user to a Kafka cluster, additional options can be configured in
         the ``settings`` object.
 
-         When adding a user to a MongoDB cluster, additional options can be configured in
+        When adding a user to a MongoDB cluster, additional options can be configured in
         the ``settings.mongo_user_settings`` object.
 
         The response will be a JSON object with a key called ``user``. The value of this will be an
@@ -118551,9 +118579,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -118585,10 +118615,14 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         When adding a user to a MySQL cluster, additional options can be configured in the
         ``mysql_settings`` object.
 
+        When adding a user to a PostgreSQL cluster, additional options can be configured in
+        the ``settings`` object (for example, ``pg_allow_replication``\\ ). When
+        ``pg_allow_replication`` is omitted, it defaults to ``false``.
+
         When adding a user to a Kafka cluster, additional options can be configured in
         the ``settings`` object.
 
-         When adding a user to a MongoDB cluster, additional options can be configured in
+        When adding a user to a MongoDB cluster, additional options can be configured in
         the ``settings.mongo_user_settings`` object.
 
         The response will be a JSON object with a key called ``user``. The value of this will be an
@@ -118677,9 +118711,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                   values are: "deny", "admin", "read", "readwrite", and "write".
                             }
                         ],
-                        "pg_allow_replication": bool  # Optional. For Postgres clusters, set
-                          to ``true`` for a user with replication rights. This option is not currently
-                          supported for other database engines.
+                        "pg_allow_replication": bool  # Optional. For PostgreSQL clusters,
+                          set to ``true`` to grant the user replication privileges. When omitted on
+                          create or update, the value defaults to ``false`` and replication privileges
+                          are not granted. This option is not currently supported for other database
+                          engines.
                     }
                 }
 
@@ -118754,9 +118790,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -118883,6 +118921,9 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         For MySQL clusters, additional options will be contained in the ``mysql_settings``
         object.
 
+        For PostgreSQL clusters, additional options will be contained in the ``settings``
+        object (for example, ``pg_allow_replication``\\ ).
+
         For Kafka clusters, additional options will be contained in the ``settings`` object.
 
         For MongoDB clusters, additional information will be contained in the mongo_user_settings
@@ -118970,9 +119011,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -119201,8 +119244,14 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         the name of a user,
         you must recreate a new user.
 
+        For PostgreSQL clusters, you can update ``settings.pg_allow_replication`` to enable or
+        disable replication privileges for the user. When omitted, the value defaults to ``false``.
+
+        For Kafka and OpenSearch clusters, additional options can be configured in the
+        ``settings`` object (for example, topic or index ACLs).
+
         The response will be a JSON object with a key called ``user``. The value of this will be an
-        object that contains the name of the update database user, along with the ``settings`` object
+        object that contains the name of the updated database user, along with the ``settings`` object
         that
         has been updated.
 
@@ -119271,9 +119320,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                   values are: "deny", "admin", "read", "readwrite", and "write".
                             }
                         ],
-                        "pg_allow_replication": bool  # Optional. For Postgres clusters, set
-                          to ``true`` for a user with replication rights. This option is not currently
-                          supported for other database engines.
+                        "pg_allow_replication": bool  # Optional. For PostgreSQL clusters,
+                          set to ``true`` to grant the user replication privileges. When omitted on
+                          create or update, the value defaults to ``false`` and replication privileges
+                          are not granted. This option is not currently supported for other database
+                          engines.
                     }
                 }
 
@@ -119348,9 +119399,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -119388,8 +119441,14 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         the name of a user,
         you must recreate a new user.
 
+        For PostgreSQL clusters, you can update ``settings.pg_allow_replication`` to enable or
+        disable replication privileges for the user. When omitted, the value defaults to ``false``.
+
+        For Kafka and OpenSearch clusters, additional options can be configured in the
+        ``settings`` object (for example, topic or index ACLs).
+
         The response will be a JSON object with a key called ``user``. The value of this will be an
-        object that contains the name of the update database user, along with the ``settings`` object
+        object that contains the name of the updated database user, along with the ``settings`` object
         that
         has been updated.
 
@@ -119480,9 +119539,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -119518,8 +119579,14 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
         the name of a user,
         you must recreate a new user.
 
+        For PostgreSQL clusters, you can update ``settings.pg_allow_replication`` to enable or
+        disable replication privileges for the user. When omitted, the value defaults to ``false``.
+
+        For Kafka and OpenSearch clusters, additional options can be configured in the
+        ``settings`` object (for example, topic or index ACLs).
+
         The response will be a JSON object with a key called ``user``. The value of this will be an
-        object that contains the name of the update database user, along with the ``settings`` object
+        object that contains the name of the updated database user, along with the ``settings`` object
         that
         has been updated.
 
@@ -119585,9 +119652,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                   values are: "deny", "admin", "read", "readwrite", and "write".
                             }
                         ],
-                        "pg_allow_replication": bool  # Optional. For Postgres clusters, set
-                          to ``true`` for a user with replication rights. This option is not currently
-                          supported for other database engines.
+                        "pg_allow_replication": bool  # Optional. For PostgreSQL clusters,
+                          set to ``true`` to grant the user replication privileges. When omitted on
+                          create or update, the value defaults to ``false`` and replication privileges
+                          are not granted. This option is not currently supported for other database
+                          engines.
                     }
                 }
 
@@ -119662,9 +119731,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -119895,9 +119966,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -120024,9 +120097,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -120160,9 +120235,11 @@ class DatabasesOperations:  # pylint: disable=too-many-public-methods
                                       "readwrite", and "write".
                                 }
                             ],
-                            "pg_allow_replication": bool  # Optional. For Postgres
-                              clusters, set to ``true`` for a user with replication rights. This option
-                              is not currently supported for other database engines.
+                            "pg_allow_replication": bool  # Optional. For PostgreSQL
+                              clusters, set to ``true`` to grant the user replication privileges. When
+                              omitted on create or update, the value defaults to ``false`` and
+                              replication privileges are not granted. This option is not currently
+                              supported for other database engines.
                         }
                     }
                 }
@@ -133724,9 +133801,10 @@ class DropletsOperations:
                                               The unit of measure for the disk size.
                                         },
                                         "type": "str"  # Optional. The type
-                                          of disk. All Droplets contain a ``local`` disk. Additionally,
-                                          GPU Droplets can also have a ``scratch`` disk for
-                                          non-persistent data. Known values are: "local" and "scratch".
+                                          of disk. All Droplets contain a ``local`` or ``remote`` disk.
+                                          Additionally, GPU Droplets can also have a ``scratch`` disk
+                                          for non-persistent data. Known values are: "local", "remote",
+                                          and "scratch".
                                     }
                                 ],
                                 "gpu_info": {
@@ -133771,9 +133849,10 @@ class DropletsOperations:
                                           of measure for the disk size.
                                     },
                                     "type": "str"  # Optional. The type of disk.
-                                      All Droplets contain a ``local`` disk. Additionally, GPU Droplets
-                                      can also have a ``scratch`` disk for non-persistent data. Known
-                                      values are: "local" and "scratch".
+                                      All Droplets contain a ``local`` or ``remote`` disk.
+                                      Additionally, GPU Droplets can also have a ``scratch`` disk for
+                                      non-persistent data. Known values are: "local", "remote", and
+                                      "scratch".
                                 }
                             ],
                             "gpu_info": {
@@ -134397,9 +134476,10 @@ class DropletsOperations:
                                           of measure for the disk size.
                                     },
                                     "type": "str"  # Optional. The type of disk.
-                                      All Droplets contain a ``local`` disk. Additionally, GPU Droplets
-                                      can also have a ``scratch`` disk for non-persistent data. Known
-                                      values are: "local" and "scratch".
+                                      All Droplets contain a ``local`` or ``remote`` disk.
+                                      Additionally, GPU Droplets can also have a ``scratch`` disk for
+                                      non-persistent data. Known values are: "local", "remote", and
+                                      "scratch".
                                 }
                             ],
                             "gpu_info": {
@@ -134442,9 +134522,9 @@ class DropletsOperations:
                                       measure for the disk size.
                                 },
                                 "type": "str"  # Optional. The type of disk. All
-                                  Droplets contain a ``local`` disk. Additionally, GPU Droplets can
-                                  also have a ``scratch`` disk for non-persistent data. Known values
-                                  are: "local" and "scratch".
+                                  Droplets contain a ``local`` or ``remote`` disk. Additionally, GPU
+                                  Droplets can also have a ``scratch`` disk for non-persistent data.
+                                  Known values are: "local", "remote", and "scratch".
                             }
                         ],
                         "gpu_info": {
@@ -135970,9 +136050,10 @@ class DropletsOperations:
                                               The unit of measure for the disk size.
                                         },
                                         "type": "str"  # Optional. The type
-                                          of disk. All Droplets contain a ``local`` disk. Additionally,
-                                          GPU Droplets can also have a ``scratch`` disk for
-                                          non-persistent data. Known values are: "local" and "scratch".
+                                          of disk. All Droplets contain a ``local`` or ``remote`` disk.
+                                          Additionally, GPU Droplets can also have a ``scratch`` disk
+                                          for non-persistent data. Known values are: "local", "remote",
+                                          and "scratch".
                                     }
                                 ],
                                 "gpu_info": {
@@ -136017,9 +136098,10 @@ class DropletsOperations:
                                           of measure for the disk size.
                                     },
                                     "type": "str"  # Optional. The type of disk.
-                                      All Droplets contain a ``local`` disk. Additionally, GPU Droplets
-                                      can also have a ``scratch`` disk for non-persistent data. Known
-                                      values are: "local" and "scratch".
+                                      All Droplets contain a ``local`` or ``remote`` disk.
+                                      Additionally, GPU Droplets can also have a ``scratch`` disk for
+                                      non-persistent data. Known values are: "local", "remote", and
+                                      "scratch".
                                 }
                             ],
                             "gpu_info": {
@@ -150188,6 +150270,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                                 "enabled": bool  # Optional. Indicates whether the
                                   Nvidia GPU Device Plugin is enabled.
                             },
+                            "p2p_oci_registry_plugin": {
+                                "enabled": bool  # Optional. Indicates whether the
+                                  Peer-to-peer OCI registry component is enabled.
+                            },
                             "rdma_shared_dev_plugin": {
                                 "enabled": bool  # Optional. Indicates whether the
                                   RDMA shared device plugin is enabled.
@@ -150500,6 +150586,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "enabled": bool  # Optional. Indicates whether the Nvidia GPU Device
                           Plugin is enabled.
                     },
+                    "p2p_oci_registry_plugin": {
+                        "enabled": bool  # Optional. Indicates whether the Peer-to-peer OCI
+                          registry component is enabled.
+                    },
                     "rdma_shared_dev_plugin": {
                         "enabled": bool  # Optional. Indicates whether the RDMA shared device
                           plugin is enabled.
@@ -150718,6 +150808,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "nvidia_gpu_device_plugin": {
                             "enabled": bool  # Optional. Indicates whether the Nvidia GPU
                               Device Plugin is enabled.
+                        },
+                        "p2p_oci_registry_plugin": {
+                            "enabled": bool  # Optional. Indicates whether the
+                              Peer-to-peer OCI registry component is enabled.
                         },
                         "rdma_shared_dev_plugin": {
                             "enabled": bool  # Optional. Indicates whether the RDMA
@@ -150971,6 +151065,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                             "enabled": bool  # Optional. Indicates whether the Nvidia GPU
                               Device Plugin is enabled.
                         },
+                        "p2p_oci_registry_plugin": {
+                            "enabled": bool  # Optional. Indicates whether the
+                              Peer-to-peer OCI registry component is enabled.
+                        },
                         "rdma_shared_dev_plugin": {
                             "enabled": bool  # Optional. Indicates whether the RDMA
                               shared device plugin is enabled.
@@ -151209,6 +151307,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "enabled": bool  # Optional. Indicates whether the Nvidia GPU Device
                           Plugin is enabled.
                     },
+                    "p2p_oci_registry_plugin": {
+                        "enabled": bool  # Optional. Indicates whether the Peer-to-peer OCI
+                          registry component is enabled.
+                    },
                     "rdma_shared_dev_plugin": {
                         "enabled": bool  # Optional. Indicates whether the RDMA shared device
                           plugin is enabled.
@@ -151427,6 +151529,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "nvidia_gpu_device_plugin": {
                             "enabled": bool  # Optional. Indicates whether the Nvidia GPU
                               Device Plugin is enabled.
+                        },
+                        "p2p_oci_registry_plugin": {
+                            "enabled": bool  # Optional. Indicates whether the
+                              Peer-to-peer OCI registry component is enabled.
                         },
                         "rdma_shared_dev_plugin": {
                             "enabled": bool  # Optional. Indicates whether the RDMA
@@ -151741,6 +151847,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                             "enabled": bool  # Optional. Indicates whether the Nvidia GPU
                               Device Plugin is enabled.
                         },
+                        "p2p_oci_registry_plugin": {
+                            "enabled": bool  # Optional. Indicates whether the
+                              Peer-to-peer OCI registry component is enabled.
+                        },
                         "rdma_shared_dev_plugin": {
                             "enabled": bool  # Optional. Indicates whether the RDMA
                               shared device plugin is enabled.
@@ -151983,6 +152093,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "enabled": bool  # Optional. Indicates whether the Nvidia GPU Device
                           Plugin is enabled.
                     },
+                    "p2p_oci_registry_plugin": {
+                        "enabled": bool  # Optional. Indicates whether the Peer-to-peer OCI
+                          registry component is enabled.
+                    },
                     "rdma_shared_dev_plugin": {
                         "enabled": bool  # Optional. Indicates whether the RDMA shared device
                           plugin is enabled.
@@ -152178,6 +152292,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "nvidia_gpu_device_plugin": {
                             "enabled": bool  # Optional. Indicates whether the Nvidia GPU
                               Device Plugin is enabled.
+                        },
+                        "p2p_oci_registry_plugin": {
+                            "enabled": bool  # Optional. Indicates whether the
+                              Peer-to-peer OCI registry component is enabled.
                         },
                         "rdma_shared_dev_plugin": {
                             "enabled": bool  # Optional. Indicates whether the RDMA
@@ -152443,6 +152561,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                             "enabled": bool  # Optional. Indicates whether the Nvidia GPU
                               Device Plugin is enabled.
                         },
+                        "p2p_oci_registry_plugin": {
+                            "enabled": bool  # Optional. Indicates whether the
+                              Peer-to-peer OCI registry component is enabled.
+                        },
                         "rdma_shared_dev_plugin": {
                             "enabled": bool  # Optional. Indicates whether the RDMA
                               shared device plugin is enabled.
@@ -152599,6 +152721,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                     "nvidia_gpu_device_plugin": {
                         "enabled": bool  # Optional. Indicates whether the Nvidia GPU Device
                           Plugin is enabled.
+                    },
+                    "p2p_oci_registry_plugin": {
+                        "enabled": bool  # Optional. Indicates whether the Peer-to-peer OCI
+                          registry component is enabled.
                     },
                     "rdma_shared_dev_plugin": {
                         "enabled": bool  # Optional. Indicates whether the RDMA shared device
@@ -152795,6 +152921,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "nvidia_gpu_device_plugin": {
                             "enabled": bool  # Optional. Indicates whether the Nvidia GPU
                               Device Plugin is enabled.
+                        },
+                        "p2p_oci_registry_plugin": {
+                            "enabled": bool  # Optional. Indicates whether the
+                              Peer-to-peer OCI registry component is enabled.
                         },
                         "rdma_shared_dev_plugin": {
                             "enabled": bool  # Optional. Indicates whether the RDMA
@@ -174396,6 +174526,483 @@ class NfsOperations:
         return cast(JSON, deserialized)  # type: ignore
 
 
+class OrganizationsOperations:
+    """
+    .. warning::
+        **DO NOT** instantiate this class directly.
+
+        Instead, you should access the following operations through
+        :class:`~pydo.aio.GeneratedClient`'s
+        :attr:`organizations` attribute.
+    """
+
+    def __init__(self, *args, **kwargs) -> None:
+        input_args = list(args)
+        self._client = input_args.pop(0) if input_args else kwargs.pop("client")
+        self._config = input_args.pop(0) if input_args else kwargs.pop("config")
+        self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
+        self._deserialize = (
+            input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        )
+
+    @overload
+    async def create_team(
+        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Team in an Organization.
+
+        To create a new team within an organization, send a POST request to
+        ``/v2/organizations/team``.
+
+        This endpoint must be called in an organization context. Optionally include
+        ``invitations`` to invite users to the new team. The ``owner`` role cannot be
+        assigned via invitation.
+
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "name": "str",  # The human-readable name for the team to create. Required.
+                    "invitations": [
+                        {
+                            "email": "str",  # The email address of the user to invite.
+                              Required.
+                            "role": "str"  # The role to assign to the invited user. The
+                              ``owner`` role cannot be assigned via invitation. Required. Known values
+                              are: "member", "biller", "billing viewer", "resource viewer", and
+                              "modifier".
+                        }
+                    ]
+                }
+
+                # response body for status code(s): 201
+                response == {
+                    "team": {
+                        "name": "str",  # The human-readable name for the newly created team.
+                          Required.
+                        "uuid": "str"  # A unique universal identifier for the newly created
+                          team. Required.
+                    },
+                    "invitations": {
+                        "str": {
+                            "status": "str"  # Optional. The invitation delivery status
+                              for the email address. Known values are: "ok" and
+                              "daily_invite_limit_reached".
+                        }
+                    }
+                }
+                # response body for status code(s): 400, 403, 412
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def create_team(
+        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Team in an Organization.
+
+        To create a new team within an organization, send a POST request to
+        ``/v2/organizations/team``.
+
+        This endpoint must be called in an organization context. Optionally include
+        ``invitations`` to invite users to the new team. The ``owner`` role cannot be
+        assigned via invitation.
+
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 201
+                response == {
+                    "team": {
+                        "name": "str",  # The human-readable name for the newly created team.
+                          Required.
+                        "uuid": "str"  # A unique universal identifier for the newly created
+                          team. Required.
+                    },
+                    "invitations": {
+                        "str": {
+                            "status": "str"  # Optional. The invitation delivery status
+                              for the email address. Known values are: "ok" and
+                              "daily_invite_limit_reached".
+                        }
+                    }
+                }
+                # response body for status code(s): 400, 403, 412
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def create_team(self, body: Union[JSON, IO[bytes]], **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Team in an Organization.
+
+        To create a new team within an organization, send a POST request to
+        ``/v2/organizations/team``.
+
+        This endpoint must be called in an organization context. Optionally include
+        ``invitations`` to invite users to the new team. The ``owner`` role cannot be
+        assigned via invitation.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "name": "str",  # The human-readable name for the team to create. Required.
+                    "invitations": [
+                        {
+                            "email": "str",  # The email address of the user to invite.
+                              Required.
+                            "role": "str"  # The role to assign to the invited user. The
+                              ``owner`` role cannot be assigned via invitation. Required. Known values
+                              are: "member", "biller", "billing viewer", "resource viewer", and
+                              "modifier".
+                        }
+                    ]
+                }
+
+                # response body for status code(s): 201
+                response == {
+                    "team": {
+                        "name": "str",  # The human-readable name for the newly created team.
+                          Required.
+                        "uuid": "str"  # A unique universal identifier for the newly created
+                          team. Required.
+                    },
+                    "invitations": {
+                        "str": {
+                            "status": "str"  # Optional. The invitation delivery status
+                              for the email address. Known values are: "ok" and
+                              "daily_invite_limit_reached".
+                        }
+                    }
+                }
+                # response body for status code(s): 400, 403, 412
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_organizations_create_team_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [201, 400, 403, 412]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 201:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 412:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def list_teams(self, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """List Teams in an Organization.
+
+        To list all teams in an organization, send a GET request to
+        ``/v2/organizations/teams``.
+
+        This endpoint must be called in an organization context.
+
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "teams": [
+                        {
+                            "company": "str",  # Optional. The company name associated
+                              with the team, if set.
+                            "email": "str",  # Optional. The email address associated
+                              with the team.
+                            "id": 0,  # Optional. A unique identifier for the team.
+                            "joined_organization_at": "2020-02-20 00:00:00",  # Optional.
+                              A time value given in ISO8601 combined date and time format that
+                              represents when the team joined the organization.
+                            "member_count": 0,  # Optional. The number of members on the
+                              team.
+                            "name": "str",  # Optional. The human-readable name for the
+                              team.
+                            "status": "str",  # Optional. The team's membership status
+                              within the organization. Known values are: "joined" and "pending".
+                            "uuid": "str"  # Optional. A unique universal identifier for
+                              the team.
+                        }
+                    ]
+                }
+                # response body for status code(s): 403, 412
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_organizations_list_teams_request(
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 403, 412]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 412:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+
 class PartnerAttachmentsOperations:
     """
     .. warning::
@@ -178398,9 +179005,10 @@ class ProjectsOperations:
         To assign resources to a project, send a POST request to
         ``/v2/projects/$PROJECT_ID/resources``.
 
-        You must have both ``project:update`` and ``<resource>:read`` scopes to assign new resources.
-        For example, to assign a Droplet to a project, include both the ``project:update`` and
-        ``droplet:read`` scopes.
+        You must have both ``project:assign_resource`` and ``<resource>:read`` scopes to assign new
+        resources. For example, to assign a Droplet to a project, include both the
+        ``project:assign_resource`` and ``droplet:read`` scopes. The ``project:update`` scope also
+        grants ``project:assign_resource``.
 
         :param project_id: A unique identifier for a project. Required.
         :type project_id: str
@@ -178472,9 +179080,10 @@ class ProjectsOperations:
         To assign resources to a project, send a POST request to
         ``/v2/projects/$PROJECT_ID/resources``.
 
-        You must have both ``project:update`` and ``<resource>:read`` scopes to assign new resources.
-        For example, to assign a Droplet to a project, include both the ``project:update`` and
-        ``droplet:read`` scopes.
+        You must have both ``project:assign_resource`` and ``<resource>:read`` scopes to assign new
+        resources. For example, to assign a Droplet to a project, include both the
+        ``project:assign_resource`` and ``droplet:read`` scopes. The ``project:update`` scope also
+        grants ``project:assign_resource``.
 
         :param project_id: A unique identifier for a project. Required.
         :type project_id: str
@@ -178532,9 +179141,10 @@ class ProjectsOperations:
         To assign resources to a project, send a POST request to
         ``/v2/projects/$PROJECT_ID/resources``.
 
-        You must have both ``project:update`` and ``<resource>:read`` scopes to assign new resources.
-        For example, to assign a Droplet to a project, include both the ``project:update`` and
-        ``droplet:read`` scopes.
+        You must have both ``project:assign_resource`` and ``<resource>:read`` scopes to assign new
+        resources. For example, to assign a Droplet to a project, include both the
+        ``project:assign_resource`` and ``droplet:read`` scopes. The ``project:update`` scope also
+        grants ``project:assign_resource``.
 
         :param project_id: A unique identifier for a project. Required.
         :type project_id: str
@@ -178821,9 +179431,10 @@ class ProjectsOperations:
         To assign resources to your default project, send a POST request to
         ``/v2/projects/default/resources``.
 
-        You must have both project:update and :code:`<resource>`:read scopes to assign new resources.
-        For example, to assign a Droplet to the default project, include both the ``project:update``
-        and ``droplet:read`` scopes.
+        You must have both ``project:assign_resource`` and ``<resource>:read`` scopes to assign new
+        resources. For example, to assign a Droplet to the default project, include both the
+        ``project:assign_resource`` and ``droplet:read`` scopes. The ``project:update`` scope also
+        grants ``project:assign_resource``.
 
         :param body: Required.
         :type body: JSON
@@ -178888,9 +179499,10 @@ class ProjectsOperations:
         To assign resources to your default project, send a POST request to
         ``/v2/projects/default/resources``.
 
-        You must have both project:update and :code:`<resource>`:read scopes to assign new resources.
-        For example, to assign a Droplet to the default project, include both the ``project:update``
-        and ``droplet:read`` scopes.
+        You must have both ``project:assign_resource`` and ``<resource>:read`` scopes to assign new
+        resources. For example, to assign a Droplet to the default project, include both the
+        ``project:assign_resource`` and ``droplet:read`` scopes. The ``project:update`` scope also
+        grants ``project:assign_resource``.
 
         :param body: Required.
         :type body: IO[bytes]
@@ -178946,9 +179558,10 @@ class ProjectsOperations:
         To assign resources to your default project, send a POST request to
         ``/v2/projects/default/resources``.
 
-        You must have both project:update and :code:`<resource>`:read scopes to assign new resources.
-        For example, to assign a Droplet to the default project, include both the ``project:update``
-        and ``droplet:read`` scopes.
+        You must have both ``project:assign_resource`` and ``<resource>:read`` scopes to assign new
+        resources. For example, to assign a Droplet to the default project, include both the
+        ``project:assign_resource`` and ``droplet:read`` scopes. The ``project:update`` scope also
+        grants ``project:assign_resource``.
 
         :param body: Is either a JSON type or a IO[bytes] type. Required.
         :type body: JSON or IO[bytes]
@@ -191063,1097 +191676,6 @@ class SecurityOperations:
 
         return deserialized  # type: ignore
 
-    @distributed_trace_async
-    async def list_secrets(
-        self, *, per_page: int = 20, page: int = 1, **kwargs: Any
-    ) -> JSON:
-        """List Secrets.
-
-        To list secrets across all configured regions, send a GET request to ``/v2/security/secrets``.
-
-        :keyword per_page: Number of items returned per page. Default value is 20.
-        :paramtype per_page: int
-        :keyword page: Which 'page' of paginated results to return. Default value is 1.
-        :paramtype page: int
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "links": {
-                        "pages": {
-                            "first": "str",  # Optional. URL for the first page of
-                              results.
-                            "last": "str",  # Optional. URL for the last page of results.
-                            "next": "str",  # Optional. URL for the next page of results.
-                            "prev": "str"  # Optional. URL for the previous page of
-                              results.
-                        }
-                    },
-                    "meta": {
-                        "page": 0,  # Optional. The current page number.
-                        "pages": 0,  # Optional. The total number of pages.
-                        "total": 0  # Optional. The total number of secrets across all
-                          regions.
-                    },
-                    "secrets": [
-                        {
-                            "created_at": "2020-02-20 00:00:00",  # Optional. When the
-                              secret was created.
-                            "delete_requested_at": "2020-02-20 00:00:00",  # Optional.
-                              When deletion was requested for the secret.
-                            "region": "str",  # Optional. The region where the secret is
-                              stored.
-                            "secret": "str",  # Optional. The name of the secret.
-                            "updated_at": "2020-02-20 00:00:00",  # Optional. When the
-                              secret was last updated.
-                            "version": 0  # Optional. The current version of the secret.
-                        }
-                    ],
-                    "unavailable_regions": [
-                        "str"  # Optional. Regions that could not be queried while building
-                          the list response.
-                    ]
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = kwargs.pop("headers", {}) or {}
-        _params = kwargs.pop("params", {}) or {}
-
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        _request = build_security_list_secrets_request(
-            per_page=per_page,
-            page=page,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            await self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200]:
-            if _stream:
-                await response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        response_headers["ratelimit-limit"] = self._deserialize(
-            "int", response.headers.get("ratelimit-limit")
-        )
-        response_headers["ratelimit-remaining"] = self._deserialize(
-            "int", response.headers.get("ratelimit-remaining")
-        )
-        response_headers["ratelimit-reset"] = self._deserialize(
-            "int", response.headers.get("ratelimit-reset")
-        )
-
-        if response.content:
-            deserialized = response.json()
-        else:
-            deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-    @overload
-    async def create_secret(
-        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Create Secret.
-
-        To create a secret, send a POST request to ``/v2/security/secrets``.
-
-        :param body: Required.
-        :type body: JSON
-        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
-         Default value is "application/json".
-        :paramtype content_type: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # JSON input template you can fill out and use as your body input.
-                body = {
-                    "name": "str",  # The name of the secret to create. Required.
-                    "region": "str",  # The region where the secret will be stored. Required.
-                    "values": {
-                        "str": "str"  # Key-value pairs to store in the secret. Required.
-                    }
-                }
-
-                # response body for status code(s): 200
-                response == {
-                    "name": "str",  # Optional. The name of the secret.
-                    "region": "str",  # Optional. The region where the secret is stored.
-                    "version": 0  # Optional. The version of the secret after the operation.
-                }
-                # response body for status code(s): 400
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-
-    @overload
-    async def create_secret(
-        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Create Secret.
-
-        To create a secret, send a POST request to ``/v2/security/secrets``.
-
-        :param body: Required.
-        :type body: IO[bytes]
-        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
-         Default value is "application/json".
-        :paramtype content_type: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "name": "str",  # Optional. The name of the secret.
-                    "region": "str",  # Optional. The region where the secret is stored.
-                    "version": 0  # Optional. The version of the secret after the operation.
-                }
-                # response body for status code(s): 400
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-
-    @distributed_trace_async
-    async def create_secret(self, body: Union[JSON, IO[bytes]], **kwargs: Any) -> JSON:
-        # pylint: disable=line-too-long
-        """Create Secret.
-
-        To create a secret, send a POST request to ``/v2/security/secrets``.
-
-        :param body: Is either a JSON type or a IO[bytes] type. Required.
-        :type body: JSON or IO[bytes]
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # JSON input template you can fill out and use as your body input.
-                body = {
-                    "name": "str",  # The name of the secret to create. Required.
-                    "region": "str",  # The region where the secret will be stored. Required.
-                    "values": {
-                        "str": "str"  # Key-value pairs to store in the secret. Required.
-                    }
-                }
-
-                # response body for status code(s): 200
-                response == {
-                    "name": "str",  # Optional. The name of the secret.
-                    "region": "str",  # Optional. The region where the secret is stored.
-                    "version": 0  # Optional. The version of the secret after the operation.
-                }
-                # response body for status code(s): 400
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-        _params = kwargs.pop("params", {}) or {}
-
-        content_type: Optional[str] = kwargs.pop(
-            "content_type", _headers.pop("Content-Type", None)
-        )
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        content_type = content_type or "application/json"
-        _json = None
-        _content = None
-        if isinstance(body, (IOBase, bytes)):
-            _content = body
-        else:
-            _json = body
-
-        _request = build_security_create_secret_request(
-            content_type=content_type,
-            json=_json,
-            content=_content,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            await self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200, 400]:
-            if _stream:
-                await response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        if response.status_code == 200:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 400:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-    @distributed_trace_async
-    async def get_secret(
-        self, secret: str, *, region: Optional[str] = None, **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Get Secret.
-
-        To retrieve a secret and its values, send a GET request to ``/v2/security/secrets/{secret}``.
-
-        :param secret: The name of the secret. Required.
-        :type secret: str
-        :keyword region: The slug identifier for the region where the resource is available. Known
-         values are: "ams1", "ams2", "ams3", "blr1", "fra1", "lon1", "nyc1", "nyc2", "nyc3", "sfo1",
-         "sfo2", "sfo3", "sgp1", "tor1", and "syd1". Default value is None.
-        :paramtype region: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "created_at": "2020-02-20 00:00:00",  # Optional. When the secret was
-                      created.
-                    "delete_requested_at": "2020-02-20 00:00:00",  # Optional. When deletion was
-                      requested for the secret.
-                    "region": "str",  # Optional. The region where the secret is stored.
-                    "secret": "str",  # Optional. The name of the secret.
-                    "updated_at": "2020-02-20 00:00:00",  # Optional. When the secret was last
-                      updated.
-                    "values": {
-                        "str": "str"  # Optional. Key-value pairs stored in the secret.
-                    },
-                    "version": 0  # Optional. The current version of the secret.
-                }
-                # response body for status code(s): 404
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = kwargs.pop("headers", {}) or {}
-        _params = kwargs.pop("params", {}) or {}
-
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        _request = build_security_get_secret_request(
-            secret=secret,
-            region=region,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            await self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200, 404]:
-            if _stream:
-                await response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        if response.status_code == 200:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 404:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-    @overload
-    async def update_secret(
-        self,
-        secret: str,
-        body: JSON,
-        *,
-        content_type: str = "application/json",
-        **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Update Secret.
-
-        To update a secret, send a PUT request to ``/v2/security/secrets/{secret}``.
-
-        :param secret: The name of the secret. Required.
-        :type secret: str
-        :param body: Required.
-        :type body: JSON
-        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
-         Default value is "application/json".
-        :paramtype content_type: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # JSON input template you can fill out and use as your body input.
-                body = {
-                    "region": "str",  # The region where the secret is stored. Required.
-                    "values": {
-                        "str": "str"  # Updated key-value pairs for the secret. Required.
-                    },
-                    "version": 0  # The current version of the secret to update. Required.
-                }
-
-                # response body for status code(s): 200
-                response == {
-                    "name": "str",  # Optional. The name of the secret.
-                    "region": "str",  # Optional. The region where the secret is stored.
-                    "version": 0  # Optional. The version of the secret after the operation.
-                }
-                # response body for status code(s): 400, 404
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-
-    @overload
-    async def update_secret(
-        self,
-        secret: str,
-        body: IO[bytes],
-        *,
-        content_type: str = "application/json",
-        **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Update Secret.
-
-        To update a secret, send a PUT request to ``/v2/security/secrets/{secret}``.
-
-        :param secret: The name of the secret. Required.
-        :type secret: str
-        :param body: Required.
-        :type body: IO[bytes]
-        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
-         Default value is "application/json".
-        :paramtype content_type: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "name": "str",  # Optional. The name of the secret.
-                    "region": "str",  # Optional. The region where the secret is stored.
-                    "version": 0  # Optional. The version of the secret after the operation.
-                }
-                # response body for status code(s): 400, 404
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-
-    @distributed_trace_async
-    async def update_secret(
-        self, secret: str, body: Union[JSON, IO[bytes]], **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Update Secret.
-
-        To update a secret, send a PUT request to ``/v2/security/secrets/{secret}``.
-
-        :param secret: The name of the secret. Required.
-        :type secret: str
-        :param body: Is either a JSON type or a IO[bytes] type. Required.
-        :type body: JSON or IO[bytes]
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # JSON input template you can fill out and use as your body input.
-                body = {
-                    "region": "str",  # The region where the secret is stored. Required.
-                    "values": {
-                        "str": "str"  # Updated key-value pairs for the secret. Required.
-                    },
-                    "version": 0  # The current version of the secret to update. Required.
-                }
-
-                # response body for status code(s): 200
-                response == {
-                    "name": "str",  # Optional. The name of the secret.
-                    "region": "str",  # Optional. The region where the secret is stored.
-                    "version": 0  # Optional. The version of the secret after the operation.
-                }
-                # response body for status code(s): 400, 404
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-        _params = kwargs.pop("params", {}) or {}
-
-        content_type: Optional[str] = kwargs.pop(
-            "content_type", _headers.pop("Content-Type", None)
-        )
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        content_type = content_type or "application/json"
-        _json = None
-        _content = None
-        if isinstance(body, (IOBase, bytes)):
-            _content = body
-        else:
-            _json = body
-
-        _request = build_security_update_secret_request(
-            secret=secret,
-            content_type=content_type,
-            json=_json,
-            content=_content,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            await self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200, 400, 404]:
-            if _stream:
-                await response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        if response.status_code == 200:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 400:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 404:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-    @distributed_trace_async
-    async def delete_secret(
-        self, secret: str, *, region: Optional[str] = None, **kwargs: Any
-    ) -> Optional[JSON]:
-        # pylint: disable=line-too-long
-        """Delete Secret.
-
-        To request deletion of a secret, send a DELETE request to ``/v2/security/secrets/{secret}``.
-
-        :param secret: The name of the secret. Required.
-        :type secret: str
-        :keyword region: The slug identifier for the region where the resource is available. Known
-         values are: "ams1", "ams2", "ams3", "blr1", "fra1", "lon1", "nyc1", "nyc2", "nyc3", "sfo1",
-         "sfo2", "sfo3", "sgp1", "tor1", and "syd1". Default value is None.
-        :paramtype region: str
-        :return: JSON object or None
-        :rtype: JSON or None
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 404
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = kwargs.pop("headers", {}) or {}
-        _params = kwargs.pop("params", {}) or {}
-
-        cls: ClsType[Optional[JSON]] = kwargs.pop("cls", None)
-
-        _request = build_security_delete_secret_request(
-            secret=secret,
-            region=region,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            await self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [204, 404]:
-            if _stream:
-                await response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        deserialized = None
-        response_headers = {}
-        if response.status_code == 204:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-        if response.status_code == 404:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if cls:
-            return cls(pipeline_response, deserialized, response_headers)  # type: ignore
-
-        return deserialized  # type: ignore
-
-    @distributed_trace_async
-    async def list_secret_versions(
-        self, secret: str, *, region: Optional[str] = None, **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """List Secret Versions.
-
-        To list all versions of a secret, send a GET request to
-        ``/v2/security/secrets/{secret}/versions``.
-
-        :param secret: The name of the secret. Required.
-        :type secret: str
-        :keyword region: The slug identifier for the region where the resource is available. Known
-         values are: "ams1", "ams2", "ams3", "blr1", "fra1", "lon1", "nyc1", "nyc2", "nyc3", "sfo1",
-         "sfo2", "sfo3", "sgp1", "tor1", and "syd1". Default value is None.
-        :paramtype region: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "versions": [
-                        {
-                            "created_at": "2020-02-20 00:00:00",  # Optional. When this
-                              version was created.
-                            "updated_at": "2020-02-20 00:00:00",  # Optional. When this
-                              version was last updated.
-                            "version": 0  # Optional. The version number.
-                        }
-                    ]
-                }
-                # response body for status code(s): 404
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = kwargs.pop("headers", {}) or {}
-        _params = kwargs.pop("params", {}) or {}
-
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        _request = build_security_list_secret_versions_request(
-            secret=secret,
-            region=region,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            await self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200, 404]:
-            if _stream:
-                await response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        if response.status_code == 200:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 404:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-    @distributed_trace_async
-    async def post_restore_secret(
-        self, secret: str, *, region: Optional[str] = None, **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Restore Secret.
-
-        To restore a deleted secret, send a POST request to ``/v2/security/secrets/{secret}/restore``.
-
-        :param secret: The name of the secret. Required.
-        :type secret: str
-        :keyword region: The slug identifier for the region where the resource is available. Known
-         values are: "ams1", "ams2", "ams3", "blr1", "fra1", "lon1", "nyc1", "nyc2", "nyc3", "sfo1",
-         "sfo2", "sfo3", "sgp1", "tor1", and "syd1". Default value is None.
-        :paramtype region: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "created_at": "2020-02-20 00:00:00",  # Optional. When the secret was
-                      created.
-                    "delete_requested_at": "2020-02-20 00:00:00",  # Optional. When deletion was
-                      requested for the secret.
-                    "region": "str",  # Optional. The region where the secret is stored.
-                    "secret": "str",  # Optional. The name of the secret.
-                    "updated_at": "2020-02-20 00:00:00",  # Optional. When the secret was last
-                      updated.
-                    "values": {
-                        "str": "str"  # Optional. Key-value pairs stored in the secret.
-                    },
-                    "version": 0  # Optional. The current version of the secret.
-                }
-                # response body for status code(s): 404
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = kwargs.pop("headers", {}) or {}
-        _params = kwargs.pop("params", {}) or {}
-
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        _request = build_security_post_restore_secret_request(
-            secret=secret,
-            region=region,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            await self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200, 404]:
-            if _stream:
-                await response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        if response.status_code == 200:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 404:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
 
 class SizesOperations:
     """
@@ -192237,9 +191759,10 @@ class SizesOperations:
                                           of measure for the disk size.
                                     },
                                     "type": "str"  # Optional. The type of disk.
-                                      All Droplets contain a ``local`` disk. Additionally, GPU Droplets
-                                      can also have a ``scratch`` disk for non-persistent data. Known
-                                      values are: "local" and "scratch".
+                                      All Droplets contain a ``local`` or ``remote`` disk.
+                                      Additionally, GPU Droplets can also have a ``scratch`` disk for
+                                      non-persistent data. Known values are: "local", "remote", and
+                                      "scratch".
                                 }
                             ],
                             "gpu_info": {
