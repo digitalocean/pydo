@@ -44,6 +44,7 @@ from .operations import (
     MonitoringOperations,
     NfsOperations,
     OneClicksOperations,
+    OrganizationsOperations,
     PartnerAttachmentsOperations,
     ProjectsOperations,
     RegionsOperations,
@@ -131,6 +132,8 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype monitoring: pydo.aio.operations.MonitoringOperations
     :ivar nfs: NfsOperations operations
     :vartype nfs: pydo.aio.operations.NfsOperations
+    :ivar organizations: OrganizationsOperations operations
+    :vartype organizations: pydo.aio.operations.OrganizationsOperations
     :ivar partner_attachments: PartnerAttachmentsOperations operations
     :vartype partner_attachments: pydo.aio.operations.PartnerAttachmentsOperations
     :ivar projects: ProjectsOperations operations
@@ -304,6 +307,9 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.nfs = NfsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.organizations = OrganizationsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.partner_attachments = PartnerAttachmentsOperations(
