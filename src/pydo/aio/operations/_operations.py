@@ -150254,6 +150254,11 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                             "ipv4": "str",  # Optional. The public IPv4 address of the
                               Kubernetes master node. This will not be set if high availability is
                               configured on the cluster (v1.21+).
+                            "isolated_workers": False,  # Optional. Default value is
+                              False. A boolean value indicating whether worker nodes in the cluster are
+                              not assigned public IP addresses. When omitted on create, the default
+                              value is false. When enabled, a NAT gateway must exist in the VPC where
+                              the cluster is created.
                             "maintenance_policy": {
                                 "day": "str",  # Optional. The day of the maintenance
                                   window policy. May be one of ``monday`` through ``sunday``"" , or
@@ -150571,6 +150576,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                     "ipv4": "str",  # Optional. The public IPv4 address of the Kubernetes master
                       node. This will not be set if high availability is configured on the cluster
                       (v1.21+).
+                    "isolated_workers": False,  # Optional. Default value is False. A boolean
+                      value indicating whether worker nodes in the cluster are not assigned public IP
+                      addresses. When omitted on create, the default value is false. When enabled, a
+                      NAT gateway must exist in the VPC where the cluster is created.
                     "maintenance_policy": {
                         "day": "str",  # Optional. The day of the maintenance window policy.
                           May be one of ``monday`` through ``sunday``"" , or ``any`` to indicate an
@@ -150794,6 +150803,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "ipv4": "str",  # Optional. The public IPv4 address of the Kubernetes
                           master node. This will not be set if high availability is configured on the
                           cluster (v1.21+).
+                        "isolated_workers": False,  # Optional. Default value is False. A
+                          boolean value indicating whether worker nodes in the cluster are not assigned
+                          public IP addresses. When omitted on create, the default value is false. When
+                          enabled, a NAT gateway must exist in the VPC where the cluster is created.
                         "maintenance_policy": {
                             "day": "str",  # Optional. The day of the maintenance window
                               policy. May be one of ``monday`` through ``sunday``"" , or ``any`` to
@@ -151050,6 +151063,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "ipv4": "str",  # Optional. The public IPv4 address of the Kubernetes
                           master node. This will not be set if high availability is configured on the
                           cluster (v1.21+).
+                        "isolated_workers": False,  # Optional. Default value is False. A
+                          boolean value indicating whether worker nodes in the cluster are not assigned
+                          public IP addresses. When omitted on create, the default value is false. When
+                          enabled, a NAT gateway must exist in the VPC where the cluster is created.
                         "maintenance_policy": {
                             "day": "str",  # Optional. The day of the maintenance window
                               policy. May be one of ``monday`` through ``sunday``"" , or ``any`` to
@@ -151292,6 +151309,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                     "ipv4": "str",  # Optional. The public IPv4 address of the Kubernetes master
                       node. This will not be set if high availability is configured on the cluster
                       (v1.21+).
+                    "isolated_workers": False,  # Optional. Default value is False. A boolean
+                      value indicating whether worker nodes in the cluster are not assigned public IP
+                      addresses. When omitted on create, the default value is false. When enabled, a
+                      NAT gateway must exist in the VPC where the cluster is created.
                     "maintenance_policy": {
                         "day": "str",  # Optional. The day of the maintenance window policy.
                           May be one of ``monday`` through ``sunday``"" , or ``any`` to indicate an
@@ -151515,6 +151536,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "ipv4": "str",  # Optional. The public IPv4 address of the Kubernetes
                           master node. This will not be set if high availability is configured on the
                           cluster (v1.21+).
+                        "isolated_workers": False,  # Optional. Default value is False. A
+                          boolean value indicating whether worker nodes in the cluster are not assigned
+                          public IP addresses. When omitted on create, the default value is false. When
+                          enabled, a NAT gateway must exist in the VPC where the cluster is created.
                         "maintenance_policy": {
                             "day": "str",  # Optional. The day of the maintenance window
                               policy. May be one of ``monday`` through ``sunday``"" , or ``any`` to
@@ -151832,6 +151857,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "ipv4": "str",  # Optional. The public IPv4 address of the Kubernetes
                           master node. This will not be set if high availability is configured on the
                           cluster (v1.21+).
+                        "isolated_workers": False,  # Optional. Default value is False. A
+                          boolean value indicating whether worker nodes in the cluster are not assigned
+                          public IP addresses. When omitted on create, the default value is false. When
+                          enabled, a NAT gateway must exist in the VPC where the cluster is created.
                         "maintenance_policy": {
                             "day": "str",  # Optional. The day of the maintenance window
                               policy. May be one of ``monday`` through ``sunday``"" , or ``any`` to
@@ -152278,6 +152307,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "ipv4": "str",  # Optional. The public IPv4 address of the Kubernetes
                           master node. This will not be set if high availability is configured on the
                           cluster (v1.21+).
+                        "isolated_workers": False,  # Optional. Default value is False. A
+                          boolean value indicating whether worker nodes in the cluster are not assigned
+                          public IP addresses. When omitted on create, the default value is false. When
+                          enabled, a NAT gateway must exist in the VPC where the cluster is created.
                         "maintenance_policy": {
                             "day": "str",  # Optional. The day of the maintenance window
                               policy. May be one of ``monday`` through ``sunday``"" , or ``any`` to
@@ -152546,6 +152579,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "ipv4": "str",  # Optional. The public IPv4 address of the Kubernetes
                           master node. This will not be set if high availability is configured on the
                           cluster (v1.21+).
+                        "isolated_workers": False,  # Optional. Default value is False. A
+                          boolean value indicating whether worker nodes in the cluster are not assigned
+                          public IP addresses. When omitted on create, the default value is false. When
+                          enabled, a NAT gateway must exist in the VPC where the cluster is created.
                         "maintenance_policy": {
                             "day": "str",  # Optional. The day of the maintenance window
                               policy. May be one of ``monday`` through ``sunday``"" , or ``any`` to
@@ -152907,6 +152944,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "ipv4": "str",  # Optional. The public IPv4 address of the Kubernetes
                           master node. This will not be set if high availability is configured on the
                           cluster (v1.21+).
+                        "isolated_workers": False,  # Optional. Default value is False. A
+                          boolean value indicating whether worker nodes in the cluster are not assigned
+                          public IP addresses. When omitted on create, the default value is false. When
+                          enabled, a NAT gateway must exist in the VPC where the cluster is created.
                         "maintenance_policy": {
                             "day": "str",  # Optional. The day of the maintenance window
                               policy. May be one of ``monday`` through ``sunday``"" , or ``any`` to
