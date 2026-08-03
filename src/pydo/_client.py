@@ -26,6 +26,7 @@ from .operations import (
     ByoipPrefixesOperations,
     CdnOperations,
     CertificatesOperations,
+    ConnectionsOperations,
     DatabasesOperations,
     DedicatedInferencesOperations,
     DomainsOperations,
@@ -55,12 +56,16 @@ from .operations import (
     ReservedIPv6ActionsOperations,
     ReservedIPv6Operations,
     SecurityOperations,
+    SessionsOperations,
     SizesOperations,
     SnapshotsOperations,
     SpacesKeyOperations,
     SshKeysOperations,
     TagsOperations,
+    ToolbeltsOperations,
+    ToolsOperations,
     UptimeOperations,
+    UsersOperations,
     VectorDatabasesOperations,
     VolumeActionsOperations,
     VolumeSnapshotsOperations,
@@ -78,6 +83,16 @@ if TYPE_CHECKING:
 class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too-many-instance-attributes
     """GeneratedClient.
 
+    :ivar tools: ToolsOperations operations
+    :vartype tools: pydo.operations.ToolsOperations
+    :ivar toolbelts: ToolbeltsOperations operations
+    :vartype toolbelts: pydo.operations.ToolbeltsOperations
+    :ivar connections: ConnectionsOperations operations
+    :vartype connections: pydo.operations.ConnectionsOperations
+    :ivar users: UsersOperations operations
+    :vartype users: pydo.operations.UsersOperations
+    :ivar sessions: SessionsOperations operations
+    :vartype sessions: pydo.operations.SessionsOperations
     :ivar one_clicks: OneClicksOperations operations
     :vartype one_clicks: pydo.operations.OneClicksOperations
     :ivar account: AccountOperations operations
@@ -214,11 +229,9 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
                 self._config.custom_hook_policy,
                 self._config.logging_policy,
                 policies.DistributedTracingPolicy(**kwargs),
-                (
-                    policies.SensitiveHeaderCleanupPolicy(**kwargs)
-                    if self._config.redirect_policy
-                    else None
-                ),
+                policies.SensitiveHeaderCleanupPolicy(**kwargs)
+                if self._config.redirect_policy
+                else None,
                 self._config.http_logging_policy,
             ]
         self._client: PipelineClient = PipelineClient(
@@ -228,6 +241,21 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
         self._serialize = Serializer()
         self._deserialize = Deserializer()
         self._serialize.client_side_validation = False
+        self.tools = ToolsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.toolbelts = ToolbeltsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.connections = ConnectionsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.users = UsersOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.sessions = SessionsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
         self.one_clicks = OneClicksOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
