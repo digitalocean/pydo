@@ -378,6 +378,13 @@ class AgentSession:
     def stream(self, **kwargs: Any) -> Any:
         return self._sessions.stream(self.session_id, **kwargs)
 
+    def history(self, *, before: str, limit: Optional[int] = None) -> Any:
+        """Read one page of history older than ``before``.
+
+        See :meth:`SessionsOperations.history_page`.
+        """
+        return self._sessions.history_page(self.session_id, before=before, limit=limit)
+
     def resolve_hitl(
         self,
         request_id: str,

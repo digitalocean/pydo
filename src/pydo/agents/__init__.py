@@ -32,6 +32,7 @@ from .custom_models import (
 from .custom_sessions import (
     HarnessEventStream,
     HarnessStreamError,
+    HistoryPage,
     SessionsOperations,
     WorkspaceDownload,
     WorkspaceTransferError,
@@ -129,6 +130,7 @@ __all__ = [
     "TriggersOperations",
     "HarnessEventStream",
     "HarnessStreamError",
+    "HistoryPage",
     "WorkspaceDownload",
     "WorkspaceTransferError",
     "DEFAULT_AGENTS_BASE_URL",

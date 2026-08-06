@@ -330,6 +330,132 @@ def test_stream_passes_replay_query_params():
     assert "replay_only=true" in call.request.url
 
 
+# ---------------------------------------------------------------------------
+# Backward history paging
+# ---------------------------------------------------------------------------
+
+_HISTORY_PAGE_SSE = (
+    b": connected to s1\n\n"
+    b'data: {"event_id":"e10","type":"run.token_delta","data":{"text":"older "}}\n\n'
+    b'data: {"event_id":"e11","type":"run.token_delta","data":{"text":"newer"}}\n\n'
+    b": has_more=true\n\n"
+)
+
+
+def test_stream_before_implies_replay_only_and_sends_limit():
+    resources = _make_resources([_FakeResponse(200, sse_chunks=[b""])])
+
+    list(resources.sessions.stream("s1", before="evt-99", limit=50))
+
+    url = resources._proxy._original._pipeline.calls[0].request.url
+    assert "before=evt-99" in url
+    assert "limit=50" in url
+    assert "replay_only=true" in url
+
+
+def test_stream_omits_paging_params_when_unset():
+    resources = _make_resources([_FakeResponse(200, sse_chunks=[b""])])
+
+    list(resources.sessions.stream("s1"))
+
+    url = resources._proxy._original._pipeline.calls[0].request.url
+    assert "before=" not in url
+    assert "limit=" not in url
+    assert "replay_only=" not in url
+
+
+def test_stream_rejects_limit_without_before():
+    resources = _make_resources([])
+    with pytest.raises(ValueError, match="before"):
+        resources.sessions.stream("s1", limit=10)
+
+
+@pytest.mark.parametrize("limit", [0, -1])
+def test_stream_rejects_non_positive_limit(limit):
+    resources = _make_resources([])
+    with pytest.raises(ValueError, match="positive"):
+        resources.sessions.stream("s1", before="evt-99", limit=limit)
+
+
+def test_stream_records_has_more_comment():
+    resources = _make_resources([_FakeResponse(200, sse_chunks=[_HISTORY_PAGE_SSE])])
+
+    stream = resources.sessions.stream("s1", before="evt-12")
+    assert stream.has_more is None  # not known until the trailing comment arrives
+
+    events = list(stream)
+    assert [e.event_id for e in events] == ["e10", "e11"]
+    assert stream.has_more is True
+    assert stream.oldest_event_id == "e10"
+
+
+def test_stream_ignores_non_has_more_comments():
+    payload = (
+        b": connected to s1\n\n"
+        b'data: {"event_id":"e1","type":"run.started","data":{}}\n\n'
+    )
+    resources = _make_resources([_FakeResponse(200, sse_chunks=[payload])])
+
+    stream = resources.sessions.stream("s1")
+    assert len(list(stream)) == 1
+    assert stream.has_more is None
+
+
+def test_history_page_returns_events_cursor_and_has_more():
+    resources = _make_resources([_FakeResponse(200, sse_chunks=[_HISTORY_PAGE_SSE])])
+
+    page = resources.sessions.history_page("s1", before="evt-12", limit=2)
+
+    url = resources._proxy._original._pipeline.calls[0].request.url
+    assert "before=evt-12" in url
+    assert "limit=2" in url
+    assert "replay_only=true" in url
+
+    events, has_more, next_before = page
+    assert [e.event_id for e in events] == ["e10", "e11"]
+    assert has_more is True
+    assert next_before == "e10"
+
+
+def test_history_page_at_oldest_event_reports_no_more():
+    payload = (
+        b'data: {"event_id":"e1","type":"run.started","data":{}}\n\n'
+        b": has_more=false\n\n"
+    )
+    resources = _make_resources([_FakeResponse(200, sse_chunks=[payload])])
+
+    page = resources.sessions.history_page("s1", before="e2")
+    assert page.has_more is False
+    assert page.next_before == "e1"
+
+
+def test_history_page_empty_has_no_cursor():
+    payload = b": has_more=false\n\n"
+    resources = _make_resources([_FakeResponse(200, sse_chunks=[payload])])
+
+    page = resources.sessions.history_page("s1", before="e1")
+    assert page.events == []
+    assert page.has_more is False
+    assert page.next_before is None
+
+
+def test_history_page_requires_before():
+    resources = _make_resources([])
+    with pytest.raises(ValueError, match="before"):
+        resources.sessions.history_page("s1", before="")
+
+
+def test_agent_session_history_binds_session_id():
+    resources = _make_resources([_FakeResponse(200, sse_chunks=[_HISTORY_PAGE_SSE])])
+
+    page = resources.attach("s1").history(before="evt-12")
+
+    url = resources._proxy._original._pipeline.calls[0].request.url
+    assert "/v2/agents/sessions/s1/stream" in url
+    assert "before=evt-12" in url
+    assert page.next_before == "e10"
+
+
 def test_resolve_agents_base_url_adds_https_scheme():
     assert (
         resolve_agents_base_url("api.digitalocean.com")
