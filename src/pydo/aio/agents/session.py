@@ -216,6 +216,15 @@ class AsyncAgentSession:
     async def stream(self, **kwargs: Any) -> Any:
         return await self._sessions.stream(self.session_id, **kwargs)
 
+    async def history(self, *, before: str, limit: Optional[int] = None) -> Any:
+        """Read one page of history older than ``before``.
+
+        See :meth:`AsyncSessionsOperations.history_page`.
+        """
+        return await self._sessions.history_page(
+            self.session_id, before=before, limit=limit
+        )
+
     async def resolve_hitl(
         self,
         request_id: str,

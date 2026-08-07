@@ -26,6 +26,7 @@ from pydo.agents.custom_sessions import (
     _TRANSFERS_SUFFIX,
     _YAML_MEDIA_TYPE,
     HarnessStreamError,
+    HistoryPage,
     UploadData,
     WorkspaceTransferError,
     _coerce_upload_content,
@@ -95,6 +96,16 @@ async def _aio_http_get_iter(url: str) -> AsyncIterator[bytes]:
 class AsyncHarnessEventStream:
     def __init__(self, sse_stream: AsyncSSEStream):
         self._sse = sse_stream
+        self.oldest_event_id: Optional[str] = None
+
+    @property
+    def has_more(self) -> Optional[bool]:
+        """Whether older history remains, per the server's trailing comment.
+
+        Only history pages (``before=``) carry this; ``None`` until the
+        ``: has_more=...`` frame arrives, so read it after iterating.
+        """
+        return getattr(self._sse, "has_more", None)
 
     def __aiter__(self) -> AsyncIterator[Any]:
         return self._iter()
@@ -114,6 +125,10 @@ class AsyncHarnessEventStream:
                 )
             event = _unwrap_harness_sse_chunk(chunk)
             if event is not None:
+                if self.oldest_event_id is None:
+                    event_id = _field(event, "event_id")
+                    if event_id:
+                        self.oldest_event_id = str(event_id)
                 yield event
 
     async def close(self) -> None:
@@ -294,10 +309,35 @@ class AsyncSessionsOperations:
         *,
         replay_from: Optional[str] = None,
         replay_only: bool = False,
+        before: Optional[str] = None,
+        limit: Optional[int] = None,
     ) -> AsyncHarnessEventStream:
+        """Attach to a session's SSE event feed.
+
+        A cursorless attach replays only the newest events the server keeps
+        within its replay budget, then goes live — it is not the session's
+        full history. Older history is read a page at a time with ``before``,
+        an ``event_id`` to page backwards from (exclusive): the server sends
+        up to ``limit`` older events, oldest-first, then closes without going
+        live. ``before`` implies ``replay_only``, which the server requires.
+
+        Prefer :meth:`history_page` for scrollback; it drains one page and
+        hands back the next cursor.
+        """
+        if limit is not None:
+            if before is None:
+                raise ValueError("limit is only meaningful together with before")
+            if int(limit) < 1:
+                raise ValueError("limit must be a positive integer")
+
         params: Dict[str, Any] = {}
         if replay_from:
             params["replay_from"] = replay_from
+        if before:
+            params["before"] = before
+            replay_only = True
+        if limit is not None:
+            params["limit"] = int(limit)
         if replay_only:
             params["replay_only"] = "true"
 
@@ -314,6 +354,33 @@ class AsyncSessionsOperations:
             await response.read()
             _raise_agents_http_error(response)
         return AsyncHarnessEventStream(AsyncSSEStream(response))
+
+    async def history_page(
+        self,
+        session_id: str,
+        *,
+        before: str,
+        limit: Optional[int] = None,
+    ) -> HistoryPage:
+        """Read one page of history older than ``before``, oldest-first.
+
+        Walk backwards by feeding ``next_before`` into the next call::
+
+            cursor = oldest_event_id_you_hold
+            while cursor:
+                page = await sessions.history_page(session_id, before=cursor)
+                cursor = page.next_before if page.has_more else None
+        """
+        if not before:
+            raise ValueError("before is required")
+        stream = await self.stream(session_id, before=before, limit=limit)
+        async with stream:
+            events = [event async for event in stream]
+        return HistoryPage(
+            events=events,
+            has_more=stream.has_more,
+            next_before=stream.oldest_event_id,
+        )
 
     def _transfers_path(self, session_id: str, *parts: str) -> str:
         path = f"{_BASE_PATH}/{_quote(session_id)}/{_TRANSFERS_SUFFIX}"
