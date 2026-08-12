@@ -15280,7 +15280,19 @@ def build_genai_regenerate_model_api_key_request(  # pylint: disable=name-too-lo
 
 
 def build_genai_list_model_catalog_request(
-    *, page: Optional[int] = None, limit: Optional[int] = None, **kwargs: Any
+    *,
+    page: Optional[int] = None,
+    limit: Optional[int] = None,
+    search: Optional[str] = None,
+    model_type: Optional[List[str]] = None,
+    provider: Optional[List[str]] = None,
+    availability: Optional[List[str]] = None,
+    badges: Optional[List[str]] = None,
+    sort_by: str = "MODEL_CATALOG_SORT_BY_CREATED_AT",
+    per_page: Optional[int] = None,
+    sort_direction: str = "SORT_DIRECTION_UNSPECIFIED",
+    use_case: str = "MODEL_CATALOG_USE_CASE_UNSPECIFIED",
+    **kwargs: Any,
 ) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
     _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
@@ -15295,6 +15307,28 @@ def build_genai_list_model_catalog_request(
         _params["page"] = _SERIALIZER.query("page", page, "int")
     if limit is not None:
         _params["limit"] = _SERIALIZER.query("limit", limit, "int")
+    if search is not None:
+        _params["search"] = _SERIALIZER.query("search", search, "str")
+    if model_type is not None:
+        _params["model_type"] = _SERIALIZER.query("model_type", model_type, "[str]")
+    if provider is not None:
+        _params["provider"] = _SERIALIZER.query("provider", provider, "[str]")
+    if availability is not None:
+        _params["availability"] = _SERIALIZER.query(
+            "availability", availability, "[str]"
+        )
+    if badges is not None:
+        _params["badges"] = _SERIALIZER.query("badges", badges, "[str]")
+    if sort_by is not None:
+        _params["sort_by"] = _SERIALIZER.query("sort_by", sort_by, "str")
+    if per_page is not None:
+        _params["per_page"] = _SERIALIZER.query("per_page", per_page, "int")
+    if sort_direction is not None:
+        _params["sort_direction"] = _SERIALIZER.query(
+            "sort_direction", sort_direction, "str"
+        )
+    if use_case is not None:
+        _params["use_case"] = _SERIALIZER.query("use_case", use_case, "str")
 
     # Construct headers
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
@@ -149388,9 +149422,9 @@ class DropletsOperations:
                                               The unit of measure for the disk size.
                                         },
                                         "type": "str"  # Optional. The type
-                                          of disk. All Droplets contain a ``local`` or ``remote`` disk.
+                                          of disk. All Droplets contain a ``local`` or ``boot`` disk.
                                           Additionally, GPU Droplets can also have a ``scratch`` disk
-                                          for non-persistent data. Known values are: "local", "remote",
+                                          for non-persistent data. Known values are: "local", "boot",
                                           and "scratch".
                                     }
                                 ],
@@ -149436,10 +149470,9 @@ class DropletsOperations:
                                           of measure for the disk size.
                                     },
                                     "type": "str"  # Optional. The type of disk.
-                                      All Droplets contain a ``local`` or ``remote`` disk.
-                                      Additionally, GPU Droplets can also have a ``scratch`` disk for
-                                      non-persistent data. Known values are: "local", "remote", and
-                                      "scratch".
+                                      All Droplets contain a ``local`` or ``boot`` disk. Additionally,
+                                      GPU Droplets can also have a ``scratch`` disk for non-persistent
+                                      data. Known values are: "local", "boot", and "scratch".
                                 }
                             ],
                             "gpu_info": {
@@ -150063,10 +150096,9 @@ class DropletsOperations:
                                           of measure for the disk size.
                                     },
                                     "type": "str"  # Optional. The type of disk.
-                                      All Droplets contain a ``local`` or ``remote`` disk.
-                                      Additionally, GPU Droplets can also have a ``scratch`` disk for
-                                      non-persistent data. Known values are: "local", "remote", and
-                                      "scratch".
+                                      All Droplets contain a ``local`` or ``boot`` disk. Additionally,
+                                      GPU Droplets can also have a ``scratch`` disk for non-persistent
+                                      data. Known values are: "local", "boot", and "scratch".
                                 }
                             ],
                             "gpu_info": {
@@ -150109,9 +150141,9 @@ class DropletsOperations:
                                       measure for the disk size.
                                 },
                                 "type": "str"  # Optional. The type of disk. All
-                                  Droplets contain a ``local`` or ``remote`` disk. Additionally, GPU
+                                  Droplets contain a ``local`` or ``boot`` disk. Additionally, GPU
                                   Droplets can also have a ``scratch`` disk for non-persistent data.
-                                  Known values are: "local", "remote", and "scratch".
+                                  Known values are: "local", "boot", and "scratch".
                             }
                         ],
                         "gpu_info": {
@@ -151637,9 +151669,9 @@ class DropletsOperations:
                                               The unit of measure for the disk size.
                                         },
                                         "type": "str"  # Optional. The type
-                                          of disk. All Droplets contain a ``local`` or ``remote`` disk.
+                                          of disk. All Droplets contain a ``local`` or ``boot`` disk.
                                           Additionally, GPU Droplets can also have a ``scratch`` disk
-                                          for non-persistent data. Known values are: "local", "remote",
+                                          for non-persistent data. Known values are: "local", "boot",
                                           and "scratch".
                                     }
                                 ],
@@ -151685,10 +151717,9 @@ class DropletsOperations:
                                           of measure for the disk size.
                                     },
                                     "type": "str"  # Optional. The type of disk.
-                                      All Droplets contain a ``local`` or ``remote`` disk.
-                                      Additionally, GPU Droplets can also have a ``scratch`` disk for
-                                      non-persistent data. Known values are: "local", "remote", and
-                                      "scratch".
+                                      All Droplets contain a ``local`` or ``boot`` disk. Additionally,
+                                      GPU Droplets can also have a ``scratch`` disk for non-persistent
+                                      data. Known values are: "local", "boot", and "scratch".
                                 }
                             ],
                             "gpu_info": {
@@ -165835,6 +165866,11 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                             "ipv4": "str",  # Optional. The public IPv4 address of the
                               Kubernetes master node. This will not be set if high availability is
                               configured on the cluster (v1.21+).
+                            "isolated_workers": False,  # Optional. Default value is
+                              False. A boolean value indicating whether worker nodes in the cluster are
+                              not assigned public IP addresses. When omitted on create, the default
+                              value is false. When enabled, a NAT gateway must exist in the VPC where
+                              the cluster is created.
                             "maintenance_policy": {
                                 "day": "str",  # Optional. The day of the maintenance
                                   window policy. May be one of ``monday`` through ``sunday``"" , or
@@ -166152,6 +166188,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                     "ipv4": "str",  # Optional. The public IPv4 address of the Kubernetes master
                       node. This will not be set if high availability is configured on the cluster
                       (v1.21+).
+                    "isolated_workers": False,  # Optional. Default value is False. A boolean
+                      value indicating whether worker nodes in the cluster are not assigned public IP
+                      addresses. When omitted on create, the default value is false. When enabled, a
+                      NAT gateway must exist in the VPC where the cluster is created.
                     "maintenance_policy": {
                         "day": "str",  # Optional. The day of the maintenance window policy.
                           May be one of ``monday`` through ``sunday``"" , or ``any`` to indicate an
@@ -166375,6 +166415,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "ipv4": "str",  # Optional. The public IPv4 address of the Kubernetes
                           master node. This will not be set if high availability is configured on the
                           cluster (v1.21+).
+                        "isolated_workers": False,  # Optional. Default value is False. A
+                          boolean value indicating whether worker nodes in the cluster are not assigned
+                          public IP addresses. When omitted on create, the default value is false. When
+                          enabled, a NAT gateway must exist in the VPC where the cluster is created.
                         "maintenance_policy": {
                             "day": "str",  # Optional. The day of the maintenance window
                               policy. May be one of ``monday`` through ``sunday``"" , or ``any`` to
@@ -166631,6 +166675,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "ipv4": "str",  # Optional. The public IPv4 address of the Kubernetes
                           master node. This will not be set if high availability is configured on the
                           cluster (v1.21+).
+                        "isolated_workers": False,  # Optional. Default value is False. A
+                          boolean value indicating whether worker nodes in the cluster are not assigned
+                          public IP addresses. When omitted on create, the default value is false. When
+                          enabled, a NAT gateway must exist in the VPC where the cluster is created.
                         "maintenance_policy": {
                             "day": "str",  # Optional. The day of the maintenance window
                               policy. May be one of ``monday`` through ``sunday``"" , or ``any`` to
@@ -166873,6 +166921,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                     "ipv4": "str",  # Optional. The public IPv4 address of the Kubernetes master
                       node. This will not be set if high availability is configured on the cluster
                       (v1.21+).
+                    "isolated_workers": False,  # Optional. Default value is False. A boolean
+                      value indicating whether worker nodes in the cluster are not assigned public IP
+                      addresses. When omitted on create, the default value is false. When enabled, a
+                      NAT gateway must exist in the VPC where the cluster is created.
                     "maintenance_policy": {
                         "day": "str",  # Optional. The day of the maintenance window policy.
                           May be one of ``monday`` through ``sunday``"" , or ``any`` to indicate an
@@ -167096,6 +167148,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "ipv4": "str",  # Optional. The public IPv4 address of the Kubernetes
                           master node. This will not be set if high availability is configured on the
                           cluster (v1.21+).
+                        "isolated_workers": False,  # Optional. Default value is False. A
+                          boolean value indicating whether worker nodes in the cluster are not assigned
+                          public IP addresses. When omitted on create, the default value is false. When
+                          enabled, a NAT gateway must exist in the VPC where the cluster is created.
                         "maintenance_policy": {
                             "day": "str",  # Optional. The day of the maintenance window
                               policy. May be one of ``monday`` through ``sunday``"" , or ``any`` to
@@ -167413,6 +167469,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "ipv4": "str",  # Optional. The public IPv4 address of the Kubernetes
                           master node. This will not be set if high availability is configured on the
                           cluster (v1.21+).
+                        "isolated_workers": False,  # Optional. Default value is False. A
+                          boolean value indicating whether worker nodes in the cluster are not assigned
+                          public IP addresses. When omitted on create, the default value is false. When
+                          enabled, a NAT gateway must exist in the VPC where the cluster is created.
                         "maintenance_policy": {
                             "day": "str",  # Optional. The day of the maintenance window
                               policy. May be one of ``monday`` through ``sunday``"" , or ``any`` to
@@ -167859,6 +167919,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "ipv4": "str",  # Optional. The public IPv4 address of the Kubernetes
                           master node. This will not be set if high availability is configured on the
                           cluster (v1.21+).
+                        "isolated_workers": False,  # Optional. Default value is False. A
+                          boolean value indicating whether worker nodes in the cluster are not assigned
+                          public IP addresses. When omitted on create, the default value is false. When
+                          enabled, a NAT gateway must exist in the VPC where the cluster is created.
                         "maintenance_policy": {
                             "day": "str",  # Optional. The day of the maintenance window
                               policy. May be one of ``monday`` through ``sunday``"" , or ``any`` to
@@ -168127,6 +168191,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "ipv4": "str",  # Optional. The public IPv4 address of the Kubernetes
                           master node. This will not be set if high availability is configured on the
                           cluster (v1.21+).
+                        "isolated_workers": False,  # Optional. Default value is False. A
+                          boolean value indicating whether worker nodes in the cluster are not assigned
+                          public IP addresses. When omitted on create, the default value is false. When
+                          enabled, a NAT gateway must exist in the VPC where the cluster is created.
                         "maintenance_policy": {
                             "day": "str",  # Optional. The day of the maintenance window
                               policy. May be one of ``monday`` through ``sunday``"" , or ``any`` to
@@ -168488,6 +168556,10 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                         "ipv4": "str",  # Optional. The public IPv4 address of the Kubernetes
                           master node. This will not be set if high availability is configured on the
                           cluster (v1.21+).
+                        "isolated_workers": False,  # Optional. Default value is False. A
+                          boolean value indicating whether worker nodes in the cluster are not assigned
+                          public IP addresses. When omitted on create, the default value is false. When
+                          enabled, a NAT gateway must exist in the VPC where the cluster is created.
                         "maintenance_policy": {
                             "day": "str",  # Optional. The day of the maintenance window
                               policy. May be one of ``monday`` through ``sunday``"" , or ``any`` to
@@ -207320,10 +207392,9 @@ class SizesOperations:
                                           of measure for the disk size.
                                     },
                                     "type": "str"  # Optional. The type of disk.
-                                      All Droplets contain a ``local`` or ``remote`` disk.
-                                      Additionally, GPU Droplets can also have a ``scratch`` disk for
-                                      non-persistent data. Known values are: "local", "remote", and
-                                      "scratch".
+                                      All Droplets contain a ``local`` or ``boot`` disk. Additionally,
+                                      GPU Droplets can also have a ``scratch`` disk for non-persistent
+                                      data. Known values are: "local", "boot", and "scratch".
                                 }
                             ],
                             "gpu_info": {
@@ -278109,17 +278180,93 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
 
     @distributed_trace
     def list_model_catalog(
-        self, *, page: Optional[int] = None, limit: Optional[int] = None, **kwargs: Any
+        self,
+        *,
+        page: Optional[int] = None,
+        limit: Optional[int] = None,
+        search: Optional[str] = None,
+        model_type: Optional[List[str]] = None,
+        provider: Optional[List[str]] = None,
+        availability: Optional[List[str]] = None,
+        badges: Optional[List[str]] = None,
+        sort_by: str = "MODEL_CATALOG_SORT_BY_CREATED_AT",
+        per_page: Optional[int] = None,
+        sort_direction: str = "SORT_DIRECTION_UNSPECIFIED",
+        use_case: str = "MODEL_CATALOG_USE_CASE_UNSPECIFIED",
+        **kwargs: Any,
     ) -> JSON:
         # pylint: disable=line-too-long
         """List Model Catalog.
 
         Returns all available models.
 
-        :keyword page: Default value is None.
+        :keyword page: Page number for pagination. Default value is None.
         :paramtype page: int
-        :keyword limit: Default value is None.
+        :keyword limit: Deprecated. Use ``per_page`` instead. Default value is None.
         :paramtype limit: int
+        :keyword search: Partial, case-insensitive match on the model's display name. Default value is
+         None.
+        :paramtype search: str
+        :keyword model_type: Filter by model type. Multiple values use OR semantics.
+         Accepted values: ``chat``\\ , ``embedding``\\ , ``image``\\ , ``reasoning``\\ , ``coding``\\ ,
+         ``audio``\\ , ``reranking``. Default value is None.
+        :paramtype model_type: list[str]
+        :keyword provider: Filter by model creator/developer. Multiple values use OR semantics.
+         Values are data-driven; use ``available_providers`` from the response to discover valid
+         options. Default value is None.
+        :paramtype provider: list[str]
+        :keyword availability: Filter by deployment availability. Multiple values use OR semantics.
+         Accepted values: ``serverless``\\ , ``dedicated``. Default value is None.
+        :paramtype availability: list[str]
+        :keyword badges: Filter by badge. Multiple values use OR semantics.
+         Accepted values: ``featured``\\ , ``new``\\ , ``preview``. Default value is None.
+        :paramtype badges: list[str]
+        :keyword sort_by: Field to sort results by. Default is ``MODEL_CATALOG_SORT_BY_CREATED_AT``.
+
+
+         * MODEL_CATALOG_SORT_BY_CREATED_AT: Default: sort by creation date.
+         * MODEL_CATALOG_SORT_BY_NAME: Sort by the model's display name (case-insensitive).
+         * MODEL_CATALOG_SORT_BY_PRICE: Sort by input token price. Known values are:
+         "MODEL_CATALOG_SORT_BY_CREATED_AT", "MODEL_CATALOG_SORT_BY_NAME", and
+         "MODEL_CATALOG_SORT_BY_PRICE". Default value is "MODEL_CATALOG_SORT_BY_CREATED_AT".
+        :paramtype sort_by: str
+        :keyword per_page: Number of items per page. Replaces the deprecated ``limit`` field. Default
+         value is None.
+        :paramtype per_page: int
+        :keyword sort_direction: Sort direction. Defaults to descending when unspecified. Known values
+         are: "SORT_DIRECTION_UNSPECIFIED", "SORT_DIRECTION_ASC", and "SORT_DIRECTION_DESC". Default
+         value is "SORT_DIRECTION_UNSPECIFIED".
+        :paramtype sort_direction: str
+        :keyword use_case: Filter by pre-defined use case. When unspecified, no use-case filter is
+         applied.
+         Accepted values: ``MODEL_CATALOG_USE_CASE_CODING``\\ , ``MODEL_CATALOG_USE_CASE_AGENTS``\\ ,
+         ``MODEL_CATALOG_USE_CASE_AUDIO``\\ , ``MODEL_CATALOG_USE_CASE_IMAGE``\\ ,
+         ``MODEL_CATALOG_USE_CASE_EMBEDDING``\\ , ``MODEL_CATALOG_USE_CASE_VIDEO``.
+
+
+         * MODEL_CATALOG_USE_CASE_UNSPECIFIED: No use-case filter applied; return all models.
+         * MODEL_CATALOG_USE_CASE_CODING: Coding-optimized models: model_type = coding, or usecases
+         include coding,
+           agentic_coding, or code_generation.
+         * MODEL_CATALOG_USE_CASE_AGENTS: Agent-building models: usecases include tool_calling,
+         agentic,
+           agent_platform, agentic_workflows, or agentic_coding.
+         * MODEL_CATALOG_USE_CASE_AUDIO: Audio models: model_type is audio, or usecases include audio,
+           text_to_speech, or voice_cloning, or output modalities include audio.
+         * MODEL_CATALOG_USE_CASE_IMAGE: Image models: model_type is image, or usecases include
+         image_generation,
+           text_to_image, or ideogram, or output modalities include image.
+         * MODEL_CATALOG_USE_CASE_VIDEO: Video models: usecases include video_generation or
+         text_to_video, or
+           output modalities include video.
+         * MODEL_CATALOG_USE_CASE_EMBEDDING: Embedding and reranking models: model_type is embedding or
+         reranking, or
+           usecases include vectorization or reranking. Known values are:
+         "MODEL_CATALOG_USE_CASE_UNSPECIFIED", "MODEL_CATALOG_USE_CASE_CODING",
+         "MODEL_CATALOG_USE_CASE_AGENTS", "MODEL_CATALOG_USE_CASE_AUDIO",
+         "MODEL_CATALOG_USE_CASE_IMAGE", "MODEL_CATALOG_USE_CASE_VIDEO", and
+         "MODEL_CATALOG_USE_CASE_EMBEDDING". Default value is "MODEL_CATALOG_USE_CASE_UNSPECIFIED".
+        :paramtype use_case: str
         :return: JSON object
         :rtype: JSON
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -278129,6 +278276,30 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
 
                 # response body for status code(s): 200
                 response == {
+                    "available_availability": [
+                        "str"  # Optional. All deployment availability values the client can
+                          offer in the availability filter UI.
+                    ],
+                    "available_badges": [
+                        "str"  # Optional. All badge values the client can offer in the
+                          badges filter UI.
+                    ],
+                    "available_model_types": [
+                        "str"  # Optional. All model type values the client can offer in the
+                          type filter UI.
+                    ],
+                    "available_providers": [
+                        "str"  # Optional. All provider values the client can offer in the
+                          provider filter UI.
+                    ],
+                    "available_sort_by": [
+                        "str"  # Optional. All sort-by field values the client can offer in
+                          the sort UI.
+                    ],
+                    "available_sort_directions": [
+                        "str"  # Optional. All sort-direction values the client can offer in
+                          the sort UI.
+                    ],
                     "data": [
                         {
                             "availability": [
@@ -278265,6 +278436,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
         _request = build_genai_list_model_catalog_request(
             page=page,
             limit=limit,
+            search=search,
+            model_type=model_type,
+            provider=provider,
+            availability=availability,
+            badges=badges,
+            sort_by=sort_by,
+            per_page=per_page,
+            sort_direction=sort_direction,
+            use_case=use_case,
             headers=_headers,
             params=_params,
         )
