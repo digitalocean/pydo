@@ -1,0 +1,34 @@
+apiVersion: agents.digitalocean.com/v1alpha1
+kind: Agent
+metadata:
+  name: openai-codex-pydo
+spec:
+  runtime:
+    adapter: codex-agentapi
+    config:
+      agent:
+        model: gpt-5.6
+        instructions: "Answer the user clearly and concisely."
+      environment:
+        type: self_hosted
+        workspace_directory: /workspace
+      input:
+        - role: user
+          content:
+            - type: input_text
+              text: "What can you help with?"
+  sandbox:
+    template: codex-agentapi
+    idleTimeoutSeconds: 2700
+    egress:
+      allow:
+        - host: api.openai.com
+        - host: codex-cloud-environments.chatgpt.com
+  # Match doctl's fixture shape: key in env + tenantSecret slot (no value:).
+  # pydo expands ${...} before POST.
+  env:
+    CODEX_ENVIRONMENT_ID: ${ENV_ID}
+    CODEX_API_KEY: ${OPENAI_API_KEY}
+  secrets:
+    - name: CODEX_API_KEY
+      source: tenantSecret

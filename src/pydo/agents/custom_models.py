@@ -16,6 +16,9 @@ class AgentKind:
     CURSOR_CLI = "AGENT_KIND_CURSOR_CLI"
     NONE = "AGENT_KIND_NONE"
     CUSTOM = "AGENT_KIND_CUSTOM"
+    # OpenAI Agents API sandbox-provider path: DO boots the microVM; the
+    # agent loop lives at OpenAI (codex exec-server dials api.openai.com).
+    OPENAI_CODEX = "AGENT_KIND_OPENAI_CODEX"
 
 
 class SessionStatus:

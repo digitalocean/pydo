@@ -38,6 +38,12 @@ _ERROR_MAP = {
 _BASE_PATH = "/v2/agents/sessions"
 _OK_STATUS = (200, 201, 202, 204)
 
+# CreateSession often blocks until the sandbox is READY (Firecracker boot).
+# doctl tolerates several minutes; azure-core's default absolute timeout is ~120s
+# and surfaces as ServiceResponseTimeoutError.
+_DEFAULT_CREATE_TIMEOUT = 600.0
+_DEFAULT_REQUEST_TIMEOUT = 120.0
+
 # Private Beta contract: a session is created from an ``agents.yaml`` manifest
 # uploaded verbatim. The server routes on this media type (handlers.go:
 # isYAMLContentType) and parses the body as the agent spec.
@@ -364,6 +370,7 @@ class SessionsOperations:
         params: Optional[Dict[str, Any]] = None,
         headers: Optional[Dict[str, str]] = None,
         stream: bool = False,
+        timeout: Optional[float] = None,
     ):
         headers = {"Accept": "application/json", **(headers or {})}
         kwargs: Dict[str, Any] = {"headers": headers}
@@ -381,7 +388,15 @@ class SessionsOperations:
 
         request = HttpRequest(method, path, **kwargs)
         request.url = self._client.format_url(request.url)
-        pipeline_response = self._client._pipeline.run(request, stream=stream)
+        run_kwargs: Dict[str, Any] = {"stream": stream}
+        if timeout is not None:
+            # azure-core: connection_timeout + read_timeout; also raise the
+            # retry policy's absolute deadline so long CreateSession calls
+            # are not aborted mid-provision.
+            run_kwargs["connection_timeout"] = float(timeout)
+            run_kwargs["read_timeout"] = float(timeout)
+            run_kwargs["timeout"] = float(timeout)
+        pipeline_response = self._client._pipeline.run(request, **run_kwargs)
         response = pipeline_response.http_response
 
         if response.status_code not in _OK_STATUS:
@@ -424,7 +439,13 @@ class SessionsOperations:
             ),
         )
 
-    def create_from_manifest(self, manifest: Union[str, bytes]) -> Any:
+    def create_from_manifest(
+        self,
+        manifest: Union[str, bytes],
+        *,
+        openai_session_id: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> Any:
         """Create a session from an ``agents.yaml`` manifest.
 
         This is the supported creation path: the manifest defines everything
@@ -432,15 +453,31 @@ class SessionsOperations:
         uploaded verbatim as ``application/x-yaml`` and the server owns parsing
         and validation. There are no ``agent_kind``/``repo_hint`` arguments.
 
+        For OpenAI sandbox-provider sessions (``AGENT_KIND_OPENAI_CODEX``),
+        pass ``openai_session_id`` (the ``sess_…`` from OpenAI's create-session
+        call). The server persists it for attach correlation; doctl /
+        :meth:`pydo.agents.AgentsResources.start` resolve ``${ENV_ID}`` /
+        ``${OPENAI_API_KEY}`` client-side before calling this method.
+
         :param manifest: The agent spec as a YAML ``str`` or ``bytes`` document.
+        :param openai_session_id: Optional OpenAI session id query param.
+        :param timeout: HTTP timeout in seconds (defaults to 600 for create —
+            sandbox boot can exceed the client-wide 120s default).
         """
         data = _manifest_bytes(manifest)
+        params: Optional[Dict[str, Any]] = None
+        if openai_session_id:
+            params = {"openai_session_id": openai_session_id}
         return self._parse_json(
             self._send(
                 "POST",
                 _BASE_PATH,
                 content=data,
                 content_type=_YAML_MEDIA_TYPE,
+                params=params,
+                timeout=(
+                    _DEFAULT_CREATE_TIMEOUT if timeout is None else float(timeout)
+                ),
             ),
         )
 

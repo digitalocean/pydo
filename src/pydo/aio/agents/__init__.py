@@ -7,7 +7,12 @@ from __future__ import annotations
 
 from typing import Optional
 
-from pydo.agents import _select_session_by_name, resolve_agents_base_url
+from pydo.agents import (
+    _looks_like_openai_codex_manifest,
+    _select_session_by_name,
+    prepare_openai_codex_manifest,
+    resolve_agents_base_url,
+)
 from pydo.custom_extensions import _BaseURLProxy
 
 from .custom_sessions import (
@@ -32,23 +37,68 @@ class AsyncAgentsResources:
     def base_url(self) -> str:
         return self._proxy._base_url
 
-    async def start(self, manifest: "str | bytes") -> AsyncAgentSession:
+    async def start(
+        self,
+        manifest: "str | bytes",
+        *,
+        openai_api_key: Optional[str] = None,
+        openai_session_id: Optional[str] = None,
+        openai_environment_id: Optional[str] = None,
+        openai_base_url: Optional[str] = None,
+    ) -> AsyncAgentSession:
         """Create a session from an ``agents.yaml`` manifest and return a handle.
 
-        Use as ``async with await client.agents.start(manifest) as agent:`` to
-        auto-destroy on exit.
+        See :meth:`pydo.agents.AgentsResources.start`.
         """
-        resp = await self.sessions.create_from_manifest(manifest)
+        resolved: "str | bytes" = manifest
+        oai_session_id = openai_session_id
+
+        if openai_session_id or _looks_like_openai_codex_manifest(manifest):
+            resolved, oai_session_id, _env_id = prepare_openai_codex_manifest(
+                manifest,
+                openai_api_key=openai_api_key,
+                openai_base_url=openai_base_url,
+                openai_session_id=openai_session_id,
+                openai_environment_id=openai_environment_id,
+            )
+
+        resp = await self.sessions.create_from_manifest(
+            resolved,
+            openai_session_id=oai_session_id,
+        )
         get = getattr(resp, "get", None)
         info = get("session") if get else None
         session_id = (getattr(info or resp, "get", lambda *_: None))("session_id")
-        return AsyncAgentSession(self.sessions, session_id, raw=resp)
+        return AsyncAgentSession(
+            self.sessions,
+            session_id,
+            raw=resp,
+            openai_api_key=openai_api_key,
+            openai_base_url=openai_base_url,
+        )
 
-    def attach(self, session_id: str) -> AsyncAgentSession:
+    def attach(
+        self,
+        session_id: str,
+        *,
+        openai_api_key: Optional[str] = None,
+        openai_base_url: Optional[str] = None,
+    ) -> AsyncAgentSession:
         """Return an :class:`AsyncAgentSession` handle for an existing session."""
-        return AsyncAgentSession(self.sessions, session_id)
+        return AsyncAgentSession(
+            self.sessions,
+            session_id,
+            openai_api_key=openai_api_key,
+            openai_base_url=openai_base_url,
+        )
 
-    async def attach_by_name(self, name: str) -> AsyncAgentSession:
+    async def attach_by_name(
+        self,
+        name: str,
+        *,
+        openai_api_key: Optional[str] = None,
+        openai_base_url: Optional[str] = None,
+    ) -> AsyncAgentSession:
         """Resolve a session by ``name`` and return an :class:`AsyncAgentSession`.
 
         See :meth:`pydo.agents.AgentsResources.attach_by_name`.
@@ -56,7 +106,13 @@ class AsyncAgentsResources:
         resp = await self.sessions.list(name=name)
         session = _select_session_by_name(resp, name)
         session_id = (getattr(session, "get", lambda *_: None))("session_id")
-        return AsyncAgentSession(self.sessions, session_id, raw=session)
+        return AsyncAgentSession(
+            self.sessions,
+            session_id,
+            raw=session,
+            openai_api_key=openai_api_key,
+            openai_base_url=openai_base_url,
+        )
 
 
 __all__ = [

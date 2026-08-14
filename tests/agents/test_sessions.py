@@ -64,8 +64,8 @@ class _FakePipeline:
         self._responses = list(responses)
         self.calls: List[Any] = []
 
-    def run(self, request, *, stream=False):
-        self.calls.append(SimpleNamespace(request=request, stream=stream))
+    def run(self, request, *, stream=False, **kwargs):
+        self.calls.append(SimpleNamespace(request=request, stream=stream, kwargs=kwargs))
         response = self._responses.pop(0)
         return SimpleNamespace(http_response=response)
 

@@ -17,6 +17,7 @@ from urllib.parse import quote
 from azure.core.rest import HttpRequest
 
 from pydo.agents.custom_sessions import (
+    _DEFAULT_CREATE_TIMEOUT,
     _DEFAULT_POLL_INTERVAL,
     _DEFAULT_POLL_TIMEOUT,
     _DOWNLOAD_CHUNK,
@@ -156,6 +157,7 @@ class AsyncSessionsOperations:
         params: Optional[Dict[str, Any]] = None,
         headers: Optional[Dict[str, str]] = None,
         stream: bool = False,
+        timeout: Optional[float] = None,
     ):
         headers = {"Accept": "application/json", **(headers or {})}
         kwargs: Dict[str, Any] = {"headers": headers}
@@ -173,7 +175,12 @@ class AsyncSessionsOperations:
 
         request = HttpRequest(method, path, **kwargs)
         request.url = self._client.format_url(request.url)
-        pipeline_response = await self._client._pipeline.run(request, stream=stream)
+        run_kwargs: Dict[str, Any] = {"stream": stream}
+        if timeout is not None:
+            run_kwargs["connection_timeout"] = float(timeout)
+            run_kwargs["read_timeout"] = float(timeout)
+            run_kwargs["timeout"] = float(timeout)
+        pipeline_response = await self._client._pipeline.run(request, **run_kwargs)
         response = pipeline_response.http_response
 
         if response.status_code not in _OK_STATUS:
@@ -216,23 +223,31 @@ class AsyncSessionsOperations:
             ),
         )
 
-    async def create_from_manifest(self, manifest: Union[str, bytes]) -> Any:
+    async def create_from_manifest(
+        self,
+        manifest: Union[str, bytes],
+        *,
+        openai_session_id: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> Any:
         """Create a session from an ``agents.yaml`` manifest.
 
-        This is the supported creation path: the manifest defines everything
-        about the session (runtime adapter, sandbox, env vars, egress). It is
-        uploaded verbatim as ``application/x-yaml`` and the server owns parsing
-        and validation. There are no ``agent_kind``/``repo_hint`` arguments.
-
-        :param manifest: The agent spec as a YAML ``str`` or ``bytes`` document.
+        See :meth:`pydo.agents.custom_sessions.SessionsOperations.create_from_manifest`.
         """
         data = _manifest_bytes(manifest)
+        params: Optional[Dict[str, Any]] = None
+        if openai_session_id:
+            params = {"openai_session_id": openai_session_id}
         return await self._parse_json(
             await self._send(
                 "POST",
                 _BASE_PATH,
                 content=data,
                 content_type=_YAML_MEDIA_TYPE,
+                params=params,
+                timeout=(
+                    _DEFAULT_CREATE_TIMEOUT if timeout is None else float(timeout)
+                ),
             ),
         )
 

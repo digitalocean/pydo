@@ -41,8 +41,8 @@ class _FakeSessions:
         self.resolved: List[Any] = []
         self.destroyed = False
 
-    def create_from_manifest(self, manifest):
-        self.calls.append(("create", manifest))
+    def create_from_manifest(self, manifest, **kwargs):
+        self.calls.append(("create", manifest, kwargs))
         return {"session": {"session_id": "s1", "status": "SESSION_STATUS_READY"}}
 
     def stream(self, session_id, **kwargs):
@@ -252,6 +252,15 @@ class _FakeAsyncSessions:
         self, session_id, request_id, *, outcome, reason=None, source=None
     ):
         self.resolved.append((request_id, outcome))
+
+    async def get(self, session_id):
+        return {
+            "session": {
+                "session_id": session_id,
+                "status": "SESSION_STATUS_READY",
+                "agent_kind": "AGENT_KIND_CLAUDE_CODE",
+            }
+        }
 
     async def destroy(self, session_id):
         self.destroyed = True

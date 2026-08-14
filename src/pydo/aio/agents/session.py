@@ -9,13 +9,46 @@ import asyncio
 from typing import Any, Dict, List, Optional
 
 from pydo.agents.custom_models import ResolutionSource, SessionStatus
+from pydo.agents.custom_openai_sandbox import (
+    is_openai_codex_session,
+    resolve_openai_api_key,
+    send_openai_session_input,
+    stream_openai_session_events,
+)
 from pydo.agents.session import (
     AgentEvent,
     AgentEventType,
     HITLPolicy,
     RunResult,
+    _OpenAIEventAdapter,
     _decide_hitl,
 )
+
+
+async def _run_sync(func, *args, **kwargs):
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(None, lambda: func(*args, **kwargs))
+
+
+class _AsyncOpenAIEventAdapter:
+    """Async wrapper over the sync OpenAI→harness event adapter."""
+
+    def __init__(self, sync_adapter: _OpenAIEventAdapter):
+        self._sync = sync_adapter
+        self._iter = iter(sync_adapter)
+
+    def __aiter__(self):
+        return self
+
+    async def __anext__(self):
+        loop = asyncio.get_event_loop()
+        try:
+            return await loop.run_in_executor(None, next, self._iter)
+        except StopIteration as exc:
+            raise StopAsyncIteration from exc
+
+    async def close(self) -> None:
+        self._sync.close()
 
 
 class AsyncRunStream:
@@ -113,7 +146,9 @@ class AsyncRunStream:
         closer = getattr(self._raw, "close", None)
         if closer:
             try:
-                await closer()
+                result = closer()
+                if asyncio.iscoroutine(result):
+                    await result
             except Exception:  # noqa: BLE001
                 pass
 
@@ -127,10 +162,20 @@ class AsyncRunStream:
 class AsyncAgentSession:
     """Async self-managing handle to one hosted-agent session."""
 
-    def __init__(self, sessions: Any, session_id: str, *, raw: Any = None):
+    def __init__(
+        self,
+        sessions: Any,
+        session_id: str,
+        *,
+        raw: Any = None,
+        openai_api_key: Optional[str] = None,
+        openai_base_url: Optional[str] = None,
+    ):
         self._sessions = sessions
         self.session_id = session_id
         self._raw = raw
+        self._openai_api_key = openai_api_key
+        self._openai_base_url = openai_base_url
 
     @property
     def sessions(self) -> Any:
@@ -150,6 +195,30 @@ class AsyncAgentSession:
         info = self.info
         get = getattr(info, "get", None)
         return get("status") if get else None
+
+    @property
+    def agent_kind(self) -> Optional[str]:
+        info = self.info
+        get = getattr(info, "get", None)
+        return get("agent_kind") if get else None
+
+    @property
+    def openai_session_id(self) -> Optional[str]:
+        info = self.info
+        get = getattr(info, "get", None)
+        value = get("openai_session_id") if get else None
+        return str(value) if value else None
+
+    @property
+    def openai_environment_id(self) -> Optional[str]:
+        info = self.info
+        get = getattr(info, "get", None)
+        value = get("openai_environment_id") if get else None
+        return str(value) if value else None
+
+    @property
+    def is_openai_codex(self) -> bool:
+        return is_openai_codex_session(self.info)
 
     async def refresh(self) -> Any:
         self._raw = await self._sessions.get(self.session_id)
@@ -173,6 +242,23 @@ class AsyncAgentSession:
                 )
             await asyncio.sleep(poll_interval)
 
+    def _require_openai_bridge(self):
+        if self.info is None:
+            raise RuntimeError(
+                f"session {self.session_id} has no cached info; call refresh() first"
+            )
+        if not self.is_openai_codex:
+            raise RuntimeError(
+                f"session {self.session_id} is not AGENT_KIND_OPENAI_CODEX"
+            )
+        oai_id = self.openai_session_id
+        if not oai_id:
+            raise RuntimeError(
+                f"session {self.session_id} is missing openai_session_id"
+            )
+        api_key = resolve_openai_api_key(self._openai_api_key)
+        return oai_id, api_key
+
     async def run_streamed(
         self,
         prompt: str,
@@ -180,6 +266,11 @@ class AsyncAgentSession:
         hitl: HITLPolicy = "approve",
         timeout: Optional[float] = 300.0,
     ) -> AsyncRunStream:
+        if self.info is None:
+            await self.refresh()
+        if self.is_openai_codex:
+            return await self._run_streamed_openai(prompt, timeout=timeout)
+
         raw_stream = await self._sessions.stream(self.session_id)
         run = await self._sessions.send_input(self.session_id, text=prompt)
         run_id = (getattr(run, "get", lambda *_: None))("run_id")
@@ -188,6 +279,50 @@ class AsyncAgentSession:
             run_id=run_id,
             session=self,
             hitl=hitl,
+            timeout=timeout,
+        )
+
+    async def _run_streamed_openai(
+        self,
+        prompt: str,
+        *,
+        timeout: Optional[float] = 300.0,
+    ) -> AsyncRunStream:
+        from ...agents.session import _ConcurrentOpenAITurn
+
+        oai_id, api_key = self._require_openai_bridge()
+        # Match doctl / sync path: SSE + POST /events must run concurrently.
+        stream_timeout = timeout or 300.0
+        raw_events = await _run_sync(
+            stream_openai_session_events,
+            oai_id,
+            api_key=api_key,
+            base_url=self._openai_base_url,
+            timeout=stream_timeout,
+        )
+        concurrent = _ConcurrentOpenAITurn(
+            raw_events,
+            send=None,
+            timeout=stream_timeout,
+        )
+        concurrent.set_send(
+            lambda: send_openai_session_input(
+                oai_id,
+                text=prompt,
+                api_key=api_key,
+                base_url=self._openai_base_url,
+                timeout=max(stream_timeout, 600.0),
+                should_abort=concurrent.aborted,
+                on_request_sent=concurrent.mark_input_sent,
+            )
+        )
+        concurrent.start()
+        sync_adapter = _OpenAIEventAdapter(concurrent)
+        return AsyncRunStream(
+            raw_stream=_AsyncOpenAIEventAdapter(sync_adapter),
+            run_id=None,
+            session=self,
+            hitl=None,
             timeout=timeout,
         )
 
@@ -205,6 +340,17 @@ class AsyncAgentSession:
 
     # --- thin passthroughs (session id bound) ---------------------------
     async def send_input(self, text: str) -> Any:
+        if self.info is None:
+            await self.refresh()
+        if self.is_openai_codex:
+            oai_id, api_key = self._require_openai_bridge()
+            return await _run_sync(
+                send_openai_session_input,
+                oai_id,
+                text=text,
+                api_key=api_key,
+                base_url=self._openai_base_url,
+            )
         return await self._sessions.send_input(self.session_id, text=text)
 
     async def pause(self) -> Any:
@@ -214,6 +360,19 @@ class AsyncAgentSession:
         return await self._sessions.resume(self.session_id)
 
     async def stream(self, **kwargs: Any) -> Any:
+        if self.info is None:
+            await self.refresh()
+        if self.is_openai_codex:
+            oai_id, api_key = self._require_openai_bridge()
+            sync_adapter = _OpenAIEventAdapter(
+                stream_openai_session_events(
+                    oai_id,
+                    api_key=api_key,
+                    base_url=self._openai_base_url,
+                    timeout=float(kwargs.get("timeout") or 300.0),
+                )
+            )
+            return _AsyncOpenAIEventAdapter(sync_adapter)
         return await self._sessions.stream(self.session_id, **kwargs)
 
     async def history(self, *, before: str, limit: Optional[int] = None) -> Any:

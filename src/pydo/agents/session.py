@@ -24,10 +24,18 @@ No threads, no raw event-string matching, no manual teardown.
 """
 from __future__ import annotations
 
+import queue
+import threading
 import time
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Any, Callable, Dict, Iterator, List, Optional, Union
 
 from .custom_models import HITLOutcome, ResolutionSource, SessionStatus
+from .custom_openai_sandbox import (
+    is_openai_codex_session,
+    resolve_openai_api_key,
+    send_openai_session_input,
+    stream_openai_session_events,
+)
 
 # Normalized event type -> raw SPI ``type`` it maps from.
 _RAW_TO_TYPE = {
@@ -279,12 +287,27 @@ class AgentSession:
     Wraps :class:`~pydo.agents.custom_sessions.SessionsOperations`, binding the
     ``session_id`` so callers never re-pass it, and adds :meth:`run` /
     :meth:`run_streamed`. Use as a context manager to auto-destroy on exit.
+
+    For ``AGENT_KIND_OPENAI_CODEX`` sessions, :meth:`run` / :meth:`run_streamed`
+    bridge to the OpenAI Agents API (design §5) using ``openai_session_id``
+    from the DO session read model — they never call DO ``stream`` /
+    ``send_input``.
     """
 
-    def __init__(self, sessions: Any, session_id: str, *, raw: Any = None):
+    def __init__(
+        self,
+        sessions: Any,
+        session_id: str,
+        *,
+        raw: Any = None,
+        openai_api_key: Optional[str] = None,
+        openai_base_url: Optional[str] = None,
+    ):
         self._sessions = sessions
         self.session_id = session_id
         self._raw = raw
+        self._openai_api_key = openai_api_key
+        self._openai_base_url = openai_base_url
 
     @property
     def sessions(self) -> Any:
@@ -306,6 +329,31 @@ class AgentSession:
         info = self.info
         get = getattr(info, "get", None)
         return get("status") if get else None
+
+    @property
+    def agent_kind(self) -> Optional[str]:
+        info = self.info
+        get = getattr(info, "get", None)
+        return get("agent_kind") if get else None
+
+    @property
+    def openai_session_id(self) -> Optional[str]:
+        info = self.info
+        get = getattr(info, "get", None)
+        value = get("openai_session_id") if get else None
+        return str(value) if value else None
+
+    @property
+    def openai_environment_id(self) -> Optional[str]:
+        info = self.info
+        get = getattr(info, "get", None)
+        value = get("openai_environment_id") if get else None
+        return str(value) if value else None
+
+    @property
+    def is_openai_codex(self) -> bool:
+        """Whether attach/run should bridge to OpenAI (design §5)."""
+        return is_openai_codex_session(self.info)
 
     def refresh(self) -> Any:
         """Fetch and cache the latest session state."""
@@ -329,6 +377,21 @@ class AgentSession:
                 )
             time.sleep(poll_interval)
 
+    def _require_openai_bridge(self) -> tuple:
+        if self.info is None:
+            self.refresh()
+        if not self.is_openai_codex:
+            raise RuntimeError(
+                f"session {self.session_id} is not AGENT_KIND_OPENAI_CODEX"
+            )
+        oai_id = self.openai_session_id
+        if not oai_id:
+            raise RuntimeError(
+                f"session {self.session_id} is missing openai_session_id"
+            )
+        api_key = resolve_openai_api_key(self._openai_api_key)
+        return oai_id, api_key
+
     def run_streamed(
         self,
         prompt: str,
@@ -338,9 +401,14 @@ class AgentSession:
     ) -> RunStream:
         """Send ``prompt`` and return a :class:`RunStream` of typed events.
 
-        The SSE subscription is opened *before* the input is submitted, so no
-        early events are missed — no caller-managed thread required.
+        Managed-loop sessions open DO's SSE feed before ``send_input``.
+        OpenAI sandbox-provider sessions bridge to api.openai.com instead.
         """
+        if self.info is None:
+            self.refresh()
+        if self.is_openai_codex:
+            return self._run_streamed_openai(prompt, timeout=timeout)
+
         raw_stream = self._sessions.stream(self.session_id)
         run = self._sessions.send_input(self.session_id, text=prompt)
         run_id = (getattr(run, "get", lambda *_: None))("run_id")
@@ -349,6 +417,48 @@ class AgentSession:
             run_id=run_id,
             session=self,
             hitl=hitl,
+            timeout=timeout,
+        )
+
+    def _run_streamed_openai(
+        self,
+        prompt: str,
+        *,
+        timeout: Optional[float] = 300.0,
+    ) -> RunStream:
+        oai_id, api_key = self._require_openai_bridge()
+        # Match doctl agents attach: open SSE and send input concurrently.
+        # Self-hosted POST /events often blocks until the sandbox executor
+        # connects; turn output arrives on the GET stream in parallel.
+        stream_timeout = timeout or 300.0
+        raw_events = stream_openai_session_events(
+            oai_id,
+            api_key=api_key,
+            base_url=self._openai_base_url,
+            timeout=stream_timeout,
+        )
+        concurrent = _ConcurrentOpenAITurn(
+            raw_events,
+            send=None,  # set below once abort hook exists
+            timeout=stream_timeout,
+        )
+        concurrent.set_send(
+            lambda: send_openai_session_input(
+                oai_id,
+                text=prompt,
+                api_key=api_key,
+                base_url=self._openai_base_url,
+                timeout=max(stream_timeout, 600.0),
+                should_abort=concurrent.aborted,
+                on_request_sent=concurrent.mark_input_sent,
+            )
+        )
+        concurrent.start()
+        return RunStream(
+            raw_stream=_OpenAIEventAdapter(concurrent),
+            run_id=None,
+            session=self,
+            hitl=None,
             timeout=timeout,
         )
 
@@ -367,6 +477,16 @@ class AgentSession:
 
     # --- thin passthroughs (session id bound) ---------------------------
     def send_input(self, text: str) -> Any:
+        if self.info is None:
+            self.refresh()
+        if self.is_openai_codex:
+            oai_id, api_key = self._require_openai_bridge()
+            return send_openai_session_input(
+                oai_id,
+                text=text,
+                api_key=api_key,
+                base_url=self._openai_base_url,
+            )
         return self._sessions.send_input(self.session_id, text=text)
 
     def pause(self) -> Any:
@@ -376,6 +496,18 @@ class AgentSession:
         return self._sessions.resume(self.session_id)
 
     def stream(self, **kwargs: Any) -> Any:
+        if self.info is None:
+            self.refresh()
+        if self.is_openai_codex:
+            oai_id, api_key = self._require_openai_bridge()
+            return _OpenAIEventAdapter(
+                stream_openai_session_events(
+                    oai_id,
+                    api_key=api_key,
+                    base_url=self._openai_base_url,
+                    timeout=float(kwargs.get("timeout") or 300.0),
+                )
+            )
         return self._sessions.stream(self.session_id, **kwargs)
 
     def history(self, *, before: str, limit: Optional[int] = None) -> Any:
@@ -455,6 +587,260 @@ class AgentSession:
 
     def __repr__(self) -> str:
         return f"AgentSession(session_id={self.session_id!r})"
+
+
+def _is_timeout_exc(exc: BaseException) -> bool:
+    if isinstance(exc, TimeoutError):
+        return True
+    name = type(exc).__name__.lower()
+    if "timeout" in name:
+        return True
+    return "timed out" in str(exc).lower()
+
+
+class _ConcurrentOpenAITurn:
+    """OpenAI self-hosted turns need concurrent send + SSE (doctl attach).
+
+    ``POST .../events`` often blocks until the sandbox executor connects.
+    Output arrives on the already-open ``GET .../events?stream=true`` feed,
+    so both must run in parallel or the POST hangs with nobody reading SSE.
+
+    A timed-out POST must not abort the turn: SSE is authoritative. Hard send
+    failures (HTTP 4xx/5xx) still fail the run immediately.
+
+    Manifest ``spec.openai`` / ``runtime.config`` seed ``input`` can replay on
+    stream connect. Events are ignored until the POST body is written, then
+    until a new turn starts, so ``run()`` does not return the seed reply.
+
+    :meth:`close` releases the SSE socket and aborts a hung POST so the next
+    ``run()`` is not starved by a leftover connection (doctl keeps one stream
+    for the whole attach; we open one per ``run`` and must close it).
+    """
+
+    _TURN_START_TYPES = frozenset(
+        {
+            "session.turn.created",
+            "session.turn.in_progress",
+            "session.in_progress",
+            "response.created",
+            "session.started",
+            "run.started",
+        }
+    )
+
+    def __init__(
+        self,
+        events: Iterator[Any],
+        *,
+        send: Optional[Callable[[], Any]] = None,
+        timeout: Optional[float] = None,
+    ) -> None:
+        self._events = events
+        self._send = send
+        self._timeout = timeout
+        self._q: "queue.Queue[tuple[str, Any]]" = queue.Queue()
+        self._started = False
+        self._abort = threading.Event()
+
+    def set_send(self, send: Callable[[], Any]) -> None:
+        self._send = send
+
+    def aborted(self) -> bool:
+        return self._abort.is_set()
+
+    def mark_input_sent(self) -> None:
+        """Signal that the POST body was written (seed SSE may be ignored now)."""
+        self._q.put(("input_sent", None))
+
+    def close(self) -> None:
+        self._abort.set()
+        closer = getattr(self._events, "close", None)
+        if closer:
+            try:
+                closer()
+            except Exception:  # noqa: BLE001
+                pass
+
+    def start(self) -> None:
+        if self._started:
+            return
+        if self._send is None:
+            raise RuntimeError("OpenAI turn send callback not set")
+        self._started = True
+
+        def reader() -> None:
+            try:
+                for event in self._events:
+                    if self._abort.is_set():
+                        break
+                    self._q.put(("event", event))
+            except BaseException as exc:  # noqa: BLE001 - surface on consumer
+                if not self._abort.is_set():
+                    self._q.put(("error", exc))
+            finally:
+                self._q.put(("done", None))
+
+        def sender() -> None:
+            try:
+                self._send()
+            except BaseException as exc:  # noqa: BLE001
+                if self._abort.is_set():
+                    return
+                # Soft: POST timeout is expected while waiting on the executor;
+                # turn completion still arrives on SSE.
+                if _is_timeout_exc(exc):
+                    self._q.put(("send_timeout", exc))
+                else:
+                    self._q.put(("error", exc))
+
+        threading.Thread(target=reader, daemon=True).start()
+        threading.Thread(target=sender, daemon=True).start()
+
+    def __iter__(self) -> Iterator[Any]:
+        if not self._started:
+            self.start()
+        deadline = (
+            time.monotonic() + self._timeout if self._timeout is not None else None
+        )
+        armed = False
+        in_new_turn = False
+        try:
+            while True:
+                if deadline is not None and time.monotonic() > deadline:
+                    raise TimeoutError(
+                        "OpenAI turn timed out waiting for session events"
+                    )
+                try:
+                    wait = 1.0
+                    if deadline is not None:
+                        wait = min(wait, max(0.05, deadline - time.monotonic()))
+                    kind, payload = self._q.get(timeout=wait)
+                except queue.Empty:
+                    continue
+                if kind == "input_sent":
+                    armed = True
+                    continue
+                if kind == "event":
+                    if not armed:
+                        # Drop seed-turn / history replayed before our POST.
+                        continue
+                    if not in_new_turn:
+                        etype = (
+                            payload.get("type") or payload.get("event") or ""
+                            if isinstance(payload, dict)
+                            else ""
+                        )
+                        if etype not in self._TURN_START_TYPES:
+                            continue
+                        in_new_turn = True
+                    yield payload
+                elif kind == "send_timeout":
+                    # Ignore — keep reading SSE until turn.completed / deadline.
+                    continue
+                elif kind == "error":
+                    raise payload
+                elif kind == "done":
+                    break
+        finally:
+            self.close()
+
+
+class _OpenAIEventAdapter:
+    """Map OpenAI Agents stream events onto harness-shaped dicts for RunStream."""
+
+    def __init__(self, events):
+        self._events = events
+        self._closed = False
+
+    def close(self) -> None:
+        self._closed = True
+        closer = getattr(self._events, "close", None)
+        if closer:
+            try:
+                closer()
+            except Exception:  # noqa: BLE001
+                pass
+
+    def __iter__(self):
+        yielded_start = False
+        try:
+            for event in self._events:
+                if self._closed:
+                    break
+                etype = event.get("type") or event.get("event") or ""
+
+                if etype in (
+                    "session.turn.created",
+                    "session.turn.in_progress",
+                    "session.in_progress",
+                    "response.created",
+                    "session.started",
+                    "run.started",
+                ):
+                    if not yielded_start:
+                        yielded_start = True
+                        yield {
+                            "type": "run.started",
+                            "run_id": event.get("id") or "",
+                            "data": event,
+                        }
+                    continue
+
+                if etype in (
+                    "session.turn.output_text.delta",
+                    "response.output_text.delta",
+                    "output_text_delta",
+                    "response.output_text_delta",
+                ):
+                    text = event.get("delta") or event.get("text") or ""
+                    data = event.get("data")
+                    if not text and isinstance(data, dict):
+                        text = data.get("text") or data.get("delta") or ""
+                    yield {
+                        "type": "run.token_delta",
+                        "run_id": event.get("id") or "",
+                        "data": {"text": text},
+                    }
+                    continue
+
+                if etype in (
+                    "session.turn.completed",
+                    "response.completed",
+                    "session.completed",
+                    "run.completed",
+                ):
+                    usage = event.get("usage") if isinstance(event.get("usage"), dict) else {}
+                    yield {
+                        "type": "run.completed",
+                        "run_id": event.get("id") or "",
+                        "data": {
+                            "total_tokens_in": usage.get("input_tokens"),
+                            "total_tokens_out": usage.get("output_tokens"),
+                            **(event.get("data") or {}),
+                        },
+                    }
+                    break
+
+                if etype in (
+                    "session.turn.failed",
+                    "response.failed",
+                    "session.failed",
+                    "error",
+                    "run.failed",
+                ):
+                    yield {
+                        "type": "run.failed",
+                        "run_id": event.get("id") or "",
+                        "data": {
+                            "code": event.get("code"),
+                            "message": event.get("message")
+                            or event.get("error")
+                            or "openai session failed",
+                        },
+                    }
+                    break
+        finally:
+            self.close()
 
 
 __all__ = [
