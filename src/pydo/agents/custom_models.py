@@ -86,18 +86,13 @@ class ResolutionSource:
 
 
 class OAuthProvider:
-    """External identity provider a session is linking to."""
+    """External identity provider a team can connect for its sessions.
 
-    UNSPECIFIED = "OAUTH_PROVIDER_UNSPECIFIED"
-    GITHUB = "OAUTH_PROVIDER_GITHUB"
+    The value is the provider path segment used by
+    ``/v2/agents/auth/{provider}`` (e.g. ``github``).
+    """
 
-
-class OAuthFlowKind:
-    """Interaction model the client should drive the developer through."""
-
-    UNSPECIFIED = "OAUTH_FLOW_KIND_UNSPECIFIED"
-    WEB_CALLBACK = "OAUTH_FLOW_KIND_WEB_CALLBACK"
-    DEVICE = "OAUTH_FLOW_KIND_DEVICE"
+    GITHUB = "github"
 
 
 class ProviderAuthState:
@@ -177,7 +172,6 @@ __all__ = [
     "HITLActionKind",
     "ResolutionSource",
     "OAuthProvider",
-    "OAuthFlowKind",
     "ProviderAuthState",
     "TriggerKind",
     "TriggerStatus",

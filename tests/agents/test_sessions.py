@@ -248,25 +248,47 @@ def test_resolve_hitl_url_and_body():
     }
 
 
-def test_start_oauth_flow():
+def test_start_provider_auth():
     body = {
-        "authorize_url": "https://github.com/login/oauth/authorize?...",
-        "flow_kind": "OAUTH_FLOW_KIND_WEB_CALLBACK",
+        "provider": "github",
+        "status": "pending",
+        "connect_url": "https://cloud.digitalocean.com/security/connectlinks/confirm?token=abc",
+        "poll_url": "https://cloud.digitalocean.com/api/v1/security/connectlinks/poll?token=def",
+        "verification_code": "k5r2cprq",
     }
     resources = _make_resources([_FakeResponse(200, body)])
 
-    resp = resources.sessions.start_oauth_flow(
-        "s1",
+    resp = resources.sessions.start_provider_auth(OAuthProvider.GITHUB)
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "POST"
+    assert call.request.url.endswith("/v2/agents/auth/github")
+    assert json.loads(call.request.content) == {}
+    assert resp.status == "pending"
+    assert resp.connect_url.endswith("token=abc")
+
+
+def test_poll_provider_auth():
+    body = {"provider": "github", "status": "success"}
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    resp = resources.sessions.poll_provider_auth(
         OAuthProvider.GITHUB,
-        requested_scopes=["repo"],
+        "https://cloud.digitalocean.com/api/v1/security/connectlinks/poll?token=def",
     )
 
     call = resources._proxy._original._pipeline.calls[0]
-    assert call.request.url.endswith(
-        "/v2/agents/sessions/s1/oauth/OAUTH_PROVIDER_GITHUB"
-    )
-    assert json.loads(call.request.content) == {"requested_scopes": ["repo"]}
-    assert resp.flow_kind == "OAUTH_FLOW_KIND_WEB_CALLBACK"
+    assert call.request.method == "GET"
+    url = call.request.url
+    assert "/v2/agents/auth/github/poll" in url
+    assert "poll_url=" in url
+    assert resp.status == "success"
+
+
+def test_poll_provider_auth_requires_poll_url():
+    resources = _make_resources([])
+    with pytest.raises(ValueError):
+        resources.sessions.poll_provider_auth(OAuthProvider.GITHUB, "")
 
 
 # ---------------------------------------------------------------------------
