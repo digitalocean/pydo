@@ -53,7 +53,9 @@ class _FakeAsyncPipeline:
         self.calls: List[Any] = []
 
     async def run(self, request, *, stream=False, **kwargs):
-        self.calls.append(SimpleNamespace(request=request, stream=stream, kwargs=kwargs))
+        self.calls.append(
+            SimpleNamespace(request=request, stream=stream, kwargs=kwargs)
+        )
         return SimpleNamespace(http_response=self._responses.pop(0))
 
 
