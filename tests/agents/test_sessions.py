@@ -13,6 +13,7 @@ from typing import Any, List
 from unittest.mock import MagicMock
 
 import pytest
+from azure.core.exceptions import HttpResponseError
 
 from pydo.agents import (
     AgentsResources,
@@ -30,8 +31,11 @@ from pydo.agents import (
 
 
 class _FakeResponse:
-    def __init__(self, status_code: int, body: Any = None, *, sse_chunks=None):
+    def __init__(
+        self, status_code: int, body: Any = None, *, sse_chunks=None, reason: str = ""
+    ):
         self.status_code = status_code
+        self.reason = reason
         if isinstance(body, (dict, list)):
             self._body_bytes = json.dumps(body).encode("utf-8")
         elif isinstance(body, str):
@@ -121,6 +125,58 @@ def test_create_from_manifest_rejects_empty():
     resources = _make_resources([])
     with pytest.raises(ValueError):
         resources.sessions.create_from_manifest("   \n  ")
+
+
+def test_create_from_manifest_preserves_multiline_skill_instructions():
+    # spec.skills is forwarded raw, like the rest of the manifest — no client-side
+    # parsing/re-marshaling happens, so a multi-line `instructions` block scalar
+    # must survive byte-for-byte.
+    body = {"session": {"session_id": "abc", "status": SessionStatus.PROVISIONING}}
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    manifest = (
+        "apiVersion: agents.digitalocean.com/v1alpha1\n"
+        "kind: Agent\n"
+        "metadata:\n"
+        "  name: harness-demo\n"
+        "spec:\n"
+        "  skills:\n"
+        "    - name: release-notes\n"
+        "      description: Draft release notes from a diff.\n"
+        "      instructions: |\n"
+        "        Summarize the diff in Keep a Changelog format.\n"
+        "        Group entries under Added/Changed/Fixed.\n"
+    )
+    resources.sessions.create_from_manifest(manifest)
+
+    call = resources._proxy._original._pipeline.calls[0]
+    content = call.request.content
+    if isinstance(content, bytes):
+        content = content.decode("utf-8")
+    assert content == manifest
+
+
+def test_create_from_manifest_surfaces_skills_size_cap_error():
+    # harness-api rejects an oversized spec.skills list with a nested
+    # {"error": {"code", "message"}} envelope. azure-core's OData-v4 error
+    # parsing already extracts a clean message from this shape — no SDK
+    # code change needed, this just proves it.
+    message = (
+        "agentspec: spec.skills would encode to 70000 bytes as the "
+        "HARNESS_SKILLS guest env value, exceeding the sandbox's 65536-byte "
+        "limit; trim instructions/descriptions or reduce the number of "
+        "skills (temporary limit while skill delivery rides an env var)"
+    )
+    body = {"error": {"code": 400, "message": message}}
+    resources = _make_resources([_FakeResponse(400, body, reason="Bad Request")])
+
+    with pytest.raises(HttpResponseError) as exc_info:
+        resources.sessions.create_from_manifest("kind: Agent\nspec:\n  skills: []\n")
+
+    error_text = str(exc_info.value)
+    assert message in error_text
+    assert '{"error"' not in error_text
+    assert '{"message"' not in error_text
 
 
 def test_get_session_url_encodes_id():
