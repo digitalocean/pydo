@@ -134,6 +134,15 @@ def test_get_session_url_encodes_id():
     assert call.request.url.endswith("/v2/agents/sessions/x%2Fy")
 
 
+def test_get_session_has_no_team_id():
+    body = {"session": {"session_id": "abc-123", "status": SessionStatus.READY}}
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    session = resources.sessions.get("abc-123").session
+    assert session.session_id == "abc-123"
+    assert "team_id" not in session
+
+
 def test_destroy_session():
     resources = _make_resources([_FakeResponse(200, "")])
     resources.sessions.destroy("abc-123")
@@ -184,6 +193,21 @@ def test_list_sessions_filters_by_name():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert "name=my-session" in call.request.url
+
+
+def test_list_sessions_have_no_team_id():
+    body = {
+        "sessions": [
+            {"session_id": "s1", "status": SessionStatus.READY},
+            {"session_id": "s2", "status": SessionStatus.PAUSED},
+        ],
+        "next_page_token": "",
+    }
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    sessions = resources.sessions.list().sessions
+    assert [session.session_id for session in sessions] == ["s1", "s2"]
+    assert all("team_id" not in session for session in sessions)
 
 
 def test_attach_by_name_picks_most_recent_match():
@@ -304,6 +328,34 @@ def test_stream_unwraps_result_envelope():
     assert events[0].token_chunk.text == "hello "
     assert events[1].token_chunk.text == "world"
     assert events[2].run_completed.run_cost_micros == 1234
+
+
+def test_stream_drops_tenant_id_from_spi_canonical_events():
+    sse_payload = (
+        b'data: {"event_id":"e1","tenant_id":"10212320","session_id":"s1",'
+        b'"seq":1,"type":"run.token_delta","data":{"text":"hello"}}\n\n'
+    )
+    resources = _make_resources([_FakeResponse(200, sse_chunks=[sse_payload])])
+
+    event = list(resources.sessions.stream("s1"))[0]
+    assert "tenant_id" not in event
+    assert "team_id" not in event
+    assert event.event_id == "e1"
+    assert event.type == "run.token_delta"
+    assert event.data.text == "hello"
+
+
+def test_stream_drops_tenant_id_from_result_envelope():
+    sse_payload = (
+        b'data: {"result":{"event_id":"e1","tenant_id":"10212320",'
+        b'"team_id":10212320,"token_chunk":{"text":"hello"}}}\n\n'
+    )
+    resources = _make_resources([_FakeResponse(200, sse_chunks=[sse_payload])])
+
+    event = list(resources.sessions.stream("s1"))[0]
+    assert "tenant_id" not in event
+    assert "team_id" not in event
+    assert event.token_chunk.text == "hello"
 
 
 def test_stream_error_envelope_raises():

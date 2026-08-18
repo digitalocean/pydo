@@ -231,17 +231,34 @@ def _verify_transfer_sha256(
     )
 
 
+_DROPPED_EVENT_FIELDS = ("tenant_id", "team_id")
+
+
+def _strip_tenant_fields(event: Any) -> Any:
+    """Remove the tenant/team identifier from an event in place.
+
+    The tenant is not part of the client-facing event contract: it is implied
+    by the credential the request was made with.
+    """
+    popper = getattr(event, "pop", None)
+    if popper is not None:
+        for key in _DROPPED_EVENT_FIELDS:
+            popper(key, None)
+    return event
+
+
 def _unwrap_harness_sse_chunk(chunk: Dict[str, Any]) -> Optional[Any]:
     """Normalize SSE JSON to a harness Event.
 
     harness-api's HTTP handler emits SPI canonical events
     (``event_id``, ``type``, ``data``).  grpc-gateway streaming uses a
-    ``{result, error}`` envelope — accept both.
+    ``{result, error}`` envelope — accept both.  Either shape may still carry
+    a tenant/team identifier, which is dropped before the event is yielded.
     """
     if chunk.get("result") is not None:
-        return chunk["result"]
+        return _strip_tenant_fields(chunk["result"])
     if chunk.get("event_id") and chunk.get("type"):
-        return chunk
+        return _strip_tenant_fields(chunk)
     return None
 
 

@@ -233,6 +233,23 @@ async def test_async_stream_records_has_more_comment():
 
 
 @pytest.mark.asyncio
+async def test_async_stream_drops_tenant_id():
+    sse_payload = (
+        b'data: {"event_id":"e1","tenant_id":"10212320","session_id":"s1",'
+        b'"seq":1,"type":"run.token_delta","data":{"text":"hello"}}\n\n'
+    )
+    resources = _make_async_resources(
+        [_FakeAsyncResponse(200, sse_chunks=[sse_payload])]
+    )
+
+    events = await _drain(await resources.sessions.stream("s1"))
+    assert "tenant_id" not in events[0]
+    assert "team_id" not in events[0]
+    assert events[0].event_id == "e1"
+    assert events[0].data.text == "hello"
+
+
+@pytest.mark.asyncio
 async def test_async_history_page_returns_events_cursor_and_has_more():
     resources = _make_async_resources(
         [_FakeAsyncResponse(200, sse_chunks=[_HISTORY_PAGE_SSE])]
