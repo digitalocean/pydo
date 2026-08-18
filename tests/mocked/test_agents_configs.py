@@ -50,7 +50,23 @@ EXPECTED_GET = {
         "created_by": "user-1",
         "created_at": "2026-08-01T12:00:00Z",
         "updated_at": "2026-08-01T12:00:00Z",
-        "credentials": [],
+        "credentials": [
+            {
+                "name": "OPENAI_API_KEY",
+                "source": "tenantSecret",
+                "provider": "openai",
+                "configured": True,
+            }
+        ],
+    }
+}
+
+# Create returns the same config plus the manifest advisories. A get re-reads
+# the same manifest but omits them, so they belong to this response only.
+EXPECTED_CREATE = {
+    "config": {
+        **EXPECTED_GET["config"],
+        "warnings": ["spec.unknownField is ignored by this schema version"],
     }
 }
 
@@ -100,7 +116,7 @@ def test_agents_create_config(mock_client: Client, mock_client_url):
     responses.add(
         responses.POST,
         f"{mock_client_url}/v2/agents/configs",
-        json=EXPECTED_GET,
+        json=EXPECTED_CREATE,
         status=201,
     )
     got = mock_client.agents.create_config(
@@ -110,6 +126,7 @@ def test_agents_create_config(mock_client: Client, mock_client_url):
         }
     )
     assert got["config"]["name"] == "support-agent"
+    assert got["config"]["warnings"]
 
 
 @responses.activate
