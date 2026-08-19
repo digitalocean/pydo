@@ -300,21 +300,38 @@ class AsyncSessionsOperations:
             body=body,
         )
 
-    async def start_oauth_flow(
-        self,
-        session_id: str,
-        provider: str,
-        *,
-        requested_scopes: Optional[List[str]] = None,
-    ) -> Any:
-        body: Dict[str, Any] = {}
-        if requested_scopes is not None:
-            body["requested_scopes"] = list(requested_scopes)
+    async def start_provider_auth(self, provider: str) -> Any:
+        """Start (or resume) the team-scoped connect flow for an external
+        provider (e.g. GitHub).
+
+        The team is derived from the API token; there is no session and no
+        request body. Returns the parsed JSON: ``status`` ("pending" or
+        "success") and, while pending, ``connect_url`` / ``poll_url`` /
+        ``verification_code`` for the browser authorization step. The
+        authorization handle is never exposed — tokens are exchanged
+        server-side at session time.
+        """
         return await self._parse_json(
             await self._send(
                 "POST",
-                f"{_BASE_PATH}/{_quote(session_id)}/oauth/{_quote(provider)}",
-                body=body,
+                f"/v2/agents/auth/{_quote(provider)}",
+                body={},
+            ),
+        )
+
+    async def poll_provider_auth(self, provider: str, poll_url: str) -> Any:
+        """Check whether a pending connect link has been authorized.
+
+        ``poll_url`` is the value returned by :meth:`start_provider_auth`.
+        Returns the parsed JSON with ``status`` ("pending" or "success").
+        """
+        if not poll_url:
+            raise ValueError("poll_url is required")
+        return await self._parse_json(
+            await self._send(
+                "GET",
+                f"/v2/agents/auth/{_quote(provider)}/poll",
+                params={"poll_url": poll_url},
             ),
         )
 
