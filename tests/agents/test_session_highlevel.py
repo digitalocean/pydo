@@ -12,6 +12,7 @@ import pytest
 
 from pydo.agents import AgentEvent, AgentEventType, AgentSession, RunResult
 from pydo.agents.custom_models import HITLOutcome
+from pydo.agents.custom_sessions import _unwrap_harness_sse_chunk
 from pydo.aio.agents import AsyncAgentSession
 
 
@@ -91,6 +92,24 @@ def test_agent_event_normalizes_completed_and_failed():
 
 def test_agent_event_unknown_type_is_other():
     assert AgentEvent({"type": "session.updated"}).type == AgentEventType.OTHER
+
+
+def test_agent_event_raw_has_no_tenant_id():
+    event = _unwrap_harness_sse_chunk(
+        {
+            "event_id": "e1",
+            "tenant_id": "10212320",
+            "run_id": "r1",
+            "type": "run.token_delta",
+            "data": {"text": "hi"},
+        }
+    )
+    ev = AgentEvent(event)
+
+    assert "tenant_id" not in ev.raw
+    assert "team_id" not in ev.raw
+    assert ev.type == AgentEventType.TOKEN
+    assert ev.text == "hi"
 
 
 # ---------------------------------------------------------------------------

@@ -96,6 +96,24 @@ async def test_async_create_from_manifest_rejects_empty():
 
 
 @pytest.mark.asyncio
+async def test_async_create_from_manifest_strips_team_id_and_tenant_id():
+    body = {
+        "session": {
+            "session_id": "abc",
+            "team_id": 10212320,
+            "tenant_id": "10212320",
+        }
+    }
+    resources = _make_async_resources([_FakeAsyncResponse(200, body)])
+
+    resp = await resources.sessions.create_from_manifest("kind: Agent\n")
+
+    assert resp.session.session_id == "abc"
+    assert "team_id" not in resp.session
+    assert "tenant_id" not in resp.session
+
+
+@pytest.mark.asyncio
 async def test_async_pause_session():
     resources = _make_async_resources(
         [_FakeAsyncResponse(200, {"session": {"session_id": "abc-123"}})]
@@ -105,6 +123,23 @@ async def test_async_pause_session():
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "POST"
     assert call.request.url.endswith("/v2/agents/sessions/abc-123/pause")
+
+
+@pytest.mark.asyncio
+async def test_async_pause_session_strips_team_id_and_tenant_id():
+    body = {
+        "session": {
+            "session_id": "abc-123",
+            "team_id": 10212320,
+            "tenant_id": "10212320",
+        }
+    }
+    resources = _make_async_resources([_FakeAsyncResponse(200, body)])
+
+    resp = await resources.sessions.pause("abc-123")
+
+    assert "team_id" not in resp.session
+    assert "tenant_id" not in resp.session
 
 
 @pytest.mark.asyncio
@@ -120,12 +155,73 @@ async def test_async_resume_session():
 
 
 @pytest.mark.asyncio
+async def test_async_resume_session_strips_team_id_and_tenant_id():
+    body = {
+        "session": {
+            "session_id": "abc-123",
+            "team_id": 10212320,
+            "tenant_id": "10212320",
+        }
+    }
+    resources = _make_async_resources([_FakeAsyncResponse(200, body)])
+
+    resp = await resources.sessions.resume("abc-123")
+
+    assert "team_id" not in resp.session
+    assert "tenant_id" not in resp.session
+
+
+@pytest.mark.asyncio
+async def test_async_get_session_strips_team_id_and_tenant_id():
+    body = {
+        "session": {
+            "session_id": "abc-123",
+            "team_id": 10212320,
+            "tenant_id": "10212320",
+        }
+    }
+    resources = _make_async_resources([_FakeAsyncResponse(200, body)])
+
+    resp = await resources.sessions.get("abc-123")
+
+    assert resp.session.session_id == "abc-123"
+    assert "team_id" not in resp.session
+    assert "tenant_id" not in resp.session
+
+
+@pytest.mark.asyncio
 async def test_async_list_filters_by_name():
     resources = _make_async_resources([_FakeAsyncResponse(200, {"sessions": []})])
     await resources.sessions.list(name="my-session")
 
     call = resources._proxy._original._pipeline.calls[0]
     assert "name=my-session" in call.request.url
+
+
+@pytest.mark.asyncio
+async def test_async_list_sessions_strips_team_id_and_tenant_id():
+    body = {
+        "sessions": [
+            {
+                "session_id": "s1",
+                "team_id": 10212320,
+                "tenant_id": "10212320",
+            },
+            {
+                "session_id": "s2",
+                "team_id": 55,
+                "tenant_id": "55",
+            },
+        ],
+        "next_page_token": "",
+    }
+    resources = _make_async_resources([_FakeAsyncResponse(200, body)])
+
+    resp = await resources.sessions.list()
+
+    assert [s.session_id for s in resp.sessions] == ["s1", "s2"]
+    assert all("team_id" not in s for s in resp.sessions)
+    assert all("tenant_id" not in s for s in resp.sessions)
 
 
 @pytest.mark.asyncio
@@ -230,6 +326,23 @@ async def test_async_stream_records_has_more_comment():
     assert [e.event_id for e in events] == ["e10", "e11"]
     assert stream.has_more is True
     assert stream.oldest_event_id == "e10"
+
+
+@pytest.mark.asyncio
+async def test_async_stream_drops_tenant_id():
+    sse_payload = (
+        b'data: {"event_id":"e1","tenant_id":"10212320","session_id":"s1",'
+        b'"seq":1,"type":"run.token_delta","data":{"text":"hello"}}\n\n'
+    )
+    resources = _make_async_resources(
+        [_FakeAsyncResponse(200, sse_chunks=[sse_payload])]
+    )
+
+    events = await _drain(await resources.sessions.stream("s1"))
+    assert "tenant_id" not in events[0]
+    assert "team_id" not in events[0]
+    assert events[0].event_id == "e1"
+    assert events[0].data.text == "hello"
 
 
 @pytest.mark.asyncio

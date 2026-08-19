@@ -36,6 +36,7 @@ from pydo.agents.custom_sessions import (
     _http_put_bytes,
     _manifest_bytes,
     _raise_agents_http_error,
+    _strip_tenant_fields,
     _unwrap_harness_sse_chunk,
     _verify_transfer_sha256,
 )
@@ -195,7 +196,7 @@ class AsyncSessionsOperations:
             return None
         if isinstance(body, bytes):
             body = body.decode("utf-8")
-        return _wrap(_json.loads(body))
+        return _strip_tenant_fields(_wrap(_json.loads(body)))
 
     async def list(
         self,

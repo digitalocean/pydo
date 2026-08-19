@@ -231,17 +231,41 @@ def _verify_transfer_sha256(
     )
 
 
+_DROPPED_TENANT_FIELDS = ("tenant_id", "team_id")
+
+
+def _strip_tenant_fields(obj: Any) -> Any:
+    """Recursively remove tenant/team identifiers from a parsed response.
+
+    Neither identifier is part of the client-facing contract for hosted-agent
+    sessions or events: the tenant is implied by the credential the request
+    was made with. This walks nested dicts/lists so it strips consistently
+    whether it runs on a single SSE event or a whole ``{"sessions": [...]}``
+    GET/LIST response body.
+    """
+    if isinstance(obj, dict):
+        for key in _DROPPED_TENANT_FIELDS:
+            obj.pop(key, None)
+        for value in obj.values():
+            _strip_tenant_fields(value)
+    elif isinstance(obj, list):
+        for item in obj:
+            _strip_tenant_fields(item)
+    return obj
+
+
 def _unwrap_harness_sse_chunk(chunk: Dict[str, Any]) -> Optional[Any]:
     """Normalize SSE JSON to a harness Event.
 
     harness-api's HTTP handler emits SPI canonical events
     (``event_id``, ``type``, ``data``).  grpc-gateway streaming uses a
-    ``{result, error}`` envelope — accept both.
+    ``{result, error}`` envelope — accept both.  Either shape may still carry
+    a tenant/team identifier, which is dropped before the event is yielded.
     """
     if chunk.get("result") is not None:
-        return chunk["result"]
+        return _strip_tenant_fields(chunk["result"])
     if chunk.get("event_id") and chunk.get("type"):
-        return chunk
+        return _strip_tenant_fields(chunk)
     return None
 
 
@@ -411,7 +435,7 @@ class SessionsOperations:
             return None
         if isinstance(body, bytes):
             body = body.decode("utf-8")
-        return _wrap(_json.loads(body))
+        return _strip_tenant_fields(_wrap(_json.loads(body)))
 
     def list(
         self,
