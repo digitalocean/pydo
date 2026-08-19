@@ -123,6 +123,24 @@ def test_create_from_manifest_rejects_empty():
         resources.sessions.create_from_manifest("   \n  ")
 
 
+def test_create_from_manifest_strips_team_id_and_tenant_id():
+    body = {
+        "session": {
+            "session_id": "abc",
+            "status": SessionStatus.PROVISIONING,
+            "team_id": 10212320,
+            "tenant_id": "10212320",
+        }
+    }
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    resp = resources.sessions.create_from_manifest("kind: Agent\n")
+
+    assert resp.session.session_id == "abc"
+    assert "team_id" not in resp.session
+    assert "tenant_id" not in resp.session
+
+
 def test_get_session_url_encodes_id():
     resources = _make_resources(
         [_FakeResponse(200, {"session": {"session_id": "x/y"}})]
@@ -134,13 +152,21 @@ def test_get_session_url_encodes_id():
     assert call.request.url.endswith("/v2/agents/sessions/x%2Fy")
 
 
-def test_get_session_has_no_team_id():
-    body = {"session": {"session_id": "abc-123", "status": SessionStatus.READY}}
+def test_get_session_strips_team_id_and_tenant_id():
+    body = {
+        "session": {
+            "session_id": "abc-123",
+            "status": SessionStatus.READY,
+            "team_id": 10212320,
+            "tenant_id": "10212320",
+        }
+    }
     resources = _make_resources([_FakeResponse(200, body)])
 
     session = resources.sessions.get("abc-123").session
     assert session.session_id == "abc-123"
     assert "team_id" not in session
+    assert "tenant_id" not in session
 
 
 def test_destroy_session():
@@ -163,6 +189,22 @@ def test_pause_session():
     assert call.request.url.endswith("/v2/agents/sessions/abc-123/pause")
 
 
+def test_pause_session_strips_team_id_and_tenant_id():
+    body = {
+        "session": {
+            "session_id": "abc-123",
+            "team_id": 10212320,
+            "tenant_id": "10212320",
+        }
+    }
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    resp = resources.sessions.pause("abc-123")
+
+    assert "team_id" not in resp.session
+    assert "tenant_id" not in resp.session
+
+
 def test_resume_session():
     resources = _make_resources(
         [_FakeResponse(200, {"session": {"session_id": "abc-123"}})]
@@ -172,6 +214,22 @@ def test_resume_session():
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "POST"
     assert call.request.url.endswith("/v2/agents/sessions/abc-123/resume")
+
+
+def test_resume_session_strips_team_id_and_tenant_id():
+    body = {
+        "session": {
+            "session_id": "abc-123",
+            "team_id": 10212320,
+            "tenant_id": "10212320",
+        }
+    }
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    resp = resources.sessions.resume("abc-123")
+
+    assert "team_id" not in resp.session
+    assert "tenant_id" not in resp.session
 
 
 def test_list_sessions_propagates_query_params():
@@ -195,11 +253,21 @@ def test_list_sessions_filters_by_name():
     assert "name=my-session" in call.request.url
 
 
-def test_list_sessions_have_no_team_id():
+def test_list_sessions_strips_team_id_and_tenant_id():
     body = {
         "sessions": [
-            {"session_id": "s1", "status": SessionStatus.READY},
-            {"session_id": "s2", "status": SessionStatus.PAUSED},
+            {
+                "session_id": "s1",
+                "status": SessionStatus.READY,
+                "team_id": 10212320,
+                "tenant_id": "10212320",
+            },
+            {
+                "session_id": "s2",
+                "status": SessionStatus.PAUSED,
+                "team_id": 55,
+                "tenant_id": "55",
+            },
         ],
         "next_page_token": "",
     }
@@ -208,6 +276,7 @@ def test_list_sessions_have_no_team_id():
     sessions = resources.sessions.list().sessions
     assert [session.session_id for session in sessions] == ["s1", "s2"]
     assert all("team_id" not in session for session in sessions)
+    assert all("tenant_id" not in session for session in sessions)
 
 
 def test_attach_by_name_picks_most_recent_match():

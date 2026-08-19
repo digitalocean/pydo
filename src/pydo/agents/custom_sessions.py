@@ -231,20 +231,27 @@ def _verify_transfer_sha256(
     )
 
 
-_DROPPED_EVENT_FIELDS = ("tenant_id", "team_id")
+_DROPPED_TENANT_FIELDS = ("tenant_id", "team_id")
 
 
-def _strip_tenant_fields(event: Any) -> Any:
-    """Remove the tenant/team identifier from an event in place.
+def _strip_tenant_fields(obj: Any) -> Any:
+    """Recursively remove tenant/team identifiers from a parsed response.
 
-    The tenant is not part of the client-facing event contract: it is implied
-    by the credential the request was made with.
+    Neither identifier is part of the client-facing contract for hosted-agent
+    sessions or events: the tenant is implied by the credential the request
+    was made with. This walks nested dicts/lists so it strips consistently
+    whether it runs on a single SSE event or a whole ``{"sessions": [...]}``
+    GET/LIST response body.
     """
-    popper = getattr(event, "pop", None)
-    if popper is not None:
-        for key in _DROPPED_EVENT_FIELDS:
-            popper(key, None)
-    return event
+    if isinstance(obj, dict):
+        for key in _DROPPED_TENANT_FIELDS:
+            obj.pop(key, None)
+        for value in obj.values():
+            _strip_tenant_fields(value)
+    elif isinstance(obj, list):
+        for item in obj:
+            _strip_tenant_fields(item)
+    return obj
 
 
 def _unwrap_harness_sse_chunk(chunk: Dict[str, Any]) -> Optional[Any]:
@@ -428,7 +435,7 @@ class SessionsOperations:
             return None
         if isinstance(body, bytes):
             body = body.decode("utf-8")
-        return _wrap(_json.loads(body))
+        return _strip_tenant_fields(_wrap(_json.loads(body)))
 
     def list(
         self,
