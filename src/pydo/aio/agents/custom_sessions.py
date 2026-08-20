@@ -252,6 +252,30 @@ class AsyncSessionsOperations:
             ),
         )
 
+    async def create_from_config(
+        self,
+        *,
+        name: str,
+        config_id: str,
+        timeout: Optional[float] = None,
+    ) -> Any:
+        """Create a session from a durable Agent Config.
+
+        See :meth:`pydo.agents.custom_sessions.SessionsOperations.create_from_config`.
+        """
+        if not name or not config_id:
+            raise ValueError("name and config_id are required")
+        return await self._parse_json(
+            await self._send(
+                "POST",
+                _BASE_PATH,
+                body={"name": name, "config_id": config_id},
+                timeout=(
+                    _DEFAULT_CREATE_TIMEOUT if timeout is None else float(timeout)
+                ),
+            ),
+        )
+
     async def get(self, session_id: str) -> Any:
         return await self._parse_json(
             await self._send("GET", f"{_BASE_PATH}/{_quote(session_id)}"),

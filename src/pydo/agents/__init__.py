@@ -36,6 +36,7 @@ from .custom_sessions import (
     WorkspaceDownload,
     WorkspaceTransferError,
 )
+from .custom_configs import ConfigsOperations
 from .custom_triggers import TriggersOperations
 from .custom_openai_sandbox import (
     OPENAI_CODEX_ADAPTERS,
@@ -101,6 +102,7 @@ class AgentsResources:
             resolve_agents_base_url(agents_endpoint),
         )
         self.sessions = SessionsOperations(self._proxy)
+        self.configs = ConfigsOperations(self._proxy)
         self.triggers = TriggersOperations(self._proxy)
 
     @property
@@ -213,6 +215,7 @@ __all__ = [
     "RunStream",
     "HITLPolicy",
     "SessionsOperations",
+    "ConfigsOperations",
     "TriggersOperations",
     "HarnessEventStream",
     "HarnessStreamError",

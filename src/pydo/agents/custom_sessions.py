@@ -505,6 +505,32 @@ class SessionsOperations:
             ),
         )
 
+    def create_from_config(
+        self,
+        *,
+        name: str,
+        config_id: str,
+        timeout: Optional[float] = None,
+    ) -> Any:
+        """Create a session from a durable Agent Config (``POST /v2/agents/sessions``).
+
+        Sends ``application/json`` with ``name`` and ``config_id``. The server
+        loads the config, resolves credentials from Secrets Manager, and
+        provisions the sandbox. No inline secrets are accepted.
+        """
+        if not name or not config_id:
+            raise ValueError("name and config_id are required")
+        return self._parse_json(
+            self._send(
+                "POST",
+                _BASE_PATH,
+                body={"name": name, "config_id": config_id},
+                timeout=(
+                    _DEFAULT_CREATE_TIMEOUT if timeout is None else float(timeout)
+                ),
+            ),
+        )
+
     def get(self, session_id: str) -> Any:
         return self._parse_json(
             self._send("GET", f"{_BASE_PATH}/{_quote(session_id)}"),

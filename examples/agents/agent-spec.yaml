@@ -1,0 +1,12 @@
+# Minimal agents.yaml for Agent Config smoke tests.
+# Secrets (if any) go under spec.secrets with write-only `value` at create time.
+apiVersion: agents.digitalocean.com/v1alpha1
+kind: Agent
+metadata:
+  name: pydo-config-demo
+spec:
+  runtime:
+    adapter: claude-code
+  sandbox:
+    template: claude-code
+    idleTimeoutSeconds: 1800

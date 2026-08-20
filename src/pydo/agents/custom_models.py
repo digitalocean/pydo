@@ -32,6 +32,8 @@ class SessionStatus:
     DESTROYING = "SESSION_STATUS_DESTROYING"
     DESTROYED = "SESSION_STATUS_DESTROYED"
     FAILED = "SESSION_STATUS_FAILED"
+    # List filter sentinel — not an actual session state.
+    ALL = "SESSION_STATUS_ALL"
 
 
 class RunState:
