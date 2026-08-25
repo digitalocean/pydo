@@ -120,12 +120,19 @@ class AsyncTriggersOperations:
         """Soft-delete a trigger (``DELETE /v2/agents/triggers/{id}``)."""
         await self._send("DELETE", f"{_TRIGGERS_PATH}/{_quote(trigger_id)}")
 
-    async def rotate_secret(self, trigger_id: str) -> Any:
-        """Issue a new webhook secret (shown once)."""
+    async def rotate_secret(
+        self, trigger_id: str, *, revoke_previous: bool = False
+    ) -> Any:
+        """Issue a new webhook secret (shown once).
+
+        The outgoing secret keeps verifying deliveries for a short grace window
+        unless ``revoke_previous=True`` retires it on this call.
+        """
         return await self._parse_json(
             await self._send(
                 "POST",
                 f"{_TRIGGERS_PATH}/{_quote(trigger_id)}/rotate-secret",
+                params={"revoke_previous": "true" if revoke_previous else None},
             ),
         )
 

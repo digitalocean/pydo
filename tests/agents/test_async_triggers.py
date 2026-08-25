@@ -130,6 +130,10 @@ async def test_async_update_delete_rotate_and_executions():
 
     rotated = await resources.triggers.rotate_secret("t1")
     assert rotated.webhook_secret == "new"
+    assert (
+        "revoke_previous"
+        not in resources._proxy._original._pipeline.calls[2].request.url
+    )
 
     executions = await resources.triggers.list_executions("t1")
     assert executions.executions[0].execution_id == "e1"
@@ -152,3 +156,21 @@ async def test_async_update_delete_rotate_and_executions():
     assert resources._proxy._original._pipeline.calls[7].request.url.endswith(
         "/v2/agents/webhook-providers"
     )
+
+
+@pytest.mark.asyncio
+async def test_async_rotate_secret_revoke_previous():
+    resources = _make_async_resources(
+        [
+            _FakeAsyncResponse(
+                200, {"webhook_secret": "new", "previous_secret_revoked": True}
+            )
+        ]
+    )
+
+    rotated = await resources.triggers.rotate_secret("t1", revoke_previous=True)
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "POST"
+    assert "revoke_previous=true" in call.request.url
+    assert rotated.previous_secret_revoked is True

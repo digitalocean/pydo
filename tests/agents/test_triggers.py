@@ -197,7 +197,10 @@ def test_delete_trigger_returns_none_on_204():
 
 
 def test_rotate_secret():
-    body = {"webhook_secret": "whsec_rotated"}
+    body = {
+        "webhook_secret": "whsec_rotated",
+        "previous_secret_expires_at": "2026-07-01T12:05:00Z",
+    }
     resources = _make_resources([_FakeResponse(200, body)])
 
     resp = resources.triggers.rotate_secret("t1")
@@ -205,7 +208,22 @@ def test_rotate_secret():
     call = _last_call(resources)
     assert call.request.method == "POST"
     assert call.request.url.endswith("/v2/agents/triggers/t1/rotate-secret")
+    assert "revoke_previous" not in call.request.url
     assert resp.webhook_secret == "whsec_rotated"
+    assert resp.previous_secret_expires_at == "2026-07-01T12:05:00Z"
+
+
+def test_rotate_secret_revoke_previous():
+    body = {"webhook_secret": "whsec_rotated", "previous_secret_revoked": True}
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    resp = resources.triggers.rotate_secret("t1", revoke_previous=True)
+
+    call = _last_call(resources)
+    assert call.request.method == "POST"
+    assert _path(call.request.url).endswith("/v2/agents/triggers/t1/rotate-secret")
+    assert "revoke_previous=true" in call.request.url
+    assert resp.previous_secret_revoked is True
 
 
 # ---------------------------------------------------------------------------
