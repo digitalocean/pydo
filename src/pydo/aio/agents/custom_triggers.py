@@ -120,12 +120,27 @@ class AsyncTriggersOperations:
         """Soft-delete a trigger (``DELETE /v2/agents/triggers/{id}``)."""
         await self._send("DELETE", f"{_TRIGGERS_PATH}/{_quote(trigger_id)}")
 
-    async def rotate_secret(self, trigger_id: str) -> Any:
-        """Issue a new webhook secret (shown once)."""
+    async def rotate_secret(
+        self, trigger_id: str, *, revoke_previous: bool = False
+    ) -> Any:
+        """Issue a new webhook secret (``POST .../{id}/rotate-secret``).
+
+        Webhook triggers only (``409`` for cron). The new secret is shown once.
+
+        By default the outgoing secret keeps verifying deliveries for a short
+        server-configured window, because the provider signs with the old value
+        until someone pastes the new one in, and ``previous_secret_expires_at``
+        in the response says when it dies. Pass ``revoke_previous=True`` to
+        retire it on this call instead — intended for a compromised secret,
+        since deliveries still signed with the old value fail immediately, and
+        the response then carries ``previous_secret_revoked`` instead of an
+        expiry. Exactly one of the two is present.
+        """
         return await self._parse_json(
             await self._send(
                 "POST",
                 f"{_TRIGGERS_PATH}/{_quote(trigger_id)}/rotate-secret",
+                params={"revoke_previous": "true" if revoke_previous else None},
             ),
         )
 

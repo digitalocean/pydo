@@ -59,6 +59,19 @@ def _make_async_resources(responses: List[_FakeAsyncResponse]) -> AsyncAgentsRes
     )
 
 
+def _find_call(resources: AsyncAgentsResources, path_suffix: str):
+    """Return the single recorded call whose URL path ends with path_suffix."""
+    matches = [
+        c
+        for c in resources._proxy._original._pipeline.calls
+        if c.request.url.split("?")[0].endswith(path_suffix)
+    ]
+    assert (
+        len(matches) == 1
+    ), f"expected exactly one {path_suffix} call, got {len(matches)}"
+    return matches[0]
+
+
 @pytest.mark.asyncio
 async def test_async_list_and_create_triggers():
     resources = _make_async_resources(
@@ -130,6 +143,11 @@ async def test_async_update_delete_rotate_and_executions():
 
     rotated = await resources.triggers.rotate_secret("t1")
     assert rotated.webhook_secret == "new"
+    # Located by URL rather than by index: this test walks a fixed sequence of
+    # calls, and a positional assertion silently starts checking someone else's
+    # request the moment a call is inserted above.
+    rotate_call = _find_call(resources, "/rotate-secret")
+    assert "revoke_previous" not in rotate_call.request.url
 
     executions = await resources.triggers.list_executions("t1")
     assert executions.executions[0].execution_id == "e1"
@@ -152,3 +170,21 @@ async def test_async_update_delete_rotate_and_executions():
     assert resources._proxy._original._pipeline.calls[7].request.url.endswith(
         "/v2/agents/webhook-providers"
     )
+
+
+@pytest.mark.asyncio
+async def test_async_rotate_secret_revoke_previous():
+    resources = _make_async_resources(
+        [
+            _FakeAsyncResponse(
+                200, {"webhook_secret": "new", "previous_secret_revoked": True}
+            )
+        ]
+    )
+
+    rotated = await resources.triggers.rotate_secret("t1", revoke_previous=True)
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "POST"
+    assert "revoke_previous=true" in call.request.url
+    assert rotated.previous_secret_revoked is True
