@@ -35,6 +35,8 @@ from .custom_sessions import (
     SessionsOperations,
     WorkspaceDownload,
     WorkspaceTransferError,
+    emit_session_create_warnings,
+    session_create_warnings,
 )
 from .custom_configs import ConfigsOperations
 from .custom_triggers import TriggersOperations
@@ -150,6 +152,8 @@ class AgentsResources:
             resolved,
             openai_session_id=oai_session_id,
         )
+        # Mirror doctl: surface create-time advisories (policy fidelity, etc.).
+        emit_session_create_warnings(session_create_warnings(resp), stacklevel=2)
         get = getattr(resp, "get", None)
         info = get("session") if get else None
         session_id = (getattr(info or resp, "get", lambda *_: None))("session_id")
@@ -222,6 +226,8 @@ __all__ = [
     "HistoryPage",
     "WorkspaceDownload",
     "WorkspaceTransferError",
+    "session_create_warnings",
+    "emit_session_create_warnings",
     "DEFAULT_AGENTS_BASE_URL",
     "resolve_agents_base_url",
     "OPENAI_CODEX_ADAPTERS",

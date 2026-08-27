@@ -15,6 +15,7 @@ from pydo.agents.custom_openai_sandbox import (
     send_openai_session_input,
     stream_openai_session_events,
 )
+from pydo.agents.custom_sessions import session_create_warnings
 from pydo.agents.session import (
     AgentEvent,
     AgentEventType,
@@ -215,6 +216,16 @@ class AsyncAgentSession:
         get = getattr(info, "get", None)
         value = get("openai_environment_id") if get else None
         return str(value) if value else None
+
+    @property
+    def warnings(self) -> List[str]:
+        """Create-time advisories from the server (empty when unknown/omitted).
+
+        See :attr:`pydo.agents.session.AgentSession.warnings`.
+        """
+        return session_create_warnings(
+            self.info if self.info is not None else self._raw
+        )
 
     @property
     def is_openai_codex(self) -> bool:

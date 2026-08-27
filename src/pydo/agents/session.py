@@ -36,6 +36,7 @@ from .custom_openai_sandbox import (
     send_openai_session_input,
     stream_openai_session_events,
 )
+from .custom_sessions import session_create_warnings
 
 # Normalized event type -> raw SPI ``type`` it maps from.
 _RAW_TO_TYPE = {
@@ -349,6 +350,18 @@ class AgentSession:
         get = getattr(info, "get", None)
         value = get("openai_environment_id") if get else None
         return str(value) if value else None
+
+    @property
+    def warnings(self) -> List[str]:
+        """Create-time advisories from the server (empty when unknown/omitted).
+
+        Populated on the create response only (manifest + policy fidelity);
+        get/list typically omit ``warnings``. See MARSOHS-1019 / godo
+        ``HostedAgentSession.Warnings``.
+        """
+        return session_create_warnings(
+            self.info if self.info is not None else self._raw
+        )
 
     @property
     def is_openai_codex(self) -> bool:
