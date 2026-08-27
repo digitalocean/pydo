@@ -150,7 +150,7 @@ def test_create_from_manifest_decodes_session_warnings():
     # create-time policy fidelity advisories ride session.warnings.
     warn_msg = (
         'permissions.rules (tool bash, match.command "*"): matcher:prefix '
-        "requires at least one literal token; \"*\" yields zero tokens and "
+        'requires at least one literal token; "*" yields zero tokens and '
         "cannot be rendered as a native prefix rule"
     )
     body = {

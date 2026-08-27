@@ -127,7 +127,10 @@ def test_agent_session_warnings_property():
         },
     )
     assert agent.warnings == [warn_msg]
-    assert AgentSession(sessions, "s2", raw={"session": {"session_id": "s2"}}).warnings == []
+    assert (
+        AgentSession(sessions, "s2", raw={"session": {"session_id": "s2"}}).warnings
+        == []
+    )
 
 
 # ---------------------------------------------------------------------------
