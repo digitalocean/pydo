@@ -208,22 +208,36 @@ def test_rotate_secret():
     call = _last_call(resources)
     assert call.request.method == "POST"
     assert call.request.url.endswith("/v2/agents/triggers/t1/rotate-secret")
-    assert "revoke_previous" not in call.request.url
+    assert "grace_period_seconds" not in call.request.url
     assert resp.webhook_secret == "whsec_rotated"
     assert resp.previous_secret_expires_at == "2026-07-01T12:05:00Z"
 
 
-def test_rotate_secret_revoke_previous():
+def test_rotate_secret_zero_grace():
     body = {"webhook_secret": "whsec_rotated", "previous_secret_revoked": True}
     resources = _make_resources([_FakeResponse(200, body)])
 
-    resp = resources.triggers.rotate_secret("t1", revoke_previous=True)
+    resp = resources.triggers.rotate_secret("t1", grace_period_seconds=0)
 
     call = _last_call(resources)
     assert call.request.method == "POST"
     assert _path(call.request.url).endswith("/v2/agents/triggers/t1/rotate-secret")
-    assert "revoke_previous=true" in call.request.url
+    assert "grace_period_seconds=0" in call.request.url
     assert resp.previous_secret_revoked is True
+
+
+def test_rotate_secret_custom_grace():
+    body = {
+        "webhook_secret": "whsec_rotated",
+        "previous_secret_expires_at": "2026-07-01T12:01:30Z",
+    }
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    resp = resources.triggers.rotate_secret("t1", grace_period_seconds=90)
+
+    call = _last_call(resources)
+    assert "grace_period_seconds=90" in call.request.url
+    assert resp.previous_secret_expires_at == "2026-07-01T12:01:30Z"
 
 
 # ---------------------------------------------------------------------------

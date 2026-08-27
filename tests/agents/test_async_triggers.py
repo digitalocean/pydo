@@ -147,7 +147,7 @@ async def test_async_update_delete_rotate_and_executions():
     # calls, and a positional assertion silently starts checking someone else's
     # request the moment a call is inserted above.
     rotate_call = _find_call(resources, "/rotate-secret")
-    assert "revoke_previous" not in rotate_call.request.url
+    assert "grace_period_seconds" not in rotate_call.request.url
 
     executions = await resources.triggers.list_executions("t1")
     assert executions.executions[0].execution_id == "e1"
@@ -173,7 +173,7 @@ async def test_async_update_delete_rotate_and_executions():
 
 
 @pytest.mark.asyncio
-async def test_async_rotate_secret_revoke_previous():
+async def test_async_rotate_secret_zero_grace():
     resources = _make_async_resources(
         [
             _FakeAsyncResponse(
@@ -182,9 +182,9 @@ async def test_async_rotate_secret_revoke_previous():
         ]
     )
 
-    rotated = await resources.triggers.rotate_secret("t1", revoke_previous=True)
+    rotated = await resources.triggers.rotate_secret("t1", grace_period_seconds=0)
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "POST"
-    assert "revoke_previous=true" in call.request.url
+    assert "grace_period_seconds=0" in call.request.url
     assert rotated.previous_secret_revoked is True

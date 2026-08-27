@@ -157,25 +157,28 @@ class TriggersOperations:
         """
         self._send("DELETE", f"{_TRIGGERS_PATH}/{_quote(trigger_id)}")
 
-    def rotate_secret(self, trigger_id: str, *, revoke_previous: bool = False) -> Any:
+    def rotate_secret(
+        self, trigger_id: str, *, grace_period_seconds: Optional[int] = None
+    ) -> Any:
         """Issue a new webhook secret (``POST .../{id}/rotate-secret``).
 
         Webhook triggers only (``409`` for cron). The new secret is shown once.
 
-        By default the outgoing secret keeps verifying deliveries for a short
-        server-configured window, because the provider signs with the old value
-        until someone pastes the new one in, and ``previous_secret_expires_at``
-        in the response says when it dies. Pass ``revoke_previous=True`` to
+        By default (``grace_period_seconds`` omitted) the outgoing secret keeps
+        verifying deliveries for 5 minutes, and ``previous_secret_expires_at``
+        in the response says when it dies. Pass ``grace_period_seconds=0`` to
         retire it on this call instead — intended for a compromised secret,
         since deliveries still signed with the old value fail immediately, and
         the response then carries ``previous_secret_revoked`` instead of an
-        expiry. Exactly one of the two is present.
+        expiry. A positive value sets a custom handoff window (server max
+        default 1 hour; above the max is ``400``). Exactly one of the two
+        outcome fields is present.
         """
         return self._parse_json(
             self._send(
                 "POST",
                 f"{_TRIGGERS_PATH}/{_quote(trigger_id)}/rotate-secret",
-                params={"revoke_previous": "true" if revoke_previous else None},
+                params={"grace_period_seconds": grace_period_seconds},
             ),
         )
 
