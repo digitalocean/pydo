@@ -234,6 +234,46 @@ def _verify_transfer_sha256(
 _DROPPED_TENANT_FIELDS = ("tenant_id", "team_id")
 
 
+def session_create_warnings(obj: Any) -> List[str]:
+    """Return create-time advisories from a session object or create response.
+
+    Mirrors godo ``HostedAgentSession.Warnings`` / doctl session-create
+    printing (MARSOHS-1019). Accepts either the create envelope
+    ``{"session": {...}}`` or the inner session object. Populated on create
+    only (manifest + policy fidelity); typically omitted on get/list.
+    """
+    if obj is None:
+        return []
+    get = getattr(obj, "get", None)
+    if get is None:
+        return []
+    inner = get("session")
+    source = inner if inner is not None else obj
+    get_s = getattr(source, "get", None)
+    if get_s is None:
+        return []
+    raw = get_s("warnings")
+    if not raw:
+        return []
+    return [str(item) for item in raw if item]
+
+
+def emit_session_create_warnings(
+    warns: List[str], *, stacklevel: int = 2
+) -> None:
+    """Emit each create-time advisory as a :class:`UserWarning`.
+
+    Used by high-level :meth:`pydo.agents.AgentsResources.start` so callers
+    see the same signals doctl prints on stderr after CreateSession.
+    """
+    for msg in warns:
+        warnings.warn(
+            f"hosted agents session create: {msg}",
+            UserWarning,
+            stacklevel=stacklevel,
+        )
+
+
 def _strip_tenant_fields(obj: Any) -> Any:
     """Recursively remove tenant/team identifiers from a parsed response.
 
@@ -487,6 +527,10 @@ class SessionsOperations:
         :param openai_session_id: Optional OpenAI session id query param.
         :param timeout: HTTP timeout in seconds (defaults to 600 for create —
             sandbox boot can exceed the client-wide 120s default).
+        :returns: Create envelope ``{"session": {...}}``. The session may
+            include ``warnings`` (non-fatal create-time advisories such as
+            policy fidelity / manifest parse notes); see
+            :func:`session_create_warnings`.
         """
         data = _manifest_bytes(manifest)
         params: Optional[Dict[str, Any]] = None
@@ -1121,4 +1165,6 @@ __all__ = [
     "WorkspaceDownload",
     "WorkspaceTransferError",
     "UploadData",
+    "session_create_warnings",
+    "emit_session_create_warnings",
 ]

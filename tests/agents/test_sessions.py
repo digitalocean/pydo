@@ -145,6 +145,70 @@ def test_create_from_manifest_strips_team_id_and_tenant_id():
     assert "tenant_id" not in resp.session
 
 
+def test_create_from_manifest_decodes_session_warnings():
+    # Mirrors godo TestHostedAgentSession_DecodesWarnings (MARSOHS-1019):
+    # create-time policy fidelity advisories ride session.warnings.
+    warn_msg = (
+        'permissions.rules (tool bash, match.command "*"): matcher:prefix '
+        'requires at least one literal token; "*" yields zero tokens and '
+        "cannot be rendered as a native prefix rule"
+    )
+    body = {
+        "session": {
+            "session_id": "sess-warn",
+            "status": SessionStatus.READY,
+            "warnings": [warn_msg],
+        }
+    }
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    resp = resources.sessions.create_from_manifest("kind: Agent\n")
+
+    from pydo.agents import session_create_warnings
+
+    assert resp.session.warnings == [warn_msg]
+    assert session_create_warnings(resp) == [warn_msg]
+    assert 'command "*"' in resp.session.warnings[0]
+
+
+def test_create_from_config_decodes_session_warnings():
+    warn_msg = "policy: bare-wildcard bash ask cannot be enforced by Codex CLI"
+    body = {
+        "session": {
+            "session_id": "sess-cfg",
+            "config_id": "cfg-1",
+            "warnings": [warn_msg],
+        }
+    }
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    resp = resources.sessions.create_from_config(name="demo", config_id="cfg-1")
+
+    assert resp.session.warnings == [warn_msg]
+
+
+def test_agents_start_emits_session_create_warnings():
+    warn_msg = (
+        'permissions.rules (tool bash, match.command "*"): matcher:prefix '
+        "requires at least one literal token"
+    )
+    body = {
+        "session": {
+            "session_id": "sess-warn",
+            "status": SessionStatus.READY,
+            "agent_kind": "AGENT_KIND_CODEX_CLI",
+            "warnings": [warn_msg],
+        }
+    }
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    with pytest.warns(UserWarning, match=r'command "\*"'):
+        agent = resources.start("kind: Agent\nmetadata:\n  name: demo\n")
+
+    assert agent.session_id == "sess-warn"
+    assert agent.warnings == [warn_msg]
+
+
 def test_create_from_manifest_preserves_multiline_skill_instructions():
     # spec.skills is forwarded raw, like the rest of the manifest — no client-side
     # parsing/re-marshaling happens, so a multi-line `instructions` block scalar

@@ -10,8 +10,10 @@ from typing import Optional
 from pydo.agents import (
     _looks_like_openai_codex_manifest,
     _select_session_by_name,
+    emit_session_create_warnings,
     prepare_openai_codex_manifest,
     resolve_agents_base_url,
+    session_create_warnings,
 )
 from pydo.custom_extensions import _BaseURLProxy
 
@@ -68,6 +70,7 @@ class AsyncAgentsResources:
             resolved,
             openai_session_id=oai_session_id,
         )
+        emit_session_create_warnings(session_create_warnings(resp), stacklevel=2)
         get = getattr(resp, "get", None)
         info = get("session") if get else None
         session_id = (getattr(info or resp, "get", lambda *_: None))("session_id")

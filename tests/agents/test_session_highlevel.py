@@ -112,6 +112,27 @@ def test_agent_event_raw_has_no_tenant_id():
     assert ev.text == "hi"
 
 
+def test_agent_session_warnings_property():
+    warn_msg = 'permissions.rules (tool bash, match.command "*"): inexpressible'
+    sessions = _FakeSessions([])
+    agent = AgentSession(
+        sessions,
+        "s1",
+        raw={
+            "session": {
+                "session_id": "s1",
+                "status": "SESSION_STATUS_READY",
+                "warnings": [warn_msg],
+            }
+        },
+    )
+    assert agent.warnings == [warn_msg]
+    assert (
+        AgentSession(sessions, "s2", raw={"session": {"session_id": "s2"}}).warnings
+        == []
+    )
+
+
 # ---------------------------------------------------------------------------
 # run / run_streamed
 # ---------------------------------------------------------------------------
