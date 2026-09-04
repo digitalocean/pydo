@@ -196,9 +196,7 @@ def test_list_builds():
     }
     resources = _make_resources([_FakeResponse(200, body)])
 
-    resp = resources.templates.list_builds(
-        "tmpl-1", page_size=10, page_token="tok"
-    )
+    resp = resources.templates.list_builds("tmpl-1", page_size=10, page_token="tok")
 
     call = _last_call(resources)
     assert call.request.method == "GET"
@@ -222,9 +220,7 @@ def test_get_build():
 
     call = _last_call(resources)
     assert call.request.method == "GET"
-    assert _path(call.request.url).endswith(
-        "/v2/agents/templates/tmpl-1/builds/bld-1"
-    )
+    assert _path(call.request.url).endswith("/v2/agents/templates/tmpl-1/builds/bld-1")
     assert resp.build.error == "boom"
 
 
