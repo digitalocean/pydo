@@ -168,6 +168,31 @@ class SignatureScheme:
     PLAINTEXT = "plaintext"
 
 
+# ---------------------------------------------------------------------------
+# Sandbox templates (OHS / harness-api)
+# ---------------------------------------------------------------------------
+
+
+class TemplateStatus:
+    """Lifecycle state for a sandbox template (catalog or team custom)."""
+
+    UNSPECIFIED = "TEMPLATE_STATUS_UNSPECIFIED"
+    PENDING = "TEMPLATE_STATUS_PENDING"
+    BUILDING = "TEMPLATE_STATUS_BUILDING"
+    READY = "TEMPLATE_STATUS_READY"
+    FAILED = "TEMPLATE_STATUS_FAILED"
+
+
+class TemplateBuildStatus:
+    """Lifecycle state for one template build."""
+
+    UNSPECIFIED = "STATUS_UNSPECIFIED"
+    PENDING = "PENDING"
+    BUILDING = "BUILDING"
+    SUCCEEDED = "SUCCEEDED"
+    FAILED = "FAILED"
+
+
 __all__ = [
     "AgentKind",
     "SessionStatus",
@@ -185,4 +210,6 @@ __all__ = [
     "WebhookProviderKey",
     "TriggerExecutionStatus",
     "SignatureScheme",
+    "TemplateStatus",
+    "TemplateBuildStatus",
 ]

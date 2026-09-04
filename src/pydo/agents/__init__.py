@@ -21,6 +21,8 @@ from .custom_models import (
     RunState,
     SessionStatus,
     SignatureScheme,
+    TemplateBuildStatus,
+    TemplateStatus,
     TriggerExecutionStatus,
     TriggerKind,
     TriggerOutputMode,
@@ -39,6 +41,7 @@ from .custom_sessions import (
     session_create_warnings,
 )
 from .custom_configs import ConfigsOperations
+from .custom_templates import TemplatesOperations
 from .custom_triggers import TriggersOperations
 from .custom_openai_sandbox import (
     OPENAI_CODEX_ADAPTERS,
@@ -105,6 +108,7 @@ class AgentsResources:
         )
         self.sessions = SessionsOperations(self._proxy)
         self.configs = ConfigsOperations(self._proxy)
+        self.templates = TemplatesOperations(self._proxy)
         self.triggers = TriggersOperations(self._proxy)
 
     @property
@@ -220,6 +224,7 @@ __all__ = [
     "HITLPolicy",
     "SessionsOperations",
     "ConfigsOperations",
+    "TemplatesOperations",
     "TriggersOperations",
     "HarnessEventStream",
     "HarnessStreamError",
@@ -252,4 +257,6 @@ __all__ = [
     "WebhookProviderKey",
     "TriggerExecutionStatus",
     "SignatureScheme",
+    "TemplateStatus",
+    "TemplateBuildStatus",
 ]

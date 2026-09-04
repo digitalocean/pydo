@@ -23,6 +23,7 @@ from .custom_sessions import (
     AsyncWorkspaceDownload,
 )
 from .custom_configs import AsyncConfigsOperations
+from .custom_templates import AsyncTemplatesOperations
 from .custom_triggers import AsyncTriggersOperations
 from .session import AsyncAgentSession, AsyncRunStream
 
@@ -35,6 +36,7 @@ class AsyncAgentsResources:
         )
         self.sessions = AsyncSessionsOperations(self._proxy)
         self.configs = AsyncConfigsOperations(self._proxy)
+        self.templates = AsyncTemplatesOperations(self._proxy)
         self.triggers = AsyncTriggersOperations(self._proxy)
 
     @property
@@ -126,6 +128,7 @@ __all__ = [
     "AsyncRunStream",
     "AsyncSessionsOperations",
     "AsyncConfigsOperations",
+    "AsyncTemplatesOperations",
     "AsyncTriggersOperations",
     "AsyncHarnessEventStream",
     "AsyncWorkspaceDownload",
