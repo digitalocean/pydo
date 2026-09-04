@@ -193,6 +193,76 @@ def test_create_from_manifest_passes_openai_session_id_query_param():
     assert "openai_session_id=sess_abc" in call.request.url
 
 
+_DOC_MANIFEST = """\
+apiVersion: agents.digitalocean.com/v1alpha1
+kind: Agent
+metadata:
+  name: openai-codex-session
+spec:
+  runtime:
+    adapter: codex-agentapi
+  sandbox:
+    idleTimeoutSeconds: 600
+    template: codex-agentapi
+    egress:
+      allow:
+        - host: api.openai.com
+        - host: codex-cloud-environments.chatgpt.com
+  env:
+    CODEX_ENVIRONMENT_ID: ${ENV_ID}
+    CODEX_API_KEY: ${OPENAI_API_KEY}
+  secrets:
+    - name: CODEX_API_KEY
+      source: tenantSecret
+"""
+
+
+def test_create_session_docs_api_resolves_variables_and_posts_yaml():
+    body = {
+        "session": {
+            "session_id": "do-docs-1",
+            "status": SessionStatus.READY,
+            "openai_session_id": "sess_docs",
+        }
+    }
+    resources = _make_resources([_FakeResponse(200, body)])
+    resp = resources.create_session(
+        params={"openai_session_id": "sess_docs"},
+        body={
+            "manifest": _DOC_MANIFEST,
+            "variables": {
+                "ENV_ID": "env_docs",
+                "OPENAI_API_KEY": "sk-docs",
+            },
+        },
+    )
+    assert resp["session"]["session_id"] == "do-docs-1"
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "POST"
+    assert "openai_session_id=sess_docs" in call.request.url
+    content = call.request.content
+    if isinstance(content, bytes):
+        content = content.decode("utf-8")
+    assert "CODEX_ENVIRONMENT_ID: env_docs" in content
+    assert "CODEX_API_KEY: sk-docs" in content
+    assert "${ENV_ID}" not in content
+    assert "${OPENAI_API_KEY}" not in content
+
+
+def test_create_session_requires_manifest():
+    resources = _make_resources([])
+    with pytest.raises(ValueError, match="body.manifest"):
+        resources.create_session(body={"variables": {}})
+
+
+def test_destroy_session_docs_api():
+    resources = _make_resources([_FakeResponse(204)])
+    resources.destroy_session(session_id="do-docs-1")
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "DELETE"
+    assert call.request.url.endswith("/v2/agents/sessions/do-docs-1")
+
+
 def test_start_orchestrates_openai_then_creates_do_session():
     body = {
         "session": {

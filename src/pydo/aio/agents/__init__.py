@@ -5,7 +5,7 @@
 """Async Hosted Agents API — hand-written; preserved across ``make generate``."""
 from __future__ import annotations
 
-from typing import Optional
+from typing import Any, Mapping, Optional
 
 from pydo.agents import (
     _looks_like_openai_codex_manifest,
@@ -13,6 +13,7 @@ from pydo.agents import (
     emit_session_create_warnings,
     prepare_openai_codex_manifest,
     resolve_agents_base_url,
+    resolve_placeholders,
     session_create_warnings,
 )
 from pydo.custom_extensions import _BaseURLProxy
@@ -120,6 +121,47 @@ class AsyncAgentsResources:
             openai_api_key=openai_api_key,
             openai_base_url=openai_base_url,
         )
+
+    async def create_session(
+        self,
+        *,
+        params: Optional[Mapping[str, Any]] = None,
+        body: Optional[Mapping[str, Any]] = None,
+        timeout: Optional[float] = None,
+    ) -> Any:
+        """Boot a sandbox for an existing OpenAI session (docs-compatible API).
+
+        See :meth:`pydo.agents.AgentsResources.create_session`.
+        """
+        if body is None or "manifest" not in body:
+            raise ValueError("body.manifest is required")
+        manifest = body["manifest"]
+        variables = body.get("variables") or {}
+        if variables:
+            if isinstance(manifest, (bytes, bytearray)):
+                text = bytes(manifest).decode("utf-8")
+            else:
+                text = str(manifest)
+            replacements = {str(k): str(v) for k, v in dict(variables).items()}
+            manifest = resolve_placeholders(text, replacements)
+
+        openai_session_id = None
+        if params:
+            openai_session_id = params.get("openai_session_id")
+
+        resp = await self.sessions.create_from_manifest(
+            manifest,
+            openai_session_id=openai_session_id,
+            timeout=timeout,
+        )
+        emit_session_create_warnings(session_create_warnings(resp), stacklevel=2)
+        return resp
+
+    async def destroy_session(self, *, session_id: str) -> None:
+        """Release a sandbox session (docs-compatible API)."""
+        if not session_id:
+            raise ValueError("session_id is required")
+        await self.sessions.destroy(session_id)
 
 
 __all__ = [

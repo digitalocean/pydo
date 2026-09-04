@@ -6,7 +6,7 @@
 from __future__ import annotations
 
 import os
-from typing import Optional
+from typing import Any, Mapping, Optional
 
 from pydo.custom_extensions import _BaseURLProxy
 
@@ -212,6 +212,62 @@ class AgentsResources:
             openai_api_key=openai_api_key,
             openai_base_url=openai_base_url,
         )
+
+    def create_session(
+        self,
+        *,
+        params: Optional[Mapping[str, Any]] = None,
+        body: Optional[Mapping[str, Any]] = None,
+        timeout: Optional[float] = None,
+    ) -> Any:
+        """Boot a sandbox for an existing OpenAI session (docs-compatible API).
+
+        Matches the Agent Harness Runtime Python SDK how-to::
+
+            client.agents.create_session(
+                params={"openai_session_id": openai_session_id},
+                body={
+                    "manifest": open("agent.yaml").read(),
+                    "variables": {"ENV_ID": env_id, "OPENAI_API_KEY": api_key},
+                },
+            )
+
+        ``variables`` are expanded client-side into ``${...}`` placeholders in
+        the manifest (harness-api has no server-side variables map; same as
+        doctl). The resolved YAML is POSTed as ``application/x-yaml`` with
+        optional ``?openai_session_id=``.
+
+        :returns: Create envelope ``{"session": {...}}``.
+        """
+        if body is None or "manifest" not in body:
+            raise ValueError("body.manifest is required")
+        manifest = body["manifest"]
+        variables = body.get("variables") or {}
+        if variables:
+            if isinstance(manifest, (bytes, bytearray)):
+                text = bytes(manifest).decode("utf-8")
+            else:
+                text = str(manifest)
+            replacements = {str(k): str(v) for k, v in dict(variables).items()}
+            manifest = resolve_placeholders(text, replacements)
+
+        openai_session_id = None
+        if params:
+            openai_session_id = params.get("openai_session_id")
+
+        resp = self.sessions.create_from_manifest(
+            manifest,
+            openai_session_id=openai_session_id,
+            timeout=timeout,
+        )
+        emit_session_create_warnings(session_create_warnings(resp), stacklevel=2)
+        return resp
+
+    def destroy_session(self, *, session_id: str) -> None:
+        """Release a sandbox session (docs-compatible API)."""
+        if not session_id:
+            raise ValueError("session_id is required")
+        self.sessions.destroy(session_id)
 
 
 __all__ = [
