@@ -137509,7 +137509,8 @@ class DropletActionsOperations:
         All Droplets created after March 2017 use internal kernels by default.
              - :code:`<nobr>`droplet:update`</nobr>`
            * - :code:`<nobr>`enable_ipv6`</nobr>`
-             - Enables IPv6 for a Droplet. Once enabled for a Droplet, IPv6 can not be disabled. When
+             - Enables IPv6 for a Droplet. Once enabled for a Droplet, IPv6 can not be disabled.
+        **Warning:** The Droplet must be powered off before enabling IPv6 on an existing Droplet. When
         enabling IPv6 on an existing Droplet, `additional OS-level configuration
         <https://docs.digitalocean.com/products/networking/ipv6/how-to/enable/#on-existing-droplets>`_
         is required.
@@ -137671,7 +137672,8 @@ class DropletActionsOperations:
         All Droplets created after March 2017 use internal kernels by default.
              - :code:`<nobr>`droplet:update`</nobr>`
            * - :code:`<nobr>`enable_ipv6`</nobr>`
-             - Enables IPv6 for a Droplet. Once enabled for a Droplet, IPv6 can not be disabled. When
+             - Enables IPv6 for a Droplet. Once enabled for a Droplet, IPv6 can not be disabled.
+        **Warning:** The Droplet must be powered off before enabling IPv6 on an existing Droplet. When
         enabling IPv6 on an existing Droplet, `additional OS-level configuration
         <https://docs.digitalocean.com/products/networking/ipv6/how-to/enable/#on-existing-droplets>`_
         is required.
@@ -137828,7 +137830,8 @@ class DropletActionsOperations:
         All Droplets created after March 2017 use internal kernels by default.
              - :code:`<nobr>`droplet:update`</nobr>`
            * - :code:`<nobr>`enable_ipv6`</nobr>`
-             - Enables IPv6 for a Droplet. Once enabled for a Droplet, IPv6 can not be disabled. When
+             - Enables IPv6 for a Droplet. Once enabled for a Droplet, IPv6 can not be disabled.
+        **Warning:** The Droplet must be powered off before enabling IPv6 on an existing Droplet. When
         enabling IPv6 on an existing Droplet, `additional OS-level configuration
         <https://docs.digitalocean.com/products/networking/ipv6/how-to/enable/#on-existing-droplets>`_
         is required.
@@ -138027,7 +138030,8 @@ class DropletActionsOperations:
         * ``power_on``
         * ``power_off``
         * ``shutdown``
-        * ``enable_ipv6``
+        * ``enable_ipv6`` (\\ **Warning:** The Droplet must be powered off before enabling IPv6 on an
+        existing Droplet.)
         * ``enable_backups``
         * ``disable_backups``
         * ``snapshot`` (also requires ``image:create`` permission).
@@ -138124,7 +138128,8 @@ class DropletActionsOperations:
         * ``power_on``
         * ``power_off``
         * ``shutdown``
-        * ``enable_ipv6``
+        * ``enable_ipv6`` (\\ **Warning:** The Droplet must be powered off before enabling IPv6 on an
+        existing Droplet.)
         * ``enable_backups``
         * ``disable_backups``
         * ``snapshot`` (also requires ``image:create`` permission).
@@ -138217,7 +138222,8 @@ class DropletActionsOperations:
         * ``power_on``
         * ``power_off``
         * ``shutdown``
-        * ``enable_ipv6``
+        * ``enable_ipv6`` (\\ **Warning:** The Droplet must be powered off before enabling IPv6 on an
+        existing Droplet.)
         * ``enable_backups``
         * ``disable_backups``
         * ``snapshot`` (also requires ``image:create`` permission).
