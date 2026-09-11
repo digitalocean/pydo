@@ -1,0 +1,26 @@
+apiVersion: agents.digitalocean.com/v1alpha1
+kind: Agent
+metadata:
+  name: openai-codex-session
+spec:
+  runtime:
+    # Selects the DigitalOcean Codex executor sandbox. No managed agent loop.
+    adapter: codex-agentapi
+  sandbox:
+    idleTimeoutSeconds: 600  # seconds; 10m
+    template: codex-agentapi
+    # Defaulted in for this adapter; listed for clarity.
+    egress:
+      allow:
+        - host: api.openai.com
+        - host: codex-cloud-environments.chatgpt.com
+  # Guest env. Your code supplies ${...} values per session. CODEX_API_KEY is
+  # declared as a secret slot below so DigitalOcean brokers it through Secrets
+  # Manager. See How to Secure Sandbox Sessions.
+  env:
+    CODEX_ENVIRONMENT_ID: ${ENV_ID}
+    CODEX_REMOTE_URL: ${REMOTE_URL}
+    CODEX_API_KEY: ${OPENAI_API_KEY}
+  secrets:
+    - name: CODEX_API_KEY  # logical slot == guest env key
+      source: tenantSecret

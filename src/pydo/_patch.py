@@ -6,6 +6,7 @@
 
 Follow our quickstart for examples: https://aka.ms/azsdk/python/dpcodegen/python/customize
 """
+
 from typing import Optional
 
 from azure.core.credentials import AccessToken
@@ -58,6 +59,15 @@ class Client(  # type: ignore
         subdomain (e.g. ``"https://<id>.agents.do-ai.run"``).
         Required only when using agent inference endpoints.
     :paramtype agent_endpoint: str
+    :keyword agents_endpoint: Hosted Agents API base URL (default
+        ``api.digitalocean.com``; override via ``PYDO_AGENTS_ENDPOINT``).
+    :keyword gateway_endpoint: Action Gateway base URL (default
+        ``https://actions.do-ai.run``; preview is
+        ``https://actions.do-ai-test.run``; override via
+        ``PYDO_GATEWAY_ENDPOINT``).
+    :keyword gateway_provider: Provider that formats gateway tools for an
+        inference surface (default :class:`ChatCompletionsProvider`; also
+        ``MessagesProvider`` and ``ResponsesProvider`` in ``pydo.gateway``).
     """
 
     def __init__(
@@ -68,6 +78,9 @@ class Client(  # type: ignore
         timeout: int = 120,
         inference_endpoint: str = INFERENCE_BASE_URL,
         agent_endpoint: str = "",
+        agents_endpoint: Optional[str] = None,
+        gateway_endpoint: Optional[str] = None,
+        gateway_provider=None,
         **kwargs,
     ):
         if token is not None and api_key is not None:
@@ -110,6 +123,24 @@ class Client(  # type: ignore
             inference_images = self._inference_resource_root.images
             self.images.generate = inference_images.generate
             self.images.generations = inference_images.generations
+
+        try:
+            from pydo.agents import AgentsResources
+        except ImportError:
+            self.agents = None
+        else:
+            self.agents = AgentsResources(self, agents_endpoint=agents_endpoint)
+
+        try:
+            from pydo.gateway import GatewayResources
+        except ImportError:
+            self.gateway = None
+        else:
+            self.gateway = GatewayResources(
+                self,
+                gateway_endpoint=gateway_endpoint,
+                provider=gateway_provider,
+            )
 
     def _setup_inference_routing(
         self,
