@@ -5,11 +5,13 @@
 """Client-side OpenAI Agents API helpers for the DO sandbox-provider path.
 
 Mirrors doctl's orchestration for ``openai-agent-codex`` / ``codex-agentapi``
-sessions (design §4 / §5):
+sessions (Agents API beta):
 
 1. Extract ``spec.openai`` (opaque create-session body) from the manifest.
-2. ``POST api.openai.com/v1/agents/sessions`` with ``$OPENAI_API_KEY``.
-3. Resolve ``${ENV_ID}`` / ``${OPENAI_API_KEY}`` into ``spec.env``.
+2. ``POST api.openai.com/v1/agents/sessions`` with ``$OPENAI_API_KEY`` and
+   ``OpenAI-Beta: agents=v1``.
+3. Resolve ``${ENV_ID}`` / ``${REMOTE_URL}`` / ``${OPENAI_API_KEY}`` into
+   ``spec.env``.
 4. Create the DO session with ``openai_session_id`` as a query param.
 
 Attach never uses DO's SSE stream for this agent kind — callers bridge to
@@ -47,7 +49,12 @@ _ENV_OPENAI_BASE_URL = "OPENAI_BASE_URL"
 
 # Placeholders doctl / pydo resolve client-side before CreateSession.
 _PLACEHOLDER_ENV_ID = "ENV_ID"
+_PLACEHOLDER_REMOTE_URL = "REMOTE_URL"
 _PLACEHOLDER_OPENAI_KEY = "OPENAI_API_KEY"
+
+_OPENAI_AGENTS_BETA_HEADER = "OpenAI-Beta"
+_OPENAI_AGENTS_BETA_VALUE = "agents=v1"
+_OPENAI_AGENTS_INPUT_EVENT = "agent.session.input.message"
 
 _PLACEHOLDER_RE = re.compile(r"\$\{([A-Za-z_][A-Za-z0-9_]*)\}")
 
@@ -215,6 +222,48 @@ def resolve_placeholders(
     return _PLACEHOLDER_RE.sub(_sub, text)
 
 
+def normalize_openai_session_event_type(event_type: str) -> str:
+    """Strip optional ``agent.`` prefix from Agents API beta event types.
+
+    Beta streams emit ``agent.session.*``; alpha used bare ``session.*``.
+    Matching doctl, normalize before comparing event names.
+    """
+    value = (event_type or "").strip()
+    if value.startswith("agent."):
+        return value[len("agent.") :]
+    return value
+
+
+def openai_event_usage(event: Mapping[str, Any]) -> Tuple[Any, Any]:
+    """Return ``(input_tokens, output_tokens)`` from a session event if present."""
+    usage = event.get("usage")
+    if isinstance(usage, Mapping):
+        return usage.get("input_tokens"), usage.get("output_tokens")
+    turn = event.get("turn")
+    if isinstance(turn, Mapping):
+        nested = turn.get("usage")
+        if isinstance(nested, Mapping):
+            return nested.get("input_tokens"), nested.get("output_tokens")
+    return None, None
+
+
+def _openai_agents_headers(
+    api_key: str,
+    *,
+    content_type: Optional[str] = None,
+    accept: Optional[str] = None,
+) -> Dict[str, str]:
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        _OPENAI_AGENTS_BETA_HEADER: _OPENAI_AGENTS_BETA_VALUE,
+    }
+    if content_type:
+        headers["Content-Type"] = content_type
+    if accept:
+        headers["Accept"] = accept
+    return headers
+
+
 def _http_json(
     method: str,
     url: str,
@@ -224,13 +273,13 @@ def _http_json(
     timeout: float = 60.0,
 ) -> Any:
     data = None
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Accept": "application/json",
-    }
+    headers = _openai_agents_headers(
+        api_key,
+        content_type="application/json" if body is not None else None,
+        accept="application/json",
+    )
     if body is not None:
         data = json.dumps(body).encode("utf-8")
-        headers["Content-Type"] = "application/json"
     request = Request(url, data=data, method=method, headers=headers)
     try:
         with urlopen(request, timeout=timeout) as resp:  # noqa: S310 — fixed API host
@@ -300,6 +349,42 @@ def _pick_environment_id(payload: Mapping[str, Any]) -> str:
     )
 
 
+def _first_non_empty(*values: Any) -> str:
+    for value in values:
+        if value is None:
+            continue
+        text = str(value).strip()
+        if text:
+            return text
+    return ""
+
+
+def _pick_remote_url(payload: Mapping[str, Any]) -> str:
+    """Extract executor ``remote_url`` from an Agents create-session response.
+
+    Beta payloads may place it on ``environment.remote_url``,
+    ``environment.connect.remote_url``, or top-level ``connect.remote_url``.
+    """
+    connect = payload.get("connect")
+    top_remote = ""
+    if isinstance(connect, Mapping):
+        top_remote = _first_non_empty(connect.get("remote_url"))
+
+    env = payload.get("environment")
+    if isinstance(env, Mapping):
+        nested_connect = env.get("connect")
+        nested_remote = ""
+        if isinstance(nested_connect, Mapping):
+            nested_remote = _first_non_empty(nested_connect.get("remote_url"))
+        return _first_non_empty(
+            env.get("remote_url"),
+            nested_remote,
+            top_remote,
+            payload.get("remote_url"),
+        )
+    return _first_non_empty(top_remote, payload.get("remote_url"))
+
+
 def create_openai_agents_session(
     create_body: Mapping[str, Any],
     *,
@@ -366,7 +451,7 @@ def send_openai_session_input(
     body = {
         "events": [
             {
-                "type": "session.input.message",
+                "type": _OPENAI_AGENTS_INPUT_EVENT,
                 "input": [
                     {
                         "role": "user",
@@ -409,14 +494,14 @@ def _http_json_cancellable(
     if parsed.query:
         path = f"{path}?{parsed.query}"
     data = None
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Accept": "application/json",
-        "Host": parsed.hostname,
-    }
+    headers = _openai_agents_headers(
+        api_key,
+        content_type="application/json" if body is not None else None,
+        accept="application/json",
+    )
+    headers["Host"] = parsed.hostname
     if body is not None:
         data = json.dumps(body).encode("utf-8")
-        headers["Content-Type"] = "application/json"
 
     deadline = None
     if timeout is not None and timeout > 0:
@@ -555,10 +640,10 @@ def stream_openai_session_events(
     request = Request(
         url,
         method="GET",
-        headers={
-            "Authorization": f"Bearer {key}",
-            "Accept": "text/event-stream, application/json",
-        },
+        headers=_openai_agents_headers(
+            key,
+            accept="text/event-stream, application/json",
+        ),
     )
     # Long-lived stream: no hard socket timeout (doctl uses Timeout: 0).
     del timeout  # reserved for future soft-deadline use
@@ -585,6 +670,7 @@ def prepare_openai_codex_manifest(
     openai_base_url: Optional[str] = None,
     openai_session_id: Optional[str] = None,
     openai_environment_id: Optional[str] = None,
+    openai_remote_url: Optional[str] = None,
 ) -> Tuple[str, str, str]:
     """Resolve OpenAI ids into the manifest and return create inputs.
 
@@ -593,6 +679,10 @@ def prepare_openai_codex_manifest(
     If *openai_session_id* and *openai_environment_id* are already known
     (caller created the OpenAI session), only placeholder resolution runs.
     Otherwise this creates the OpenAI session from ``spec.openai``.
+
+    *openai_remote_url* (or the create-session response ``remote_url``) is
+    expanded into ``${REMOTE_URL}`` for ``CODEX_REMOTE_URL`` / ``codex
+    exec-server --remote``.
     """
     if isinstance(manifest, (bytes, bytearray)):
         text = bytes(manifest).decode("utf-8")
@@ -612,19 +702,23 @@ def prepare_openai_codex_manifest(
     key = resolve_openai_api_key(openai_api_key)
     session_id = openai_session_id
     environment_id = openai_environment_id
+    remote_url = (openai_remote_url or "").strip()
 
     if not session_id or not environment_id:
         create_body = extract_openai_create_body(doc)
-        session_id, environment_id, _ = create_openai_agents_session(
+        session_id, environment_id, payload = create_openai_agents_session(
             create_body,
             api_key=key,
             base_url=openai_base_url,
         )
+        if not remote_url and isinstance(payload, Mapping):
+            remote_url = _pick_remote_url(payload)
 
     resolved = resolve_placeholders(
         text,
         {
             _PLACEHOLDER_ENV_ID: environment_id,
+            _PLACEHOLDER_REMOTE_URL: remote_url,
             _PLACEHOLDER_OPENAI_KEY: key,
         },
     )
@@ -640,6 +734,8 @@ __all__ = [
     "is_openai_codex_session",
     "load_manifest_doc",
     "manifest_adapter",
+    "normalize_openai_session_event_type",
+    "openai_event_usage",
     "prepare_openai_codex_manifest",
     "resolve_openai_api_key",
     "resolve_placeholders",

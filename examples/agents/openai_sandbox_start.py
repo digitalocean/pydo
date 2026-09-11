@@ -3,7 +3,7 @@
 Mirrors doctl ``agents start`` for ``openai-agent-codex`` manifests:
 
 1. Create the OpenAI session from ``spec.openai`` (``$OPENAI_API_KEY``).
-2. Resolve ``${ENV_ID}`` / ``${OPENAI_API_KEY}`` into ``spec.env``.
+2. Resolve ``${ENV_ID}`` / ``${REMOTE_URL}`` / ``${OPENAI_API_KEY}`` into ``spec.env``.
 3. Create the DO sandbox session with ``openai_session_id``.
 4. ``agent.run(...)`` bridges to OpenAI (not DO's SSE stream).
 
@@ -33,6 +33,7 @@ spec:
     idleTimeoutSeconds: 2700
   env:
     CODEX_ENVIRONMENT_ID: ${ENV_ID}
+    CODEX_REMOTE_URL: ${REMOTE_URL}
     CODEX_API_KEY: ${OPENAI_API_KEY}
   secrets:
     - name: CODEX_API_KEY

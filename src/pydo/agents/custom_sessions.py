@@ -521,7 +521,8 @@ class SessionsOperations:
         pass ``openai_session_id`` (the ``sess_…`` from OpenAI's create-session
         call). The server persists it for attach correlation; doctl /
         :meth:`pydo.agents.AgentsResources.start` resolve ``${ENV_ID}`` /
-        ``${OPENAI_API_KEY}`` client-side before calling this method.
+        ``${REMOTE_URL}`` / ``${OPENAI_API_KEY}`` client-side before calling
+        this method.
 
         :param manifest: The agent spec as a YAML ``str`` or ``bytes`` document.
         :param openai_session_id: Optional OpenAI session id query param.

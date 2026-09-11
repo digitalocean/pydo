@@ -51,6 +51,7 @@ class AsyncAgentsResources:
         openai_api_key: Optional[str] = None,
         openai_session_id: Optional[str] = None,
         openai_environment_id: Optional[str] = None,
+        openai_remote_url: Optional[str] = None,
         openai_base_url: Optional[str] = None,
     ) -> AsyncAgentSession:
         """Create a session from an ``agents.yaml`` manifest and return a handle.
@@ -67,6 +68,7 @@ class AsyncAgentsResources:
                 openai_base_url=openai_base_url,
                 openai_session_id=openai_session_id,
                 openai_environment_id=openai_environment_id,
+                openai_remote_url=openai_remote_url,
             )
 
         resp = await self.sessions.create_from_manifest(

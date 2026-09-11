@@ -19,6 +19,7 @@ spec:
   # Manager. See How to Secure Sandbox Sessions.
   env:
     CODEX_ENVIRONMENT_ID: ${ENV_ID}
+    CODEX_REMOTE_URL: ${REMOTE_URL}
     CODEX_API_KEY: ${OPENAI_API_KEY}
   secrets:
     - name: CODEX_API_KEY  # logical slot == guest env key

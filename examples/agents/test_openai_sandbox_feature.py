@@ -145,10 +145,14 @@ def run_offline(manifest: str) -> int:
         _ok(f"extract openai body (model={body.get('agent', {}).get('model')})")
 
     resolved = resolve_placeholders(
-        "env=${ENV_ID} key=${OPENAI_API_KEY}",
-        {"ENV_ID": "env_demo", "OPENAI_API_KEY": "sk-demo"},
+        "env=${ENV_ID} remote=${REMOTE_URL} key=${OPENAI_API_KEY}",
+        {
+            "ENV_ID": "env_demo",
+            "REMOTE_URL": "wss://example/env_demo",
+            "OPENAI_API_KEY": "sk-demo",
+        },
     )
-    if resolved != "env=env_demo key=sk-demo":
+    if resolved != "env=env_demo remote=wss://example/env_demo key=sk-demo":
         _fail("placeholder resolution", resolved)
         failures += 1
     else:
@@ -159,8 +163,13 @@ def run_offline(manifest: str) -> int:
         openai_api_key="sk-demo",
         openai_session_id="sess_demo",
         openai_environment_id="env_demo",
+        openai_remote_url="wss://example/env_demo",
     )
-    if "${ENV_ID}" in prepared or "${OPENAI_API_KEY}" in prepared:
+    if (
+        "${ENV_ID}" in prepared
+        or "${REMOTE_URL}" in prepared
+        or "${OPENAI_API_KEY}" in prepared
+    ):
         _fail("prepare_openai_codex_manifest", "placeholders still present")
         failures += 1
     elif sess != "sess_demo" or env != "env_demo":

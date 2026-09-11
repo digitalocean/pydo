@@ -48,6 +48,7 @@ from .custom_openai_sandbox import (
     OpenAIAgentsError,
     is_openai_codex_manifest,
     is_openai_codex_session,
+    normalize_openai_session_event_type,
     prepare_openai_codex_manifest,
     resolve_placeholders,
 )
@@ -122,6 +123,7 @@ class AgentsResources:
         openai_api_key: Optional[str] = None,
         openai_session_id: Optional[str] = None,
         openai_environment_id: Optional[str] = None,
+        openai_remote_url: Optional[str] = None,
         openai_base_url: Optional[str] = None,
     ) -> AgentSession:
         """Create a session from an ``agents.yaml`` manifest and return a handle.
@@ -132,8 +134,9 @@ class AgentsResources:
         :data:`~pydo.agents.custom_openai_sandbox.OPENAI_CODEX_ADAPTERS`) this mirrors
         doctl ``agents start``: create the OpenAI session (unless
         ``openai_session_id`` + ``openai_environment_id`` are already known),
-        resolve ``${ENV_ID}`` / ``${OPENAI_API_KEY}`` into ``spec.env``, then
-        create the DO session with ``openai_session_id`` as a query param.
+        resolve ``${ENV_ID}`` / ``${REMOTE_URL}`` / ``${OPENAI_API_KEY}`` into
+        ``spec.env``, then create the DO session with ``openai_session_id`` as
+        a query param.
 
         Use as a context manager to auto-destroy on exit::
 
@@ -150,6 +153,7 @@ class AgentsResources:
                 openai_base_url=openai_base_url,
                 openai_session_id=openai_session_id,
                 openai_environment_id=openai_environment_id,
+                openai_remote_url=openai_remote_url,
             )
 
         resp = self.sessions.create_from_manifest(
@@ -228,7 +232,11 @@ class AgentsResources:
                 params={"openai_session_id": openai_session_id},
                 body={
                     "manifest": open("agent.yaml").read(),
-                    "variables": {"ENV_ID": env_id, "OPENAI_API_KEY": api_key},
+                    "variables": {
+                        "ENV_ID": env_id,
+                        "REMOTE_URL": remote_url,
+                        "OPENAI_API_KEY": api_key,
+                    },
                 },
             )
 
@@ -295,6 +303,7 @@ __all__ = [
     "OpenAIAgentsError",
     "is_openai_codex_manifest",
     "is_openai_codex_session",
+    "normalize_openai_session_event_type",
     "prepare_openai_codex_manifest",
     "resolve_placeholders",
     "AgentKind",

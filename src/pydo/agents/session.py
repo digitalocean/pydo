@@ -32,6 +32,8 @@ from typing import Any, Callable, Dict, Iterator, List, Optional, Union
 from .custom_models import HITLOutcome, ResolutionSource, SessionStatus
 from .custom_openai_sandbox import (
     is_openai_codex_session,
+    normalize_openai_session_event_type,
+    openai_event_usage,
     resolve_openai_api_key,
     send_openai_session_input,
     stream_openai_session_events,
@@ -738,7 +740,7 @@ class _ConcurrentOpenAITurn:
                         # Drop seed-turn / history replayed before our POST.
                         continue
                     if not in_new_turn:
-                        etype = (
+                        etype = normalize_openai_session_event_type(
                             payload.get("type") or payload.get("event") or ""
                             if isinstance(payload, dict)
                             else ""
@@ -780,7 +782,9 @@ class _OpenAIEventAdapter:
             for event in self._events:
                 if self._closed:
                     break
-                etype = event.get("type") or event.get("event") or ""
+                etype = normalize_openai_session_event_type(
+                    event.get("type") or event.get("event") or ""
+                )
 
                 if etype in (
                     "session.turn.created",
@@ -822,13 +826,13 @@ class _OpenAIEventAdapter:
                     "session.completed",
                     "run.completed",
                 ):
-                    usage = event.get("usage") if isinstance(event.get("usage"), dict) else {}
+                    in_tok, out_tok = openai_event_usage(event)
                     yield {
                         "type": "run.completed",
                         "run_id": event.get("id") or "",
                         "data": {
-                            "total_tokens_in": usage.get("input_tokens"),
-                            "total_tokens_out": usage.get("output_tokens"),
+                            "total_tokens_in": in_tok,
+                            "total_tokens_out": out_tok,
                             **(event.get("data") or {}),
                         },
                     }
@@ -836,17 +840,23 @@ class _OpenAIEventAdapter:
 
                 if etype in (
                     "session.turn.failed",
+                    "session.turn.cancelled",
                     "response.failed",
                     "session.failed",
                     "error",
                     "run.failed",
                 ):
+                    err_obj = event.get("error")
+                    err_msg = None
+                    if isinstance(err_obj, dict):
+                        err_msg = err_obj.get("message")
                     yield {
                         "type": "run.failed",
                         "run_id": event.get("id") or "",
                         "data": {
                             "code": event.get("code"),
                             "message": event.get("message")
+                            or err_msg
                             or event.get("error")
                             or "openai session failed",
                         },
