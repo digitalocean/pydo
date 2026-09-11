@@ -141,7 +141,11 @@ def test_resolve_placeholders_prefers_explicit_map():
     text = "id=${ENV_ID} remote=${REMOTE_URL} key=${OPENAI_API_KEY} other=${HOME}"
     out = resolve_placeholders(
         text,
-        {"ENV_ID": "env_1", "REMOTE_URL": "wss://example/r", "OPENAI_API_KEY": "sk-test"},
+        {
+            "ENV_ID": "env_1",
+            "REMOTE_URL": "wss://example/r",
+            "OPENAI_API_KEY": "sk-test",
+        },
         environ={"HOME": "/tmp", "OPENAI_API_KEY": "sk-env"},
     )
     assert out == "id=env_1 remote=wss://example/r key=sk-test other=/tmp"
@@ -231,9 +235,7 @@ def test_send_openai_session_input_uses_beta_event_type():
         captured["body"] = body
         return {"ok": True}
 
-    with patch(
-        "pydo.agents.custom_openai_sandbox._http_json", side_effect=_fake_http
-    ):
+    with patch("pydo.agents.custom_openai_sandbox._http_json", side_effect=_fake_http):
         send_openai_session_input("sess_1", text="hi", api_key="sk-test")
 
     assert captured["method"] == "POST"
