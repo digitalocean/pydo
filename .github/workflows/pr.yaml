@@ -10,15 +10,15 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v7.0.0
 
       - name: Setup python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v6.3.0
         with:
           python-version: "3.10"
 
       - name: Install Poetry
-        uses: snok/install-poetry@v1.3.4
+        uses: snok/install-poetry@v1.4.1
         with:
           version: 1.6.1
           virtualenvs-path: .venv
@@ -28,7 +28,7 @@ jobs:
 
       - name: Restore poetry cache
         if: success() && !env.ACT
-        uses: actions/cache@v3
+        uses: actions/cache@v6.1.0
         with:
           path: $(poetry config cache-dir)
           key: ubuntu-latest-poetry-3.10-${{ hashFiles('**/pyproject.toml') }}
@@ -55,21 +55,22 @@ jobs:
       fail-fast: true
       matrix:
         python-version:
-          - "3.8"
-          - "3.9"
           - "3.10"
+          - "3.11"
+          - "3.12"
+          - "3.13"
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v7.0.0
 
       - name: Setup python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v6.3.0
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Install Poetry
-        uses: snok/install-poetry@v1.3.1
+        uses: snok/install-poetry@v1.4.1
         with:
           version: 1.6.1
           virtualenvs-path: .venv
@@ -79,7 +80,7 @@ jobs:
 
       - name: Restore poetry cache
         if: success() && !env.ACT
-        uses: actions/cache@v3
+        uses: actions/cache@v6.1.0
         with:
           path: $(poetry config cache-dir)
           key: ubuntu-latest-poetry-${{ matrix.python-version }}-${{ hashFiles('**/pyproject.toml') }}
