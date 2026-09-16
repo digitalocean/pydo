@@ -232,6 +232,31 @@ def test_hitl_none_leaves_prompt_unresolved():
 
 
 # ---------------------------------------------------------------------------
+# Read-model properties
+# ---------------------------------------------------------------------------
+
+
+def test_size_slug_reads_from_session_info():
+    agent = AgentSession(
+        _FakeSessions([]),
+        "s1",
+        raw={
+            "session": {
+                "status": "ready",
+                "agent_kind": "AGENT_KIND_OPENCODE",
+                "size_slug": "mv-2vcpu-4gb",
+            }
+        },
+    )
+    assert agent.size_slug == "mv-2vcpu-4gb"
+
+
+def test_size_slug_is_none_when_absent():
+    agent = AgentSession(_FakeSessions([]), "s1", raw={"session": {"status": "ready"}})
+    assert agent.size_slug is None
+
+
+# ---------------------------------------------------------------------------
 # Lifecycle
 # ---------------------------------------------------------------------------
 
@@ -339,3 +364,12 @@ async def test_async_context_manager_destroys():
     async with AsyncAgentSession(sessions, "s1") as agent:
         assert agent.session_id == "s1"
     assert sessions.destroyed
+
+
+def test_async_size_slug_reads_from_session_info():
+    agent = AsyncAgentSession(
+        _FakeAsyncSessions([]),
+        "s1",
+        raw={"session": {"status": "ready", "size_slug": "mv-8vcpu-16gb"}},
+    )
+    assert agent.size_slug == "mv-8vcpu-16gb"

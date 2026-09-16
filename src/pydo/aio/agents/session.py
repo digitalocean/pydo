@@ -204,6 +204,16 @@ class AsyncAgentSession:
         return get("agent_kind") if get else None
 
     @property
+    def size_slug(self) -> Optional[str]:
+        """The sandbox size slug this session's sandbox actually booted at
+        (e.g. ``"mv-2vcpu-4gb"``), or ``None`` if unknown (a session that has
+        not reached a sandbox yet, or one created before this field existed).
+        """
+        info = self.info
+        get = getattr(info, "get", None)
+        return get("size_slug") if get else None
+
+    @property
     def openai_session_id(self) -> Optional[str]:
         info = self.info
         get = getattr(info, "get", None)
