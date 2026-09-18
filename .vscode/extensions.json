@@ -1,6 +1,10 @@
-{
+{{
+  // Recommended VS Code extensions for this project
   "recommendations": [
+    // Core Python extension for VS Code
     "ms-python.python",
+
+    // Pytest extension for testing and debugging Python code
     "cameron.vscode-pytest"
   ]
 }
