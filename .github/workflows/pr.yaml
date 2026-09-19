@@ -10,12 +10,12 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
 
-      - name: Setup python
-        uses: actions/setup-python@v4
+      - name: Setup Python
+        uses: actions/setup-python@v6
         with:
-          python-version: "3.10"
+          python-version: "3.14"
 
       - name: Install Poetry
         uses: snok/install-poetry@v1.3.4
@@ -31,7 +31,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: $(poetry config cache-dir)
-          key: ubuntu-latest-poetry-3.10-${{ hashFiles('**/pyproject.toml') }}
+          key: ubuntu-latest-poetry-3.14-${{ hashFiles('**/pyproject.toml') }}
 
       - name: Lint tests
         run: make lint-tests
@@ -55,16 +55,18 @@ jobs:
       fail-fast: true
       matrix:
         python-version:
-          - "3.8"
-          - "3.9"
           - "3.10"
+          - "3.11"
+          - "3.12"
+          - "3.13"
+          - "3.14"
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v5
 
-      - name: Setup python
-        uses: actions/setup-python@v4
+      - name: Setup Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
 
