@@ -857,9 +857,7 @@ def test_create_list_get_delete_checkpoint():
     assert _path(pipeline.calls[0].request.url).endswith(
         "/v2/agents/sessions/s1/checkpoints"
     )
-    assert json.loads(pipeline.calls[0].request.content) == {
-        "label": "before-refactor"
-    }
+    assert json.loads(pipeline.calls[0].request.content) == {"label": "before-refactor"}
     assert pipeline.calls[1].request.method == "GET"
     assert "page_size=10" in pipeline.calls[1].request.url
     assert pipeline.calls[2].request.method == "GET"
