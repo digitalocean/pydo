@@ -6,12 +6,23 @@
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import json as _json
 import os
 import time
 import warnings
-from typing import Any, BinaryIO, Dict, Iterator, List, NamedTuple, Optional, Union
+from typing import (
+    Any,
+    BinaryIO,
+    Dict,
+    Iterator,
+    List,
+    NamedTuple,
+    Optional,
+    Sequence,
+    Union,
+)
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote
 from urllib.request import Request, urlopen
@@ -37,6 +48,9 @@ _ERROR_MAP = {
 
 _BASE_PATH = "/v2/agents/sessions"
 _OK_STATUS = (200, 201, 202, 204)
+
+# Cap on children created by one ``fork`` call (matches godo HostedAgentForkMaxCount).
+FORK_MAX_COUNT = 4
 
 # CreateSession often blocks until the sandbox is READY (Firecracker boot).
 # doctl tolerates several minutes; azure-core's default absolute timeout is ~120s
@@ -159,8 +173,7 @@ def _http_put_bytes(url: str, data: bytes) -> None:
         raise WorkspaceTransferError(f"part upload failed: {exc.reason}") from exc
     if status not in (200, 201, 204):
         raise WorkspaceTransferError(
-            f"part upload failed: HTTP {status}"
-            + (f": {body[:200]!r}" if body else "")
+            f"part upload failed: HTTP {status}" + (f": {body[:200]!r}" if body else "")
         )
 
 
@@ -258,9 +271,7 @@ def session_create_warnings(obj: Any) -> List[str]:
     return [str(item) for item in raw if item]
 
 
-def emit_session_create_warnings(
-    warns: List[str], *, stacklevel: int = 2
-) -> None:
+def emit_session_create_warnings(warns: List[str], *, stacklevel: int = 2) -> None:
     """Emit each create-time advisory as a :class:`UserWarning`.
 
     Used by high-level :meth:`pydo.agents.AgentsResources.start` so callers
@@ -311,6 +322,36 @@ def _unwrap_harness_sse_chunk(chunk: Dict[str, Any]) -> Optional[Any]:
 
 def _quote(value: str) -> str:
     return quote(str(value), safe="")
+
+
+def _encode_source_raw(source_raw: Union[bytes, bytearray, memoryview, str]) -> str:
+    """Proto ``bytes`` fields are standard-base64 on the JSON wire."""
+    if isinstance(source_raw, str):
+        raw = source_raw.encode("utf-8")
+    else:
+        raw = bytes(source_raw)
+    if not raw:
+        raise ValueError("source_raw must be non-empty")
+    return base64.b64encode(raw).decode("ascii")
+
+
+def _port_forward_ws_url(base_url: str, session_id: str, remote_port: int) -> str:
+    """Build ``ws[s]://…/v2/agents/sessions/{id}/port-forward/{port}``."""
+    port = int(remote_port)
+    if port < 1024 or port > 65535:
+        raise ValueError(f"remote_port must be between 1024 and 65535 (got {port})")
+    if not session_id:
+        raise ValueError("session_id is required")
+    base = (base_url or "").rstrip("/")
+    if base.startswith("https://"):
+        ws = "wss://" + base[len("https://") :]
+    elif base.startswith("http://"):
+        ws = "ws://" + base[len("http://") :]
+    elif base.startswith("wss://") or base.startswith("ws://"):
+        ws = base
+    else:
+        raise ValueError(f"unsupported agents base URL scheme in {base_url!r}")
+    return f"{ws}{_BASE_PATH}/{_quote(session_id)}/port-forward/{port}"
 
 
 def _response_body_text(response) -> str:
@@ -595,6 +636,241 @@ class SessionsOperations:
         return self._parse_json(
             self._send("POST", f"{_BASE_PATH}/{_quote(session_id)}/resume"),
         )
+
+    def update(
+        self,
+        session_id: str,
+        *,
+        resume_on_topoff: Optional[bool] = None,
+    ) -> Any:
+        """Patch session-scoped settings (``PATCH .../sessions/{session_id}``).
+
+        Only allowlisted fields may be set; the server rejects an empty body.
+        Today the sole field is ``resume_on_topoff`` (auto-resume after a
+        low-balance pause once prepayment is restored).
+        """
+        body: Dict[str, Any] = {}
+        if resume_on_topoff is not None:
+            body["resume_on_topoff"] = bool(resume_on_topoff)
+        if not body:
+            raise ValueError("update must set at least one field")
+        return self._parse_json(
+            self._send(
+                "PATCH",
+                f"{_BASE_PATH}/{_quote(session_id)}",
+                body=body,
+            ),
+        )
+
+    def validate_policy(self, manifest: Union[str, bytes]) -> Any:
+        """Validate a manifest's tool-permission policy without creating a session.
+
+        ``POST /v2/agents/sessions/policy/validate`` with ``application/x-yaml``.
+        """
+        data = _manifest_bytes(manifest)
+        if not data.strip():
+            raise ValueError("manifest is required")
+        return self._parse_json(
+            self._send(
+                "POST",
+                f"{_BASE_PATH}/policy/validate",
+                content=data,
+                content_type=_YAML_MEDIA_TYPE,
+            ),
+        )
+
+    def list_sandbox_sizes(self) -> Any:
+        """List customer-selectable sandbox sizes (``GET .../sandbox/sizes``).
+
+        Ordered smallest-to-largest. Every returned ``slug`` is accepted as
+        ``spec.sandbox.sizeSlug`` on create.
+        """
+        return self._parse_json(
+            self._send("GET", f"{_BASE_PATH}/sandbox/sizes"),
+        )
+
+    def exec_in_sandbox(
+        self,
+        session_id: str,
+        *,
+        argv: Sequence[str],
+        workdir: Optional[str] = None,
+        timeout_seconds: Optional[int] = None,
+        timeout: Optional[float] = None,
+    ) -> Any:
+        """Run a command in the session sandbox (``POST .../sandbox/exec``).
+
+        Works on managed-agent and bare-sandbox sessions. ``argv`` is the
+        argv vector (not a shell string). ``timeout`` is the HTTP client
+        deadline; ``timeout_seconds`` is forwarded to the guest.
+        """
+        if not argv:
+            raise ValueError("argv is required")
+        body: Dict[str, Any] = {"argv": [str(a) for a in argv]}
+        if workdir is not None:
+            body["workdir"] = workdir
+        if timeout_seconds is not None:
+            body["timeout_seconds"] = int(timeout_seconds)
+        return self._parse_json(
+            self._send(
+                "POST",
+                f"{_BASE_PATH}/{_quote(session_id)}/sandbox/exec",
+                body=body,
+                timeout=(
+                    _DEFAULT_REQUEST_TIMEOUT if timeout is None else float(timeout)
+                ),
+            ),
+        )
+
+    def relay_request(
+        self,
+        session_id: str,
+        *,
+        source_raw: Union[bytes, bytearray, memoryview, str],
+        timeout: Optional[float] = None,
+    ) -> Any:
+        """Forward one native agent-protocol frame (``POST .../request``).
+
+        ``source_raw`` is the caller's own protocol request (for Codex, a
+        JSON-RPC request object). On the wire it is standard-base64. An empty
+        ``source_raw`` in the response means the in-sandbox adapter declined
+        the method.
+        """
+        body = {"source_raw": _encode_source_raw(source_raw)}
+        return self._parse_json(
+            self._send(
+                "POST",
+                f"{_BASE_PATH}/{_quote(session_id)}/request",
+                body=body,
+                timeout=(
+                    _DEFAULT_REQUEST_TIMEOUT if timeout is None else float(timeout)
+                ),
+            ),
+        )
+
+    def create_checkpoint(
+        self,
+        session_id: str,
+        *,
+        label: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> Any:
+        """Capture a session checkpoint (``POST .../checkpoints``).
+
+        Blocks until the checkpoint is READY (or the server errors). Only
+        allowed between turns.
+        """
+        body: Dict[str, Any] = {}
+        if label is not None:
+            body["label"] = label
+        return self._parse_json(
+            self._send(
+                "POST",
+                f"{_BASE_PATH}/{_quote(session_id)}/checkpoints",
+                body=body,
+                timeout=(
+                    _DEFAULT_CREATE_TIMEOUT if timeout is None else float(timeout)
+                ),
+            ),
+        )
+
+    def list_checkpoints(
+        self,
+        session_id: str,
+        *,
+        page_token: Optional[str] = None,
+        page_size: Optional[int] = None,
+    ) -> Any:
+        """List checkpoints for a session, newest first."""
+        return self._parse_json(
+            self._send(
+                "GET",
+                f"{_BASE_PATH}/{_quote(session_id)}/checkpoints",
+                params={
+                    "page_token": page_token,
+                    "page_size": page_size,
+                },
+            ),
+        )
+
+    def get_checkpoint(self, session_id: str, checkpoint_id: str) -> Any:
+        """Get one checkpoint by id."""
+        if not checkpoint_id:
+            raise ValueError("checkpoint_id is required")
+        return self._parse_json(
+            self._send(
+                "GET",
+                f"{_BASE_PATH}/{_quote(session_id)}/checkpoints/{_quote(checkpoint_id)}",
+            ),
+        )
+
+    def delete_checkpoint(self, session_id: str, checkpoint_id: str) -> Any:
+        """Delete a checkpoint (idempotent)."""
+        if not checkpoint_id:
+            raise ValueError("checkpoint_id is required")
+        return self._parse_json(
+            self._send(
+                "DELETE",
+                f"{_BASE_PATH}/{_quote(session_id)}/checkpoints/{_quote(checkpoint_id)}",
+            ),
+        )
+
+    def rollback_to_checkpoint(self, session_id: str, checkpoint_id: str) -> Any:
+        """Rewind the session in place to a checkpoint (``POST .../rollback``).
+
+        The session id is unchanged; the underlying sandbox is replaced.
+        """
+        if not checkpoint_id:
+            raise ValueError("checkpoint_id is required")
+        return self._parse_json(
+            self._send(
+                "POST",
+                f"{_BASE_PATH}/{_quote(session_id)}/checkpoints/"
+                f"{_quote(checkpoint_id)}/rollback",
+                body={},
+                timeout=_DEFAULT_CREATE_TIMEOUT,
+            ),
+        )
+
+    def fork(
+        self,
+        session_id: str,
+        *,
+        from_checkpoint_id: Optional[str] = None,
+        count: int = 1,
+        timeout: Optional[float] = None,
+    ) -> Any:
+        """Fork child sessions from a checkpoint (or from "now").
+
+        ``count`` defaults to 1 and must be in ``1..FORK_MAX_COUNT``. All-or-
+        nothing: on failure no children are left running.
+        """
+        if count < 1 or count > FORK_MAX_COUNT:
+            raise ValueError(
+                f"fork count must be between 1 and {FORK_MAX_COUNT} (got {count})"
+            )
+        body: Dict[str, Any] = {"count": int(count)}
+        if from_checkpoint_id:
+            body["from_checkpoint_id"] = from_checkpoint_id
+        return self._parse_json(
+            self._send(
+                "POST",
+                f"{_BASE_PATH}/{_quote(session_id)}/fork",
+                body=body,
+                timeout=(
+                    _DEFAULT_CREATE_TIMEOUT if timeout is None else float(timeout)
+                ),
+            ),
+        )
+
+    def port_forward_url(self, session_id: str, remote_port: int) -> str:
+        """Return the WebSocket URL for ``port-forward`` to a guest port.
+
+        Does not open the tunnel — callers dial with a WebSocket client using
+        the same bearer token as the REST API. Remote ports must be
+        ``1024..65535``.
+        """
+        return _port_forward_ws_url(self._client._base_url, session_id, remote_port)
 
     def send_input(self, session_id: str, *, text: str) -> Any:
         return self._parse_json(
@@ -931,7 +1207,9 @@ class SessionsOperations:
             transfer_id = _field(created, "transfer_id")
             part_size = int(_field(created, "part_size") or 0)
             if not transfer_id:
-                raise WorkspaceTransferError("CreateTransfer response missing transfer_id")
+                raise WorkspaceTransferError(
+                    "CreateTransfer response missing transfer_id"
+                )
             if part_size < 1:
                 raise WorkspaceTransferError(
                     "CreateTransfer response missing a positive part_size"
@@ -1166,6 +1444,7 @@ __all__ = [
     "WorkspaceDownload",
     "WorkspaceTransferError",
     "UploadData",
+    "FORK_MAX_COUNT",
     "session_create_warnings",
     "emit_session_create_warnings",
 ]

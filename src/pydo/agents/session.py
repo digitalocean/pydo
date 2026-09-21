@@ -510,6 +510,75 @@ class AgentSession:
     def resume(self) -> Any:
         return self._sessions.resume(self.session_id)
 
+    def update(self, *, resume_on_topoff: Optional[bool] = None) -> Any:
+        """Patch session-scoped settings (e.g. ``resume_on_topoff``)."""
+        return self._sessions.update(self.session_id, resume_on_topoff=resume_on_topoff)
+
+    def exec(
+        self,
+        *argv: str,
+        workdir: Optional[str] = None,
+        timeout_seconds: Optional[int] = None,
+        timeout: Optional[float] = None,
+    ) -> Any:
+        """Run a command in this session's sandbox."""
+        return self._sessions.exec_in_sandbox(
+            self.session_id,
+            argv=argv,
+            workdir=workdir,
+            timeout_seconds=timeout_seconds,
+            timeout=timeout,
+        )
+
+    def relay(self, source_raw: Any, *, timeout: Optional[float] = None) -> Any:
+        """Forward one native agent-protocol request frame."""
+        return self._sessions.relay_request(
+            self.session_id, source_raw=source_raw, timeout=timeout
+        )
+
+    def create_checkpoint(
+        self, *, label: Optional[str] = None, timeout: Optional[float] = None
+    ) -> Any:
+        return self._sessions.create_checkpoint(
+            self.session_id, label=label, timeout=timeout
+        )
+
+    def list_checkpoints(
+        self,
+        *,
+        page_token: Optional[str] = None,
+        page_size: Optional[int] = None,
+    ) -> Any:
+        return self._sessions.list_checkpoints(
+            self.session_id, page_token=page_token, page_size=page_size
+        )
+
+    def get_checkpoint(self, checkpoint_id: str) -> Any:
+        return self._sessions.get_checkpoint(self.session_id, checkpoint_id)
+
+    def delete_checkpoint(self, checkpoint_id: str) -> Any:
+        return self._sessions.delete_checkpoint(self.session_id, checkpoint_id)
+
+    def rollback(self, checkpoint_id: str) -> Any:
+        return self._sessions.rollback_to_checkpoint(self.session_id, checkpoint_id)
+
+    def fork(
+        self,
+        *,
+        from_checkpoint_id: Optional[str] = None,
+        count: int = 1,
+        timeout: Optional[float] = None,
+    ) -> Any:
+        return self._sessions.fork(
+            self.session_id,
+            from_checkpoint_id=from_checkpoint_id,
+            count=count,
+            timeout=timeout,
+        )
+
+    def port_forward_url(self, remote_port: int) -> str:
+        return self._sessions.port_forward_url(self.session_id, remote_port)
+
     def stream(self, **kwargs: Any) -> Any:
         if self.info is None:
             self.refresh()

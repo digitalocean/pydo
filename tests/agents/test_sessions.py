@@ -727,3 +727,201 @@ def test_resolve_agents_base_url_adds_https_scheme():
         == "https://api.digitalocean.com"
     )
     assert resolve_agents_base_url("http://127.0.0.1:8080") == "http://127.0.0.1:8080"
+
+
+# ---------------------------------------------------------------------------
+# Newly ported OHS endpoints (checkpoints, fork, exec, sizes, update, …)
+# ---------------------------------------------------------------------------
+
+
+def _path(url: str) -> str:
+    return url.split("?", 1)[0]
+
+
+def test_update_session_resume_on_topoff():
+    body = {"session": {"session_id": "s1", "resume_on_topoff": True}}
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    resp = resources.sessions.update("s1", resume_on_topoff=True)
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "PATCH"
+    assert _path(call.request.url).endswith("/v2/agents/sessions/s1")
+    assert json.loads(call.request.content) == {"resume_on_topoff": True}
+    assert resp.session.resume_on_topoff is True
+
+
+def test_update_session_requires_field():
+    resources = _make_resources([])
+    with pytest.raises(ValueError, match="at least one field"):
+        resources.sessions.update("s1")
+
+
+def test_validate_policy_uploads_yaml():
+    body = {"ok": True, "agent": "opencode"}
+    resources = _make_resources([_FakeResponse(200, body)])
+    manifest = "agent: opencode\n"
+    resp = resources.sessions.validate_policy(manifest)
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "POST"
+    assert _path(call.request.url).endswith("/v2/agents/sessions/policy/validate")
+    assert call.request.headers.get("Content-Type") == "application/x-yaml"
+    assert resp.ok is True
+
+
+def test_list_sandbox_sizes():
+    body = {"sizes": [{"slug": "s-1vcpu-1gb", "vcpus": 1, "memory_mb": 1024}]}
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    resp = resources.sessions.list_sandbox_sizes()
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "GET"
+    assert _path(call.request.url).endswith("/v2/agents/sessions/sandbox/sizes")
+    assert resp.sizes[0].slug == "s-1vcpu-1gb"
+
+
+def test_exec_in_sandbox():
+    body = {"exit_code": 0, "stdout": "ok\n", "stderr": ""}
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    resp = resources.sessions.exec_in_sandbox(
+        "s1", argv=["ls", "-la"], workdir="/workspace", timeout_seconds=30
+    )
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "POST"
+    assert _path(call.request.url).endswith("/v2/agents/sessions/s1/sandbox/exec")
+    assert json.loads(call.request.content) == {
+        "argv": ["ls", "-la"],
+        "workdir": "/workspace",
+        "timeout_seconds": 30,
+    }
+    assert resp.exit_code == 0
+
+
+def test_exec_in_sandbox_requires_argv():
+    resources = _make_resources([])
+    with pytest.raises(ValueError, match="argv"):
+        resources.sessions.exec_in_sandbox("s1", argv=[])
+
+
+def test_relay_request_base64_encodes_source_raw():
+    import base64
+
+    reply = b'{"jsonrpc":"2.0","id":1,"result":{}}'
+    body = {"source_raw": base64.b64encode(reply).decode("ascii")}
+    resources = _make_resources([_FakeResponse(200, body)])
+    frame = b'{"jsonrpc":"2.0","id":1,"method":"ping"}'
+
+    resp = resources.sessions.relay_request("s1", source_raw=frame)
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "POST"
+    assert _path(call.request.url).endswith("/v2/agents/sessions/s1/request")
+    assert json.loads(call.request.content) == {
+        "source_raw": base64.b64encode(frame).decode("ascii")
+    }
+    assert resp.source_raw == body["source_raw"]
+
+
+def test_create_list_get_delete_checkpoint():
+    create_body = {
+        "checkpoint": {
+            "checkpoint_id": "cp1",
+            "session_id": "s1",
+            "status": "READY",
+            "kind": "explicit",
+            "label": "before-refactor",
+        }
+    }
+    list_body = {"checkpoints": [create_body["checkpoint"]], "next_page_token": ""}
+    delete_body = {"checkpoint_id": "cp1", "deleted": True}
+    resources = _make_resources(
+        [
+            _FakeResponse(200, create_body),
+            _FakeResponse(200, list_body),
+            _FakeResponse(200, create_body),
+            _FakeResponse(200, delete_body),
+        ]
+    )
+
+    created = resources.sessions.create_checkpoint("s1", label="before-refactor")
+    listed = resources.sessions.list_checkpoints("s1", page_size=10)
+    got = resources.sessions.get_checkpoint("s1", "cp1")
+    deleted = resources.sessions.delete_checkpoint("s1", "cp1")
+
+    pipeline = resources._proxy._original._pipeline
+    assert pipeline.calls[0].request.method == "POST"
+    assert _path(pipeline.calls[0].request.url).endswith(
+        "/v2/agents/sessions/s1/checkpoints"
+    )
+    assert json.loads(pipeline.calls[0].request.content) == {
+        "label": "before-refactor"
+    }
+    assert pipeline.calls[1].request.method == "GET"
+    assert "page_size=10" in pipeline.calls[1].request.url
+    assert pipeline.calls[2].request.method == "GET"
+    assert _path(pipeline.calls[2].request.url).endswith(
+        "/v2/agents/sessions/s1/checkpoints/cp1"
+    )
+    assert pipeline.calls[3].request.method == "DELETE"
+    assert created.checkpoint.checkpoint_id == "cp1"
+    assert listed.checkpoints[0].label == "before-refactor"
+    assert got.checkpoint.status == "READY"
+    assert deleted.deleted is True
+
+
+def test_rollback_to_checkpoint():
+    body = {"session": {"session_id": "s1", "status": SessionStatus.READY}}
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    resp = resources.sessions.rollback_to_checkpoint("s1", "cp1")
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "POST"
+    assert _path(call.request.url).endswith(
+        "/v2/agents/sessions/s1/checkpoints/cp1/rollback"
+    )
+    assert resp.session.session_id == "s1"
+
+
+def test_fork_session():
+    body = {
+        "sessions": [
+            {"session_id": "child-1", "status": SessionStatus.PROVISIONING},
+            {"session_id": "child-2", "status": SessionStatus.PROVISIONING},
+        ]
+    }
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    resp = resources.sessions.fork("s1", from_checkpoint_id="cp1", count=2)
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "POST"
+    assert _path(call.request.url).endswith("/v2/agents/sessions/s1/fork")
+    assert json.loads(call.request.content) == {
+        "count": 2,
+        "from_checkpoint_id": "cp1",
+    }
+    assert len(resp.sessions) == 2
+
+
+def test_fork_rejects_invalid_count():
+    resources = _make_resources([])
+    with pytest.raises(ValueError, match="between 1 and"):
+        resources.sessions.fork("s1", count=0)
+    with pytest.raises(ValueError, match="between 1 and"):
+        resources.sessions.fork("s1", count=5)
+
+
+def test_port_forward_url():
+    resources = _make_resources([])
+    url = resources.sessions.port_forward_url("sess-1", 3000)
+    assert (
+        url
+        == "wss://api.stage2.digitalocean.com/v2/agents/sessions/sess-1/port-forward/3000"
+    )
+    with pytest.raises(ValueError, match="1024"):
+        resources.sessions.port_forward_url("sess-1", 80)

@@ -6,9 +6,6 @@
 
 Hand-written against harness-api's public contract
 (``public/harness.swagger.json`` / OHS). Preserved across ``make generate``.
-
-Does not expose ``GET .../builds/{build_id}/logs`` (signed URL) — omit that
-surface from the client for now.
 """
 
 from __future__ import annotations
@@ -191,5 +188,22 @@ class TemplatesOperations:
             self._send(
                 "GET",
                 f"{_TEMPLATES_PATH}/{_quote(template_id)}/builds/{_quote(build_id)}",
+            ),
+        )
+
+    def get_build_logs(self, template_id: str, build_id: str) -> Any:
+        """Return a short-lived signed URL for archived build logs.
+
+        ``GET /v2/agents/templates/{template_id}/builds/{build_id}/logs``
+
+        Response shape is ``{"signed_url": "..."}`` (≈15-minute Spaces GET URL).
+        """
+        if not template_id or not build_id:
+            raise ValueError("template_id and build_id are required")
+        return self._parse_json(
+            self._send(
+                "GET",
+                f"{_TEMPLATES_PATH}/{_quote(template_id)}/builds/"
+                f"{_quote(build_id)}/logs",
             ),
         )

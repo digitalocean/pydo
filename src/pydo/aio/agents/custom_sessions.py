@@ -11,15 +11,26 @@ import hashlib
 import json as _json
 import os
 import time
-from typing import Any, AsyncIterator, BinaryIO, Dict, List, Optional, Union
+from typing import (
+    Any,
+    AsyncIterator,
+    BinaryIO,
+    Dict,
+    List,
+    Optional,
+    Sequence,
+    Union,
+)
 from urllib.parse import quote
 
 from azure.core.rest import HttpRequest
 
 from pydo.agents.custom_sessions import (
+    FORK_MAX_COUNT,
     _DEFAULT_CREATE_TIMEOUT,
     _DEFAULT_POLL_INTERVAL,
     _DEFAULT_POLL_TIMEOUT,
+    _DEFAULT_REQUEST_TIMEOUT,
     _DOWNLOAD_CHUNK,
     _MAX_TRANSFER_BYTES,
     _OCTET_STREAM,
@@ -31,10 +42,12 @@ from pydo.agents.custom_sessions import (
     UploadData,
     WorkspaceTransferError,
     _coerce_upload_content,
+    _encode_source_raw,
     _field,
     _http_get_iter,
     _http_put_bytes,
     _manifest_bytes,
+    _port_forward_ws_url,
     _raise_agents_http_error,
     _strip_tenant_fields,
     _unwrap_harness_sse_chunk,
@@ -295,6 +308,202 @@ class AsyncSessionsOperations:
         return await self._parse_json(
             await self._send("POST", f"{_BASE_PATH}/{_quote(session_id)}/resume"),
         )
+
+    async def update(
+        self,
+        session_id: str,
+        *,
+        resume_on_topoff: Optional[bool] = None,
+    ) -> Any:
+        """Patch session-scoped settings (``PATCH .../sessions/{session_id}``)."""
+        body: Dict[str, Any] = {}
+        if resume_on_topoff is not None:
+            body["resume_on_topoff"] = bool(resume_on_topoff)
+        if not body:
+            raise ValueError("update must set at least one field")
+        return await self._parse_json(
+            await self._send(
+                "PATCH",
+                f"{_BASE_PATH}/{_quote(session_id)}",
+                body=body,
+            ),
+        )
+
+    async def validate_policy(self, manifest: Union[str, bytes]) -> Any:
+        """Validate a manifest's tool-permission policy without creating a session."""
+        data = _manifest_bytes(manifest)
+        if not data.strip():
+            raise ValueError("manifest is required")
+        return await self._parse_json(
+            await self._send(
+                "POST",
+                f"{_BASE_PATH}/policy/validate",
+                content=data,
+                content_type=_YAML_MEDIA_TYPE,
+            ),
+        )
+
+    async def list_sandbox_sizes(self) -> Any:
+        """List customer-selectable sandbox sizes."""
+        return await self._parse_json(
+            await self._send("GET", f"{_BASE_PATH}/sandbox/sizes"),
+        )
+
+    async def exec_in_sandbox(
+        self,
+        session_id: str,
+        *,
+        argv: Sequence[str],
+        workdir: Optional[str] = None,
+        timeout_seconds: Optional[int] = None,
+        timeout: Optional[float] = None,
+    ) -> Any:
+        """Run a command in the session sandbox."""
+        if not argv:
+            raise ValueError("argv is required")
+        body: Dict[str, Any] = {"argv": [str(a) for a in argv]}
+        if workdir is not None:
+            body["workdir"] = workdir
+        if timeout_seconds is not None:
+            body["timeout_seconds"] = int(timeout_seconds)
+        return await self._parse_json(
+            await self._send(
+                "POST",
+                f"{_BASE_PATH}/{_quote(session_id)}/sandbox/exec",
+                body=body,
+                timeout=(
+                    _DEFAULT_REQUEST_TIMEOUT if timeout is None else float(timeout)
+                ),
+            ),
+        )
+
+    async def relay_request(
+        self,
+        session_id: str,
+        *,
+        source_raw: Union[bytes, bytearray, memoryview, str],
+        timeout: Optional[float] = None,
+    ) -> Any:
+        """Forward one native agent-protocol frame (``POST .../request``)."""
+        body = {"source_raw": _encode_source_raw(source_raw)}
+        return await self._parse_json(
+            await self._send(
+                "POST",
+                f"{_BASE_PATH}/{_quote(session_id)}/request",
+                body=body,
+                timeout=(
+                    _DEFAULT_REQUEST_TIMEOUT if timeout is None else float(timeout)
+                ),
+            ),
+        )
+
+    async def create_checkpoint(
+        self,
+        session_id: str,
+        *,
+        label: Optional[str] = None,
+        timeout: Optional[float] = None,
+    ) -> Any:
+        """Capture a session checkpoint."""
+        body: Dict[str, Any] = {}
+        if label is not None:
+            body["label"] = label
+        return await self._parse_json(
+            await self._send(
+                "POST",
+                f"{_BASE_PATH}/{_quote(session_id)}/checkpoints",
+                body=body,
+                timeout=(
+                    _DEFAULT_CREATE_TIMEOUT if timeout is None else float(timeout)
+                ),
+            ),
+        )
+
+    async def list_checkpoints(
+        self,
+        session_id: str,
+        *,
+        page_token: Optional[str] = None,
+        page_size: Optional[int] = None,
+    ) -> Any:
+        """List checkpoints for a session, newest first."""
+        return await self._parse_json(
+            await self._send(
+                "GET",
+                f"{_BASE_PATH}/{_quote(session_id)}/checkpoints",
+                params={
+                    "page_token": page_token,
+                    "page_size": page_size,
+                },
+            ),
+        )
+
+    async def get_checkpoint(self, session_id: str, checkpoint_id: str) -> Any:
+        """Get one checkpoint by id."""
+        if not checkpoint_id:
+            raise ValueError("checkpoint_id is required")
+        return await self._parse_json(
+            await self._send(
+                "GET",
+                f"{_BASE_PATH}/{_quote(session_id)}/checkpoints/{_quote(checkpoint_id)}",
+            ),
+        )
+
+    async def delete_checkpoint(self, session_id: str, checkpoint_id: str) -> Any:
+        """Delete a checkpoint (idempotent)."""
+        if not checkpoint_id:
+            raise ValueError("checkpoint_id is required")
+        return await self._parse_json(
+            await self._send(
+                "DELETE",
+                f"{_BASE_PATH}/{_quote(session_id)}/checkpoints/{_quote(checkpoint_id)}",
+            ),
+        )
+
+    async def rollback_to_checkpoint(self, session_id: str, checkpoint_id: str) -> Any:
+        """Rewind the session in place to a checkpoint."""
+        if not checkpoint_id:
+            raise ValueError("checkpoint_id is required")
+        return await self._parse_json(
+            await self._send(
+                "POST",
+                f"{_BASE_PATH}/{_quote(session_id)}/checkpoints/"
+                f"{_quote(checkpoint_id)}/rollback",
+                body={},
+                timeout=_DEFAULT_CREATE_TIMEOUT,
+            ),
+        )
+
+    async def fork(
+        self,
+        session_id: str,
+        *,
+        from_checkpoint_id: Optional[str] = None,
+        count: int = 1,
+        timeout: Optional[float] = None,
+    ) -> Any:
+        """Fork child sessions from a checkpoint (or from "now")."""
+        if count < 1 or count > FORK_MAX_COUNT:
+            raise ValueError(
+                f"fork count must be between 1 and {FORK_MAX_COUNT} (got {count})"
+            )
+        body: Dict[str, Any] = {"count": int(count)}
+        if from_checkpoint_id:
+            body["from_checkpoint_id"] = from_checkpoint_id
+        return await self._parse_json(
+            await self._send(
+                "POST",
+                f"{_BASE_PATH}/{_quote(session_id)}/fork",
+                body=body,
+                timeout=(
+                    _DEFAULT_CREATE_TIMEOUT if timeout is None else float(timeout)
+                ),
+            ),
+        )
+
+    def port_forward_url(self, session_id: str, remote_port: int) -> str:
+        """Return the WebSocket URL for ``port-forward`` to a guest port."""
+        return _port_forward_ws_url(self._client._base_url, session_id, remote_port)
 
     async def send_input(self, session_id: str, *, text: str) -> Any:
         return await self._parse_json(

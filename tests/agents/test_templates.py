@@ -224,11 +224,18 @@ def test_get_build():
     assert resp.build.error == "boom"
 
 
-def test_no_build_logs_method():
-    """Build-logs signed-URL endpoint is intentionally not exposed."""
-    resources = _make_resources([])
-    assert not hasattr(resources.templates, "get_build_logs")
-    assert not hasattr(resources.templates, "get_logs")
+def test_get_build_logs():
+    body = {"signed_url": "https://spaces.example/logs?sig=abc"}
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    resp = resources.templates.get_build_logs("tmpl-1", "bld-1")
+
+    call = _last_call(resources)
+    assert call.request.method == "GET"
+    assert _path(call.request.url).endswith(
+        "/v2/agents/templates/tmpl-1/builds/bld-1/logs"
+    )
+    assert resp.signed_url.endswith("sig=abc")
 
 
 def test_get_template_not_found_raises():

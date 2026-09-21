@@ -12,6 +12,8 @@ from pydo.custom_extensions import _BaseURLProxy
 
 from .custom_models import (
     AgentKind,
+    CheckpointKind,
+    CheckpointStatus,
     HITLActionKind,
     HITLOutcome,
     OAuthProvider,
@@ -31,6 +33,7 @@ from .custom_models import (
     WebhookProviderKey,
 )
 from .custom_sessions import (
+    FORK_MAX_COUNT,
     HarnessEventStream,
     HarnessStreamError,
     HistoryPage,
@@ -322,6 +325,9 @@ __all__ = [
     "WebhookProviderKey",
     "TriggerExecutionStatus",
     "SignatureScheme",
+    "CheckpointStatus",
+    "CheckpointKind",
     "TemplateStatus",
     "TemplateBuildStatus",
+    "FORK_MAX_COUNT",
 ]

@@ -169,6 +169,26 @@ class SignatureScheme:
 
 
 # ---------------------------------------------------------------------------
+# Checkpoints (OHS / harness-api)
+# ---------------------------------------------------------------------------
+
+
+class CheckpointStatus:
+    """Lifecycle status of a session checkpoint."""
+
+    PENDING = "PENDING"
+    READY = "READY"
+    FAILED = "FAILED"
+
+
+class CheckpointKind:
+    """User-requested vs automatic checkpoints."""
+
+    EXPLICIT = "explicit"
+    IMPLICIT = "implicit"
+
+
+# ---------------------------------------------------------------------------
 # Sandbox templates (OHS / harness-api)
 # ---------------------------------------------------------------------------
 
@@ -210,6 +230,8 @@ __all__ = [
     "WebhookProviderKey",
     "TriggerExecutionStatus",
     "SignatureScheme",
+    "CheckpointStatus",
+    "CheckpointKind",
     "TemplateStatus",
     "TemplateBuildStatus",
 ]

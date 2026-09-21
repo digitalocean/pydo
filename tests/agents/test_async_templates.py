@@ -123,6 +123,10 @@ async def test_async_templates_crud_and_builds():
                     }
                 },
             ),
+            _FakeAsyncResponse(
+                200,
+                {"signed_url": "https://spaces.example/logs?sig=xyz"},
+            ),
         ]
     )
 
@@ -152,14 +156,17 @@ async def test_async_templates_crud_and_builds():
     build = await resources.templates.get_build("tmpl-2", "bld-1")
     assert build.build.build_id == "bld-1"
 
+    logs = await resources.templates.get_build_logs("tmpl-2", "bld-1")
+    assert logs.signed_url.endswith("sig=xyz")
+
     pipeline = resources._proxy._original._pipeline
     methods = [c.request.method for c in pipeline.calls]
     paths = [_path(c.request.url) for c in pipeline.calls]
-    assert methods == ["GET", "POST", "PUT", "DELETE", "GET", "GET"]
+    assert methods == ["GET", "POST", "PUT", "DELETE", "GET", "GET", "GET"]
     assert paths[0].endswith("/v2/agents/templates")
     assert paths[1].endswith("/v2/agents/templates")
     assert paths[2].endswith("/v2/agents/templates/tmpl-2")
     assert paths[3].endswith("/v2/agents/templates/tmpl-2")
     assert paths[4].endswith("/v2/agents/templates/tmpl-2/builds")
     assert paths[5].endswith("/v2/agents/templates/tmpl-2/builds/bld-1")
-    assert not hasattr(resources.templates, "get_build_logs")
+    assert paths[6].endswith("/v2/agents/templates/tmpl-2/builds/bld-1/logs")

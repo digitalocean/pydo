@@ -22,10 +22,7 @@ def _quote(value: str) -> str:
 
 
 class AsyncTemplatesOperations:
-    """Async twin of :class:`~pydo.agents.custom_templates.TemplatesOperations`.
-
-    Does not expose ``GET .../builds/{build_id}/logs``.
-    """
+    """Async twin of :class:`~pydo.agents.custom_templates.TemplatesOperations`."""
 
     def __init__(self, base_url_proxy):
         self._client = base_url_proxy
@@ -143,5 +140,17 @@ class AsyncTemplatesOperations:
             await self._send(
                 "GET",
                 f"{_TEMPLATES_PATH}/{_quote(template_id)}/builds/{_quote(build_id)}",
+            ),
+        )
+
+    async def get_build_logs(self, template_id: str, build_id: str) -> Any:
+        """Return a short-lived signed URL for archived build logs."""
+        if not template_id or not build_id:
+            raise ValueError("template_id and build_id are required")
+        return await self._parse_json(
+            await self._send(
+                "GET",
+                f"{_TEMPLATES_PATH}/{_quote(template_id)}/builds/"
+                f"{_quote(build_id)}/logs",
             ),
         )
