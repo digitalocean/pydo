@@ -13,6 +13,8 @@ from ._operations import AppsOperations
 from ._operations import CdnOperations
 from ._operations import CertificatesOperations
 from ._operations import BalanceOperations
+from ._operations import PrepaymentConfigOperations
+from ._operations import PrepaymentStatusOperations
 from ._operations import BillingHistoryOperations
 from ._operations import InvoicesOperations
 from ._operations import BillingInsightsOperations
@@ -73,6 +75,8 @@ __all__ = [
     "CdnOperations",
     "CertificatesOperations",
     "BalanceOperations",
+    "PrepaymentConfigOperations",
+    "PrepaymentStatusOperations",
     "BillingHistoryOperations",
     "InvoicesOperations",
     "BillingInsightsOperations",

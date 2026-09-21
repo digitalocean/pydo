@@ -46,6 +46,8 @@ from .operations import (
     OneClicksOperations,
     OrganizationsOperations,
     PartnerAttachmentsOperations,
+    PrepaymentConfigOperations,
+    PrepaymentStatusOperations,
     ProjectsOperations,
     RegionsOperations,
     RegistriesOperations,
@@ -96,6 +98,10 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype certificates: pydo.aio.operations.CertificatesOperations
     :ivar balance: BalanceOperations operations
     :vartype balance: pydo.aio.operations.BalanceOperations
+    :ivar prepayment_config: PrepaymentConfigOperations operations
+    :vartype prepayment_config: pydo.aio.operations.PrepaymentConfigOperations
+    :ivar prepayment_status: PrepaymentStatusOperations operations
+    :vartype prepayment_status: pydo.aio.operations.PrepaymentStatusOperations
     :ivar billing_history: BillingHistoryOperations operations
     :vartype billing_history: pydo.aio.operations.BillingHistoryOperations
     :ivar invoices: InvoicesOperations operations
@@ -253,6 +259,12 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.balance = BalanceOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.prepayment_config = PrepaymentConfigOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.prepayment_status = PrepaymentStatusOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.billing_history = BillingHistoryOperations(
