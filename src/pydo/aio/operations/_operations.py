@@ -113,11 +113,6 @@ from ...operations._operations import (
     build_certificates_delete_request,
     build_certificates_get_request,
     build_certificates_list_request,
-    build_connections_create_request,
-    build_connections_delete_request,
-    build_connections_get_request,
-    build_connections_list_request,
-    build_connections_update_request,
     build_databases_add_connection_pool_request,
     build_databases_add_request,
     build_databases_add_user_request,
@@ -271,9 +266,11 @@ from ...operations._operations import (
     build_genai_create_anthropic_api_key_request,
     build_genai_create_custom_evaluation_metric_request,
     build_genai_create_data_source_file_upload_presigned_urls_request,
+    build_genai_create_duplicate_scenario_set_request,
     build_genai_create_evaluation_dataset_file_upload_presigned_urls_request,
     build_genai_create_evaluation_dataset_request,
     build_genai_create_evaluation_test_case_request,
+    build_genai_create_generated_scenario_set_request,
     build_genai_create_indexing_job_request,
     build_genai_create_knowledge_base_data_source_request,
     build_genai_create_knowledge_base_request,
@@ -283,7 +280,11 @@ from ...operations._operations import (
     build_genai_create_model_router_request,
     build_genai_create_oauth2_dropbox_tokens_request,
     build_genai_create_openai_api_key_request,
+    build_genai_create_scenario_set_from_library_request,
+    build_genai_create_scenario_set_request,
+    build_genai_create_scenario_set_upload_presigned_urls_request,
     build_genai_create_scheduled_indexing_request,
+    build_genai_create_simulation_run_request,
     build_genai_create_workspace_request,
     build_genai_delete_agent_api_key_request,
     build_genai_delete_agent_request,
@@ -298,7 +299,9 @@ from ...operations._operations import (
     build_genai_delete_model_evaluation_run_request,
     build_genai_delete_model_router_request,
     build_genai_delete_openai_api_key_request,
+    build_genai_delete_scenario_set_request,
     build_genai_delete_scheduled_indexing_request,
+    build_genai_delete_simulation_run_request,
     build_genai_delete_workspace_request,
     build_genai_detach_agent_function_request,
     build_genai_detach_agent_guardrail_request,
@@ -324,7 +327,13 @@ from ...operations._operations import (
     build_genai_get_model_router_request,
     build_genai_get_oauth2_url_request,
     build_genai_get_openai_api_key_request,
+    build_genai_get_scenario_set_download_url_request,
+    build_genai_get_scenario_set_request,
     build_genai_get_scheduled_indexing_request,
+    build_genai_get_simulation_journey_request,
+    build_genai_get_simulation_journey_trajectory_request,
+    build_genai_get_simulation_journey_trajectory_url_request,
+    build_genai_get_simulation_run_request,
     build_genai_get_workspace_request,
     build_genai_import_custom_model_request,
     build_genai_list_agent_api_keys_request,
@@ -356,7 +365,14 @@ from ...operations._operations import (
     build_genai_list_model_routers_request,
     build_genai_list_models_request,
     build_genai_list_openai_api_keys_request,
+    build_genai_list_scenario_library_request,
+    build_genai_list_scenario_library_scenarios_request,
+    build_genai_list_scenario_sets_request,
+    build_genai_list_scenarios_request,
+    build_genai_list_simulation_journeys_request,
+    build_genai_list_simulation_runs_request,
     build_genai_list_workspaces_request,
+    build_genai_patch_cancel_simulation_run_request,
     build_genai_regenerate_agent_api_key_request,
     build_genai_regenerate_model_api_key_request,
     build_genai_rollback_to_agent_version_request,
@@ -377,6 +393,8 @@ from ...operations._operations import (
     build_genai_update_model_evaluation_run_request,
     build_genai_update_model_router_request,
     build_genai_update_openai_api_key_request,
+    build_genai_update_scenario_set_request,
+    build_genai_update_simulation_run_request,
     build_genai_update_workspace_request,
     build_image_actions_get_request,
     build_image_actions_list_request,
@@ -544,6 +562,8 @@ from ...operations._operations import (
     build_partner_attachments_list_remote_routes_request,
     build_partner_attachments_list_request,
     build_partner_attachments_patch_request,
+    build_prepayment_config_get_request,
+    build_prepayment_status_get_request,
     build_projects_assign_resources_default_request,
     build_projects_assign_resources_request,
     build_projects_create_request,
@@ -617,9 +637,6 @@ from ...operations._operations import (
     build_security_list_scans_request,
     build_security_list_settings_request,
     build_security_update_settings_plan_request,
-    build_sessions_create_request,
-    build_sessions_delete_request,
-    build_sessions_list_request,
     build_sizes_list_request,
     build_snapshots_delete_request,
     build_snapshots_get_request,
@@ -641,16 +658,6 @@ from ...operations._operations import (
     build_tags_get_request,
     build_tags_list_request,
     build_tags_unassign_resources_request,
-    build_toolbelts_add_tools_request,
-    build_toolbelts_create_request,
-    build_toolbelts_delete_request,
-    build_toolbelts_delete_tools_request,
-    build_toolbelts_get_request,
-    build_toolbelts_list_request,
-    build_tools_get_definition_request,
-    build_tools_list_providers_request,
-    build_tools_list_request,
-    build_tools_list_toolkits_request,
     build_uptime_create_alert_request,
     build_uptime_create_check_request,
     build_uptime_delete_alert_request,
@@ -662,8 +669,6 @@ from ...operations._operations import (
     build_uptime_list_checks_request,
     build_uptime_update_alert_request,
     build_uptime_update_check_request,
-    build_users_get_request,
-    build_users_list_request,
     build_vector_databases_create_request,
     build_vector_databases_delete_request,
     build_vector_databases_get_credentials_request,
@@ -719,4615 +724,6 @@ T = TypeVar("T")
 ClsType = Optional[
     Callable[[PipelineResponse[HttpRequest, AsyncHttpResponse], T, Dict[str, Any]], Any]
 ]
-
-
-class ToolsOperations:
-    """
-    .. warning::
-        **DO NOT** instantiate this class directly.
-
-        Instead, you should access the following operations through
-        :class:`~pydo.aio.GeneratedClient`'s
-        :attr:`tools` attribute.
-    """
-
-    def __init__(self, *args, **kwargs) -> None:
-        input_args = list(args)
-        self._client = input_args.pop(0) if input_args else kwargs.pop("client")
-        self._config = input_args.pop(0) if input_args else kwargs.pop("config")
-        self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
-        self._deserialize = (
-            input_args.pop(0) if input_args else kwargs.pop("deserializer")
-        )
-
-    @distributed_trace_async
-    async def list(
-        self,
-        *,
-        toolkit_id: Optional[str] = None,
-        page: int = 1,
-        per_page: int = 20,
-        **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """List Tools.
-
-        Lists active Action Gateway tools visible to the authenticated team.
-
-        :keyword toolkit_id: Filter tools by toolkit identifier. Default value is None.
-        :paramtype toolkit_id: str
-        :keyword page: Which 'page' of paginated results to return. Default value is 1.
-        :paramtype page: int
-        :keyword per_page: Number of items returned per page. Default value is 20.
-        :paramtype per_page: int
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "definitions": [
-                        {
-                            "annotations": {
-                                "destructiveHint": bool,  # Optional.
-                                "idempotentHint": bool,  # Optional.
-                                "openWorldHint": bool,  # Optional.
-                                "readOnlyHint": bool,  # Optional.
-                                "title": "str"  # Optional.
-                            },
-                            "auth": {
-                                "baseUrlResolution": {
-                                    "httpLookup": {
-                                        "baseUrlTemplate": "str",  #
-                                          Optional. HTTPLookupSpec resolves a base_url by calling url
-                                          (bearer-authenticated with the just-exchanged access token),
-                                          selecting an entry in the JSON array, extracting
-                                          extract_field from that entry, and substituting it for
-                                          "{value}" in base_url_template. When match_field and
-                                          match_value are both set, they select the entry. When both
-                                          are empty, exactly one entry whose own "scopes" array
-                                          contains required_scopes must exist. Configuring only one
-                                          match field is invalid. Resolution fails fast on zero or
-                                          multiple compatible entries.
-                                        "caseInsensitive": bool,  # Optional.
-                                          HTTPLookupSpec resolves a base_url by calling url
-                                          (bearer-authenticated with the just-exchanged access token),
-                                          selecting an entry in the JSON array, extracting
-                                          extract_field from that entry, and substituting it for
-                                          "{value}" in base_url_template. When match_field and
-                                          match_value are both set, they select the entry. When both
-                                          are empty, exactly one entry whose own "scopes" array
-                                          contains required_scopes must exist. Configuring only one
-                                          match field is invalid. Resolution fails fast on zero or
-                                          multiple compatible entries.
-                                        "extractField": "str",  # Optional.
-                                          HTTPLookupSpec resolves a base_url by calling url
-                                          (bearer-authenticated with the just-exchanged access token),
-                                          selecting an entry in the JSON array, extracting
-                                          extract_field from that entry, and substituting it for
-                                          "{value}" in base_url_template. When match_field and
-                                          match_value are both set, they select the entry. When both
-                                          are empty, exactly one entry whose own "scopes" array
-                                          contains required_scopes must exist. Configuring only one
-                                          match field is invalid. Resolution fails fast on zero or
-                                          multiple compatible entries.
-                                        "matchField": "str",  # Optional.
-                                          HTTPLookupSpec resolves a base_url by calling url
-                                          (bearer-authenticated with the just-exchanged access token),
-                                          selecting an entry in the JSON array, extracting
-                                          extract_field from that entry, and substituting it for
-                                          "{value}" in base_url_template. When match_field and
-                                          match_value are both set, they select the entry. When both
-                                          are empty, exactly one entry whose own "scopes" array
-                                          contains required_scopes must exist. Configuring only one
-                                          match field is invalid. Resolution fails fast on zero or
-                                          multiple compatible entries.
-                                        "matchValue": "str",  # Optional.
-                                          HTTPLookupSpec resolves a base_url by calling url
-                                          (bearer-authenticated with the just-exchanged access token),
-                                          selecting an entry in the JSON array, extracting
-                                          extract_field from that entry, and substituting it for
-                                          "{value}" in base_url_template. When match_field and
-                                          match_value are both set, they select the entry. When both
-                                          are empty, exactly one entry whose own "scopes" array
-                                          contains required_scopes must exist. Configuring only one
-                                          match field is invalid. Resolution fails fast on zero or
-                                          multiple compatible entries.
-                                        "match_value_parameter": "str",  #
-                                          Optional. HTTPLookupSpec resolves a base_url by calling url
-                                          (bearer-authenticated with the just-exchanged access token),
-                                          selecting an entry in the JSON array, extracting
-                                          extract_field from that entry, and substituting it for
-                                          "{value}" in base_url_template. When match_field and
-                                          match_value are both set, they select the entry. When both
-                                          are empty, exactly one entry whose own "scopes" array
-                                          contains required_scopes must exist. Configuring only one
-                                          match field is invalid. Resolution fails fast on zero or
-                                          multiple compatible entries.
-                                        "method": "str",  # Optional.
-                                          HTTPLookupSpec resolves a base_url by calling url
-                                          (bearer-authenticated with the just-exchanged access token),
-                                          selecting an entry in the JSON array, extracting
-                                          extract_field from that entry, and substituting it for
-                                          "{value}" in base_url_template. When match_field and
-                                          match_value are both set, they select the entry. When both
-                                          are empty, exactly one entry whose own "scopes" array
-                                          contains required_scopes must exist. Configuring only one
-                                          match field is invalid. Resolution fails fast on zero or
-                                          multiple compatible entries.
-                                        "requiredScopes": [
-                                            "str"  # Optional.
-                                              HTTPLookupSpec resolves a base_url by calling url
-                                              (bearer-authenticated with the just-exchanged access
-                                              token), selecting an entry in the JSON array, extracting
-                                              extract_field from that entry, and substituting it for
-                                              "{value}" in base_url_template. When match_field and
-                                              match_value are both set, they select the entry. When
-                                              both are empty, exactly one entry whose own "scopes"
-                                              array contains required_scopes must exist. Configuring
-                                              only one match field is invalid. Resolution fails fast on
-                                              zero or multiple compatible entries.
-                                        ],
-                                        "trimTrailingSlash": bool,  #
-                                          Optional. HTTPLookupSpec resolves a base_url by calling url
-                                          (bearer-authenticated with the just-exchanged access token),
-                                          selecting an entry in the JSON array, extracting
-                                          extract_field from that entry, and substituting it for
-                                          "{value}" in base_url_template. When match_field and
-                                          match_value are both set, they select the entry. When both
-                                          are empty, exactly one entry whose own "scopes" array
-                                          contains required_scopes must exist. Configuring only one
-                                          match field is invalid. Resolution fails fast on zero or
-                                          multiple compatible entries.
-                                        "url": "str"  # Optional.
-                                          HTTPLookupSpec resolves a base_url by calling url
-                                          (bearer-authenticated with the just-exchanged access token),
-                                          selecting an entry in the JSON array, extracting
-                                          extract_field from that entry, and substituting it for
-                                          "{value}" in base_url_template. When match_field and
-                                          match_value are both set, they select the entry. When both
-                                          are empty, exactly one entry whose own "scopes" array
-                                          contains required_scopes must exist. Configuring only one
-                                          match field is invalid. Resolution fails fast on zero or
-                                          multiple compatible entries.
-                                    }
-                                },
-                                "credentialBinding": "str",  # Optional.
-                                "credentialRefSource": "str",  # Optional.
-                                "doManagedCredentialRef": "str",  # Optional.
-                                "injection": {
-                                    "location": "str",  # Optional.
-                                    "name": "str",  # Optional.
-                                    "scheme": "str"  # Optional.
-                                },
-                                "modes": [
-                                    "str"  # Optional.
-                                ],
-                                "provider": "str",  # Optional.
-                                "scopes": [
-                                    "str"  # Optional.
-                                ]
-                            },
-                            "classification": {
-                                "dataClasses": [
-                                    "str"  # Optional.
-                                ],
-                                "operation": "str",  # Optional.
-                                "risk": "str"  # Optional.
-                            },
-                            "description": "str",  # Optional.
-                            "execution": {
-                                "adapterVersion": "str",  # Optional.
-                                "configRef": "str",  # Optional.
-                                "http": {
-                                    "allowedHosts": [
-                                        "str"  # Optional.
-                                    ],
-                                    "baseUrl": "str",  # Optional.
-                                    "method": "str",  # Optional.
-                                    "path": "str",  # Optional.
-                                    "requestEncoding": "str",  # Optional.
-                                    "responseFormat": "str"  # Optional.
-                                },
-                                "mcp": {
-                                    "allowedHosts": [
-                                        "str"  # Optional. MCPExecution
-                                          describes how to invoke a tool that is fronted by a remote
-                                          MCP server (as opposed to a plain HTTP endpoint). endpoint is
-                                          the remote MCP server's URL, tool_name is the name the remote
-                                          server expects on tools/call (may differ from this tool's
-                                          registry name), transport selects the wire protocol
-                                          ("streamable_http" is the only kind implemented today), and
-                                          server_ref is an opaque label identifying the remote server
-                                          for logging/metrics/allowlisting.
-                                    ],
-                                    "endpoint": "str",  # Optional. MCPExecution
-                                      describes how to invoke a tool that is fronted by a remote MCP
-                                      server (as opposed to a plain HTTP endpoint). endpoint is the
-                                      remote MCP server's URL, tool_name is the name the remote server
-                                      expects on tools/call (may differ from this tool's registry
-                                      name), transport selects the wire protocol ("streamable_http" is
-                                      the only kind implemented today), and server_ref is an opaque
-                                      label identifying the remote server for
-                                      logging/metrics/allowlisting.
-                                    "serverRef": "str",  # Optional. MCPExecution
-                                      describes how to invoke a tool that is fronted by a remote MCP
-                                      server (as opposed to a plain HTTP endpoint). endpoint is the
-                                      remote MCP server's URL, tool_name is the name the remote server
-                                      expects on tools/call (may differ from this tool's registry
-                                      name), transport selects the wire protocol ("streamable_http" is
-                                      the only kind implemented today), and server_ref is an opaque
-                                      label identifying the remote server for
-                                      logging/metrics/allowlisting.
-                                    "toolName": "str",  # Optional. MCPExecution
-                                      describes how to invoke a tool that is fronted by a remote MCP
-                                      server (as opposed to a plain HTTP endpoint). endpoint is the
-                                      remote MCP server's URL, tool_name is the name the remote server
-                                      expects on tools/call (may differ from this tool's registry
-                                      name), transport selects the wire protocol ("streamable_http" is
-                                      the only kind implemented today), and server_ref is an opaque
-                                      label identifying the remote server for
-                                      logging/metrics/allowlisting.
-                                    "transport": "str"  # Optional. MCPExecution
-                                      describes how to invoke a tool that is fronted by a remote MCP
-                                      server (as opposed to a plain HTTP endpoint). endpoint is the
-                                      remote MCP server's URL, tool_name is the name the remote server
-                                      expects on tools/call (may differ from this tool's registry
-                                      name), transport selects the wire protocol ("streamable_http" is
-                                      the only kind implemented today), and server_ref is an opaque
-                                      label identifying the remote server for
-                                      logging/metrics/allowlisting.
-                                },
-                                "type": "str"  # Optional.
-                            },
-                            "flipperName": "str",  # Optional.
-                            "hooks": {
-                                "usage": {
-                                    "billable": bool,  # Optional. When usage
-                                      metadata is present, false prevents billing. Omitting usage
-                                      metadata leaves consumers' legacy billing classification
-                                      unchanged.
-                                    "meters": [
-                                        {
-                                            "quantitySource": "str",  #
-                                              Optional.
-                                            "sku": "str",  # Optional.
-                                            "unit": "str"  # Optional.
-                                        }
-                                    ]
-                                }
-                            },
-                            "inputSchema": {},  # Optional. Any object.
-                            "name": "str",  # Optional.
-                            "outputSchema": {},  # Optional. Any object.
-                            "parallelizable": bool,  # Optional.
-                            "policy": {
-                                "permission": "str"  # Optional.
-                            },
-                            "reliability": {
-                                "maxOutputBytes": "str",  # Optional.
-                                "retry": {
-                                    "backoff": "str",  # Optional.
-                                    "maxAttempts": 0,  # Optional.
-                                    "retryOn": [
-                                        "str"  # Optional.
-                                    ]
-                                },
-                                "timeoutMs": 0  # Optional.
-                            },
-                            "schemaVersion": "str",  # Optional.
-                            "status": "str",  # Optional.
-                            "streamingSafe": bool,  # Optional.
-                            "tags": [
-                                "str"  # Optional.
-                            ],
-                            "title": "str",  # Optional.
-                            "toolId": "str",  # Optional.
-                            "toolSlug": "str",  # Optional. tool_slug is the
-                              provider-qualified, stable tool identifier
-                              ":code:`<toolkit_id>`_:code:`<name>`". Pass this value back verbatim to
-                              the toolbelt add/remove endpoints; clients should treat it as opaque.
-                            "toolkitId": "str",  # Optional.
-                            "transform": {
-                                "input": {},  # Optional. Any object.
-                                "language": "str",  # Optional.
-                                "output": {}  # Optional. Any object.
-                            },
-                            "version": "str"  # Optional.
-                        }
-                    ],
-                    "pagination": {
-                        "page": 0,  # Required.
-                        "per_page": 0,  # Required.
-                        "total": 0  # Required.
-                    },
-                    "tools": [
-                        {
-                            "annotations": {
-                                "destructiveHint": bool,  # Optional.
-                                "idempotentHint": bool,  # Optional.
-                                "openWorldHint": bool,  # Optional.
-                                "readOnlyHint": bool,  # Optional.
-                                "title": "str"  # Optional.
-                            },
-                            "description": "str",  # Optional.
-                            "inputSchema": {},  # Optional. Any object.
-                            "name": "str",  # Optional.
-                            "outputSchema": {},  # Optional. Any object.
-                            "parallelizable": bool,  # Optional.
-                            "streamingSafe": bool,  # Optional.
-                            "title": "str",  # Optional.
-                            "toolSlug": "str",  # Optional. tool_slug is the
-                              provider-qualified, stable tool identifier
-                              ":code:`<toolkit_id>`_:code:`<name>`". Pass this value back verbatim to
-                              the toolbelt add/remove endpoints; clients should treat it as opaque
-                              rather than reconstructing it from toolkit_id and name.
-                            "toolkitId": "str",  # Optional.
-                            "version": "str"  # Optional.
-                        }
-                    ],
-                    "version": "str"  # Optional.
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = kwargs.pop("headers", {}) or {}
-        _params = kwargs.pop("params", {}) or {}
-
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        _request = build_tools_list_request(
-            toolkit_id=toolkit_id,
-            page=page,
-            per_page=per_page,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            await self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200]:
-            if _stream:
-                await response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        response_headers["ratelimit-limit"] = self._deserialize(
-            "int", response.headers.get("ratelimit-limit")
-        )
-        response_headers["ratelimit-remaining"] = self._deserialize(
-            "int", response.headers.get("ratelimit-remaining")
-        )
-        response_headers["ratelimit-reset"] = self._deserialize(
-            "int", response.headers.get("ratelimit-reset")
-        )
-
-        if response.content:
-            deserialized = response.json()
-        else:
-            deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-    @distributed_trace_async
-    async def list_toolkits(self, **kwargs: Any) -> JSON:
-        """List Toolkits.
-
-        Lists the toolkits that group Action Gateway tools.
-
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "toolkits": [
-                        {
-                            "description": "str",  # Optional.
-                            "id": "str",  # Optional.
-                            "name": "str"  # Optional.
-                        }
-                    ],
-                    "version": "str"  # Optional.
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = kwargs.pop("headers", {}) or {}
-        _params = kwargs.pop("params", {}) or {}
-
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        _request = build_tools_list_toolkits_request(
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            await self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200]:
-            if _stream:
-                await response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        response_headers["ratelimit-limit"] = self._deserialize(
-            "int", response.headers.get("ratelimit-limit")
-        )
-        response_headers["ratelimit-remaining"] = self._deserialize(
-            "int", response.headers.get("ratelimit-remaining")
-        )
-        response_headers["ratelimit-reset"] = self._deserialize(
-            "int", response.headers.get("ratelimit-reset")
-        )
-
-        if response.content:
-            deserialized = response.json()
-        else:
-            deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-    @distributed_trace_async
-    async def list_providers(self, **kwargs: Any) -> JSON:
-        """List Tool Providers.
-
-        Lists Action Gateway providers and their connection requirements.
-
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "providers": [
-                        {
-                            "auth_type": "str",  # Optional.
-                            "connection_parameters": [
-                                {
-                                    "allowed_host_suffixes": [
-                                        "str"  # Optional.
-                                    ],
-                                    "allowed_values": [
-                                        "str"  # Optional.
-                                    ],
-                                    "description": "str",  # Optional.
-                                    "input_kind": "str",  # Optional.
-                                    "key": "str",  # Optional.
-                                    "label": "str",  # Optional.
-                                    "max_length": 0,  # Optional.
-                                    "normalization": "str",  # Optional.
-                                    "required": bool  # Optional.
-                                }
-                            ],
-                            "description": "str",  # Optional.
-                            "display_name": "str",  # Optional.
-                            "name": "str",  # Optional.
-                            "scopes": [
-                                "str"  # Optional.
-                            ]
-                        }
-                    ]
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = kwargs.pop("headers", {}) or {}
-        _params = kwargs.pop("params", {}) or {}
-
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        _request = build_tools_list_providers_request(
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            await self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200]:
-            if _stream:
-                await response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        response_headers["ratelimit-limit"] = self._deserialize(
-            "int", response.headers.get("ratelimit-limit")
-        )
-        response_headers["ratelimit-remaining"] = self._deserialize(
-            "int", response.headers.get("ratelimit-remaining")
-        )
-        response_headers["ratelimit-reset"] = self._deserialize(
-            "int", response.headers.get("ratelimit-reset")
-        )
-
-        if response.content:
-            deserialized = response.json()
-        else:
-            deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-    @distributed_trace_async
-    async def get_definition(
-        self,
-        name: str,
-        *,
-        version: Optional[str] = None,
-        toolkit_id: Optional[str] = None,
-        **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Retrieve a Tool Definition.
-
-        Retrieves the executable definition for an active Action Gateway tool.
-
-        :param name: The provider-qualified tool name. Required.
-        :type name: str
-        :keyword version: The tool version. Omit to retrieve the current version. Default value is
-         None.
-        :paramtype version: str
-        :keyword toolkit_id: The toolkit identifier used to disambiguate a bare tool name. Default
-         value is None.
-        :paramtype toolkit_id: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "annotations": {
-                        "destructiveHint": bool,  # Optional.
-                        "idempotentHint": bool,  # Optional.
-                        "openWorldHint": bool,  # Optional.
-                        "readOnlyHint": bool,  # Optional.
-                        "title": "str"  # Optional.
-                    },
-                    "auth": {
-                        "baseUrlResolution": {
-                            "httpLookup": {
-                                "baseUrlTemplate": "str",  # Optional. HTTPLookupSpec
-                                  resolves a base_url by calling url (bearer-authenticated with the
-                                  just-exchanged access token), selecting an entry in the JSON array,
-                                  extracting extract_field from that entry, and substituting it for
-                                  "{value}" in base_url_template. When match_field and match_value are
-                                  both set, they select the entry. When both are empty, exactly one
-                                  entry whose own "scopes" array contains required_scopes must exist.
-                                  Configuring only one match field is invalid. Resolution fails fast on
-                                  zero or multiple compatible entries.
-                                "caseInsensitive": bool,  # Optional. HTTPLookupSpec
-                                  resolves a base_url by calling url (bearer-authenticated with the
-                                  just-exchanged access token), selecting an entry in the JSON array,
-                                  extracting extract_field from that entry, and substituting it for
-                                  "{value}" in base_url_template. When match_field and match_value are
-                                  both set, they select the entry. When both are empty, exactly one
-                                  entry whose own "scopes" array contains required_scopes must exist.
-                                  Configuring only one match field is invalid. Resolution fails fast on
-                                  zero or multiple compatible entries.
-                                "extractField": "str",  # Optional. HTTPLookupSpec
-                                  resolves a base_url by calling url (bearer-authenticated with the
-                                  just-exchanged access token), selecting an entry in the JSON array,
-                                  extracting extract_field from that entry, and substituting it for
-                                  "{value}" in base_url_template. When match_field and match_value are
-                                  both set, they select the entry. When both are empty, exactly one
-                                  entry whose own "scopes" array contains required_scopes must exist.
-                                  Configuring only one match field is invalid. Resolution fails fast on
-                                  zero or multiple compatible entries.
-                                "matchField": "str",  # Optional. HTTPLookupSpec
-                                  resolves a base_url by calling url (bearer-authenticated with the
-                                  just-exchanged access token), selecting an entry in the JSON array,
-                                  extracting extract_field from that entry, and substituting it for
-                                  "{value}" in base_url_template. When match_field and match_value are
-                                  both set, they select the entry. When both are empty, exactly one
-                                  entry whose own "scopes" array contains required_scopes must exist.
-                                  Configuring only one match field is invalid. Resolution fails fast on
-                                  zero or multiple compatible entries.
-                                "matchValue": "str",  # Optional. HTTPLookupSpec
-                                  resolves a base_url by calling url (bearer-authenticated with the
-                                  just-exchanged access token), selecting an entry in the JSON array,
-                                  extracting extract_field from that entry, and substituting it for
-                                  "{value}" in base_url_template. When match_field and match_value are
-                                  both set, they select the entry. When both are empty, exactly one
-                                  entry whose own "scopes" array contains required_scopes must exist.
-                                  Configuring only one match field is invalid. Resolution fails fast on
-                                  zero or multiple compatible entries.
-                                "match_value_parameter": "str",  # Optional.
-                                  HTTPLookupSpec resolves a base_url by calling url
-                                  (bearer-authenticated with the just-exchanged access token),
-                                  selecting an entry in the JSON array, extracting extract_field from
-                                  that entry, and substituting it for "{value}" in base_url_template.
-                                  When match_field and match_value are both set, they select the entry.
-                                  When both are empty, exactly one entry whose own "scopes" array
-                                  contains required_scopes must exist. Configuring only one match field
-                                  is invalid. Resolution fails fast on zero or multiple compatible
-                                  entries.
-                                "method": "str",  # Optional. HTTPLookupSpec resolves
-                                  a base_url by calling url (bearer-authenticated with the
-                                  just-exchanged access token), selecting an entry in the JSON array,
-                                  extracting extract_field from that entry, and substituting it for
-                                  "{value}" in base_url_template. When match_field and match_value are
-                                  both set, they select the entry. When both are empty, exactly one
-                                  entry whose own "scopes" array contains required_scopes must exist.
-                                  Configuring only one match field is invalid. Resolution fails fast on
-                                  zero or multiple compatible entries.
-                                "requiredScopes": [
-                                    "str"  # Optional. HTTPLookupSpec resolves a
-                                      base_url by calling url (bearer-authenticated with the
-                                      just-exchanged access token), selecting an entry in the JSON
-                                      array, extracting extract_field from that entry, and substituting
-                                      it for "{value}" in base_url_template. When match_field and
-                                      match_value are both set, they select the entry. When both are
-                                      empty, exactly one entry whose own "scopes" array contains
-                                      required_scopes must exist. Configuring only one match field is
-                                      invalid. Resolution fails fast on zero or multiple compatible
-                                      entries.
-                                ],
-                                "trimTrailingSlash": bool,  # Optional.
-                                  HTTPLookupSpec resolves a base_url by calling url
-                                  (bearer-authenticated with the just-exchanged access token),
-                                  selecting an entry in the JSON array, extracting extract_field from
-                                  that entry, and substituting it for "{value}" in base_url_template.
-                                  When match_field and match_value are both set, they select the entry.
-                                  When both are empty, exactly one entry whose own "scopes" array
-                                  contains required_scopes must exist. Configuring only one match field
-                                  is invalid. Resolution fails fast on zero or multiple compatible
-                                  entries.
-                                "url": "str"  # Optional. HTTPLookupSpec resolves a
-                                  base_url by calling url (bearer-authenticated with the just-exchanged
-                                  access token), selecting an entry in the JSON array, extracting
-                                  extract_field from that entry, and substituting it for "{value}" in
-                                  base_url_template. When match_field and match_value are both set,
-                                  they select the entry. When both are empty, exactly one entry whose
-                                  own "scopes" array contains required_scopes must exist. Configuring
-                                  only one match field is invalid. Resolution fails fast on zero or
-                                  multiple compatible entries.
-                            }
-                        },
-                        "credentialBinding": "str",  # Optional.
-                        "credentialRefSource": "str",  # Optional.
-                        "doManagedCredentialRef": "str",  # Optional.
-                        "injection": {
-                            "location": "str",  # Optional.
-                            "name": "str",  # Optional.
-                            "scheme": "str"  # Optional.
-                        },
-                        "modes": [
-                            "str"  # Optional.
-                        ],
-                        "provider": "str",  # Optional.
-                        "scopes": [
-                            "str"  # Optional.
-                        ]
-                    },
-                    "classification": {
-                        "dataClasses": [
-                            "str"  # Optional.
-                        ],
-                        "operation": "str",  # Optional.
-                        "risk": "str"  # Optional.
-                    },
-                    "description": "str",  # Optional.
-                    "execution": {
-                        "adapterVersion": "str",  # Optional.
-                        "configRef": "str",  # Optional.
-                        "http": {
-                            "allowedHosts": [
-                                "str"  # Optional.
-                            ],
-                            "baseUrl": "str",  # Optional.
-                            "method": "str",  # Optional.
-                            "path": "str",  # Optional.
-                            "requestEncoding": "str",  # Optional.
-                            "responseFormat": "str"  # Optional.
-                        },
-                        "mcp": {
-                            "allowedHosts": [
-                                "str"  # Optional. MCPExecution describes how to
-                                  invoke a tool that is fronted by a remote MCP server (as opposed to a
-                                  plain HTTP endpoint). endpoint is the remote MCP server's URL,
-                                  tool_name is the name the remote server expects on tools/call (may
-                                  differ from this tool's registry name), transport selects the wire
-                                  protocol ("streamable_http" is the only kind implemented today), and
-                                  server_ref is an opaque label identifying the remote server for
-                                  logging/metrics/allowlisting.
-                            ],
-                            "endpoint": "str",  # Optional. MCPExecution describes how to
-                              invoke a tool that is fronted by a remote MCP server (as opposed to a
-                              plain HTTP endpoint). endpoint is the remote MCP server's URL, tool_name
-                              is the name the remote server expects on tools/call (may differ from this
-                              tool's registry name), transport selects the wire protocol
-                              ("streamable_http" is the only kind implemented today), and server_ref is
-                              an opaque label identifying the remote server for
-                              logging/metrics/allowlisting.
-                            "serverRef": "str",  # Optional. MCPExecution describes how
-                              to invoke a tool that is fronted by a remote MCP server (as opposed to a
-                              plain HTTP endpoint). endpoint is the remote MCP server's URL, tool_name
-                              is the name the remote server expects on tools/call (may differ from this
-                              tool's registry name), transport selects the wire protocol
-                              ("streamable_http" is the only kind implemented today), and server_ref is
-                              an opaque label identifying the remote server for
-                              logging/metrics/allowlisting.
-                            "toolName": "str",  # Optional. MCPExecution describes how to
-                              invoke a tool that is fronted by a remote MCP server (as opposed to a
-                              plain HTTP endpoint). endpoint is the remote MCP server's URL, tool_name
-                              is the name the remote server expects on tools/call (may differ from this
-                              tool's registry name), transport selects the wire protocol
-                              ("streamable_http" is the only kind implemented today), and server_ref is
-                              an opaque label identifying the remote server for
-                              logging/metrics/allowlisting.
-                            "transport": "str"  # Optional. MCPExecution describes how to
-                              invoke a tool that is fronted by a remote MCP server (as opposed to a
-                              plain HTTP endpoint). endpoint is the remote MCP server's URL, tool_name
-                              is the name the remote server expects on tools/call (may differ from this
-                              tool's registry name), transport selects the wire protocol
-                              ("streamable_http" is the only kind implemented today), and server_ref is
-                              an opaque label identifying the remote server for
-                              logging/metrics/allowlisting.
-                        },
-                        "type": "str"  # Optional.
-                    },
-                    "flipperName": "str",  # Optional.
-                    "hooks": {
-                        "usage": {
-                            "billable": bool,  # Optional. When usage metadata is
-                              present, false prevents billing. Omitting usage metadata leaves
-                              consumers' legacy billing classification unchanged.
-                            "meters": [
-                                {
-                                    "quantitySource": "str",  # Optional.
-                                    "sku": "str",  # Optional.
-                                    "unit": "str"  # Optional.
-                                }
-                            ]
-                        }
-                    },
-                    "inputSchema": {},  # Optional. Any object.
-                    "name": "str",  # Optional.
-                    "outputSchema": {},  # Optional. Any object.
-                    "parallelizable": bool,  # Optional.
-                    "policy": {
-                        "permission": "str"  # Optional.
-                    },
-                    "reliability": {
-                        "maxOutputBytes": "str",  # Optional.
-                        "retry": {
-                            "backoff": "str",  # Optional.
-                            "maxAttempts": 0,  # Optional.
-                            "retryOn": [
-                                "str"  # Optional.
-                            ]
-                        },
-                        "timeoutMs": 0  # Optional.
-                    },
-                    "schemaVersion": "str",  # Optional.
-                    "status": "str",  # Optional.
-                    "streamingSafe": bool,  # Optional.
-                    "tags": [
-                        "str"  # Optional.
-                    ],
-                    "title": "str",  # Optional.
-                    "toolId": "str",  # Optional.
-                    "toolSlug": "str",  # Optional. tool_slug is the provider-qualified, stable
-                      tool identifier ":code:`<toolkit_id>`_:code:`<name>`". Pass this value back
-                      verbatim to the toolbelt add/remove endpoints; clients should treat it as opaque.
-                    "toolkitId": "str",  # Optional.
-                    "transform": {
-                        "input": {},  # Optional. Any object.
-                        "language": "str",  # Optional.
-                        "output": {}  # Optional. Any object.
-                    },
-                    "version": "str"  # Optional.
-                }
-                # response body for status code(s): 404
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = kwargs.pop("headers", {}) or {}
-        _params = kwargs.pop("params", {}) or {}
-
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        _request = build_tools_get_definition_request(
-            name=name,
-            version=version,
-            toolkit_id=toolkit_id,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            await self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200, 404]:
-            if _stream:
-                await response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        if response.status_code == 200:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 404:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-
-class ToolbeltsOperations:
-    """
-    .. warning::
-        **DO NOT** instantiate this class directly.
-
-        Instead, you should access the following operations through
-        :class:`~pydo.aio.GeneratedClient`'s
-        :attr:`toolbelts` attribute.
-    """
-
-    def __init__(self, *args, **kwargs) -> None:
-        input_args = list(args)
-        self._client = input_args.pop(0) if input_args else kwargs.pop("client")
-        self._config = input_args.pop(0) if input_args else kwargs.pop("config")
-        self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
-        self._deserialize = (
-            input_args.pop(0) if input_args else kwargs.pop("deserializer")
-        )
-
-    @distributed_trace_async
-    async def list(
-        self,
-        *,
-        status: str = "active",
-        page: int = 1,
-        per_page: int = 20,
-        **kwargs: Any
-    ) -> JSON:
-        """List Toolbelts.
-
-        Lists the latest version of each toolbelt owned by the authenticated team.
-
-        :keyword status: Filter toolbelts by status. Known values are: "active", "deprecated", and
-         "all". Default value is "active".
-        :paramtype status: str
-        :keyword page: Which 'page' of paginated results to return. Default value is 1.
-        :paramtype page: int
-        :keyword per_page: Number of items returned per page. Default value is 20.
-        :paramtype per_page: int
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "pagination": {
-                        "page": 0,  # Required.
-                        "per_page": 0,  # Required.
-                        "total": 0  # Required.
-                    },
-                    "toolbelts": [
-                        {
-                            "latest_version": "str",  # Required.
-                            "name": "str",  # Required.
-                            "reference_latest": "str",  # Required.
-                            "status": "str",  # Required. Known values are: "active" and
-                              "deprecated".
-                            "tool_count": 0,  # Required.
-                            "updated_at": "2020-02-20 00:00:00",  # Required.
-                            "version_count": 0,  # Required.
-                            "description": "str",  # Optional. Required.
-                            "display_name": "str"  # Optional. Required.
-                        }
-                    ]
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = kwargs.pop("headers", {}) or {}
-        _params = kwargs.pop("params", {}) or {}
-
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        _request = build_toolbelts_list_request(
-            status=status,
-            page=page,
-            per_page=per_page,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            await self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200]:
-            if _stream:
-                await response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        response_headers["ratelimit-limit"] = self._deserialize(
-            "int", response.headers.get("ratelimit-limit")
-        )
-        response_headers["ratelimit-remaining"] = self._deserialize(
-            "int", response.headers.get("ratelimit-remaining")
-        )
-        response_headers["ratelimit-reset"] = self._deserialize(
-            "int", response.headers.get("ratelimit-reset")
-        )
-
-        if response.content:
-            deserialized = response.json()
-        else:
-            deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-    @overload
-    async def create(
-        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Create a Toolbelt.
-
-        Creates a versioned collection of provider-qualified Action Gateway tool names.
-
-        :param body: Required.
-        :type body: JSON
-        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
-         Default value is "application/json".
-        :paramtype content_type: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # JSON input template you can fill out and use as your body input.
-                body = {
-                    "name": "str",  # Required.
-                    "tools": [
-                        "str"  # Required.
-                    ],
-                    "description": "str",  # Optional.
-                    "display_name": "str",  # Optional.
-                    "version": "1"  # Optional. Default value is "1".
-                }
-
-                # response body for status code(s): 200
-                response == {
-                    "toolbelt": {
-                        "created_at": "2020-02-20 00:00:00",  # Required.
-                        "name": "str",  # Required.
-                        "reference": "str",  # A reference pinned to this immutable toolbelt
-                          version. Required.
-                        "reference_latest": "str",  # An unversioned reference to the latest
-                          active version. Required.
-                        "status": "str",  # Required. Known values are: "active" and
-                          "deprecated".
-                        "tool_count": 0,  # Required.
-                        "tools": [
-                            "str"  # Required.
-                        ],
-                        "updated_at": "2020-02-20 00:00:00",  # Required.
-                        "version": "str",  # Required.
-                        "description": "str",  # Optional. Required.
-                        "display_name": "str"  # Optional. Required.
-                    }
-                }
-                # response body for status code(s): 400, 409
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-
-    @overload
-    async def create(
-        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Create a Toolbelt.
-
-        Creates a versioned collection of provider-qualified Action Gateway tool names.
-
-        :param body: Required.
-        :type body: IO[bytes]
-        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
-         Default value is "application/json".
-        :paramtype content_type: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "toolbelt": {
-                        "created_at": "2020-02-20 00:00:00",  # Required.
-                        "name": "str",  # Required.
-                        "reference": "str",  # A reference pinned to this immutable toolbelt
-                          version. Required.
-                        "reference_latest": "str",  # An unversioned reference to the latest
-                          active version. Required.
-                        "status": "str",  # Required. Known values are: "active" and
-                          "deprecated".
-                        "tool_count": 0,  # Required.
-                        "tools": [
-                            "str"  # Required.
-                        ],
-                        "updated_at": "2020-02-20 00:00:00",  # Required.
-                        "version": "str",  # Required.
-                        "description": "str",  # Optional. Required.
-                        "display_name": "str"  # Optional. Required.
-                    }
-                }
-                # response body for status code(s): 400, 409
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-
-    @distributed_trace_async
-    async def create(self, body: Union[JSON, IO[bytes]], **kwargs: Any) -> JSON:
-        # pylint: disable=line-too-long
-        """Create a Toolbelt.
-
-        Creates a versioned collection of provider-qualified Action Gateway tool names.
-
-        :param body: Is either a JSON type or a IO[bytes] type. Required.
-        :type body: JSON or IO[bytes]
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # JSON input template you can fill out and use as your body input.
-                body = {
-                    "name": "str",  # Required.
-                    "tools": [
-                        "str"  # Required.
-                    ],
-                    "description": "str",  # Optional.
-                    "display_name": "str",  # Optional.
-                    "version": "1"  # Optional. Default value is "1".
-                }
-
-                # response body for status code(s): 200
-                response == {
-                    "toolbelt": {
-                        "created_at": "2020-02-20 00:00:00",  # Required.
-                        "name": "str",  # Required.
-                        "reference": "str",  # A reference pinned to this immutable toolbelt
-                          version. Required.
-                        "reference_latest": "str",  # An unversioned reference to the latest
-                          active version. Required.
-                        "status": "str",  # Required. Known values are: "active" and
-                          "deprecated".
-                        "tool_count": 0,  # Required.
-                        "tools": [
-                            "str"  # Required.
-                        ],
-                        "updated_at": "2020-02-20 00:00:00",  # Required.
-                        "version": "str",  # Required.
-                        "description": "str",  # Optional. Required.
-                        "display_name": "str"  # Optional. Required.
-                    }
-                }
-                # response body for status code(s): 400, 409
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-        _params = kwargs.pop("params", {}) or {}
-
-        content_type: Optional[str] = kwargs.pop(
-            "content_type", _headers.pop("Content-Type", None)
-        )
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        content_type = content_type or "application/json"
-        _json = None
-        _content = None
-        if isinstance(body, (IOBase, bytes)):
-            _content = body
-        else:
-            _json = body
-
-        _request = build_toolbelts_create_request(
-            content_type=content_type,
-            json=_json,
-            content=_content,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            await self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200, 400, 409]:
-            if _stream:
-                await response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        if response.status_code == 200:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 400:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 409:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-    @distributed_trace_async
-    async def get(
-        self, name: str, *, version: Optional[str] = None, **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Retrieve a Toolbelt.
-
-        Retrieves the latest active version or a specified immutable version of a toolbelt.
-
-        :param name: The natural key identifying the toolbelt. Required.
-        :type name: str
-        :keyword version: An immutable numeric toolbelt version. Omit to retrieve the latest active
-         version. Default value is None.
-        :paramtype version: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "toolbelt": {
-                        "created_at": "2020-02-20 00:00:00",  # Required.
-                        "name": "str",  # Required.
-                        "reference": "str",  # A reference pinned to this immutable toolbelt
-                          version. Required.
-                        "reference_latest": "str",  # An unversioned reference to the latest
-                          active version. Required.
-                        "status": "str",  # Required. Known values are: "active" and
-                          "deprecated".
-                        "tool_count": 0,  # Required.
-                        "tools": [
-                            "str"  # Required.
-                        ],
-                        "updated_at": "2020-02-20 00:00:00",  # Required.
-                        "version": "str",  # Required.
-                        "description": "str",  # Optional. Required.
-                        "display_name": "str"  # Optional. Required.
-                    }
-                }
-                # response body for status code(s): 404
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = kwargs.pop("headers", {}) or {}
-        _params = kwargs.pop("params", {}) or {}
-
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        _request = build_toolbelts_get_request(
-            name=name,
-            version=version,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            await self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200, 404]:
-            if _stream:
-                await response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        if response.status_code == 200:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 404:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-    @distributed_trace_async
-    async def delete(self, name: str, **kwargs: Any) -> JSON:
-        # pylint: disable=line-too-long
-        """Delete a Toolbelt.
-
-        Deprecates the latest active version of a toolbelt.
-
-        :param name: The natural key identifying the toolbelt. Required.
-        :type name: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "toolbelt": {
-                        "created_at": "2020-02-20 00:00:00",  # Required.
-                        "name": "str",  # Required.
-                        "reference": "str",  # A reference pinned to this immutable toolbelt
-                          version. Required.
-                        "reference_latest": "str",  # An unversioned reference to the latest
-                          active version. Required.
-                        "status": "str",  # Required. Known values are: "active" and
-                          "deprecated".
-                        "tool_count": 0,  # Required.
-                        "tools": [
-                            "str"  # Required.
-                        ],
-                        "updated_at": "2020-02-20 00:00:00",  # Required.
-                        "version": "str",  # Required.
-                        "description": "str",  # Optional. Required.
-                        "display_name": "str"  # Optional. Required.
-                    }
-                }
-                # response body for status code(s): 404
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = kwargs.pop("headers", {}) or {}
-        _params = kwargs.pop("params", {}) or {}
-
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        _request = build_toolbelts_delete_request(
-            name=name,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            await self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200, 404]:
-            if _stream:
-                await response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        if response.status_code == 200:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 404:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-    @overload
-    async def add_tools(
-        self,
-        name: str,
-        body: JSON,
-        *,
-        content_type: str = "application/json",
-        **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Add Tools to a Toolbelt.
-
-        Adds provider-qualified tool names and creates a new immutable toolbelt version.
-
-        :param name: The natural key identifying the toolbelt. Required.
-        :type name: str
-        :param body: Required.
-        :type body: JSON
-        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
-         Default value is "application/json".
-        :paramtype content_type: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # JSON input template you can fill out and use as your body input.
-                body = {
-                    "tools": [
-                        "str"  # Required.
-                    ]
-                }
-
-                # response body for status code(s): 200
-                response == {
-                    "toolbelt": {
-                        "created_at": "2020-02-20 00:00:00",  # Required.
-                        "name": "str",  # Required.
-                        "reference": "str",  # A reference pinned to this immutable toolbelt
-                          version. Required.
-                        "reference_latest": "str",  # An unversioned reference to the latest
-                          active version. Required.
-                        "status": "str",  # Required. Known values are: "active" and
-                          "deprecated".
-                        "tool_count": 0,  # Required.
-                        "tools": [
-                            "str"  # Required.
-                        ],
-                        "updated_at": "2020-02-20 00:00:00",  # Required.
-                        "version": "str",  # Required.
-                        "description": "str",  # Optional. Required.
-                        "display_name": "str"  # Optional. Required.
-                    }
-                }
-                # response body for status code(s): 400, 404
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-
-    @overload
-    async def add_tools(
-        self,
-        name: str,
-        body: IO[bytes],
-        *,
-        content_type: str = "application/json",
-        **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Add Tools to a Toolbelt.
-
-        Adds provider-qualified tool names and creates a new immutable toolbelt version.
-
-        :param name: The natural key identifying the toolbelt. Required.
-        :type name: str
-        :param body: Required.
-        :type body: IO[bytes]
-        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
-         Default value is "application/json".
-        :paramtype content_type: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "toolbelt": {
-                        "created_at": "2020-02-20 00:00:00",  # Required.
-                        "name": "str",  # Required.
-                        "reference": "str",  # A reference pinned to this immutable toolbelt
-                          version. Required.
-                        "reference_latest": "str",  # An unversioned reference to the latest
-                          active version. Required.
-                        "status": "str",  # Required. Known values are: "active" and
-                          "deprecated".
-                        "tool_count": 0,  # Required.
-                        "tools": [
-                            "str"  # Required.
-                        ],
-                        "updated_at": "2020-02-20 00:00:00",  # Required.
-                        "version": "str",  # Required.
-                        "description": "str",  # Optional. Required.
-                        "display_name": "str"  # Optional. Required.
-                    }
-                }
-                # response body for status code(s): 400, 404
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-
-    @distributed_trace_async
-    async def add_tools(
-        self, name: str, body: Union[JSON, IO[bytes]], **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Add Tools to a Toolbelt.
-
-        Adds provider-qualified tool names and creates a new immutable toolbelt version.
-
-        :param name: The natural key identifying the toolbelt. Required.
-        :type name: str
-        :param body: Is either a JSON type or a IO[bytes] type. Required.
-        :type body: JSON or IO[bytes]
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # JSON input template you can fill out and use as your body input.
-                body = {
-                    "tools": [
-                        "str"  # Required.
-                    ]
-                }
-
-                # response body for status code(s): 200
-                response == {
-                    "toolbelt": {
-                        "created_at": "2020-02-20 00:00:00",  # Required.
-                        "name": "str",  # Required.
-                        "reference": "str",  # A reference pinned to this immutable toolbelt
-                          version. Required.
-                        "reference_latest": "str",  # An unversioned reference to the latest
-                          active version. Required.
-                        "status": "str",  # Required. Known values are: "active" and
-                          "deprecated".
-                        "tool_count": 0,  # Required.
-                        "tools": [
-                            "str"  # Required.
-                        ],
-                        "updated_at": "2020-02-20 00:00:00",  # Required.
-                        "version": "str",  # Required.
-                        "description": "str",  # Optional. Required.
-                        "display_name": "str"  # Optional. Required.
-                    }
-                }
-                # response body for status code(s): 400, 404
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-        _params = kwargs.pop("params", {}) or {}
-
-        content_type: Optional[str] = kwargs.pop(
-            "content_type", _headers.pop("Content-Type", None)
-        )
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        content_type = content_type or "application/json"
-        _json = None
-        _content = None
-        if isinstance(body, (IOBase, bytes)):
-            _content = body
-        else:
-            _json = body
-
-        _request = build_toolbelts_add_tools_request(
-            name=name,
-            content_type=content_type,
-            json=_json,
-            content=_content,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            await self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200, 400, 404]:
-            if _stream:
-                await response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        if response.status_code == 200:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 400:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 404:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-    @overload
-    async def delete_tools(
-        self,
-        name: str,
-        body: JSON,
-        *,
-        content_type: str = "application/json",
-        **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Remove Tools from a Toolbelt.
-
-        Removes tool names and creates a new immutable toolbelt version.
-
-        :param name: The natural key identifying the toolbelt. Required.
-        :type name: str
-        :param body: Required.
-        :type body: JSON
-        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
-         Default value is "application/json".
-        :paramtype content_type: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # JSON input template you can fill out and use as your body input.
-                body = {
-                    "tools": [
-                        "str"  # Required.
-                    ]
-                }
-
-                # response body for status code(s): 200
-                response == {
-                    "toolbelt": {
-                        "created_at": "2020-02-20 00:00:00",  # Required.
-                        "name": "str",  # Required.
-                        "reference": "str",  # A reference pinned to this immutable toolbelt
-                          version. Required.
-                        "reference_latest": "str",  # An unversioned reference to the latest
-                          active version. Required.
-                        "status": "str",  # Required. Known values are: "active" and
-                          "deprecated".
-                        "tool_count": 0,  # Required.
-                        "tools": [
-                            "str"  # Required.
-                        ],
-                        "updated_at": "2020-02-20 00:00:00",  # Required.
-                        "version": "str",  # Required.
-                        "description": "str",  # Optional. Required.
-                        "display_name": "str"  # Optional. Required.
-                    }
-                }
-                # response body for status code(s): 400, 404
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-
-    @overload
-    async def delete_tools(
-        self,
-        name: str,
-        body: IO[bytes],
-        *,
-        content_type: str = "application/json",
-        **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Remove Tools from a Toolbelt.
-
-        Removes tool names and creates a new immutable toolbelt version.
-
-        :param name: The natural key identifying the toolbelt. Required.
-        :type name: str
-        :param body: Required.
-        :type body: IO[bytes]
-        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
-         Default value is "application/json".
-        :paramtype content_type: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "toolbelt": {
-                        "created_at": "2020-02-20 00:00:00",  # Required.
-                        "name": "str",  # Required.
-                        "reference": "str",  # A reference pinned to this immutable toolbelt
-                          version. Required.
-                        "reference_latest": "str",  # An unversioned reference to the latest
-                          active version. Required.
-                        "status": "str",  # Required. Known values are: "active" and
-                          "deprecated".
-                        "tool_count": 0,  # Required.
-                        "tools": [
-                            "str"  # Required.
-                        ],
-                        "updated_at": "2020-02-20 00:00:00",  # Required.
-                        "version": "str",  # Required.
-                        "description": "str",  # Optional. Required.
-                        "display_name": "str"  # Optional. Required.
-                    }
-                }
-                # response body for status code(s): 400, 404
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-
-    @distributed_trace_async
-    async def delete_tools(
-        self, name: str, body: Union[JSON, IO[bytes]], **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Remove Tools from a Toolbelt.
-
-        Removes tool names and creates a new immutable toolbelt version.
-
-        :param name: The natural key identifying the toolbelt. Required.
-        :type name: str
-        :param body: Is either a JSON type or a IO[bytes] type. Required.
-        :type body: JSON or IO[bytes]
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # JSON input template you can fill out and use as your body input.
-                body = {
-                    "tools": [
-                        "str"  # Required.
-                    ]
-                }
-
-                # response body for status code(s): 200
-                response == {
-                    "toolbelt": {
-                        "created_at": "2020-02-20 00:00:00",  # Required.
-                        "name": "str",  # Required.
-                        "reference": "str",  # A reference pinned to this immutable toolbelt
-                          version. Required.
-                        "reference_latest": "str",  # An unversioned reference to the latest
-                          active version. Required.
-                        "status": "str",  # Required. Known values are: "active" and
-                          "deprecated".
-                        "tool_count": 0,  # Required.
-                        "tools": [
-                            "str"  # Required.
-                        ],
-                        "updated_at": "2020-02-20 00:00:00",  # Required.
-                        "version": "str",  # Required.
-                        "description": "str",  # Optional. Required.
-                        "display_name": "str"  # Optional. Required.
-                    }
-                }
-                # response body for status code(s): 400, 404
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-        _params = kwargs.pop("params", {}) or {}
-
-        content_type: Optional[str] = kwargs.pop(
-            "content_type", _headers.pop("Content-Type", None)
-        )
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        content_type = content_type or "application/json"
-        _json = None
-        _content = None
-        if isinstance(body, (IOBase, bytes)):
-            _content = body
-        else:
-            _json = body
-
-        _request = build_toolbelts_delete_tools_request(
-            name=name,
-            content_type=content_type,
-            json=_json,
-            content=_content,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            await self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200, 400, 404]:
-            if _stream:
-                await response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        if response.status_code == 200:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 400:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 404:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-
-class ConnectionsOperations:
-    """
-    .. warning::
-        **DO NOT** instantiate this class directly.
-
-        Instead, you should access the following operations through
-        :class:`~pydo.aio.GeneratedClient`'s
-        :attr:`connections` attribute.
-    """
-
-    def __init__(self, *args, **kwargs) -> None:
-        input_args = list(args)
-        self._client = input_args.pop(0) if input_args else kwargs.pop("client")
-        self._config = input_args.pop(0) if input_args else kwargs.pop("config")
-        self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
-        self._deserialize = (
-            input_args.pop(0) if input_args else kwargs.pop("deserializer")
-        )
-
-    @distributed_trace_async
-    async def list(
-        self,
-        *,
-        provider: Optional[str] = None,
-        user_id: Optional[str] = None,
-        status: Optional[str] = None,
-        sort: Optional[str] = None,
-        sort_direction: Optional[str] = None,
-        page: int = 1,
-        per_page: int = 20,
-        **kwargs: Any
-    ) -> JSON:
-        """List Connections.
-
-        Lists OAuth connections owned by the authenticated team.
-
-        :keyword provider: Filter by provider name. Default value is None.
-        :paramtype provider: str
-        :keyword user_id: Filter by end-user identifier. Default value is None.
-        :paramtype user_id: str
-        :keyword status: Filter by connection status. Default value is None.
-        :paramtype status: str
-        :keyword sort: Field used to sort results. Default value is None.
-        :paramtype sort: str
-        :keyword sort_direction: Sort direction. Default value is None.
-        :paramtype sort_direction: str
-        :keyword page: Which 'page' of paginated results to return. Default value is 1.
-        :paramtype page: int
-        :keyword per_page: Number of items returned per page. Default value is 20.
-        :paramtype per_page: int
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "connections": [
-                        {
-                            "connection_parameters": {},  # Optional. Any object.
-                            "created_at": "2020-02-20 00:00:00",  # Optional.
-                            "granted_at": "2020-02-20 00:00:00",  # Optional.
-                            "id": "str",  # Optional.
-                            "provider": "str",  # Optional.
-                            "provider_display_name": "str",  # Optional.
-                            "revoked_at": "2020-02-20 00:00:00",  # Optional.
-                            "scopes": [
-                                "str"  # Optional.
-                            ],
-                            "status": "str",  # Optional.
-                            "updated_at": "2020-02-20 00:00:00",  # Optional.
-                            "user_id": "str"  # Optional.
-                        }
-                    ],
-                    "pagination": {
-                        "page": 0,  # Required.
-                        "per_page": 0,  # Required.
-                        "total": 0  # Required.
-                    }
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = kwargs.pop("headers", {}) or {}
-        _params = kwargs.pop("params", {}) or {}
-
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        _request = build_connections_list_request(
-            provider=provider,
-            user_id=user_id,
-            status=status,
-            sort=sort,
-            sort_direction=sort_direction,
-            page=page,
-            per_page=per_page,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            await self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200]:
-            if _stream:
-                await response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        response_headers["ratelimit-limit"] = self._deserialize(
-            "int", response.headers.get("ratelimit-limit")
-        )
-        response_headers["ratelimit-remaining"] = self._deserialize(
-            "int", response.headers.get("ratelimit-remaining")
-        )
-        response_headers["ratelimit-reset"] = self._deserialize(
-            "int", response.headers.get("ratelimit-reset")
-        )
-
-        if response.content:
-            deserialized = response.json()
-        else:
-            deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-    @overload
-    async def create(
-        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Create a Connection.
-
-        Creates or begins authorization for an OAuth connection to an Action Gateway provider.
-
-        :param body: Required.
-        :type body: JSON
-        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
-         Default value is "application/json".
-        :paramtype content_type: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # JSON input template you can fill out and use as your body input.
-                body = {
-                    "connection_parameters": {},  # Optional. Any object.
-                    "provider": "str",  # Optional.
-                    "scopes": [
-                        "str"  # Optional.
-                    ],
-                    "user_id": "str"  # Optional.
-                }
-
-                # response body for status code(s): 200
-                response == {
-                    "authorization": {
-                        "connect_url": "str",  # Optional. ConnectionAuthorization is present
-                          only while a connection is pending. The UI sends the user to connect_url and
-                          polls GetConnection until the connection becomes active or expires. The
-                          Secrets Manager poll URL is never exposed.
-                        "expires_at": "2020-02-20 00:00:00",  # Optional.
-                          ConnectionAuthorization is present only while a connection is pending. The UI
-                          sends the user to connect_url and polls GetConnection until the connection
-                          becomes active or expires. The Secrets Manager poll URL is never exposed.
-                        "status": "str",  # Optional. ConnectionAuthorization is present only
-                          while a connection is pending. The UI sends the user to connect_url and polls
-                          GetConnection until the connection becomes active or expires. The Secrets
-                          Manager poll URL is never exposed.
-                        "verification_code": "str"  # Optional. ConnectionAuthorization is
-                          present only while a connection is pending. The UI sends the user to
-                          connect_url and polls GetConnection until the connection becomes active or
-                          expires. The Secrets Manager poll URL is never exposed.
-                    },
-                    "connection": {
-                        "connection_parameters": {},  # Optional. Any object.
-                        "created_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "granted_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "id": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider_display_name": "str",  # Optional. ----  OAuth connection
-                          resources --------------------------  OAuthConnection is the public,
-                          team-scoped connection metadata returned to the UI. It deliberately excludes
-                          the team ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                          authorization handle.
-                        "revoked_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "scopes": [
-                            "str"  # Optional. ----  OAuth connection resources
-                              --------------------------  OAuthConnection is the public, team-scoped
-                              connection metadata returned to the UI. It deliberately excludes the team
-                              ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                              authorization handle.
-                        ],
-                        "status": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "updated_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "user_id": "str"  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                    }
-                }
-                # response body for status code(s): 400, 409
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-
-    @overload
-    async def create(
-        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Create a Connection.
-
-        Creates or begins authorization for an OAuth connection to an Action Gateway provider.
-
-        :param body: Required.
-        :type body: IO[bytes]
-        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
-         Default value is "application/json".
-        :paramtype content_type: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "authorization": {
-                        "connect_url": "str",  # Optional. ConnectionAuthorization is present
-                          only while a connection is pending. The UI sends the user to connect_url and
-                          polls GetConnection until the connection becomes active or expires. The
-                          Secrets Manager poll URL is never exposed.
-                        "expires_at": "2020-02-20 00:00:00",  # Optional.
-                          ConnectionAuthorization is present only while a connection is pending. The UI
-                          sends the user to connect_url and polls GetConnection until the connection
-                          becomes active or expires. The Secrets Manager poll URL is never exposed.
-                        "status": "str",  # Optional. ConnectionAuthorization is present only
-                          while a connection is pending. The UI sends the user to connect_url and polls
-                          GetConnection until the connection becomes active or expires. The Secrets
-                          Manager poll URL is never exposed.
-                        "verification_code": "str"  # Optional. ConnectionAuthorization is
-                          present only while a connection is pending. The UI sends the user to
-                          connect_url and polls GetConnection until the connection becomes active or
-                          expires. The Secrets Manager poll URL is never exposed.
-                    },
-                    "connection": {
-                        "connection_parameters": {},  # Optional. Any object.
-                        "created_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "granted_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "id": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider_display_name": "str",  # Optional. ----  OAuth connection
-                          resources --------------------------  OAuthConnection is the public,
-                          team-scoped connection metadata returned to the UI. It deliberately excludes
-                          the team ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                          authorization handle.
-                        "revoked_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "scopes": [
-                            "str"  # Optional. ----  OAuth connection resources
-                              --------------------------  OAuthConnection is the public, team-scoped
-                              connection metadata returned to the UI. It deliberately excludes the team
-                              ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                              authorization handle.
-                        ],
-                        "status": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "updated_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "user_id": "str"  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                    }
-                }
-                # response body for status code(s): 400, 409
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-
-    @distributed_trace_async
-    async def create(self, body: Union[JSON, IO[bytes]], **kwargs: Any) -> JSON:
-        # pylint: disable=line-too-long
-        """Create a Connection.
-
-        Creates or begins authorization for an OAuth connection to an Action Gateway provider.
-
-        :param body: Is either a JSON type or a IO[bytes] type. Required.
-        :type body: JSON or IO[bytes]
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # JSON input template you can fill out and use as your body input.
-                body = {
-                    "connection_parameters": {},  # Optional. Any object.
-                    "provider": "str",  # Optional.
-                    "scopes": [
-                        "str"  # Optional.
-                    ],
-                    "user_id": "str"  # Optional.
-                }
-
-                # response body for status code(s): 200
-                response == {
-                    "authorization": {
-                        "connect_url": "str",  # Optional. ConnectionAuthorization is present
-                          only while a connection is pending. The UI sends the user to connect_url and
-                          polls GetConnection until the connection becomes active or expires. The
-                          Secrets Manager poll URL is never exposed.
-                        "expires_at": "2020-02-20 00:00:00",  # Optional.
-                          ConnectionAuthorization is present only while a connection is pending. The UI
-                          sends the user to connect_url and polls GetConnection until the connection
-                          becomes active or expires. The Secrets Manager poll URL is never exposed.
-                        "status": "str",  # Optional. ConnectionAuthorization is present only
-                          while a connection is pending. The UI sends the user to connect_url and polls
-                          GetConnection until the connection becomes active or expires. The Secrets
-                          Manager poll URL is never exposed.
-                        "verification_code": "str"  # Optional. ConnectionAuthorization is
-                          present only while a connection is pending. The UI sends the user to
-                          connect_url and polls GetConnection until the connection becomes active or
-                          expires. The Secrets Manager poll URL is never exposed.
-                    },
-                    "connection": {
-                        "connection_parameters": {},  # Optional. Any object.
-                        "created_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "granted_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "id": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider_display_name": "str",  # Optional. ----  OAuth connection
-                          resources --------------------------  OAuthConnection is the public,
-                          team-scoped connection metadata returned to the UI. It deliberately excludes
-                          the team ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                          authorization handle.
-                        "revoked_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "scopes": [
-                            "str"  # Optional. ----  OAuth connection resources
-                              --------------------------  OAuthConnection is the public, team-scoped
-                              connection metadata returned to the UI. It deliberately excludes the team
-                              ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                              authorization handle.
-                        ],
-                        "status": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "updated_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "user_id": "str"  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                    }
-                }
-                # response body for status code(s): 400, 409
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-        _params = kwargs.pop("params", {}) or {}
-
-        content_type: Optional[str] = kwargs.pop(
-            "content_type", _headers.pop("Content-Type", None)
-        )
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        content_type = content_type or "application/json"
-        _json = None
-        _content = None
-        if isinstance(body, (IOBase, bytes)):
-            _content = body
-        else:
-            _json = body
-
-        _request = build_connections_create_request(
-            content_type=content_type,
-            json=_json,
-            content=_content,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            await self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200, 400, 409]:
-            if _stream:
-                await response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        if response.status_code == 200:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 400:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 409:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-    @distributed_trace_async
-    async def get(self, id: str, **kwargs: Any) -> JSON:
-        # pylint: disable=line-too-long
-        """Retrieve a Connection.
-
-        Retrieves an OAuth connection owned by the authenticated team.
-
-        :param id: The connection UUID. Required.
-        :type id: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "authorization": {
-                        "connect_url": "str",  # Optional. ConnectionAuthorization is present
-                          only while a connection is pending. The UI sends the user to connect_url and
-                          polls GetConnection until the connection becomes active or expires. The
-                          Secrets Manager poll URL is never exposed.
-                        "expires_at": "2020-02-20 00:00:00",  # Optional.
-                          ConnectionAuthorization is present only while a connection is pending. The UI
-                          sends the user to connect_url and polls GetConnection until the connection
-                          becomes active or expires. The Secrets Manager poll URL is never exposed.
-                        "status": "str",  # Optional. ConnectionAuthorization is present only
-                          while a connection is pending. The UI sends the user to connect_url and polls
-                          GetConnection until the connection becomes active or expires. The Secrets
-                          Manager poll URL is never exposed.
-                        "verification_code": "str"  # Optional. ConnectionAuthorization is
-                          present only while a connection is pending. The UI sends the user to
-                          connect_url and polls GetConnection until the connection becomes active or
-                          expires. The Secrets Manager poll URL is never exposed.
-                    },
-                    "connection": {
-                        "connection_parameters": {},  # Optional. Any object.
-                        "created_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "granted_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "id": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider_display_name": "str",  # Optional. ----  OAuth connection
-                          resources --------------------------  OAuthConnection is the public,
-                          team-scoped connection metadata returned to the UI. It deliberately excludes
-                          the team ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                          authorization handle.
-                        "revoked_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "scopes": [
-                            "str"  # Optional. ----  OAuth connection resources
-                              --------------------------  OAuthConnection is the public, team-scoped
-                              connection metadata returned to the UI. It deliberately excludes the team
-                              ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                              authorization handle.
-                        ],
-                        "status": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "updated_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "user_id": "str"  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                    }
-                }
-                # response body for status code(s): 404
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = kwargs.pop("headers", {}) or {}
-        _params = kwargs.pop("params", {}) or {}
-
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        _request = build_connections_get_request(
-            id=id,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            await self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200, 404]:
-            if _stream:
-                await response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        if response.status_code == 200:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 404:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-    @overload
-    async def update(
-        self,
-        id: str,
-        body: JSON,
-        *,
-        content_type: str = "application/json",
-        **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Update Connection Parameters.
-
-        Updates non-sensitive connection parameters for an OAuth connection.
-
-        :param id: The connection UUID. Required.
-        :type id: str
-        :param body: Required.
-        :type body: JSON
-        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
-         Default value is "application/json".
-        :paramtype content_type: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # JSON input template you can fill out and use as your body input.
-                body = {
-                    "connection_parameters": {},  # Optional. Any object.
-                    "id": "str"  # Optional.
-                }
-
-                # response body for status code(s): 200
-                response == {
-                    "connection": {
-                        "connection_parameters": {},  # Optional. Any object.
-                        "created_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "granted_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "id": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider_display_name": "str",  # Optional. ----  OAuth connection
-                          resources --------------------------  OAuthConnection is the public,
-                          team-scoped connection metadata returned to the UI. It deliberately excludes
-                          the team ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                          authorization handle.
-                        "revoked_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "scopes": [
-                            "str"  # Optional. ----  OAuth connection resources
-                              --------------------------  OAuthConnection is the public, team-scoped
-                              connection metadata returned to the UI. It deliberately excludes the team
-                              ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                              authorization handle.
-                        ],
-                        "status": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "updated_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "user_id": "str"  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                    }
-                }
-                # response body for status code(s): 400, 404
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-
-    @overload
-    async def update(
-        self,
-        id: str,
-        body: IO[bytes],
-        *,
-        content_type: str = "application/json",
-        **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Update Connection Parameters.
-
-        Updates non-sensitive connection parameters for an OAuth connection.
-
-        :param id: The connection UUID. Required.
-        :type id: str
-        :param body: Required.
-        :type body: IO[bytes]
-        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
-         Default value is "application/json".
-        :paramtype content_type: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "connection": {
-                        "connection_parameters": {},  # Optional. Any object.
-                        "created_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "granted_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "id": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider_display_name": "str",  # Optional. ----  OAuth connection
-                          resources --------------------------  OAuthConnection is the public,
-                          team-scoped connection metadata returned to the UI. It deliberately excludes
-                          the team ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                          authorization handle.
-                        "revoked_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "scopes": [
-                            "str"  # Optional. ----  OAuth connection resources
-                              --------------------------  OAuthConnection is the public, team-scoped
-                              connection metadata returned to the UI. It deliberately excludes the team
-                              ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                              authorization handle.
-                        ],
-                        "status": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "updated_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "user_id": "str"  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                    }
-                }
-                # response body for status code(s): 400, 404
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-
-    @distributed_trace_async
-    async def update(
-        self, id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Update Connection Parameters.
-
-        Updates non-sensitive connection parameters for an OAuth connection.
-
-        :param id: The connection UUID. Required.
-        :type id: str
-        :param body: Is either a JSON type or a IO[bytes] type. Required.
-        :type body: JSON or IO[bytes]
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # JSON input template you can fill out and use as your body input.
-                body = {
-                    "connection_parameters": {},  # Optional. Any object.
-                    "id": "str"  # Optional.
-                }
-
-                # response body for status code(s): 200
-                response == {
-                    "connection": {
-                        "connection_parameters": {},  # Optional. Any object.
-                        "created_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "granted_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "id": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider_display_name": "str",  # Optional. ----  OAuth connection
-                          resources --------------------------  OAuthConnection is the public,
-                          team-scoped connection metadata returned to the UI. It deliberately excludes
-                          the team ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                          authorization handle.
-                        "revoked_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "scopes": [
-                            "str"  # Optional. ----  OAuth connection resources
-                              --------------------------  OAuthConnection is the public, team-scoped
-                              connection metadata returned to the UI. It deliberately excludes the team
-                              ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                              authorization handle.
-                        ],
-                        "status": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "updated_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "user_id": "str"  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                    }
-                }
-                # response body for status code(s): 400, 404
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-        _params = kwargs.pop("params", {}) or {}
-
-        content_type: Optional[str] = kwargs.pop(
-            "content_type", _headers.pop("Content-Type", None)
-        )
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        content_type = content_type or "application/json"
-        _json = None
-        _content = None
-        if isinstance(body, (IOBase, bytes)):
-            _content = body
-        else:
-            _json = body
-
-        _request = build_connections_update_request(
-            id=id,
-            content_type=content_type,
-            json=_json,
-            content=_content,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            await self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200, 400, 404]:
-            if _stream:
-                await response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        if response.status_code == 200:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 400:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 404:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-    @distributed_trace_async
-    async def delete(self, id: str, **kwargs: Any) -> JSON:
-        # pylint: disable=line-too-long
-        """Delete a Connection.
-
-        Revokes and deletes an OAuth connection owned by the authenticated team.
-
-        :param id: The connection UUID. Required.
-        :type id: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "connection": {
-                        "connection_parameters": {},  # Optional. Any object.
-                        "created_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "granted_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "id": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider_display_name": "str",  # Optional. ----  OAuth connection
-                          resources --------------------------  OAuthConnection is the public,
-                          team-scoped connection metadata returned to the UI. It deliberately excludes
-                          the team ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                          authorization handle.
-                        "revoked_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "scopes": [
-                            "str"  # Optional. ----  OAuth connection resources
-                              --------------------------  OAuthConnection is the public, team-scoped
-                              connection metadata returned to the UI. It deliberately excludes the team
-                              ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                              authorization handle.
-                        ],
-                        "status": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "updated_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "user_id": "str"  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                    }
-                }
-                # response body for status code(s): 404
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = kwargs.pop("headers", {}) or {}
-        _params = kwargs.pop("params", {}) or {}
-
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        _request = build_connections_delete_request(
-            id=id,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            await self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200, 404]:
-            if _stream:
-                await response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        if response.status_code == 200:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 404:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-
-class UsersOperations:
-    """
-    .. warning::
-        **DO NOT** instantiate this class directly.
-
-        Instead, you should access the following operations through
-        :class:`~pydo.aio.GeneratedClient`'s
-        :attr:`users` attribute.
-    """
-
-    def __init__(self, *args, **kwargs) -> None:
-        input_args = list(args)
-        self._client = input_args.pop(0) if input_args else kwargs.pop("client")
-        self._config = input_args.pop(0) if input_args else kwargs.pop("config")
-        self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
-        self._deserialize = (
-            input_args.pop(0) if input_args else kwargs.pop("deserializer")
-        )
-
-    @distributed_trace_async
-    async def list(self, *, page: int = 1, per_page: int = 20, **kwargs: Any) -> JSON:
-        """List Action Gateway Users.
-
-        Lists end-user identifiers derived from sessions and OAuth connections for the authenticated
-        team.
-
-        :keyword page: Which 'page' of paginated results to return. Default value is 1.
-        :paramtype page: int
-        :keyword per_page: Number of items returned per page. Default value is 20.
-        :paramtype per_page: int
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "pagination": {
-                        "page": 0,  # Required.
-                        "per_page": 0,  # Required.
-                        "total": 0  # Required.
-                    },
-                    "user_ids": [
-                        "str"  # Optional.
-                    ]
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = kwargs.pop("headers", {}) or {}
-        _params = kwargs.pop("params", {}) or {}
-
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        _request = build_users_list_request(
-            page=page,
-            per_page=per_page,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            await self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200]:
-            if _stream:
-                await response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        response_headers["ratelimit-limit"] = self._deserialize(
-            "int", response.headers.get("ratelimit-limit")
-        )
-        response_headers["ratelimit-remaining"] = self._deserialize(
-            "int", response.headers.get("ratelimit-remaining")
-        )
-        response_headers["ratelimit-reset"] = self._deserialize(
-            "int", response.headers.get("ratelimit-reset")
-        )
-
-        if response.content:
-            deserialized = response.json()
-        else:
-            deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-    @distributed_trace_async
-    async def get(self, user_id: str, **kwargs: Any) -> JSON:
-        # pylint: disable=line-too-long
-        """Retrieve an Action Gateway User.
-
-        Retrieves a derived end-user view containing its sessions and OAuth connections.
-
-        :param user_id: The end-user identifier. Required.
-        :type user_id: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "user": {
-                        "connections": [
-                            {
-                                "connection_parameters": {},  # Optional. Any object.
-                                "created_at": "2020-02-20 00:00:00",  # Optional.
-                                  User is a derived, team-scoped view across sessions and OAuth
-                                  connections.
-                                "granted_at": "2020-02-20 00:00:00",  # Optional.
-                                  User is a derived, team-scoped view across sessions and OAuth
-                                  connections.
-                                "id": "str",  # Optional. User is a derived,
-                                  team-scoped view across sessions and OAuth connections.
-                                "provider": "str",  # Optional. User is a derived,
-                                  team-scoped view across sessions and OAuth connections.
-                                "provider_display_name": "str",  # Optional. User is
-                                  a derived, team-scoped view across sessions and OAuth connections.
-                                "revoked_at": "2020-02-20 00:00:00",  # Optional.
-                                  User is a derived, team-scoped view across sessions and OAuth
-                                  connections.
-                                "scopes": [
-                                    "str"  # Optional. User is a derived,
-                                      team-scoped view across sessions and OAuth connections.
-                                ],
-                                "status": "str",  # Optional. User is a derived,
-                                  team-scoped view across sessions and OAuth connections.
-                                "updated_at": "2020-02-20 00:00:00",  # Optional.
-                                  User is a derived, team-scoped view across sessions and OAuth
-                                  connections.
-                                "user_id": "str"  # Optional. User is a derived,
-                                  team-scoped view across sessions and OAuth connections.
-                            }
-                        ],
-                        "sessions": [
-                            {
-                                "created_at": "2020-02-20 00:00:00",  # Optional.
-                                  User is a derived, team-scoped view across sessions and OAuth
-                                  connections.
-                                "name": "str",  # Optional. User is a derived,
-                                  team-scoped view across sessions and OAuth connections.
-                                "session_urn": "str",  # Optional. User is a derived,
-                                  team-scoped view across sessions and OAuth connections.
-                                "updated_at": "2020-02-20 00:00:00"  # Optional. User
-                                  is a derived, team-scoped view across sessions and OAuth connections.
-                            }
-                        ],
-                        "user_id": "str"  # Optional. User is a derived, team-scoped view
-                          across sessions and OAuth connections.
-                    }
-                }
-                # response body for status code(s): 404
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = kwargs.pop("headers", {}) or {}
-        _params = kwargs.pop("params", {}) or {}
-
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        _request = build_users_get_request(
-            user_id=user_id,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            await self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200, 404]:
-            if _stream:
-                await response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        if response.status_code == 200:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 404:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-
-class SessionsOperations:
-    """
-    .. warning::
-        **DO NOT** instantiate this class directly.
-
-        Instead, you should access the following operations through
-        :class:`~pydo.aio.GeneratedClient`'s
-        :attr:`sessions` attribute.
-    """
-
-    def __init__(self, *args, **kwargs) -> None:
-        input_args = list(args)
-        self._client = input_args.pop(0) if input_args else kwargs.pop("client")
-        self._config = input_args.pop(0) if input_args else kwargs.pop("config")
-        self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
-        self._deserialize = (
-            input_args.pop(0) if input_args else kwargs.pop("deserializer")
-        )
-
-    @distributed_trace_async
-    async def list(
-        self,
-        *,
-        end_user_id: Optional[str] = None,
-        page: int = 1,
-        per_page: int = 20,
-        **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """List Action Gateway Sessions.
-
-        Lists Action Gateway sessions owned by the authenticated team.
-
-        :keyword end_user_id: Filter sessions by actor identifier. Default value is None.
-        :paramtype end_user_id: str
-        :keyword page: Which 'page' of paginated results to return. Default value is 1.
-        :paramtype page: int
-        :keyword per_page: Number of items returned per page. Default value is 20.
-        :paramtype per_page: int
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "pagination": {
-                        "page": 0,  # Required.
-                        "per_page": 0,  # Required.
-                        "total": 0  # Required.
-                    },
-                    "sessions": [
-                        {
-                            "actorId": "str",  # Optional. actor_id is empty when the
-                              session is not bound to an actor.
-                            "config": {},  # Optional. Preserved as an opaque object.
-                              Gateway currently interprets config.preloadTools to add selected direct
-                              tools to the session MCP.
-                            "createdAt": "2020-02-20 00:00:00",  # Optional.
-                            "name": "str",  # Optional. name is the required
-                              human-readable session name.
-                            "policy": {
-                                "defaultAction": "ask",  # Optional. Default value is
-                                  "ask". SessionPolicyAction is the disposition applied to a tool call.
-                                  Lowercase values are canonical so ProtoJSON matches the public REST
-                                  vocabulary; the prefixed aliases preserve compatibility for existing
-                                  protobuf clients. Known values are: "allow", "ask", and "deny".
-                                "rules": [
-                                    {
-                                        "action": "ask",  # Optional. Default
-                                          value is "ask". SessionPolicyAction is the disposition
-                                          applied to a tool call. Lowercase values are canonical so
-                                          ProtoJSON matches the public REST vocabulary; the prefixed
-                                          aliases preserve compatibility for existing protobuf clients.
-                                          Known values are: "allow", "ask", and "deny".
-                                        "match": {
-                                            "str": "str"  # Optional.
-                                              Dictionary of :code:`<string>`.
-                                        },
-                                        "tool": "str"  # Optional.
-                                          SessionPolicySpec is the Gateway-relevant subset of a
-                                          session's permission policy. Filesystem and network policy
-                                          remain enforced by the sandbox.
-                                    }
-                                ]
-                            },
-                            "sessionUrn": "str",  # Optional.
-                            "tools": {
-                                "references": [
-                                    {
-                                        "kind": "str",  # Optional. Known
-                                          values are: "SESSION_TOOL_REFERENCE_KIND_TOOL" and
-                                          "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
-                                        "name": "str",  # Optional. Omitted
-                                          when the request omitted tools (all tools). A present
-                                          selection with no references represents tools: [].
-                                        "version": "str"  # Optional. Omitted
-                                          when the request omitted tools (all tools). A present
-                                          selection with no references represents tools: [].
-                                    }
-                                ]
-                            },
-                            "updatedAt": "2020-02-20 00:00:00"  # Optional.
-                        }
-                    ]
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = kwargs.pop("headers", {}) or {}
-        _params = kwargs.pop("params", {}) or {}
-
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        _request = build_sessions_list_request(
-            end_user_id=end_user_id,
-            page=page,
-            per_page=per_page,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            await self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200]:
-            if _stream:
-                await response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        response_headers["ratelimit-limit"] = self._deserialize(
-            "int", response.headers.get("ratelimit-limit")
-        )
-        response_headers["ratelimit-remaining"] = self._deserialize(
-            "int", response.headers.get("ratelimit-remaining")
-        )
-        response_headers["ratelimit-reset"] = self._deserialize(
-            "int", response.headers.get("ratelimit-reset")
-        )
-
-        if response.content:
-            deserialized = response.json()
-        else:
-            deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-    @overload
-    async def create(
-        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Create an Action Gateway Session.
-
-        Creates a session with a tool selection, invocation policy, and optional direct-tool preload
-        configuration.
-
-        :param body: Required.
-        :type body: JSON
-        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
-         Default value is "application/json".
-        :paramtype content_type: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # JSON input template you can fill out and use as your body input.
-                body = {
-                    "actor_id": "str",  # Required.
-                    "name": "str",  # Required.
-                    "config": {
-                        "preloadTools": [
-                            "str"  # Optional. Concrete tools or pinned toolbelts to
-                              expose directly beside the session meta-tools.
-                        ]
-                    },
-                    "policy": {
-                        "defaultAction": "ask",  # Optional. Default value is "ask".
-                          SessionPolicyAction is the disposition applied to a tool call. Lowercase
-                          values are canonical so ProtoJSON matches the public REST vocabulary; the
-                          prefixed aliases preserve compatibility for existing protobuf clients. Known
-                          values are: "allow", "ask", and "deny".
-                        "rules": [
-                            {
-                                "action": "ask",  # Optional. Default value is "ask".
-                                  SessionPolicyAction is the disposition applied to a tool call.
-                                  Lowercase values are canonical so ProtoJSON matches the public REST
-                                  vocabulary; the prefixed aliases preserve compatibility for existing
-                                  protobuf clients. Known values are: "allow", "ask", and "deny".
-                                "match": {
-                                    "str": "str"  # Optional. Dictionary of
-                                      :code:`<string>`.
-                                },
-                                "tool": "str"  # Optional. Invocation policy. Omit to
-                                  use a default action of ask.
-                            }
-                        ]
-                    },
-                    "tools": [
-                        "str"  # Optional. Omitted enables every tool. An explicit empty
-                          array enables no tools. Direct tools may be :code:`<tool>` or
-                          <tool>@:code:`<version>`; toolbelt references must be version-pinned as
-                          toolbelt::code:`<belt-name>`@:code:`<version>`.
-                    ]
-                }
-
-                # response body for status code(s): 200
-                response == {
-                    "mcpUrl": "str",  # Public session-pinned MCP URL. Required.
-                    "session": {
-                        "actorId": "str",  # Optional. actor_id is empty when the session is
-                          not bound to an actor.
-                        "config": {},  # Optional. Preserved as an opaque object. Gateway
-                          currently interprets config.preloadTools to add selected direct tools to the
-                          session MCP.
-                        "createdAt": "2020-02-20 00:00:00",  # Optional. A session and the
-                          tool-permission policy bound to it. Required.
-                        "name": "str",  # Optional. name is the required human-readable
-                          session name.
-                        "policy": {
-                            "defaultAction": "ask",  # Optional. Default value is "ask".
-                              SessionPolicyAction is the disposition applied to a tool call. Lowercase
-                              values are canonical so ProtoJSON matches the public REST vocabulary; the
-                              prefixed aliases preserve compatibility for existing protobuf clients.
-                              Known values are: "allow", "ask", and "deny".
-                            "rules": [
-                                {
-                                    "action": "ask",  # Optional. Default value
-                                      is "ask". SessionPolicyAction is the disposition applied to a
-                                      tool call. Lowercase values are canonical so ProtoJSON matches
-                                      the public REST vocabulary; the prefixed aliases preserve
-                                      compatibility for existing protobuf clients. Known values are:
-                                      "allow", "ask", and "deny".
-                                    "match": {
-                                        "str": "str"  # Optional. Dictionary
-                                          of :code:`<string>`.
-                                    },
-                                    "tool": "str"  # Optional. SessionPolicySpec
-                                      is the Gateway-relevant subset of a session's permission policy.
-                                      Filesystem and network policy remain enforced by the sandbox.
-                                }
-                            ]
-                        },
-                        "sessionUrn": "str",  # Optional. A session and the tool-permission
-                          policy bound to it. Required.
-                        "tools": {
-                            "references": [
-                                {
-                                    "kind": "str",  # Optional. Known values are:
-                                      "SESSION_TOOL_REFERENCE_KIND_TOOL" and
-                                      "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
-                                    "name": "str",  # Optional. Omitted when the
-                                      request omitted tools (all tools). A present selection with no
-                                      references represents tools: [].
-                                    "version": "str"  # Optional. Omitted when
-                                      the request omitted tools (all tools). A present selection with
-                                      no references represents tools: [].
-                                }
-                            ]
-                        },
-                        "updatedAt": "2020-02-20 00:00:00"  # Optional. A session and the
-                          tool-permission policy bound to it. Required.
-                    },
-                    "tools": [
-                        "str"  # Canonical, version-pinned selected tool references.
-                          Required.
-                    ]
-                }
-                # response body for status code(s): 400
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-
-    @overload
-    async def create(
-        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Create an Action Gateway Session.
-
-        Creates a session with a tool selection, invocation policy, and optional direct-tool preload
-        configuration.
-
-        :param body: Required.
-        :type body: IO[bytes]
-        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
-         Default value is "application/json".
-        :paramtype content_type: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "mcpUrl": "str",  # Public session-pinned MCP URL. Required.
-                    "session": {
-                        "actorId": "str",  # Optional. actor_id is empty when the session is
-                          not bound to an actor.
-                        "config": {},  # Optional. Preserved as an opaque object. Gateway
-                          currently interprets config.preloadTools to add selected direct tools to the
-                          session MCP.
-                        "createdAt": "2020-02-20 00:00:00",  # Optional. A session and the
-                          tool-permission policy bound to it. Required.
-                        "name": "str",  # Optional. name is the required human-readable
-                          session name.
-                        "policy": {
-                            "defaultAction": "ask",  # Optional. Default value is "ask".
-                              SessionPolicyAction is the disposition applied to a tool call. Lowercase
-                              values are canonical so ProtoJSON matches the public REST vocabulary; the
-                              prefixed aliases preserve compatibility for existing protobuf clients.
-                              Known values are: "allow", "ask", and "deny".
-                            "rules": [
-                                {
-                                    "action": "ask",  # Optional. Default value
-                                      is "ask". SessionPolicyAction is the disposition applied to a
-                                      tool call. Lowercase values are canonical so ProtoJSON matches
-                                      the public REST vocabulary; the prefixed aliases preserve
-                                      compatibility for existing protobuf clients. Known values are:
-                                      "allow", "ask", and "deny".
-                                    "match": {
-                                        "str": "str"  # Optional. Dictionary
-                                          of :code:`<string>`.
-                                    },
-                                    "tool": "str"  # Optional. SessionPolicySpec
-                                      is the Gateway-relevant subset of a session's permission policy.
-                                      Filesystem and network policy remain enforced by the sandbox.
-                                }
-                            ]
-                        },
-                        "sessionUrn": "str",  # Optional. A session and the tool-permission
-                          policy bound to it. Required.
-                        "tools": {
-                            "references": [
-                                {
-                                    "kind": "str",  # Optional. Known values are:
-                                      "SESSION_TOOL_REFERENCE_KIND_TOOL" and
-                                      "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
-                                    "name": "str",  # Optional. Omitted when the
-                                      request omitted tools (all tools). A present selection with no
-                                      references represents tools: [].
-                                    "version": "str"  # Optional. Omitted when
-                                      the request omitted tools (all tools). A present selection with
-                                      no references represents tools: [].
-                                }
-                            ]
-                        },
-                        "updatedAt": "2020-02-20 00:00:00"  # Optional. A session and the
-                          tool-permission policy bound to it. Required.
-                    },
-                    "tools": [
-                        "str"  # Canonical, version-pinned selected tool references.
-                          Required.
-                    ]
-                }
-                # response body for status code(s): 400
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-
-    @distributed_trace_async
-    async def create(self, body: Union[JSON, IO[bytes]], **kwargs: Any) -> JSON:
-        # pylint: disable=line-too-long
-        """Create an Action Gateway Session.
-
-        Creates a session with a tool selection, invocation policy, and optional direct-tool preload
-        configuration.
-
-        :param body: Is either a JSON type or a IO[bytes] type. Required.
-        :type body: JSON or IO[bytes]
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # JSON input template you can fill out and use as your body input.
-                body = {
-                    "actor_id": "str",  # Required.
-                    "name": "str",  # Required.
-                    "config": {
-                        "preloadTools": [
-                            "str"  # Optional. Concrete tools or pinned toolbelts to
-                              expose directly beside the session meta-tools.
-                        ]
-                    },
-                    "policy": {
-                        "defaultAction": "ask",  # Optional. Default value is "ask".
-                          SessionPolicyAction is the disposition applied to a tool call. Lowercase
-                          values are canonical so ProtoJSON matches the public REST vocabulary; the
-                          prefixed aliases preserve compatibility for existing protobuf clients. Known
-                          values are: "allow", "ask", and "deny".
-                        "rules": [
-                            {
-                                "action": "ask",  # Optional. Default value is "ask".
-                                  SessionPolicyAction is the disposition applied to a tool call.
-                                  Lowercase values are canonical so ProtoJSON matches the public REST
-                                  vocabulary; the prefixed aliases preserve compatibility for existing
-                                  protobuf clients. Known values are: "allow", "ask", and "deny".
-                                "match": {
-                                    "str": "str"  # Optional. Dictionary of
-                                      :code:`<string>`.
-                                },
-                                "tool": "str"  # Optional. Invocation policy. Omit to
-                                  use a default action of ask.
-                            }
-                        ]
-                    },
-                    "tools": [
-                        "str"  # Optional. Omitted enables every tool. An explicit empty
-                          array enables no tools. Direct tools may be :code:`<tool>` or
-                          <tool>@:code:`<version>`; toolbelt references must be version-pinned as
-                          toolbelt::code:`<belt-name>`@:code:`<version>`.
-                    ]
-                }
-
-                # response body for status code(s): 200
-                response == {
-                    "mcpUrl": "str",  # Public session-pinned MCP URL. Required.
-                    "session": {
-                        "actorId": "str",  # Optional. actor_id is empty when the session is
-                          not bound to an actor.
-                        "config": {},  # Optional. Preserved as an opaque object. Gateway
-                          currently interprets config.preloadTools to add selected direct tools to the
-                          session MCP.
-                        "createdAt": "2020-02-20 00:00:00",  # Optional. A session and the
-                          tool-permission policy bound to it. Required.
-                        "name": "str",  # Optional. name is the required human-readable
-                          session name.
-                        "policy": {
-                            "defaultAction": "ask",  # Optional. Default value is "ask".
-                              SessionPolicyAction is the disposition applied to a tool call. Lowercase
-                              values are canonical so ProtoJSON matches the public REST vocabulary; the
-                              prefixed aliases preserve compatibility for existing protobuf clients.
-                              Known values are: "allow", "ask", and "deny".
-                            "rules": [
-                                {
-                                    "action": "ask",  # Optional. Default value
-                                      is "ask". SessionPolicyAction is the disposition applied to a
-                                      tool call. Lowercase values are canonical so ProtoJSON matches
-                                      the public REST vocabulary; the prefixed aliases preserve
-                                      compatibility for existing protobuf clients. Known values are:
-                                      "allow", "ask", and "deny".
-                                    "match": {
-                                        "str": "str"  # Optional. Dictionary
-                                          of :code:`<string>`.
-                                    },
-                                    "tool": "str"  # Optional. SessionPolicySpec
-                                      is the Gateway-relevant subset of a session's permission policy.
-                                      Filesystem and network policy remain enforced by the sandbox.
-                                }
-                            ]
-                        },
-                        "sessionUrn": "str",  # Optional. A session and the tool-permission
-                          policy bound to it. Required.
-                        "tools": {
-                            "references": [
-                                {
-                                    "kind": "str",  # Optional. Known values are:
-                                      "SESSION_TOOL_REFERENCE_KIND_TOOL" and
-                                      "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
-                                    "name": "str",  # Optional. Omitted when the
-                                      request omitted tools (all tools). A present selection with no
-                                      references represents tools: [].
-                                    "version": "str"  # Optional. Omitted when
-                                      the request omitted tools (all tools). A present selection with
-                                      no references represents tools: [].
-                                }
-                            ]
-                        },
-                        "updatedAt": "2020-02-20 00:00:00"  # Optional. A session and the
-                          tool-permission policy bound to it. Required.
-                    },
-                    "tools": [
-                        "str"  # Canonical, version-pinned selected tool references.
-                          Required.
-                    ]
-                }
-                # response body for status code(s): 400
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-        _params = kwargs.pop("params", {}) or {}
-
-        content_type: Optional[str] = kwargs.pop(
-            "content_type", _headers.pop("Content-Type", None)
-        )
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        content_type = content_type or "application/json"
-        _json = None
-        _content = None
-        if isinstance(body, (IOBase, bytes)):
-            _content = body
-        else:
-            _json = body
-
-        _request = build_sessions_create_request(
-            content_type=content_type,
-            json=_json,
-            content=_content,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            await self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200, 400]:
-            if _stream:
-                await response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        if response.status_code == 200:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 400:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-    @distributed_trace_async
-    async def delete(self, session_urn: str, **kwargs: Any) -> JSON:
-        # pylint: disable=line-too-long
-        """Delete an Action Gateway Session.
-
-        Deletes an Action Gateway session owned by the authenticated team.
-
-        :param session_urn: The URL-encoded managed agents session URN. Required.
-        :type session_urn: str
-        :return: JSON or JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 404
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = kwargs.pop("headers", {}) or {}
-        _params = kwargs.pop("params", {}) or {}
-
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        _request = build_sessions_delete_request(
-            session_urn=session_urn,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            await self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200, 404]:
-            if _stream:
-                await response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        if response.status_code == 200:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 404:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
 
 
 class OneClicksOperations:
@@ -114278,6 +109674,298 @@ class BalanceOperations:
         return cast(JSON, deserialized)  # type: ignore
 
 
+class PrepaymentConfigOperations:
+    """
+    .. warning::
+        **DO NOT** instantiate this class directly.
+
+        Instead, you should access the following operations through
+        :class:`~pydo.aio.GeneratedClient`'s
+        :attr:`prepayment_config` attribute.
+    """
+
+    def __init__(self, *args, **kwargs) -> None:
+        input_args = list(args)
+        self._client = input_args.pop(0) if input_args else kwargs.pop("client")
+        self._config = input_args.pop(0) if input_args else kwargs.pop("config")
+        self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
+        self._deserialize = (
+            input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        )
+
+    @distributed_trace_async
+    async def get(self, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Get Customer Prepayment Configuration.
+
+        To retrieve the prepayment configuration and current prepayment status for a customer's
+        account, send a GET request to ``/v2/customers/my/prepayment_config``.
+
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "config": {
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Time at which the
+                          prepayment configuration was created.
+                        "is_auto_prepay_enabled": bool,  # Optional. Whether automatic
+                          prepayment top-up is enabled.
+                        "prepay_amount": "str",  # Optional. Amount to charge when auto
+                          top-up triggers. Decimal dollars, e.g. ``"50.00"``.
+                        "prepay_threshold": "str",  # Optional. Balance threshold that
+                          triggers auto top-up. Decimal dollars, e.g. ``"10.00"``.
+                        "spend_limit": "str",  # Optional. Maximum spend allowed before the
+                          prepayment gate blocks usage. Decimal dollars, e.g. ``"100.00"``.
+                        "updated_at": "2020-02-20 00:00:00"  # Optional. Time at which the
+                          prepayment configuration was last updated.
+                    },
+                    "status": {
+                        "balance": "str",  # Optional. Current prepayment balance. Decimal
+                          dollars, e.g. ``"25.00"``.
+                        "blocked": bool,  # Optional. Whether the prepayment gate is
+                          currently blocking usage.
+                        "eligible": bool,  # Optional. Whether the account is eligible for
+                          the prepayment gate experience.
+                        "is_auto_prepay_enabled": bool,  # Optional. Whether automatic
+                          prepayment top-up is enabled.
+                        "month_to_date_balance": "str"  # Optional. Current account balance
+                          including month-to-date usage. Decimal dollars, e.g. ``"75.00"``.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_prepayment_config_get_request(
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+
+class PrepaymentStatusOperations:
+    """
+    .. warning::
+        **DO NOT** instantiate this class directly.
+
+        Instead, you should access the following operations through
+        :class:`~pydo.aio.GeneratedClient`'s
+        :attr:`prepayment_status` attribute.
+    """
+
+    def __init__(self, *args, **kwargs) -> None:
+        input_args = list(args)
+        self._client = input_args.pop(0) if input_args else kwargs.pop("client")
+        self._config = input_args.pop(0) if input_args else kwargs.pop("config")
+        self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
+        self._deserialize = (
+            input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        )
+
+    @distributed_trace_async
+    async def get(self, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Get Customer Prepayment Status.
+
+        To retrieve the prepayment gate status and balances for a customer's account, send a GET
+        request to ``/v2/customers/my/prepayment_status``.
+
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "status": {
+                        "balance": "str",  # Optional. Current prepayment balance. Decimal
+                          dollars, e.g. ``"25.00"``.
+                        "blocked": bool,  # Optional. Whether the prepayment gate is
+                          currently blocking usage.
+                        "eligible": bool,  # Optional. Whether the account is eligible for
+                          the prepayment gate experience.
+                        "is_auto_prepay_enabled": bool,  # Optional. Whether automatic
+                          prepayment top-up is enabled.
+                        "month_to_date_balance": "str"  # Optional. Current account balance
+                          including month-to-date usage. Decimal dollars, e.g. ``"75.00"``.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_prepayment_status_get_request(
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+
 class BillingHistoryOperations:
     """
     .. warning::
@@ -138504,6 +134192,9 @@ class DropletsOperations:
                                   version string representing the version, patch, and release
                                   information.
                             },
+                            "subnet_uuid": "str",  # Optional. A string specifying the
+                              UUID of the VPC subnet to which the Droplet is
+                              assigned.:code:`<br>`Requires ``vpc:read`` scope.
                             "vpc_uuid": "str"  # Optional. A string specifying the UUID
                               of the VPC to which the Droplet is assigned.:code:`<br>`Requires
                               ``vpc:read`` scope.
@@ -139174,6 +134865,9 @@ class DropletsOperations:
                             "version": "str"  # Optional. A standard kernel version
                               string representing the version, patch, and release information.
                         },
+                        "subnet_uuid": "str",  # Optional. A string specifying the UUID of
+                          the VPC subnet to which the Droplet is assigned.:code:`<br>`Requires
+                          ``vpc:read`` scope.
                         "vpc_uuid": "str"  # Optional. A string specifying the UUID of the
                           VPC to which the Droplet is assigned.:code:`<br>`Requires ``vpc:read`` scope.
                     }
@@ -140305,7 +135999,12 @@ class DropletsOperations:
                                               firewall will allow traffic.
                                         ],
                                         "tags": {}  # Optional. Any object.
-                                    }
+                                    },
+                                    "action": "allow"  # Optional. Default value
+                                      is "allow". The action to be taken when traffic matches the rule.
+                                      This may be one of ``allow`` or ``deny``. For backward
+                                      compatibility, this field is optional. When not set, it defaults
+                                      to ``allow``. Known values are: "allow" and "deny".
                                 }
                             ],
                             "name": "str",  # Optional. A human-readable name for a
@@ -140343,9 +136042,14 @@ class DropletsOperations:
                                       range (e.g. "8000-9000"), or "0" when all ports are open for a
                                       protocol. For ICMP rules this parameter will always return "0".
                                       Required.
-                                    "protocol": "str"  # The type of traffic to
+                                    "protocol": "str",  # The type of traffic to
                                       be allowed. This may be one of ``tcp``"" , ``udp``"" , or
                                       ``icmp``. Required. Known values are: "tcp", "udp", and "icmp".
+                                    "action": "allow"  # Optional. Default value
+                                      is "allow". The action to be taken when traffic matches the rule.
+                                      This may be one of ``allow`` or ``deny``. For backward
+                                      compatibility, this field is optional. When not set, it defaults
+                                      to ``allow``. Known values are: "allow" and "deny".
                                 }
                             ],
                             "pending_changes": [
@@ -140751,6 +136455,9 @@ class DropletsOperations:
                                   version string representing the version, patch, and release
                                   information.
                             },
+                            "subnet_uuid": "str",  # Optional. A string specifying the
+                              UUID of the VPC subnet to which the Droplet is
+                              assigned.:code:`<br>`Requires ``vpc:read`` scope.
                             "vpc_uuid": "str"  # Optional. A string specifying the UUID
                               of the VPC to which the Droplet is assigned.:code:`<br>`Requires
                               ``vpc:read`` scope.
@@ -145156,7 +140863,12 @@ class FirewallsOperations:
                                               firewall will allow traffic.
                                         ],
                                         "tags": {}  # Optional. Any object.
-                                    }
+                                    },
+                                    "action": "allow"  # Optional. Default value
+                                      is "allow". The action to be taken when traffic matches the rule.
+                                      This may be one of ``allow`` or ``deny``. For backward
+                                      compatibility, this field is optional. When not set, it defaults
+                                      to ``allow``. Known values are: "allow" and "deny".
                                 }
                             ],
                             "name": "str",  # Optional. A human-readable name for a
@@ -145194,9 +140906,14 @@ class FirewallsOperations:
                                       range (e.g. "8000-9000"), or "0" when all ports are open for a
                                       protocol. For ICMP rules this parameter will always return "0".
                                       Required.
-                                    "protocol": "str"  # The type of traffic to
+                                    "protocol": "str",  # The type of traffic to
                                       be allowed. This may be one of ``tcp``"" , ``udp``"" , or
                                       ``icmp``. Required. Known values are: "tcp", "udp", and "icmp".
+                                    "action": "allow"  # Optional. Default value
+                                      is "allow". The action to be taken when traffic matches the rule.
+                                      This may be one of ``allow`` or ``deny``. For backward
+                                      compatibility, this field is optional. When not set, it defaults
+                                      to ``allow``. Known values are: "allow" and "deny".
                                 }
                             ],
                             "pending_changes": [
@@ -145358,7 +141075,12 @@ class FirewallsOperations:
                                       traffic.
                                 ],
                                 "tags": {}  # Optional. Any object.
-                            }
+                            },
+                            "action": "allow"  # Optional. Default value is "allow". The
+                              action to be taken when traffic matches the rule. This may be one of
+                              ``allow`` or ``deny``. For backward compatibility, this field is
+                              optional. When not set, it defaults to ``allow``. Known values are:
+                              "allow" and "deny".
                         }
                     ],
                     "name": "str",  # Optional. A human-readable name for a firewall. The name
@@ -145392,9 +141114,14 @@ class FirewallsOperations:
                               specified as a string containing a single port, a range (e.g.
                               "8000-9000"), or "0" when all ports are open for a protocol. For ICMP
                               rules this parameter will always return "0". Required.
-                            "protocol": "str"  # The type of traffic to be allowed. This
+                            "protocol": "str",  # The type of traffic to be allowed. This
                               may be one of ``tcp``"" , ``udp``"" , or ``icmp``. Required. Known values
                               are: "tcp", "udp", and "icmp".
+                            "action": "allow"  # Optional. Default value is "allow". The
+                              action to be taken when traffic matches the rule. This may be one of
+                              ``allow`` or ``deny``. For backward compatibility, this field is
+                              optional. When not set, it defaults to ``allow``. Known values are:
+                              "allow" and "deny".
                         }
                     ],
                     "pending_changes": [
@@ -145464,7 +141191,12 @@ class FirewallsOperations:
                                           firewall will allow traffic.
                                     ],
                                     "tags": {}  # Optional. Any object.
-                                }
+                                },
+                                "action": "allow"  # Optional. Default value is
+                                  "allow". The action to be taken when traffic matches the rule. This
+                                  may be one of ``allow`` or ``deny``. For backward compatibility, this
+                                  field is optional. When not set, it defaults to ``allow``. Known
+                                  values are: "allow" and "deny".
                             }
                         ],
                         "name": "str",  # Optional. A human-readable name for a firewall. The
@@ -145500,9 +141232,14 @@ class FirewallsOperations:
                                   allowed specified as a string containing a single port, a range (e.g.
                                   "8000-9000"), or "0" when all ports are open for a protocol. For ICMP
                                   rules this parameter will always return "0". Required.
-                                "protocol": "str"  # The type of traffic to be
+                                "protocol": "str",  # The type of traffic to be
                                   allowed. This may be one of ``tcp``"" , ``udp``"" , or ``icmp``.
                                   Required. Known values are: "tcp", "udp", and "icmp".
+                                "action": "allow"  # Optional. Default value is
+                                  "allow". The action to be taken when traffic matches the rule. This
+                                  may be one of ``allow`` or ``deny``. For backward compatibility, this
+                                  field is optional. When not set, it defaults to ``allow``. Known
+                                  values are: "allow" and "deny".
                             }
                         ],
                         "pending_changes": [
@@ -145614,7 +141351,12 @@ class FirewallsOperations:
                                           firewall will allow traffic.
                                     ],
                                     "tags": {}  # Optional. Any object.
-                                }
+                                },
+                                "action": "allow"  # Optional. Default value is
+                                  "allow". The action to be taken when traffic matches the rule. This
+                                  may be one of ``allow`` or ``deny``. For backward compatibility, this
+                                  field is optional. When not set, it defaults to ``allow``. Known
+                                  values are: "allow" and "deny".
                             }
                         ],
                         "name": "str",  # Optional. A human-readable name for a firewall. The
@@ -145650,9 +141392,14 @@ class FirewallsOperations:
                                   allowed specified as a string containing a single port, a range (e.g.
                                   "8000-9000"), or "0" when all ports are open for a protocol. For ICMP
                                   rules this parameter will always return "0". Required.
-                                "protocol": "str"  # The type of traffic to be
+                                "protocol": "str",  # The type of traffic to be
                                   allowed. This may be one of ``tcp``"" , ``udp``"" , or ``icmp``.
                                   Required. Known values are: "tcp", "udp", and "icmp".
+                                "action": "allow"  # Optional. Default value is
+                                  "allow". The action to be taken when traffic matches the rule. This
+                                  may be one of ``allow`` or ``deny``. For backward compatibility, this
+                                  field is optional. When not set, it defaults to ``allow``. Known
+                                  values are: "allow" and "deny".
                             }
                         ],
                         "pending_changes": [
@@ -145753,7 +141500,12 @@ class FirewallsOperations:
                                       traffic.
                                 ],
                                 "tags": {}  # Optional. Any object.
-                            }
+                            },
+                            "action": "allow"  # Optional. Default value is "allow". The
+                              action to be taken when traffic matches the rule. This may be one of
+                              ``allow`` or ``deny``. For backward compatibility, this field is
+                              optional. When not set, it defaults to ``allow``. Known values are:
+                              "allow" and "deny".
                         }
                     ],
                     "name": "str",  # Optional. A human-readable name for a firewall. The name
@@ -145787,9 +141539,14 @@ class FirewallsOperations:
                               specified as a string containing a single port, a range (e.g.
                               "8000-9000"), or "0" when all ports are open for a protocol. For ICMP
                               rules this parameter will always return "0". Required.
-                            "protocol": "str"  # The type of traffic to be allowed. This
+                            "protocol": "str",  # The type of traffic to be allowed. This
                               may be one of ``tcp``"" , ``udp``"" , or ``icmp``. Required. Known values
                               are: "tcp", "udp", and "icmp".
+                            "action": "allow"  # Optional. Default value is "allow". The
+                              action to be taken when traffic matches the rule. This may be one of
+                              ``allow`` or ``deny``. For backward compatibility, this field is
+                              optional. When not set, it defaults to ``allow``. Known values are:
+                              "allow" and "deny".
                         }
                     ],
                     "pending_changes": [
@@ -145859,7 +141616,12 @@ class FirewallsOperations:
                                           firewall will allow traffic.
                                     ],
                                     "tags": {}  # Optional. Any object.
-                                }
+                                },
+                                "action": "allow"  # Optional. Default value is
+                                  "allow". The action to be taken when traffic matches the rule. This
+                                  may be one of ``allow`` or ``deny``. For backward compatibility, this
+                                  field is optional. When not set, it defaults to ``allow``. Known
+                                  values are: "allow" and "deny".
                             }
                         ],
                         "name": "str",  # Optional. A human-readable name for a firewall. The
@@ -145895,9 +141657,14 @@ class FirewallsOperations:
                                   allowed specified as a string containing a single port, a range (e.g.
                                   "8000-9000"), or "0" when all ports are open for a protocol. For ICMP
                                   rules this parameter will always return "0". Required.
-                                "protocol": "str"  # The type of traffic to be
+                                "protocol": "str",  # The type of traffic to be
                                   allowed. This may be one of ``tcp``"" , ``udp``"" , or ``icmp``.
                                   Required. Known values are: "tcp", "udp", and "icmp".
+                                "action": "allow"  # Optional. Default value is
+                                  "allow". The action to be taken when traffic matches the rule. This
+                                  may be one of ``allow`` or ``deny``. For backward compatibility, this
+                                  field is optional. When not set, it defaults to ``allow``. Known
+                                  values are: "allow" and "deny".
                             }
                         ],
                         "pending_changes": [
@@ -146094,7 +141861,12 @@ class FirewallsOperations:
                                           firewall will allow traffic.
                                     ],
                                     "tags": {}  # Optional. Any object.
-                                }
+                                },
+                                "action": "allow"  # Optional. Default value is
+                                  "allow". The action to be taken when traffic matches the rule. This
+                                  may be one of ``allow`` or ``deny``. For backward compatibility, this
+                                  field is optional. When not set, it defaults to ``allow``. Known
+                                  values are: "allow" and "deny".
                             }
                         ],
                         "name": "str",  # Optional. A human-readable name for a firewall. The
@@ -146130,9 +141902,14 @@ class FirewallsOperations:
                                   allowed specified as a string containing a single port, a range (e.g.
                                   "8000-9000"), or "0" when all ports are open for a protocol. For ICMP
                                   rules this parameter will always return "0". Required.
-                                "protocol": "str"  # The type of traffic to be
+                                "protocol": "str",  # The type of traffic to be
                                   allowed. This may be one of ``tcp``"" , ``udp``"" , or ``icmp``.
                                   Required. Known values are: "tcp", "udp", and "icmp".
+                                "action": "allow"  # Optional. Default value is
+                                  "allow". The action to be taken when traffic matches the rule. This
+                                  may be one of ``allow`` or ``deny``. For backward compatibility, this
+                                  field is optional. When not set, it defaults to ``allow``. Known
+                                  values are: "allow" and "deny".
                             }
                         ],
                         "pending_changes": [
@@ -146326,7 +142103,12 @@ class FirewallsOperations:
                                       traffic.
                                 ],
                                 "tags": {}  # Optional. Any object.
-                            }
+                            },
+                            "action": "allow"  # Optional. Default value is "allow". The
+                              action to be taken when traffic matches the rule. This may be one of
+                              ``allow`` or ``deny``. For backward compatibility, this field is
+                              optional. When not set, it defaults to ``allow``. Known values are:
+                              "allow" and "deny".
                         }
                     ],
                     "name": "str",  # Optional. A human-readable name for a firewall. The name
@@ -146360,9 +142142,14 @@ class FirewallsOperations:
                               specified as a string containing a single port, a range (e.g.
                               "8000-9000"), or "0" when all ports are open for a protocol. For ICMP
                               rules this parameter will always return "0". Required.
-                            "protocol": "str"  # The type of traffic to be allowed. This
+                            "protocol": "str",  # The type of traffic to be allowed. This
                               may be one of ``tcp``"" , ``udp``"" , or ``icmp``. Required. Known values
                               are: "tcp", "udp", and "icmp".
+                            "action": "allow"  # Optional. Default value is "allow". The
+                              action to be taken when traffic matches the rule. This may be one of
+                              ``allow`` or ``deny``. For backward compatibility, this field is
+                              optional. When not set, it defaults to ``allow``. Known values are:
+                              "allow" and "deny".
                         }
                     ],
                     "pending_changes": [
@@ -146432,7 +142219,12 @@ class FirewallsOperations:
                                           firewall will allow traffic.
                                     ],
                                     "tags": {}  # Optional. Any object.
-                                }
+                                },
+                                "action": "allow"  # Optional. Default value is
+                                  "allow". The action to be taken when traffic matches the rule. This
+                                  may be one of ``allow`` or ``deny``. For backward compatibility, this
+                                  field is optional. When not set, it defaults to ``allow``. Known
+                                  values are: "allow" and "deny".
                             }
                         ],
                         "name": "str",  # Optional. A human-readable name for a firewall. The
@@ -146468,9 +142260,14 @@ class FirewallsOperations:
                                   allowed specified as a string containing a single port, a range (e.g.
                                   "8000-9000"), or "0" when all ports are open for a protocol. For ICMP
                                   rules this parameter will always return "0". Required.
-                                "protocol": "str"  # The type of traffic to be
+                                "protocol": "str",  # The type of traffic to be
                                   allowed. This may be one of ``tcp``"" , ``udp``"" , or ``icmp``.
                                   Required. Known values are: "tcp", "udp", and "icmp".
+                                "action": "allow"  # Optional. Default value is
+                                  "allow". The action to be taken when traffic matches the rule. This
+                                  may be one of ``allow`` or ``deny``. For backward compatibility, this
+                                  field is optional. When not set, it defaults to ``allow``. Known
+                                  values are: "allow" and "deny".
                             }
                         ],
                         "pending_changes": [
@@ -146591,7 +142388,12 @@ class FirewallsOperations:
                                           firewall will allow traffic.
                                     ],
                                     "tags": {}  # Optional. Any object.
-                                }
+                                },
+                                "action": "allow"  # Optional. Default value is
+                                  "allow". The action to be taken when traffic matches the rule. This
+                                  may be one of ``allow`` or ``deny``. For backward compatibility, this
+                                  field is optional. When not set, it defaults to ``allow``. Known
+                                  values are: "allow" and "deny".
                             }
                         ],
                         "name": "str",  # Optional. A human-readable name for a firewall. The
@@ -146627,9 +142429,14 @@ class FirewallsOperations:
                                   allowed specified as a string containing a single port, a range (e.g.
                                   "8000-9000"), or "0" when all ports are open for a protocol. For ICMP
                                   rules this parameter will always return "0". Required.
-                                "protocol": "str"  # The type of traffic to be
+                                "protocol": "str",  # The type of traffic to be
                                   allowed. This may be one of ``tcp``"" , ``udp``"" , or ``icmp``.
                                   Required. Known values are: "tcp", "udp", and "icmp".
+                                "action": "allow"  # Optional. Default value is
+                                  "allow". The action to be taken when traffic matches the rule. This
+                                  may be one of ``allow`` or ``deny``. For backward compatibility, this
+                                  field is optional. When not set, it defaults to ``allow``. Known
+                                  values are: "allow" and "deny".
                             }
                         ],
                         "pending_changes": [
@@ -146741,7 +142548,12 @@ class FirewallsOperations:
                                       traffic.
                                 ],
                                 "tags": {}  # Optional. Any object.
-                            }
+                            },
+                            "action": "allow"  # Optional. Default value is "allow". The
+                              action to be taken when traffic matches the rule. This may be one of
+                              ``allow`` or ``deny``. For backward compatibility, this field is
+                              optional. When not set, it defaults to ``allow``. Known values are:
+                              "allow" and "deny".
                         }
                     ],
                     "name": "str",  # Optional. A human-readable name for a firewall. The name
@@ -146775,9 +142587,14 @@ class FirewallsOperations:
                               specified as a string containing a single port, a range (e.g.
                               "8000-9000"), or "0" when all ports are open for a protocol. For ICMP
                               rules this parameter will always return "0". Required.
-                            "protocol": "str"  # The type of traffic to be allowed. This
+                            "protocol": "str",  # The type of traffic to be allowed. This
                               may be one of ``tcp``"" , ``udp``"" , or ``icmp``. Required. Known values
                               are: "tcp", "udp", and "icmp".
+                            "action": "allow"  # Optional. Default value is "allow". The
+                              action to be taken when traffic matches the rule. This may be one of
+                              ``allow`` or ``deny``. For backward compatibility, this field is
+                              optional. When not set, it defaults to ``allow``. Known values are:
+                              "allow" and "deny".
                         }
                     ],
                     "pending_changes": [
@@ -146847,7 +142664,12 @@ class FirewallsOperations:
                                           firewall will allow traffic.
                                     ],
                                     "tags": {}  # Optional. Any object.
-                                }
+                                },
+                                "action": "allow"  # Optional. Default value is
+                                  "allow". The action to be taken when traffic matches the rule. This
+                                  may be one of ``allow`` or ``deny``. For backward compatibility, this
+                                  field is optional. When not set, it defaults to ``allow``. Known
+                                  values are: "allow" and "deny".
                             }
                         ],
                         "name": "str",  # Optional. A human-readable name for a firewall. The
@@ -146883,9 +142705,14 @@ class FirewallsOperations:
                                   allowed specified as a string containing a single port, a range (e.g.
                                   "8000-9000"), or "0" when all ports are open for a protocol. For ICMP
                                   rules this parameter will always return "0". Required.
-                                "protocol": "str"  # The type of traffic to be
+                                "protocol": "str",  # The type of traffic to be
                                   allowed. This may be one of ``tcp``"" , ``udp``"" , or ``icmp``.
                                   Required. Known values are: "tcp", "udp", and "icmp".
+                                "action": "allow"  # Optional. Default value is
+                                  "allow". The action to be taken when traffic matches the rule. This
+                                  may be one of ``allow`` or ``deny``. For backward compatibility, this
+                                  field is optional. When not set, it defaults to ``allow``. Known
+                                  values are: "allow" and "deny".
                             }
                         ],
                         "pending_changes": [
@@ -148243,7 +144070,12 @@ class FirewallsOperations:
                                       traffic.
                                 ],
                                 "tags": {}  # Optional. Any object.
-                            }
+                            },
+                            "action": "allow"  # Optional. Default value is "allow". The
+                              action to be taken when traffic matches the rule. This may be one of
+                              ``allow`` or ``deny``. For backward compatibility, this field is
+                              optional. When not set, it defaults to ``allow``. Known values are:
+                              "allow" and "deny".
                         }
                     ],
                     "outbound_rules": [
@@ -148274,9 +144106,14 @@ class FirewallsOperations:
                               specified as a string containing a single port, a range (e.g.
                               "8000-9000"), or "0" when all ports are open for a protocol. For ICMP
                               rules this parameter will always return "0". Required.
-                            "protocol": "str"  # The type of traffic to be allowed. This
+                            "protocol": "str",  # The type of traffic to be allowed. This
                               may be one of ``tcp``"" , ``udp``"" , or ``icmp``. Required. Known values
                               are: "tcp", "udp", and "icmp".
+                            "action": "allow"  # Optional. Default value is "allow". The
+                              action to be taken when traffic matches the rule. This may be one of
+                              ``allow`` or ``deny``. For backward compatibility, this field is
+                              optional. When not set, it defaults to ``allow``. Known values are:
+                              "allow" and "deny".
                         }
                     ]
                 }
@@ -148406,7 +144243,12 @@ class FirewallsOperations:
                                       traffic.
                                 ],
                                 "tags": {}  # Optional. Any object.
-                            }
+                            },
+                            "action": "allow"  # Optional. Default value is "allow". The
+                              action to be taken when traffic matches the rule. This may be one of
+                              ``allow`` or ``deny``. For backward compatibility, this field is
+                              optional. When not set, it defaults to ``allow``. Known values are:
+                              "allow" and "deny".
                         }
                     ],
                     "outbound_rules": [
@@ -148437,9 +144279,14 @@ class FirewallsOperations:
                               specified as a string containing a single port, a range (e.g.
                               "8000-9000"), or "0" when all ports are open for a protocol. For ICMP
                               rules this parameter will always return "0". Required.
-                            "protocol": "str"  # The type of traffic to be allowed. This
+                            "protocol": "str",  # The type of traffic to be allowed. This
                               may be one of ``tcp``"" , ``udp``"" , or ``icmp``. Required. Known values
                               are: "tcp", "udp", and "icmp".
+                            "action": "allow"  # Optional. Default value is "allow". The
+                              action to be taken when traffic matches the rule. This may be one of
+                              ``allow`` or ``deny``. For backward compatibility, this field is
+                              optional. When not set, it defaults to ``allow``. Known values are:
+                              "allow" and "deny".
                         }
                     ]
                 }
@@ -148631,7 +144478,12 @@ class FirewallsOperations:
                                       traffic.
                                 ],
                                 "tags": {}  # Optional. Any object.
-                            }
+                            },
+                            "action": "allow"  # Optional. Default value is "allow". The
+                              action to be taken when traffic matches the rule. This may be one of
+                              ``allow`` or ``deny``. For backward compatibility, this field is
+                              optional. When not set, it defaults to ``allow``. Known values are:
+                              "allow" and "deny".
                         }
                     ],
                     "outbound_rules": [
@@ -148662,9 +144514,14 @@ class FirewallsOperations:
                               specified as a string containing a single port, a range (e.g.
                               "8000-9000"), or "0" when all ports are open for a protocol. For ICMP
                               rules this parameter will always return "0". Required.
-                            "protocol": "str"  # The type of traffic to be allowed. This
+                            "protocol": "str",  # The type of traffic to be allowed. This
                               may be one of ``tcp``"" , ``udp``"" , or ``icmp``. Required. Known values
                               are: "tcp", "udp", and "icmp".
+                            "action": "allow"  # Optional. Default value is "allow". The
+                              action to be taken when traffic matches the rule. This may be one of
+                              ``allow`` or ``deny``. For backward compatibility, this field is
+                              optional. When not set, it defaults to ``allow``. Known values are:
+                              "allow" and "deny".
                         }
                     ]
                 }
@@ -148794,7 +144651,12 @@ class FirewallsOperations:
                                       traffic.
                                 ],
                                 "tags": {}  # Optional. Any object.
-                            }
+                            },
+                            "action": "allow"  # Optional. Default value is "allow". The
+                              action to be taken when traffic matches the rule. This may be one of
+                              ``allow`` or ``deny``. For backward compatibility, this field is
+                              optional. When not set, it defaults to ``allow``. Known values are:
+                              "allow" and "deny".
                         }
                     ],
                     "outbound_rules": [
@@ -148825,9 +144687,14 @@ class FirewallsOperations:
                               specified as a string containing a single port, a range (e.g.
                               "8000-9000"), or "0" when all ports are open for a protocol. For ICMP
                               rules this parameter will always return "0". Required.
-                            "protocol": "str"  # The type of traffic to be allowed. This
+                            "protocol": "str",  # The type of traffic to be allowed. This
                               may be one of ``tcp``"" , ``udp``"" , or ``icmp``. Required. Known values
                               are: "tcp", "udp", and "icmp".
+                            "action": "allow"  # Optional. Default value is "allow". The
+                              action to be taken when traffic matches the rule. This may be one of
+                              ``allow`` or ``deny``. For backward compatibility, this field is
+                              optional. When not set, it defaults to ``allow``. Known values are:
+                              "allow" and "deny".
                         }
                     ]
                 }
@@ -162892,6 +158759,8 @@ class LoadBalancersOperations:
                               persistently served by the same backend Droplet. The possible values are
                               ``cookies`` or ``none``. Known values are: "cookies" and "none".
                         },
+                        "subnet_uuid": "str",  # Optional. A string specifying the UUID of
+                          the VPC subnet to which the load balancer is assigned.
                         "tag": "str",  # Optional. The name of a Droplet tag corresponding to
                           Droplets assigned to the load balancer.
                         "target_load_balancer_ids": [
@@ -163119,6 +158988,8 @@ class LoadBalancersOperations:
                               persistently served by the same backend Droplet. The possible values are
                               ``cookies`` or ``none``. Known values are: "cookies" and "none".
                         },
+                        "subnet_uuid": "str",  # Optional. A string specifying the UUID of
+                          the VPC subnet to which the load balancer is assigned.
                         "tag": "str",  # Optional. The name of a Droplet tag corresponding to
                           Droplets assigned to the load balancer.
                         "target_load_balancer_ids": [
@@ -163351,6 +159222,8 @@ class LoadBalancersOperations:
                               persistently served by the same backend Droplet. The possible values are
                               ``cookies`` or ``none``. Known values are: "cookies" and "none".
                         },
+                        "subnet_uuid": "str",  # Optional. A string specifying the UUID of
+                          the VPC subnet to which the load balancer is assigned.
                         "tag": "str",  # Optional. The name of a Droplet tag corresponding to
                           Droplets assigned to the load balancer.
                         "target_load_balancer_ids": [
@@ -163654,6 +159527,8 @@ class LoadBalancersOperations:
                                   persistently served by the same backend Droplet. The possible values
                                   are ``cookies`` or ``none``. Known values are: "cookies" and "none".
                             },
+                            "subnet_uuid": "str",  # Optional. A string specifying the
+                              UUID of the VPC subnet to which the load balancer is assigned.
                             "tag": "str",  # Optional. The name of a Droplet tag
                               corresponding to Droplets assigned to the load balancer.
                             "target_load_balancer_ids": [
@@ -163928,6 +159803,8 @@ class LoadBalancersOperations:
                               persistently served by the same backend Droplet. The possible values are
                               ``cookies`` or ``none``. Known values are: "cookies" and "none".
                         },
+                        "subnet_uuid": "str",  # Optional. A string specifying the UUID of
+                          the VPC subnet to which the load balancer is assigned.
                         "tag": "str",  # Optional. The name of a Droplet tag corresponding to
                           Droplets assigned to the load balancer.
                         "target_load_balancer_ids": [
@@ -164246,6 +160123,8 @@ class LoadBalancersOperations:
                               persistently served by the same backend Droplet. The possible values are
                               ``cookies`` or ``none``. Known values are: "cookies" and "none".
                         },
+                        "subnet_uuid": "str",  # Optional. A string specifying the UUID of
+                          the VPC subnet to which the load balancer is assigned.
                         "tag": "str",  # Optional. The name of a Droplet tag corresponding to
                           Droplets assigned to the load balancer.
                         "target_load_balancer_ids": [
@@ -164484,6 +160363,8 @@ class LoadBalancersOperations:
                               persistently served by the same backend Droplet. The possible values are
                               ``cookies`` or ``none``. Known values are: "cookies" and "none".
                         },
+                        "subnet_uuid": "str",  # Optional. A string specifying the UUID of
+                          the VPC subnet to which the load balancer is assigned.
                         "tag": "str",  # Optional. The name of a Droplet tag corresponding to
                           Droplets assigned to the load balancer.
                         "target_load_balancer_ids": [
@@ -164717,6 +160598,8 @@ class LoadBalancersOperations:
                               persistently served by the same backend Droplet. The possible values are
                               ``cookies`` or ``none``. Known values are: "cookies" and "none".
                         },
+                        "subnet_uuid": "str",  # Optional. A string specifying the UUID of
+                          the VPC subnet to which the load balancer is assigned.
                         "tag": "str",  # Optional. The name of a Droplet tag corresponding to
                           Droplets assigned to the load balancer.
                         "target_load_balancer_ids": [
@@ -208750,6 +204633,9 @@ class VpcnatgatewaysOperations:
                                 {
                                     "gateway_ip": "str",  # Optional. The gateway
                                       IP address of the VPC NAT gateway.
+                                    "subnet_uuid": "str",  # Optional. The unique
+                                      identifier of the VPC subnet to which the NAT gateway is
+                                      attached.
                                     "vpc_uuid": "str"  # Optional. The unique
                                       identifier of the VPC to which the NAT gateway is attached.
                                 }
@@ -208865,8 +204751,10 @@ class VpcnatgatewaysOperations:
                         {
                             "vpc_uuid": "str",  # The unique identifier of the VPC to
                               which the NAT gateway is attached. Required.
-                            "default_gateway": bool  # Optional. The classification of
+                            "default_gateway": bool,  # Optional. The classification of
                               the NAT gateway as the default egress route for the VPC traffic.
+                            "subnet_uuid": "str"  # Optional. The unique identifier of
+                              the VPC subnet to which the NAT gateway is attached.
                         }
                     ],
                     "egresses": {
@@ -208910,9 +204798,11 @@ class VpcnatgatewaysOperations:
                             {
                                 "vpc_uuid": "str",  # The unique identifier of the
                                   VPC to which the NAT gateway is attached. Required.
-                                "default_gateway": bool  # Optional. The
+                                "default_gateway": bool,  # Optional. The
                                   classification of the NAT gateway as the default egress route for the
                                   VPC traffic.
+                                "subnet_uuid": "str"  # Optional. The unique
+                                  identifier of the VPC subnet to which the NAT gateway is attached.
                             }
                         ],
                         "egresses": {
@@ -208987,9 +204877,11 @@ class VpcnatgatewaysOperations:
                             {
                                 "vpc_uuid": "str",  # The unique identifier of the
                                   VPC to which the NAT gateway is attached. Required.
-                                "default_gateway": bool  # Optional. The
+                                "default_gateway": bool,  # Optional. The
                                   classification of the NAT gateway as the default egress route for the
                                   VPC traffic.
+                                "subnet_uuid": "str"  # Optional. The unique
+                                  identifier of the VPC subnet to which the NAT gateway is attached.
                             }
                         ],
                         "egresses": {
@@ -209054,8 +204946,10 @@ class VpcnatgatewaysOperations:
                         {
                             "vpc_uuid": "str",  # The unique identifier of the VPC to
                               which the NAT gateway is attached. Required.
-                            "default_gateway": bool  # Optional. The classification of
+                            "default_gateway": bool,  # Optional. The classification of
                               the NAT gateway as the default egress route for the VPC traffic.
+                            "subnet_uuid": "str"  # Optional. The unique identifier of
+                              the VPC subnet to which the NAT gateway is attached.
                         }
                     ],
                     "egresses": {
@@ -209099,9 +204993,11 @@ class VpcnatgatewaysOperations:
                             {
                                 "vpc_uuid": "str",  # The unique identifier of the
                                   VPC to which the NAT gateway is attached. Required.
-                                "default_gateway": bool  # Optional. The
+                                "default_gateway": bool,  # Optional. The
                                   classification of the NAT gateway as the default egress route for the
                                   VPC traffic.
+                                "subnet_uuid": "str"  # Optional. The unique
+                                  identifier of the VPC subnet to which the NAT gateway is attached.
                             }
                         ],
                         "egresses": {
@@ -209266,6 +205162,8 @@ class VpcnatgatewaysOperations:
                             {
                                 "gateway_ip": "str",  # Optional. The gateway IP
                                   address of the VPC NAT gateway.
+                                "subnet_uuid": "str",  # Optional. The unique
+                                  identifier of the VPC subnet to which the NAT gateway is attached.
                                 "vpc_uuid": "str"  # Optional. The unique identifier
                                   of the VPC to which the NAT gateway is attached.
                             }
@@ -209406,6 +205304,8 @@ class VpcnatgatewaysOperations:
                         {
                             "default_gateway": bool,  # Optional. The classification of
                               the NAT gateway as the default egress route for the VPC traffic.
+                            "subnet_uuid": "str",  # Optional. The unique identifier of
+                              the VPC subnet to which the NAT gateway is attached.
                             "vpc_uuid": "str"  # Optional. The unique identifier of the
                               VPC to which the NAT gateway is attached.
                         }
@@ -209429,6 +205329,8 @@ class VpcnatgatewaysOperations:
                                 "default_gateway": bool,  # Optional. The
                                   classification of the NAT gateway as the default egress route for the
                                   VPC traffic.
+                                "subnet_uuid": "str",  # Optional. The unique
+                                  identifier of the VPC subnet to which the NAT gateway is attached.
                                 "vpc_uuid": "str"  # Optional. The unique identifier
                                   of the VPC to which the NAT gateway is attached.
                             }
@@ -209495,6 +205397,8 @@ class VpcnatgatewaysOperations:
                                 "default_gateway": bool,  # Optional. The
                                   classification of the NAT gateway as the default egress route for the
                                   VPC traffic.
+                                "subnet_uuid": "str",  # Optional. The unique
+                                  identifier of the VPC subnet to which the NAT gateway is attached.
                                 "vpc_uuid": "str"  # Optional. The unique identifier
                                   of the VPC to which the NAT gateway is attached.
                             }
@@ -209550,6 +205454,8 @@ class VpcnatgatewaysOperations:
                         {
                             "default_gateway": bool,  # Optional. The classification of
                               the NAT gateway as the default egress route for the VPC traffic.
+                            "subnet_uuid": "str",  # Optional. The unique identifier of
+                              the VPC subnet to which the NAT gateway is attached.
                             "vpc_uuid": "str"  # Optional. The unique identifier of the
                               VPC to which the NAT gateway is attached.
                         }
@@ -209573,6 +205479,8 @@ class VpcnatgatewaysOperations:
                                 "default_gateway": bool,  # Optional. The
                                   classification of the NAT gateway as the default egress route for the
                                   VPC traffic.
+                                "subnet_uuid": "str",  # Optional. The unique
+                                  identifier of the VPC subnet to which the NAT gateway is attached.
                                 "vpc_uuid": "str"  # Optional. The unique identifier
                                   of the VPC to which the NAT gateway is attached.
                             }
@@ -273743,6 +269651,3628 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
 
         return cast(JSON, deserialized)  # type: ignore
 
+    @distributed_trace_async
+    async def list_scenario_library(
+        self,
+        *,
+        page: Optional[int] = None,
+        per_page: Optional[int] = None,
+        category: Optional[str] = None,
+        search: Optional[str] = None,
+        sort_by: str = "SCENARIO_LIBRARY_SORT_FIELD_UNSPECIFIED",
+        sort_direction: str = "SORT_DIRECTION_UNSPECIFIED",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Common Scenario & Goal Library.
+
+        To list the platform-curated Common Scenario & Goal Library, send a GET request to
+        ``/v2/gen-ai/scenario_library``.
+
+        :keyword page: Page number. Default value is None.
+        :paramtype page: int
+        :keyword per_page: Items per page. Default value is None.
+        :paramtype per_page: int
+        :keyword category: Filter by category (exact match). Empty means no category filter. Default
+         value is None.
+        :paramtype category: str
+        :keyword search: Free-text search across name, description, and goal_description
+         (case-insensitive substring match). Empty means no search. Default value is None.
+        :paramtype search: str
+        :keyword sort_by: Field to sort by. Defaults to name when unspecified.
+
+
+         * SCENARIO_LIBRARY_SORT_FIELD_NAME: Sort by customer-facing name (case-insensitive). Default.
+         * SCENARIO_LIBRARY_SORT_FIELD_CREATED_AT: Sort by creation date. Known values are:
+         "SCENARIO_LIBRARY_SORT_FIELD_UNSPECIFIED", "SCENARIO_LIBRARY_SORT_FIELD_NAME", and
+         "SCENARIO_LIBRARY_SORT_FIELD_CREATED_AT". Default value is
+         "SCENARIO_LIBRARY_SORT_FIELD_UNSPECIFIED".
+        :paramtype sort_by: str
+        :keyword sort_direction: Sort direction. Defaults to ascending when unspecified. Known values
+         are: "SORT_DIRECTION_UNSPECIFIED", "SORT_DIRECTION_ASC", and "SORT_DIRECTION_DESC". Default
+         value is "SORT_DIRECTION_UNSPECIFIED".
+        :paramtype sort_direction: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "available_categories": [
+                        "str"  # Optional. Categories currently in use, for filtering library
+                          results.
+                    ],
+                    "available_sort_by": [
+                        "str"  # Optional. Sort-by values available for this list request.
+                    ],
+                    "available_sort_directions": [
+                        "str"  # Optional. Sort-direction values available for this list
+                          request.
+                    ],
+                    "links": {
+                        "pages": {
+                            "first": "str",  # Optional. First page.
+                            "last": "str",  # Optional. Last page.
+                            "next": "str",  # Optional. Next page.
+                            "previous": "str"  # Optional. Previous page.
+                        }
+                    },
+                    "meta": {
+                        "page": 0,  # Optional. The current page.
+                        "pages": 0,  # Optional. Total number of pages.
+                        "total": 0  # Optional. Total amount of items over all pages.
+                    },
+                    "scenarios": [
+                        {
+                            "category": "str",  # Optional. Optional grouping for catalog
+                              browsing (e.g. "Billing", "Onboarding"). Empty when uncategorized.
+                            "created_at": "2020-02-20 00:00:00",  # Optional. Time
+                              created at.
+                            "description": "str",  # Optional. Curated description.
+                            "goal_description": "str",  # Optional. The goal this
+                              scenario set demonstrates, shown as context alongside goal-driven
+                              generation.
+                            "library_scenario_uuid": "str",  # Optional. UUID of the
+                              library entry.
+                            "name": "str",  # Optional. Curated display name.
+                            "scenario_count": 0,  # Optional. Number of scenarios in the
+                              library entry.
+                            "status": "SCENARIO_LIBRARY_ENTRY_STATUS_UNSPECIFIED",  #
+                              Optional. Default value is "SCENARIO_LIBRARY_ENTRY_STATUS_UNSPECIFIED".
+                              Lifecycle status of a Common Scenario & Goal Library entry.   *
+                              SCENARIO_LIBRARY_ENTRY_STATUS_ACTIVE: Visible in the library and
+                              available to copy into a scenario set. *
+                              SCENARIO_LIBRARY_ENTRY_STATUS_ARCHIVED: Hidden from the library catalog.
+                              Existing scenario sets created from   this entry keep their provenance.
+                              Known values are: "SCENARIO_LIBRARY_ENTRY_STATUS_UNSPECIFIED",
+                              "SCENARIO_LIBRARY_ENTRY_STATUS_ACTIVE", and
+                              "SCENARIO_LIBRARY_ENTRY_STATUS_ARCHIVED".
+                            "updated_at": "2020-02-20 00:00:00"  # Optional. Time last
+                              updated at.
+                        }
+                    ]
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_genai_list_scenario_library_request(
+            page=page,
+            per_page=per_page,
+            category=category,
+            search=search,
+            sort_by=sort_by,
+            sort_direction=sort_direction,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def create_scenario_set_from_library(
+        self,
+        library_scenario_uuid: str,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create Scenario Set From Library.
+
+        To create a scenario set from a Common Scenario & Goal Library entry, send a POST request to
+        ``/v2/gen-ai/scenario_library/{library_scenario_uuid}/create_scenario_set``. The library
+        scenarios are copied into a new scenario set owned by the calling team. The new set is ready to
+        use when creating a simulation run.
+
+        :param library_scenario_uuid: UUID of the library entry to copy. Required.
+        :type library_scenario_uuid: str
+        :param body: Default value is None.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "library_scenario_uuid": "str",  # Optional. UUID of the library entry to
+                      copy.
+                    "name": "str"  # Optional. Optional name for the new scenario set. Defaults
+                      to the library entry's name when unset.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "scenario_set": {
+                        "bucket_name": "str",  # Optional. Object storage bucket holding the
+                          scenario file. Unset while status is generating.
+                        "bucket_region": "str",  # Optional. Object storage bucket region.
+                          Unset while status is generating.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Time created at.
+                        "deleted_at": "2020-02-20 00:00:00",  # Optional. Time deleted at.
+                          Unset unless the scenario set has been deleted.
+                        "description": "str",  # Optional. Customer-supplied description.
+                        "failure_reason": "str",  # Optional. Human-readable explanation of a
+                          terminal FAILED status. Empty otherwise.
+                        "generator_model_uuid": "str",  # Optional. Model that produced the
+                          scenarios. Only set for goal-generated scenario sets.
+                        "library_scenario_uuid": "str",  # Optional. UUID of the source
+                          library entry. Only set for library scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_LIBRARY``"" ).
+                        "name": "str",  # Optional. Customer-supplied name.
+                        "scenario_count": 0,  # Optional. Number of scenarios in the set.
+                          Unset while status is generating.
+                        "scenario_set_uuid": "str",  # Optional. UUID of the scenario set.
+                        "source_export_id": "str",  # Optional. Signals export UUID that
+                          produced this set. Only set for signal-generated scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED``"" ).
+                        "source_goal_description": "str",  # Optional. The goal that drove
+                          generation. Only set for goal_generated scenario sets.
+                        "source_kind": "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",  # Optional.
+                          Default value is "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED". How a scenario set
+                          was created.   * SCENARIO_SET_SOURCE_KIND_USER_UPLOAD: Created from uploaded
+                          or inline scenarios. * SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED: Produced by
+                          goal-driven generation. * SCENARIO_SET_SOURCE_KIND_LIBRARY: Copied from a
+                          platform-curated library entry. * SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED:
+                          Produced from a completed Signals export. Known values are:
+                          "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",
+                          "SCENARIO_SET_SOURCE_KIND_USER_UPLOAD",
+                          "SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED",
+                          "SCENARIO_SET_SOURCE_KIND_LIBRARY", and
+                          "SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED".
+                        "spaces_key": "str",  # Optional. Object storage key for the scenario
+                          file. Unset while status is generating.
+                        "status": "SCENARIO_SET_STATUS_UNSPECIFIED",  # Optional. Default
+                          value is "SCENARIO_SET_STATUS_UNSPECIFIED". Lifecycle status of a scenario
+                          set. Uploaded sets are created as ready. Generated sets start as generating
+                          and then become ready, failed, or cancelled.   *
+                          SCENARIO_SET_STATUS_GENERATING: Generation is in progress. The scenarios are
+                          not ready yet. * SCENARIO_SET_STATUS_READY: The scenario set is ready to use.
+                          * SCENARIO_SET_STATUS_FAILED: Generation failed. The scenario set has no
+                          readable scenarios. * SCENARIO_SET_STATUS_CANCELLED: Generation was cancelled
+                          before completion. Known values are: "SCENARIO_SET_STATUS_UNSPECIFIED",
+                          "SCENARIO_SET_STATUS_GENERATING", "SCENARIO_SET_STATUS_READY",
+                          "SCENARIO_SET_STATUS_FAILED", and "SCENARIO_SET_STATUS_CANCELLED".
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. Time last updated
+                          at.
+                        "workflow_uuid": "str"  # Optional. Identifier of the generation
+                          workflow. Only set for goal-generated scenario sets.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def create_scenario_set_from_library(
+        self,
+        library_scenario_uuid: str,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create Scenario Set From Library.
+
+        To create a scenario set from a Common Scenario & Goal Library entry, send a POST request to
+        ``/v2/gen-ai/scenario_library/{library_scenario_uuid}/create_scenario_set``. The library
+        scenarios are copied into a new scenario set owned by the calling team. The new set is ready to
+        use when creating a simulation run.
+
+        :param library_scenario_uuid: UUID of the library entry to copy. Required.
+        :type library_scenario_uuid: str
+        :param body: Default value is None.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "scenario_set": {
+                        "bucket_name": "str",  # Optional. Object storage bucket holding the
+                          scenario file. Unset while status is generating.
+                        "bucket_region": "str",  # Optional. Object storage bucket region.
+                          Unset while status is generating.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Time created at.
+                        "deleted_at": "2020-02-20 00:00:00",  # Optional. Time deleted at.
+                          Unset unless the scenario set has been deleted.
+                        "description": "str",  # Optional. Customer-supplied description.
+                        "failure_reason": "str",  # Optional. Human-readable explanation of a
+                          terminal FAILED status. Empty otherwise.
+                        "generator_model_uuid": "str",  # Optional. Model that produced the
+                          scenarios. Only set for goal-generated scenario sets.
+                        "library_scenario_uuid": "str",  # Optional. UUID of the source
+                          library entry. Only set for library scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_LIBRARY``"" ).
+                        "name": "str",  # Optional. Customer-supplied name.
+                        "scenario_count": 0,  # Optional. Number of scenarios in the set.
+                          Unset while status is generating.
+                        "scenario_set_uuid": "str",  # Optional. UUID of the scenario set.
+                        "source_export_id": "str",  # Optional. Signals export UUID that
+                          produced this set. Only set for signal-generated scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED``"" ).
+                        "source_goal_description": "str",  # Optional. The goal that drove
+                          generation. Only set for goal_generated scenario sets.
+                        "source_kind": "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",  # Optional.
+                          Default value is "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED". How a scenario set
+                          was created.   * SCENARIO_SET_SOURCE_KIND_USER_UPLOAD: Created from uploaded
+                          or inline scenarios. * SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED: Produced by
+                          goal-driven generation. * SCENARIO_SET_SOURCE_KIND_LIBRARY: Copied from a
+                          platform-curated library entry. * SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED:
+                          Produced from a completed Signals export. Known values are:
+                          "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",
+                          "SCENARIO_SET_SOURCE_KIND_USER_UPLOAD",
+                          "SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED",
+                          "SCENARIO_SET_SOURCE_KIND_LIBRARY", and
+                          "SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED".
+                        "spaces_key": "str",  # Optional. Object storage key for the scenario
+                          file. Unset while status is generating.
+                        "status": "SCENARIO_SET_STATUS_UNSPECIFIED",  # Optional. Default
+                          value is "SCENARIO_SET_STATUS_UNSPECIFIED". Lifecycle status of a scenario
+                          set. Uploaded sets are created as ready. Generated sets start as generating
+                          and then become ready, failed, or cancelled.   *
+                          SCENARIO_SET_STATUS_GENERATING: Generation is in progress. The scenarios are
+                          not ready yet. * SCENARIO_SET_STATUS_READY: The scenario set is ready to use.
+                          * SCENARIO_SET_STATUS_FAILED: Generation failed. The scenario set has no
+                          readable scenarios. * SCENARIO_SET_STATUS_CANCELLED: Generation was cancelled
+                          before completion. Known values are: "SCENARIO_SET_STATUS_UNSPECIFIED",
+                          "SCENARIO_SET_STATUS_GENERATING", "SCENARIO_SET_STATUS_READY",
+                          "SCENARIO_SET_STATUS_FAILED", and "SCENARIO_SET_STATUS_CANCELLED".
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. Time last updated
+                          at.
+                        "workflow_uuid": "str"  # Optional. Identifier of the generation
+                          workflow. Only set for goal-generated scenario sets.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def create_scenario_set_from_library(
+        self,
+        library_scenario_uuid: str,
+        body: Optional[Union[JSON, IO[bytes]]] = None,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create Scenario Set From Library.
+
+        To create a scenario set from a Common Scenario & Goal Library entry, send a POST request to
+        ``/v2/gen-ai/scenario_library/{library_scenario_uuid}/create_scenario_set``. The library
+        scenarios are copied into a new scenario set owned by the calling team. The new set is ready to
+        use when creating a simulation run.
+
+        :param library_scenario_uuid: UUID of the library entry to copy. Required.
+        :type library_scenario_uuid: str
+        :param body: Is either a JSON type or a IO[bytes] type. Default value is None.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "library_scenario_uuid": "str",  # Optional. UUID of the library entry to
+                      copy.
+                    "name": "str"  # Optional. Optional name for the new scenario set. Defaults
+                      to the library entry's name when unset.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "scenario_set": {
+                        "bucket_name": "str",  # Optional. Object storage bucket holding the
+                          scenario file. Unset while status is generating.
+                        "bucket_region": "str",  # Optional. Object storage bucket region.
+                          Unset while status is generating.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Time created at.
+                        "deleted_at": "2020-02-20 00:00:00",  # Optional. Time deleted at.
+                          Unset unless the scenario set has been deleted.
+                        "description": "str",  # Optional. Customer-supplied description.
+                        "failure_reason": "str",  # Optional. Human-readable explanation of a
+                          terminal FAILED status. Empty otherwise.
+                        "generator_model_uuid": "str",  # Optional. Model that produced the
+                          scenarios. Only set for goal-generated scenario sets.
+                        "library_scenario_uuid": "str",  # Optional. UUID of the source
+                          library entry. Only set for library scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_LIBRARY``"" ).
+                        "name": "str",  # Optional. Customer-supplied name.
+                        "scenario_count": 0,  # Optional. Number of scenarios in the set.
+                          Unset while status is generating.
+                        "scenario_set_uuid": "str",  # Optional. UUID of the scenario set.
+                        "source_export_id": "str",  # Optional. Signals export UUID that
+                          produced this set. Only set for signal-generated scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED``"" ).
+                        "source_goal_description": "str",  # Optional. The goal that drove
+                          generation. Only set for goal_generated scenario sets.
+                        "source_kind": "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",  # Optional.
+                          Default value is "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED". How a scenario set
+                          was created.   * SCENARIO_SET_SOURCE_KIND_USER_UPLOAD: Created from uploaded
+                          or inline scenarios. * SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED: Produced by
+                          goal-driven generation. * SCENARIO_SET_SOURCE_KIND_LIBRARY: Copied from a
+                          platform-curated library entry. * SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED:
+                          Produced from a completed Signals export. Known values are:
+                          "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",
+                          "SCENARIO_SET_SOURCE_KIND_USER_UPLOAD",
+                          "SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED",
+                          "SCENARIO_SET_SOURCE_KIND_LIBRARY", and
+                          "SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED".
+                        "spaces_key": "str",  # Optional. Object storage key for the scenario
+                          file. Unset while status is generating.
+                        "status": "SCENARIO_SET_STATUS_UNSPECIFIED",  # Optional. Default
+                          value is "SCENARIO_SET_STATUS_UNSPECIFIED". Lifecycle status of a scenario
+                          set. Uploaded sets are created as ready. Generated sets start as generating
+                          and then become ready, failed, or cancelled.   *
+                          SCENARIO_SET_STATUS_GENERATING: Generation is in progress. The scenarios are
+                          not ready yet. * SCENARIO_SET_STATUS_READY: The scenario set is ready to use.
+                          * SCENARIO_SET_STATUS_FAILED: Generation failed. The scenario set has no
+                          readable scenarios. * SCENARIO_SET_STATUS_CANCELLED: Generation was cancelled
+                          before completion. Known values are: "SCENARIO_SET_STATUS_UNSPECIFIED",
+                          "SCENARIO_SET_STATUS_GENERATING", "SCENARIO_SET_STATUS_READY",
+                          "SCENARIO_SET_STATUS_FAILED", and "SCENARIO_SET_STATUS_CANCELLED".
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. Time last updated
+                          at.
+                        "workflow_uuid": "str"  # Optional. Identifier of the generation
+                          workflow. Only set for goal-generated scenario sets.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            if body is not None:
+                _json = body
+            else:
+                _json = None
+
+        _request = build_genai_create_scenario_set_from_library_request(
+            library_scenario_uuid=library_scenario_uuid,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def list_scenario_library_scenarios(
+        self,
+        library_scenario_uuid: str,
+        *,
+        page: Optional[int] = None,
+        per_page: Optional[int] = None,
+        search: Optional[str] = None,
+        sort_by: str = "SCENARIO_SORT_FIELD_UNSPECIFIED",
+        sort_direction: str = "SORT_DIRECTION_UNSPECIFIED",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Scenarios In Library Entry.
+
+        To list the scenarios inside a Common Scenario & Goal Library entry without creating a
+        team-owned scenario set, send a GET request to
+        ``/v2/gen-ai/scenario_library/{library_scenario_uuid}/scenarios``.
+
+        :param library_scenario_uuid: UUID of the library entry to read. Required.
+        :type library_scenario_uuid: str
+        :keyword page: Page number. Default value is None.
+        :paramtype page: int
+        :keyword per_page: Items per page. Default value is None.
+        :paramtype per_page: int
+        :keyword search: Free-text search across name, description, and user_persona
+         (case-insensitive substring match). Empty means no search. Default value is None.
+        :paramtype search: str
+        :keyword sort_by: Field to sort by. Defaults to original file order when unspecified.
+
+
+         * SCENARIO_SORT_FIELD_FILE_ORDER: Preserve original file order. Default.
+         * SCENARIO_SORT_FIELD_NAME: Sort by scenario name (case-insensitive). Empty names sort last.
+         * SCENARIO_SORT_FIELD_DESCRIPTION: Sort by scenario description (case-insensitive). Known
+         values are: "SCENARIO_SORT_FIELD_UNSPECIFIED", "SCENARIO_SORT_FIELD_FILE_ORDER",
+         "SCENARIO_SORT_FIELD_NAME", and "SCENARIO_SORT_FIELD_DESCRIPTION". Default value is
+         "SCENARIO_SORT_FIELD_UNSPECIFIED".
+        :paramtype sort_by: str
+        :keyword sort_direction: Sort direction. Defaults to ascending when unspecified. Known values
+         are: "SORT_DIRECTION_UNSPECIFIED", "SORT_DIRECTION_ASC", and "SORT_DIRECTION_DESC". Default
+         value is "SORT_DIRECTION_UNSPECIFIED".
+        :paramtype sort_direction: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "available_sort_by": [
+                        "str"  # Optional. Sort-by values available for this list request.
+                    ],
+                    "available_sort_directions": [
+                        "str"  # Optional. Sort-direction values available for this list
+                          request.
+                    ],
+                    "links": {
+                        "pages": {
+                            "first": "str",  # Optional. First page.
+                            "last": "str",  # Optional. Last page.
+                            "next": "str",  # Optional. Next page.
+                            "previous": "str"  # Optional. Previous page.
+                        }
+                    },
+                    "meta": {
+                        "page": 0,  # Optional. The current page.
+                        "pages": 0,  # Optional. Total number of pages.
+                        "total": 0  # Optional. Total amount of items over all pages.
+                    },
+                    "scenarios": [
+                        {
+                            "description": "str",  # Optional. What the user tries to
+                              accomplish. Required.
+                            "exploration_budget": 0,  # Optional. Number of journeys to
+                              explore for this scenario. Defaults to 1 if unset.
+                            "max_turns": 0,  # Optional. Turn budget for the scenario.
+                              Falls back to the run-level default if unset.
+                            "name": "str",  # Optional. Human-readable name for the
+                              scenario. Optional.
+                            "scenario_uuid": "str",  # Optional. Unique id for the
+                              scenario. Always generated by the API; any customer-supplied value is
+                              ignored and overwritten.
+                            "stopping_criteria": [
+                                "str"  # Optional. Judge stopping criteria. Required;
+                                  must contain at least one entry.
+                            ],
+                            "user_persona": "str"  # Optional. How the user communicates
+                              (tone, role). Optional.
+                        }
+                    ]
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_genai_list_scenario_library_scenarios_request(
+            library_scenario_uuid=library_scenario_uuid,
+            page=page,
+            per_page=per_page,
+            search=search,
+            sort_by=sort_by,
+            sort_direction=sort_direction,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def list_scenario_sets(
+        self,
+        *,
+        page: Optional[int] = None,
+        per_page: Optional[int] = None,
+        statuses: Optional[List[str]] = None,
+        source_kinds: Optional[List[str]] = None,
+        search: Optional[str] = None,
+        sort_by: str = "SCENARIO_SET_SORT_FIELD_UNSPECIFIED",
+        sort_direction: str = "SORT_DIRECTION_UNSPECIFIED",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Scenario Sets.
+
+        To list scenario sets, send a GET request to ``/v2/gen-ai/scenario_sets``.
+
+        :keyword page: Page number. Default value is None.
+        :paramtype page: int
+        :keyword per_page: Items per page. Default value is None.
+        :paramtype per_page: int
+        :keyword statuses: Filter by one or more statuses. Empty means no status filter.
+
+
+         * SCENARIO_SET_STATUS_GENERATING: Generation is in progress. The scenarios are not ready yet.
+         * SCENARIO_SET_STATUS_READY: The scenario set is ready to use.
+         * SCENARIO_SET_STATUS_FAILED: Generation failed. The scenario set has no readable scenarios.
+         * SCENARIO_SET_STATUS_CANCELLED: Generation was cancelled before completion. Default value is
+         None.
+        :paramtype statuses: list[str]
+        :keyword source_kinds: Filter by one or more source kinds. Empty means no source-kind filter.
+
+
+         * SCENARIO_SET_SOURCE_KIND_USER_UPLOAD: Created from uploaded or inline scenarios.
+         * SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED: Produced by goal-driven generation.
+         * SCENARIO_SET_SOURCE_KIND_LIBRARY: Copied from a platform-curated library entry.
+         * SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED: Produced from a completed Signals export. Default
+         value is None.
+        :paramtype source_kinds: list[str]
+        :keyword search: Free-text search across name and description
+         (case-insensitive substring match). Empty means no search. Default value is None.
+        :paramtype search: str
+        :keyword sort_by: Field to sort by. Defaults to creation date when unspecified.
+
+
+         * SCENARIO_SET_SORT_FIELD_CREATED_AT: Sort by creation date. Default.
+         * SCENARIO_SET_SORT_FIELD_NAME: Sort by customer-supplied name (case-insensitive).
+         * SCENARIO_SET_SORT_FIELD_STATUS: Sort by status using lifecycle order (generating → ready →
+         terminal).
+         * SCENARIO_SET_SORT_FIELD_SCENARIO_COUNT: Sort by scenario_count.
+         * SCENARIO_SET_SORT_FIELD_UPDATED_AT: Sort by last update date. Known values are:
+         "SCENARIO_SET_SORT_FIELD_UNSPECIFIED", "SCENARIO_SET_SORT_FIELD_CREATED_AT",
+         "SCENARIO_SET_SORT_FIELD_NAME", "SCENARIO_SET_SORT_FIELD_STATUS",
+         "SCENARIO_SET_SORT_FIELD_SCENARIO_COUNT", and "SCENARIO_SET_SORT_FIELD_UPDATED_AT". Default
+         value is "SCENARIO_SET_SORT_FIELD_UNSPECIFIED".
+        :paramtype sort_by: str
+        :keyword sort_direction: Sort direction. Defaults to descending when unspecified. Known values
+         are: "SORT_DIRECTION_UNSPECIFIED", "SORT_DIRECTION_ASC", and "SORT_DIRECTION_DESC". Default
+         value is "SORT_DIRECTION_UNSPECIFIED".
+        :paramtype sort_direction: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "available_sort_by": [
+                        "str"  # Optional. Sort-by values available for this list request.
+                    ],
+                    "available_sort_directions": [
+                        "str"  # Optional. Sort-direction values available for this list
+                          request.
+                    ],
+                    "available_source_kinds": [
+                        "str"  # Optional. Source kinds available for filtering this list
+                          request.
+                    ],
+                    "available_statuses": [
+                        "str"  # Optional. Statuses available for filtering this list
+                          request.
+                    ],
+                    "links": {
+                        "pages": {
+                            "first": "str",  # Optional. First page.
+                            "last": "str",  # Optional. Last page.
+                            "next": "str",  # Optional. Next page.
+                            "previous": "str"  # Optional. Previous page.
+                        }
+                    },
+                    "meta": {
+                        "page": 0,  # Optional. The current page.
+                        "pages": 0,  # Optional. Total number of pages.
+                        "total": 0  # Optional. Total amount of items over all pages.
+                    },
+                    "scenario_sets": [
+                        {
+                            "bucket_name": "str",  # Optional. Object storage bucket
+                              holding the scenario file. Unset while status is generating.
+                            "bucket_region": "str",  # Optional. Object storage bucket
+                              region. Unset while status is generating.
+                            "created_at": "2020-02-20 00:00:00",  # Optional. Time
+                              created at.
+                            "deleted_at": "2020-02-20 00:00:00",  # Optional. Time
+                              deleted at. Unset unless the scenario set has been deleted.
+                            "description": "str",  # Optional. Customer-supplied
+                              description.
+                            "failure_reason": "str",  # Optional. Human-readable
+                              explanation of a terminal FAILED status. Empty otherwise.
+                            "generator_model_uuid": "str",  # Optional. Model that
+                              produced the scenarios. Only set for goal-generated scenario sets.
+                            "library_scenario_uuid": "str",  # Optional. UUID of the
+                              source library entry. Only set for library scenario sets (""
+                              ``source_kind=SCENARIO_SET_SOURCE_KIND_LIBRARY``"" ).
+                            "name": "str",  # Optional. Customer-supplied name.
+                            "scenario_count": 0,  # Optional. Number of scenarios in the
+                              set. Unset while status is generating.
+                            "scenario_set_uuid": "str",  # Optional. UUID of the scenario
+                              set.
+                            "source_export_id": "str",  # Optional. Signals export UUID
+                              that produced this set. Only set for signal-generated scenario sets (""
+                              ``source_kind=SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED``"" ).
+                            "source_goal_description": "str",  # Optional. The goal that
+                              drove generation. Only set for goal_generated scenario sets.
+                            "source_kind": "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",  #
+                              Optional. Default value is "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED". How a
+                              scenario set was created.   * SCENARIO_SET_SOURCE_KIND_USER_UPLOAD:
+                              Created from uploaded or inline scenarios. *
+                              SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED: Produced by goal-driven
+                              generation. * SCENARIO_SET_SOURCE_KIND_LIBRARY: Copied from a
+                              platform-curated library entry. *
+                              SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED: Produced from a completed
+                              Signals export. Known values are: "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",
+                              "SCENARIO_SET_SOURCE_KIND_USER_UPLOAD",
+                              "SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED",
+                              "SCENARIO_SET_SOURCE_KIND_LIBRARY", and
+                              "SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED".
+                            "spaces_key": "str",  # Optional. Object storage key for the
+                              scenario file. Unset while status is generating.
+                            "status": "SCENARIO_SET_STATUS_UNSPECIFIED",  # Optional.
+                              Default value is "SCENARIO_SET_STATUS_UNSPECIFIED". Lifecycle status of a
+                              scenario set. Uploaded sets are created as ready. Generated sets start as
+                              generating and then become ready, failed, or cancelled.   *
+                              SCENARIO_SET_STATUS_GENERATING: Generation is in progress. The scenarios
+                              are not ready yet. * SCENARIO_SET_STATUS_READY: The scenario set is ready
+                              to use. * SCENARIO_SET_STATUS_FAILED: Generation failed. The scenario set
+                              has no readable scenarios. * SCENARIO_SET_STATUS_CANCELLED: Generation
+                              was cancelled before completion. Known values are:
+                              "SCENARIO_SET_STATUS_UNSPECIFIED", "SCENARIO_SET_STATUS_GENERATING",
+                              "SCENARIO_SET_STATUS_READY", "SCENARIO_SET_STATUS_FAILED", and
+                              "SCENARIO_SET_STATUS_CANCELLED".
+                            "updated_at": "2020-02-20 00:00:00",  # Optional. Time last
+                              updated at.
+                            "workflow_uuid": "str"  # Optional. Identifier of the
+                              generation workflow. Only set for goal-generated scenario sets.
+                        }
+                    ]
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_genai_list_scenario_sets_request(
+            page=page,
+            per_page=per_page,
+            statuses=statuses,
+            source_kinds=source_kinds,
+            search=search,
+            sort_by=sort_by,
+            sort_direction=sort_direction,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def create_scenario_set(
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create Scenario Set.
+
+        To create a scenario set, send a POST request to ``/v2/gen-ai/scenario_sets``. Provide exactly
+        one of ``scenarios`` or ``file_upload_scenario_set``. The set is created in the ready state.
+
+        :param body: Default value is None.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "file_upload_scenario_set": {
+                        "original_file_name": "str",  # Optional. The original file name.
+                        "size_in_bytes": "str",  # Optional. The size of the file in bytes.
+                        "stored_object_key": "str"  # Optional. The object key the file was
+                          stored as.
+                    },
+                    "name": "str",  # Optional. The name of the scenario set.
+                    "scenarios": [
+                        {
+                            "description": "str",  # Optional. What the user tries to
+                              accomplish. Required.
+                            "exploration_budget": 0,  # Optional. Number of journeys to
+                              explore for this scenario. Defaults to 1 if unset.
+                            "max_turns": 0,  # Optional. Turn budget for the scenario.
+                              Falls back to the run-level default if unset.
+                            "name": "str",  # Optional. Human-readable name for the
+                              scenario. Optional.
+                            "scenario_uuid": "str",  # Optional. Unique id for the
+                              scenario. Always generated by the API; any customer-supplied value is
+                              ignored and overwritten.
+                            "stopping_criteria": [
+                                "str"  # Optional. Judge stopping criteria. Required;
+                                  must contain at least one entry.
+                            ],
+                            "user_persona": "str"  # Optional. How the user communicates
+                              (tone, role). Optional.
+                        }
+                    ]
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "scenario_set": {
+                        "bucket_name": "str",  # Optional. Object storage bucket holding the
+                          scenario file. Unset while status is generating.
+                        "bucket_region": "str",  # Optional. Object storage bucket region.
+                          Unset while status is generating.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Time created at.
+                        "deleted_at": "2020-02-20 00:00:00",  # Optional. Time deleted at.
+                          Unset unless the scenario set has been deleted.
+                        "description": "str",  # Optional. Customer-supplied description.
+                        "failure_reason": "str",  # Optional. Human-readable explanation of a
+                          terminal FAILED status. Empty otherwise.
+                        "generator_model_uuid": "str",  # Optional. Model that produced the
+                          scenarios. Only set for goal-generated scenario sets.
+                        "library_scenario_uuid": "str",  # Optional. UUID of the source
+                          library entry. Only set for library scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_LIBRARY``"" ).
+                        "name": "str",  # Optional. Customer-supplied name.
+                        "scenario_count": 0,  # Optional. Number of scenarios in the set.
+                          Unset while status is generating.
+                        "scenario_set_uuid": "str",  # Optional. UUID of the scenario set.
+                        "source_export_id": "str",  # Optional. Signals export UUID that
+                          produced this set. Only set for signal-generated scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED``"" ).
+                        "source_goal_description": "str",  # Optional. The goal that drove
+                          generation. Only set for goal_generated scenario sets.
+                        "source_kind": "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",  # Optional.
+                          Default value is "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED". How a scenario set
+                          was created.   * SCENARIO_SET_SOURCE_KIND_USER_UPLOAD: Created from uploaded
+                          or inline scenarios. * SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED: Produced by
+                          goal-driven generation. * SCENARIO_SET_SOURCE_KIND_LIBRARY: Copied from a
+                          platform-curated library entry. * SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED:
+                          Produced from a completed Signals export. Known values are:
+                          "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",
+                          "SCENARIO_SET_SOURCE_KIND_USER_UPLOAD",
+                          "SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED",
+                          "SCENARIO_SET_SOURCE_KIND_LIBRARY", and
+                          "SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED".
+                        "spaces_key": "str",  # Optional. Object storage key for the scenario
+                          file. Unset while status is generating.
+                        "status": "SCENARIO_SET_STATUS_UNSPECIFIED",  # Optional. Default
+                          value is "SCENARIO_SET_STATUS_UNSPECIFIED". Lifecycle status of a scenario
+                          set. Uploaded sets are created as ready. Generated sets start as generating
+                          and then become ready, failed, or cancelled.   *
+                          SCENARIO_SET_STATUS_GENERATING: Generation is in progress. The scenarios are
+                          not ready yet. * SCENARIO_SET_STATUS_READY: The scenario set is ready to use.
+                          * SCENARIO_SET_STATUS_FAILED: Generation failed. The scenario set has no
+                          readable scenarios. * SCENARIO_SET_STATUS_CANCELLED: Generation was cancelled
+                          before completion. Known values are: "SCENARIO_SET_STATUS_UNSPECIFIED",
+                          "SCENARIO_SET_STATUS_GENERATING", "SCENARIO_SET_STATUS_READY",
+                          "SCENARIO_SET_STATUS_FAILED", and "SCENARIO_SET_STATUS_CANCELLED".
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. Time last updated
+                          at.
+                        "workflow_uuid": "str"  # Optional. Identifier of the generation
+                          workflow. Only set for goal-generated scenario sets.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def create_scenario_set(
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create Scenario Set.
+
+        To create a scenario set, send a POST request to ``/v2/gen-ai/scenario_sets``. Provide exactly
+        one of ``scenarios`` or ``file_upload_scenario_set``. The set is created in the ready state.
+
+        :param body: Default value is None.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "scenario_set": {
+                        "bucket_name": "str",  # Optional. Object storage bucket holding the
+                          scenario file. Unset while status is generating.
+                        "bucket_region": "str",  # Optional. Object storage bucket region.
+                          Unset while status is generating.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Time created at.
+                        "deleted_at": "2020-02-20 00:00:00",  # Optional. Time deleted at.
+                          Unset unless the scenario set has been deleted.
+                        "description": "str",  # Optional. Customer-supplied description.
+                        "failure_reason": "str",  # Optional. Human-readable explanation of a
+                          terminal FAILED status. Empty otherwise.
+                        "generator_model_uuid": "str",  # Optional. Model that produced the
+                          scenarios. Only set for goal-generated scenario sets.
+                        "library_scenario_uuid": "str",  # Optional. UUID of the source
+                          library entry. Only set for library scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_LIBRARY``"" ).
+                        "name": "str",  # Optional. Customer-supplied name.
+                        "scenario_count": 0,  # Optional. Number of scenarios in the set.
+                          Unset while status is generating.
+                        "scenario_set_uuid": "str",  # Optional. UUID of the scenario set.
+                        "source_export_id": "str",  # Optional. Signals export UUID that
+                          produced this set. Only set for signal-generated scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED``"" ).
+                        "source_goal_description": "str",  # Optional. The goal that drove
+                          generation. Only set for goal_generated scenario sets.
+                        "source_kind": "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",  # Optional.
+                          Default value is "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED". How a scenario set
+                          was created.   * SCENARIO_SET_SOURCE_KIND_USER_UPLOAD: Created from uploaded
+                          or inline scenarios. * SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED: Produced by
+                          goal-driven generation. * SCENARIO_SET_SOURCE_KIND_LIBRARY: Copied from a
+                          platform-curated library entry. * SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED:
+                          Produced from a completed Signals export. Known values are:
+                          "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",
+                          "SCENARIO_SET_SOURCE_KIND_USER_UPLOAD",
+                          "SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED",
+                          "SCENARIO_SET_SOURCE_KIND_LIBRARY", and
+                          "SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED".
+                        "spaces_key": "str",  # Optional. Object storage key for the scenario
+                          file. Unset while status is generating.
+                        "status": "SCENARIO_SET_STATUS_UNSPECIFIED",  # Optional. Default
+                          value is "SCENARIO_SET_STATUS_UNSPECIFIED". Lifecycle status of a scenario
+                          set. Uploaded sets are created as ready. Generated sets start as generating
+                          and then become ready, failed, or cancelled.   *
+                          SCENARIO_SET_STATUS_GENERATING: Generation is in progress. The scenarios are
+                          not ready yet. * SCENARIO_SET_STATUS_READY: The scenario set is ready to use.
+                          * SCENARIO_SET_STATUS_FAILED: Generation failed. The scenario set has no
+                          readable scenarios. * SCENARIO_SET_STATUS_CANCELLED: Generation was cancelled
+                          before completion. Known values are: "SCENARIO_SET_STATUS_UNSPECIFIED",
+                          "SCENARIO_SET_STATUS_GENERATING", "SCENARIO_SET_STATUS_READY",
+                          "SCENARIO_SET_STATUS_FAILED", and "SCENARIO_SET_STATUS_CANCELLED".
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. Time last updated
+                          at.
+                        "workflow_uuid": "str"  # Optional. Identifier of the generation
+                          workflow. Only set for goal-generated scenario sets.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def create_scenario_set(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create Scenario Set.
+
+        To create a scenario set, send a POST request to ``/v2/gen-ai/scenario_sets``. Provide exactly
+        one of ``scenarios`` or ``file_upload_scenario_set``. The set is created in the ready state.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Default value is None.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "file_upload_scenario_set": {
+                        "original_file_name": "str",  # Optional. The original file name.
+                        "size_in_bytes": "str",  # Optional. The size of the file in bytes.
+                        "stored_object_key": "str"  # Optional. The object key the file was
+                          stored as.
+                    },
+                    "name": "str",  # Optional. The name of the scenario set.
+                    "scenarios": [
+                        {
+                            "description": "str",  # Optional. What the user tries to
+                              accomplish. Required.
+                            "exploration_budget": 0,  # Optional. Number of journeys to
+                              explore for this scenario. Defaults to 1 if unset.
+                            "max_turns": 0,  # Optional. Turn budget for the scenario.
+                              Falls back to the run-level default if unset.
+                            "name": "str",  # Optional. Human-readable name for the
+                              scenario. Optional.
+                            "scenario_uuid": "str",  # Optional. Unique id for the
+                              scenario. Always generated by the API; any customer-supplied value is
+                              ignored and overwritten.
+                            "stopping_criteria": [
+                                "str"  # Optional. Judge stopping criteria. Required;
+                                  must contain at least one entry.
+                            ],
+                            "user_persona": "str"  # Optional. How the user communicates
+                              (tone, role). Optional.
+                        }
+                    ]
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "scenario_set": {
+                        "bucket_name": "str",  # Optional. Object storage bucket holding the
+                          scenario file. Unset while status is generating.
+                        "bucket_region": "str",  # Optional. Object storage bucket region.
+                          Unset while status is generating.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Time created at.
+                        "deleted_at": "2020-02-20 00:00:00",  # Optional. Time deleted at.
+                          Unset unless the scenario set has been deleted.
+                        "description": "str",  # Optional. Customer-supplied description.
+                        "failure_reason": "str",  # Optional. Human-readable explanation of a
+                          terminal FAILED status. Empty otherwise.
+                        "generator_model_uuid": "str",  # Optional. Model that produced the
+                          scenarios. Only set for goal-generated scenario sets.
+                        "library_scenario_uuid": "str",  # Optional. UUID of the source
+                          library entry. Only set for library scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_LIBRARY``"" ).
+                        "name": "str",  # Optional. Customer-supplied name.
+                        "scenario_count": 0,  # Optional. Number of scenarios in the set.
+                          Unset while status is generating.
+                        "scenario_set_uuid": "str",  # Optional. UUID of the scenario set.
+                        "source_export_id": "str",  # Optional. Signals export UUID that
+                          produced this set. Only set for signal-generated scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED``"" ).
+                        "source_goal_description": "str",  # Optional. The goal that drove
+                          generation. Only set for goal_generated scenario sets.
+                        "source_kind": "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",  # Optional.
+                          Default value is "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED". How a scenario set
+                          was created.   * SCENARIO_SET_SOURCE_KIND_USER_UPLOAD: Created from uploaded
+                          or inline scenarios. * SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED: Produced by
+                          goal-driven generation. * SCENARIO_SET_SOURCE_KIND_LIBRARY: Copied from a
+                          platform-curated library entry. * SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED:
+                          Produced from a completed Signals export. Known values are:
+                          "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",
+                          "SCENARIO_SET_SOURCE_KIND_USER_UPLOAD",
+                          "SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED",
+                          "SCENARIO_SET_SOURCE_KIND_LIBRARY", and
+                          "SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED".
+                        "spaces_key": "str",  # Optional. Object storage key for the scenario
+                          file. Unset while status is generating.
+                        "status": "SCENARIO_SET_STATUS_UNSPECIFIED",  # Optional. Default
+                          value is "SCENARIO_SET_STATUS_UNSPECIFIED". Lifecycle status of a scenario
+                          set. Uploaded sets are created as ready. Generated sets start as generating
+                          and then become ready, failed, or cancelled.   *
+                          SCENARIO_SET_STATUS_GENERATING: Generation is in progress. The scenarios are
+                          not ready yet. * SCENARIO_SET_STATUS_READY: The scenario set is ready to use.
+                          * SCENARIO_SET_STATUS_FAILED: Generation failed. The scenario set has no
+                          readable scenarios. * SCENARIO_SET_STATUS_CANCELLED: Generation was cancelled
+                          before completion. Known values are: "SCENARIO_SET_STATUS_UNSPECIFIED",
+                          "SCENARIO_SET_STATUS_GENERATING", "SCENARIO_SET_STATUS_READY",
+                          "SCENARIO_SET_STATUS_FAILED", and "SCENARIO_SET_STATUS_CANCELLED".
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. Time last updated
+                          at.
+                        "workflow_uuid": "str"  # Optional. Identifier of the generation
+                          workflow. Only set for goal-generated scenario sets.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            if body is not None:
+                _json = body
+            else:
+                _json = None
+
+        _request = build_genai_create_scenario_set_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def create_scenario_set_upload_presigned_urls(  # pylint: disable=name-too-long
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create Presigned URLs for Scenario Set File Upload.
+
+        To create presigned URLs for uploading a scenario set file, send a POST request to
+        ``/v2/gen-ai/scenario_sets/file_upload_presigned_urls``. After uploading, pass the stored
+        object in Create Scenario Set as ``file_upload_scenario_set``.
+
+        :param body: Default value is None.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "files": [
+                        {
+                            "file_name": "str",  # Optional. Local filename.
+                            "file_size": "str"  # Optional. The size of the file in
+                              bytes.
+                        }
+                    ]
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "request_id": "str",  # Optional. The ID generated for the request for
+                      Presigned URLs.
+                    "uploads": [
+                        {
+                            "expires_at": "2020-02-20 00:00:00",  # Optional. The time
+                              the url expires at.
+                            "object_key": "str",  # Optional. The unique object key to
+                              store the file as.
+                            "original_file_name": "str",  # Optional. The original file
+                              name.
+                            "presigned_url": "str"  # Optional. The actual presigned URL
+                              the client can use to upload the file directly.
+                        }
+                    ]
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def create_scenario_set_upload_presigned_urls(  # pylint: disable=name-too-long
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create Presigned URLs for Scenario Set File Upload.
+
+        To create presigned URLs for uploading a scenario set file, send a POST request to
+        ``/v2/gen-ai/scenario_sets/file_upload_presigned_urls``. After uploading, pass the stored
+        object in Create Scenario Set as ``file_upload_scenario_set``.
+
+        :param body: Default value is None.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "request_id": "str",  # Optional. The ID generated for the request for
+                      Presigned URLs.
+                    "uploads": [
+                        {
+                            "expires_at": "2020-02-20 00:00:00",  # Optional. The time
+                              the url expires at.
+                            "object_key": "str",  # Optional. The unique object key to
+                              store the file as.
+                            "original_file_name": "str",  # Optional. The original file
+                              name.
+                            "presigned_url": "str"  # Optional. The actual presigned URL
+                              the client can use to upload the file directly.
+                        }
+                    ]
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def create_scenario_set_upload_presigned_urls(  # pylint: disable=name-too-long
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create Presigned URLs for Scenario Set File Upload.
+
+        To create presigned URLs for uploading a scenario set file, send a POST request to
+        ``/v2/gen-ai/scenario_sets/file_upload_presigned_urls``. After uploading, pass the stored
+        object in Create Scenario Set as ``file_upload_scenario_set``.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Default value is None.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "files": [
+                        {
+                            "file_name": "str",  # Optional. Local filename.
+                            "file_size": "str"  # Optional. The size of the file in
+                              bytes.
+                        }
+                    ]
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "request_id": "str",  # Optional. The ID generated for the request for
+                      Presigned URLs.
+                    "uploads": [
+                        {
+                            "expires_at": "2020-02-20 00:00:00",  # Optional. The time
+                              the url expires at.
+                            "object_key": "str",  # Optional. The unique object key to
+                              store the file as.
+                            "original_file_name": "str",  # Optional. The original file
+                              name.
+                            "presigned_url": "str"  # Optional. The actual presigned URL
+                              the client can use to upload the file directly.
+                        }
+                    ]
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            if body is not None:
+                _json = body
+            else:
+                _json = None
+
+        _request = build_genai_create_scenario_set_upload_presigned_urls_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def create_generated_scenario_set(
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Generate Scenario Set.
+
+        To dispatch goal-driven scenario generation, send a POST request to
+        ``/v2/gen-ai/scenario_sets/generate``. The scenario set is returned in the generating state.
+        Poll the retrieve scenario set endpoint until the set reaches a ready, failed, or cancelled
+        status.
+
+        :param body: Default value is None.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "generator_model_uuid": "str",  # Optional. Optional model to use for
+                      generation. Platform default when unset.
+                    "goal_description": "str",  # Optional. The goal that drives scenario
+                      generation.
+                    "name": "str",  # Optional. The name of the scenario set to create.
+                    "num_scenarios": 0  # Optional. Number of scenarios to generate. Defaults to
+                      1 if unset.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "scenario_set": {
+                        "bucket_name": "str",  # Optional. Object storage bucket holding the
+                          scenario file. Unset while status is generating.
+                        "bucket_region": "str",  # Optional. Object storage bucket region.
+                          Unset while status is generating.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Time created at.
+                        "deleted_at": "2020-02-20 00:00:00",  # Optional. Time deleted at.
+                          Unset unless the scenario set has been deleted.
+                        "description": "str",  # Optional. Customer-supplied description.
+                        "failure_reason": "str",  # Optional. Human-readable explanation of a
+                          terminal FAILED status. Empty otherwise.
+                        "generator_model_uuid": "str",  # Optional. Model that produced the
+                          scenarios. Only set for goal-generated scenario sets.
+                        "library_scenario_uuid": "str",  # Optional. UUID of the source
+                          library entry. Only set for library scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_LIBRARY``"" ).
+                        "name": "str",  # Optional. Customer-supplied name.
+                        "scenario_count": 0,  # Optional. Number of scenarios in the set.
+                          Unset while status is generating.
+                        "scenario_set_uuid": "str",  # Optional. UUID of the scenario set.
+                        "source_export_id": "str",  # Optional. Signals export UUID that
+                          produced this set. Only set for signal-generated scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED``"" ).
+                        "source_goal_description": "str",  # Optional. The goal that drove
+                          generation. Only set for goal_generated scenario sets.
+                        "source_kind": "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",  # Optional.
+                          Default value is "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED". How a scenario set
+                          was created.   * SCENARIO_SET_SOURCE_KIND_USER_UPLOAD: Created from uploaded
+                          or inline scenarios. * SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED: Produced by
+                          goal-driven generation. * SCENARIO_SET_SOURCE_KIND_LIBRARY: Copied from a
+                          platform-curated library entry. * SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED:
+                          Produced from a completed Signals export. Known values are:
+                          "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",
+                          "SCENARIO_SET_SOURCE_KIND_USER_UPLOAD",
+                          "SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED",
+                          "SCENARIO_SET_SOURCE_KIND_LIBRARY", and
+                          "SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED".
+                        "spaces_key": "str",  # Optional. Object storage key for the scenario
+                          file. Unset while status is generating.
+                        "status": "SCENARIO_SET_STATUS_UNSPECIFIED",  # Optional. Default
+                          value is "SCENARIO_SET_STATUS_UNSPECIFIED". Lifecycle status of a scenario
+                          set. Uploaded sets are created as ready. Generated sets start as generating
+                          and then become ready, failed, or cancelled.   *
+                          SCENARIO_SET_STATUS_GENERATING: Generation is in progress. The scenarios are
+                          not ready yet. * SCENARIO_SET_STATUS_READY: The scenario set is ready to use.
+                          * SCENARIO_SET_STATUS_FAILED: Generation failed. The scenario set has no
+                          readable scenarios. * SCENARIO_SET_STATUS_CANCELLED: Generation was cancelled
+                          before completion. Known values are: "SCENARIO_SET_STATUS_UNSPECIFIED",
+                          "SCENARIO_SET_STATUS_GENERATING", "SCENARIO_SET_STATUS_READY",
+                          "SCENARIO_SET_STATUS_FAILED", and "SCENARIO_SET_STATUS_CANCELLED".
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. Time last updated
+                          at.
+                        "workflow_uuid": "str"  # Optional. Identifier of the generation
+                          workflow. Only set for goal-generated scenario sets.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def create_generated_scenario_set(
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Generate Scenario Set.
+
+        To dispatch goal-driven scenario generation, send a POST request to
+        ``/v2/gen-ai/scenario_sets/generate``. The scenario set is returned in the generating state.
+        Poll the retrieve scenario set endpoint until the set reaches a ready, failed, or cancelled
+        status.
+
+        :param body: Default value is None.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "scenario_set": {
+                        "bucket_name": "str",  # Optional. Object storage bucket holding the
+                          scenario file. Unset while status is generating.
+                        "bucket_region": "str",  # Optional. Object storage bucket region.
+                          Unset while status is generating.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Time created at.
+                        "deleted_at": "2020-02-20 00:00:00",  # Optional. Time deleted at.
+                          Unset unless the scenario set has been deleted.
+                        "description": "str",  # Optional. Customer-supplied description.
+                        "failure_reason": "str",  # Optional. Human-readable explanation of a
+                          terminal FAILED status. Empty otherwise.
+                        "generator_model_uuid": "str",  # Optional. Model that produced the
+                          scenarios. Only set for goal-generated scenario sets.
+                        "library_scenario_uuid": "str",  # Optional. UUID of the source
+                          library entry. Only set for library scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_LIBRARY``"" ).
+                        "name": "str",  # Optional. Customer-supplied name.
+                        "scenario_count": 0,  # Optional. Number of scenarios in the set.
+                          Unset while status is generating.
+                        "scenario_set_uuid": "str",  # Optional. UUID of the scenario set.
+                        "source_export_id": "str",  # Optional. Signals export UUID that
+                          produced this set. Only set for signal-generated scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED``"" ).
+                        "source_goal_description": "str",  # Optional. The goal that drove
+                          generation. Only set for goal_generated scenario sets.
+                        "source_kind": "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",  # Optional.
+                          Default value is "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED". How a scenario set
+                          was created.   * SCENARIO_SET_SOURCE_KIND_USER_UPLOAD: Created from uploaded
+                          or inline scenarios. * SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED: Produced by
+                          goal-driven generation. * SCENARIO_SET_SOURCE_KIND_LIBRARY: Copied from a
+                          platform-curated library entry. * SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED:
+                          Produced from a completed Signals export. Known values are:
+                          "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",
+                          "SCENARIO_SET_SOURCE_KIND_USER_UPLOAD",
+                          "SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED",
+                          "SCENARIO_SET_SOURCE_KIND_LIBRARY", and
+                          "SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED".
+                        "spaces_key": "str",  # Optional. Object storage key for the scenario
+                          file. Unset while status is generating.
+                        "status": "SCENARIO_SET_STATUS_UNSPECIFIED",  # Optional. Default
+                          value is "SCENARIO_SET_STATUS_UNSPECIFIED". Lifecycle status of a scenario
+                          set. Uploaded sets are created as ready. Generated sets start as generating
+                          and then become ready, failed, or cancelled.   *
+                          SCENARIO_SET_STATUS_GENERATING: Generation is in progress. The scenarios are
+                          not ready yet. * SCENARIO_SET_STATUS_READY: The scenario set is ready to use.
+                          * SCENARIO_SET_STATUS_FAILED: Generation failed. The scenario set has no
+                          readable scenarios. * SCENARIO_SET_STATUS_CANCELLED: Generation was cancelled
+                          before completion. Known values are: "SCENARIO_SET_STATUS_UNSPECIFIED",
+                          "SCENARIO_SET_STATUS_GENERATING", "SCENARIO_SET_STATUS_READY",
+                          "SCENARIO_SET_STATUS_FAILED", and "SCENARIO_SET_STATUS_CANCELLED".
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. Time last updated
+                          at.
+                        "workflow_uuid": "str"  # Optional. Identifier of the generation
+                          workflow. Only set for goal-generated scenario sets.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def create_generated_scenario_set(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Generate Scenario Set.
+
+        To dispatch goal-driven scenario generation, send a POST request to
+        ``/v2/gen-ai/scenario_sets/generate``. The scenario set is returned in the generating state.
+        Poll the retrieve scenario set endpoint until the set reaches a ready, failed, or cancelled
+        status.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Default value is None.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "generator_model_uuid": "str",  # Optional. Optional model to use for
+                      generation. Platform default when unset.
+                    "goal_description": "str",  # Optional. The goal that drives scenario
+                      generation.
+                    "name": "str",  # Optional. The name of the scenario set to create.
+                    "num_scenarios": 0  # Optional. Number of scenarios to generate. Defaults to
+                      1 if unset.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "scenario_set": {
+                        "bucket_name": "str",  # Optional. Object storage bucket holding the
+                          scenario file. Unset while status is generating.
+                        "bucket_region": "str",  # Optional. Object storage bucket region.
+                          Unset while status is generating.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Time created at.
+                        "deleted_at": "2020-02-20 00:00:00",  # Optional. Time deleted at.
+                          Unset unless the scenario set has been deleted.
+                        "description": "str",  # Optional. Customer-supplied description.
+                        "failure_reason": "str",  # Optional. Human-readable explanation of a
+                          terminal FAILED status. Empty otherwise.
+                        "generator_model_uuid": "str",  # Optional. Model that produced the
+                          scenarios. Only set for goal-generated scenario sets.
+                        "library_scenario_uuid": "str",  # Optional. UUID of the source
+                          library entry. Only set for library scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_LIBRARY``"" ).
+                        "name": "str",  # Optional. Customer-supplied name.
+                        "scenario_count": 0,  # Optional. Number of scenarios in the set.
+                          Unset while status is generating.
+                        "scenario_set_uuid": "str",  # Optional. UUID of the scenario set.
+                        "source_export_id": "str",  # Optional. Signals export UUID that
+                          produced this set. Only set for signal-generated scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED``"" ).
+                        "source_goal_description": "str",  # Optional. The goal that drove
+                          generation. Only set for goal_generated scenario sets.
+                        "source_kind": "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",  # Optional.
+                          Default value is "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED". How a scenario set
+                          was created.   * SCENARIO_SET_SOURCE_KIND_USER_UPLOAD: Created from uploaded
+                          or inline scenarios. * SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED: Produced by
+                          goal-driven generation. * SCENARIO_SET_SOURCE_KIND_LIBRARY: Copied from a
+                          platform-curated library entry. * SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED:
+                          Produced from a completed Signals export. Known values are:
+                          "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",
+                          "SCENARIO_SET_SOURCE_KIND_USER_UPLOAD",
+                          "SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED",
+                          "SCENARIO_SET_SOURCE_KIND_LIBRARY", and
+                          "SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED".
+                        "spaces_key": "str",  # Optional. Object storage key for the scenario
+                          file. Unset while status is generating.
+                        "status": "SCENARIO_SET_STATUS_UNSPECIFIED",  # Optional. Default
+                          value is "SCENARIO_SET_STATUS_UNSPECIFIED". Lifecycle status of a scenario
+                          set. Uploaded sets are created as ready. Generated sets start as generating
+                          and then become ready, failed, or cancelled.   *
+                          SCENARIO_SET_STATUS_GENERATING: Generation is in progress. The scenarios are
+                          not ready yet. * SCENARIO_SET_STATUS_READY: The scenario set is ready to use.
+                          * SCENARIO_SET_STATUS_FAILED: Generation failed. The scenario set has no
+                          readable scenarios. * SCENARIO_SET_STATUS_CANCELLED: Generation was cancelled
+                          before completion. Known values are: "SCENARIO_SET_STATUS_UNSPECIFIED",
+                          "SCENARIO_SET_STATUS_GENERATING", "SCENARIO_SET_STATUS_READY",
+                          "SCENARIO_SET_STATUS_FAILED", and "SCENARIO_SET_STATUS_CANCELLED".
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. Time last updated
+                          at.
+                        "workflow_uuid": "str"  # Optional. Identifier of the generation
+                          workflow. Only set for goal-generated scenario sets.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            if body is not None:
+                _json = body
+            else:
+                _json = None
+
+        _request = build_genai_create_generated_scenario_set_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_scenario_set(self, scenario_set_uuid: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve Scenario Set.
+
+        To retrieve a scenario set, send a GET request to
+        ``/v2/gen-ai/scenario_sets/{scenario_set_uuid}``.
+
+        :param scenario_set_uuid: UUID of the scenario set. Required.
+        :type scenario_set_uuid: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "scenario_set": {
+                        "bucket_name": "str",  # Optional. Object storage bucket holding the
+                          scenario file. Unset while status is generating.
+                        "bucket_region": "str",  # Optional. Object storage bucket region.
+                          Unset while status is generating.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Time created at.
+                        "deleted_at": "2020-02-20 00:00:00",  # Optional. Time deleted at.
+                          Unset unless the scenario set has been deleted.
+                        "description": "str",  # Optional. Customer-supplied description.
+                        "failure_reason": "str",  # Optional. Human-readable explanation of a
+                          terminal FAILED status. Empty otherwise.
+                        "generator_model_uuid": "str",  # Optional. Model that produced the
+                          scenarios. Only set for goal-generated scenario sets.
+                        "library_scenario_uuid": "str",  # Optional. UUID of the source
+                          library entry. Only set for library scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_LIBRARY``"" ).
+                        "name": "str",  # Optional. Customer-supplied name.
+                        "scenario_count": 0,  # Optional. Number of scenarios in the set.
+                          Unset while status is generating.
+                        "scenario_set_uuid": "str",  # Optional. UUID of the scenario set.
+                        "source_export_id": "str",  # Optional. Signals export UUID that
+                          produced this set. Only set for signal-generated scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED``"" ).
+                        "source_goal_description": "str",  # Optional. The goal that drove
+                          generation. Only set for goal_generated scenario sets.
+                        "source_kind": "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",  # Optional.
+                          Default value is "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED". How a scenario set
+                          was created.   * SCENARIO_SET_SOURCE_KIND_USER_UPLOAD: Created from uploaded
+                          or inline scenarios. * SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED: Produced by
+                          goal-driven generation. * SCENARIO_SET_SOURCE_KIND_LIBRARY: Copied from a
+                          platform-curated library entry. * SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED:
+                          Produced from a completed Signals export. Known values are:
+                          "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",
+                          "SCENARIO_SET_SOURCE_KIND_USER_UPLOAD",
+                          "SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED",
+                          "SCENARIO_SET_SOURCE_KIND_LIBRARY", and
+                          "SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED".
+                        "spaces_key": "str",  # Optional. Object storage key for the scenario
+                          file. Unset while status is generating.
+                        "status": "SCENARIO_SET_STATUS_UNSPECIFIED",  # Optional. Default
+                          value is "SCENARIO_SET_STATUS_UNSPECIFIED". Lifecycle status of a scenario
+                          set. Uploaded sets are created as ready. Generated sets start as generating
+                          and then become ready, failed, or cancelled.   *
+                          SCENARIO_SET_STATUS_GENERATING: Generation is in progress. The scenarios are
+                          not ready yet. * SCENARIO_SET_STATUS_READY: The scenario set is ready to use.
+                          * SCENARIO_SET_STATUS_FAILED: Generation failed. The scenario set has no
+                          readable scenarios. * SCENARIO_SET_STATUS_CANCELLED: Generation was cancelled
+                          before completion. Known values are: "SCENARIO_SET_STATUS_UNSPECIFIED",
+                          "SCENARIO_SET_STATUS_GENERATING", "SCENARIO_SET_STATUS_READY",
+                          "SCENARIO_SET_STATUS_FAILED", and "SCENARIO_SET_STATUS_CANCELLED".
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. Time last updated
+                          at.
+                        "workflow_uuid": "str"  # Optional. Identifier of the generation
+                          workflow. Only set for goal-generated scenario sets.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_genai_get_scenario_set_request(
+            scenario_set_uuid=scenario_set_uuid,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def update_scenario_set(
+        self,
+        scenario_set_uuid: str,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Scenario Set.
+
+        To update a scenario set in place, send a PUT request to
+        ``/v2/gen-ai/scenario_sets/{scenario_set_uuid}``. Provide a new ``name`` and/or replacement
+        ``scenarios``. At least one is required. Replacing contents keeps the same scenario set UUID,
+        remints scenario UUIDs, and is rejected unless the set is ready and no simulation run
+        references it. There is no file-upload path on update.
+
+        :param scenario_set_uuid: UUID of the scenario set to update. Returned by ``CreateScenarioSet``
+         and listed via ``ListScenarioSets``. Required.
+        :type scenario_set_uuid: str
+        :param body: Default value is None.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "name": "str",  # Optional. Optional new name. When set, must be non-empty
+                      and at most 255 characters.
+                    "scenario_set_uuid": "str",  # Optional. UUID of the scenario set to update.
+                    "scenarios": [
+                        {
+                            "description": "str",  # Optional. What the user tries to
+                              accomplish. Required.
+                            "exploration_budget": 0,  # Optional. Number of journeys to
+                              explore for this scenario. Defaults to 1 if unset.
+                            "max_turns": 0,  # Optional. Turn budget for the scenario.
+                              Falls back to the run-level default if unset.
+                            "name": "str",  # Optional. Human-readable name for the
+                              scenario. Optional.
+                            "scenario_uuid": "str",  # Optional. Unique id for the
+                              scenario. Always generated by the API; any customer-supplied value is
+                              ignored and overwritten.
+                            "stopping_criteria": [
+                                "str"  # Optional. Judge stopping criteria. Required;
+                                  must contain at least one entry.
+                            ],
+                            "user_persona": "str"  # Optional. How the user communicates
+                              (tone, role). Optional.
+                        }
+                    ]
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "scenario_set": {
+                        "bucket_name": "str",  # Optional. Object storage bucket holding the
+                          scenario file. Unset while status is generating.
+                        "bucket_region": "str",  # Optional. Object storage bucket region.
+                          Unset while status is generating.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Time created at.
+                        "deleted_at": "2020-02-20 00:00:00",  # Optional. Time deleted at.
+                          Unset unless the scenario set has been deleted.
+                        "description": "str",  # Optional. Customer-supplied description.
+                        "failure_reason": "str",  # Optional. Human-readable explanation of a
+                          terminal FAILED status. Empty otherwise.
+                        "generator_model_uuid": "str",  # Optional. Model that produced the
+                          scenarios. Only set for goal-generated scenario sets.
+                        "library_scenario_uuid": "str",  # Optional. UUID of the source
+                          library entry. Only set for library scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_LIBRARY``"" ).
+                        "name": "str",  # Optional. Customer-supplied name.
+                        "scenario_count": 0,  # Optional. Number of scenarios in the set.
+                          Unset while status is generating.
+                        "scenario_set_uuid": "str",  # Optional. UUID of the scenario set.
+                        "source_export_id": "str",  # Optional. Signals export UUID that
+                          produced this set. Only set for signal-generated scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED``"" ).
+                        "source_goal_description": "str",  # Optional. The goal that drove
+                          generation. Only set for goal_generated scenario sets.
+                        "source_kind": "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",  # Optional.
+                          Default value is "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED". How a scenario set
+                          was created.   * SCENARIO_SET_SOURCE_KIND_USER_UPLOAD: Created from uploaded
+                          or inline scenarios. * SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED: Produced by
+                          goal-driven generation. * SCENARIO_SET_SOURCE_KIND_LIBRARY: Copied from a
+                          platform-curated library entry. * SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED:
+                          Produced from a completed Signals export. Known values are:
+                          "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",
+                          "SCENARIO_SET_SOURCE_KIND_USER_UPLOAD",
+                          "SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED",
+                          "SCENARIO_SET_SOURCE_KIND_LIBRARY", and
+                          "SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED".
+                        "spaces_key": "str",  # Optional. Object storage key for the scenario
+                          file. Unset while status is generating.
+                        "status": "SCENARIO_SET_STATUS_UNSPECIFIED",  # Optional. Default
+                          value is "SCENARIO_SET_STATUS_UNSPECIFIED". Lifecycle status of a scenario
+                          set. Uploaded sets are created as ready. Generated sets start as generating
+                          and then become ready, failed, or cancelled.   *
+                          SCENARIO_SET_STATUS_GENERATING: Generation is in progress. The scenarios are
+                          not ready yet. * SCENARIO_SET_STATUS_READY: The scenario set is ready to use.
+                          * SCENARIO_SET_STATUS_FAILED: Generation failed. The scenario set has no
+                          readable scenarios. * SCENARIO_SET_STATUS_CANCELLED: Generation was cancelled
+                          before completion. Known values are: "SCENARIO_SET_STATUS_UNSPECIFIED",
+                          "SCENARIO_SET_STATUS_GENERATING", "SCENARIO_SET_STATUS_READY",
+                          "SCENARIO_SET_STATUS_FAILED", and "SCENARIO_SET_STATUS_CANCELLED".
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. Time last updated
+                          at.
+                        "workflow_uuid": "str"  # Optional. Identifier of the generation
+                          workflow. Only set for goal-generated scenario sets.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def update_scenario_set(
+        self,
+        scenario_set_uuid: str,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Scenario Set.
+
+        To update a scenario set in place, send a PUT request to
+        ``/v2/gen-ai/scenario_sets/{scenario_set_uuid}``. Provide a new ``name`` and/or replacement
+        ``scenarios``. At least one is required. Replacing contents keeps the same scenario set UUID,
+        remints scenario UUIDs, and is rejected unless the set is ready and no simulation run
+        references it. There is no file-upload path on update.
+
+        :param scenario_set_uuid: UUID of the scenario set to update. Returned by ``CreateScenarioSet``
+         and listed via ``ListScenarioSets``. Required.
+        :type scenario_set_uuid: str
+        :param body: Default value is None.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "scenario_set": {
+                        "bucket_name": "str",  # Optional. Object storage bucket holding the
+                          scenario file. Unset while status is generating.
+                        "bucket_region": "str",  # Optional. Object storage bucket region.
+                          Unset while status is generating.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Time created at.
+                        "deleted_at": "2020-02-20 00:00:00",  # Optional. Time deleted at.
+                          Unset unless the scenario set has been deleted.
+                        "description": "str",  # Optional. Customer-supplied description.
+                        "failure_reason": "str",  # Optional. Human-readable explanation of a
+                          terminal FAILED status. Empty otherwise.
+                        "generator_model_uuid": "str",  # Optional. Model that produced the
+                          scenarios. Only set for goal-generated scenario sets.
+                        "library_scenario_uuid": "str",  # Optional. UUID of the source
+                          library entry. Only set for library scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_LIBRARY``"" ).
+                        "name": "str",  # Optional. Customer-supplied name.
+                        "scenario_count": 0,  # Optional. Number of scenarios in the set.
+                          Unset while status is generating.
+                        "scenario_set_uuid": "str",  # Optional. UUID of the scenario set.
+                        "source_export_id": "str",  # Optional. Signals export UUID that
+                          produced this set. Only set for signal-generated scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED``"" ).
+                        "source_goal_description": "str",  # Optional. The goal that drove
+                          generation. Only set for goal_generated scenario sets.
+                        "source_kind": "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",  # Optional.
+                          Default value is "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED". How a scenario set
+                          was created.   * SCENARIO_SET_SOURCE_KIND_USER_UPLOAD: Created from uploaded
+                          or inline scenarios. * SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED: Produced by
+                          goal-driven generation. * SCENARIO_SET_SOURCE_KIND_LIBRARY: Copied from a
+                          platform-curated library entry. * SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED:
+                          Produced from a completed Signals export. Known values are:
+                          "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",
+                          "SCENARIO_SET_SOURCE_KIND_USER_UPLOAD",
+                          "SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED",
+                          "SCENARIO_SET_SOURCE_KIND_LIBRARY", and
+                          "SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED".
+                        "spaces_key": "str",  # Optional. Object storage key for the scenario
+                          file. Unset while status is generating.
+                        "status": "SCENARIO_SET_STATUS_UNSPECIFIED",  # Optional. Default
+                          value is "SCENARIO_SET_STATUS_UNSPECIFIED". Lifecycle status of a scenario
+                          set. Uploaded sets are created as ready. Generated sets start as generating
+                          and then become ready, failed, or cancelled.   *
+                          SCENARIO_SET_STATUS_GENERATING: Generation is in progress. The scenarios are
+                          not ready yet. * SCENARIO_SET_STATUS_READY: The scenario set is ready to use.
+                          * SCENARIO_SET_STATUS_FAILED: Generation failed. The scenario set has no
+                          readable scenarios. * SCENARIO_SET_STATUS_CANCELLED: Generation was cancelled
+                          before completion. Known values are: "SCENARIO_SET_STATUS_UNSPECIFIED",
+                          "SCENARIO_SET_STATUS_GENERATING", "SCENARIO_SET_STATUS_READY",
+                          "SCENARIO_SET_STATUS_FAILED", and "SCENARIO_SET_STATUS_CANCELLED".
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. Time last updated
+                          at.
+                        "workflow_uuid": "str"  # Optional. Identifier of the generation
+                          workflow. Only set for goal-generated scenario sets.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def update_scenario_set(
+        self,
+        scenario_set_uuid: str,
+        body: Optional[Union[JSON, IO[bytes]]] = None,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Scenario Set.
+
+        To update a scenario set in place, send a PUT request to
+        ``/v2/gen-ai/scenario_sets/{scenario_set_uuid}``. Provide a new ``name`` and/or replacement
+        ``scenarios``. At least one is required. Replacing contents keeps the same scenario set UUID,
+        remints scenario UUIDs, and is rejected unless the set is ready and no simulation run
+        references it. There is no file-upload path on update.
+
+        :param scenario_set_uuid: UUID of the scenario set to update. Returned by ``CreateScenarioSet``
+         and listed via ``ListScenarioSets``. Required.
+        :type scenario_set_uuid: str
+        :param body: Is either a JSON type or a IO[bytes] type. Default value is None.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "name": "str",  # Optional. Optional new name. When set, must be non-empty
+                      and at most 255 characters.
+                    "scenario_set_uuid": "str",  # Optional. UUID of the scenario set to update.
+                    "scenarios": [
+                        {
+                            "description": "str",  # Optional. What the user tries to
+                              accomplish. Required.
+                            "exploration_budget": 0,  # Optional. Number of journeys to
+                              explore for this scenario. Defaults to 1 if unset.
+                            "max_turns": 0,  # Optional. Turn budget for the scenario.
+                              Falls back to the run-level default if unset.
+                            "name": "str",  # Optional. Human-readable name for the
+                              scenario. Optional.
+                            "scenario_uuid": "str",  # Optional. Unique id for the
+                              scenario. Always generated by the API; any customer-supplied value is
+                              ignored and overwritten.
+                            "stopping_criteria": [
+                                "str"  # Optional. Judge stopping criteria. Required;
+                                  must contain at least one entry.
+                            ],
+                            "user_persona": "str"  # Optional. How the user communicates
+                              (tone, role). Optional.
+                        }
+                    ]
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "scenario_set": {
+                        "bucket_name": "str",  # Optional. Object storage bucket holding the
+                          scenario file. Unset while status is generating.
+                        "bucket_region": "str",  # Optional. Object storage bucket region.
+                          Unset while status is generating.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Time created at.
+                        "deleted_at": "2020-02-20 00:00:00",  # Optional. Time deleted at.
+                          Unset unless the scenario set has been deleted.
+                        "description": "str",  # Optional. Customer-supplied description.
+                        "failure_reason": "str",  # Optional. Human-readable explanation of a
+                          terminal FAILED status. Empty otherwise.
+                        "generator_model_uuid": "str",  # Optional. Model that produced the
+                          scenarios. Only set for goal-generated scenario sets.
+                        "library_scenario_uuid": "str",  # Optional. UUID of the source
+                          library entry. Only set for library scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_LIBRARY``"" ).
+                        "name": "str",  # Optional. Customer-supplied name.
+                        "scenario_count": 0,  # Optional. Number of scenarios in the set.
+                          Unset while status is generating.
+                        "scenario_set_uuid": "str",  # Optional. UUID of the scenario set.
+                        "source_export_id": "str",  # Optional. Signals export UUID that
+                          produced this set. Only set for signal-generated scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED``"" ).
+                        "source_goal_description": "str",  # Optional. The goal that drove
+                          generation. Only set for goal_generated scenario sets.
+                        "source_kind": "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",  # Optional.
+                          Default value is "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED". How a scenario set
+                          was created.   * SCENARIO_SET_SOURCE_KIND_USER_UPLOAD: Created from uploaded
+                          or inline scenarios. * SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED: Produced by
+                          goal-driven generation. * SCENARIO_SET_SOURCE_KIND_LIBRARY: Copied from a
+                          platform-curated library entry. * SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED:
+                          Produced from a completed Signals export. Known values are:
+                          "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",
+                          "SCENARIO_SET_SOURCE_KIND_USER_UPLOAD",
+                          "SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED",
+                          "SCENARIO_SET_SOURCE_KIND_LIBRARY", and
+                          "SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED".
+                        "spaces_key": "str",  # Optional. Object storage key for the scenario
+                          file. Unset while status is generating.
+                        "status": "SCENARIO_SET_STATUS_UNSPECIFIED",  # Optional. Default
+                          value is "SCENARIO_SET_STATUS_UNSPECIFIED". Lifecycle status of a scenario
+                          set. Uploaded sets are created as ready. Generated sets start as generating
+                          and then become ready, failed, or cancelled.   *
+                          SCENARIO_SET_STATUS_GENERATING: Generation is in progress. The scenarios are
+                          not ready yet. * SCENARIO_SET_STATUS_READY: The scenario set is ready to use.
+                          * SCENARIO_SET_STATUS_FAILED: Generation failed. The scenario set has no
+                          readable scenarios. * SCENARIO_SET_STATUS_CANCELLED: Generation was cancelled
+                          before completion. Known values are: "SCENARIO_SET_STATUS_UNSPECIFIED",
+                          "SCENARIO_SET_STATUS_GENERATING", "SCENARIO_SET_STATUS_READY",
+                          "SCENARIO_SET_STATUS_FAILED", and "SCENARIO_SET_STATUS_CANCELLED".
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. Time last updated
+                          at.
+                        "workflow_uuid": "str"  # Optional. Identifier of the generation
+                          workflow. Only set for goal-generated scenario sets.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            if body is not None:
+                _json = body
+            else:
+                _json = None
+
+        _request = build_genai_update_scenario_set_request(
+            scenario_set_uuid=scenario_set_uuid,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def delete_scenario_set(self, scenario_set_uuid: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Delete Scenario Set.
+
+        To delete a scenario set, send a DELETE request to
+        ``/v2/gen-ai/scenario_sets/{scenario_set_uuid}``. A scenario set that is referenced by a
+        simulation run cannot be deleted.
+
+        :param scenario_set_uuid: UUID of the scenario set to delete. Returned by ``CreateScenarioSet``
+         and listed via ``ListScenarioSets``. A set still referenced by a
+         simulation run cannot be deleted. Required.
+        :type scenario_set_uuid: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "scenario_set_uuid": "str"  # Optional. UUID of the deleted scenario set.
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_genai_delete_scenario_set_request(
+            scenario_set_uuid=scenario_set_uuid,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_scenario_set_download_url(
+        self, scenario_set_uuid: str, **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve Scenario Set Download URL.
+
+        To retrieve a presigned download URL for a scenario set file, send a GET request to
+        ``/v2/gen-ai/scenario_sets/{scenario_set_uuid}/download_url``.
+
+        :param scenario_set_uuid: UUID of the scenario set. Required.
+        :type scenario_set_uuid: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "download_url": "str",  # Optional. The presigned URL to download the
+                      scenario set file.
+                    "expires_at": "2020-02-20 00:00:00"  # Optional. The time the URL expires at.
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_genai_get_scenario_set_download_url_request(
+            scenario_set_uuid=scenario_set_uuid,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def create_duplicate_scenario_set(
+        self,
+        scenario_set_uuid: str,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Duplicate Scenario Set.
+
+        To duplicate a scenario set, send a POST request to
+        ``/v2/gen-ai/scenario_sets/{scenario_set_uuid}/duplicate``. The source set must be ready. The
+        new set is named ``{original name} duplicate`` and contains a copy of the source scenarios.
+
+        :param scenario_set_uuid: UUID of the scenario set to duplicate. Required.
+        :type scenario_set_uuid: str
+        :param body: Default value is None.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "scenario_set_uuid": "str"  # Optional. UUID of the scenario set to
+                      duplicate.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "scenario_set": {
+                        "bucket_name": "str",  # Optional. Object storage bucket holding the
+                          scenario file. Unset while status is generating.
+                        "bucket_region": "str",  # Optional. Object storage bucket region.
+                          Unset while status is generating.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Time created at.
+                        "deleted_at": "2020-02-20 00:00:00",  # Optional. Time deleted at.
+                          Unset unless the scenario set has been deleted.
+                        "description": "str",  # Optional. Customer-supplied description.
+                        "failure_reason": "str",  # Optional. Human-readable explanation of a
+                          terminal FAILED status. Empty otherwise.
+                        "generator_model_uuid": "str",  # Optional. Model that produced the
+                          scenarios. Only set for goal-generated scenario sets.
+                        "library_scenario_uuid": "str",  # Optional. UUID of the source
+                          library entry. Only set for library scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_LIBRARY``"" ).
+                        "name": "str",  # Optional. Customer-supplied name.
+                        "scenario_count": 0,  # Optional. Number of scenarios in the set.
+                          Unset while status is generating.
+                        "scenario_set_uuid": "str",  # Optional. UUID of the scenario set.
+                        "source_export_id": "str",  # Optional. Signals export UUID that
+                          produced this set. Only set for signal-generated scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED``"" ).
+                        "source_goal_description": "str",  # Optional. The goal that drove
+                          generation. Only set for goal_generated scenario sets.
+                        "source_kind": "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",  # Optional.
+                          Default value is "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED". How a scenario set
+                          was created.   * SCENARIO_SET_SOURCE_KIND_USER_UPLOAD: Created from uploaded
+                          or inline scenarios. * SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED: Produced by
+                          goal-driven generation. * SCENARIO_SET_SOURCE_KIND_LIBRARY: Copied from a
+                          platform-curated library entry. * SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED:
+                          Produced from a completed Signals export. Known values are:
+                          "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",
+                          "SCENARIO_SET_SOURCE_KIND_USER_UPLOAD",
+                          "SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED",
+                          "SCENARIO_SET_SOURCE_KIND_LIBRARY", and
+                          "SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED".
+                        "spaces_key": "str",  # Optional. Object storage key for the scenario
+                          file. Unset while status is generating.
+                        "status": "SCENARIO_SET_STATUS_UNSPECIFIED",  # Optional. Default
+                          value is "SCENARIO_SET_STATUS_UNSPECIFIED". Lifecycle status of a scenario
+                          set. Uploaded sets are created as ready. Generated sets start as generating
+                          and then become ready, failed, or cancelled.   *
+                          SCENARIO_SET_STATUS_GENERATING: Generation is in progress. The scenarios are
+                          not ready yet. * SCENARIO_SET_STATUS_READY: The scenario set is ready to use.
+                          * SCENARIO_SET_STATUS_FAILED: Generation failed. The scenario set has no
+                          readable scenarios. * SCENARIO_SET_STATUS_CANCELLED: Generation was cancelled
+                          before completion. Known values are: "SCENARIO_SET_STATUS_UNSPECIFIED",
+                          "SCENARIO_SET_STATUS_GENERATING", "SCENARIO_SET_STATUS_READY",
+                          "SCENARIO_SET_STATUS_FAILED", and "SCENARIO_SET_STATUS_CANCELLED".
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. Time last updated
+                          at.
+                        "workflow_uuid": "str"  # Optional. Identifier of the generation
+                          workflow. Only set for goal-generated scenario sets.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def create_duplicate_scenario_set(
+        self,
+        scenario_set_uuid: str,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Duplicate Scenario Set.
+
+        To duplicate a scenario set, send a POST request to
+        ``/v2/gen-ai/scenario_sets/{scenario_set_uuid}/duplicate``. The source set must be ready. The
+        new set is named ``{original name} duplicate`` and contains a copy of the source scenarios.
+
+        :param scenario_set_uuid: UUID of the scenario set to duplicate. Required.
+        :type scenario_set_uuid: str
+        :param body: Default value is None.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "scenario_set": {
+                        "bucket_name": "str",  # Optional. Object storage bucket holding the
+                          scenario file. Unset while status is generating.
+                        "bucket_region": "str",  # Optional. Object storage bucket region.
+                          Unset while status is generating.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Time created at.
+                        "deleted_at": "2020-02-20 00:00:00",  # Optional. Time deleted at.
+                          Unset unless the scenario set has been deleted.
+                        "description": "str",  # Optional. Customer-supplied description.
+                        "failure_reason": "str",  # Optional. Human-readable explanation of a
+                          terminal FAILED status. Empty otherwise.
+                        "generator_model_uuid": "str",  # Optional. Model that produced the
+                          scenarios. Only set for goal-generated scenario sets.
+                        "library_scenario_uuid": "str",  # Optional. UUID of the source
+                          library entry. Only set for library scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_LIBRARY``"" ).
+                        "name": "str",  # Optional. Customer-supplied name.
+                        "scenario_count": 0,  # Optional. Number of scenarios in the set.
+                          Unset while status is generating.
+                        "scenario_set_uuid": "str",  # Optional. UUID of the scenario set.
+                        "source_export_id": "str",  # Optional. Signals export UUID that
+                          produced this set. Only set for signal-generated scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED``"" ).
+                        "source_goal_description": "str",  # Optional. The goal that drove
+                          generation. Only set for goal_generated scenario sets.
+                        "source_kind": "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",  # Optional.
+                          Default value is "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED". How a scenario set
+                          was created.   * SCENARIO_SET_SOURCE_KIND_USER_UPLOAD: Created from uploaded
+                          or inline scenarios. * SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED: Produced by
+                          goal-driven generation. * SCENARIO_SET_SOURCE_KIND_LIBRARY: Copied from a
+                          platform-curated library entry. * SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED:
+                          Produced from a completed Signals export. Known values are:
+                          "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",
+                          "SCENARIO_SET_SOURCE_KIND_USER_UPLOAD",
+                          "SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED",
+                          "SCENARIO_SET_SOURCE_KIND_LIBRARY", and
+                          "SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED".
+                        "spaces_key": "str",  # Optional. Object storage key for the scenario
+                          file. Unset while status is generating.
+                        "status": "SCENARIO_SET_STATUS_UNSPECIFIED",  # Optional. Default
+                          value is "SCENARIO_SET_STATUS_UNSPECIFIED". Lifecycle status of a scenario
+                          set. Uploaded sets are created as ready. Generated sets start as generating
+                          and then become ready, failed, or cancelled.   *
+                          SCENARIO_SET_STATUS_GENERATING: Generation is in progress. The scenarios are
+                          not ready yet. * SCENARIO_SET_STATUS_READY: The scenario set is ready to use.
+                          * SCENARIO_SET_STATUS_FAILED: Generation failed. The scenario set has no
+                          readable scenarios. * SCENARIO_SET_STATUS_CANCELLED: Generation was cancelled
+                          before completion. Known values are: "SCENARIO_SET_STATUS_UNSPECIFIED",
+                          "SCENARIO_SET_STATUS_GENERATING", "SCENARIO_SET_STATUS_READY",
+                          "SCENARIO_SET_STATUS_FAILED", and "SCENARIO_SET_STATUS_CANCELLED".
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. Time last updated
+                          at.
+                        "workflow_uuid": "str"  # Optional. Identifier of the generation
+                          workflow. Only set for goal-generated scenario sets.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def create_duplicate_scenario_set(
+        self,
+        scenario_set_uuid: str,
+        body: Optional[Union[JSON, IO[bytes]]] = None,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Duplicate Scenario Set.
+
+        To duplicate a scenario set, send a POST request to
+        ``/v2/gen-ai/scenario_sets/{scenario_set_uuid}/duplicate``. The source set must be ready. The
+        new set is named ``{original name} duplicate`` and contains a copy of the source scenarios.
+
+        :param scenario_set_uuid: UUID of the scenario set to duplicate. Required.
+        :type scenario_set_uuid: str
+        :param body: Is either a JSON type or a IO[bytes] type. Default value is None.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "scenario_set_uuid": "str"  # Optional. UUID of the scenario set to
+                      duplicate.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "scenario_set": {
+                        "bucket_name": "str",  # Optional. Object storage bucket holding the
+                          scenario file. Unset while status is generating.
+                        "bucket_region": "str",  # Optional. Object storage bucket region.
+                          Unset while status is generating.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Time created at.
+                        "deleted_at": "2020-02-20 00:00:00",  # Optional. Time deleted at.
+                          Unset unless the scenario set has been deleted.
+                        "description": "str",  # Optional. Customer-supplied description.
+                        "failure_reason": "str",  # Optional. Human-readable explanation of a
+                          terminal FAILED status. Empty otherwise.
+                        "generator_model_uuid": "str",  # Optional. Model that produced the
+                          scenarios. Only set for goal-generated scenario sets.
+                        "library_scenario_uuid": "str",  # Optional. UUID of the source
+                          library entry. Only set for library scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_LIBRARY``"" ).
+                        "name": "str",  # Optional. Customer-supplied name.
+                        "scenario_count": 0,  # Optional. Number of scenarios in the set.
+                          Unset while status is generating.
+                        "scenario_set_uuid": "str",  # Optional. UUID of the scenario set.
+                        "source_export_id": "str",  # Optional. Signals export UUID that
+                          produced this set. Only set for signal-generated scenario sets (""
+                          ``source_kind=SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED``"" ).
+                        "source_goal_description": "str",  # Optional. The goal that drove
+                          generation. Only set for goal_generated scenario sets.
+                        "source_kind": "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",  # Optional.
+                          Default value is "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED". How a scenario set
+                          was created.   * SCENARIO_SET_SOURCE_KIND_USER_UPLOAD: Created from uploaded
+                          or inline scenarios. * SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED: Produced by
+                          goal-driven generation. * SCENARIO_SET_SOURCE_KIND_LIBRARY: Copied from a
+                          platform-curated library entry. * SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED:
+                          Produced from a completed Signals export. Known values are:
+                          "SCENARIO_SET_SOURCE_KIND_UNSPECIFIED",
+                          "SCENARIO_SET_SOURCE_KIND_USER_UPLOAD",
+                          "SCENARIO_SET_SOURCE_KIND_GOAL_GENERATED",
+                          "SCENARIO_SET_SOURCE_KIND_LIBRARY", and
+                          "SCENARIO_SET_SOURCE_KIND_SIGNAL_GENERATED".
+                        "spaces_key": "str",  # Optional. Object storage key for the scenario
+                          file. Unset while status is generating.
+                        "status": "SCENARIO_SET_STATUS_UNSPECIFIED",  # Optional. Default
+                          value is "SCENARIO_SET_STATUS_UNSPECIFIED". Lifecycle status of a scenario
+                          set. Uploaded sets are created as ready. Generated sets start as generating
+                          and then become ready, failed, or cancelled.   *
+                          SCENARIO_SET_STATUS_GENERATING: Generation is in progress. The scenarios are
+                          not ready yet. * SCENARIO_SET_STATUS_READY: The scenario set is ready to use.
+                          * SCENARIO_SET_STATUS_FAILED: Generation failed. The scenario set has no
+                          readable scenarios. * SCENARIO_SET_STATUS_CANCELLED: Generation was cancelled
+                          before completion. Known values are: "SCENARIO_SET_STATUS_UNSPECIFIED",
+                          "SCENARIO_SET_STATUS_GENERATING", "SCENARIO_SET_STATUS_READY",
+                          "SCENARIO_SET_STATUS_FAILED", and "SCENARIO_SET_STATUS_CANCELLED".
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. Time last updated
+                          at.
+                        "workflow_uuid": "str"  # Optional. Identifier of the generation
+                          workflow. Only set for goal-generated scenario sets.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            if body is not None:
+                _json = body
+            else:
+                _json = None
+
+        _request = build_genai_create_duplicate_scenario_set_request(
+            scenario_set_uuid=scenario_set_uuid,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def list_scenarios(
+        self,
+        scenario_set_uuid: str,
+        *,
+        page: Optional[int] = None,
+        per_page: Optional[int] = None,
+        search: Optional[str] = None,
+        sort_by: str = "SCENARIO_SORT_FIELD_UNSPECIFIED",
+        sort_direction: str = "SORT_DIRECTION_UNSPECIFIED",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Scenarios.
+
+        To list the scenarios in a scenario set, send a GET request to
+        ``/v2/gen-ai/scenario_sets/{scenario_set_uuid}/scenarios``.
+
+        :param scenario_set_uuid: UUID of the scenario set to read. Required.
+        :type scenario_set_uuid: str
+        :keyword page: Page number. Default value is None.
+        :paramtype page: int
+        :keyword per_page: Items per page. Default value is None.
+        :paramtype per_page: int
+        :keyword search: Free-text search across name, description, and user_persona
+         (case-insensitive substring match). Empty means no search. Default value is None.
+        :paramtype search: str
+        :keyword sort_by: Field to sort by. Defaults to original file order when unspecified.
+
+
+         * SCENARIO_SORT_FIELD_FILE_ORDER: Preserve original file order. Default.
+         * SCENARIO_SORT_FIELD_NAME: Sort by scenario name (case-insensitive). Empty names sort last.
+         * SCENARIO_SORT_FIELD_DESCRIPTION: Sort by scenario description (case-insensitive). Known
+         values are: "SCENARIO_SORT_FIELD_UNSPECIFIED", "SCENARIO_SORT_FIELD_FILE_ORDER",
+         "SCENARIO_SORT_FIELD_NAME", and "SCENARIO_SORT_FIELD_DESCRIPTION". Default value is
+         "SCENARIO_SORT_FIELD_UNSPECIFIED".
+        :paramtype sort_by: str
+        :keyword sort_direction: Sort direction. Defaults to ascending when unspecified. Known values
+         are: "SORT_DIRECTION_UNSPECIFIED", "SORT_DIRECTION_ASC", and "SORT_DIRECTION_DESC". Default
+         value is "SORT_DIRECTION_UNSPECIFIED".
+        :paramtype sort_direction: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "available_sort_by": [
+                        "str"  # Optional. Sort-by values available for this list request.
+                    ],
+                    "available_sort_directions": [
+                        "str"  # Optional. Sort-direction values available for this list
+                          request.
+                    ],
+                    "links": {
+                        "pages": {
+                            "first": "str",  # Optional. First page.
+                            "last": "str",  # Optional. Last page.
+                            "next": "str",  # Optional. Next page.
+                            "previous": "str"  # Optional. Previous page.
+                        }
+                    },
+                    "meta": {
+                        "page": 0,  # Optional. The current page.
+                        "pages": 0,  # Optional. Total number of pages.
+                        "total": 0  # Optional. Total amount of items over all pages.
+                    },
+                    "scenarios": [
+                        {
+                            "description": "str",  # Optional. What the user tries to
+                              accomplish. Required.
+                            "exploration_budget": 0,  # Optional. Number of journeys to
+                              explore for this scenario. Defaults to 1 if unset.
+                            "max_turns": 0,  # Optional. Turn budget for the scenario.
+                              Falls back to the run-level default if unset.
+                            "name": "str",  # Optional. Human-readable name for the
+                              scenario. Optional.
+                            "scenario_uuid": "str",  # Optional. Unique id for the
+                              scenario. Always generated by the API; any customer-supplied value is
+                              ignored and overwritten.
+                            "stopping_criteria": [
+                                "str"  # Optional. Judge stopping criteria. Required;
+                                  must contain at least one entry.
+                            ],
+                            "user_persona": "str"  # Optional. How the user communicates
+                              (tone, role). Optional.
+                        }
+                    ]
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_genai_list_scenarios_request(
+            scenario_set_uuid=scenario_set_uuid,
+            page=page,
+            per_page=per_page,
+            search=search,
+            sort_by=sort_by,
+            sort_direction=sort_direction,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
     @overload
     async def create_scheduled_indexing(
         self,
@@ -274261,6 +273791,3103 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
 
         _request = build_genai_delete_scheduled_indexing_request(
             uuid=uuid,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def list_simulation_runs(
+        self,
+        *,
+        scenario_set_uuid: Optional[str] = None,
+        page: Optional[int] = None,
+        per_page: Optional[int] = None,
+        statuses: Optional[List[str]] = None,
+        search: Optional[str] = None,
+        sort_by: str = "SIMULATION_RUN_SORT_FIELD_UNSPECIFIED",
+        sort_direction: str = "SORT_DIRECTION_UNSPECIFIED",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Simulation Runs.
+
+        To list simulation runs, send a GET request to ``/v2/gen-ai/simulation_runs``.
+
+        :keyword scenario_set_uuid: Optional filter by scenario set. Default value is None.
+        :paramtype scenario_set_uuid: str
+        :keyword page: Page number. Default value is None.
+        :paramtype page: int
+        :keyword per_page: Items per page. Default value is None.
+        :paramtype per_page: int
+        :keyword statuses: Filter by one or more statuses. Empty means no status filter.
+
+
+         * SIMULATION_RUN_STATUS_PENDING: Accepted and queued, not yet executing.
+         * SIMULATION_RUN_STATUS_RUNNING: Journeys are executing.
+         * SIMULATION_RUN_STATUS_SUCCEEDED: All journeys finished successfully.
+         * SIMULATION_RUN_STATUS_FAILED: The run failed, for example because of a timeout or workflow
+         error.
+         * SIMULATION_RUN_STATUS_CANCELLED: The run was cancelled.
+         * SIMULATION_RUN_STATUS_EVALUATING: Journeys finished and an attached evaluation is running.
+         Only reachable
+           when the create request included evaluation_config. When the evaluation
+           reaches a terminal status, its outcome is reflected in the simulation run
+           status.
+         * SIMULATION_RUN_STATUS_PARTIALLY_SUCCESSFUL: The simulation or its attached evaluation
+         completed with a mixture of
+           successful and failed results. Default value is None.
+        :paramtype statuses: list[str]
+        :keyword search: Free-text search across the run name and scenario set name
+         (case-insensitive substring match). Empty means no search. Default value is None.
+        :paramtype search: str
+        :keyword sort_by: Field to sort by. Defaults to creation date when unspecified.
+
+
+         * SIMULATION_RUN_SORT_FIELD_CREATED_AT: Sort by creation date. Default.
+         * SIMULATION_RUN_SORT_FIELD_NAME: Sort by customer-supplied run name (case-insensitive).
+         * SIMULATION_RUN_SORT_FIELD_STATUS: Sort by status using lifecycle order (pending → running →
+         terminal).
+         * SIMULATION_RUN_SORT_FIELD_UPDATED_AT: Sort by last update date. Known values are:
+         "SIMULATION_RUN_SORT_FIELD_UNSPECIFIED", "SIMULATION_RUN_SORT_FIELD_CREATED_AT",
+         "SIMULATION_RUN_SORT_FIELD_NAME", "SIMULATION_RUN_SORT_FIELD_STATUS", and
+         "SIMULATION_RUN_SORT_FIELD_UPDATED_AT". Default value is
+         "SIMULATION_RUN_SORT_FIELD_UNSPECIFIED".
+        :paramtype sort_by: str
+        :keyword sort_direction: Sort direction. Defaults to descending when unspecified. Known values
+         are: "SORT_DIRECTION_UNSPECIFIED", "SORT_DIRECTION_ASC", and "SORT_DIRECTION_DESC". Default
+         value is "SORT_DIRECTION_UNSPECIFIED".
+        :paramtype sort_direction: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "available_sort_by": [
+                        "str"  # Optional. Sort-by values available for this list request.
+                    ],
+                    "available_sort_directions": [
+                        "str"  # Optional. Sort-direction values available for this list
+                          request.
+                    ],
+                    "available_statuses": [
+                        "str"  # Optional. Statuses available for filtering this list
+                          request.
+                    ],
+                    "links": {
+                        "pages": {
+                            "first": "str",  # Optional. First page.
+                            "last": "str",  # Optional. Last page.
+                            "next": "str",  # Optional. Next page.
+                            "previous": "str"  # Optional. Previous page.
+                        }
+                    },
+                    "meta": {
+                        "page": 0,  # Optional. The current page.
+                        "pages": 0,  # Optional. Total number of pages.
+                        "total": 0  # Optional. Total amount of items over all pages.
+                    },
+                    "simulation_runs": [
+                        {
+                            "agent_config": {
+                                "agent_deployment_uuid": "str",  # Optional. Optional
+                                  agent deployment to run. Defaults to the agent's current deployment
+                                  when unset.
+                                "agent_uuid": "str",  # Optional. UUID of the agent
+                                  to exercise as the candidate.
+                                "name": "str"  # Optional. Display name of the
+                                  candidate agent. Persisted with the run.
+                            },
+                            "created_at": "2020-02-20 00:00:00",  # Optional. Time
+                              created at.
+                            "created_by_user_email": "str",  # Optional. Email of the
+                              user who triggered this run.
+                            "created_by_user_id": "str",  # Optional. User id of the
+                              actor who triggered this run.
+                            "deleted_at": "2020-02-20 00:00:00",  # Optional. Time
+                              deleted at. Unset unless the run has been deleted.
+                            "evaluation_run_uuid": "str",  # Optional. UUID of the
+                              evaluation run reserved for this simulation, when the create request
+                              included evaluation_config. Empty when no evaluation is attached.
+                            "exploration_budget": 0,  # Optional. Optional run-level
+                              journeys-per-scenario override. When set, overrides each scenario's
+                              exploration_budget.
+                            "failure_reason": "str",  # Optional. Human-readable
+                              explanation of a terminal FAILED status. Empty otherwise.
+                            "journeys_finished": 0,  # Optional. Number of journeys that
+                              have finished (successfully or not).
+                            "judge_model_name": "str",  # Optional. Display name of the
+                              judge model (from the model catalog).
+                            "judge_model_uuid": "str",  # Optional. Model used by the
+                              judge.
+                            "max_turns": 0,  # Optional. Optional run-level turn budget.
+                              When set, overrides each scenario's max_turns.
+                            "name": "str",  # Optional. Optional run name.
+                            "result_summary": {
+                                "token_usage": {
+                                    "candidate_agent_tokens": "str",  # Optional.
+                                      Tokens consumed by the candidate agent.
+                                    "generator_tokens": "str",  # Optional.
+                                      Tokens consumed by the scenario generator.
+                                    "judge_tokens": "str",  # Optional. Tokens
+                                      consumed by the judge.
+                                    "simulator_tokens": "str",  # Optional.
+                                      Tokens consumed by the user simulator.
+                                    "total_tokens": "str"  # Optional. Total
+                                      tokens across all actors.
+                                },
+                                "total_duration_sec": "str",  # Optional. Total
+                                  wall-clock duration across the run, in seconds.
+                                "verdict_counts": {
+                                    "failure_count": 0,  # Optional. Number of
+                                      journeys with a FAILURE verdict.
+                                    "inconclusive_count": 0,  # Optional. Number
+                                      of journeys with an INCONCLUSIVE verdict.
+                                    "success_count": 0  # Optional. Number of
+                                      journeys with a SUCCESS verdict.
+                                }
+                            },
+                            "run_uuid": "str",  # Optional. UUID of the run.
+                            "scenario_count": 0,  # Optional. Number of scenarios in the
+                              scenario set for this run.
+                            "scenario_set_uuid": "str",  # Optional. UUID of the scenario
+                              set being executed (must exist at run create).
+                            "status": "SIMULATION_RUN_STATUS_UNSPECIFIED",  # Optional.
+                              Default value is "SIMULATION_RUN_STATUS_UNSPECIFIED". Lifecycle status of
+                              a simulation run.   * SIMULATION_RUN_STATUS_PENDING: Accepted and queued,
+                              not yet executing. * SIMULATION_RUN_STATUS_RUNNING: Journeys are
+                              executing. * SIMULATION_RUN_STATUS_SUCCEEDED: All journeys finished
+                              successfully. * SIMULATION_RUN_STATUS_FAILED: The run failed, for example
+                              because of a timeout or workflow error. *
+                              SIMULATION_RUN_STATUS_CANCELLED: The run was cancelled. *
+                              SIMULATION_RUN_STATUS_EVALUATING: Journeys finished and an attached
+                              evaluation is running. Only reachable   when the create request included
+                              evaluation_config. When the evaluation   reaches a terminal status, its
+                              outcome is reflected in the simulation run   status. *
+                              SIMULATION_RUN_STATUS_PARTIALLY_SUCCESSFUL: The simulation or its
+                              attached evaluation completed with a mixture of   successful and failed
+                              results. Known values are: "SIMULATION_RUN_STATUS_UNSPECIFIED",
+                              "SIMULATION_RUN_STATUS_PENDING", "SIMULATION_RUN_STATUS_RUNNING",
+                              "SIMULATION_RUN_STATUS_SUCCEEDED", "SIMULATION_RUN_STATUS_FAILED",
+                              "SIMULATION_RUN_STATUS_CANCELLED", "SIMULATION_RUN_STATUS_EVALUATING",
+                              and "SIMULATION_RUN_STATUS_PARTIALLY_SUCCESSFUL".
+                            "total_journeys": 0,  # Optional. Total number of journeys
+                              (sum of exploration budgets).
+                            "updated_at": "2020-02-20 00:00:00",  # Optional. Time last
+                              updated at.
+                            "user_simulator_config": {},  # Optional. Optional user
+                              simulator model settings such as temperature and max_tokens.
+                            "user_simulator_model_name": "str",  # Optional. Display name
+                              of the user simulator model (from the model catalog).
+                            "user_simulator_model_uuid": "str",  # Optional. Model used
+                              by the user simulator.
+                            "workflow_uuid": "str"  # Optional. Identifier of the
+                              workflow executing this run.
+                        }
+                    ]
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_genai_list_simulation_runs_request(
+            scenario_set_uuid=scenario_set_uuid,
+            page=page,
+            per_page=per_page,
+            statuses=statuses,
+            search=search,
+            sort_by=sort_by,
+            sort_direction=sort_direction,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def create_simulation_run(
+        self,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create Simulation Run.
+
+        To create a simulation run, send a POST request to ``/v2/gen-ai/simulation_runs``. The scenario
+        set must be ready. Judge and user simulator models are optional and use platform defaults when
+        omitted. The run is returned in the pending state.
+
+        :param body: Default value is None.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "agent_config": {
+                        "agent_deployment_uuid": "str",  # Optional. Optional agent
+                          deployment to run. Defaults to the agent's current deployment when unset.
+                        "agent_uuid": "str",  # Optional. UUID of the agent to exercise as
+                          the candidate.
+                        "name": "str"  # Optional. Display name of the candidate agent.
+                          Persisted with the run.
+                    },
+                    "evaluation_config": {
+                        "metric_uuids": [
+                            "str"  # Optional. Evaluation metric UUIDs (from the
+                              evaluation metrics catalog). Must be simulation-eligible (multi-turn)
+                              metrics; the create request is rejected if any UUID is unknown or
+                              ineligible.
+                        ],
+                        "star_metric": {
+                            "metric_uuid": "str",  # Optional. Optional configuration
+                              that opts a simulation run into an evaluation. When included on the
+                              create-run request, the platform reserves a model_evaluation_run linked
+                              to this simulation run and dispatches the evaluation automatically after
+                              the simulation finishes. The evaluation reuses the simulation run's
+                              judge_model_uuid.
+                            "name": "str",  # Optional. Optional configuration that opts
+                              a simulation run into an evaluation. When included on the create-run
+                              request, the platform reserves a model_evaluation_run linked to this
+                              simulation run and dispatches the evaluation automatically after the
+                              simulation finishes. The evaluation reuses the simulation run's
+                              judge_model_uuid.
+                            "success_threshold": 0.0,  # Optional. The success threshold
+                              for the star metric. This is a value that the metric must reach to be
+                              considered successful.
+                            "success_threshold_pct": 0  # Optional. The success threshold
+                              for the star metric. This is a percentage value between 0 and 100.
+                        }
+                    },
+                    "exploration_budget": 0,  # Optional. Optional run-level
+                      journeys-per-scenario override. When set, overrides each scenario's
+                      exploration_budget.
+                    "judge_model_uuid": "str",  # Optional. Optional model override for the
+                      judge. Platform default when unset.
+                    "max_turns": 0,  # Optional. Optional run-level turn budget. When set,
+                      overrides each scenario's max_turns.
+                    "name": "str",  # Optional. Optional run name.
+                    "scenario_set_uuid": "str",  # Optional. UUID of the existing scenario set to
+                      execute. The set must be ready.
+                    "user_simulator_config": {},  # Optional. Optional user simulator model
+                      settings such as temperature and max_tokens.
+                    "user_simulator_model_uuid": "str"  # Optional. Optional model override for
+                      the user simulator. Platform default when unset.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "simulation_run": {
+                        "agent_config": {
+                            "agent_deployment_uuid": "str",  # Optional. Optional agent
+                              deployment to run. Defaults to the agent's current deployment when unset.
+                            "agent_uuid": "str",  # Optional. UUID of the agent to
+                              exercise as the candidate.
+                            "name": "str"  # Optional. Display name of the candidate
+                              agent. Persisted with the run.
+                        },
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Time created at.
+                        "created_by_user_email": "str",  # Optional. Email of the user who
+                          triggered this run.
+                        "created_by_user_id": "str",  # Optional. User id of the actor who
+                          triggered this run.
+                        "deleted_at": "2020-02-20 00:00:00",  # Optional. Time deleted at.
+                          Unset unless the run has been deleted.
+                        "evaluation_run_uuid": "str",  # Optional. UUID of the evaluation run
+                          reserved for this simulation, when the create request included
+                          evaluation_config. Empty when no evaluation is attached.
+                        "exploration_budget": 0,  # Optional. Optional run-level
+                          journeys-per-scenario override. When set, overrides each scenario's
+                          exploration_budget.
+                        "failure_reason": "str",  # Optional. Human-readable explanation of a
+                          terminal FAILED status. Empty otherwise.
+                        "journeys_finished": 0,  # Optional. Number of journeys that have
+                          finished (successfully or not).
+                        "judge_model_name": "str",  # Optional. Display name of the judge
+                          model (from the model catalog).
+                        "judge_model_uuid": "str",  # Optional. Model used by the judge.
+                        "max_turns": 0,  # Optional. Optional run-level turn budget. When
+                          set, overrides each scenario's max_turns.
+                        "name": "str",  # Optional. Optional run name.
+                        "result_summary": {
+                            "token_usage": {
+                                "candidate_agent_tokens": "str",  # Optional. Tokens
+                                  consumed by the candidate agent.
+                                "generator_tokens": "str",  # Optional. Tokens
+                                  consumed by the scenario generator.
+                                "judge_tokens": "str",  # Optional. Tokens consumed
+                                  by the judge.
+                                "simulator_tokens": "str",  # Optional. Tokens
+                                  consumed by the user simulator.
+                                "total_tokens": "str"  # Optional. Total tokens
+                                  across all actors.
+                            },
+                            "total_duration_sec": "str",  # Optional. Total wall-clock
+                              duration across the run, in seconds.
+                            "verdict_counts": {
+                                "failure_count": 0,  # Optional. Number of journeys
+                                  with a FAILURE verdict.
+                                "inconclusive_count": 0,  # Optional. Number of
+                                  journeys with an INCONCLUSIVE verdict.
+                                "success_count": 0  # Optional. Number of journeys
+                                  with a SUCCESS verdict.
+                            }
+                        },
+                        "run_uuid": "str",  # Optional. UUID of the run.
+                        "scenario_count": 0,  # Optional. Number of scenarios in the scenario
+                          set for this run.
+                        "scenario_set_uuid": "str",  # Optional. UUID of the scenario set
+                          being executed (must exist at run create).
+                        "status": "SIMULATION_RUN_STATUS_UNSPECIFIED",  # Optional. Default
+                          value is "SIMULATION_RUN_STATUS_UNSPECIFIED". Lifecycle status of a
+                          simulation run.   * SIMULATION_RUN_STATUS_PENDING: Accepted and queued, not
+                          yet executing. * SIMULATION_RUN_STATUS_RUNNING: Journeys are executing. *
+                          SIMULATION_RUN_STATUS_SUCCEEDED: All journeys finished successfully. *
+                          SIMULATION_RUN_STATUS_FAILED: The run failed, for example because of a
+                          timeout or workflow error. * SIMULATION_RUN_STATUS_CANCELLED: The run was
+                          cancelled. * SIMULATION_RUN_STATUS_EVALUATING: Journeys finished and an
+                          attached evaluation is running. Only reachable   when the create request
+                          included evaluation_config. When the evaluation   reaches a terminal status,
+                          its outcome is reflected in the simulation run   status. *
+                          SIMULATION_RUN_STATUS_PARTIALLY_SUCCESSFUL: The simulation or its attached
+                          evaluation completed with a mixture of   successful and failed results. Known
+                          values are: "SIMULATION_RUN_STATUS_UNSPECIFIED",
+                          "SIMULATION_RUN_STATUS_PENDING", "SIMULATION_RUN_STATUS_RUNNING",
+                          "SIMULATION_RUN_STATUS_SUCCEEDED", "SIMULATION_RUN_STATUS_FAILED",
+                          "SIMULATION_RUN_STATUS_CANCELLED", "SIMULATION_RUN_STATUS_EVALUATING", and
+                          "SIMULATION_RUN_STATUS_PARTIALLY_SUCCESSFUL".
+                        "total_journeys": 0,  # Optional. Total number of journeys (sum of
+                          exploration budgets).
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. Time last updated
+                          at.
+                        "user_simulator_config": {},  # Optional. Optional user simulator
+                          model settings such as temperature and max_tokens.
+                        "user_simulator_model_name": "str",  # Optional. Display name of the
+                          user simulator model (from the model catalog).
+                        "user_simulator_model_uuid": "str",  # Optional. Model used by the
+                          user simulator.
+                        "workflow_uuid": "str"  # Optional. Identifier of the workflow
+                          executing this run.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def create_simulation_run(
+        self,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create Simulation Run.
+
+        To create a simulation run, send a POST request to ``/v2/gen-ai/simulation_runs``. The scenario
+        set must be ready. Judge and user simulator models are optional and use platform defaults when
+        omitted. The run is returned in the pending state.
+
+        :param body: Default value is None.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "simulation_run": {
+                        "agent_config": {
+                            "agent_deployment_uuid": "str",  # Optional. Optional agent
+                              deployment to run. Defaults to the agent's current deployment when unset.
+                            "agent_uuid": "str",  # Optional. UUID of the agent to
+                              exercise as the candidate.
+                            "name": "str"  # Optional. Display name of the candidate
+                              agent. Persisted with the run.
+                        },
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Time created at.
+                        "created_by_user_email": "str",  # Optional. Email of the user who
+                          triggered this run.
+                        "created_by_user_id": "str",  # Optional. User id of the actor who
+                          triggered this run.
+                        "deleted_at": "2020-02-20 00:00:00",  # Optional. Time deleted at.
+                          Unset unless the run has been deleted.
+                        "evaluation_run_uuid": "str",  # Optional. UUID of the evaluation run
+                          reserved for this simulation, when the create request included
+                          evaluation_config. Empty when no evaluation is attached.
+                        "exploration_budget": 0,  # Optional. Optional run-level
+                          journeys-per-scenario override. When set, overrides each scenario's
+                          exploration_budget.
+                        "failure_reason": "str",  # Optional. Human-readable explanation of a
+                          terminal FAILED status. Empty otherwise.
+                        "journeys_finished": 0,  # Optional. Number of journeys that have
+                          finished (successfully or not).
+                        "judge_model_name": "str",  # Optional. Display name of the judge
+                          model (from the model catalog).
+                        "judge_model_uuid": "str",  # Optional. Model used by the judge.
+                        "max_turns": 0,  # Optional. Optional run-level turn budget. When
+                          set, overrides each scenario's max_turns.
+                        "name": "str",  # Optional. Optional run name.
+                        "result_summary": {
+                            "token_usage": {
+                                "candidate_agent_tokens": "str",  # Optional. Tokens
+                                  consumed by the candidate agent.
+                                "generator_tokens": "str",  # Optional. Tokens
+                                  consumed by the scenario generator.
+                                "judge_tokens": "str",  # Optional. Tokens consumed
+                                  by the judge.
+                                "simulator_tokens": "str",  # Optional. Tokens
+                                  consumed by the user simulator.
+                                "total_tokens": "str"  # Optional. Total tokens
+                                  across all actors.
+                            },
+                            "total_duration_sec": "str",  # Optional. Total wall-clock
+                              duration across the run, in seconds.
+                            "verdict_counts": {
+                                "failure_count": 0,  # Optional. Number of journeys
+                                  with a FAILURE verdict.
+                                "inconclusive_count": 0,  # Optional. Number of
+                                  journeys with an INCONCLUSIVE verdict.
+                                "success_count": 0  # Optional. Number of journeys
+                                  with a SUCCESS verdict.
+                            }
+                        },
+                        "run_uuid": "str",  # Optional. UUID of the run.
+                        "scenario_count": 0,  # Optional. Number of scenarios in the scenario
+                          set for this run.
+                        "scenario_set_uuid": "str",  # Optional. UUID of the scenario set
+                          being executed (must exist at run create).
+                        "status": "SIMULATION_RUN_STATUS_UNSPECIFIED",  # Optional. Default
+                          value is "SIMULATION_RUN_STATUS_UNSPECIFIED". Lifecycle status of a
+                          simulation run.   * SIMULATION_RUN_STATUS_PENDING: Accepted and queued, not
+                          yet executing. * SIMULATION_RUN_STATUS_RUNNING: Journeys are executing. *
+                          SIMULATION_RUN_STATUS_SUCCEEDED: All journeys finished successfully. *
+                          SIMULATION_RUN_STATUS_FAILED: The run failed, for example because of a
+                          timeout or workflow error. * SIMULATION_RUN_STATUS_CANCELLED: The run was
+                          cancelled. * SIMULATION_RUN_STATUS_EVALUATING: Journeys finished and an
+                          attached evaluation is running. Only reachable   when the create request
+                          included evaluation_config. When the evaluation   reaches a terminal status,
+                          its outcome is reflected in the simulation run   status. *
+                          SIMULATION_RUN_STATUS_PARTIALLY_SUCCESSFUL: The simulation or its attached
+                          evaluation completed with a mixture of   successful and failed results. Known
+                          values are: "SIMULATION_RUN_STATUS_UNSPECIFIED",
+                          "SIMULATION_RUN_STATUS_PENDING", "SIMULATION_RUN_STATUS_RUNNING",
+                          "SIMULATION_RUN_STATUS_SUCCEEDED", "SIMULATION_RUN_STATUS_FAILED",
+                          "SIMULATION_RUN_STATUS_CANCELLED", "SIMULATION_RUN_STATUS_EVALUATING", and
+                          "SIMULATION_RUN_STATUS_PARTIALLY_SUCCESSFUL".
+                        "total_journeys": 0,  # Optional. Total number of journeys (sum of
+                          exploration budgets).
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. Time last updated
+                          at.
+                        "user_simulator_config": {},  # Optional. Optional user simulator
+                          model settings such as temperature and max_tokens.
+                        "user_simulator_model_name": "str",  # Optional. Display name of the
+                          user simulator model (from the model catalog).
+                        "user_simulator_model_uuid": "str",  # Optional. Model used by the
+                          user simulator.
+                        "workflow_uuid": "str"  # Optional. Identifier of the workflow
+                          executing this run.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def create_simulation_run(
+        self, body: Optional[Union[JSON, IO[bytes]]] = None, **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create Simulation Run.
+
+        To create a simulation run, send a POST request to ``/v2/gen-ai/simulation_runs``. The scenario
+        set must be ready. Judge and user simulator models are optional and use platform defaults when
+        omitted. The run is returned in the pending state.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Default value is None.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "agent_config": {
+                        "agent_deployment_uuid": "str",  # Optional. Optional agent
+                          deployment to run. Defaults to the agent's current deployment when unset.
+                        "agent_uuid": "str",  # Optional. UUID of the agent to exercise as
+                          the candidate.
+                        "name": "str"  # Optional. Display name of the candidate agent.
+                          Persisted with the run.
+                    },
+                    "evaluation_config": {
+                        "metric_uuids": [
+                            "str"  # Optional. Evaluation metric UUIDs (from the
+                              evaluation metrics catalog). Must be simulation-eligible (multi-turn)
+                              metrics; the create request is rejected if any UUID is unknown or
+                              ineligible.
+                        ],
+                        "star_metric": {
+                            "metric_uuid": "str",  # Optional. Optional configuration
+                              that opts a simulation run into an evaluation. When included on the
+                              create-run request, the platform reserves a model_evaluation_run linked
+                              to this simulation run and dispatches the evaluation automatically after
+                              the simulation finishes. The evaluation reuses the simulation run's
+                              judge_model_uuid.
+                            "name": "str",  # Optional. Optional configuration that opts
+                              a simulation run into an evaluation. When included on the create-run
+                              request, the platform reserves a model_evaluation_run linked to this
+                              simulation run and dispatches the evaluation automatically after the
+                              simulation finishes. The evaluation reuses the simulation run's
+                              judge_model_uuid.
+                            "success_threshold": 0.0,  # Optional. The success threshold
+                              for the star metric. This is a value that the metric must reach to be
+                              considered successful.
+                            "success_threshold_pct": 0  # Optional. The success threshold
+                              for the star metric. This is a percentage value between 0 and 100.
+                        }
+                    },
+                    "exploration_budget": 0,  # Optional. Optional run-level
+                      journeys-per-scenario override. When set, overrides each scenario's
+                      exploration_budget.
+                    "judge_model_uuid": "str",  # Optional. Optional model override for the
+                      judge. Platform default when unset.
+                    "max_turns": 0,  # Optional. Optional run-level turn budget. When set,
+                      overrides each scenario's max_turns.
+                    "name": "str",  # Optional. Optional run name.
+                    "scenario_set_uuid": "str",  # Optional. UUID of the existing scenario set to
+                      execute. The set must be ready.
+                    "user_simulator_config": {},  # Optional. Optional user simulator model
+                      settings such as temperature and max_tokens.
+                    "user_simulator_model_uuid": "str"  # Optional. Optional model override for
+                      the user simulator. Platform default when unset.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "simulation_run": {
+                        "agent_config": {
+                            "agent_deployment_uuid": "str",  # Optional. Optional agent
+                              deployment to run. Defaults to the agent's current deployment when unset.
+                            "agent_uuid": "str",  # Optional. UUID of the agent to
+                              exercise as the candidate.
+                            "name": "str"  # Optional. Display name of the candidate
+                              agent. Persisted with the run.
+                        },
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Time created at.
+                        "created_by_user_email": "str",  # Optional. Email of the user who
+                          triggered this run.
+                        "created_by_user_id": "str",  # Optional. User id of the actor who
+                          triggered this run.
+                        "deleted_at": "2020-02-20 00:00:00",  # Optional. Time deleted at.
+                          Unset unless the run has been deleted.
+                        "evaluation_run_uuid": "str",  # Optional. UUID of the evaluation run
+                          reserved for this simulation, when the create request included
+                          evaluation_config. Empty when no evaluation is attached.
+                        "exploration_budget": 0,  # Optional. Optional run-level
+                          journeys-per-scenario override. When set, overrides each scenario's
+                          exploration_budget.
+                        "failure_reason": "str",  # Optional. Human-readable explanation of a
+                          terminal FAILED status. Empty otherwise.
+                        "journeys_finished": 0,  # Optional. Number of journeys that have
+                          finished (successfully or not).
+                        "judge_model_name": "str",  # Optional. Display name of the judge
+                          model (from the model catalog).
+                        "judge_model_uuid": "str",  # Optional. Model used by the judge.
+                        "max_turns": 0,  # Optional. Optional run-level turn budget. When
+                          set, overrides each scenario's max_turns.
+                        "name": "str",  # Optional. Optional run name.
+                        "result_summary": {
+                            "token_usage": {
+                                "candidate_agent_tokens": "str",  # Optional. Tokens
+                                  consumed by the candidate agent.
+                                "generator_tokens": "str",  # Optional. Tokens
+                                  consumed by the scenario generator.
+                                "judge_tokens": "str",  # Optional. Tokens consumed
+                                  by the judge.
+                                "simulator_tokens": "str",  # Optional. Tokens
+                                  consumed by the user simulator.
+                                "total_tokens": "str"  # Optional. Total tokens
+                                  across all actors.
+                            },
+                            "total_duration_sec": "str",  # Optional. Total wall-clock
+                              duration across the run, in seconds.
+                            "verdict_counts": {
+                                "failure_count": 0,  # Optional. Number of journeys
+                                  with a FAILURE verdict.
+                                "inconclusive_count": 0,  # Optional. Number of
+                                  journeys with an INCONCLUSIVE verdict.
+                                "success_count": 0  # Optional. Number of journeys
+                                  with a SUCCESS verdict.
+                            }
+                        },
+                        "run_uuid": "str",  # Optional. UUID of the run.
+                        "scenario_count": 0,  # Optional. Number of scenarios in the scenario
+                          set for this run.
+                        "scenario_set_uuid": "str",  # Optional. UUID of the scenario set
+                          being executed (must exist at run create).
+                        "status": "SIMULATION_RUN_STATUS_UNSPECIFIED",  # Optional. Default
+                          value is "SIMULATION_RUN_STATUS_UNSPECIFIED". Lifecycle status of a
+                          simulation run.   * SIMULATION_RUN_STATUS_PENDING: Accepted and queued, not
+                          yet executing. * SIMULATION_RUN_STATUS_RUNNING: Journeys are executing. *
+                          SIMULATION_RUN_STATUS_SUCCEEDED: All journeys finished successfully. *
+                          SIMULATION_RUN_STATUS_FAILED: The run failed, for example because of a
+                          timeout or workflow error. * SIMULATION_RUN_STATUS_CANCELLED: The run was
+                          cancelled. * SIMULATION_RUN_STATUS_EVALUATING: Journeys finished and an
+                          attached evaluation is running. Only reachable   when the create request
+                          included evaluation_config. When the evaluation   reaches a terminal status,
+                          its outcome is reflected in the simulation run   status. *
+                          SIMULATION_RUN_STATUS_PARTIALLY_SUCCESSFUL: The simulation or its attached
+                          evaluation completed with a mixture of   successful and failed results. Known
+                          values are: "SIMULATION_RUN_STATUS_UNSPECIFIED",
+                          "SIMULATION_RUN_STATUS_PENDING", "SIMULATION_RUN_STATUS_RUNNING",
+                          "SIMULATION_RUN_STATUS_SUCCEEDED", "SIMULATION_RUN_STATUS_FAILED",
+                          "SIMULATION_RUN_STATUS_CANCELLED", "SIMULATION_RUN_STATUS_EVALUATING", and
+                          "SIMULATION_RUN_STATUS_PARTIALLY_SUCCESSFUL".
+                        "total_journeys": 0,  # Optional. Total number of journeys (sum of
+                          exploration budgets).
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. Time last updated
+                          at.
+                        "user_simulator_config": {},  # Optional. Optional user simulator
+                          model settings such as temperature and max_tokens.
+                        "user_simulator_model_name": "str",  # Optional. Display name of the
+                          user simulator model (from the model catalog).
+                        "user_simulator_model_uuid": "str",  # Optional. Model used by the
+                          user simulator.
+                        "workflow_uuid": "str"  # Optional. Identifier of the workflow
+                          executing this run.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            if body is not None:
+                _json = body
+            else:
+                _json = None
+
+        _request = build_genai_create_simulation_run_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_simulation_run(self, run_uuid: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve Simulation Run.
+
+        To retrieve a simulation run, send a GET request to ``/v2/gen-ai/simulation_runs/{run_uuid}``.
+
+        :param run_uuid: UUID of the simulation run. Required.
+        :type run_uuid: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "scenario_results": [
+                        {
+                            "journeys_finished": 0,  # Optional. Journeys that have
+                              finished (successfully or not).
+                            "scenario_uuid": "str",  # Optional. UUID of the scenario.
+                            "total_journeys": 0,  # Optional. Total journeys for this
+                              scenario (its exploration budget).
+                            "verdict_counts": {
+                                "failure_count": 0,  # Optional. Number of journeys
+                                  with a FAILURE verdict.
+                                "inconclusive_count": 0,  # Optional. Number of
+                                  journeys with an INCONCLUSIVE verdict.
+                                "success_count": 0  # Optional. Number of journeys
+                                  with a SUCCESS verdict.
+                            }
+                        }
+                    ],
+                    "simulation_run": {
+                        "agent_config": {
+                            "agent_deployment_uuid": "str",  # Optional. Optional agent
+                              deployment to run. Defaults to the agent's current deployment when unset.
+                            "agent_uuid": "str",  # Optional. UUID of the agent to
+                              exercise as the candidate.
+                            "name": "str"  # Optional. Display name of the candidate
+                              agent. Persisted with the run.
+                        },
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Time created at.
+                        "created_by_user_email": "str",  # Optional. Email of the user who
+                          triggered this run.
+                        "created_by_user_id": "str",  # Optional. User id of the actor who
+                          triggered this run.
+                        "deleted_at": "2020-02-20 00:00:00",  # Optional. Time deleted at.
+                          Unset unless the run has been deleted.
+                        "evaluation_run_uuid": "str",  # Optional. UUID of the evaluation run
+                          reserved for this simulation, when the create request included
+                          evaluation_config. Empty when no evaluation is attached.
+                        "exploration_budget": 0,  # Optional. Optional run-level
+                          journeys-per-scenario override. When set, overrides each scenario's
+                          exploration_budget.
+                        "failure_reason": "str",  # Optional. Human-readable explanation of a
+                          terminal FAILED status. Empty otherwise.
+                        "journeys_finished": 0,  # Optional. Number of journeys that have
+                          finished (successfully or not).
+                        "judge_model_name": "str",  # Optional. Display name of the judge
+                          model (from the model catalog).
+                        "judge_model_uuid": "str",  # Optional. Model used by the judge.
+                        "max_turns": 0,  # Optional. Optional run-level turn budget. When
+                          set, overrides each scenario's max_turns.
+                        "name": "str",  # Optional. Optional run name.
+                        "result_summary": {
+                            "token_usage": {
+                                "candidate_agent_tokens": "str",  # Optional. Tokens
+                                  consumed by the candidate agent.
+                                "generator_tokens": "str",  # Optional. Tokens
+                                  consumed by the scenario generator.
+                                "judge_tokens": "str",  # Optional. Tokens consumed
+                                  by the judge.
+                                "simulator_tokens": "str",  # Optional. Tokens
+                                  consumed by the user simulator.
+                                "total_tokens": "str"  # Optional. Total tokens
+                                  across all actors.
+                            },
+                            "total_duration_sec": "str",  # Optional. Total wall-clock
+                              duration across the run, in seconds.
+                            "verdict_counts": {
+                                "failure_count": 0,  # Optional. Number of journeys
+                                  with a FAILURE verdict.
+                                "inconclusive_count": 0,  # Optional. Number of
+                                  journeys with an INCONCLUSIVE verdict.
+                                "success_count": 0  # Optional. Number of journeys
+                                  with a SUCCESS verdict.
+                            }
+                        },
+                        "run_uuid": "str",  # Optional. UUID of the run.
+                        "scenario_count": 0,  # Optional. Number of scenarios in the scenario
+                          set for this run.
+                        "scenario_set_uuid": "str",  # Optional. UUID of the scenario set
+                          being executed (must exist at run create).
+                        "status": "SIMULATION_RUN_STATUS_UNSPECIFIED",  # Optional. Default
+                          value is "SIMULATION_RUN_STATUS_UNSPECIFIED". Lifecycle status of a
+                          simulation run.   * SIMULATION_RUN_STATUS_PENDING: Accepted and queued, not
+                          yet executing. * SIMULATION_RUN_STATUS_RUNNING: Journeys are executing. *
+                          SIMULATION_RUN_STATUS_SUCCEEDED: All journeys finished successfully. *
+                          SIMULATION_RUN_STATUS_FAILED: The run failed, for example because of a
+                          timeout or workflow error. * SIMULATION_RUN_STATUS_CANCELLED: The run was
+                          cancelled. * SIMULATION_RUN_STATUS_EVALUATING: Journeys finished and an
+                          attached evaluation is running. Only reachable   when the create request
+                          included evaluation_config. When the evaluation   reaches a terminal status,
+                          its outcome is reflected in the simulation run   status. *
+                          SIMULATION_RUN_STATUS_PARTIALLY_SUCCESSFUL: The simulation or its attached
+                          evaluation completed with a mixture of   successful and failed results. Known
+                          values are: "SIMULATION_RUN_STATUS_UNSPECIFIED",
+                          "SIMULATION_RUN_STATUS_PENDING", "SIMULATION_RUN_STATUS_RUNNING",
+                          "SIMULATION_RUN_STATUS_SUCCEEDED", "SIMULATION_RUN_STATUS_FAILED",
+                          "SIMULATION_RUN_STATUS_CANCELLED", "SIMULATION_RUN_STATUS_EVALUATING", and
+                          "SIMULATION_RUN_STATUS_PARTIALLY_SUCCESSFUL".
+                        "total_journeys": 0,  # Optional. Total number of journeys (sum of
+                          exploration budgets).
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. Time last updated
+                          at.
+                        "user_simulator_config": {},  # Optional. Optional user simulator
+                          model settings such as temperature and max_tokens.
+                        "user_simulator_model_name": "str",  # Optional. Display name of the
+                          user simulator model (from the model catalog).
+                        "user_simulator_model_uuid": "str",  # Optional. Model used by the
+                          user simulator.
+                        "workflow_uuid": "str"  # Optional. Identifier of the workflow
+                          executing this run.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_genai_get_simulation_run_request(
+            run_uuid=run_uuid,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def update_simulation_run(
+        self,
+        run_uuid: str,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Simulation Run.
+
+        To update a simulation run's display name, send a PUT request to
+        ``/v2/gen-ai/simulation_runs/{run_uuid}``. Only the name is mutable; run configuration and
+        results are immutable.
+
+        :param run_uuid: UUID of the simulation run to update. Returned by ``CreateSimulationRun``
+         and listed via ``ListSimulationRuns``. Required.
+        :type run_uuid: str
+        :param body: Default value is None.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "name": "str",  # Optional. The new name of the run.
+                    "run_uuid": "str"  # Optional. UUID of the run to update.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "simulation_run": {
+                        "agent_config": {
+                            "agent_deployment_uuid": "str",  # Optional. Optional agent
+                              deployment to run. Defaults to the agent's current deployment when unset.
+                            "agent_uuid": "str",  # Optional. UUID of the agent to
+                              exercise as the candidate.
+                            "name": "str"  # Optional. Display name of the candidate
+                              agent. Persisted with the run.
+                        },
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Time created at.
+                        "created_by_user_email": "str",  # Optional. Email of the user who
+                          triggered this run.
+                        "created_by_user_id": "str",  # Optional. User id of the actor who
+                          triggered this run.
+                        "deleted_at": "2020-02-20 00:00:00",  # Optional. Time deleted at.
+                          Unset unless the run has been deleted.
+                        "evaluation_run_uuid": "str",  # Optional. UUID of the evaluation run
+                          reserved for this simulation, when the create request included
+                          evaluation_config. Empty when no evaluation is attached.
+                        "exploration_budget": 0,  # Optional. Optional run-level
+                          journeys-per-scenario override. When set, overrides each scenario's
+                          exploration_budget.
+                        "failure_reason": "str",  # Optional. Human-readable explanation of a
+                          terminal FAILED status. Empty otherwise.
+                        "journeys_finished": 0,  # Optional. Number of journeys that have
+                          finished (successfully or not).
+                        "judge_model_name": "str",  # Optional. Display name of the judge
+                          model (from the model catalog).
+                        "judge_model_uuid": "str",  # Optional. Model used by the judge.
+                        "max_turns": 0,  # Optional. Optional run-level turn budget. When
+                          set, overrides each scenario's max_turns.
+                        "name": "str",  # Optional. Optional run name.
+                        "result_summary": {
+                            "token_usage": {
+                                "candidate_agent_tokens": "str",  # Optional. Tokens
+                                  consumed by the candidate agent.
+                                "generator_tokens": "str",  # Optional. Tokens
+                                  consumed by the scenario generator.
+                                "judge_tokens": "str",  # Optional. Tokens consumed
+                                  by the judge.
+                                "simulator_tokens": "str",  # Optional. Tokens
+                                  consumed by the user simulator.
+                                "total_tokens": "str"  # Optional. Total tokens
+                                  across all actors.
+                            },
+                            "total_duration_sec": "str",  # Optional. Total wall-clock
+                              duration across the run, in seconds.
+                            "verdict_counts": {
+                                "failure_count": 0,  # Optional. Number of journeys
+                                  with a FAILURE verdict.
+                                "inconclusive_count": 0,  # Optional. Number of
+                                  journeys with an INCONCLUSIVE verdict.
+                                "success_count": 0  # Optional. Number of journeys
+                                  with a SUCCESS verdict.
+                            }
+                        },
+                        "run_uuid": "str",  # Optional. UUID of the run.
+                        "scenario_count": 0,  # Optional. Number of scenarios in the scenario
+                          set for this run.
+                        "scenario_set_uuid": "str",  # Optional. UUID of the scenario set
+                          being executed (must exist at run create).
+                        "status": "SIMULATION_RUN_STATUS_UNSPECIFIED",  # Optional. Default
+                          value is "SIMULATION_RUN_STATUS_UNSPECIFIED". Lifecycle status of a
+                          simulation run.   * SIMULATION_RUN_STATUS_PENDING: Accepted and queued, not
+                          yet executing. * SIMULATION_RUN_STATUS_RUNNING: Journeys are executing. *
+                          SIMULATION_RUN_STATUS_SUCCEEDED: All journeys finished successfully. *
+                          SIMULATION_RUN_STATUS_FAILED: The run failed, for example because of a
+                          timeout or workflow error. * SIMULATION_RUN_STATUS_CANCELLED: The run was
+                          cancelled. * SIMULATION_RUN_STATUS_EVALUATING: Journeys finished and an
+                          attached evaluation is running. Only reachable   when the create request
+                          included evaluation_config. When the evaluation   reaches a terminal status,
+                          its outcome is reflected in the simulation run   status. *
+                          SIMULATION_RUN_STATUS_PARTIALLY_SUCCESSFUL: The simulation or its attached
+                          evaluation completed with a mixture of   successful and failed results. Known
+                          values are: "SIMULATION_RUN_STATUS_UNSPECIFIED",
+                          "SIMULATION_RUN_STATUS_PENDING", "SIMULATION_RUN_STATUS_RUNNING",
+                          "SIMULATION_RUN_STATUS_SUCCEEDED", "SIMULATION_RUN_STATUS_FAILED",
+                          "SIMULATION_RUN_STATUS_CANCELLED", "SIMULATION_RUN_STATUS_EVALUATING", and
+                          "SIMULATION_RUN_STATUS_PARTIALLY_SUCCESSFUL".
+                        "total_journeys": 0,  # Optional. Total number of journeys (sum of
+                          exploration budgets).
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. Time last updated
+                          at.
+                        "user_simulator_config": {},  # Optional. Optional user simulator
+                          model settings such as temperature and max_tokens.
+                        "user_simulator_model_name": "str",  # Optional. Display name of the
+                          user simulator model (from the model catalog).
+                        "user_simulator_model_uuid": "str",  # Optional. Model used by the
+                          user simulator.
+                        "workflow_uuid": "str"  # Optional. Identifier of the workflow
+                          executing this run.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def update_simulation_run(
+        self,
+        run_uuid: str,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Simulation Run.
+
+        To update a simulation run's display name, send a PUT request to
+        ``/v2/gen-ai/simulation_runs/{run_uuid}``. Only the name is mutable; run configuration and
+        results are immutable.
+
+        :param run_uuid: UUID of the simulation run to update. Returned by ``CreateSimulationRun``
+         and listed via ``ListSimulationRuns``. Required.
+        :type run_uuid: str
+        :param body: Default value is None.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "simulation_run": {
+                        "agent_config": {
+                            "agent_deployment_uuid": "str",  # Optional. Optional agent
+                              deployment to run. Defaults to the agent's current deployment when unset.
+                            "agent_uuid": "str",  # Optional. UUID of the agent to
+                              exercise as the candidate.
+                            "name": "str"  # Optional. Display name of the candidate
+                              agent. Persisted with the run.
+                        },
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Time created at.
+                        "created_by_user_email": "str",  # Optional. Email of the user who
+                          triggered this run.
+                        "created_by_user_id": "str",  # Optional. User id of the actor who
+                          triggered this run.
+                        "deleted_at": "2020-02-20 00:00:00",  # Optional. Time deleted at.
+                          Unset unless the run has been deleted.
+                        "evaluation_run_uuid": "str",  # Optional. UUID of the evaluation run
+                          reserved for this simulation, when the create request included
+                          evaluation_config. Empty when no evaluation is attached.
+                        "exploration_budget": 0,  # Optional. Optional run-level
+                          journeys-per-scenario override. When set, overrides each scenario's
+                          exploration_budget.
+                        "failure_reason": "str",  # Optional. Human-readable explanation of a
+                          terminal FAILED status. Empty otherwise.
+                        "journeys_finished": 0,  # Optional. Number of journeys that have
+                          finished (successfully or not).
+                        "judge_model_name": "str",  # Optional. Display name of the judge
+                          model (from the model catalog).
+                        "judge_model_uuid": "str",  # Optional. Model used by the judge.
+                        "max_turns": 0,  # Optional. Optional run-level turn budget. When
+                          set, overrides each scenario's max_turns.
+                        "name": "str",  # Optional. Optional run name.
+                        "result_summary": {
+                            "token_usage": {
+                                "candidate_agent_tokens": "str",  # Optional. Tokens
+                                  consumed by the candidate agent.
+                                "generator_tokens": "str",  # Optional. Tokens
+                                  consumed by the scenario generator.
+                                "judge_tokens": "str",  # Optional. Tokens consumed
+                                  by the judge.
+                                "simulator_tokens": "str",  # Optional. Tokens
+                                  consumed by the user simulator.
+                                "total_tokens": "str"  # Optional. Total tokens
+                                  across all actors.
+                            },
+                            "total_duration_sec": "str",  # Optional. Total wall-clock
+                              duration across the run, in seconds.
+                            "verdict_counts": {
+                                "failure_count": 0,  # Optional. Number of journeys
+                                  with a FAILURE verdict.
+                                "inconclusive_count": 0,  # Optional. Number of
+                                  journeys with an INCONCLUSIVE verdict.
+                                "success_count": 0  # Optional. Number of journeys
+                                  with a SUCCESS verdict.
+                            }
+                        },
+                        "run_uuid": "str",  # Optional. UUID of the run.
+                        "scenario_count": 0,  # Optional. Number of scenarios in the scenario
+                          set for this run.
+                        "scenario_set_uuid": "str",  # Optional. UUID of the scenario set
+                          being executed (must exist at run create).
+                        "status": "SIMULATION_RUN_STATUS_UNSPECIFIED",  # Optional. Default
+                          value is "SIMULATION_RUN_STATUS_UNSPECIFIED". Lifecycle status of a
+                          simulation run.   * SIMULATION_RUN_STATUS_PENDING: Accepted and queued, not
+                          yet executing. * SIMULATION_RUN_STATUS_RUNNING: Journeys are executing. *
+                          SIMULATION_RUN_STATUS_SUCCEEDED: All journeys finished successfully. *
+                          SIMULATION_RUN_STATUS_FAILED: The run failed, for example because of a
+                          timeout or workflow error. * SIMULATION_RUN_STATUS_CANCELLED: The run was
+                          cancelled. * SIMULATION_RUN_STATUS_EVALUATING: Journeys finished and an
+                          attached evaluation is running. Only reachable   when the create request
+                          included evaluation_config. When the evaluation   reaches a terminal status,
+                          its outcome is reflected in the simulation run   status. *
+                          SIMULATION_RUN_STATUS_PARTIALLY_SUCCESSFUL: The simulation or its attached
+                          evaluation completed with a mixture of   successful and failed results. Known
+                          values are: "SIMULATION_RUN_STATUS_UNSPECIFIED",
+                          "SIMULATION_RUN_STATUS_PENDING", "SIMULATION_RUN_STATUS_RUNNING",
+                          "SIMULATION_RUN_STATUS_SUCCEEDED", "SIMULATION_RUN_STATUS_FAILED",
+                          "SIMULATION_RUN_STATUS_CANCELLED", "SIMULATION_RUN_STATUS_EVALUATING", and
+                          "SIMULATION_RUN_STATUS_PARTIALLY_SUCCESSFUL".
+                        "total_journeys": 0,  # Optional. Total number of journeys (sum of
+                          exploration budgets).
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. Time last updated
+                          at.
+                        "user_simulator_config": {},  # Optional. Optional user simulator
+                          model settings such as temperature and max_tokens.
+                        "user_simulator_model_name": "str",  # Optional. Display name of the
+                          user simulator model (from the model catalog).
+                        "user_simulator_model_uuid": "str",  # Optional. Model used by the
+                          user simulator.
+                        "workflow_uuid": "str"  # Optional. Identifier of the workflow
+                          executing this run.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def update_simulation_run(
+        self,
+        run_uuid: str,
+        body: Optional[Union[JSON, IO[bytes]]] = None,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Simulation Run.
+
+        To update a simulation run's display name, send a PUT request to
+        ``/v2/gen-ai/simulation_runs/{run_uuid}``. Only the name is mutable; run configuration and
+        results are immutable.
+
+        :param run_uuid: UUID of the simulation run to update. Returned by ``CreateSimulationRun``
+         and listed via ``ListSimulationRuns``. Required.
+        :type run_uuid: str
+        :param body: Is either a JSON type or a IO[bytes] type. Default value is None.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "name": "str",  # Optional. The new name of the run.
+                    "run_uuid": "str"  # Optional. UUID of the run to update.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "simulation_run": {
+                        "agent_config": {
+                            "agent_deployment_uuid": "str",  # Optional. Optional agent
+                              deployment to run. Defaults to the agent's current deployment when unset.
+                            "agent_uuid": "str",  # Optional. UUID of the agent to
+                              exercise as the candidate.
+                            "name": "str"  # Optional. Display name of the candidate
+                              agent. Persisted with the run.
+                        },
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Time created at.
+                        "created_by_user_email": "str",  # Optional. Email of the user who
+                          triggered this run.
+                        "created_by_user_id": "str",  # Optional. User id of the actor who
+                          triggered this run.
+                        "deleted_at": "2020-02-20 00:00:00",  # Optional. Time deleted at.
+                          Unset unless the run has been deleted.
+                        "evaluation_run_uuid": "str",  # Optional. UUID of the evaluation run
+                          reserved for this simulation, when the create request included
+                          evaluation_config. Empty when no evaluation is attached.
+                        "exploration_budget": 0,  # Optional. Optional run-level
+                          journeys-per-scenario override. When set, overrides each scenario's
+                          exploration_budget.
+                        "failure_reason": "str",  # Optional. Human-readable explanation of a
+                          terminal FAILED status. Empty otherwise.
+                        "journeys_finished": 0,  # Optional. Number of journeys that have
+                          finished (successfully or not).
+                        "judge_model_name": "str",  # Optional. Display name of the judge
+                          model (from the model catalog).
+                        "judge_model_uuid": "str",  # Optional. Model used by the judge.
+                        "max_turns": 0,  # Optional. Optional run-level turn budget. When
+                          set, overrides each scenario's max_turns.
+                        "name": "str",  # Optional. Optional run name.
+                        "result_summary": {
+                            "token_usage": {
+                                "candidate_agent_tokens": "str",  # Optional. Tokens
+                                  consumed by the candidate agent.
+                                "generator_tokens": "str",  # Optional. Tokens
+                                  consumed by the scenario generator.
+                                "judge_tokens": "str",  # Optional. Tokens consumed
+                                  by the judge.
+                                "simulator_tokens": "str",  # Optional. Tokens
+                                  consumed by the user simulator.
+                                "total_tokens": "str"  # Optional. Total tokens
+                                  across all actors.
+                            },
+                            "total_duration_sec": "str",  # Optional. Total wall-clock
+                              duration across the run, in seconds.
+                            "verdict_counts": {
+                                "failure_count": 0,  # Optional. Number of journeys
+                                  with a FAILURE verdict.
+                                "inconclusive_count": 0,  # Optional. Number of
+                                  journeys with an INCONCLUSIVE verdict.
+                                "success_count": 0  # Optional. Number of journeys
+                                  with a SUCCESS verdict.
+                            }
+                        },
+                        "run_uuid": "str",  # Optional. UUID of the run.
+                        "scenario_count": 0,  # Optional. Number of scenarios in the scenario
+                          set for this run.
+                        "scenario_set_uuid": "str",  # Optional. UUID of the scenario set
+                          being executed (must exist at run create).
+                        "status": "SIMULATION_RUN_STATUS_UNSPECIFIED",  # Optional. Default
+                          value is "SIMULATION_RUN_STATUS_UNSPECIFIED". Lifecycle status of a
+                          simulation run.   * SIMULATION_RUN_STATUS_PENDING: Accepted and queued, not
+                          yet executing. * SIMULATION_RUN_STATUS_RUNNING: Journeys are executing. *
+                          SIMULATION_RUN_STATUS_SUCCEEDED: All journeys finished successfully. *
+                          SIMULATION_RUN_STATUS_FAILED: The run failed, for example because of a
+                          timeout or workflow error. * SIMULATION_RUN_STATUS_CANCELLED: The run was
+                          cancelled. * SIMULATION_RUN_STATUS_EVALUATING: Journeys finished and an
+                          attached evaluation is running. Only reachable   when the create request
+                          included evaluation_config. When the evaluation   reaches a terminal status,
+                          its outcome is reflected in the simulation run   status. *
+                          SIMULATION_RUN_STATUS_PARTIALLY_SUCCESSFUL: The simulation or its attached
+                          evaluation completed with a mixture of   successful and failed results. Known
+                          values are: "SIMULATION_RUN_STATUS_UNSPECIFIED",
+                          "SIMULATION_RUN_STATUS_PENDING", "SIMULATION_RUN_STATUS_RUNNING",
+                          "SIMULATION_RUN_STATUS_SUCCEEDED", "SIMULATION_RUN_STATUS_FAILED",
+                          "SIMULATION_RUN_STATUS_CANCELLED", "SIMULATION_RUN_STATUS_EVALUATING", and
+                          "SIMULATION_RUN_STATUS_PARTIALLY_SUCCESSFUL".
+                        "total_journeys": 0,  # Optional. Total number of journeys (sum of
+                          exploration budgets).
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. Time last updated
+                          at.
+                        "user_simulator_config": {},  # Optional. Optional user simulator
+                          model settings such as temperature and max_tokens.
+                        "user_simulator_model_name": "str",  # Optional. Display name of the
+                          user simulator model (from the model catalog).
+                        "user_simulator_model_uuid": "str",  # Optional. Model used by the
+                          user simulator.
+                        "workflow_uuid": "str"  # Optional. Identifier of the workflow
+                          executing this run.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            if body is not None:
+                _json = body
+            else:
+                _json = None
+
+        _request = build_genai_update_simulation_run_request(
+            run_uuid=run_uuid,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def delete_simulation_run(self, run_uuid: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Delete Simulation Run.
+
+        To delete a simulation run, send a DELETE request to ``/v2/gen-ai/simulation_runs/{run_uuid}``.
+        The run must be in a terminal status (\\ ``SIMULATION_RUN_STATUS_SUCCEEDED``\\ ,
+        ``SIMULATION_RUN_STATUS_PARTIALLY_SUCCESSFUL``\\ , ``SIMULATION_RUN_STATUS_FAILED``\\ , or
+        ``SIMULATION_RUN_STATUS_CANCELLED``\\ ). For runs still in progress, cancel the run first, then
+        retry the delete.
+
+        :param run_uuid: UUID of the simulation run to delete. The run must be in a terminal
+         status. For runs still in progress, cancel the run first, then retry
+         the delete. Required.
+        :type run_uuid: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "run_uuid": "str"  # Optional. UUID of the deleted run.
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_genai_delete_simulation_run_request(
+            run_uuid=run_uuid,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def patch_cancel_simulation_run(
+        self,
+        run_uuid: str,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Cancel Simulation Run.
+
+        To cancel an in-progress simulation run, send a PATCH request to
+        ``/v2/gen-ai/simulation_runs/{run_uuid}/cancel``.
+
+        :param run_uuid: UUID of the simulation run to cancel. Returned by ``CreateSimulationRun``
+         and listed via ``ListSimulationRuns``. The run must be in a non-terminal
+         status; already-terminal runs return an error. Required.
+        :type run_uuid: str
+        :param body: Default value is None.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "run_uuid": "str"  # Optional. UUID of the run to cancel.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "simulation_run": {
+                        "agent_config": {
+                            "agent_deployment_uuid": "str",  # Optional. Optional agent
+                              deployment to run. Defaults to the agent's current deployment when unset.
+                            "agent_uuid": "str",  # Optional. UUID of the agent to
+                              exercise as the candidate.
+                            "name": "str"  # Optional. Display name of the candidate
+                              agent. Persisted with the run.
+                        },
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Time created at.
+                        "created_by_user_email": "str",  # Optional. Email of the user who
+                          triggered this run.
+                        "created_by_user_id": "str",  # Optional. User id of the actor who
+                          triggered this run.
+                        "deleted_at": "2020-02-20 00:00:00",  # Optional. Time deleted at.
+                          Unset unless the run has been deleted.
+                        "evaluation_run_uuid": "str",  # Optional. UUID of the evaluation run
+                          reserved for this simulation, when the create request included
+                          evaluation_config. Empty when no evaluation is attached.
+                        "exploration_budget": 0,  # Optional. Optional run-level
+                          journeys-per-scenario override. When set, overrides each scenario's
+                          exploration_budget.
+                        "failure_reason": "str",  # Optional. Human-readable explanation of a
+                          terminal FAILED status. Empty otherwise.
+                        "journeys_finished": 0,  # Optional. Number of journeys that have
+                          finished (successfully or not).
+                        "judge_model_name": "str",  # Optional. Display name of the judge
+                          model (from the model catalog).
+                        "judge_model_uuid": "str",  # Optional. Model used by the judge.
+                        "max_turns": 0,  # Optional. Optional run-level turn budget. When
+                          set, overrides each scenario's max_turns.
+                        "name": "str",  # Optional. Optional run name.
+                        "result_summary": {
+                            "token_usage": {
+                                "candidate_agent_tokens": "str",  # Optional. Tokens
+                                  consumed by the candidate agent.
+                                "generator_tokens": "str",  # Optional. Tokens
+                                  consumed by the scenario generator.
+                                "judge_tokens": "str",  # Optional. Tokens consumed
+                                  by the judge.
+                                "simulator_tokens": "str",  # Optional. Tokens
+                                  consumed by the user simulator.
+                                "total_tokens": "str"  # Optional. Total tokens
+                                  across all actors.
+                            },
+                            "total_duration_sec": "str",  # Optional. Total wall-clock
+                              duration across the run, in seconds.
+                            "verdict_counts": {
+                                "failure_count": 0,  # Optional. Number of journeys
+                                  with a FAILURE verdict.
+                                "inconclusive_count": 0,  # Optional. Number of
+                                  journeys with an INCONCLUSIVE verdict.
+                                "success_count": 0  # Optional. Number of journeys
+                                  with a SUCCESS verdict.
+                            }
+                        },
+                        "run_uuid": "str",  # Optional. UUID of the run.
+                        "scenario_count": 0,  # Optional. Number of scenarios in the scenario
+                          set for this run.
+                        "scenario_set_uuid": "str",  # Optional. UUID of the scenario set
+                          being executed (must exist at run create).
+                        "status": "SIMULATION_RUN_STATUS_UNSPECIFIED",  # Optional. Default
+                          value is "SIMULATION_RUN_STATUS_UNSPECIFIED". Lifecycle status of a
+                          simulation run.   * SIMULATION_RUN_STATUS_PENDING: Accepted and queued, not
+                          yet executing. * SIMULATION_RUN_STATUS_RUNNING: Journeys are executing. *
+                          SIMULATION_RUN_STATUS_SUCCEEDED: All journeys finished successfully. *
+                          SIMULATION_RUN_STATUS_FAILED: The run failed, for example because of a
+                          timeout or workflow error. * SIMULATION_RUN_STATUS_CANCELLED: The run was
+                          cancelled. * SIMULATION_RUN_STATUS_EVALUATING: Journeys finished and an
+                          attached evaluation is running. Only reachable   when the create request
+                          included evaluation_config. When the evaluation   reaches a terminal status,
+                          its outcome is reflected in the simulation run   status. *
+                          SIMULATION_RUN_STATUS_PARTIALLY_SUCCESSFUL: The simulation or its attached
+                          evaluation completed with a mixture of   successful and failed results. Known
+                          values are: "SIMULATION_RUN_STATUS_UNSPECIFIED",
+                          "SIMULATION_RUN_STATUS_PENDING", "SIMULATION_RUN_STATUS_RUNNING",
+                          "SIMULATION_RUN_STATUS_SUCCEEDED", "SIMULATION_RUN_STATUS_FAILED",
+                          "SIMULATION_RUN_STATUS_CANCELLED", "SIMULATION_RUN_STATUS_EVALUATING", and
+                          "SIMULATION_RUN_STATUS_PARTIALLY_SUCCESSFUL".
+                        "total_journeys": 0,  # Optional. Total number of journeys (sum of
+                          exploration budgets).
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. Time last updated
+                          at.
+                        "user_simulator_config": {},  # Optional. Optional user simulator
+                          model settings such as temperature and max_tokens.
+                        "user_simulator_model_name": "str",  # Optional. Display name of the
+                          user simulator model (from the model catalog).
+                        "user_simulator_model_uuid": "str",  # Optional. Model used by the
+                          user simulator.
+                        "workflow_uuid": "str"  # Optional. Identifier of the workflow
+                          executing this run.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def patch_cancel_simulation_run(
+        self,
+        run_uuid: str,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Cancel Simulation Run.
+
+        To cancel an in-progress simulation run, send a PATCH request to
+        ``/v2/gen-ai/simulation_runs/{run_uuid}/cancel``.
+
+        :param run_uuid: UUID of the simulation run to cancel. Returned by ``CreateSimulationRun``
+         and listed via ``ListSimulationRuns``. The run must be in a non-terminal
+         status; already-terminal runs return an error. Required.
+        :type run_uuid: str
+        :param body: Default value is None.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "simulation_run": {
+                        "agent_config": {
+                            "agent_deployment_uuid": "str",  # Optional. Optional agent
+                              deployment to run. Defaults to the agent's current deployment when unset.
+                            "agent_uuid": "str",  # Optional. UUID of the agent to
+                              exercise as the candidate.
+                            "name": "str"  # Optional. Display name of the candidate
+                              agent. Persisted with the run.
+                        },
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Time created at.
+                        "created_by_user_email": "str",  # Optional. Email of the user who
+                          triggered this run.
+                        "created_by_user_id": "str",  # Optional. User id of the actor who
+                          triggered this run.
+                        "deleted_at": "2020-02-20 00:00:00",  # Optional. Time deleted at.
+                          Unset unless the run has been deleted.
+                        "evaluation_run_uuid": "str",  # Optional. UUID of the evaluation run
+                          reserved for this simulation, when the create request included
+                          evaluation_config. Empty when no evaluation is attached.
+                        "exploration_budget": 0,  # Optional. Optional run-level
+                          journeys-per-scenario override. When set, overrides each scenario's
+                          exploration_budget.
+                        "failure_reason": "str",  # Optional. Human-readable explanation of a
+                          terminal FAILED status. Empty otherwise.
+                        "journeys_finished": 0,  # Optional. Number of journeys that have
+                          finished (successfully or not).
+                        "judge_model_name": "str",  # Optional. Display name of the judge
+                          model (from the model catalog).
+                        "judge_model_uuid": "str",  # Optional. Model used by the judge.
+                        "max_turns": 0,  # Optional. Optional run-level turn budget. When
+                          set, overrides each scenario's max_turns.
+                        "name": "str",  # Optional. Optional run name.
+                        "result_summary": {
+                            "token_usage": {
+                                "candidate_agent_tokens": "str",  # Optional. Tokens
+                                  consumed by the candidate agent.
+                                "generator_tokens": "str",  # Optional. Tokens
+                                  consumed by the scenario generator.
+                                "judge_tokens": "str",  # Optional. Tokens consumed
+                                  by the judge.
+                                "simulator_tokens": "str",  # Optional. Tokens
+                                  consumed by the user simulator.
+                                "total_tokens": "str"  # Optional. Total tokens
+                                  across all actors.
+                            },
+                            "total_duration_sec": "str",  # Optional. Total wall-clock
+                              duration across the run, in seconds.
+                            "verdict_counts": {
+                                "failure_count": 0,  # Optional. Number of journeys
+                                  with a FAILURE verdict.
+                                "inconclusive_count": 0,  # Optional. Number of
+                                  journeys with an INCONCLUSIVE verdict.
+                                "success_count": 0  # Optional. Number of journeys
+                                  with a SUCCESS verdict.
+                            }
+                        },
+                        "run_uuid": "str",  # Optional. UUID of the run.
+                        "scenario_count": 0,  # Optional. Number of scenarios in the scenario
+                          set for this run.
+                        "scenario_set_uuid": "str",  # Optional. UUID of the scenario set
+                          being executed (must exist at run create).
+                        "status": "SIMULATION_RUN_STATUS_UNSPECIFIED",  # Optional. Default
+                          value is "SIMULATION_RUN_STATUS_UNSPECIFIED". Lifecycle status of a
+                          simulation run.   * SIMULATION_RUN_STATUS_PENDING: Accepted and queued, not
+                          yet executing. * SIMULATION_RUN_STATUS_RUNNING: Journeys are executing. *
+                          SIMULATION_RUN_STATUS_SUCCEEDED: All journeys finished successfully. *
+                          SIMULATION_RUN_STATUS_FAILED: The run failed, for example because of a
+                          timeout or workflow error. * SIMULATION_RUN_STATUS_CANCELLED: The run was
+                          cancelled. * SIMULATION_RUN_STATUS_EVALUATING: Journeys finished and an
+                          attached evaluation is running. Only reachable   when the create request
+                          included evaluation_config. When the evaluation   reaches a terminal status,
+                          its outcome is reflected in the simulation run   status. *
+                          SIMULATION_RUN_STATUS_PARTIALLY_SUCCESSFUL: The simulation or its attached
+                          evaluation completed with a mixture of   successful and failed results. Known
+                          values are: "SIMULATION_RUN_STATUS_UNSPECIFIED",
+                          "SIMULATION_RUN_STATUS_PENDING", "SIMULATION_RUN_STATUS_RUNNING",
+                          "SIMULATION_RUN_STATUS_SUCCEEDED", "SIMULATION_RUN_STATUS_FAILED",
+                          "SIMULATION_RUN_STATUS_CANCELLED", "SIMULATION_RUN_STATUS_EVALUATING", and
+                          "SIMULATION_RUN_STATUS_PARTIALLY_SUCCESSFUL".
+                        "total_journeys": 0,  # Optional. Total number of journeys (sum of
+                          exploration budgets).
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. Time last updated
+                          at.
+                        "user_simulator_config": {},  # Optional. Optional user simulator
+                          model settings such as temperature and max_tokens.
+                        "user_simulator_model_name": "str",  # Optional. Display name of the
+                          user simulator model (from the model catalog).
+                        "user_simulator_model_uuid": "str",  # Optional. Model used by the
+                          user simulator.
+                        "workflow_uuid": "str"  # Optional. Identifier of the workflow
+                          executing this run.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def patch_cancel_simulation_run(
+        self,
+        run_uuid: str,
+        body: Optional[Union[JSON, IO[bytes]]] = None,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Cancel Simulation Run.
+
+        To cancel an in-progress simulation run, send a PATCH request to
+        ``/v2/gen-ai/simulation_runs/{run_uuid}/cancel``.
+
+        :param run_uuid: UUID of the simulation run to cancel. Returned by ``CreateSimulationRun``
+         and listed via ``ListSimulationRuns``. The run must be in a non-terminal
+         status; already-terminal runs return an error. Required.
+        :type run_uuid: str
+        :param body: Is either a JSON type or a IO[bytes] type. Default value is None.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "run_uuid": "str"  # Optional. UUID of the run to cancel.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "simulation_run": {
+                        "agent_config": {
+                            "agent_deployment_uuid": "str",  # Optional. Optional agent
+                              deployment to run. Defaults to the agent's current deployment when unset.
+                            "agent_uuid": "str",  # Optional. UUID of the agent to
+                              exercise as the candidate.
+                            "name": "str"  # Optional. Display name of the candidate
+                              agent. Persisted with the run.
+                        },
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Time created at.
+                        "created_by_user_email": "str",  # Optional. Email of the user who
+                          triggered this run.
+                        "created_by_user_id": "str",  # Optional. User id of the actor who
+                          triggered this run.
+                        "deleted_at": "2020-02-20 00:00:00",  # Optional. Time deleted at.
+                          Unset unless the run has been deleted.
+                        "evaluation_run_uuid": "str",  # Optional. UUID of the evaluation run
+                          reserved for this simulation, when the create request included
+                          evaluation_config. Empty when no evaluation is attached.
+                        "exploration_budget": 0,  # Optional. Optional run-level
+                          journeys-per-scenario override. When set, overrides each scenario's
+                          exploration_budget.
+                        "failure_reason": "str",  # Optional. Human-readable explanation of a
+                          terminal FAILED status. Empty otherwise.
+                        "journeys_finished": 0,  # Optional. Number of journeys that have
+                          finished (successfully or not).
+                        "judge_model_name": "str",  # Optional. Display name of the judge
+                          model (from the model catalog).
+                        "judge_model_uuid": "str",  # Optional. Model used by the judge.
+                        "max_turns": 0,  # Optional. Optional run-level turn budget. When
+                          set, overrides each scenario's max_turns.
+                        "name": "str",  # Optional. Optional run name.
+                        "result_summary": {
+                            "token_usage": {
+                                "candidate_agent_tokens": "str",  # Optional. Tokens
+                                  consumed by the candidate agent.
+                                "generator_tokens": "str",  # Optional. Tokens
+                                  consumed by the scenario generator.
+                                "judge_tokens": "str",  # Optional. Tokens consumed
+                                  by the judge.
+                                "simulator_tokens": "str",  # Optional. Tokens
+                                  consumed by the user simulator.
+                                "total_tokens": "str"  # Optional. Total tokens
+                                  across all actors.
+                            },
+                            "total_duration_sec": "str",  # Optional. Total wall-clock
+                              duration across the run, in seconds.
+                            "verdict_counts": {
+                                "failure_count": 0,  # Optional. Number of journeys
+                                  with a FAILURE verdict.
+                                "inconclusive_count": 0,  # Optional. Number of
+                                  journeys with an INCONCLUSIVE verdict.
+                                "success_count": 0  # Optional. Number of journeys
+                                  with a SUCCESS verdict.
+                            }
+                        },
+                        "run_uuid": "str",  # Optional. UUID of the run.
+                        "scenario_count": 0,  # Optional. Number of scenarios in the scenario
+                          set for this run.
+                        "scenario_set_uuid": "str",  # Optional. UUID of the scenario set
+                          being executed (must exist at run create).
+                        "status": "SIMULATION_RUN_STATUS_UNSPECIFIED",  # Optional. Default
+                          value is "SIMULATION_RUN_STATUS_UNSPECIFIED". Lifecycle status of a
+                          simulation run.   * SIMULATION_RUN_STATUS_PENDING: Accepted and queued, not
+                          yet executing. * SIMULATION_RUN_STATUS_RUNNING: Journeys are executing. *
+                          SIMULATION_RUN_STATUS_SUCCEEDED: All journeys finished successfully. *
+                          SIMULATION_RUN_STATUS_FAILED: The run failed, for example because of a
+                          timeout or workflow error. * SIMULATION_RUN_STATUS_CANCELLED: The run was
+                          cancelled. * SIMULATION_RUN_STATUS_EVALUATING: Journeys finished and an
+                          attached evaluation is running. Only reachable   when the create request
+                          included evaluation_config. When the evaluation   reaches a terminal status,
+                          its outcome is reflected in the simulation run   status. *
+                          SIMULATION_RUN_STATUS_PARTIALLY_SUCCESSFUL: The simulation or its attached
+                          evaluation completed with a mixture of   successful and failed results. Known
+                          values are: "SIMULATION_RUN_STATUS_UNSPECIFIED",
+                          "SIMULATION_RUN_STATUS_PENDING", "SIMULATION_RUN_STATUS_RUNNING",
+                          "SIMULATION_RUN_STATUS_SUCCEEDED", "SIMULATION_RUN_STATUS_FAILED",
+                          "SIMULATION_RUN_STATUS_CANCELLED", "SIMULATION_RUN_STATUS_EVALUATING", and
+                          "SIMULATION_RUN_STATUS_PARTIALLY_SUCCESSFUL".
+                        "total_journeys": 0,  # Optional. Total number of journeys (sum of
+                          exploration budgets).
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. Time last updated
+                          at.
+                        "user_simulator_config": {},  # Optional. Optional user simulator
+                          model settings such as temperature and max_tokens.
+                        "user_simulator_model_name": "str",  # Optional. Display name of the
+                          user simulator model (from the model catalog).
+                        "user_simulator_model_uuid": "str",  # Optional. Model used by the
+                          user simulator.
+                        "workflow_uuid": "str"  # Optional. Identifier of the workflow
+                          executing this run.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            if body is not None:
+                _json = body
+            else:
+                _json = None
+
+        _request = build_genai_patch_cancel_simulation_run_request(
+            run_uuid=run_uuid,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def list_simulation_journeys(
+        self,
+        run_uuid: str,
+        *,
+        scenario_uuid: Optional[str] = None,
+        page: Optional[int] = None,
+        per_page: Optional[int] = None,
+        statuses: Optional[List[str]] = None,
+        verdicts: Optional[List[str]] = None,
+        search: Optional[str] = None,
+        sort_by: str = "SIMULATION_JOURNEY_SORT_FIELD_UNSPECIFIED",
+        sort_direction: str = "SORT_DIRECTION_UNSPECIFIED",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Simulation Journeys.
+
+        To list the journeys within a simulation run, send a GET request to
+        ``/v2/gen-ai/simulation_runs/{run_uuid}/journeys``.
+
+        :param run_uuid: UUID of the run whose journeys to list. Required.
+        :type run_uuid: str
+        :keyword scenario_uuid: Optional filter by scenario. Default value is None.
+        :paramtype scenario_uuid: str
+        :keyword page: Page number. Default value is None.
+        :paramtype page: int
+        :keyword per_page: Items per page. Default value is None.
+        :paramtype per_page: int
+        :keyword statuses: Filter by one or more statuses. Empty means no status filter.
+
+
+         * SIMULATION_JOURNEY_STATUS_RUNNING: The journey is executing and a trajectory is available to
+         retrieve.
+         * SIMULATION_JOURNEY_STATUS_FINISHED: The journey reached a stop condition and produced a
+         verdict.
+         * SIMULATION_JOURNEY_STATUS_FAILED: The journey failed because of a cancel, timeout, or error.
+         * SIMULATION_JOURNEY_STATUS_PREPARING: The journey is allocated but its trajectory is not
+         available yet. Default value is None.
+        :paramtype statuses: list[str]
+        :keyword verdicts: Filter by one or more verdicts. Empty means no verdict filter.
+
+
+         * SIMULATION_JOURNEY_VERDICT_SUCCESS: The candidate agent satisfied the scenario's stopping
+         criteria.
+         * SIMULATION_JOURNEY_VERDICT_FAILURE: The candidate agent did not satisfy the stopping
+         criteria.
+         * SIMULATION_JOURNEY_VERDICT_INCONCLUSIVE: No conclusive verdict (e.g. max_turns reached
+         without the judge finishing). Default value is None.
+        :paramtype verdicts: list[str]
+        :keyword search: Free-text search across scenario_uuid and session_id
+         (case-insensitive substring match). Empty means no search. Default value is None.
+        :paramtype search: str
+        :keyword sort_by: Field to sort by. Defaults to scenario ordering when unspecified.
+
+
+         * SIMULATION_JOURNEY_SORT_FIELD_SCENARIO: Sort by scenario_uuid then journey_index. Default.
+         * SIMULATION_JOURNEY_SORT_FIELD_CREATED_AT: Sort by creation date.
+         * SIMULATION_JOURNEY_SORT_FIELD_STATUS: Sort by journey status using lifecycle order.
+         * SIMULATION_JOURNEY_SORT_FIELD_VERDICT: Sort by verdict (nulls last). Known values are:
+         "SIMULATION_JOURNEY_SORT_FIELD_UNSPECIFIED", "SIMULATION_JOURNEY_SORT_FIELD_SCENARIO",
+         "SIMULATION_JOURNEY_SORT_FIELD_CREATED_AT", "SIMULATION_JOURNEY_SORT_FIELD_STATUS", and
+         "SIMULATION_JOURNEY_SORT_FIELD_VERDICT". Default value is
+         "SIMULATION_JOURNEY_SORT_FIELD_UNSPECIFIED".
+        :paramtype sort_by: str
+        :keyword sort_direction: Sort direction. Defaults to ascending when unspecified. Known values
+         are: "SORT_DIRECTION_UNSPECIFIED", "SORT_DIRECTION_ASC", and "SORT_DIRECTION_DESC". Default
+         value is "SORT_DIRECTION_UNSPECIFIED".
+        :paramtype sort_direction: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "available_sort_by": [
+                        "str"  # Optional. Sort-by values available for this list request.
+                    ],
+                    "available_sort_directions": [
+                        "str"  # Optional. Sort-direction values available for this list
+                          request.
+                    ],
+                    "available_statuses": [
+                        "str"  # Optional. Statuses available for filtering this list
+                          request.
+                    ],
+                    "available_verdicts": [
+                        "str"  # Optional. Verdicts available for filtering this list
+                          request.
+                    ],
+                    "journeys": [
+                        {
+                            "created_at": "2020-02-20 00:00:00",  # Optional. Time
+                              created at.
+                            "duration_sec": "str",  # Optional. Wall-clock time taken for
+                              the journey to complete, in seconds.
+                            "failure_reason": "str",  # Optional. Human-readable
+                              explanation of a terminal FAILED status. Empty otherwise.
+                            "journey_index": 0,  # Optional. Zero-based index of this
+                              journey within its scenario's exploration budget.
+                            "journey_uuid": "str",  # Optional. UUID of the journey.
+                            "judge_reasoning": "str",  # Optional. Optional judge
+                              reasoning for the verdict.
+                            "run_uuid": "str",  # Optional. UUID of the run this journey
+                              belongs to.
+                            "scenario_uuid": "str",  # Optional. UUID of the scenario
+                              this journey executed.
+                            "session_id": "str",  # Optional. Session identifier for this
+                              journey.
+                            "status": "SIMULATION_JOURNEY_STATUS_UNSPECIFIED",  #
+                              Optional. Default value is "SIMULATION_JOURNEY_STATUS_UNSPECIFIED".
+                              Lifecycle status of a single journey.   *
+                              SIMULATION_JOURNEY_STATUS_RUNNING: The journey is executing and a
+                              trajectory is available to retrieve. *
+                              SIMULATION_JOURNEY_STATUS_FINISHED: The journey reached a stop condition
+                              and produced a verdict. * SIMULATION_JOURNEY_STATUS_FAILED: The journey
+                              failed because of a cancel, timeout, or error. *
+                              SIMULATION_JOURNEY_STATUS_PREPARING: The journey is allocated but its
+                              trajectory is not available yet. Known values are:
+                              "SIMULATION_JOURNEY_STATUS_UNSPECIFIED",
+                              "SIMULATION_JOURNEY_STATUS_RUNNING",
+                              "SIMULATION_JOURNEY_STATUS_FINISHED", "SIMULATION_JOURNEY_STATUS_FAILED",
+                              and "SIMULATION_JOURNEY_STATUS_PREPARING".
+                            "token_usage": {
+                                "candidate_agent_tokens": "str",  # Optional. Tokens
+                                  consumed by the candidate agent.
+                                "generator_tokens": "str",  # Optional. Tokens
+                                  consumed by the scenario generator.
+                                "judge_tokens": "str",  # Optional. Tokens consumed
+                                  by the judge.
+                                "simulator_tokens": "str",  # Optional. Tokens
+                                  consumed by the user simulator.
+                                "total_tokens": "str"  # Optional. Total tokens
+                                  across all actors.
+                            },
+                            "trajectory_bucket_name": "str",  # Optional. Object storage
+                              bucket holding the trajectory JSON. Set when the journey finishes.
+                            "trajectory_bucket_region": "str",  # Optional. Object
+                              storage bucket region for the trajectory JSON. Set when the journey
+                              finishes.
+                            "trajectory_spaces_key": "str",  # Optional. Object storage
+                              key for the trajectory JSON. Set when the journey finishes.
+                            "updated_at": "2020-02-20 00:00:00",  # Optional. Time last
+                              updated at.
+                            "verdict": "SIMULATION_JOURNEY_VERDICT_UNSPECIFIED"  #
+                              Optional. Default value is "SIMULATION_JOURNEY_VERDICT_UNSPECIFIED". The
+                              judge's verdict for a journey.   * SIMULATION_JOURNEY_VERDICT_SUCCESS:
+                              The candidate agent satisfied the scenario's stopping criteria. *
+                              SIMULATION_JOURNEY_VERDICT_FAILURE: The candidate agent did not satisfy
+                              the stopping criteria. * SIMULATION_JOURNEY_VERDICT_INCONCLUSIVE: No
+                              conclusive verdict (e.g. max_turns reached without the judge finishing).
+                              Known values are: "SIMULATION_JOURNEY_VERDICT_UNSPECIFIED",
+                              "SIMULATION_JOURNEY_VERDICT_SUCCESS",
+                              "SIMULATION_JOURNEY_VERDICT_FAILURE", and
+                              "SIMULATION_JOURNEY_VERDICT_INCONCLUSIVE".
+                        }
+                    ],
+                    "links": {
+                        "pages": {
+                            "first": "str",  # Optional. First page.
+                            "last": "str",  # Optional. Last page.
+                            "next": "str",  # Optional. Next page.
+                            "previous": "str"  # Optional. Previous page.
+                        }
+                    },
+                    "meta": {
+                        "page": 0,  # Optional. The current page.
+                        "pages": 0,  # Optional. Total number of pages.
+                        "total": 0  # Optional. Total amount of items over all pages.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_genai_list_simulation_journeys_request(
+            run_uuid=run_uuid,
+            scenario_uuid=scenario_uuid,
+            page=page,
+            per_page=per_page,
+            statuses=statuses,
+            verdicts=verdicts,
+            search=search,
+            sort_by=sort_by,
+            sort_direction=sort_direction,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_simulation_journey(
+        self, run_uuid: str, journey_uuid: str, **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve Simulation Journey.
+
+        To retrieve a single journey, send a GET request to
+        ``/v2/gen-ai/simulation_runs/{run_uuid}/journeys/{journey_uuid}``.
+
+        :param run_uuid: UUID of the run the journey belongs to. Required.
+        :type run_uuid: str
+        :param journey_uuid: UUID of the journey. Required.
+        :type journey_uuid: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "journey": {
+                        "created_at": "2020-02-20 00:00:00",  # Optional. Time created at.
+                        "duration_sec": "str",  # Optional. Wall-clock time taken for the
+                          journey to complete, in seconds.
+                        "failure_reason": "str",  # Optional. Human-readable explanation of a
+                          terminal FAILED status. Empty otherwise.
+                        "journey_index": 0,  # Optional. Zero-based index of this journey
+                          within its scenario's exploration budget.
+                        "journey_uuid": "str",  # Optional. UUID of the journey.
+                        "judge_reasoning": "str",  # Optional. Optional judge reasoning for
+                          the verdict.
+                        "run_uuid": "str",  # Optional. UUID of the run this journey belongs
+                          to.
+                        "scenario_uuid": "str",  # Optional. UUID of the scenario this
+                          journey executed.
+                        "session_id": "str",  # Optional. Session identifier for this
+                          journey.
+                        "status": "SIMULATION_JOURNEY_STATUS_UNSPECIFIED",  # Optional.
+                          Default value is "SIMULATION_JOURNEY_STATUS_UNSPECIFIED". Lifecycle status of
+                          a single journey.   * SIMULATION_JOURNEY_STATUS_RUNNING: The journey is
+                          executing and a trajectory is available to retrieve. *
+                          SIMULATION_JOURNEY_STATUS_FINISHED: The journey reached a stop condition and
+                          produced a verdict. * SIMULATION_JOURNEY_STATUS_FAILED: The journey failed
+                          because of a cancel, timeout, or error. *
+                          SIMULATION_JOURNEY_STATUS_PREPARING: The journey is allocated but its
+                          trajectory is not available yet. Known values are:
+                          "SIMULATION_JOURNEY_STATUS_UNSPECIFIED", "SIMULATION_JOURNEY_STATUS_RUNNING",
+                          "SIMULATION_JOURNEY_STATUS_FINISHED", "SIMULATION_JOURNEY_STATUS_FAILED", and
+                          "SIMULATION_JOURNEY_STATUS_PREPARING".
+                        "token_usage": {
+                            "candidate_agent_tokens": "str",  # Optional. Tokens consumed
+                              by the candidate agent.
+                            "generator_tokens": "str",  # Optional. Tokens consumed by
+                              the scenario generator.
+                            "judge_tokens": "str",  # Optional. Tokens consumed by the
+                              judge.
+                            "simulator_tokens": "str",  # Optional. Tokens consumed by
+                              the user simulator.
+                            "total_tokens": "str"  # Optional. Total tokens across all
+                              actors.
+                        },
+                        "trajectory_bucket_name": "str",  # Optional. Object storage bucket
+                          holding the trajectory JSON. Set when the journey finishes.
+                        "trajectory_bucket_region": "str",  # Optional. Object storage bucket
+                          region for the trajectory JSON. Set when the journey finishes.
+                        "trajectory_spaces_key": "str",  # Optional. Object storage key for
+                          the trajectory JSON. Set when the journey finishes.
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. Time last updated
+                          at.
+                        "verdict": "SIMULATION_JOURNEY_VERDICT_UNSPECIFIED"  # Optional.
+                          Default value is "SIMULATION_JOURNEY_VERDICT_UNSPECIFIED". The judge's
+                          verdict for a journey.   * SIMULATION_JOURNEY_VERDICT_SUCCESS: The candidate
+                          agent satisfied the scenario's stopping criteria. *
+                          SIMULATION_JOURNEY_VERDICT_FAILURE: The candidate agent did not satisfy the
+                          stopping criteria. * SIMULATION_JOURNEY_VERDICT_INCONCLUSIVE: No conclusive
+                          verdict (e.g. max_turns reached without the judge finishing). Known values
+                          are: "SIMULATION_JOURNEY_VERDICT_UNSPECIFIED",
+                          "SIMULATION_JOURNEY_VERDICT_SUCCESS", "SIMULATION_JOURNEY_VERDICT_FAILURE",
+                          and "SIMULATION_JOURNEY_VERDICT_INCONCLUSIVE".
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_genai_get_simulation_journey_request(
+            run_uuid=run_uuid,
+            journey_uuid=journey_uuid,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_simulation_journey_trajectory(
+        self, run_uuid: str, journey_uuid: str, **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve Journey Trajectory.
+
+        To retrieve a journey's live trajectory, send a GET request to
+        ``/v2/gen-ai/simulation_runs/{run_uuid}/journeys/{journey_uuid}/trajectory``. Poll while the
+        journey is running to watch turn-by-turn progress.
+
+        :param run_uuid: UUID of the run the journey belongs to. Required.
+        :type run_uuid: str
+        :param journey_uuid: UUID of the journey. Required.
+        :type journey_uuid: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "trajectory": {
+                        "agent_id": "str",  # Optional. Identifier of the candidate agent
+                          under test for this journey.
+                        "completed_at": "str",  # Optional. Turn-by-turn trajectory for one
+                          journey. Poll this resource while the journey is running to watch live
+                          progress.
+                        "duration_sec": "str",  # Optional. Turn-by-turn trajectory for one
+                          journey. Poll this resource while the journey is running to watch live
+                          progress.
+                        "evaluation_metrics": [
+                            {
+                                "error_description": "str",  # Optional. Error
+                                  description if the metric could not be calculated.
+                                "metric_name": "str",  # Optional. Metric name.
+                                "metric_uuid": "str",  # Optional. Metric UUID
+                                  (built-in or custom); stable key for results UI and aggregation.
+                                "metric_value_type": "METRIC_VALUE_TYPE_UNSPECIFIED",
+                                  # Optional. Default value is "METRIC_VALUE_TYPE_UNSPECIFIED". Known
+                                  values are: "METRIC_VALUE_TYPE_UNSPECIFIED",
+                                  "METRIC_VALUE_TYPE_NUMBER", "METRIC_VALUE_TYPE_STRING", and
+                                  "METRIC_VALUE_TYPE_PERCENTAGE".
+                                "number_value": 0.0,  # Optional. The value of the
+                                  metric as a number.
+                                "reasoning": "str",  # Optional. Reasoning of the
+                                  metric result.
+                                "status":
+                                  "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",  # Optional. Default
+                                  value is "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED". Outcome of
+                                  scoring a single metric for one prompt or span. Known values are:
+                                  "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",
+                                  "EVALUATION_METRIC_RESULT_STATUS_COMPLETED",
+                                  "EVALUATION_METRIC_RESULT_STATUS_FAILED", and
+                                  "EVALUATION_METRIC_RESULT_STATUS_SKIPPED".
+                                "string_value": "str"  # Optional. The value of the
+                                  metric as a string.
+                            }
+                        ],
+                        "failure_reason": "str",  # Optional. Turn-by-turn trajectory for one
+                          journey. Poll this resource while the journey is running to watch live
+                          progress.
+                        "journey_index": 0,  # Optional. Turn-by-turn trajectory for one
+                          journey. Poll this resource while the journey is running to watch live
+                          progress.
+                        "journey_uuid": "str",  # Optional. Turn-by-turn trajectory for one
+                          journey. Poll this resource while the journey is running to watch live
+                          progress.
+                        "judge": {
+                            "criteria_pass_fail": [
+                                {
+                                    "criterion": "str",  # Optional. Judge output
+                                      embedded in the trajectory JSON.
+                                    "passed": bool,  # Optional. Judge output
+                                      embedded in the trajectory JSON.
+                                    "reasoning": "str"  # Optional. Judge output
+                                      embedded in the trajectory JSON.
+                                }
+                            ],
+                            "reasoning": "str",  # Optional. Judge output embedded in the
+                              trajectory JSON.
+                            "verdict": "SIMULATION_JOURNEY_VERDICT_UNSPECIFIED"  #
+                              Optional. Default value is "SIMULATION_JOURNEY_VERDICT_UNSPECIFIED". The
+                              judge's verdict for a journey.   * SIMULATION_JOURNEY_VERDICT_SUCCESS:
+                              The candidate agent satisfied the scenario's stopping criteria. *
+                              SIMULATION_JOURNEY_VERDICT_FAILURE: The candidate agent did not satisfy
+                              the stopping criteria. * SIMULATION_JOURNEY_VERDICT_INCONCLUSIVE: No
+                              conclusive verdict (e.g. max_turns reached without the judge finishing).
+                              Known values are: "SIMULATION_JOURNEY_VERDICT_UNSPECIFIED",
+                              "SIMULATION_JOURNEY_VERDICT_SUCCESS",
+                              "SIMULATION_JOURNEY_VERDICT_FAILURE", and
+                              "SIMULATION_JOURNEY_VERDICT_INCONCLUSIVE".
+                        },
+                        "max_turns": 0,  # Optional. Turn budget configured for this journey
+                          (per-scenario max_turns, after any run-level override). Compare with
+                          turn_count to see how many of the budgeted turns actually ran.
+                        "messages": [
+                            {
+                                "completed_at": "str",  # Optional. ISO-8601
+                                  timestamp when the message completed.
+                                "content": "str",  # Optional. Message body text.
+                                "role": "str",  # Optional. Message role: "user" or
+                                  "assistant".
+                                "started_at": "str",  # Optional. ISO-8601 timestamp
+                                  when the message started.
+                                "tokens": {
+                                    "input": 0,  # Optional. Token usage for a
+                                      single assistant message in the trajectory JSON.
+                                    "output": 0  # Optional. Token usage for a
+                                      single assistant message in the trajectory JSON.
+                                },
+                                "tool_calls": [
+                                    {
+                                        "description": "str",  # Optional.
+                                          Tool calls on assistant turns.
+                                        "input_parameters": {},  # Optional.
+                                          Any object.
+                                        "name": "str",  # Optional. Tool
+                                          calls on assistant turns.
+                                        "ok": bool,  # Optional. Tool calls
+                                          on assistant turns.
+                                        "output": {},  # Optional. Any
+                                          object.
+                                        "tool_call_id": "str"  # Optional.
+                                          Tool calls on assistant turns.
+                                    }
+                                ],
+                                "turn_index": 0  # Optional. Zero-based turn index
+                                  shared by the user and assistant messages in one exchange.
+                            }
+                        ],
+                        "run_uuid": "str",  # Optional. Turn-by-turn trajectory for one
+                          journey. Poll this resource while the journey is running to watch live
+                          progress.
+                        "scenario_uuid": "str",  # Optional. Turn-by-turn trajectory for one
+                          journey. Poll this resource while the journey is running to watch live
+                          progress.
+                        "session_id": "str",  # Optional. Turn-by-turn trajectory for one
+                          journey. Poll this resource while the journey is running to watch live
+                          progress.
+                        "started_at": "str",  # Optional. Turn-by-turn trajectory for one
+                          journey. Poll this resource while the journey is running to watch live
+                          progress.
+                        "status": "SIMULATION_TRAJECTORY_STATUS_UNSPECIFIED",  # Optional.
+                          Default value is "SIMULATION_TRAJECTORY_STATUS_UNSPECIFIED". Lifecycle status
+                          of the trajectory. Distinct from journey status: the trajectory is updated on
+                          every turn while the journey is executing.   *
+                          SIMULATION_TRAJECTORY_STATUS_RUNNING: The journey loop is in progress;
+                          messages may grow on each poll. * SIMULATION_TRAJECTORY_STATUS_COMPLETED: The
+                          journey reached a stop condition and the trajectory is complete. *
+                          SIMULATION_TRAJECTORY_STATUS_FAILED: The journey failed before or during
+                          execution. * SIMULATION_TRAJECTORY_STATUS_CANCELLED: The journey was
+                          cancelled. Known values are: "SIMULATION_TRAJECTORY_STATUS_UNSPECIFIED",
+                          "SIMULATION_TRAJECTORY_STATUS_RUNNING",
+                          "SIMULATION_TRAJECTORY_STATUS_COMPLETED",
+                          "SIMULATION_TRAJECTORY_STATUS_FAILED", and
+                          "SIMULATION_TRAJECTORY_STATUS_CANCELLED".
+                        "token_usage": {
+                            "candidate_agent_tokens": "str",  # Optional. Tokens consumed
+                              by the candidate agent.
+                            "generator_tokens": "str",  # Optional. Tokens consumed by
+                              the scenario generator.
+                            "judge_tokens": "str",  # Optional. Tokens consumed by the
+                              judge.
+                            "simulator_tokens": "str",  # Optional. Tokens consumed by
+                              the user simulator.
+                            "total_tokens": "str"  # Optional. Total tokens across all
+                              actors.
+                        },
+                        "turn_count": 0,  # Optional. Turn-by-turn trajectory for one
+                          journey. Poll this resource while the journey is running to watch live
+                          progress.
+                        "verdict": "SIMULATION_JOURNEY_VERDICT_UNSPECIFIED"  # Optional.
+                          Default value is "SIMULATION_JOURNEY_VERDICT_UNSPECIFIED". The judge's
+                          verdict for a journey.   * SIMULATION_JOURNEY_VERDICT_SUCCESS: The candidate
+                          agent satisfied the scenario's stopping criteria. *
+                          SIMULATION_JOURNEY_VERDICT_FAILURE: The candidate agent did not satisfy the
+                          stopping criteria. * SIMULATION_JOURNEY_VERDICT_INCONCLUSIVE: No conclusive
+                          verdict (e.g. max_turns reached without the judge finishing). Known values
+                          are: "SIMULATION_JOURNEY_VERDICT_UNSPECIFIED",
+                          "SIMULATION_JOURNEY_VERDICT_SUCCESS", "SIMULATION_JOURNEY_VERDICT_FAILURE",
+                          and "SIMULATION_JOURNEY_VERDICT_INCONCLUSIVE".
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_genai_get_simulation_journey_trajectory_request(
+            run_uuid=run_uuid,
+            journey_uuid=journey_uuid,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_simulation_journey_trajectory_url(
+        self, run_uuid: str, journey_uuid: str, **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve Journey Trajectory Download URL.
+
+        To retrieve a presigned download URL for a journey's trajectory, send a GET request to
+        ``/v2/gen-ai/simulation_runs/{run_uuid}/journeys/{journey_uuid}/trajectory_url``.
+
+        :param run_uuid: UUID of the run the journey belongs to. Required.
+        :type run_uuid: str
+        :param journey_uuid: UUID of the journey. Required.
+        :type journey_uuid: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "download_url": "str",  # Optional. The presigned URL to download the
+                      trajectory JSON file.
+                    "expires_at": "2020-02-20 00:00:00"  # Optional. The time the URL expires at.
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_genai_get_simulation_journey_trajectory_url_request(
+            run_uuid=run_uuid,
+            journey_uuid=journey_uuid,
             headers=_headers,
             params=_params,
         )
