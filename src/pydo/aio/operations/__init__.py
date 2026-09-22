@@ -4,11 +4,6 @@
 # Changes may cause incorrect behavior and will be lost if the code is regenerated.
 # --------------------------------------------------------------------------
 
-from ._operations import ToolsOperations
-from ._operations import ToolbeltsOperations
-from ._operations import ConnectionsOperations
-from ._operations import UsersOperations
-from ._operations import SessionsOperations
 from ._operations import OneClicksOperations
 from ._operations import AccountOperations
 from ._operations import SshKeysOperations
@@ -18,6 +13,8 @@ from ._operations import AppsOperations
 from ._operations import CdnOperations
 from ._operations import CertificatesOperations
 from ._operations import BalanceOperations
+from ._operations import PrepaymentConfigOperations
+from ._operations import PrepaymentStatusOperations
 from ._operations import BillingHistoryOperations
 from ._operations import InvoicesOperations
 from ._operations import BillingInsightsOperations
@@ -57,6 +54,9 @@ from ._operations import VolumesOperations
 from ._operations import VolumeActionsOperations
 from ._operations import VolumeSnapshotsOperations
 from ._operations import VpcsOperations
+from ._operations import VpcRoutesOperations
+from ._operations import VpcSubnetsOperations
+from ._operations import VpcSubnetRoutesOperations
 from ._operations import VpcPeeringsOperations
 from ._operations import VpcnatgatewaysOperations
 from ._operations import UptimeOperations
@@ -69,11 +69,6 @@ from ._patch import *  # pylint: disable=unused-wildcard-import
 from ._patch import patch_sdk as _patch_sdk
 
 __all__ = [
-    "ToolsOperations",
-    "ToolbeltsOperations",
-    "ConnectionsOperations",
-    "UsersOperations",
-    "SessionsOperations",
     "OneClicksOperations",
     "AccountOperations",
     "SshKeysOperations",
@@ -83,6 +78,8 @@ __all__ = [
     "CdnOperations",
     "CertificatesOperations",
     "BalanceOperations",
+    "PrepaymentConfigOperations",
+    "PrepaymentStatusOperations",
     "BillingHistoryOperations",
     "InvoicesOperations",
     "BillingInsightsOperations",
@@ -122,6 +119,9 @@ __all__ = [
     "VolumeActionsOperations",
     "VolumeSnapshotsOperations",
     "VpcsOperations",
+    "VpcRoutesOperations",
+    "VpcSubnetsOperations",
+    "VpcSubnetRoutesOperations",
     "VpcPeeringsOperations",
     "VpcnatgatewaysOperations",
     "UptimeOperations",
