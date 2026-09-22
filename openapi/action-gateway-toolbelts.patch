@@ -1,0 +1,518 @@
+diff --git a/specification/DigitalOcean-public.v2.yaml b/specification/DigitalOcean-public.v2.yaml
+index b8c29b4..6bbe488 100644
+--- a/specification/DigitalOcean-public.v2.yaml
++++ b/specification/DigitalOcean-public.v2.yaml
+@@ -50,6 +50,9 @@ tags:
+ 
+       - `Accept: application/vnd.digitalocean.reserveip+json`
+ 
++  - name: Action Gateway
++    description: Manage versioned tool collections used by Action Gateway sessions.
++
+   - name: Add-Ons
+     description: |-
+       Add-ons are third-party applications that can be added to your DigitalOcean account.
+@@ -718,6 +721,26 @@ x-tagGroups:
+       - Serverless Inference
+ 
+ paths:
++  /v2/toolbelts:
++    get:
++      $ref: "resources/action_gateway/toolbelts_list.yml"
++    post:
++      $ref: "resources/action_gateway/toolbelts_create.yml"
++
++  /v2/toolbelts/{name}:
++    get:
++      $ref: "resources/action_gateway/toolbelts_get.yml"
++    delete:
++      $ref: "resources/action_gateway/toolbelts_delete.yml"
++
++  /v2/toolbelts/{name}/tools/add:
++    post:
++      $ref: "resources/action_gateway/toolbelts_add_tools.yml"
++
++  /v2/toolbelts/{name}/tools/remove:
++    post:
++      $ref: "resources/action_gateway/toolbelts_remove_tools.yml"
++
+   /v2/1-clicks:
+     get:
+       $ref: "resources/1-clicks/oneClicks_list.yml"
+diff --git a/specification/resources/action_gateway/models.yml b/specification/resources/action_gateway/models.yml
+new file mode 100644
+index 0000000..c709cc0
+--- /dev/null
++++ b/specification/resources/action_gateway/models.yml
+@@ -0,0 +1,193 @@
++toolbelt:
++  type: object
++  required:
++    - name
++    - version
++    - tools
++    - status
++    - reference
++    - reference_latest
++    - tool_count
++    - created_at
++    - updated_at
++  properties:
++    name:
++      type: string
++      example: search-toolbelt
++    version:
++      type: string
++      pattern: '^[0-9]+$'
++      example: '1'
++    display_name:
++      type: string
++      maxLength: 128
++      example: Search Tools
++    description:
++      type: string
++      maxLength: 255
++      example: Tools for searching and fetching public web pages.
++    tools:
++      type: array
++      maxItems: 500
++      items:
++        type: string
++      example:
++        - exa_web_search
++        - exa_web_fetch
++    status:
++      type: string
++      enum:
++        - active
++        - deprecated
++      example: active
++    reference:
++      type: string
++      description: A reference pinned to this immutable toolbelt version.
++      example: search-toolbelt@1
++    reference_latest:
++      type: string
++      description: An unversioned reference to the latest active version.
++      example: search-toolbelt
++    tool_count:
++      type: integer
++      format: int32
++      example: 2
++    created_at:
++      type: string
++      format: date-time
++      example: '2026-06-11T12:00:00Z'
++    updated_at:
++      type: string
++      format: date-time
++      example: '2026-06-11T12:00:00Z'
++
++toolbelt_summary:
++  type: object
++  required:
++    - name
++    - latest_version
++    - version_count
++    - tool_count
++    - status
++    - reference_latest
++    - updated_at
++  properties:
++    name:
++      type: string
++      example: search-toolbelt
++    display_name:
++      type: string
++      example: Search Tools
++    description:
++      type: string
++      example: Tools for searching and fetching public web pages.
++    latest_version:
++      type: string
++      example: '1'
++    version_count:
++      type: integer
++      format: int32
++      example: 1
++    tool_count:
++      type: integer
++      format: int32
++      example: 2
++    status:
++      type: string
++      enum:
++        - active
++        - deprecated
++      example: active
++    reference_latest:
++      type: string
++      example: search-toolbelt
++    updated_at:
++      type: string
++      format: date-time
++      example: '2026-06-11T12:00:00Z'
++
++toolbelt_create:
++  type: object
++  required:
++    - name
++    - tools
++  properties:
++    name:
++      type: string
++      pattern: '^[a-z][a-z0-9_-]{0,63}$'
++      example: search-toolbelt
++    version:
++      type: string
++      pattern: '^[0-9]+$'
++      default: '1'
++    display_name:
++      type: string
++      maxLength: 128
++      example: Search Tools
++    description:
++      type: string
++      maxLength: 255
++      example: Tools for searching and fetching public web pages.
++    tools:
++      type: array
++      maxItems: 500
++      items:
++        type: string
++      example:
++        - exa_web_search
++        - exa_web_fetch
++
++toolbelt_tools:
++  type: object
++  required:
++    - tools
++  properties:
++    tools:
++      type: array
++      minItems: 1
++      maxItems: 500
++      items:
++        type: string
++      example:
++        - exa_web_search
++
++toolbelt_response:
++  type: object
++  required:
++    - toolbelt
++  properties:
++    toolbelt:
++      $ref: '#/toolbelt'
++
++toolbelts_response:
++  type: object
++  required:
++    - toolbelts
++    - pagination
++  properties:
++    toolbelts:
++      type: array
++      items:
++        $ref: '#/toolbelt_summary'
++    pagination:
++      $ref: '#/pagination'
++
++pagination:
++  type: object
++  required:
++    - page
++    - per_page
++    - total
++  properties:
++    page:
++      type: integer
++      format: int32
++      example: 1
++    per_page:
++      type: integer
++      format: int32
++      example: 20
++    total:
++      type: integer
++      format: int32
++      example: 1
+diff --git a/specification/resources/action_gateway/parameters.yml b/specification/resources/action_gateway/parameters.yml
+new file mode 100644
+index 0000000..8f40fbf
+--- /dev/null
++++ b/specification/resources/action_gateway/parameters.yml
+@@ -0,0 +1,33 @@
++toolbelt_name:
++  name: name
++  in: path
++  required: true
++  description: The natural key identifying the toolbelt.
++  schema:
++    type: string
++    pattern: '^[a-z][a-z0-9_-]{0,63}$'
++  example: search-toolbelt
++
++toolbelt_version:
++  name: version
++  in: query
++  required: false
++  description: An immutable numeric toolbelt version. Omit to retrieve the latest active version.
++  schema:
++    type: string
++    pattern: '^[0-9]+$'
++  example: '1'
++
++toolbelt_status:
++  name: status
++  in: query
++  required: false
++  description: Filter toolbelts by status.
++  schema:
++    type: string
++    enum:
++      - active
++      - deprecated
++      - all
++    default: active
++  example: active
+diff --git a/specification/resources/action_gateway/response_headers.yml b/specification/resources/action_gateway/response_headers.yml
+new file mode 100644
+index 0000000..c8ac026
+--- /dev/null
++++ b/specification/resources/action_gateway/response_headers.yml
+@@ -0,0 +1,6 @@
++ratelimit-limit:
++  $ref: '../../shared/headers.yml#/ratelimit-limit'
++ratelimit-remaining:
++  $ref: '../../shared/headers.yml#/ratelimit-remaining'
++ratelimit-reset:
++  $ref: '../../shared/headers.yml#/ratelimit-reset'
+diff --git a/specification/resources/action_gateway/toolbelts_add_tools.yml b/specification/resources/action_gateway/toolbelts_add_tools.yml
+new file mode 100644
+index 0000000..8253309
+--- /dev/null
++++ b/specification/resources/action_gateway/toolbelts_add_tools.yml
+@@ -0,0 +1,36 @@
++operationId: toolbelts_add_tools
++summary: Add Tools to a Toolbelt
++description: Adds provider-qualified tool names and creates a new immutable toolbelt version.
++tags:
++  - Action Gateway
++parameters:
++  - $ref: 'parameters.yml#/toolbelt_name'
++requestBody:
++  required: true
++  content:
++    application/json:
++      schema:
++        $ref: 'models.yml#/toolbelt_tools'
++responses:
++  '200':
++    description: The resulting toolbelt version.
++    headers:
++      $ref: 'response_headers.yml'
++    content:
++      application/json:
++        schema:
++          $ref: 'models.yml#/toolbelt_response'
++  '400':
++    $ref: '../../shared/responses/bad_request.yml'
++  '401':
++    $ref: '../../shared/responses/unauthorized.yml'
++  '404':
++    $ref: '../../shared/responses/not_found.yml'
++  '429':
++    $ref: '../../shared/responses/too_many_requests.yml'
++  '500':
++    $ref: '../../shared/responses/server_error.yml'
++  default:
++    $ref: '../../shared/responses/unexpected_error.yml'
++security:
++  - bearer_auth: []
+diff --git a/specification/resources/action_gateway/toolbelts_create.yml b/specification/resources/action_gateway/toolbelts_create.yml
+new file mode 100644
+index 0000000..f496b03
+--- /dev/null
++++ b/specification/resources/action_gateway/toolbelts_create.yml
+@@ -0,0 +1,34 @@
++operationId: toolbelts_create
++summary: Create a Toolbelt
++description: Creates a versioned collection of provider-qualified Action Gateway tool names.
++tags:
++  - Action Gateway
++requestBody:
++  required: true
++  content:
++    application/json:
++      schema:
++        $ref: 'models.yml#/toolbelt_create'
++responses:
++  '200':
++    description: A toolbelt was created successfully.
++    headers:
++      $ref: 'response_headers.yml'
++    content:
++      application/json:
++        schema:
++          $ref: 'models.yml#/toolbelt_response'
++  '400':
++    $ref: '../../shared/responses/bad_request.yml'
++  '401':
++    $ref: '../../shared/responses/unauthorized.yml'
++  '409':
++    $ref: '../../shared/responses/conflict.yml'
++  '429':
++    $ref: '../../shared/responses/too_many_requests.yml'
++  '500':
++    $ref: '../../shared/responses/server_error.yml'
++  default:
++    $ref: '../../shared/responses/unexpected_error.yml'
++security:
++  - bearer_auth: []
+diff --git a/specification/resources/action_gateway/toolbelts_delete.yml b/specification/resources/action_gateway/toolbelts_delete.yml
+new file mode 100644
+index 0000000..ea6a984
+--- /dev/null
++++ b/specification/resources/action_gateway/toolbelts_delete.yml
+@@ -0,0 +1,28 @@
++operationId: toolbelts_delete
++summary: Delete a Toolbelt
++description: Deprecates the latest active version of a toolbelt.
++tags:
++  - Action Gateway
++parameters:
++  - $ref: 'parameters.yml#/toolbelt_name'
++responses:
++  '200':
++    description: The toolbelt was deprecated successfully.
++    headers:
++      $ref: 'response_headers.yml'
++    content:
++      application/json:
++        schema:
++          $ref: 'models.yml#/toolbelt_response'
++  '401':
++    $ref: '../../shared/responses/unauthorized.yml'
++  '404':
++    $ref: '../../shared/responses/not_found.yml'
++  '429':
++    $ref: '../../shared/responses/too_many_requests.yml'
++  '500':
++    $ref: '../../shared/responses/server_error.yml'
++  default:
++    $ref: '../../shared/responses/unexpected_error.yml'
++security:
++  - bearer_auth: []
+diff --git a/specification/resources/action_gateway/toolbelts_get.yml b/specification/resources/action_gateway/toolbelts_get.yml
+new file mode 100644
+index 0000000..b1e6992
+--- /dev/null
++++ b/specification/resources/action_gateway/toolbelts_get.yml
+@@ -0,0 +1,29 @@
++operationId: toolbelts_get
++summary: Retrieve a Toolbelt
++description: Retrieves the latest active version or a specified immutable version of a toolbelt.
++tags:
++  - Action Gateway
++parameters:
++  - $ref: 'parameters.yml#/toolbelt_name'
++  - $ref: 'parameters.yml#/toolbelt_version'
++responses:
++  '200':
++    description: The toolbelt was retrieved successfully.
++    headers:
++      $ref: 'response_headers.yml'
++    content:
++      application/json:
++        schema:
++          $ref: 'models.yml#/toolbelt_response'
++  '401':
++    $ref: '../../shared/responses/unauthorized.yml'
++  '404':
++    $ref: '../../shared/responses/not_found.yml'
++  '429':
++    $ref: '../../shared/responses/too_many_requests.yml'
++  '500':
++    $ref: '../../shared/responses/server_error.yml'
++  default:
++    $ref: '../../shared/responses/unexpected_error.yml'
++security:
++  - bearer_auth: []
+diff --git a/specification/resources/action_gateway/toolbelts_list.yml b/specification/resources/action_gateway/toolbelts_list.yml
+new file mode 100644
+index 0000000..f5c4776
+--- /dev/null
++++ b/specification/resources/action_gateway/toolbelts_list.yml
+@@ -0,0 +1,28 @@
++operationId: toolbelts_list
++summary: List Toolbelts
++description: Lists the latest version of each toolbelt owned by the authenticated team.
++tags:
++  - Action Gateway
++parameters:
++  - $ref: 'parameters.yml#/toolbelt_status'
++  - $ref: '../../shared/parameters.yml#/page'
++  - $ref: '../../shared/parameters.yml#/per_page'
++responses:
++  '200':
++    description: Toolbelts were retrieved successfully.
++    headers:
++      $ref: 'response_headers.yml'
++    content:
++      application/json:
++        schema:
++          $ref: 'models.yml#/toolbelts_response'
++  '401':
++    $ref: '../../shared/responses/unauthorized.yml'
++  '429':
++    $ref: '../../shared/responses/too_many_requests.yml'
++  '500':
++    $ref: '../../shared/responses/server_error.yml'
++  default:
++    $ref: '../../shared/responses/unexpected_error.yml'
++security:
++  - bearer_auth: []
+diff --git a/specification/resources/action_gateway/toolbelts_remove_tools.yml b/specification/resources/action_gateway/toolbelts_remove_tools.yml
+new file mode 100644
+index 0000000..f28dc3f
+--- /dev/null
++++ b/specification/resources/action_gateway/toolbelts_remove_tools.yml
+@@ -0,0 +1,36 @@
++operationId: toolbelts_delete_tools
++summary: Remove Tools from a Toolbelt
++description: Removes tool names and creates a new immutable toolbelt version.
++tags:
++  - Action Gateway
++parameters:
++  - $ref: 'parameters.yml#/toolbelt_name'
++requestBody:
++  required: true
++  content:
++    application/json:
++      schema:
++        $ref: 'models.yml#/toolbelt_tools'
++responses:
++  '200':
++    description: The resulting toolbelt version.
++    headers:
++      $ref: 'response_headers.yml'
++    content:
++      application/json:
++        schema:
++          $ref: 'models.yml#/toolbelt_response'
++  '400':
++    $ref: '../../shared/responses/bad_request.yml'
++  '401':
++    $ref: '../../shared/responses/unauthorized.yml'
++  '404':
++    $ref: '../../shared/responses/not_found.yml'
++  '429':
++    $ref: '../../shared/responses/too_many_requests.yml'
++  '500':
++    $ref: '../../shared/responses/server_error.yml'
++  default:
++    $ref: '../../shared/responses/unexpected_error.yml'
++security:
++  - bearer_auth: []

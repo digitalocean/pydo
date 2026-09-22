@@ -462,6 +462,20 @@ class AsyncStreamingMixin:
 # SSE stream iterators
 # ---------------------------------------------------------------------------
 
+_HAS_MORE_RE = re.compile(r"^has_more\s*=\s*(true|false)$", re.IGNORECASE)
+
+
+def _parse_has_more_comment(line: str) -> Optional[bool]:
+    """Read ``has_more`` out of an SSE comment line (``: has_more=true``).
+
+    Returns ``None`` for any other comment, such as harness-api's
+    ``: connected to <session_id>`` banner.
+    """
+    match = _HAS_MORE_RE.match(line.lstrip(":").strip())
+    if match is None:
+        return None
+    return match.group(1).lower() == "true"
+
 
 class SSEStream:
     """Synchronous iterator over Server-Sent Events.
@@ -485,10 +499,14 @@ class SSEStream:
 
     For automatic retries on **transient** transport errors **before any chunk
     is yielded**, see :func:`iter_sse_with_retry`.
+
+    :ivar has_more: ``True``/``False`` once the server has sent a
+        ``: has_more=...`` comment (harness history pages), else ``None``.
     """
 
     def __init__(self, response: Any):
         self._response = response
+        self.has_more: Optional[bool] = None
 
     def __iter__(self) -> Iterator[dict]:
         return self._iter_events()
@@ -504,6 +522,11 @@ class SSEStream:
                     line, buf = buf.split("\n", 1)
                     line = line.strip()
                     if not line:
+                        continue
+                    if line.startswith(":"):
+                        has_more = _parse_has_more_comment(line)
+                        if has_more is not None:
+                            self.has_more = has_more
                         continue
                     if line.startswith("data:"):
                         data = line[5:].strip()
@@ -546,10 +569,14 @@ class AsyncSSEStream:
 
     Transport and decode errors match :class:`SSEStream`.  See
     :func:`async_iter_sse_with_retry` for retries before the first chunk.
+
+    :ivar has_more: ``True``/``False`` once the server has sent a
+        ``: has_more=...`` comment (harness history pages), else ``None``.
     """
 
     def __init__(self, response: Any):
         self._response = response
+        self.has_more: Optional[bool] = None
 
     def __aiter__(self) -> AsyncIterator[dict]:
         return self._iter_events()
@@ -565,6 +592,11 @@ class AsyncSSEStream:
                     line, buf = buf.split("\n", 1)
                     line = line.strip()
                     if not line:
+                        continue
+                    if line.startswith(":"):
+                        has_more = _parse_has_more_comment(line)
+                        if has_more is not None:
+                            self.has_more = has_more
                         continue
                     if line.startswith("data:"):
                         data = line[5:].strip()

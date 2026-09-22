@@ -1,0 +1,199 @@
+# ------------------------------------
+# Copyright (c) DigitalOcean.
+# Licensed under the Apache-2.0 License.
+# ------------------------------------
+# pylint: disable=duplicate-code
+"""Async Action Gateway sessions."""
+
+from __future__ import annotations
+
+import uuid
+from typing import Any, Dict, List, Optional, Sequence
+
+from pydo.custom_extensions import _BaseURLProxy
+from pydo.gateway.custom_models import GatewayProtocolError
+from pydo.gateway.providers import BaseProvider, default_provider
+from pydo.gateway.session import normalize_permissions
+from pydo.gateway.transport import (
+    resolve_gateway_base_url,
+)
+
+from .custom_operations import (
+    AsyncCodeOperations,
+    AsyncMCPTransport,
+    AsyncToolsOperations,
+    async_execute_tool_calls,
+)
+
+
+def _pick(data: Dict[str, Any], *keys: str) -> Any:
+    for key in keys:
+        if key in data and data[key] is not None:
+            return data[key]
+    return None
+
+
+class AsyncSession:
+    """Async twin of :class:`pydo.gateway.session.Session`."""
+
+    def __init__(
+        self,
+        *,
+        session_urn: str,
+        actor_id: str,
+        name: str,
+        policy: Dict[str, Any],
+        mcp_url: str,
+        tools: AsyncToolsOperations,
+        code: AsyncCodeOperations,
+        provider: BaseProvider,
+        selected_tools: Optional[Sequence[str]] = None,
+        raw: Optional[Dict[str, Any]] = None,
+    ):
+        self.session_urn = session_urn
+        self.id = session_urn
+        self.actor_id = actor_id
+        self.name = name
+        self.policy = policy
+        self._mcp_url = mcp_url
+        self.tools = tools
+        self.code = code
+        self._transport = tools._transport
+        self.provider = provider
+        self.selected_tools = list(selected_tools or [])
+        self.raw = raw or {}
+
+    @property
+    def url(self) -> str:
+        return self._mcp_url
+
+    async def handle_tool_calls(
+        self,
+        response: Any,
+        *,
+        rationale: Optional[str] = None,
+    ) -> List[Any]:
+        calls = self.provider.extract_tool_calls(response)
+        if not calls:
+            return []
+        results = await async_execute_tool_calls(calls, self.tools, rationale=rationale)
+        return self.provider.format_tool_results(calls, results)
+
+    async def execute_tool_calls(
+        self,
+        calls: Sequence[Any],
+        *,
+        rationale: Optional[str] = None,
+    ) -> List[Any]:
+        return await async_execute_tool_calls(calls, self.tools, rationale=rationale)
+
+    async def approve(self, approval_id: str) -> Any:
+        """Approve a pending tool invocation for this session."""
+        return await self._transport.decide_approval(approval_id, "approve")
+
+    async def deny(self, approval_id: str) -> Any:
+        """Deny a pending tool invocation for this session."""
+        return await self._transport.decide_approval(approval_id, "deny")
+
+    def __repr__(self) -> str:  # pragma: no cover
+        return f"<AsyncSession id={self.session_urn!r} " f"actor_id={self.actor_id!r}>"
+
+
+class AsyncSessionsOperations:
+    """Create sessions through the generated async Action Gateway operation."""
+
+    def __init__(
+        self,
+        parent_client: Any,
+        *,
+        gateway_endpoint: Optional[str] = None,
+        provider: Optional[BaseProvider] = None,
+    ):
+        self._parent = parent_client
+        self._sessions_api = parent_client.sessions
+        self._gateway_base_url = resolve_gateway_base_url(gateway_endpoint)
+        self._provider = provider or default_provider()
+
+    async def create(
+        self,
+        actor_id: str,
+        *,
+        name: Optional[str] = None,
+        permissions: Optional[Dict[str, Any]] = None,
+        tools: Optional[Sequence[str]] = None,
+        config: Optional[Dict[str, Any]] = None,
+    ) -> AsyncSession:
+        if not actor_id or not str(actor_id).strip():
+            raise ValueError("actor_id is required")
+
+        session_name = name or f"pydo-session-{uuid.uuid4().hex[:8]}"
+        policy = normalize_permissions(permissions)
+        body = {
+            "name": session_name,
+            "policy": policy,
+            "actor_id": str(actor_id).strip(),
+        }
+        if tools is not None:
+            if isinstance(tools, (str, bytes)):
+                raise TypeError("tools must be a sequence of tool references")
+            body["tools"] = list(tools)
+        if config is not None:
+            if not isinstance(config, dict):
+                raise TypeError("config must be a dict")
+            body["config"] = config
+
+        raw_session = await self._post_create(body)
+        session_urn = _pick(raw_session, "sessionUrn", "session_urn")
+        if not session_urn:
+            raise GatewayProtocolError(
+                f"session create response missing sessionUrn: {raw_session!r}"
+            )
+
+        mcp_url = _pick(raw_session, "mcpUrl", "mcp_url")
+        if not mcp_url:
+            raise GatewayProtocolError(
+                f"session create response missing mcpUrl: {raw_session!r}"
+            )
+
+        transport = AsyncMCPTransport(
+            _BaseURLProxy(self._parent._client, self._gateway_base_url),
+            session_id=session_urn,
+            actor_id=actor_id,
+            endpoint_url=mcp_url,
+        )
+        tools = AsyncToolsOperations(transport, self._provider)
+        code = AsyncCodeOperations(transport)
+        return AsyncSession(
+            session_urn=session_urn,
+            actor_id=str(actor_id).strip(),
+            name=_pick(raw_session, "name") or session_name,
+            policy=policy,
+            mcp_url=mcp_url,
+            tools=tools,
+            code=code,
+            provider=self._provider,
+            selected_tools=_pick(raw_session, "selectedTools") or [],
+            raw=raw_session,
+        )
+
+    async def _post_create(self, body: Dict[str, Any]) -> Dict[str, Any]:
+        payload = await self._sessions_api.create(body=body)
+        if not isinstance(payload, dict):
+            raise GatewayProtocolError(
+                f"unexpected session create response: {payload!r}"
+            )
+        session = payload.get("session")
+        if not isinstance(session, dict):
+            raise GatewayProtocolError(
+                f"session create response missing session object: {payload!r}"
+            )
+        result = dict(session)
+        mcp_url = _pick(payload, "mcpUrl", "mcp_url")
+        if mcp_url:
+            result["mcpUrl"] = mcp_url
+        if "tools" in payload:
+            result["selectedTools"] = payload["tools"]
+        return result
+
+
+__all__ = ["AsyncSession", "AsyncSessionsOperations"]
