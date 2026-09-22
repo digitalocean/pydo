@@ -116,6 +116,7 @@ def _sessions_url(base_url: Optional[str] = None, *parts: str) -> str:
         path = f"{path}/{part}"
     return f"{root}{path}"
 
+
 def resolve_openai_api_key(explicit: Optional[str] = None) -> str:
     key = explicit if explicit is not None else os.environ.get(_ENV_OPENAI_KEY)
     if not key:
