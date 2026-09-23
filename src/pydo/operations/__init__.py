@@ -18,6 +18,8 @@ from ._operations import AppsOperations
 from ._operations import CdnOperations
 from ._operations import CertificatesOperations
 from ._operations import BalanceOperations
+from ._operations import PrepaymentConfigOperations
+from ._operations import PrepaymentStatusOperations
 from ._operations import BillingHistoryOperations
 from ._operations import InvoicesOperations
 from ._operations import BillingInsightsOperations
@@ -57,6 +59,9 @@ from ._operations import VolumesOperations
 from ._operations import VolumeActionsOperations
 from ._operations import VolumeSnapshotsOperations
 from ._operations import VpcsOperations
+from ._operations import VpcRoutesOperations
+from ._operations import VpcSubnetsOperations
+from ._operations import VpcSubnetRoutesOperations
 from ._operations import VpcPeeringsOperations
 from ._operations import VpcnatgatewaysOperations
 from ._operations import UptimeOperations
@@ -83,6 +88,8 @@ __all__ = [
     "CdnOperations",
     "CertificatesOperations",
     "BalanceOperations",
+    "PrepaymentConfigOperations",
+    "PrepaymentStatusOperations",
     "BillingHistoryOperations",
     "InvoicesOperations",
     "BillingInsightsOperations",
@@ -122,6 +129,9 @@ __all__ = [
     "VolumeActionsOperations",
     "VolumeSnapshotsOperations",
     "VpcsOperations",
+    "VpcRoutesOperations",
+    "VpcSubnetsOperations",
+    "VpcSubnetRoutesOperations",
     "VpcPeeringsOperations",
     "VpcnatgatewaysOperations",
     "UptimeOperations",
