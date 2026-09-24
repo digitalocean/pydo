@@ -281,6 +281,45 @@ def test_get_execution_includes_payload():
     assert resp.execution.output_text == "done"
 
 
+def test_cancel_execution_plain():
+    body = {"execution": {"execution_id": "e1", "status": "failed"}}
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    resp = resources.triggers.cancel_execution("t1", "e1")
+
+    call = _last_call(resources)
+    assert call.request.method == "POST"
+    assert _path(call.request.url).endswith(
+        "/v2/agents/triggers/t1/executions/e1/cancel"
+    )
+    assert "force" not in call.request.url
+    assert resp.execution.status == "failed"
+
+
+def test_cancel_execution_force_serializes_lowercase():
+    # HttpRequest serializes a bare Python bool as "True"/"False"; the API
+    # matches the literal lowercase "true" only. A regression here means
+    # force=True silently stops forcing anything.
+    body = {"execution": {"execution_id": "e1", "status": "failed"}}
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    resources.triggers.cancel_execution("t1", "e1", force=True)
+
+    call = _last_call(resources)
+    assert "force=true" in call.request.url
+    assert "force=True" not in call.request.url
+
+
+def test_cancel_execution_omits_force_when_falsy():
+    body = {"execution": {"execution_id": "e1", "status": "failed"}}
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    resources.triggers.cancel_execution("t1", "e1", force=False)
+
+    call = _last_call(resources)
+    assert "force" not in call.request.url
+
+
 def test_get_by_session():
     body = {"trigger": {"trigger_id": "t1", "bound_session_id": "s1"}}
     resources = _make_resources([_FakeResponse(200, body)])
