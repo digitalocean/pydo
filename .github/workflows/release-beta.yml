@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2.5.0
+        uses: actions/checkout@v7
 
       - name: Parse beta tag
         id: version
@@ -42,7 +42,7 @@ jobs:
           echo "Beta tag format OK: $VERSION"
 
       - name: Setup python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v6
         with:
           python-version: "3.10"
 
@@ -82,7 +82,7 @@ jobs:
 
       - name: Restore poetry cache
         if: success() && !env.ACT
-        uses: actions/cache@v3
+        uses: actions/cache@v6
         with:
           path: $(poetry config cache-dir)
           key: ubuntu-latest-poetry-${{ matrix.python-version }}-${{ hashFiles('**/pyproject.toml') }}
@@ -91,7 +91,7 @@ jobs:
         run: poetry build
 
       - name: Upload a Build Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: dist
           path: dist/
@@ -108,10 +108,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2.5.0
+        uses: actions/checkout@v7
 
       - name: Download the Build Artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: dist
           path: dist/
