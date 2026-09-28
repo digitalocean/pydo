@@ -16,6 +16,7 @@ from .images import Images
 from .messages import Messages
 from .models import Models
 from .responses import Responses
+from .systemone import Systemone
 
 
 class InferenceResources:
@@ -31,6 +32,7 @@ class InferenceResources:
         self.messages = Messages(client)
         self.models = Models(client)
         self.responses = Responses(client)
+        self.systemone = Systemone(client)
 
 
 __all__ = ["InferenceResources"]

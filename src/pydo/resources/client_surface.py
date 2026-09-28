@@ -61,6 +61,12 @@ class InferenceClientSurface:
         return self._require_inference_resource_root().responses
 
     @property
+    def systemone(self) -> Any:
+        """Nested serverless inference API under path segment ``systemone``."""
+
+        return self._require_inference_resource_root().systemone
+
+    @property
     def audio(self) -> Any:
         """Audio namespace (TTS + generation via async-invoke)."""
 
