@@ -49,6 +49,7 @@ pytest-asyncio==0.19.0 ; python_full_version >= "3.8.0" and python_full_version 
 pytest==7.4.4 ; python_full_version >= "3.8.0" and python_full_version < "4.0.0"
 pytz==2024.1 ; python_version >= "3.8" and python_version < "3.9"
 pywin32==306 ; python_version >= "3.8" and python_full_version < "4.0.0" and platform_system == "Windows"
+pyyaml==6.0.3 ; python_version >= "3.8" and python_full_version < "4.0.0"
 requests-oauthlib==2.0.0 ; python_full_version >= "3.8.0" and python_full_version < "4.0.0"
 requests==2.32.2 ; python_version >= "3.8" and python_full_version < "4.0.0"
 responses==0.21.0 ; python_full_version >= "3.8.0" and python_full_version < "4.0.0"
