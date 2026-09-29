@@ -32,7 +32,7 @@ async def main() -> None:
     print("MCP URL:", session.url)
 
     output = await session.tools.invoke_one(
-        "exa_web_search", {"query": "DigitalOcean Gradient", "max_results": 2}
+        "exa_web_search", {"query": "DigitalOcean Inference", "max_results": 2}
     )
     print("web_search output:", str(output)[:200])
 

@@ -28,7 +28,7 @@ envelope = session.tools.invoke(
     [
         {
             "tool": "exa_web_search",
-            "arguments": {"query": "DigitalOcean Gradient", "max_results": 3},
+            "arguments": {"query": "DigitalOcean Inference", "max_results": 3},
         },
         {
             "tool": "exa_web_fetch",
