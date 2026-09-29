@@ -56,12 +56,4 @@ class BatchResultsResponse(DotDict):
     expires_at: Optional[str]  # When the presigned URLs expire
 
 
-class Error(DotDict):
-    """Typed response for ``error`` schema."""
-
-    id: str
-    message: str
-    request_id: str
-
-
-__all__ = ["Batch", "BatchFileCreateResponse", "BatchResultsResponse", "Error"]
+__all__ = ["Batch", "BatchFileCreateResponse", "BatchResultsResponse"]
