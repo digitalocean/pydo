@@ -18,7 +18,6 @@ from pydo.types.async_invoke import AsyncInvokeResponse
 from pydo.types.batches import Batch
 from pydo.types.batches import BatchFileCreateResponse
 from pydo.types.batches import BatchResultsResponse
-from pydo.types.batches import Error
 from pydo.types.chat import ChatCompletionChunk
 from pydo.types.chat import ChatCompletion
 from pydo.types.chat import ChatCompletionStreamResponseDelta
@@ -42,13 +41,16 @@ from pydo.types.models import Model
 from pydo.types.responses import Response
 from pydo.types.responses import ResponseStreamChunk
 from pydo.types.responses import ResponseUsage
+from pydo.types.systemone import Error
+from pydo.types.systemone import SystemoneAnswer
+from pydo.types.systemone import SystemoneResponse
+from pydo.types.systemone import SystemoneUsage
 
 __all__ = [
     "AsyncInvokeResponse",
     "Batch",
     "BatchFileCreateResponse",
     "BatchResultsResponse",
-    "Error",
     "ChatCompletionChunk",
     "ChatCompletion",
     "ChatCompletionStreamResponseDelta",
@@ -72,4 +74,8 @@ __all__ = [
     "Response",
     "ResponseStreamChunk",
     "ResponseUsage",
+    "Error",
+    "SystemoneAnswer",
+    "SystemoneResponse",
+    "SystemoneUsage",
 ]

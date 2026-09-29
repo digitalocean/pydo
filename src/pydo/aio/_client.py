@@ -47,6 +47,8 @@ from .operations import (
     OneClicksOperations,
     OrganizationsOperations,
     PartnerAttachmentsOperations,
+    PrepaymentConfigOperations,
+    PrepaymentStatusOperations,
     ProjectsOperations,
     RegionsOperations,
     RegistriesOperations,
@@ -71,6 +73,9 @@ from .operations import (
     VolumeSnapshotsOperations,
     VolumesOperations,
     VpcPeeringsOperations,
+    VpcRoutesOperations,
+    VpcSubnetRoutesOperations,
+    VpcSubnetsOperations,
     VpcnatgatewaysOperations,
     VpcsOperations,
 )
@@ -111,6 +116,10 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype certificates: pydo.aio.operations.CertificatesOperations
     :ivar balance: BalanceOperations operations
     :vartype balance: pydo.aio.operations.BalanceOperations
+    :ivar prepayment_config: PrepaymentConfigOperations operations
+    :vartype prepayment_config: pydo.aio.operations.PrepaymentConfigOperations
+    :ivar prepayment_status: PrepaymentStatusOperations operations
+    :vartype prepayment_status: pydo.aio.operations.PrepaymentStatusOperations
     :ivar billing_history: BillingHistoryOperations operations
     :vartype billing_history: pydo.aio.operations.BillingHistoryOperations
     :ivar invoices: InvoicesOperations operations
@@ -189,6 +198,12 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype volume_snapshots: pydo.aio.operations.VolumeSnapshotsOperations
     :ivar vpcs: VpcsOperations operations
     :vartype vpcs: pydo.aio.operations.VpcsOperations
+    :ivar vpc_routes: VpcRoutesOperations operations
+    :vartype vpc_routes: pydo.aio.operations.VpcRoutesOperations
+    :ivar vpc_subnets: VpcSubnetsOperations operations
+    :vartype vpc_subnets: pydo.aio.operations.VpcSubnetsOperations
+    :ivar vpc_subnet_routes: VpcSubnetRoutesOperations operations
+    :vartype vpc_subnet_routes: pydo.aio.operations.VpcSubnetRoutesOperations
     :ivar vpc_peerings: VpcPeeringsOperations operations
     :vartype vpc_peerings: pydo.aio.operations.VpcPeeringsOperations
     :ivar vpcnatgateways: VpcnatgatewaysOperations operations
@@ -229,9 +244,11 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
                 self._config.custom_hook_policy,
                 self._config.logging_policy,
                 policies.DistributedTracingPolicy(**kwargs),
-                policies.SensitiveHeaderCleanupPolicy(**kwargs)
-                if self._config.redirect_policy
-                else None,
+                (
+                    policies.SensitiveHeaderCleanupPolicy(**kwargs)
+                    if self._config.redirect_policy
+                    else None
+                ),
                 self._config.http_logging_policy,
             ]
         self._client: AsyncPipelineClient = AsyncPipelineClient(
@@ -281,6 +298,12 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.balance = BalanceOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.prepayment_config = PrepaymentConfigOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.prepayment_status = PrepaymentStatusOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.billing_history = BillingHistoryOperations(
@@ -398,6 +421,15 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.vpcs = VpcsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.vpc_routes = VpcRoutesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.vpc_subnets = VpcSubnetsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.vpc_subnet_routes = VpcSubnetRoutesOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.vpc_peerings = VpcPeeringsOperations(
