@@ -1,4 +1,4 @@
-"""Generate an image with the Gradient AI Platform and save it to disk.
+"""Generate an image with DigitalOcean Inference and save it to disk.
 
 Uses the inference-focused ``pydo.inference.Client`` entry point so the
 top-level surface (``dir(client)``, IDE autocomplete) stays focused on

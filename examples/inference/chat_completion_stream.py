@@ -1,4 +1,4 @@
-"""Stream a chat completion from the Gradient AI Platform token-by-token.
+"""Stream a chat completion from DigitalOcean Inference token-by-token.
 
 Uses the inference-focused ``pydo.inference.Client`` entry point so the
 top-level surface (``dir(client)``, IDE autocomplete) stays focused on
