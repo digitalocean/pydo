@@ -16,6 +16,7 @@ from ._serialization import Deserializer, Serializer
 from .operations import (
     AccountOperations,
     ActionsOperations,
+    ActorLimitsOperations,
     AddonsOperations,
     AgentInferenceOperations,
     AppsOperations,
@@ -42,10 +43,12 @@ from .operations import (
     InvoicesOperations,
     KubernetesOperations,
     LoadBalancersOperations,
+    McpServersOperations,
     MonitoringOperations,
     NfsOperations,
     OneClicksOperations,
     OrganizationsOperations,
+    OutputViewsOperations,
     PartnerAttachmentsOperations,
     PrepaymentConfigOperations,
     PrepaymentStatusOperations,
@@ -88,16 +91,22 @@ if TYPE_CHECKING:
 class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too-many-instance-attributes
     """GeneratedClient.
 
-    :ivar tools: ToolsOperations operations
-    :vartype tools: pydo.operations.ToolsOperations
-    :ivar toolbelts: ToolbeltsOperations operations
-    :vartype toolbelts: pydo.operations.ToolbeltsOperations
+    :ivar actor_limits: ActorLimitsOperations operations
+    :vartype actor_limits: pydo.operations.ActorLimitsOperations
     :ivar connections: ConnectionsOperations operations
     :vartype connections: pydo.operations.ConnectionsOperations
-    :ivar users: UsersOperations operations
-    :vartype users: pydo.operations.UsersOperations
+    :ivar mcp_servers: McpServersOperations operations
+    :vartype mcp_servers: pydo.operations.McpServersOperations
+    :ivar output_views: OutputViewsOperations operations
+    :vartype output_views: pydo.operations.OutputViewsOperations
     :ivar sessions: SessionsOperations operations
     :vartype sessions: pydo.operations.SessionsOperations
+    :ivar toolbelts: ToolbeltsOperations operations
+    :vartype toolbelts: pydo.operations.ToolbeltsOperations
+    :ivar tools: ToolsOperations operations
+    :vartype tools: pydo.operations.ToolsOperations
+    :ivar users: UsersOperations operations
+    :vartype users: pydo.operations.UsersOperations
     :ivar one_clicks: OneClicksOperations operations
     :vartype one_clicks: pydo.operations.OneClicksOperations
     :ivar account: AccountOperations operations
@@ -258,19 +267,28 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
         self._serialize = Serializer()
         self._deserialize = Deserializer()
         self._serialize.client_side_validation = False
-        self.tools = ToolsOperations(
-            self._client, self._config, self._serialize, self._deserialize
-        )
-        self.toolbelts = ToolbeltsOperations(
+        self.actor_limits = ActorLimitsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.connections = ConnectionsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
-        self.users = UsersOperations(
+        self.mcp_servers = McpServersOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.output_views = OutputViewsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.sessions = SessionsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.toolbelts = ToolbeltsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.tools = ToolsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.users = UsersOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.one_clicks = OneClicksOperations(
