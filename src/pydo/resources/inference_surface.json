@@ -54,6 +54,16 @@
       ]
     },
     {
+      "op_method": "create_systemone",
+      "path_segments": [
+        "systemone"
+      ],
+      "path_params": [],
+      "facade_methods": [
+        "create"
+      ]
+    },
+    {
       "op_method": "create_response",
       "path_segments": [
         "responses"

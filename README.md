@@ -12,7 +12,7 @@ on the [DigitalOcean OpenAPI Specification](https://github.com/digitalocean/open
 > **🚀 New in v0.29.0 — AI & Inference support**
 >
 > `pydo` now ships first-class support for DigitalOcean's
-> [Gradient AI Platform](https://www.digitalocean.com/products/gradient): chat
+> [Inference](https://docs.digitalocean.com/products/inference/) APIs: chat
 > completions (with streaming), image generation, audio, batch inference, and
 > model listing — all from the same `Client`. Jump to
 > [**AI & Inference**](#ai--inference) to get started.
@@ -93,7 +93,7 @@ client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"))
 > | What you're calling | What you need |
 > | --- | --- |
 > | Infrastructure APIs (`droplets`, `ssh_keys`, `kubernetes`, `volumes`, …) | A DigitalOcean API token (PAT). |
-> | Inference APIs (`chat`, `images`, `models`, `audio`, `batches`, `files`, `responses`) | A PAT created with **full access** scope, **or** a Gradient **Model Access Key**. |
+> | Inference APIs (`chat`, `images`, `models`, `audio`, `batches`, `files`, `responses`) | A PAT created with **full access** scope, **or** a **Model Access Key**. |
 >
 > If you only have a limited-scope PAT, infra calls will work but inference
 > calls will fail with a 401. To fix it, create a new PAT with full access,
@@ -103,7 +103,7 @@ client = Client(token=os.getenv("DIGITALOCEAN_TOKEN"))
 > # All three of these work — pick the one you like:
 > client = Client(token=os.environ["DIGITALOCEAN_TOKEN"])    # full-access PAT
 > client = Client(api_key=os.environ["DIGITALOCEAN_TOKEN"])  # same thing, different name
-> client = Client(api_key=os.environ["MODEL_ACCESS_KEY"])    # Gradient model access key
+> client = Client(api_key=os.environ["MODEL_ACCESS_KEY"])    # model access key
 > ```
 
 #### Example of Using `pydo` to Access DO Resources
@@ -134,11 +134,12 @@ ID: 123457, NAME: my_prod_ssh_key, FINGERPRINT: eb:76:c7:2a:d3:3e:80:5d:ef:2e:ca
 
 ## **AI & Inference**
 
-> Talk to models on DigitalOcean's Gradient AI Platform with the same
-> `pydo.Client`.
+> Talk to models on DigitalOcean's
+> [Inference](https://docs.digitalocean.com/products/inference/) platform with
+> the same `pydo.Client`.
 
 The snippets below use a **DigitalOcean PAT created with full access scope**
-(required for inference APIs). A Gradient Model Access Key works too — see
+(required for inference APIs). A Model Access Key works too — see
 the [credentials note](#pydo-quickstart) above.
 
 There is also a separate namespace for inference: `from pydo.inference
@@ -459,8 +460,8 @@ Long term:
 
 - The client currently inputs and outputs JSON dictionaries. Adding models would unlock features such as typing and validation.
 - Add supporting functions to elevate customer experience (i.e. adding a funtion that surfaces IP address for a Droplet)
-- **AI & Inference**: continue expanding coverage of the
-  [Gradient AI Platform](https://www.digitalocean.com/products/gradient)
+- **AI & Inference**: continue expanding coverage of
+  [Inference](https://docs.digitalocean.com/products/inference/)
   alongside the infrastructure APIs — keeping chat, images, audio, batches,
   responses, agents, and model management feature-complete and idiomatic
   from the same `pydo.Client`. `pydo` is an

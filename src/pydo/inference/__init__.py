@@ -57,6 +57,7 @@ _INFERENCE_NAMESPACES: tuple = (
     "models",
     "responses",
     "speech",
+    "systemone",
 )
 
 

@@ -1,4 +1,4 @@
-"""List every inference model available to the current Gradient account.
+"""List every inference model available to the current DigitalOcean account.
 
 Uses the inference-focused ``pydo.inference.Client`` entry point so the
 top-level surface (``dir(client)``, IDE autocomplete) stays focused on
