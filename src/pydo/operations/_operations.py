@@ -51,9 +51,111 @@ _SERIALIZER = Serializer()
 _SERIALIZER.client_side_validation = False
 
 
-def build_tools_list_request(
+def build_actor_limits_get_request(actor_id: str, **kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/actors/{actor_id}/limits"
+    path_format_arguments = {
+        "actor_id": _SERIALIZER.url(
+            "actor_id", actor_id, "str", pattern=r"^[A-Za-z0-9._-]{1,64}$"
+        ),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
+
+
+def build_actor_limits_delete_request(actor_id: str, **kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/actors/{actor_id}/limits:clear"
+    path_format_arguments = {
+        "actor_id": _SERIALIZER.url(
+            "actor_id", actor_id, "str", pattern=r"^[A-Za-z0-9._-]{1,64}$"
+        ),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_actor_limits_update_request(actor_id: str, **kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/actors/{actor_id}/limits:set"
+    path_format_arguments = {
+        "actor_id": _SERIALIZER.url(
+            "actor_id", actor_id, "str", pattern=r"^[A-Za-z0-9._-]{1,64}$"
+        ),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_connections_create_request(**kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/connections"
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_connections_list_request(
     *,
-    toolkit_id: Optional[str] = None,
+    provider: Optional[str] = None,
+    user_id: Optional[str] = None,
+    status: Optional[str] = None,
+    sort: Optional[str] = None,
+    sort_direction: Optional[str] = None,
     page: int = 1,
     per_page: int = 20,
     **kwargs: Any,
@@ -64,16 +166,26 @@ def build_tools_list_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/action-gateway/tools"
+    _url = "/v2/action-gateway/connections"
 
     # Construct parameters
-    if toolkit_id is not None:
-        _params["toolkit_id"] = _SERIALIZER.query("toolkit_id", toolkit_id, "str")
+    if provider is not None:
+        _params["provider"] = _SERIALIZER.query("provider", provider, "str")
+    if user_id is not None:
+        _params["user_id"] = _SERIALIZER.query("user_id", user_id, "str")
+    if status is not None:
+        _params["status"] = _SERIALIZER.query("status", status, "str")
+    if sort is not None:
+        _params["sort"] = _SERIALIZER.query("sort", sort, "str")
+    if sort_direction is not None:
+        _params["sort_direction"] = _SERIALIZER.query(
+            "sort_direction", sort_direction, "str"
+        )
     if page is not None:
         _params["page"] = _SERIALIZER.query("page", page, "int", minimum=1)
     if per_page is not None:
         _params["per_page"] = _SERIALIZER.query(
-            "per_page", per_page, "int", maximum=200, minimum=1
+            "per_page", per_page, "int", maximum=100, minimum=1
         )
 
     # Construct headers
@@ -84,13 +196,18 @@ def build_tools_list_request(
     )
 
 
-def build_tools_list_toolkits_request(**kwargs: Any) -> HttpRequest:
+def build_connections_get_request(id: str, **kwargs: Any) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
 
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/action-gateway/tools/toolkits"
+    _url = "/v2/action-gateway/connections/{id}"
+    path_format_arguments = {
+        "id": _SERIALIZER.url("id", id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
 
     # Construct headers
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
@@ -98,13 +215,53 @@ def build_tools_list_toolkits_request(**kwargs: Any) -> HttpRequest:
     return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
 
 
-def build_tools_list_providers_request(**kwargs: Any) -> HttpRequest:
+def build_connections_delete_request(id: str, **kwargs: Any) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
 
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/action-gateway/tools/providers"
+    _url = "/v2/action-gateway/connections/{id}"
+    path_format_arguments = {
+        "id": _SERIALIZER.url("id", id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="DELETE", url=_url, headers=_headers, **kwargs)
+
+
+def build_mcp_servers_create_request(**kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/mcp-servers"
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_mcp_servers_list_request(**kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/mcp-servers"
 
     # Construct headers
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
@@ -112,11 +269,170 @@ def build_tools_list_providers_request(**kwargs: Any) -> HttpRequest:
     return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
 
 
-def build_tools_get_definition_request(
-    name: str,
+def build_mcp_servers_get_request(server_ref: str, **kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/mcp-servers/{server_ref}"
+    path_format_arguments = {
+        "server_ref": _SERIALIZER.url("server_ref", server_ref, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
+
+
+def build_mcp_servers_patch_request(server_ref: str, **kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/mcp-servers/{server_ref}"
+    path_format_arguments = {
+        "server_ref": _SERIALIZER.url("server_ref", server_ref, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="PATCH", url=_url, headers=_headers, **kwargs)
+
+
+def build_mcp_servers_delete_request(server_ref: str, **kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/mcp-servers/{server_ref}"
+    path_format_arguments = {
+        "server_ref": _SERIALIZER.url("server_ref", server_ref, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="DELETE", url=_url, headers=_headers, **kwargs)
+
+
+def build_mcp_servers_run_resync_request(server_ref: str, **kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/mcp-servers/{server_ref}/resync"
+    path_format_arguments = {
+        "server_ref": _SERIALIZER.url("server_ref", server_ref, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_mcp_servers_list_tools_request(server_ref: str, **kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/mcp-servers/{server_ref}/tools"
+    path_format_arguments = {
+        "server_ref": _SERIALIZER.url("server_ref", server_ref, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
+
+
+def build_mcp_servers_update_tools_request(
+    server_ref: str, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/mcp-servers/{server_ref}/tools"
+    path_format_arguments = {
+        "server_ref": _SERIALIZER.url("server_ref", server_ref, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="PUT", url=_url, headers=_headers, **kwargs)
+
+
+def build_output_views_create_request(**kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/output-views"
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_output_views_list_request(
     *,
-    version: Optional[str] = None,
-    toolkit_id: Optional[str] = None,
+    tool: Optional[str] = None,
+    tool_id: Optional[str] = None,
+    page_size: int = 20,
+    page_token: Optional[str] = None,
     **kwargs: Any,
 ) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
@@ -125,18 +441,19 @@ def build_tools_get_definition_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/action-gateway/tools/{name}/definition"
-    path_format_arguments = {
-        "name": _SERIALIZER.url("name", name, "str"),
-    }
-
-    _url: str = _url.format(**path_format_arguments)  # type: ignore
+    _url = "/v2/action-gateway/output-views"
 
     # Construct parameters
-    if version is not None:
-        _params["version"] = _SERIALIZER.query("version", version, "str")
-    if toolkit_id is not None:
-        _params["toolkit_id"] = _SERIALIZER.query("toolkit_id", toolkit_id, "str")
+    if tool is not None:
+        _params["tool"] = _SERIALIZER.query("tool", tool, "str")
+    if tool_id is not None:
+        _params["tool_id"] = _SERIALIZER.query("tool_id", tool_id, "str")
+    if page_size is not None:
+        _params["page_size"] = _SERIALIZER.query(
+            "page_size", page_size, "int", maximum=100, minimum=1
+        )
+    if page_token is not None:
+        _params["page_token"] = _SERIALIZER.query("page_token", page_token, "str")
 
     # Construct headers
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
@@ -146,8 +463,92 @@ def build_tools_get_definition_request(
     )
 
 
-def build_toolbelts_list_request(
-    *, status: str = "active", page: int = 1, per_page: int = 20, **kwargs: Any
+def build_output_views_validate_request(**kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/output-views/preview"
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_output_views_get_request(view_id: str, **kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/output-views/{view_id}"
+    path_format_arguments = {
+        "view_id": _SERIALIZER.url("view_id", view_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
+
+
+def build_output_views_delete_request(view_id: str, **kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/output-views/{view_id}"
+    path_format_arguments = {
+        "view_id": _SERIALIZER.url("view_id", view_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="DELETE", url=_url, headers=_headers, **kwargs)
+
+
+def build_sessions_create_request(**kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/sessions"
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_sessions_list_request(
+    *,
+    end_user_id: Optional[str] = None,
+    page: int = 1,
+    per_page: int = 20,
+    **kwargs: Any,
 ) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
     _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
@@ -155,16 +556,16 @@ def build_toolbelts_list_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/action-gateway/toolbelts"
+    _url = "/v2/action-gateway/sessions"
 
     # Construct parameters
-    if status is not None:
-        _params["status"] = _SERIALIZER.query("status", status, "str")
+    if end_user_id is not None:
+        _params["end_user_id"] = _SERIALIZER.query("end_user_id", end_user_id, "str")
     if page is not None:
         _params["page"] = _SERIALIZER.query("page", page, "int", minimum=1)
     if per_page is not None:
         _params["per_page"] = _SERIALIZER.query(
-            "per_page", per_page, "int", maximum=200, minimum=1
+            "per_page", per_page, "int", maximum=100, minimum=1
         )
 
     # Construct headers
@@ -173,6 +574,61 @@ def build_toolbelts_list_request(
     return HttpRequest(
         method="GET", url=_url, params=_params, headers=_headers, **kwargs
     )
+
+
+def build_sessions_list_search_request(
+    *,
+    query: Optional[str] = None,
+    end_user_id: Optional[str] = None,
+    page_size: int = 20,
+    page_token: Optional[str] = None,
+    **kwargs: Any,
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/sessions/search"
+
+    # Construct parameters
+    if query is not None:
+        _params["query"] = _SERIALIZER.query("query", query, "str")
+    if end_user_id is not None:
+        _params["end_user_id"] = _SERIALIZER.query("end_user_id", end_user_id, "str")
+    if page_size is not None:
+        _params["page_size"] = _SERIALIZER.query(
+            "page_size", page_size, "int", maximum=100, minimum=1
+        )
+    if page_token is not None:
+        _params["page_token"] = _SERIALIZER.query("page_token", page_token, "str")
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
+
+
+def build_sessions_delete_request(session_urn: str, **kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/sessions/{session_urn}"
+    path_format_arguments = {
+        "session_urn": _SERIALIZER.url("session_urn", session_urn, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="DELETE", url=_url, headers=_headers, **kwargs)
 
 
 def build_toolbelts_create_request(**kwargs: Any) -> HttpRequest:
@@ -196,8 +652,79 @@ def build_toolbelts_create_request(**kwargs: Any) -> HttpRequest:
     return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
 
 
+def build_toolbelts_list_request(
+    *, status: str = "active", page: int = 1, per_page: int = 20, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/toolbelts"
+
+    # Construct parameters
+    if status is not None:
+        _params["status"] = _SERIALIZER.query("status", status, "str")
+    if page is not None:
+        _params["page"] = _SERIALIZER.query("page", page, "int", minimum=1)
+    if per_page is not None:
+        _params["per_page"] = _SERIALIZER.query(
+            "per_page", per_page, "int", maximum=100, minimum=1
+        )
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
+
+
+def build_toolbelts_list_search_request(
+    *,
+    query: Optional[str] = None,
+    status: str = "active",
+    page_size: int = 20,
+    page_token: Optional[str] = None,
+    **kwargs: Any,
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/toolbelts/search"
+
+    # Construct parameters
+    if query is not None:
+        _params["query"] = _SERIALIZER.query("query", query, "str")
+    if status is not None:
+        _params["status"] = _SERIALIZER.query("status", status, "str")
+    if page_size is not None:
+        _params["page_size"] = _SERIALIZER.query(
+            "page_size", page_size, "int", maximum=100, minimum=1
+        )
+    if page_token is not None:
+        _params["page_token"] = _SERIALIZER.query("page_token", page_token, "str")
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
+
+
 def build_toolbelts_get_request(
-    name: str, *, version: Optional[str] = None, **kwargs: Any
+    name: str,
+    *,
+    version: Optional[str] = None,
+    page_size: int = 20,
+    page_token: Optional[str] = None,
+    search: Optional[str] = None,
+    **kwargs: Any,
 ) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
     _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
@@ -219,6 +746,14 @@ def build_toolbelts_get_request(
         _params["version"] = _SERIALIZER.query(
             "version", version, "str", pattern=r"^[0-9]+$"
         )
+    if page_size is not None:
+        _params["page_size"] = _SERIALIZER.query(
+            "page_size", page_size, "int", maximum=100, minimum=1
+        )
+    if page_token is not None:
+        _params["page_token"] = _SERIALIZER.query("page_token", page_token, "str")
+    if search is not None:
+        _params["search"] = _SERIALIZER.query("search", search, "str")
 
     # Construct headers
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
@@ -247,6 +782,100 @@ def build_toolbelts_delete_request(name: str, **kwargs: Any) -> HttpRequest:
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
 
     return HttpRequest(method="DELETE", url=_url, headers=_headers, **kwargs)
+
+
+def build_toolbelts_list_providers_request(
+    name: str,
+    *,
+    version: Optional[str] = None,
+    page: int = 1,
+    per_page: int = 20,
+    search: Optional[str] = None,
+    **kwargs: Any,
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/toolbelts/{name}/providers"
+    path_format_arguments = {
+        "name": _SERIALIZER.url(
+            "name", name, "str", pattern=r"^[a-z][a-z0-9_-]{0,63}$"
+        ),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct parameters
+    if version is not None:
+        _params["version"] = _SERIALIZER.query(
+            "version", version, "str", pattern=r"^[0-9]+$"
+        )
+    if page is not None:
+        _params["page"] = _SERIALIZER.query("page", page, "int", minimum=1)
+    if per_page is not None:
+        _params["per_page"] = _SERIALIZER.query(
+            "per_page", per_page, "int", maximum=100, minimum=1
+        )
+    if search is not None:
+        _params["search"] = _SERIALIZER.query("search", search, "str")
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
+
+
+def build_toolbelts_list_provider_tools_request(  # pylint: disable=name-too-long
+    name: str,
+    provider: str,
+    *,
+    version: Optional[str] = None,
+    page: int = 1,
+    per_page: int = 20,
+    search: Optional[str] = None,
+    **kwargs: Any,
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/toolbelts/{name}/providers/{provider}/tools"
+    path_format_arguments = {
+        "name": _SERIALIZER.url(
+            "name", name, "str", pattern=r"^[a-z][a-z0-9_-]{0,63}$"
+        ),
+        "provider": _SERIALIZER.url("provider", provider, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct parameters
+    if version is not None:
+        _params["version"] = _SERIALIZER.query(
+            "version", version, "str", pattern=r"^[0-9]+$"
+        )
+    if page is not None:
+        _params["page"] = _SERIALIZER.query("page", page, "int", minimum=1)
+    if per_page is not None:
+        _params["per_page"] = _SERIALIZER.query(
+            "per_page", per_page, "int", maximum=100, minimum=1
+        )
+    if search is not None:
+        _params["search"] = _SERIALIZER.query("search", search, "str")
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
 
 
 def build_toolbelts_add_tools_request(name: str, **kwargs: Any) -> HttpRequest:
@@ -305,12 +934,254 @@ def build_toolbelts_delete_tools_request(name: str, **kwargs: Any) -> HttpReques
     return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
 
 
-def build_connections_list_request(
+def build_tools_list_request(
+    *,
+    toolkit_id: Optional[str] = None,
+    page: int = 1,
+    per_page: int = 100,
+    **kwargs: Any,
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/tools"
+
+    # Construct parameters
+    if toolkit_id is not None:
+        _params["toolkit_id"] = _SERIALIZER.query("toolkit_id", toolkit_id, "str")
+    if page is not None:
+        _params["page"] = _SERIALIZER.query("page", page, "int", minimum=1)
+    if per_page is not None:
+        _params["per_page"] = _SERIALIZER.query(
+            "per_page", per_page, "int", maximum=100, minimum=1
+        )
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
+
+
+def build_tools_list_health_request(
     *,
     provider: Optional[str] = None,
+    window: str = "HEALTH_WINDOW_TWENTY_FOUR_HOURS",
+    page: int = 1,
+    per_page: int = 20,
+    **kwargs: Any,
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/tools/health"
+
+    # Construct parameters
+    if provider is not None:
+        _params["provider"] = _SERIALIZER.query("provider", provider, "str")
+    if window is not None:
+        _params["window"] = _SERIALIZER.query("window", window, "str")
+    if page is not None:
+        _params["page"] = _SERIALIZER.query("page", page, "int", minimum=1)
+    if per_page is not None:
+        _params["per_page"] = _SERIALIZER.query(
+            "per_page", per_page, "int", maximum=100, minimum=1
+        )
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
+
+
+def build_tools_list_health_providers_request(  # pylint: disable=name-too-long
+    *,
+    provider: Optional[str] = None,
+    window: str = "HEALTH_WINDOW_TWENTY_FOUR_HOURS",
+    page: int = 1,
+    per_page: int = 20,
+    **kwargs: Any,
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/tools/health/providers"
+
+    # Construct parameters
+    if provider is not None:
+        _params["provider"] = _SERIALIZER.query("provider", provider, "str")
+    if window is not None:
+        _params["window"] = _SERIALIZER.query("window", window, "str")
+    if page is not None:
+        _params["page"] = _SERIALIZER.query("page", page, "int", minimum=1)
+    if per_page is not None:
+        _params["per_page"] = _SERIALIZER.query(
+            "per_page", per_page, "int", maximum=100, minimum=1
+        )
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
+
+
+def build_tools_get_health_request(
+    tool_slug: str,
+    *,
+    window: str = "HEALTH_WINDOW_TWENTY_FOUR_HOURS",
+    include_history: bool = False,
+    **kwargs: Any,
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/tools/health/tools/{tool_slug}"
+    path_format_arguments = {
+        "tool_slug": _SERIALIZER.url("tool_slug", tool_slug, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct parameters
+    if window is not None:
+        _params["window"] = _SERIALIZER.query("window", window, "str")
+    if include_history is not None:
+        _params["include_history"] = _SERIALIZER.query(
+            "include_history", include_history, "bool"
+        )
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
+
+
+def build_tools_list_providers_request(**kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/tools/providers"
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
+
+
+def build_tools_list_search_providers_request(  # pylint: disable=name-too-long
+    *,
+    query: Optional[str] = None,
+    page_size: int = 20,
+    page_token: Optional[str] = None,
+    **kwargs: Any,
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/tools/providers/search"
+
+    # Construct parameters
+    if query is not None:
+        _params["query"] = _SERIALIZER.query("query", query, "str")
+    if page_size is not None:
+        _params["page_size"] = _SERIALIZER.query(
+            "page_size", page_size, "int", maximum=100, minimum=1
+        )
+    if page_token is not None:
+        _params["page_token"] = _SERIALIZER.query("page_token", page_token, "str")
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
+
+
+def build_tools_list_search_request(
+    *,
+    query: Optional[str] = None,
+    provider: Optional[List[str]] = None,
+    toolbelt: Optional[str] = None,
+    page_size: int = 20,
+    page_token: Optional[str] = None,
+    **kwargs: Any,
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/tools/search"
+
+    # Construct parameters
+    if query is not None:
+        _params["query"] = _SERIALIZER.query("query", query, "str")
+    if provider is not None:
+        _params["provider"] = [
+            _SERIALIZER.query("provider", q, "str") if q is not None else ""
+            for q in provider
+        ]
+    if toolbelt is not None:
+        _params["toolbelt"] = _SERIALIZER.query("toolbelt", toolbelt, "str")
+    if page_size is not None:
+        _params["page_size"] = _SERIALIZER.query(
+            "page_size", page_size, "int", maximum=100, minimum=1
+        )
+    if page_token is not None:
+        _params["page_token"] = _SERIALIZER.query("page_token", page_token, "str")
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
+
+
+def build_tools_list_toolkits_request(**kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/tools/toolkits"
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
+
+
+def build_users_list_request(
+    *,
     user_id: Optional[str] = None,
-    status: Optional[str] = None,
-    sort: Optional[str] = None,
+    sort: str = "created_at",
     sort_direction: Optional[str] = None,
     page: int = 1,
     per_page: int = 20,
@@ -322,15 +1193,11 @@ def build_connections_list_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/action-gateway/connections"
+    _url = "/v2/action-gateway/users"
 
     # Construct parameters
-    if provider is not None:
-        _params["provider"] = _SERIALIZER.query("provider", provider, "str")
     if user_id is not None:
         _params["user_id"] = _SERIALIZER.query("user_id", user_id, "str")
-    if status is not None:
-        _params["status"] = _SERIALIZER.query("status", status, "str")
     if sort is not None:
         _params["sort"] = _SERIALIZER.query("sort", sort, "str")
     if sort_direction is not None:
@@ -341,119 +1208,7 @@ def build_connections_list_request(
         _params["page"] = _SERIALIZER.query("page", page, "int", minimum=1)
     if per_page is not None:
         _params["per_page"] = _SERIALIZER.query(
-            "per_page", per_page, "int", maximum=200, minimum=1
-        )
-
-    # Construct headers
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(
-        method="GET", url=_url, params=_params, headers=_headers, **kwargs
-    )
-
-
-def build_connections_create_request(**kwargs: Any) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop(
-        "content_type", _headers.pop("Content-Type", None)
-    )
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v2/action-gateway/connections"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header(
-            "content_type", content_type, "str"
-        )
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_connections_get_request(id: str, **kwargs: Any) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v2/action-gateway/connections/{id}"
-    path_format_arguments = {
-        "id": _SERIALIZER.url("id", id, "str"),
-    }
-
-    _url: str = _url.format(**path_format_arguments)  # type: ignore
-
-    # Construct headers
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
-
-
-def build_connections_update_request(id: str, **kwargs: Any) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop(
-        "content_type", _headers.pop("Content-Type", None)
-    )
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v2/action-gateway/connections/{id}"
-    path_format_arguments = {
-        "id": _SERIALIZER.url("id", id, "str"),
-    }
-
-    _url: str = _url.format(**path_format_arguments)  # type: ignore
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header(
-            "content_type", content_type, "str"
-        )
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="PATCH", url=_url, headers=_headers, **kwargs)
-
-
-def build_connections_delete_request(id: str, **kwargs: Any) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v2/action-gateway/connections/{id}"
-    path_format_arguments = {
-        "id": _SERIALIZER.url("id", id, "str"),
-    }
-
-    _url: str = _url.format(**path_format_arguments)  # type: ignore
-
-    # Construct headers
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="DELETE", url=_url, headers=_headers, **kwargs)
-
-
-def build_users_list_request(
-    *, page: int = 1, per_page: int = 20, **kwargs: Any
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
-
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v2/action-gateway/users"
-
-    # Construct parameters
-    if page is not None:
-        _params["page"] = _SERIALIZER.query("page", page, "int", minimum=1)
-    if per_page is not None:
-        _params["per_page"] = _SERIALIZER.query(
-            "per_page", per_page, "int", maximum=200, minimum=1
+            "per_page", per_page, "int", maximum=100, minimum=1
         )
 
     # Construct headers
@@ -481,79 +1236,6 @@ def build_users_get_request(user_id: str, **kwargs: Any) -> HttpRequest:
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
 
     return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
-
-
-def build_sessions_list_request(
-    *,
-    end_user_id: Optional[str] = None,
-    page: int = 1,
-    per_page: int = 20,
-    **kwargs: Any,
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
-
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v2/action-gateway/sessions"
-
-    # Construct parameters
-    if end_user_id is not None:
-        _params["end_user_id"] = _SERIALIZER.query("end_user_id", end_user_id, "str")
-    if page is not None:
-        _params["page"] = _SERIALIZER.query("page", page, "int", minimum=1)
-    if per_page is not None:
-        _params["per_page"] = _SERIALIZER.query(
-            "per_page", per_page, "int", maximum=200, minimum=1
-        )
-
-    # Construct headers
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(
-        method="GET", url=_url, params=_params, headers=_headers, **kwargs
-    )
-
-
-def build_sessions_create_request(**kwargs: Any) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop(
-        "content_type", _headers.pop("Content-Type", None)
-    )
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v2/action-gateway/sessions"
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header(
-            "content_type", content_type, "str"
-        )
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
-
-
-def build_sessions_delete_request(session_urn: str, **kwargs: Any) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v2/action-gateway/sessions/{session_urn}"
-    path_format_arguments = {
-        "session_urn": _SERIALIZER.url("session_urn", session_urn, "str"),
-    }
-
-    _url: str = _url.format(**path_format_arguments)  # type: ignore
-
-    # Construct headers
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(method="DELETE", url=_url, headers=_headers, **kwargs)
 
 
 def build_one_clicks_list_request(
@@ -14807,7 +15489,11 @@ def build_genai_update_custom_model_metadata_request(  # pylint: disable=name-to
 
 
 def build_genai_list_evaluation_datasets_request(  # pylint: disable=name-too-long
-    *, dataset_type: str = "EVALUATION_DATASET_TYPE_UNKNOWN", **kwargs: Any
+    *,
+    dataset_type: str = "EVALUATION_DATASET_TYPE_UNKNOWN",
+    dataset_paradigm: str = "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+    has_ground_truth: Optional[bool] = None,
+    **kwargs: Any,
 ) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
     _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
@@ -14820,6 +15506,14 @@ def build_genai_list_evaluation_datasets_request(  # pylint: disable=name-too-lo
     # Construct parameters
     if dataset_type is not None:
         _params["dataset_type"] = _SERIALIZER.query("dataset_type", dataset_type, "str")
+    if dataset_paradigm is not None:
+        _params["dataset_paradigm"] = _SERIALIZER.query(
+            "dataset_paradigm", dataset_paradigm, "str"
+        )
+    if has_ground_truth is not None:
+        _params["has_ground_truth"] = _SERIALIZER.query(
+            "has_ground_truth", has_ground_truth, "bool"
+        )
 
     # Construct headers
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
@@ -17926,14 +18620,14 @@ def build_agent_inference_create_chat_completion_request(  # pylint: disable=nam
     )
 
 
-class ToolsOperations:
+class ActorLimitsOperations:
     """
     .. warning::
         **DO NOT** instantiate this class directly.
 
         Instead, you should access the following operations through
         :class:`~pydo.GeneratedClient`'s
-        :attr:`tools` attribute.
+        :attr:`actor_limits` attribute.
     """
 
     def __init__(self, *args, **kwargs):
@@ -17946,25 +18640,17 @@ class ToolsOperations:
         )
 
     @distributed_trace
-    def list(
-        self,
-        *,
-        toolkit_id: Optional[str] = None,
-        page: int = 1,
-        per_page: int = 20,
-        **kwargs: Any,
-    ) -> JSON:
+    def get(self, actor_id: str, **kwargs: Any) -> JSON:
         # pylint: disable=line-too-long
-        """List Tools.
+        """Get an Actor's Limits.
 
-        Lists active Action Gateway tools visible to the authenticated team.
+        Returns the per-minute limits set for the actor and the limits in effect, each the lower of
+        your team's limit and the actor's override. Returns 404 when the actor has no sessions,
+        connections, or limit overrides.
 
-        :keyword toolkit_id: Filter tools by toolkit identifier. Default value is None.
-        :paramtype toolkit_id: str
-        :keyword page: Which 'page' of paginated results to return. Default value is 1.
-        :paramtype page: int
-        :keyword per_page: Number of items returned per page. Default value is 20.
-        :paramtype per_page: int
+        :param actor_id: Actor ID: a session ``actor_id`` or a connection ``user_id``\\ , 1 to 64
+         characters from ``[A-Za-z0-9._-]``. Required.
+        :type actor_id: str
         :return: JSON object
         :rtype: JSON
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -17974,307 +18660,39 @@ class ToolsOperations:
 
                 # response body for status code(s): 200
                 response == {
-                    "definitions": [
+                    "configured_limits": [
                         {
-                            "annotations": {
-                                "destructiveHint": bool,  # Optional.
-                                "idempotentHint": bool,  # Optional.
-                                "openWorldHint": bool,  # Optional.
-                                "readOnlyHint": bool,  # Optional.
-                                "title": "str"  # Optional.
-                            },
-                            "auth": {
-                                "baseUrlResolution": {
-                                    "httpLookup": {
-                                        "baseUrlTemplate": "str",  #
-                                          Optional. HTTPLookupSpec resolves a base_url by calling url
-                                          (bearer-authenticated with the just-exchanged access token),
-                                          selecting an entry in the JSON array, extracting
-                                          extract_field from that entry, and substituting it for
-                                          "{value}" in base_url_template. When match_field and
-                                          match_value are both set, they select the entry. When both
-                                          are empty, exactly one entry whose own "scopes" array
-                                          contains required_scopes must exist. Configuring only one
-                                          match field is invalid. Resolution fails fast on zero or
-                                          multiple compatible entries.
-                                        "caseInsensitive": bool,  # Optional.
-                                          HTTPLookupSpec resolves a base_url by calling url
-                                          (bearer-authenticated with the just-exchanged access token),
-                                          selecting an entry in the JSON array, extracting
-                                          extract_field from that entry, and substituting it for
-                                          "{value}" in base_url_template. When match_field and
-                                          match_value are both set, they select the entry. When both
-                                          are empty, exactly one entry whose own "scopes" array
-                                          contains required_scopes must exist. Configuring only one
-                                          match field is invalid. Resolution fails fast on zero or
-                                          multiple compatible entries.
-                                        "extractField": "str",  # Optional.
-                                          HTTPLookupSpec resolves a base_url by calling url
-                                          (bearer-authenticated with the just-exchanged access token),
-                                          selecting an entry in the JSON array, extracting
-                                          extract_field from that entry, and substituting it for
-                                          "{value}" in base_url_template. When match_field and
-                                          match_value are both set, they select the entry. When both
-                                          are empty, exactly one entry whose own "scopes" array
-                                          contains required_scopes must exist. Configuring only one
-                                          match field is invalid. Resolution fails fast on zero or
-                                          multiple compatible entries.
-                                        "matchField": "str",  # Optional.
-                                          HTTPLookupSpec resolves a base_url by calling url
-                                          (bearer-authenticated with the just-exchanged access token),
-                                          selecting an entry in the JSON array, extracting
-                                          extract_field from that entry, and substituting it for
-                                          "{value}" in base_url_template. When match_field and
-                                          match_value are both set, they select the entry. When both
-                                          are empty, exactly one entry whose own "scopes" array
-                                          contains required_scopes must exist. Configuring only one
-                                          match field is invalid. Resolution fails fast on zero or
-                                          multiple compatible entries.
-                                        "matchValue": "str",  # Optional.
-                                          HTTPLookupSpec resolves a base_url by calling url
-                                          (bearer-authenticated with the just-exchanged access token),
-                                          selecting an entry in the JSON array, extracting
-                                          extract_field from that entry, and substituting it for
-                                          "{value}" in base_url_template. When match_field and
-                                          match_value are both set, they select the entry. When both
-                                          are empty, exactly one entry whose own "scopes" array
-                                          contains required_scopes must exist. Configuring only one
-                                          match field is invalid. Resolution fails fast on zero or
-                                          multiple compatible entries.
-                                        "match_value_parameter": "str",  #
-                                          Optional. HTTPLookupSpec resolves a base_url by calling url
-                                          (bearer-authenticated with the just-exchanged access token),
-                                          selecting an entry in the JSON array, extracting
-                                          extract_field from that entry, and substituting it for
-                                          "{value}" in base_url_template. When match_field and
-                                          match_value are both set, they select the entry. When both
-                                          are empty, exactly one entry whose own "scopes" array
-                                          contains required_scopes must exist. Configuring only one
-                                          match field is invalid. Resolution fails fast on zero or
-                                          multiple compatible entries.
-                                        "method": "str",  # Optional.
-                                          HTTPLookupSpec resolves a base_url by calling url
-                                          (bearer-authenticated with the just-exchanged access token),
-                                          selecting an entry in the JSON array, extracting
-                                          extract_field from that entry, and substituting it for
-                                          "{value}" in base_url_template. When match_field and
-                                          match_value are both set, they select the entry. When both
-                                          are empty, exactly one entry whose own "scopes" array
-                                          contains required_scopes must exist. Configuring only one
-                                          match field is invalid. Resolution fails fast on zero or
-                                          multiple compatible entries.
-                                        "requiredScopes": [
-                                            "str"  # Optional.
-                                              HTTPLookupSpec resolves a base_url by calling url
-                                              (bearer-authenticated with the just-exchanged access
-                                              token), selecting an entry in the JSON array, extracting
-                                              extract_field from that entry, and substituting it for
-                                              "{value}" in base_url_template. When match_field and
-                                              match_value are both set, they select the entry. When
-                                              both are empty, exactly one entry whose own "scopes"
-                                              array contains required_scopes must exist. Configuring
-                                              only one match field is invalid. Resolution fails fast on
-                                              zero or multiple compatible entries.
-                                        ],
-                                        "trimTrailingSlash": bool,  #
-                                          Optional. HTTPLookupSpec resolves a base_url by calling url
-                                          (bearer-authenticated with the just-exchanged access token),
-                                          selecting an entry in the JSON array, extracting
-                                          extract_field from that entry, and substituting it for
-                                          "{value}" in base_url_template. When match_field and
-                                          match_value are both set, they select the entry. When both
-                                          are empty, exactly one entry whose own "scopes" array
-                                          contains required_scopes must exist. Configuring only one
-                                          match field is invalid. Resolution fails fast on zero or
-                                          multiple compatible entries.
-                                        "url": "str"  # Optional.
-                                          HTTPLookupSpec resolves a base_url by calling url
-                                          (bearer-authenticated with the just-exchanged access token),
-                                          selecting an entry in the JSON array, extracting
-                                          extract_field from that entry, and substituting it for
-                                          "{value}" in base_url_template. When match_field and
-                                          match_value are both set, they select the entry. When both
-                                          are empty, exactly one entry whose own "scopes" array
-                                          contains required_scopes must exist. Configuring only one
-                                          match field is invalid. Resolution fails fast on zero or
-                                          multiple compatible entries.
-                                    }
-                                },
-                                "credentialBinding": "str",  # Optional.
-                                "credentialRefSource": "str",  # Optional.
-                                "doManagedCredentialRef": "str",  # Optional.
-                                "injection": {
-                                    "location": "str",  # Optional.
-                                    "name": "str",  # Optional.
-                                    "scheme": "str"  # Optional.
-                                },
-                                "modes": [
-                                    "str"  # Optional.
-                                ],
-                                "provider": "str",  # Optional.
-                                "scopes": [
-                                    "str"  # Optional.
-                                ]
-                            },
-                            "classification": {
-                                "dataClasses": [
-                                    "str"  # Optional.
-                                ],
-                                "operation": "str",  # Optional.
-                                "risk": "str"  # Optional.
-                            },
-                            "description": "str",  # Optional.
-                            "execution": {
-                                "adapterVersion": "str",  # Optional.
-                                "configRef": "str",  # Optional.
-                                "http": {
-                                    "allowedHosts": [
-                                        "str"  # Optional.
-                                    ],
-                                    "baseUrl": "str",  # Optional.
-                                    "method": "str",  # Optional.
-                                    "path": "str",  # Optional.
-                                    "requestEncoding": "str",  # Optional.
-                                    "responseFormat": "str"  # Optional.
-                                },
-                                "mcp": {
-                                    "allowedHosts": [
-                                        "str"  # Optional. MCPExecution
-                                          describes how to invoke a tool that is fronted by a remote
-                                          MCP server (as opposed to a plain HTTP endpoint). endpoint is
-                                          the remote MCP server's URL, tool_name is the name the remote
-                                          server expects on tools/call (may differ from this tool's
-                                          registry name), transport selects the wire protocol
-                                          ("streamable_http" is the only kind implemented today), and
-                                          server_ref is an opaque label identifying the remote server
-                                          for logging/metrics/allowlisting.
-                                    ],
-                                    "endpoint": "str",  # Optional. MCPExecution
-                                      describes how to invoke a tool that is fronted by a remote MCP
-                                      server (as opposed to a plain HTTP endpoint). endpoint is the
-                                      remote MCP server's URL, tool_name is the name the remote server
-                                      expects on tools/call (may differ from this tool's registry
-                                      name), transport selects the wire protocol ("streamable_http" is
-                                      the only kind implemented today), and server_ref is an opaque
-                                      label identifying the remote server for
-                                      logging/metrics/allowlisting.
-                                    "serverRef": "str",  # Optional. MCPExecution
-                                      describes how to invoke a tool that is fronted by a remote MCP
-                                      server (as opposed to a plain HTTP endpoint). endpoint is the
-                                      remote MCP server's URL, tool_name is the name the remote server
-                                      expects on tools/call (may differ from this tool's registry
-                                      name), transport selects the wire protocol ("streamable_http" is
-                                      the only kind implemented today), and server_ref is an opaque
-                                      label identifying the remote server for
-                                      logging/metrics/allowlisting.
-                                    "toolName": "str",  # Optional. MCPExecution
-                                      describes how to invoke a tool that is fronted by a remote MCP
-                                      server (as opposed to a plain HTTP endpoint). endpoint is the
-                                      remote MCP server's URL, tool_name is the name the remote server
-                                      expects on tools/call (may differ from this tool's registry
-                                      name), transport selects the wire protocol ("streamable_http" is
-                                      the only kind implemented today), and server_ref is an opaque
-                                      label identifying the remote server for
-                                      logging/metrics/allowlisting.
-                                    "transport": "str"  # Optional. MCPExecution
-                                      describes how to invoke a tool that is fronted by a remote MCP
-                                      server (as opposed to a plain HTTP endpoint). endpoint is the
-                                      remote MCP server's URL, tool_name is the name the remote server
-                                      expects on tools/call (may differ from this tool's registry
-                                      name), transport selects the wire protocol ("streamable_http" is
-                                      the only kind implemented today), and server_ref is an opaque
-                                      label identifying the remote server for
-                                      logging/metrics/allowlisting.
-                                },
-                                "type": "str"  # Optional.
-                            },
-                            "flipperName": "str",  # Optional.
-                            "hooks": {
-                                "usage": {
-                                    "billable": bool,  # Optional. When usage
-                                      metadata is present, false prevents billing. Omitting usage
-                                      metadata leaves consumers' legacy billing classification
-                                      unchanged.
-                                    "meters": [
-                                        {
-                                            "quantitySource": "str",  #
-                                              Optional.
-                                            "sku": "str",  # Optional.
-                                            "unit": "str"  # Optional.
-                                        }
-                                    ]
-                                }
-                            },
-                            "inputSchema": {},  # Optional. Any object.
-                            "name": "str",  # Optional.
-                            "outputSchema": {},  # Optional. Any object.
-                            "parallelizable": bool,  # Optional.
-                            "policy": {
-                                "permission": "str"  # Optional.
-                            },
-                            "reliability": {
-                                "maxOutputBytes": "str",  # Optional.
-                                "retry": {
-                                    "backoff": "str",  # Optional.
-                                    "maxAttempts": 0,  # Optional.
-                                    "retryOn": [
-                                        "str"  # Optional.
-                                    ]
-                                },
-                                "timeoutMs": 0  # Optional.
-                            },
-                            "schemaVersion": "str",  # Optional.
-                            "status": "str",  # Optional.
-                            "streamingSafe": bool,  # Optional.
-                            "tags": [
-                                "str"  # Optional.
-                            ],
-                            "title": "str",  # Optional.
-                            "toolId": "str",  # Optional.
-                            "toolSlug": "str",  # Optional. tool_slug is the
-                              provider-qualified, stable tool identifier
-                              ":code:`<toolkit_id>`_:code:`<name>`". Pass this value back verbatim to
-                              the toolbelt add/remove endpoints; clients should treat it as opaque.
-                            "toolkitId": "str",  # Optional.
-                            "transform": {
-                                "input": {},  # Optional. Any object.
-                                "language": "str",  # Optional.
-                                "output": {}  # Optional. Any object.
-                            },
-                            "version": "str"  # Optional.
+                            "category": "str",  # The category the limit applies to.
+                              Required. Known values are:
+                              "LIMIT_CATEGORY_WEB_SEARCH_REQUESTS_PER_MINUTE",
+                              "LIMIT_CATEGORY_WEB_FETCH_REQUESTS_PER_MINUTE",
+                              "LIMIT_CATEGORY_NATIVE_TOOL_CALLS_REQUESTS_PER_MINUTE", and
+                              "LIMIT_CATEGORY_NON_NATIVE_TOOL_CALLS_REQUESTS_PER_MINUTE".
+                            "requests_per_minute": "str"  # Calls allowed per minute. 0
+                              blocks every call in the category. Required.
                         }
                     ],
-                    "pagination": {
-                        "page": 0,  # Required.
-                        "per_page": 0,  # Required.
-                        "total": 0  # Required.
-                    },
-                    "tools": [
-                        {
-                            "annotations": {
-                                "destructiveHint": bool,  # Optional.
-                                "idempotentHint": bool,  # Optional.
-                                "openWorldHint": bool,  # Optional.
-                                "readOnlyHint": bool,  # Optional.
-                                "title": "str"  # Optional.
-                            },
-                            "description": "str",  # Optional.
-                            "inputSchema": {},  # Optional. Any object.
-                            "name": "str",  # Optional.
-                            "outputSchema": {},  # Optional. Any object.
-                            "parallelizable": bool,  # Optional.
-                            "streamingSafe": bool,  # Optional.
-                            "title": "str",  # Optional.
-                            "toolSlug": "str",  # Optional. tool_slug is the
-                              provider-qualified, stable tool identifier
-                              ":code:`<toolkit_id>`_:code:`<name>`". Pass this value back verbatim to
-                              the toolbelt add/remove endpoints; clients should treat it as opaque
-                              rather than reconstructing it from toolkit_id and name.
-                            "toolkitId": "str",  # Optional.
-                            "version": "str"  # Optional.
-                        }
-                    ],
-                    "version": "str"  # Optional.
+                    "effective_limits": {
+                        "native_tool_calls_requests_per_minute": "str",  # Optional. Calls
+                          per minute to DigitalOcean tools.
+                        "non_native_tool_calls_requests_per_minute": "str",  # Optional.
+                          Calls per minute to all other tools.
+                        "web_fetch_requests_per_minute": "str",  # Optional. Calls per minute
+                          to the ``exa_web_fetch`` tool.
+                        "web_search_requests_per_minute": "str"  # Optional. Calls per minute
+                          to the ``exa_web_search`` tool.
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
                 }
         """
         error_map: MutableMapping[int, Type[HttpResponseError]] = {
@@ -18295,8 +18713,1328 @@ class ToolsOperations:
 
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
-        _request = build_tools_list_request(
-            toolkit_id=toolkit_id,
+        _request = build_actor_limits_get_request(
+            actor_id=actor_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    def delete(
+        self,
+        actor_id: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Clear an Actor's Limits.
+
+        Removes the actor's overrides for the listed categories, which then follow your team's limits
+        again. Clearing a category without an override succeeds.
+
+        :param actor_id: Actor ID: a session ``actor_id`` or a connection ``user_id``\\ , 1 to 64
+         characters from ``[A-Za-z0-9._-]``. Required.
+        :type actor_id: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON or JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "categories": [
+                        "str"  # Required. Categories to clear, each at most once. Required.
+                    ]
+                }
+
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    def delete(
+        self,
+        actor_id: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Clear an Actor's Limits.
+
+        Removes the actor's overrides for the listed categories, which then follow your team's limits
+        again. Clearing a category without an override succeeds.
+
+        :param actor_id: Actor ID: a session ``actor_id`` or a connection ``user_id``\\ , 1 to 64
+         characters from ``[A-Za-z0-9._-]``. Required.
+        :type actor_id: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON or JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace
+    def delete(
+        self, actor_id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Clear an Actor's Limits.
+
+        Removes the actor's overrides for the listed categories, which then follow your team's limits
+        again. Clearing a category without an override succeeds.
+
+        :param actor_id: Actor ID: a session ``actor_id`` or a connection ``user_id``\\ , 1 to 64
+         characters from ``[A-Za-z0-9._-]``. Required.
+        :type actor_id: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON or JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "categories": [
+                        "str"  # Required. Categories to clear, each at most once. Required.
+                    ]
+                }
+
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_actor_limits_delete_request(
+            actor_id=actor_id,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    def update(
+        self,
+        actor_id: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Set an Actor's Limits.
+
+        Sets per-minute limits for the listed categories and leaves the others unchanged. A limit may
+        not exceed your team's current limit for the category (400 otherwise), and 0 blocks every call
+        in the category. The actor does not need to exist yet.
+
+        :param actor_id: Actor ID: a session ``actor_id`` or a connection ``user_id``\\ , 1 to 64
+         characters from ``[A-Za-z0-9._-]``. Required.
+        :type actor_id: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON or JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "overrides": [
+                        {
+                            "category": "str",  # The category the limit applies to.
+                              Required. Known values are:
+                              "LIMIT_CATEGORY_WEB_SEARCH_REQUESTS_PER_MINUTE",
+                              "LIMIT_CATEGORY_WEB_FETCH_REQUESTS_PER_MINUTE",
+                              "LIMIT_CATEGORY_NATIVE_TOOL_CALLS_REQUESTS_PER_MINUTE", and
+                              "LIMIT_CATEGORY_NON_NATIVE_TOOL_CALLS_REQUESTS_PER_MINUTE".
+                            "requests_per_minute": "str"  # Calls allowed per minute. 0
+                              blocks every call in the category. Required.
+                        }
+                    ]
+                }
+
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    def update(
+        self,
+        actor_id: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Set an Actor's Limits.
+
+        Sets per-minute limits for the listed categories and leaves the others unchanged. A limit may
+        not exceed your team's current limit for the category (400 otherwise), and 0 blocks every call
+        in the category. The actor does not need to exist yet.
+
+        :param actor_id: Actor ID: a session ``actor_id`` or a connection ``user_id``\\ , 1 to 64
+         characters from ``[A-Za-z0-9._-]``. Required.
+        :type actor_id: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON or JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace
+    def update(
+        self, actor_id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Set an Actor's Limits.
+
+        Sets per-minute limits for the listed categories and leaves the others unchanged. A limit may
+        not exceed your team's current limit for the category (400 otherwise), and 0 blocks every call
+        in the category. The actor does not need to exist yet.
+
+        :param actor_id: Actor ID: a session ``actor_id`` or a connection ``user_id``\\ , 1 to 64
+         characters from ``[A-Za-z0-9._-]``. Required.
+        :type actor_id: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON or JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "overrides": [
+                        {
+                            "category": "str",  # The category the limit applies to.
+                              Required. Known values are:
+                              "LIMIT_CATEGORY_WEB_SEARCH_REQUESTS_PER_MINUTE",
+                              "LIMIT_CATEGORY_WEB_FETCH_REQUESTS_PER_MINUTE",
+                              "LIMIT_CATEGORY_NATIVE_TOOL_CALLS_REQUESTS_PER_MINUTE", and
+                              "LIMIT_CATEGORY_NON_NATIVE_TOOL_CALLS_REQUESTS_PER_MINUTE".
+                            "requests_per_minute": "str"  # Calls allowed per minute. 0
+                              blocks every call in the category. Required.
+                        }
+                    ]
+                }
+
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_actor_limits_update_request(
+            actor_id=actor_id,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+
+class ConnectionsOperations:
+    """
+    .. warning::
+        **DO NOT** instantiate this class directly.
+
+        Instead, you should access the following operations through
+        :class:`~pydo.GeneratedClient`'s
+        :attr:`connections` attribute.
+    """
+
+    def __init__(self, *args, **kwargs):
+        input_args = list(args)
+        self._client = input_args.pop(0) if input_args else kwargs.pop("client")
+        self._config = input_args.pop(0) if input_args else kwargs.pop("config")
+        self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
+        self._deserialize = (
+            input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        )
+
+    @overload
+    def create(
+        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Connection.
+
+        Connects one of your users, identified by ``user_id``\\ , to a provider so tools can act on
+        their
+        account. An OAuth connection starts pending, and authorization carries the URL to send the user
+        to;
+        read the connection until it is active or expired. A connection through a team API-key
+        credential is
+        active immediately.
+
+        There is one connection per provider and ``user_id`` for each DigitalOcean user who creates
+        connections. Repeating the request returns the existing connection when its scopes cover the
+        request, reusing a pending connection's link, and restarts an expired or revoked connection
+        under
+        the same ID. Requesting scopes beyond an existing connection's, or a different credential,
+        returns
+        400 until that connection is deleted.
+
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "provider": "str",  # Required provider slug, from the provider list.
+                      Required.
+                    "user_id": "str",  # Required. Your identifier for the user the connection
+                      acts for: 1 to 64 characters from ``[A-Za-z0-9._-]``. A session whose
+                      ``actor_id`` equals it uses this connection. Required.
+                    "connection_parameters": {},  # Optional. Values for the provider's
+                      ``connection_parameters``"" , validated against their specifications.
+                    "credential": {
+                        "digitalocean_oauth": {},  # Optional. Use DigitalOcean's shared
+                          OAuth application.
+                        "team_credential": {
+                            "credential_id": "str"  # Optional. Required. ID of an active
+                              provider credential for the same provider that you can use.
+                        }
+                    },
+                    "network": {
+                        "vpc": {
+                            "destinations": [
+                                {
+                                    "allowed_ip_cidrs": [
+                                        "str"  # Optional. Optional CIDR
+                                          ranges; when set, every address the host resolves to must
+                                          fall within one of them.
+                                    ],
+                                    "host": "str",  # Optional. Host name or IP
+                                      address. It must resolve only to private addresses.
+                                    "port": 0  # Optional. Port, 1 to 65535.
+                                }
+                            ],
+                            "vpc_uuid": "str"  # Optional. UUID of a VPC owned by your
+                              team.
+                        }
+                    },
+                    "scopes": [
+                        "str"  # Optional. Optional OAuth scopes to request. Defaults to
+                          every scope the provider offers; scopes outside that set are rejected.
+                          Ignored for API-key credentials.
+                    ]
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "authorization": {
+                        "connect_url": "str",  # Optional. Browser URL, on a DigitalOcean
+                          Cloud origin, where the user authorizes the connection.
+                        "expires_at": "2020-02-20 00:00:00",  # Optional. When the
+                          authorization expires. The link can stop working earlier; if the connection
+                          becomes expired, create it again for a new link.
+                        "status": "str",  # Optional. Currently always
+                          ``requires_authorization``. "requires_authorization"
+                        "verification_code": "str"  # Optional. Verification code issued with
+                          ``connect_url``.
+                    },
+                    "connection": {
+                        "api_key": {},  # Optional. Set for ``team_api_key`` connections.
+                        "connection_parameters": {},  # Optional. Non-sensitive provider
+                          configuration.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. When the connection
+                          was created.
+                        "credential_id": "str",  # Optional. Empty for
+                          ``digitalocean_oauth``"" ; otherwise the ID of the team provider credential
+                          the connection uses.
+                        "credential_kind": "str",  # Optional. ``digitalocean_oauth``"" ,
+                          ``private_oauth``"" , or ``team_api_key``. Known values are:
+                          "digitalocean_oauth", "private_oauth", and "team_api_key".
+                        "granted_at": "2020-02-20 00:00:00",  # Optional. Deprecated: read
+                          ``oauth.granted_at``.
+                        "id": "str",  # Optional. Opaque connection ID.
+                        "network": {
+                            "vpc": {
+                                "destinations": [
+                                    {
+                                        "allowed_ip_cidrs": [
+                                            "str"  # Optional. Optional
+                                              CIDR ranges; when set, every address the host resolves to
+                                              must fall within one of them.
+                                        ],
+                                        "host": "str",  # Optional. Host name
+                                          or IP address. It must resolve only to private addresses.
+                                        "port": 0  # Optional. Port, 1 to
+                                          65535.
+                                    }
+                                ],
+                                "region": "str",  # Optional. Region of the VPC. Set
+                                  by DigitalOcean; do not send it.
+                                "vpc_uuid": "str"  # Optional. UUID of a VPC owned by
+                                  your team.
+                            }
+                        },
+                        "oauth": {
+                            "granted_at": "2020-02-20 00:00:00",  # Optional. When the
+                              user completed authorization.
+                            "scopes": [
+                                "str"  # Optional. Provider scopes granted, or
+                                  requested while pending.
+                            ]
+                        },
+                        "owning_user_id": "str",  # Optional. DigitalOcean user ID of the
+                          user who created the connection, when recorded.
+                        "provider": "str",  # Optional. Provider slug, for example ``jira``.
+                        "provider_display_name": "str",  # Optional. Human-readable provider
+                          name, for example ``Jira``.
+                        "revoked_at": "2020-02-20 00:00:00",  # Optional. When the connection
+                          was revoked.
+                        "scopes": [
+                            "str"  # Optional. Deprecated: read ``oauth.scopes``.
+                              Duplicated here so a reader of the pre-union shape keeps working; empty
+                              for a kind with no OAuth grant.
+                        ],
+                        "status": "str",  # Optional. pending, active, revoked, or expired.
+                          Known values are: "pending", "active", "revoked", and "expired".
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. When the connection
+                          was last modified.
+                        "user_id": "str"  # Optional. Your identifier for the user the
+                          connection acts for.
+                    }
+                }
+                # response body for status code(s): 400, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    def create(
+        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Connection.
+
+        Connects one of your users, identified by ``user_id``\\ , to a provider so tools can act on
+        their
+        account. An OAuth connection starts pending, and authorization carries the URL to send the user
+        to;
+        read the connection until it is active or expired. A connection through a team API-key
+        credential is
+        active immediately.
+
+        There is one connection per provider and ``user_id`` for each DigitalOcean user who creates
+        connections. Repeating the request returns the existing connection when its scopes cover the
+        request, reusing a pending connection's link, and restarts an expired or revoked connection
+        under
+        the same ID. Requesting scopes beyond an existing connection's, or a different credential,
+        returns
+        400 until that connection is deleted.
+
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "authorization": {
+                        "connect_url": "str",  # Optional. Browser URL, on a DigitalOcean
+                          Cloud origin, where the user authorizes the connection.
+                        "expires_at": "2020-02-20 00:00:00",  # Optional. When the
+                          authorization expires. The link can stop working earlier; if the connection
+                          becomes expired, create it again for a new link.
+                        "status": "str",  # Optional. Currently always
+                          ``requires_authorization``. "requires_authorization"
+                        "verification_code": "str"  # Optional. Verification code issued with
+                          ``connect_url``.
+                    },
+                    "connection": {
+                        "api_key": {},  # Optional. Set for ``team_api_key`` connections.
+                        "connection_parameters": {},  # Optional. Non-sensitive provider
+                          configuration.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. When the connection
+                          was created.
+                        "credential_id": "str",  # Optional. Empty for
+                          ``digitalocean_oauth``"" ; otherwise the ID of the team provider credential
+                          the connection uses.
+                        "credential_kind": "str",  # Optional. ``digitalocean_oauth``"" ,
+                          ``private_oauth``"" , or ``team_api_key``. Known values are:
+                          "digitalocean_oauth", "private_oauth", and "team_api_key".
+                        "granted_at": "2020-02-20 00:00:00",  # Optional. Deprecated: read
+                          ``oauth.granted_at``.
+                        "id": "str",  # Optional. Opaque connection ID.
+                        "network": {
+                            "vpc": {
+                                "destinations": [
+                                    {
+                                        "allowed_ip_cidrs": [
+                                            "str"  # Optional. Optional
+                                              CIDR ranges; when set, every address the host resolves to
+                                              must fall within one of them.
+                                        ],
+                                        "host": "str",  # Optional. Host name
+                                          or IP address. It must resolve only to private addresses.
+                                        "port": 0  # Optional. Port, 1 to
+                                          65535.
+                                    }
+                                ],
+                                "region": "str",  # Optional. Region of the VPC. Set
+                                  by DigitalOcean; do not send it.
+                                "vpc_uuid": "str"  # Optional. UUID of a VPC owned by
+                                  your team.
+                            }
+                        },
+                        "oauth": {
+                            "granted_at": "2020-02-20 00:00:00",  # Optional. When the
+                              user completed authorization.
+                            "scopes": [
+                                "str"  # Optional. Provider scopes granted, or
+                                  requested while pending.
+                            ]
+                        },
+                        "owning_user_id": "str",  # Optional. DigitalOcean user ID of the
+                          user who created the connection, when recorded.
+                        "provider": "str",  # Optional. Provider slug, for example ``jira``.
+                        "provider_display_name": "str",  # Optional. Human-readable provider
+                          name, for example ``Jira``.
+                        "revoked_at": "2020-02-20 00:00:00",  # Optional. When the connection
+                          was revoked.
+                        "scopes": [
+                            "str"  # Optional. Deprecated: read ``oauth.scopes``.
+                              Duplicated here so a reader of the pre-union shape keeps working; empty
+                              for a kind with no OAuth grant.
+                        ],
+                        "status": "str",  # Optional. pending, active, revoked, or expired.
+                          Known values are: "pending", "active", "revoked", and "expired".
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. When the connection
+                          was last modified.
+                        "user_id": "str"  # Optional. Your identifier for the user the
+                          connection acts for.
+                    }
+                }
+                # response body for status code(s): 400, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace
+    def create(self, body: Union[JSON, IO[bytes]], **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Connection.
+
+        Connects one of your users, identified by ``user_id``\\ , to a provider so tools can act on
+        their
+        account. An OAuth connection starts pending, and authorization carries the URL to send the user
+        to;
+        read the connection until it is active or expired. A connection through a team API-key
+        credential is
+        active immediately.
+
+        There is one connection per provider and ``user_id`` for each DigitalOcean user who creates
+        connections. Repeating the request returns the existing connection when its scopes cover the
+        request, reusing a pending connection's link, and restarts an expired or revoked connection
+        under
+        the same ID. Requesting scopes beyond an existing connection's, or a different credential,
+        returns
+        400 until that connection is deleted.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "provider": "str",  # Required provider slug, from the provider list.
+                      Required.
+                    "user_id": "str",  # Required. Your identifier for the user the connection
+                      acts for: 1 to 64 characters from ``[A-Za-z0-9._-]``. A session whose
+                      ``actor_id`` equals it uses this connection. Required.
+                    "connection_parameters": {},  # Optional. Values for the provider's
+                      ``connection_parameters``"" , validated against their specifications.
+                    "credential": {
+                        "digitalocean_oauth": {},  # Optional. Use DigitalOcean's shared
+                          OAuth application.
+                        "team_credential": {
+                            "credential_id": "str"  # Optional. Required. ID of an active
+                              provider credential for the same provider that you can use.
+                        }
+                    },
+                    "network": {
+                        "vpc": {
+                            "destinations": [
+                                {
+                                    "allowed_ip_cidrs": [
+                                        "str"  # Optional. Optional CIDR
+                                          ranges; when set, every address the host resolves to must
+                                          fall within one of them.
+                                    ],
+                                    "host": "str",  # Optional. Host name or IP
+                                      address. It must resolve only to private addresses.
+                                    "port": 0  # Optional. Port, 1 to 65535.
+                                }
+                            ],
+                            "vpc_uuid": "str"  # Optional. UUID of a VPC owned by your
+                              team.
+                        }
+                    },
+                    "scopes": [
+                        "str"  # Optional. Optional OAuth scopes to request. Defaults to
+                          every scope the provider offers; scopes outside that set are rejected.
+                          Ignored for API-key credentials.
+                    ]
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "authorization": {
+                        "connect_url": "str",  # Optional. Browser URL, on a DigitalOcean
+                          Cloud origin, where the user authorizes the connection.
+                        "expires_at": "2020-02-20 00:00:00",  # Optional. When the
+                          authorization expires. The link can stop working earlier; if the connection
+                          becomes expired, create it again for a new link.
+                        "status": "str",  # Optional. Currently always
+                          ``requires_authorization``. "requires_authorization"
+                        "verification_code": "str"  # Optional. Verification code issued with
+                          ``connect_url``.
+                    },
+                    "connection": {
+                        "api_key": {},  # Optional. Set for ``team_api_key`` connections.
+                        "connection_parameters": {},  # Optional. Non-sensitive provider
+                          configuration.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. When the connection
+                          was created.
+                        "credential_id": "str",  # Optional. Empty for
+                          ``digitalocean_oauth``"" ; otherwise the ID of the team provider credential
+                          the connection uses.
+                        "credential_kind": "str",  # Optional. ``digitalocean_oauth``"" ,
+                          ``private_oauth``"" , or ``team_api_key``. Known values are:
+                          "digitalocean_oauth", "private_oauth", and "team_api_key".
+                        "granted_at": "2020-02-20 00:00:00",  # Optional. Deprecated: read
+                          ``oauth.granted_at``.
+                        "id": "str",  # Optional. Opaque connection ID.
+                        "network": {
+                            "vpc": {
+                                "destinations": [
+                                    {
+                                        "allowed_ip_cidrs": [
+                                            "str"  # Optional. Optional
+                                              CIDR ranges; when set, every address the host resolves to
+                                              must fall within one of them.
+                                        ],
+                                        "host": "str",  # Optional. Host name
+                                          or IP address. It must resolve only to private addresses.
+                                        "port": 0  # Optional. Port, 1 to
+                                          65535.
+                                    }
+                                ],
+                                "region": "str",  # Optional. Region of the VPC. Set
+                                  by DigitalOcean; do not send it.
+                                "vpc_uuid": "str"  # Optional. UUID of a VPC owned by
+                                  your team.
+                            }
+                        },
+                        "oauth": {
+                            "granted_at": "2020-02-20 00:00:00",  # Optional. When the
+                              user completed authorization.
+                            "scopes": [
+                                "str"  # Optional. Provider scopes granted, or
+                                  requested while pending.
+                            ]
+                        },
+                        "owning_user_id": "str",  # Optional. DigitalOcean user ID of the
+                          user who created the connection, when recorded.
+                        "provider": "str",  # Optional. Provider slug, for example ``jira``.
+                        "provider_display_name": "str",  # Optional. Human-readable provider
+                          name, for example ``Jira``.
+                        "revoked_at": "2020-02-20 00:00:00",  # Optional. When the connection
+                          was revoked.
+                        "scopes": [
+                            "str"  # Optional. Deprecated: read ``oauth.scopes``.
+                              Duplicated here so a reader of the pre-union shape keeps working; empty
+                              for a kind with no OAuth grant.
+                        ],
+                        "status": "str",  # Optional. pending, active, revoked, or expired.
+                          Known values are: "pending", "active", "revoked", and "expired".
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. When the connection
+                          was last modified.
+                        "user_id": "str"  # Optional. Your identifier for the user the
+                          connection acts for.
+                    }
+                }
+                # response body for status code(s): 400, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_connections_create_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 409]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def list(
+        self,
+        *,
+        provider: Optional[str] = None,
+        user_id: Optional[str] = None,
+        status: Optional[str] = None,
+        sort: Optional[str] = None,
+        sort_direction: Optional[str] = None,
+        page: int = 1,
+        per_page: int = 20,
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Connections.
+
+        Returns the connections you can see, excluding revoked ones. Offset-paged with page and
+        ``per_page``\\ ; filter by provider, ``user_id``\\ , and status.
+
+        :keyword provider: Optional provider slug, matched exactly. Default value is None.
+        :paramtype provider: str
+        :keyword user_id: Optional substring of ``user_id``. It must use the ``user_id`` alphabet,
+         ``[A-Za-z0-9._-]``. Default value is None.
+        :paramtype user_id: str
+        :keyword status: pending|active|revoked|expired. List results always omit revoked connections,
+         including when this filter is revoked. Known values are: "pending", "active", and "expired".
+         Default value is None.
+        :paramtype status: str
+        :keyword sort: ``created_at``\\ , provider, ``user_id``\\ , or status. Defaults to provider,
+         then ``user_id``. Known values are: "created_at", "provider", "user_id", and "status". Default
+         value is None.
+        :paramtype sort: str
+        :keyword sort_direction: asc (the default) or desc. Known values are: "asc" and "desc". Default
+         value is None.
+        :paramtype sort_direction: str
+        :keyword page: 1-based page number. Values below 1 are treated as 1. Default value is 1.
+        :paramtype page: int
+        :keyword per_page: Page size. Defaults to 20; values above 100 are capped at 100. Default value
+         is 20.
+        :paramtype per_page: int
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "connections": [
+                        {
+                            "api_key": {},  # Optional. Set for ``team_api_key``
+                              connections.
+                            "connection_parameters": {},  # Optional. Non-sensitive
+                              provider configuration.
+                            "created_at": "2020-02-20 00:00:00",  # Optional. When the
+                              connection was created.
+                            "credential_id": "str",  # Optional. Empty for
+                              ``digitalocean_oauth``"" ; otherwise the ID of the team provider
+                              credential the connection uses.
+                            "credential_kind": "str",  # Optional.
+                              ``digitalocean_oauth``"" , ``private_oauth``"" , or ``team_api_key``.
+                              Known values are: "digitalocean_oauth", "private_oauth", and
+                              "team_api_key".
+                            "granted_at": "2020-02-20 00:00:00",  # Optional. Deprecated:
+                              read ``oauth.granted_at``.
+                            "id": "str",  # Optional. Opaque connection ID.
+                            "network": {
+                                "vpc": {
+                                    "destinations": [
+                                        {
+                                            "allowed_ip_cidrs": [
+                                                "str"  # Optional.
+                                                  Optional CIDR ranges; when set, every address the
+                                                  host resolves to must fall within one of them.
+                                            ],
+                                            "host": "str",  # Optional.
+                                              Host name or IP address. It must resolve only to private
+                                              addresses.
+                                            "port": 0  # Optional. Port,
+                                              1 to 65535.
+                                        }
+                                    ],
+                                    "region": "str",  # Optional. Region of the
+                                      VPC. Set by DigitalOcean; do not send it.
+                                    "vpc_uuid": "str"  # Optional. UUID of a VPC
+                                      owned by your team.
+                                }
+                            },
+                            "oauth": {
+                                "granted_at": "2020-02-20 00:00:00",  # Optional.
+                                  When the user completed authorization.
+                                "scopes": [
+                                    "str"  # Optional. Provider scopes granted,
+                                      or requested while pending.
+                                ]
+                            },
+                            "owning_user_id": "str",  # Optional. DigitalOcean user ID of
+                              the user who created the connection, when recorded.
+                            "provider": "str",  # Optional. Provider slug, for example
+                              ``jira``.
+                            "provider_display_name": "str",  # Optional. Human-readable
+                              provider name, for example ``Jira``.
+                            "revoked_at": "2020-02-20 00:00:00",  # Optional. When the
+                              connection was revoked.
+                            "scopes": [
+                                "str"  # Optional. Deprecated: read ``oauth.scopes``.
+                                  Duplicated here so a reader of the pre-union shape keeps working;
+                                  empty for a kind with no OAuth grant.
+                            ],
+                            "status": "str",  # Optional. pending, active, revoked, or
+                              expired. Known values are: "pending", "active", "revoked", and "expired".
+                            "updated_at": "2020-02-20 00:00:00",  # Optional. When the
+                              connection was last modified.
+                            "user_id": "str"  # Optional. Your identifier for the user
+                              the connection acts for.
+                        }
+                    ],
+                    "pagination": {
+                        "page": 0,  # Optional. 1-based page number of this response.
+                        "per_page": 0,  # Optional. Page size applied to this response, after
+                          defaults and caps.
+                        "total": 0  # Optional. Number of matching items across all pages.
+                    }
+                }
+                # response body for status code(s): 400
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_connections_list_request(
+            provider=provider,
+            user_id=user_id,
+            status=status,
+            sort=sort,
+            sort_direction=sort_direction,
             page=page,
             per_page=per_page,
             headers=_headers,
@@ -18313,217 +20051,44 @@ class ToolsOperations:
 
         response = pipeline_response.http_response
 
-        if response.status_code not in [200]:
+        if response.status_code not in [200, 400]:
             if _stream:
                 response.read()  # Load the body in memory and close the socket
             map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
             raise HttpResponseError(response=response)
 
         response_headers = {}
-        response_headers["ratelimit-limit"] = self._deserialize(
-            "int", response.headers.get("ratelimit-limit")
-        )
-        response_headers["ratelimit-remaining"] = self._deserialize(
-            "int", response.headers.get("ratelimit-remaining")
-        )
-        response_headers["ratelimit-reset"] = self._deserialize(
-            "int", response.headers.get("ratelimit-reset")
-        )
-
-        if response.content:
-            deserialized = response.json()
-        else:
-            deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-    @distributed_trace
-    def list_toolkits(self, **kwargs: Any) -> JSON:
-        """List Toolkits.
-
-        Lists the toolkits that group Action Gateway tools.
-
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "toolkits": [
-                        {
-                            "description": "str",  # Optional.
-                            "id": "str",  # Optional.
-                            "name": "str"  # Optional.
-                        }
-                    ],
-                    "version": "str"  # Optional.
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = kwargs.pop("headers", {}) or {}
-        _params = kwargs.pop("params", {}) or {}
-
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        _request = build_tools_list_toolkits_request(
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
             )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200]:
-            if _stream:
-                response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        response_headers["ratelimit-limit"] = self._deserialize(
-            "int", response.headers.get("ratelimit-limit")
-        )
-        response_headers["ratelimit-remaining"] = self._deserialize(
-            "int", response.headers.get("ratelimit-remaining")
-        )
-        response_headers["ratelimit-reset"] = self._deserialize(
-            "int", response.headers.get("ratelimit-reset")
-        )
-
-        if response.content:
-            deserialized = response.json()
-        else:
-            deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-    @distributed_trace
-    def list_providers(self, **kwargs: Any) -> JSON:
-        """List Tool Providers.
-
-        Lists Action Gateway providers and their connection requirements.
-
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "providers": [
-                        {
-                            "auth_type": "str",  # Optional.
-                            "connection_parameters": [
-                                {
-                                    "allowed_host_suffixes": [
-                                        "str"  # Optional.
-                                    ],
-                                    "allowed_values": [
-                                        "str"  # Optional.
-                                    ],
-                                    "description": "str",  # Optional.
-                                    "input_kind": "str",  # Optional.
-                                    "key": "str",  # Optional.
-                                    "label": "str",  # Optional.
-                                    "max_length": 0,  # Optional.
-                                    "normalization": "str",  # Optional.
-                                    "required": bool  # Optional.
-                                }
-                            ],
-                            "description": "str",  # Optional.
-                            "display_name": "str",  # Optional.
-                            "name": "str",  # Optional.
-                            "scopes": [
-                                "str"  # Optional.
-                            ]
-                        }
-                    ]
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = kwargs.pop("headers", {}) or {}
-        _params = kwargs.pop("params", {}) or {}
-
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        _request = build_tools_list_providers_request(
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
             )
-        )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
 
-        response = pipeline_response.http_response
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
 
-        if response.status_code not in [200]:
-            if _stream:
-                response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
 
-        response_headers = {}
-        response_headers["ratelimit-limit"] = self._deserialize(
-            "int", response.headers.get("ratelimit-limit")
-        )
-        response_headers["ratelimit-remaining"] = self._deserialize(
-            "int", response.headers.get("ratelimit-remaining")
-        )
-        response_headers["ratelimit-reset"] = self._deserialize(
-            "int", response.headers.get("ratelimit-reset")
-        )
-
-        if response.content:
-            deserialized = response.json()
-        else:
-            deserialized = None
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
 
         if cls:
             return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
@@ -18531,27 +20096,17 @@ class ToolsOperations:
         return cast(JSON, deserialized)  # type: ignore
 
     @distributed_trace
-    def get_definition(
-        self,
-        name: str,
-        *,
-        version: Optional[str] = None,
-        toolkit_id: Optional[str] = None,
-        **kwargs: Any,
-    ) -> JSON:
+    def get(self, id: str, **kwargs: Any) -> JSON:
         # pylint: disable=line-too-long
-        """Retrieve a Tool Definition.
+        """Get a Connection.
 
-        Retrieves the executable definition for an active Action Gateway tool.
+        Returns the connection and, while it is pending, the authorization the user still has to
+        complete. Reading a pending connection picks up a completed authorization, and marks the
+        connection expired once its link has lapsed. Returns 404 for an unknown connection or one you
+        cannot see.
 
-        :param name: The provider-qualified tool name. Required.
-        :type name: str
-        :keyword version: The tool version. Omit to retrieve the current version. Default value is
-         None.
-        :paramtype version: str
-        :keyword toolkit_id: The toolkit identifier used to disambiguate a bare tool name. Default
-         value is None.
-        :paramtype toolkit_id: str
+        :param id: Connection ID. Required.
+        :type id: str
         :return: JSON object
         :rtype: JSON
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -18561,247 +20116,80 @@ class ToolsOperations:
 
                 # response body for status code(s): 200
                 response == {
-                    "annotations": {
-                        "destructiveHint": bool,  # Optional.
-                        "idempotentHint": bool,  # Optional.
-                        "openWorldHint": bool,  # Optional.
-                        "readOnlyHint": bool,  # Optional.
-                        "title": "str"  # Optional.
+                    "authorization": {
+                        "connect_url": "str",  # Optional. Browser URL, on a DigitalOcean
+                          Cloud origin, where the user authorizes the connection.
+                        "expires_at": "2020-02-20 00:00:00",  # Optional. When the
+                          authorization expires. The link can stop working earlier; if the connection
+                          becomes expired, create it again for a new link.
+                        "status": "str",  # Optional. Currently always
+                          ``requires_authorization``. "requires_authorization"
+                        "verification_code": "str"  # Optional. Verification code issued with
+                          ``connect_url``.
                     },
-                    "auth": {
-                        "baseUrlResolution": {
-                            "httpLookup": {
-                                "baseUrlTemplate": "str",  # Optional. HTTPLookupSpec
-                                  resolves a base_url by calling url (bearer-authenticated with the
-                                  just-exchanged access token), selecting an entry in the JSON array,
-                                  extracting extract_field from that entry, and substituting it for
-                                  "{value}" in base_url_template. When match_field and match_value are
-                                  both set, they select the entry. When both are empty, exactly one
-                                  entry whose own "scopes" array contains required_scopes must exist.
-                                  Configuring only one match field is invalid. Resolution fails fast on
-                                  zero or multiple compatible entries.
-                                "caseInsensitive": bool,  # Optional. HTTPLookupSpec
-                                  resolves a base_url by calling url (bearer-authenticated with the
-                                  just-exchanged access token), selecting an entry in the JSON array,
-                                  extracting extract_field from that entry, and substituting it for
-                                  "{value}" in base_url_template. When match_field and match_value are
-                                  both set, they select the entry. When both are empty, exactly one
-                                  entry whose own "scopes" array contains required_scopes must exist.
-                                  Configuring only one match field is invalid. Resolution fails fast on
-                                  zero or multiple compatible entries.
-                                "extractField": "str",  # Optional. HTTPLookupSpec
-                                  resolves a base_url by calling url (bearer-authenticated with the
-                                  just-exchanged access token), selecting an entry in the JSON array,
-                                  extracting extract_field from that entry, and substituting it for
-                                  "{value}" in base_url_template. When match_field and match_value are
-                                  both set, they select the entry. When both are empty, exactly one
-                                  entry whose own "scopes" array contains required_scopes must exist.
-                                  Configuring only one match field is invalid. Resolution fails fast on
-                                  zero or multiple compatible entries.
-                                "matchField": "str",  # Optional. HTTPLookupSpec
-                                  resolves a base_url by calling url (bearer-authenticated with the
-                                  just-exchanged access token), selecting an entry in the JSON array,
-                                  extracting extract_field from that entry, and substituting it for
-                                  "{value}" in base_url_template. When match_field and match_value are
-                                  both set, they select the entry. When both are empty, exactly one
-                                  entry whose own "scopes" array contains required_scopes must exist.
-                                  Configuring only one match field is invalid. Resolution fails fast on
-                                  zero or multiple compatible entries.
-                                "matchValue": "str",  # Optional. HTTPLookupSpec
-                                  resolves a base_url by calling url (bearer-authenticated with the
-                                  just-exchanged access token), selecting an entry in the JSON array,
-                                  extracting extract_field from that entry, and substituting it for
-                                  "{value}" in base_url_template. When match_field and match_value are
-                                  both set, they select the entry. When both are empty, exactly one
-                                  entry whose own "scopes" array contains required_scopes must exist.
-                                  Configuring only one match field is invalid. Resolution fails fast on
-                                  zero or multiple compatible entries.
-                                "match_value_parameter": "str",  # Optional.
-                                  HTTPLookupSpec resolves a base_url by calling url
-                                  (bearer-authenticated with the just-exchanged access token),
-                                  selecting an entry in the JSON array, extracting extract_field from
-                                  that entry, and substituting it for "{value}" in base_url_template.
-                                  When match_field and match_value are both set, they select the entry.
-                                  When both are empty, exactly one entry whose own "scopes" array
-                                  contains required_scopes must exist. Configuring only one match field
-                                  is invalid. Resolution fails fast on zero or multiple compatible
-                                  entries.
-                                "method": "str",  # Optional. HTTPLookupSpec resolves
-                                  a base_url by calling url (bearer-authenticated with the
-                                  just-exchanged access token), selecting an entry in the JSON array,
-                                  extracting extract_field from that entry, and substituting it for
-                                  "{value}" in base_url_template. When match_field and match_value are
-                                  both set, they select the entry. When both are empty, exactly one
-                                  entry whose own "scopes" array contains required_scopes must exist.
-                                  Configuring only one match field is invalid. Resolution fails fast on
-                                  zero or multiple compatible entries.
-                                "requiredScopes": [
-                                    "str"  # Optional. HTTPLookupSpec resolves a
-                                      base_url by calling url (bearer-authenticated with the
-                                      just-exchanged access token), selecting an entry in the JSON
-                                      array, extracting extract_field from that entry, and substituting
-                                      it for "{value}" in base_url_template. When match_field and
-                                      match_value are both set, they select the entry. When both are
-                                      empty, exactly one entry whose own "scopes" array contains
-                                      required_scopes must exist. Configuring only one match field is
-                                      invalid. Resolution fails fast on zero or multiple compatible
-                                      entries.
+                    "connection": {
+                        "api_key": {},  # Optional. Set for ``team_api_key`` connections.
+                        "connection_parameters": {},  # Optional. Non-sensitive provider
+                          configuration.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. When the connection
+                          was created.
+                        "credential_id": "str",  # Optional. Empty for
+                          ``digitalocean_oauth``"" ; otherwise the ID of the team provider credential
+                          the connection uses.
+                        "credential_kind": "str",  # Optional. ``digitalocean_oauth``"" ,
+                          ``private_oauth``"" , or ``team_api_key``. Known values are:
+                          "digitalocean_oauth", "private_oauth", and "team_api_key".
+                        "granted_at": "2020-02-20 00:00:00",  # Optional. Deprecated: read
+                          ``oauth.granted_at``.
+                        "id": "str",  # Optional. Opaque connection ID.
+                        "network": {
+                            "vpc": {
+                                "destinations": [
+                                    {
+                                        "allowed_ip_cidrs": [
+                                            "str"  # Optional. Optional
+                                              CIDR ranges; when set, every address the host resolves to
+                                              must fall within one of them.
+                                        ],
+                                        "host": "str",  # Optional. Host name
+                                          or IP address. It must resolve only to private addresses.
+                                        "port": 0  # Optional. Port, 1 to
+                                          65535.
+                                    }
                                 ],
-                                "trimTrailingSlash": bool,  # Optional.
-                                  HTTPLookupSpec resolves a base_url by calling url
-                                  (bearer-authenticated with the just-exchanged access token),
-                                  selecting an entry in the JSON array, extracting extract_field from
-                                  that entry, and substituting it for "{value}" in base_url_template.
-                                  When match_field and match_value are both set, they select the entry.
-                                  When both are empty, exactly one entry whose own "scopes" array
-                                  contains required_scopes must exist. Configuring only one match field
-                                  is invalid. Resolution fails fast on zero or multiple compatible
-                                  entries.
-                                "url": "str"  # Optional. HTTPLookupSpec resolves a
-                                  base_url by calling url (bearer-authenticated with the just-exchanged
-                                  access token), selecting an entry in the JSON array, extracting
-                                  extract_field from that entry, and substituting it for "{value}" in
-                                  base_url_template. When match_field and match_value are both set,
-                                  they select the entry. When both are empty, exactly one entry whose
-                                  own "scopes" array contains required_scopes must exist. Configuring
-                                  only one match field is invalid. Resolution fails fast on zero or
-                                  multiple compatible entries.
+                                "region": "str",  # Optional. Region of the VPC. Set
+                                  by DigitalOcean; do not send it.
+                                "vpc_uuid": "str"  # Optional. UUID of a VPC owned by
+                                  your team.
                             }
                         },
-                        "credentialBinding": "str",  # Optional.
-                        "credentialRefSource": "str",  # Optional.
-                        "doManagedCredentialRef": "str",  # Optional.
-                        "injection": {
-                            "location": "str",  # Optional.
-                            "name": "str",  # Optional.
-                            "scheme": "str"  # Optional.
+                        "oauth": {
+                            "granted_at": "2020-02-20 00:00:00",  # Optional. When the
+                              user completed authorization.
+                            "scopes": [
+                                "str"  # Optional. Provider scopes granted, or
+                                  requested while pending.
+                            ]
                         },
-                        "modes": [
-                            "str"  # Optional.
-                        ],
-                        "provider": "str",  # Optional.
+                        "owning_user_id": "str",  # Optional. DigitalOcean user ID of the
+                          user who created the connection, when recorded.
+                        "provider": "str",  # Optional. Provider slug, for example ``jira``.
+                        "provider_display_name": "str",  # Optional. Human-readable provider
+                          name, for example ``Jira``.
+                        "revoked_at": "2020-02-20 00:00:00",  # Optional. When the connection
+                          was revoked.
                         "scopes": [
-                            "str"  # Optional.
-                        ]
-                    },
-                    "classification": {
-                        "dataClasses": [
-                            "str"  # Optional.
+                            "str"  # Optional. Deprecated: read ``oauth.scopes``.
+                              Duplicated here so a reader of the pre-union shape keeps working; empty
+                              for a kind with no OAuth grant.
                         ],
-                        "operation": "str",  # Optional.
-                        "risk": "str"  # Optional.
-                    },
-                    "description": "str",  # Optional.
-                    "execution": {
-                        "adapterVersion": "str",  # Optional.
-                        "configRef": "str",  # Optional.
-                        "http": {
-                            "allowedHosts": [
-                                "str"  # Optional.
-                            ],
-                            "baseUrl": "str",  # Optional.
-                            "method": "str",  # Optional.
-                            "path": "str",  # Optional.
-                            "requestEncoding": "str",  # Optional.
-                            "responseFormat": "str"  # Optional.
-                        },
-                        "mcp": {
-                            "allowedHosts": [
-                                "str"  # Optional. MCPExecution describes how to
-                                  invoke a tool that is fronted by a remote MCP server (as opposed to a
-                                  plain HTTP endpoint). endpoint is the remote MCP server's URL,
-                                  tool_name is the name the remote server expects on tools/call (may
-                                  differ from this tool's registry name), transport selects the wire
-                                  protocol ("streamable_http" is the only kind implemented today), and
-                                  server_ref is an opaque label identifying the remote server for
-                                  logging/metrics/allowlisting.
-                            ],
-                            "endpoint": "str",  # Optional. MCPExecution describes how to
-                              invoke a tool that is fronted by a remote MCP server (as opposed to a
-                              plain HTTP endpoint). endpoint is the remote MCP server's URL, tool_name
-                              is the name the remote server expects on tools/call (may differ from this
-                              tool's registry name), transport selects the wire protocol
-                              ("streamable_http" is the only kind implemented today), and server_ref is
-                              an opaque label identifying the remote server for
-                              logging/metrics/allowlisting.
-                            "serverRef": "str",  # Optional. MCPExecution describes how
-                              to invoke a tool that is fronted by a remote MCP server (as opposed to a
-                              plain HTTP endpoint). endpoint is the remote MCP server's URL, tool_name
-                              is the name the remote server expects on tools/call (may differ from this
-                              tool's registry name), transport selects the wire protocol
-                              ("streamable_http" is the only kind implemented today), and server_ref is
-                              an opaque label identifying the remote server for
-                              logging/metrics/allowlisting.
-                            "toolName": "str",  # Optional. MCPExecution describes how to
-                              invoke a tool that is fronted by a remote MCP server (as opposed to a
-                              plain HTTP endpoint). endpoint is the remote MCP server's URL, tool_name
-                              is the name the remote server expects on tools/call (may differ from this
-                              tool's registry name), transport selects the wire protocol
-                              ("streamable_http" is the only kind implemented today), and server_ref is
-                              an opaque label identifying the remote server for
-                              logging/metrics/allowlisting.
-                            "transport": "str"  # Optional. MCPExecution describes how to
-                              invoke a tool that is fronted by a remote MCP server (as opposed to a
-                              plain HTTP endpoint). endpoint is the remote MCP server's URL, tool_name
-                              is the name the remote server expects on tools/call (may differ from this
-                              tool's registry name), transport selects the wire protocol
-                              ("streamable_http" is the only kind implemented today), and server_ref is
-                              an opaque label identifying the remote server for
-                              logging/metrics/allowlisting.
-                        },
-                        "type": "str"  # Optional.
-                    },
-                    "flipperName": "str",  # Optional.
-                    "hooks": {
-                        "usage": {
-                            "billable": bool,  # Optional. When usage metadata is
-                              present, false prevents billing. Omitting usage metadata leaves
-                              consumers' legacy billing classification unchanged.
-                            "meters": [
-                                {
-                                    "quantitySource": "str",  # Optional.
-                                    "sku": "str",  # Optional.
-                                    "unit": "str"  # Optional.
-                                }
-                            ]
-                        }
-                    },
-                    "inputSchema": {},  # Optional. Any object.
-                    "name": "str",  # Optional.
-                    "outputSchema": {},  # Optional. Any object.
-                    "parallelizable": bool,  # Optional.
-                    "policy": {
-                        "permission": "str"  # Optional.
-                    },
-                    "reliability": {
-                        "maxOutputBytes": "str",  # Optional.
-                        "retry": {
-                            "backoff": "str",  # Optional.
-                            "maxAttempts": 0,  # Optional.
-                            "retryOn": [
-                                "str"  # Optional.
-                            ]
-                        },
-                        "timeoutMs": 0  # Optional.
-                    },
-                    "schemaVersion": "str",  # Optional.
-                    "status": "str",  # Optional.
-                    "streamingSafe": bool,  # Optional.
-                    "tags": [
-                        "str"  # Optional.
-                    ],
-                    "title": "str",  # Optional.
-                    "toolId": "str",  # Optional.
-                    "toolSlug": "str",  # Optional. tool_slug is the provider-qualified, stable
-                      tool identifier ":code:`<toolkit_id>`_:code:`<name>`". Pass this value back
-                      verbatim to the toolbelt add/remove endpoints; clients should treat it as opaque.
-                    "toolkitId": "str",  # Optional.
-                    "transform": {
-                        "input": {},  # Optional. Any object.
-                        "language": "str",  # Optional.
-                        "output": {}  # Optional. Any object.
-                    },
-                    "version": "str"  # Optional.
+                        "status": "str",  # Optional. pending, active, revoked, or expired.
+                          Known values are: "pending", "active", "revoked", and "expired".
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. When the connection
+                          was last modified.
+                        "user_id": "str"  # Optional. Your identifier for the user the
+                          connection acts for.
+                    }
                 }
                 # response body for status code(s): 404
                 response == {
@@ -18833,10 +20221,182 @@ class ToolsOperations:
 
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
-        _request = build_tools_get_definition_request(
-            name=name,
-            version=version,
-            toolkit_id=toolkit_id,
+        _request = build_connections_get_request(
+            id=id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def delete(self, id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Delete a Connection.
+
+        Marks the connection revoked and returns it; for an OAuth connection, its stored tokens are
+        deleted first. Creating a connection for the same provider and ``user_id`` later reuses the
+        same ID. Only the user who created the connection can delete it; for anyone else it is 404.
+
+        :param id: Connection ID. Required.
+        :type id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "connection": {
+                        "api_key": {},  # Optional. Set for ``team_api_key`` connections.
+                        "connection_parameters": {},  # Optional. Non-sensitive provider
+                          configuration.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. When the connection
+                          was created.
+                        "credential_id": "str",  # Optional. Empty for
+                          ``digitalocean_oauth``"" ; otherwise the ID of the team provider credential
+                          the connection uses.
+                        "credential_kind": "str",  # Optional. ``digitalocean_oauth``"" ,
+                          ``private_oauth``"" , or ``team_api_key``. Known values are:
+                          "digitalocean_oauth", "private_oauth", and "team_api_key".
+                        "granted_at": "2020-02-20 00:00:00",  # Optional. Deprecated: read
+                          ``oauth.granted_at``.
+                        "id": "str",  # Optional. Opaque connection ID.
+                        "network": {
+                            "vpc": {
+                                "destinations": [
+                                    {
+                                        "allowed_ip_cidrs": [
+                                            "str"  # Optional. Optional
+                                              CIDR ranges; when set, every address the host resolves to
+                                              must fall within one of them.
+                                        ],
+                                        "host": "str",  # Optional. Host name
+                                          or IP address. It must resolve only to private addresses.
+                                        "port": 0  # Optional. Port, 1 to
+                                          65535.
+                                    }
+                                ],
+                                "region": "str",  # Optional. Region of the VPC. Set
+                                  by DigitalOcean; do not send it.
+                                "vpc_uuid": "str"  # Optional. UUID of a VPC owned by
+                                  your team.
+                            }
+                        },
+                        "oauth": {
+                            "granted_at": "2020-02-20 00:00:00",  # Optional. When the
+                              user completed authorization.
+                            "scopes": [
+                                "str"  # Optional. Provider scopes granted, or
+                                  requested while pending.
+                            ]
+                        },
+                        "owning_user_id": "str",  # Optional. DigitalOcean user ID of the
+                          user who created the connection, when recorded.
+                        "provider": "str",  # Optional. Provider slug, for example ``jira``.
+                        "provider_display_name": "str",  # Optional. Human-readable provider
+                          name, for example ``Jira``.
+                        "revoked_at": "2020-02-20 00:00:00",  # Optional. When the connection
+                          was revoked.
+                        "scopes": [
+                            "str"  # Optional. Deprecated: read ``oauth.scopes``.
+                              Duplicated here so a reader of the pre-union shape keeps working; empty
+                              for a kind with no OAuth grant.
+                        ],
+                        "status": "str",  # Optional. pending, active, revoked, or expired.
+                          Known values are: "pending", "active", "revoked", and "expired".
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. When the connection
+                          was last modified.
+                        "user_id": "str"  # Optional. Your identifier for the user the
+                          connection acts for.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_connections_delete_request(
+            id=id,
             headers=_headers,
             params=_params,
         )
@@ -18896,14 +20456,14 @@ class ToolsOperations:
         return cast(JSON, deserialized)  # type: ignore
 
 
-class ToolbeltsOperations:
+class McpServersOperations:
     """
     .. warning::
         **DO NOT** instantiate this class directly.
 
         Instead, you should access the following operations through
         :class:`~pydo.GeneratedClient`'s
-        :attr:`toolbelts` attribute.
+        :attr:`mcp_servers` attribute.
     """
 
     def __init__(self, *args, **kwargs):
@@ -18915,26 +20475,159 @@ class ToolbeltsOperations:
             input_args.pop(0) if input_args else kwargs.pop("deserializer")
         )
 
-    @distributed_trace
-    def list(
-        self,
-        *,
-        status: str = "active",
-        page: int = 1,
-        per_page: int = 20,
-        **kwargs: Any,
+    @overload
+    def create(
+        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
     ) -> JSON:
-        """List Toolbelts.
+        # pylint: disable=line-too-long
+        """Register an MCP Server.
 
-        Lists the latest version of each toolbelt owned by the authenticated team.
+        Registers a remote MCP server for your team, using the streamable HTTP transport. The server
+        starts with ``syncStatus`` pending and no tools: discover its tools with ``POST
+        .../mcp-servers/{server_ref}/resync``\\ , then choose which to enable with ``PUT
+        .../mcp-servers/{server_ref}/tools``. The endpoint must be HTTPS and resolve only to public IP
+        addresses. The number of servers per team is limited (10 by default); registering beyond it
+        returns 429. Returns 409 when ``serverRef`` is already in use.
 
-        :keyword status: Filter toolbelts by status. Known values are: "active", "deprecated", and
-         "all". Default value is "active".
-        :paramtype status: str
-        :keyword page: Which 'page' of paginated results to return. Default value is 1.
-        :paramtype page: int
-        :keyword per_page: Number of items returned per page. Default value is 20.
-        :paramtype per_page: int
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "endpoint": "str",  # HTTPS URL of the server's MCP endpoint. Its host must
+                      resolve only to public IP addresses. Required. Required.
+                    "serverRef": "str",  # Identifier for the server, unique within your team.
+                      Must match ``^``"" [a-z]"" ```[a-z0-9-]``"" {0,63}$`. Required.
+                    "api_key": "str",  # Optional. For ``credentialRefSource`` secret: the key or
+                      token itself. DigitalOcean stores it; it is write-only and no response returns
+                      it. Set exactly one of ``credentialRef`` and ``api_key``.
+                    "credentialRef": "str",  # Optional. For ``credentialRefSource`` secret: a
+                      reference to a secret your team stores with DigitalOcean. Must match ``^``""
+                      [A-Za-z0-9]"" ```[A-Za-z0-9:/_.-]``"" {0,254}$"" ``. Set exactly one of``""
+                      credentialRef"" ``and``"" api_key`.
+                    "credentialRefSource": "none",  # Optional. Default value is "none". How
+                      requests to the server authenticate: none (the default), secret, or connection.
+                      With secret, the value from ``credentialRef`` or ``api_key`` is sent in the
+                      Authorization header, prefixed with "Bearer " unless it already contains a space.
+                      Known values are: "none", "secret", and "connection".
+                    "description": "str",  # Optional. Optional description shown on the server's
+                      catalog card. At most 1024 characters.
+                    "oauth_authorization_ttl_seconds": "str",  # Optional. How long, in seconds,
+                      a user's authorization may be reused before they must consent again. Optional; 0
+                      means 30 days, and the maximum is 100 years.  Authorizations are not refreshed
+                      automatically, so this window, not the provider's token lifetime, decides how
+                      often a user is sent back through consent. Set it no longer than the provider's
+                      own token lifetime, so the prompt arrives before a tool call fails against an
+                      expired token.
+                    "oauth_authorize_url": "str",  # Optional. Required for
+                      ``credentialRefSource`` connection: the OAuth authorization endpoint. It must use
+                      the endpoint's scheme and port, on the endpoint's host or another host under the
+                      same registrable domain.
+                    "oauth_client_id": "str",  # Optional. Required for ``credentialRefSource``
+                      connection: the client ID of your team's OAuth client for the server. Each user
+                      of the server then authorizes individually.
+                    "oauth_client_secret": "str",  # Optional. Required for
+                      ``credentialRefSource`` connection. Write-only; no response returns it.
+                    "oauth_scopes": [
+                        "str"  # Optional. Required for ``credentialRefSource`` connection:
+                          the scopes to request from each user, 1 to 64 of them.
+                    ],
+                    "oauth_token_url": "str",  # Optional. Required for ``credentialRefSource``
+                      connection: the OAuth token endpoint, under the same rules as
+                      ``oauth_authorize_url``.
+                    "transport": "streamable_http"  # Optional. Default value is
+                      "streamable_http". Optional. ``streamable_http``"" , the default and only
+                      accepted value. "streamable_http"
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "mcpServer": {
+                        "createdAt": "str",  # Optional. When the server was registered, in
+                          RFC 3339 format.
+                        "credentialRef": "str",  # Optional. The secret reference supplied at
+                          registration when source=secret, or the team's OAuth credential ID when
+                          source=connection. Empty when the server was registered with an ``api_key``""
+                          , whose storage DigitalOcean manages.
+                        "credentialRefSource": "str",  # Optional. How requests to the server
+                          authenticate: none, secret (a key or token sent in the Authorization header),
+                          or connection (each user's own OAuth authorization). Known values are:
+                          "none", "secret", and "connection".
+                        "description": "str",  # Optional. Team-authored description, shown
+                          on the server's catalog card. A resync does not replace it.
+                        "endpoint": "str",  # Optional. HTTPS URL of the server's MCP
+                          endpoint.
+                        "lastSyncedAt": "str",  # Optional. When discovery last succeeded, in
+                          RFC 3339 format; empty until the first success.
+                        "oauth_authorization_ttl_seconds": "str",  # Optional. How long a
+                          user's authorization is reused before re-consent. Echoed so a team can read
+                          the window without re-registering to discover it.
+                        "oauth_authorize_url": "str",  # Optional. OAuth authorization
+                          endpoint. Set only when ``credentialRefSource`` is connection; the client
+                          secret is never returned.
+                        "oauth_scopes": [
+                            "str"  # Optional. OAuth scopes requested from each user. Set
+                              only when ``credentialRefSource`` is connection.
+                        ],
+                        "protocolVersion": "str",  # Optional. MCP protocol revision
+                          negotiated with the server.
+                        "serverRef": "str",  # Optional. Server identifier, unique within
+                          your team. The server's tool slugs are ``<server_ref>_<name>``.
+                        "syncError": "str",  # Optional. Why the latest discovery failed;
+                          empty after a successful one.
+                        "syncStatus": "str",  # Optional. Outcome of the latest discovery:
+                          pending (no discovery has finished yet), ok, failed, or
+                          ``unsupported_protocol``. It is not reset while a resync runs. Known values
+                          are: "pending", "ok", "failed", and "unsupported_protocol".
+                        "toolCount": 0,  # Optional. Number of tools discovered on the
+                          server, whether enabled or not.
+                        "transport": "str",  # Optional. Always ``streamable_http``.
+                          "streamable_http"
+                        "updatedAt": "str"  # Optional. When the server was last modified, in
+                          RFC 3339 format.
+                    }
+                }
+                # response body for status code(s): 400, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    def create(
+        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Register an MCP Server.
+
+        Registers a remote MCP server for your team, using the streamable HTTP transport. The server
+        starts with ``syncStatus`` pending and no tools: discover its tools with ``POST
+        .../mcp-servers/{server_ref}/resync``\\ , then choose which to enable with ``PUT
+        .../mcp-servers/{server_ref}/tools``. The endpoint must be HTTPS and resolve only to public IP
+        addresses. The number of servers per team is limited (10 by default); registering beyond it
+        returns 429. Returns 409 when ``serverRef`` is already in use.
+
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
         :return: JSON object
         :rtype: JSON
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -18944,23 +20637,359 @@ class ToolbeltsOperations:
 
                 # response body for status code(s): 200
                 response == {
-                    "pagination": {
-                        "page": 0,  # Required.
-                        "per_page": 0,  # Required.
-                        "total": 0  # Required.
-                    },
-                    "toolbelts": [
+                    "mcpServer": {
+                        "createdAt": "str",  # Optional. When the server was registered, in
+                          RFC 3339 format.
+                        "credentialRef": "str",  # Optional. The secret reference supplied at
+                          registration when source=secret, or the team's OAuth credential ID when
+                          source=connection. Empty when the server was registered with an ``api_key``""
+                          , whose storage DigitalOcean manages.
+                        "credentialRefSource": "str",  # Optional. How requests to the server
+                          authenticate: none, secret (a key or token sent in the Authorization header),
+                          or connection (each user's own OAuth authorization). Known values are:
+                          "none", "secret", and "connection".
+                        "description": "str",  # Optional. Team-authored description, shown
+                          on the server's catalog card. A resync does not replace it.
+                        "endpoint": "str",  # Optional. HTTPS URL of the server's MCP
+                          endpoint.
+                        "lastSyncedAt": "str",  # Optional. When discovery last succeeded, in
+                          RFC 3339 format; empty until the first success.
+                        "oauth_authorization_ttl_seconds": "str",  # Optional. How long a
+                          user's authorization is reused before re-consent. Echoed so a team can read
+                          the window without re-registering to discover it.
+                        "oauth_authorize_url": "str",  # Optional. OAuth authorization
+                          endpoint. Set only when ``credentialRefSource`` is connection; the client
+                          secret is never returned.
+                        "oauth_scopes": [
+                            "str"  # Optional. OAuth scopes requested from each user. Set
+                              only when ``credentialRefSource`` is connection.
+                        ],
+                        "protocolVersion": "str",  # Optional. MCP protocol revision
+                          negotiated with the server.
+                        "serverRef": "str",  # Optional. Server identifier, unique within
+                          your team. The server's tool slugs are ``<server_ref>_<name>``.
+                        "syncError": "str",  # Optional. Why the latest discovery failed;
+                          empty after a successful one.
+                        "syncStatus": "str",  # Optional. Outcome of the latest discovery:
+                          pending (no discovery has finished yet), ok, failed, or
+                          ``unsupported_protocol``. It is not reset while a resync runs. Known values
+                          are: "pending", "ok", "failed", and "unsupported_protocol".
+                        "toolCount": 0,  # Optional. Number of tools discovered on the
+                          server, whether enabled or not.
+                        "transport": "str",  # Optional. Always ``streamable_http``.
+                          "streamable_http"
+                        "updatedAt": "str"  # Optional. When the server was last modified, in
+                          RFC 3339 format.
+                    }
+                }
+                # response body for status code(s): 400, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace
+    def create(self, body: Union[JSON, IO[bytes]], **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Register an MCP Server.
+
+        Registers a remote MCP server for your team, using the streamable HTTP transport. The server
+        starts with ``syncStatus`` pending and no tools: discover its tools with ``POST
+        .../mcp-servers/{server_ref}/resync``\\ , then choose which to enable with ``PUT
+        .../mcp-servers/{server_ref}/tools``. The endpoint must be HTTPS and resolve only to public IP
+        addresses. The number of servers per team is limited (10 by default); registering beyond it
+        returns 429. Returns 409 when ``serverRef`` is already in use.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "endpoint": "str",  # HTTPS URL of the server's MCP endpoint. Its host must
+                      resolve only to public IP addresses. Required. Required.
+                    "serverRef": "str",  # Identifier for the server, unique within your team.
+                      Must match ``^``"" [a-z]"" ```[a-z0-9-]``"" {0,63}$`. Required.
+                    "api_key": "str",  # Optional. For ``credentialRefSource`` secret: the key or
+                      token itself. DigitalOcean stores it; it is write-only and no response returns
+                      it. Set exactly one of ``credentialRef`` and ``api_key``.
+                    "credentialRef": "str",  # Optional. For ``credentialRefSource`` secret: a
+                      reference to a secret your team stores with DigitalOcean. Must match ``^``""
+                      [A-Za-z0-9]"" ```[A-Za-z0-9:/_.-]``"" {0,254}$"" ``. Set exactly one of``""
+                      credentialRef"" ``and``"" api_key`.
+                    "credentialRefSource": "none",  # Optional. Default value is "none". How
+                      requests to the server authenticate: none (the default), secret, or connection.
+                      With secret, the value from ``credentialRef`` or ``api_key`` is sent in the
+                      Authorization header, prefixed with "Bearer " unless it already contains a space.
+                      Known values are: "none", "secret", and "connection".
+                    "description": "str",  # Optional. Optional description shown on the server's
+                      catalog card. At most 1024 characters.
+                    "oauth_authorization_ttl_seconds": "str",  # Optional. How long, in seconds,
+                      a user's authorization may be reused before they must consent again. Optional; 0
+                      means 30 days, and the maximum is 100 years.  Authorizations are not refreshed
+                      automatically, so this window, not the provider's token lifetime, decides how
+                      often a user is sent back through consent. Set it no longer than the provider's
+                      own token lifetime, so the prompt arrives before a tool call fails against an
+                      expired token.
+                    "oauth_authorize_url": "str",  # Optional. Required for
+                      ``credentialRefSource`` connection: the OAuth authorization endpoint. It must use
+                      the endpoint's scheme and port, on the endpoint's host or another host under the
+                      same registrable domain.
+                    "oauth_client_id": "str",  # Optional. Required for ``credentialRefSource``
+                      connection: the client ID of your team's OAuth client for the server. Each user
+                      of the server then authorizes individually.
+                    "oauth_client_secret": "str",  # Optional. Required for
+                      ``credentialRefSource`` connection. Write-only; no response returns it.
+                    "oauth_scopes": [
+                        "str"  # Optional. Required for ``credentialRefSource`` connection:
+                          the scopes to request from each user, 1 to 64 of them.
+                    ],
+                    "oauth_token_url": "str",  # Optional. Required for ``credentialRefSource``
+                      connection: the OAuth token endpoint, under the same rules as
+                      ``oauth_authorize_url``.
+                    "transport": "streamable_http"  # Optional. Default value is
+                      "streamable_http". Optional. ``streamable_http``"" , the default and only
+                      accepted value. "streamable_http"
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "mcpServer": {
+                        "createdAt": "str",  # Optional. When the server was registered, in
+                          RFC 3339 format.
+                        "credentialRef": "str",  # Optional. The secret reference supplied at
+                          registration when source=secret, or the team's OAuth credential ID when
+                          source=connection. Empty when the server was registered with an ``api_key``""
+                          , whose storage DigitalOcean manages.
+                        "credentialRefSource": "str",  # Optional. How requests to the server
+                          authenticate: none, secret (a key or token sent in the Authorization header),
+                          or connection (each user's own OAuth authorization). Known values are:
+                          "none", "secret", and "connection".
+                        "description": "str",  # Optional. Team-authored description, shown
+                          on the server's catalog card. A resync does not replace it.
+                        "endpoint": "str",  # Optional. HTTPS URL of the server's MCP
+                          endpoint.
+                        "lastSyncedAt": "str",  # Optional. When discovery last succeeded, in
+                          RFC 3339 format; empty until the first success.
+                        "oauth_authorization_ttl_seconds": "str",  # Optional. How long a
+                          user's authorization is reused before re-consent. Echoed so a team can read
+                          the window without re-registering to discover it.
+                        "oauth_authorize_url": "str",  # Optional. OAuth authorization
+                          endpoint. Set only when ``credentialRefSource`` is connection; the client
+                          secret is never returned.
+                        "oauth_scopes": [
+                            "str"  # Optional. OAuth scopes requested from each user. Set
+                              only when ``credentialRefSource`` is connection.
+                        ],
+                        "protocolVersion": "str",  # Optional. MCP protocol revision
+                          negotiated with the server.
+                        "serverRef": "str",  # Optional. Server identifier, unique within
+                          your team. The server's tool slugs are ``<server_ref>_<name>``.
+                        "syncError": "str",  # Optional. Why the latest discovery failed;
+                          empty after a successful one.
+                        "syncStatus": "str",  # Optional. Outcome of the latest discovery:
+                          pending (no discovery has finished yet), ok, failed, or
+                          ``unsupported_protocol``. It is not reset while a resync runs. Known values
+                          are: "pending", "ok", "failed", and "unsupported_protocol".
+                        "toolCount": 0,  # Optional. Number of tools discovered on the
+                          server, whether enabled or not.
+                        "transport": "str",  # Optional. Always ``streamable_http``.
+                          "streamable_http"
+                        "updatedAt": "str"  # Optional. When the server was last modified, in
+                          RFC 3339 format.
+                    }
+                }
+                # response body for status code(s): 400, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_mcp_servers_create_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 409]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def list(self, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """List MCP Servers.
+
+        Returns every MCP server your team has registered, sorted by ``serverRef``.
+
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "mcpServers": [
                         {
-                            "latest_version": "str",  # Required.
-                            "name": "str",  # Required.
-                            "reference_latest": "str",  # Required.
-                            "status": "str",  # Required. Known values are: "active" and
-                              "deprecated".
-                            "tool_count": 0,  # Required.
-                            "updated_at": "2020-02-20 00:00:00",  # Required.
-                            "version_count": 0,  # Required.
-                            "description": "str",  # Optional. Required.
-                            "display_name": "str"  # Optional. Required.
+                            "createdAt": "str",  # Optional. When the server was
+                              registered, in RFC 3339 format.
+                            "credentialRef": "str",  # Optional. The secret reference
+                              supplied at registration when source=secret, or the team's OAuth
+                              credential ID when source=connection. Empty when the server was
+                              registered with an ``api_key``"" , whose storage DigitalOcean manages.
+                            "credentialRefSource": "str",  # Optional. How requests to
+                              the server authenticate: none, secret (a key or token sent in the
+                              Authorization header), or connection (each user's own OAuth
+                              authorization). Known values are: "none", "secret", and "connection".
+                            "description": "str",  # Optional. Team-authored description,
+                              shown on the server's catalog card. A resync does not replace it.
+                            "endpoint": "str",  # Optional. HTTPS URL of the server's MCP
+                              endpoint.
+                            "lastSyncedAt": "str",  # Optional. When discovery last
+                              succeeded, in RFC 3339 format; empty until the first success.
+                            "oauth_authorization_ttl_seconds": "str",  # Optional. How
+                              long a user's authorization is reused before re-consent. Echoed so a team
+                              can read the window without re-registering to discover it.
+                            "oauth_authorize_url": "str",  # Optional. OAuth
+                              authorization endpoint. Set only when ``credentialRefSource`` is
+                              connection; the client secret is never returned.
+                            "oauth_scopes": [
+                                "str"  # Optional. OAuth scopes requested from each
+                                  user. Set only when ``credentialRefSource`` is connection.
+                            ],
+                            "protocolVersion": "str",  # Optional. MCP protocol revision
+                              negotiated with the server.
+                            "serverRef": "str",  # Optional. Server identifier, unique
+                              within your team. The server's tool slugs are ``<server_ref>_<name>``.
+                            "syncError": "str",  # Optional. Why the latest discovery
+                              failed; empty after a successful one.
+                            "syncStatus": "str",  # Optional. Outcome of the latest
+                              discovery: pending (no discovery has finished yet), ok, failed, or
+                              ``unsupported_protocol``. It is not reset while a resync runs. Known
+                              values are: "pending", "ok", "failed", and "unsupported_protocol".
+                            "toolCount": 0,  # Optional. Number of tools discovered on
+                              the server, whether enabled or not.
+                            "transport": "str",  # Optional. Always ``streamable_http``.
+                              "streamable_http"
+                            "updatedAt": "str"  # Optional. When the server was last
+                              modified, in RFC 3339 format.
                         }
                     ]
                 }
@@ -18983,8 +21012,3643 @@ class ToolbeltsOperations:
 
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
-        _request = build_toolbelts_list_request(
-            status=status,
+        _request = build_mcp_servers_list_request(
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        response_headers["ratelimit-limit"] = self._deserialize(
+            "int", response.headers.get("ratelimit-limit")
+        )
+        response_headers["ratelimit-remaining"] = self._deserialize(
+            "int", response.headers.get("ratelimit-remaining")
+        )
+        response_headers["ratelimit-reset"] = self._deserialize(
+            "int", response.headers.get("ratelimit-reset")
+        )
+
+        if response.content:
+            deserialized = response.json()
+        else:
+            deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def get(self, server_ref: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Get an MCP Server.
+
+        Returns one of your team's MCP servers, or 404 when your team has none with this ``serverRef``.
+
+        :param server_ref: Server identifier (\\ ``serverRef``\\ ) of one of your team's MCP servers.
+         Required.
+        :type server_ref: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "mcpServer": {
+                        "createdAt": "str",  # Optional. When the server was registered, in
+                          RFC 3339 format.
+                        "credentialRef": "str",  # Optional. The secret reference supplied at
+                          registration when source=secret, or the team's OAuth credential ID when
+                          source=connection. Empty when the server was registered with an ``api_key``""
+                          , whose storage DigitalOcean manages.
+                        "credentialRefSource": "str",  # Optional. How requests to the server
+                          authenticate: none, secret (a key or token sent in the Authorization header),
+                          or connection (each user's own OAuth authorization). Known values are:
+                          "none", "secret", and "connection".
+                        "description": "str",  # Optional. Team-authored description, shown
+                          on the server's catalog card. A resync does not replace it.
+                        "endpoint": "str",  # Optional. HTTPS URL of the server's MCP
+                          endpoint.
+                        "lastSyncedAt": "str",  # Optional. When discovery last succeeded, in
+                          RFC 3339 format; empty until the first success.
+                        "oauth_authorization_ttl_seconds": "str",  # Optional. How long a
+                          user's authorization is reused before re-consent. Echoed so a team can read
+                          the window without re-registering to discover it.
+                        "oauth_authorize_url": "str",  # Optional. OAuth authorization
+                          endpoint. Set only when ``credentialRefSource`` is connection; the client
+                          secret is never returned.
+                        "oauth_scopes": [
+                            "str"  # Optional. OAuth scopes requested from each user. Set
+                              only when ``credentialRefSource`` is connection.
+                        ],
+                        "protocolVersion": "str",  # Optional. MCP protocol revision
+                          negotiated with the server.
+                        "serverRef": "str",  # Optional. Server identifier, unique within
+                          your team. The server's tool slugs are ``<server_ref>_<name>``.
+                        "syncError": "str",  # Optional. Why the latest discovery failed;
+                          empty after a successful one.
+                        "syncStatus": "str",  # Optional. Outcome of the latest discovery:
+                          pending (no discovery has finished yet), ok, failed, or
+                          ``unsupported_protocol``. It is not reset while a resync runs. Known values
+                          are: "pending", "ok", "failed", and "unsupported_protocol".
+                        "toolCount": 0,  # Optional. Number of tools discovered on the
+                          server, whether enabled or not.
+                        "transport": "str",  # Optional. Always ``streamable_http``.
+                          "streamable_http"
+                        "updatedAt": "str"  # Optional. When the server was last modified, in
+                          RFC 3339 format.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_mcp_servers_get_request(
+            server_ref=server_ref,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    def patch(
+        self,
+        server_ref: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update an MCP Server.
+
+        Changes the server's description, which is shown on its catalog card immediately. The endpoint
+        and credentials cannot be changed; to change them, delete the server and register it again.
+
+        :param server_ref: Server identifier (\\ ``serverRef``\\ ) of one of your team's MCP servers.
+         Required.
+        :type server_ref: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "description": "str"  # Optional. Replaces the stored description; empty
+                      clears it. At most 1024 characters.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "mcpServer": {
+                        "createdAt": "str",  # Optional. When the server was registered, in
+                          RFC 3339 format.
+                        "credentialRef": "str",  # Optional. The secret reference supplied at
+                          registration when source=secret, or the team's OAuth credential ID when
+                          source=connection. Empty when the server was registered with an ``api_key``""
+                          , whose storage DigitalOcean manages.
+                        "credentialRefSource": "str",  # Optional. How requests to the server
+                          authenticate: none, secret (a key or token sent in the Authorization header),
+                          or connection (each user's own OAuth authorization). Known values are:
+                          "none", "secret", and "connection".
+                        "description": "str",  # Optional. Team-authored description, shown
+                          on the server's catalog card. A resync does not replace it.
+                        "endpoint": "str",  # Optional. HTTPS URL of the server's MCP
+                          endpoint.
+                        "lastSyncedAt": "str",  # Optional. When discovery last succeeded, in
+                          RFC 3339 format; empty until the first success.
+                        "oauth_authorization_ttl_seconds": "str",  # Optional. How long a
+                          user's authorization is reused before re-consent. Echoed so a team can read
+                          the window without re-registering to discover it.
+                        "oauth_authorize_url": "str",  # Optional. OAuth authorization
+                          endpoint. Set only when ``credentialRefSource`` is connection; the client
+                          secret is never returned.
+                        "oauth_scopes": [
+                            "str"  # Optional. OAuth scopes requested from each user. Set
+                              only when ``credentialRefSource`` is connection.
+                        ],
+                        "protocolVersion": "str",  # Optional. MCP protocol revision
+                          negotiated with the server.
+                        "serverRef": "str",  # Optional. Server identifier, unique within
+                          your team. The server's tool slugs are ``<server_ref>_<name>``.
+                        "syncError": "str",  # Optional. Why the latest discovery failed;
+                          empty after a successful one.
+                        "syncStatus": "str",  # Optional. Outcome of the latest discovery:
+                          pending (no discovery has finished yet), ok, failed, or
+                          ``unsupported_protocol``. It is not reset while a resync runs. Known values
+                          are: "pending", "ok", "failed", and "unsupported_protocol".
+                        "toolCount": 0,  # Optional. Number of tools discovered on the
+                          server, whether enabled or not.
+                        "transport": "str",  # Optional. Always ``streamable_http``.
+                          "streamable_http"
+                        "updatedAt": "str"  # Optional. When the server was last modified, in
+                          RFC 3339 format.
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    def patch(
+        self,
+        server_ref: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update an MCP Server.
+
+        Changes the server's description, which is shown on its catalog card immediately. The endpoint
+        and credentials cannot be changed; to change them, delete the server and register it again.
+
+        :param server_ref: Server identifier (\\ ``serverRef``\\ ) of one of your team's MCP servers.
+         Required.
+        :type server_ref: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "mcpServer": {
+                        "createdAt": "str",  # Optional. When the server was registered, in
+                          RFC 3339 format.
+                        "credentialRef": "str",  # Optional. The secret reference supplied at
+                          registration when source=secret, or the team's OAuth credential ID when
+                          source=connection. Empty when the server was registered with an ``api_key``""
+                          , whose storage DigitalOcean manages.
+                        "credentialRefSource": "str",  # Optional. How requests to the server
+                          authenticate: none, secret (a key or token sent in the Authorization header),
+                          or connection (each user's own OAuth authorization). Known values are:
+                          "none", "secret", and "connection".
+                        "description": "str",  # Optional. Team-authored description, shown
+                          on the server's catalog card. A resync does not replace it.
+                        "endpoint": "str",  # Optional. HTTPS URL of the server's MCP
+                          endpoint.
+                        "lastSyncedAt": "str",  # Optional. When discovery last succeeded, in
+                          RFC 3339 format; empty until the first success.
+                        "oauth_authorization_ttl_seconds": "str",  # Optional. How long a
+                          user's authorization is reused before re-consent. Echoed so a team can read
+                          the window without re-registering to discover it.
+                        "oauth_authorize_url": "str",  # Optional. OAuth authorization
+                          endpoint. Set only when ``credentialRefSource`` is connection; the client
+                          secret is never returned.
+                        "oauth_scopes": [
+                            "str"  # Optional. OAuth scopes requested from each user. Set
+                              only when ``credentialRefSource`` is connection.
+                        ],
+                        "protocolVersion": "str",  # Optional. MCP protocol revision
+                          negotiated with the server.
+                        "serverRef": "str",  # Optional. Server identifier, unique within
+                          your team. The server's tool slugs are ``<server_ref>_<name>``.
+                        "syncError": "str",  # Optional. Why the latest discovery failed;
+                          empty after a successful one.
+                        "syncStatus": "str",  # Optional. Outcome of the latest discovery:
+                          pending (no discovery has finished yet), ok, failed, or
+                          ``unsupported_protocol``. It is not reset while a resync runs. Known values
+                          are: "pending", "ok", "failed", and "unsupported_protocol".
+                        "toolCount": 0,  # Optional. Number of tools discovered on the
+                          server, whether enabled or not.
+                        "transport": "str",  # Optional. Always ``streamable_http``.
+                          "streamable_http"
+                        "updatedAt": "str"  # Optional. When the server was last modified, in
+                          RFC 3339 format.
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace
+    def patch(
+        self, server_ref: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update an MCP Server.
+
+        Changes the server's description, which is shown on its catalog card immediately. The endpoint
+        and credentials cannot be changed; to change them, delete the server and register it again.
+
+        :param server_ref: Server identifier (\\ ``serverRef``\\ ) of one of your team's MCP servers.
+         Required.
+        :type server_ref: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "description": "str"  # Optional. Replaces the stored description; empty
+                      clears it. At most 1024 characters.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "mcpServer": {
+                        "createdAt": "str",  # Optional. When the server was registered, in
+                          RFC 3339 format.
+                        "credentialRef": "str",  # Optional. The secret reference supplied at
+                          registration when source=secret, or the team's OAuth credential ID when
+                          source=connection. Empty when the server was registered with an ``api_key``""
+                          , whose storage DigitalOcean manages.
+                        "credentialRefSource": "str",  # Optional. How requests to the server
+                          authenticate: none, secret (a key or token sent in the Authorization header),
+                          or connection (each user's own OAuth authorization). Known values are:
+                          "none", "secret", and "connection".
+                        "description": "str",  # Optional. Team-authored description, shown
+                          on the server's catalog card. A resync does not replace it.
+                        "endpoint": "str",  # Optional. HTTPS URL of the server's MCP
+                          endpoint.
+                        "lastSyncedAt": "str",  # Optional. When discovery last succeeded, in
+                          RFC 3339 format; empty until the first success.
+                        "oauth_authorization_ttl_seconds": "str",  # Optional. How long a
+                          user's authorization is reused before re-consent. Echoed so a team can read
+                          the window without re-registering to discover it.
+                        "oauth_authorize_url": "str",  # Optional. OAuth authorization
+                          endpoint. Set only when ``credentialRefSource`` is connection; the client
+                          secret is never returned.
+                        "oauth_scopes": [
+                            "str"  # Optional. OAuth scopes requested from each user. Set
+                              only when ``credentialRefSource`` is connection.
+                        ],
+                        "protocolVersion": "str",  # Optional. MCP protocol revision
+                          negotiated with the server.
+                        "serverRef": "str",  # Optional. Server identifier, unique within
+                          your team. The server's tool slugs are ``<server_ref>_<name>``.
+                        "syncError": "str",  # Optional. Why the latest discovery failed;
+                          empty after a successful one.
+                        "syncStatus": "str",  # Optional. Outcome of the latest discovery:
+                          pending (no discovery has finished yet), ok, failed, or
+                          ``unsupported_protocol``. It is not reset while a resync runs. Known values
+                          are: "pending", "ok", "failed", and "unsupported_protocol".
+                        "toolCount": 0,  # Optional. Number of tools discovered on the
+                          server, whether enabled or not.
+                        "transport": "str",  # Optional. Always ``streamable_http``.
+                          "streamable_http"
+                        "updatedAt": "str"  # Optional. When the server was last modified, in
+                          RFC 3339 format.
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_mcp_servers_patch_request(
+            server_ref=server_ref,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def delete(self, server_ref: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Delete an MCP Server.
+
+        Disables all of the server's tools, removes them from your team's catalog, and deletes the
+        server. An ``api_key`` supplied at registration is deleted; a ``credentialRef`` you supplied is
+        left untouched. For a server registered with ``credentialRefSource`` connection, every user
+        connection made through its OAuth client is revoked. Returns the deleted server, or 404 when it
+        does not exist.
+
+        :param server_ref: Server identifier (\\ ``serverRef``\\ ) of one of your team's MCP servers.
+         Required.
+        :type server_ref: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "mcpServer": {
+                        "createdAt": "str",  # Optional. When the server was registered, in
+                          RFC 3339 format.
+                        "credentialRef": "str",  # Optional. The secret reference supplied at
+                          registration when source=secret, or the team's OAuth credential ID when
+                          source=connection. Empty when the server was registered with an ``api_key``""
+                          , whose storage DigitalOcean manages.
+                        "credentialRefSource": "str",  # Optional. How requests to the server
+                          authenticate: none, secret (a key or token sent in the Authorization header),
+                          or connection (each user's own OAuth authorization). Known values are:
+                          "none", "secret", and "connection".
+                        "description": "str",  # Optional. Team-authored description, shown
+                          on the server's catalog card. A resync does not replace it.
+                        "endpoint": "str",  # Optional. HTTPS URL of the server's MCP
+                          endpoint.
+                        "lastSyncedAt": "str",  # Optional. When discovery last succeeded, in
+                          RFC 3339 format; empty until the first success.
+                        "oauth_authorization_ttl_seconds": "str",  # Optional. How long a
+                          user's authorization is reused before re-consent. Echoed so a team can read
+                          the window without re-registering to discover it.
+                        "oauth_authorize_url": "str",  # Optional. OAuth authorization
+                          endpoint. Set only when ``credentialRefSource`` is connection; the client
+                          secret is never returned.
+                        "oauth_scopes": [
+                            "str"  # Optional. OAuth scopes requested from each user. Set
+                              only when ``credentialRefSource`` is connection.
+                        ],
+                        "protocolVersion": "str",  # Optional. MCP protocol revision
+                          negotiated with the server.
+                        "serverRef": "str",  # Optional. Server identifier, unique within
+                          your team. The server's tool slugs are ``<server_ref>_<name>``.
+                        "syncError": "str",  # Optional. Why the latest discovery failed;
+                          empty after a successful one.
+                        "syncStatus": "str",  # Optional. Outcome of the latest discovery:
+                          pending (no discovery has finished yet), ok, failed, or
+                          ``unsupported_protocol``. It is not reset while a resync runs. Known values
+                          are: "pending", "ok", "failed", and "unsupported_protocol".
+                        "toolCount": 0,  # Optional. Number of tools discovered on the
+                          server, whether enabled or not.
+                        "transport": "str",  # Optional. Always ``streamable_http``.
+                          "streamable_http"
+                        "updatedAt": "str"  # Optional. When the server was last modified, in
+                          RFC 3339 format.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_mcp_servers_delete_request(
+            server_ref=server_ref,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    def run_resync(
+        self,
+        server_ref: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Discover an MCP Server's Tools.
+
+        Connects to the server, lists its tools, and records them. Discovered tools are not callable
+        until
+        you enable them.
+
+        When discovery finishes in time, returns 200 with the server and its tools; a discovery failure
+        is
+        reported in ``syncStatus`` and ``syncError`` rather than as an error. Otherwise returns 202
+        with pending
+        set while discovery continues: poll ``GET .../mcp-servers/{server_ref}`` until ``lastSyncedAt``
+        or
+        ``syncError`` changes (\\ ``syncStatus`` is not reset while discovery runs).
+
+        For a server registered with ``credentialRefSource`` connection, ``user_id`` is required; if
+        that user
+        has not authorized the server yet, the response carries authorization with the URL to send them
+        to.
+        Resyncs are rate limited per team, and a team can run only a few discoveries at once; either
+        limit
+        returns 429.
+
+        :param server_ref: Server identifier (\\ ``serverRef``\\ ) of one of your team's MCP servers.
+         Required.
+        :type server_ref: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "user_id": "str"  # Optional. Required for a server registered with
+                      ``credentialRefSource`` connection: discovery reaches the server as this user,
+                      through their connection, because such a server has no team-wide credential.
+                      Ignored otherwise.
+                }
+
+                # response body for status code(s): 200, 202
+                response == {
+                    "authorization": {
+                        "connect_url": "str",  # Optional. Browser URL, on a DigitalOcean
+                          Cloud origin, where the user authorizes the connection.
+                        "expires_at": "2020-02-20 00:00:00",  # Optional. When the
+                          authorization expires. The link can stop working earlier; if the connection
+                          becomes expired, create it again for a new link.
+                        "status": "str",  # Optional. Currently always
+                          ``requires_authorization``. "requires_authorization"
+                        "verification_code": "str"  # Optional. Verification code issued with
+                          ``connect_url``.
+                    },
+                    "mcpServer": {
+                        "createdAt": "str",  # Optional. When the server was registered, in
+                          RFC 3339 format.
+                        "credentialRef": "str",  # Optional. The secret reference supplied at
+                          registration when source=secret, or the team's OAuth credential ID when
+                          source=connection. Empty when the server was registered with an ``api_key``""
+                          , whose storage DigitalOcean manages.
+                        "credentialRefSource": "str",  # Optional. How requests to the server
+                          authenticate: none, secret (a key or token sent in the Authorization header),
+                          or connection (each user's own OAuth authorization). Known values are:
+                          "none", "secret", and "connection".
+                        "description": "str",  # Optional. Team-authored description, shown
+                          on the server's catalog card. A resync does not replace it.
+                        "endpoint": "str",  # Optional. HTTPS URL of the server's MCP
+                          endpoint.
+                        "lastSyncedAt": "str",  # Optional. When discovery last succeeded, in
+                          RFC 3339 format; empty until the first success.
+                        "oauth_authorization_ttl_seconds": "str",  # Optional. How long a
+                          user's authorization is reused before re-consent. Echoed so a team can read
+                          the window without re-registering to discover it.
+                        "oauth_authorize_url": "str",  # Optional. OAuth authorization
+                          endpoint. Set only when ``credentialRefSource`` is connection; the client
+                          secret is never returned.
+                        "oauth_scopes": [
+                            "str"  # Optional. OAuth scopes requested from each user. Set
+                              only when ``credentialRefSource`` is connection.
+                        ],
+                        "protocolVersion": "str",  # Optional. MCP protocol revision
+                          negotiated with the server.
+                        "serverRef": "str",  # Optional. Server identifier, unique within
+                          your team. The server's tool slugs are ``<server_ref>_<name>``.
+                        "syncError": "str",  # Optional. Why the latest discovery failed;
+                          empty after a successful one.
+                        "syncStatus": "str",  # Optional. Outcome of the latest discovery:
+                          pending (no discovery has finished yet), ok, failed, or
+                          ``unsupported_protocol``. It is not reset while a resync runs. Known values
+                          are: "pending", "ok", "failed", and "unsupported_protocol".
+                        "toolCount": 0,  # Optional. Number of tools discovered on the
+                          server, whether enabled or not.
+                        "transport": "str",  # Optional. Always ``streamable_http``.
+                          "streamable_http"
+                        "updatedAt": "str"  # Optional. When the server was last modified, in
+                          RFC 3339 format.
+                    },
+                    "pending": bool,  # Optional. True when discovery is still running (HTTP
+                      202). Poll the server to see the outcome.
+                    "tools": [
+                        {
+                            "description": "str",  # Optional. Tool description as the
+                              server reports it.
+                            "enabled": bool,  # Optional. Whether the tool is enabled in
+                              your team's catalog.
+                            "name": "str",  # Optional. Tool name as the server reports
+                              it, normalized to the catalog's naming rules.
+                            "quarantineReason": "str",  # Optional. Why the tool was
+                              quarantined; empty otherwise.
+                            "quarantined": bool,  # Optional. True when the enabled tool
+                              was suspended because it disappeared from the server or its input schema
+                              changed incompatibly. Calls to it fail until it is enabled again.
+                            "toolSlug": "str"  # Optional. ``<server_ref>_<name>``"" :
+                              the tool's catalog slug, and the value to list in ``enabledToolSlugs``.
+                        }
+                    ]
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    def run_resync(
+        self,
+        server_ref: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Discover an MCP Server's Tools.
+
+        Connects to the server, lists its tools, and records them. Discovered tools are not callable
+        until
+        you enable them.
+
+        When discovery finishes in time, returns 200 with the server and its tools; a discovery failure
+        is
+        reported in ``syncStatus`` and ``syncError`` rather than as an error. Otherwise returns 202
+        with pending
+        set while discovery continues: poll ``GET .../mcp-servers/{server_ref}`` until ``lastSyncedAt``
+        or
+        ``syncError`` changes (\\ ``syncStatus`` is not reset while discovery runs).
+
+        For a server registered with ``credentialRefSource`` connection, ``user_id`` is required; if
+        that user
+        has not authorized the server yet, the response carries authorization with the URL to send them
+        to.
+        Resyncs are rate limited per team, and a team can run only a few discoveries at once; either
+        limit
+        returns 429.
+
+        :param server_ref: Server identifier (\\ ``serverRef``\\ ) of one of your team's MCP servers.
+         Required.
+        :type server_ref: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200, 202
+                response == {
+                    "authorization": {
+                        "connect_url": "str",  # Optional. Browser URL, on a DigitalOcean
+                          Cloud origin, where the user authorizes the connection.
+                        "expires_at": "2020-02-20 00:00:00",  # Optional. When the
+                          authorization expires. The link can stop working earlier; if the connection
+                          becomes expired, create it again for a new link.
+                        "status": "str",  # Optional. Currently always
+                          ``requires_authorization``. "requires_authorization"
+                        "verification_code": "str"  # Optional. Verification code issued with
+                          ``connect_url``.
+                    },
+                    "mcpServer": {
+                        "createdAt": "str",  # Optional. When the server was registered, in
+                          RFC 3339 format.
+                        "credentialRef": "str",  # Optional. The secret reference supplied at
+                          registration when source=secret, or the team's OAuth credential ID when
+                          source=connection. Empty when the server was registered with an ``api_key``""
+                          , whose storage DigitalOcean manages.
+                        "credentialRefSource": "str",  # Optional. How requests to the server
+                          authenticate: none, secret (a key or token sent in the Authorization header),
+                          or connection (each user's own OAuth authorization). Known values are:
+                          "none", "secret", and "connection".
+                        "description": "str",  # Optional. Team-authored description, shown
+                          on the server's catalog card. A resync does not replace it.
+                        "endpoint": "str",  # Optional. HTTPS URL of the server's MCP
+                          endpoint.
+                        "lastSyncedAt": "str",  # Optional. When discovery last succeeded, in
+                          RFC 3339 format; empty until the first success.
+                        "oauth_authorization_ttl_seconds": "str",  # Optional. How long a
+                          user's authorization is reused before re-consent. Echoed so a team can read
+                          the window without re-registering to discover it.
+                        "oauth_authorize_url": "str",  # Optional. OAuth authorization
+                          endpoint. Set only when ``credentialRefSource`` is connection; the client
+                          secret is never returned.
+                        "oauth_scopes": [
+                            "str"  # Optional. OAuth scopes requested from each user. Set
+                              only when ``credentialRefSource`` is connection.
+                        ],
+                        "protocolVersion": "str",  # Optional. MCP protocol revision
+                          negotiated with the server.
+                        "serverRef": "str",  # Optional. Server identifier, unique within
+                          your team. The server's tool slugs are ``<server_ref>_<name>``.
+                        "syncError": "str",  # Optional. Why the latest discovery failed;
+                          empty after a successful one.
+                        "syncStatus": "str",  # Optional. Outcome of the latest discovery:
+                          pending (no discovery has finished yet), ok, failed, or
+                          ``unsupported_protocol``. It is not reset while a resync runs. Known values
+                          are: "pending", "ok", "failed", and "unsupported_protocol".
+                        "toolCount": 0,  # Optional. Number of tools discovered on the
+                          server, whether enabled or not.
+                        "transport": "str",  # Optional. Always ``streamable_http``.
+                          "streamable_http"
+                        "updatedAt": "str"  # Optional. When the server was last modified, in
+                          RFC 3339 format.
+                    },
+                    "pending": bool,  # Optional. True when discovery is still running (HTTP
+                      202). Poll the server to see the outcome.
+                    "tools": [
+                        {
+                            "description": "str",  # Optional. Tool description as the
+                              server reports it.
+                            "enabled": bool,  # Optional. Whether the tool is enabled in
+                              your team's catalog.
+                            "name": "str",  # Optional. Tool name as the server reports
+                              it, normalized to the catalog's naming rules.
+                            "quarantineReason": "str",  # Optional. Why the tool was
+                              quarantined; empty otherwise.
+                            "quarantined": bool,  # Optional. True when the enabled tool
+                              was suspended because it disappeared from the server or its input schema
+                              changed incompatibly. Calls to it fail until it is enabled again.
+                            "toolSlug": "str"  # Optional. ``<server_ref>_<name>``"" :
+                              the tool's catalog slug, and the value to list in ``enabledToolSlugs``.
+                        }
+                    ]
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace
+    def run_resync(
+        self, server_ref: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Discover an MCP Server's Tools.
+
+        Connects to the server, lists its tools, and records them. Discovered tools are not callable
+        until
+        you enable them.
+
+        When discovery finishes in time, returns 200 with the server and its tools; a discovery failure
+        is
+        reported in ``syncStatus`` and ``syncError`` rather than as an error. Otherwise returns 202
+        with pending
+        set while discovery continues: poll ``GET .../mcp-servers/{server_ref}`` until ``lastSyncedAt``
+        or
+        ``syncError`` changes (\\ ``syncStatus`` is not reset while discovery runs).
+
+        For a server registered with ``credentialRefSource`` connection, ``user_id`` is required; if
+        that user
+        has not authorized the server yet, the response carries authorization with the URL to send them
+        to.
+        Resyncs are rate limited per team, and a team can run only a few discoveries at once; either
+        limit
+        returns 429.
+
+        :param server_ref: Server identifier (\\ ``serverRef``\\ ) of one of your team's MCP servers.
+         Required.
+        :type server_ref: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "user_id": "str"  # Optional. Required for a server registered with
+                      ``credentialRefSource`` connection: discovery reaches the server as this user,
+                      through their connection, because such a server has no team-wide credential.
+                      Ignored otherwise.
+                }
+
+                # response body for status code(s): 200, 202
+                response == {
+                    "authorization": {
+                        "connect_url": "str",  # Optional. Browser URL, on a DigitalOcean
+                          Cloud origin, where the user authorizes the connection.
+                        "expires_at": "2020-02-20 00:00:00",  # Optional. When the
+                          authorization expires. The link can stop working earlier; if the connection
+                          becomes expired, create it again for a new link.
+                        "status": "str",  # Optional. Currently always
+                          ``requires_authorization``. "requires_authorization"
+                        "verification_code": "str"  # Optional. Verification code issued with
+                          ``connect_url``.
+                    },
+                    "mcpServer": {
+                        "createdAt": "str",  # Optional. When the server was registered, in
+                          RFC 3339 format.
+                        "credentialRef": "str",  # Optional. The secret reference supplied at
+                          registration when source=secret, or the team's OAuth credential ID when
+                          source=connection. Empty when the server was registered with an ``api_key``""
+                          , whose storage DigitalOcean manages.
+                        "credentialRefSource": "str",  # Optional. How requests to the server
+                          authenticate: none, secret (a key or token sent in the Authorization header),
+                          or connection (each user's own OAuth authorization). Known values are:
+                          "none", "secret", and "connection".
+                        "description": "str",  # Optional. Team-authored description, shown
+                          on the server's catalog card. A resync does not replace it.
+                        "endpoint": "str",  # Optional. HTTPS URL of the server's MCP
+                          endpoint.
+                        "lastSyncedAt": "str",  # Optional. When discovery last succeeded, in
+                          RFC 3339 format; empty until the first success.
+                        "oauth_authorization_ttl_seconds": "str",  # Optional. How long a
+                          user's authorization is reused before re-consent. Echoed so a team can read
+                          the window without re-registering to discover it.
+                        "oauth_authorize_url": "str",  # Optional. OAuth authorization
+                          endpoint. Set only when ``credentialRefSource`` is connection; the client
+                          secret is never returned.
+                        "oauth_scopes": [
+                            "str"  # Optional. OAuth scopes requested from each user. Set
+                              only when ``credentialRefSource`` is connection.
+                        ],
+                        "protocolVersion": "str",  # Optional. MCP protocol revision
+                          negotiated with the server.
+                        "serverRef": "str",  # Optional. Server identifier, unique within
+                          your team. The server's tool slugs are ``<server_ref>_<name>``.
+                        "syncError": "str",  # Optional. Why the latest discovery failed;
+                          empty after a successful one.
+                        "syncStatus": "str",  # Optional. Outcome of the latest discovery:
+                          pending (no discovery has finished yet), ok, failed, or
+                          ``unsupported_protocol``. It is not reset while a resync runs. Known values
+                          are: "pending", "ok", "failed", and "unsupported_protocol".
+                        "toolCount": 0,  # Optional. Number of tools discovered on the
+                          server, whether enabled or not.
+                        "transport": "str",  # Optional. Always ``streamable_http``.
+                          "streamable_http"
+                        "updatedAt": "str"  # Optional. When the server was last modified, in
+                          RFC 3339 format.
+                    },
+                    "pending": bool,  # Optional. True when discovery is still running (HTTP
+                      202). Poll the server to see the outcome.
+                    "tools": [
+                        {
+                            "description": "str",  # Optional. Tool description as the
+                              server reports it.
+                            "enabled": bool,  # Optional. Whether the tool is enabled in
+                              your team's catalog.
+                            "name": "str",  # Optional. Tool name as the server reports
+                              it, normalized to the catalog's naming rules.
+                            "quarantineReason": "str",  # Optional. Why the tool was
+                              quarantined; empty otherwise.
+                            "quarantined": bool,  # Optional. True when the enabled tool
+                              was suspended because it disappeared from the server or its input schema
+                              changed incompatibly. Calls to it fail until it is enabled again.
+                            "toolSlug": "str"  # Optional. ``<server_ref>_<name>``"" :
+                              the tool's catalog slug, and the value to list in ``enabledToolSlugs``.
+                        }
+                    ]
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_mcp_servers_run_resync_request(
+            server_ref=server_ref,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 202, 400, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 202:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def list_tools(self, server_ref: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """List an MCP Server's Tools.
+
+        Returns every tool discovered on the server, sorted by name, with whether each is enabled.
+        Tools that have since disappeared from the server stay listed.
+
+        :param server_ref: Server identifier (\\ ``serverRef``\\ ) of one of your team's MCP servers.
+         Required.
+        :type server_ref: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "tools": [
+                        {
+                            "description": "str",  # Optional. Tool description as the
+                              server reports it.
+                            "enabled": bool,  # Optional. Whether the tool is enabled in
+                              your team's catalog.
+                            "name": "str",  # Optional. Tool name as the server reports
+                              it, normalized to the catalog's naming rules.
+                            "quarantineReason": "str",  # Optional. Why the tool was
+                              quarantined; empty otherwise.
+                            "quarantined": bool,  # Optional. True when the enabled tool
+                              was suspended because it disappeared from the server or its input schema
+                              changed incompatibly. Calls to it fail until it is enabled again.
+                            "toolSlug": "str"  # Optional. ``<server_ref>_<name>``"" :
+                              the tool's catalog slug, and the value to list in ``enabledToolSlugs``.
+                        }
+                    ]
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_mcp_servers_list_tools_request(
+            server_ref=server_ref,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    def update_tools(
+        self,
+        server_ref: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Set Which of an MCP Server's Tools Are Enabled.
+
+        ``enabledToolSlugs`` is the complete set to enable; every other tool of the server is disabled.
+        An
+        enabled tool is added to your team's catalog at its latest discovered version, and a disabled
+        one is
+        removed from it. Repeating the same set changes nothing.
+
+        Before changing anything, each tool being enabled, re-enabled, or moved to a newer discovered
+        version is verified against the live server: it must still be listed there, with the same input
+        schema as when it was discovered. If any check fails or the server cannot be reached, the
+        request
+        fails with 400 and nothing changes; resync and try again. An unknown tool slug is also rejected
+        with
+
+
+        #. A request that needs verification counts against the resync rate limit (429). Returns the
+           server's full tool list.
+
+        :param server_ref: Server identifier (\\ ``serverRef``\\ ) of one of your team's MCP servers.
+         Required.
+        :type server_ref: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "enabledToolSlugs": [
+                        "str"  # The complete set of tool slugs ("" ``<server_ref>_<name>``""
+                          ) to enable; every other tool of the server is disabled. Empty disables every
+                          tool. Required.
+                    ],
+                    "user_id": "str"  # Optional. Required for a server registered with
+                      ``credentialRefSource`` connection when a tool needs verification against the
+                      live server, which can only be reached as a user who has authorized it. Ignored
+                      otherwise.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "tools": [
+                        {
+                            "description": "str",  # Optional. Tool description as the
+                              server reports it.
+                            "enabled": bool,  # Optional. Whether the tool is enabled in
+                              your team's catalog.
+                            "name": "str",  # Optional. Tool name as the server reports
+                              it, normalized to the catalog's naming rules.
+                            "quarantineReason": "str",  # Optional. Why the tool was
+                              quarantined; empty otherwise.
+                            "quarantined": bool,  # Optional. True when the enabled tool
+                              was suspended because it disappeared from the server or its input schema
+                              changed incompatibly. Calls to it fail until it is enabled again.
+                            "toolSlug": "str"  # Optional. ``<server_ref>_<name>``"" :
+                              the tool's catalog slug, and the value to list in ``enabledToolSlugs``.
+                        }
+                    ]
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    def update_tools(
+        self,
+        server_ref: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Set Which of an MCP Server's Tools Are Enabled.
+
+        ``enabledToolSlugs`` is the complete set to enable; every other tool of the server is disabled.
+        An
+        enabled tool is added to your team's catalog at its latest discovered version, and a disabled
+        one is
+        removed from it. Repeating the same set changes nothing.
+
+        Before changing anything, each tool being enabled, re-enabled, or moved to a newer discovered
+        version is verified against the live server: it must still be listed there, with the same input
+        schema as when it was discovered. If any check fails or the server cannot be reached, the
+        request
+        fails with 400 and nothing changes; resync and try again. An unknown tool slug is also rejected
+        with
+
+
+        #. A request that needs verification counts against the resync rate limit (429). Returns the
+           server's full tool list.
+
+        :param server_ref: Server identifier (\\ ``serverRef``\\ ) of one of your team's MCP servers.
+         Required.
+        :type server_ref: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "tools": [
+                        {
+                            "description": "str",  # Optional. Tool description as the
+                              server reports it.
+                            "enabled": bool,  # Optional. Whether the tool is enabled in
+                              your team's catalog.
+                            "name": "str",  # Optional. Tool name as the server reports
+                              it, normalized to the catalog's naming rules.
+                            "quarantineReason": "str",  # Optional. Why the tool was
+                              quarantined; empty otherwise.
+                            "quarantined": bool,  # Optional. True when the enabled tool
+                              was suspended because it disappeared from the server or its input schema
+                              changed incompatibly. Calls to it fail until it is enabled again.
+                            "toolSlug": "str"  # Optional. ``<server_ref>_<name>``"" :
+                              the tool's catalog slug, and the value to list in ``enabledToolSlugs``.
+                        }
+                    ]
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace
+    def update_tools(
+        self, server_ref: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Set Which of an MCP Server's Tools Are Enabled.
+
+        ``enabledToolSlugs`` is the complete set to enable; every other tool of the server is disabled.
+        An
+        enabled tool is added to your team's catalog at its latest discovered version, and a disabled
+        one is
+        removed from it. Repeating the same set changes nothing.
+
+        Before changing anything, each tool being enabled, re-enabled, or moved to a newer discovered
+        version is verified against the live server: it must still be listed there, with the same input
+        schema as when it was discovered. If any check fails or the server cannot be reached, the
+        request
+        fails with 400 and nothing changes; resync and try again. An unknown tool slug is also rejected
+        with
+
+
+        #. A request that needs verification counts against the resync rate limit (429). Returns the
+           server's full tool list.
+
+        :param server_ref: Server identifier (\\ ``serverRef``\\ ) of one of your team's MCP servers.
+         Required.
+        :type server_ref: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "enabledToolSlugs": [
+                        "str"  # The complete set of tool slugs ("" ``<server_ref>_<name>``""
+                          ) to enable; every other tool of the server is disabled. Empty disables every
+                          tool. Required.
+                    ],
+                    "user_id": "str"  # Optional. Required for a server registered with
+                      ``credentialRefSource`` connection when a tool needs verification against the
+                      live server, which can only be reached as a user who has authorized it. Ignored
+                      otherwise.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "tools": [
+                        {
+                            "description": "str",  # Optional. Tool description as the
+                              server reports it.
+                            "enabled": bool,  # Optional. Whether the tool is enabled in
+                              your team's catalog.
+                            "name": "str",  # Optional. Tool name as the server reports
+                              it, normalized to the catalog's naming rules.
+                            "quarantineReason": "str",  # Optional. Why the tool was
+                              quarantined; empty otherwise.
+                            "quarantined": bool,  # Optional. True when the enabled tool
+                              was suspended because it disappeared from the server or its input schema
+                              changed incompatibly. Calls to it fail until it is enabled again.
+                            "toolSlug": "str"  # Optional. ``<server_ref>_<name>``"" :
+                              the tool's catalog slug, and the value to list in ``enabledToolSlugs``.
+                        }
+                    ]
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_mcp_servers_update_tools_request(
+            server_ref=server_ref,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+
+class OutputViewsOperations:
+    """
+    .. warning::
+        **DO NOT** instantiate this class directly.
+
+        Instead, you should access the following operations through
+        :class:`~pydo.GeneratedClient`'s
+        :attr:`output_views` attribute.
+    """
+
+    def __init__(self, *args, **kwargs):
+        input_args = list(args)
+        self._client = input_args.pop(0) if input_args else kwargs.pop("client")
+        self._config = input_args.pop(0) if input_args else kwargs.pop("config")
+        self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
+        self._deserialize = (
+            input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        )
+
+    @overload
+    def create(
+        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create an Output View.
+
+        An output view is a named projection of one tool version's output: tool calls that use it
+        return only the listed fields, and its ``output_schema`` describes the result. The view is
+        bound to the tool version your catalog currently releases. Returns 409 when your team already
+        has a view with this name on the tool version, and 429 when your team already has the maximum
+        of 20 views on it.
+
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "fields": [
+                        "str"  # Output paths to keep, 1 to 64 of them. Each is a dotted path
+                          of up to 8 segments made of ``[A-Za-z0-9_-]``"" , and must be declared by the
+                          tool's output schema; arrays are traversed element-wise. Paths may not repeat
+                          or be a prefix of one another. The tool version must declare an object output
+                          schema. Required.
+                    ],
+                    "name": "str",  # View name. Must match ``^``"" [a-z]"" ```[a-z0-9_-]``""
+                      {0,63}$` and be unique per tool version within your team. Required.
+                    "description": "str",  # Optional. Optional description. At most 512 bytes.
+                    "tool": "str",  # Optional. Exactly one of tool or ``tool_id`` selects the
+                      tool version. tool is a provider-qualified slug, optionally pinned as
+                      ``<tool>@<version>``. You can bind only the released version your catalog
+                      exposes: an unpinned slug resolves it and the response echoes it as version; a
+                      pin must equal it, and a ``tool_id`` (the opaque identity from tool search) must
+                      be that version. Any other version returns 404.
+                    "tool_id": "str"  # Optional. Opaque ID of the tool version; see tool.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "view": {
+                        "audit": {
+                            "createdAt": "2020-02-20 00:00:00",  # Optional. When the
+                              resource was created.
+                            "deletedAt": "2020-02-20 00:00:00",  # Optional. Set once the
+                              resource is deleted.
+                            "updatedAt": "2020-02-20 00:00:00"  # Optional. When the
+                              resource was last modified.
+                        },
+                        "description": "str",  # Optional. View description.
+                        "fields": [
+                            "str"  # Optional. The dotted output paths a projection
+                              keeps; arrays are traversed element-wise. Empty for a transform.
+                        ],
+                        "kind": "str",  # Optional. ``OUTPUT_VIEW_KIND_PROJECTION`` or
+                          ``OUTPUT_VIEW_KIND_TRANSFORM``. Known values are:
+                          "OUTPUT_VIEW_KIND_PROJECTION" and "OUTPUT_VIEW_KIND_TRANSFORM".
+                        "name": "str",  # Optional. View name, unique per tool version among
+                          its owner's views.
+                        "output_schema": {},  # Optional. The JSON Schema every result of
+                          this view satisfies.
+                        "team_id": "str",  # Optional. Your team's ID on your team's views,
+                          and empty for a view DigitalOcean publishes to every team.
+                        "tool": "str",  # Optional. The provider-qualified tool slug, for
+                          example ``exa_search``.
+                        "tool_id": "str",  # Optional. The opaque identity of the exact tool
+                          version the view is bound to; tool and version are its readable coordinates.
+                        "version": "str",  # Optional. The tool version, for example ``v3``.
+                        "view_id": "str"  # Optional. Output view ID, for example ``ov_``
+                          followed by 32 hex digits. Empty on a preview.
+                    }
+                }
+                # response body for status code(s): 400, 404, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    def create(
+        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create an Output View.
+
+        An output view is a named projection of one tool version's output: tool calls that use it
+        return only the listed fields, and its ``output_schema`` describes the result. The view is
+        bound to the tool version your catalog currently releases. Returns 409 when your team already
+        has a view with this name on the tool version, and 429 when your team already has the maximum
+        of 20 views on it.
+
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "view": {
+                        "audit": {
+                            "createdAt": "2020-02-20 00:00:00",  # Optional. When the
+                              resource was created.
+                            "deletedAt": "2020-02-20 00:00:00",  # Optional. Set once the
+                              resource is deleted.
+                            "updatedAt": "2020-02-20 00:00:00"  # Optional. When the
+                              resource was last modified.
+                        },
+                        "description": "str",  # Optional. View description.
+                        "fields": [
+                            "str"  # Optional. The dotted output paths a projection
+                              keeps; arrays are traversed element-wise. Empty for a transform.
+                        ],
+                        "kind": "str",  # Optional. ``OUTPUT_VIEW_KIND_PROJECTION`` or
+                          ``OUTPUT_VIEW_KIND_TRANSFORM``. Known values are:
+                          "OUTPUT_VIEW_KIND_PROJECTION" and "OUTPUT_VIEW_KIND_TRANSFORM".
+                        "name": "str",  # Optional. View name, unique per tool version among
+                          its owner's views.
+                        "output_schema": {},  # Optional. The JSON Schema every result of
+                          this view satisfies.
+                        "team_id": "str",  # Optional. Your team's ID on your team's views,
+                          and empty for a view DigitalOcean publishes to every team.
+                        "tool": "str",  # Optional. The provider-qualified tool slug, for
+                          example ``exa_search``.
+                        "tool_id": "str",  # Optional. The opaque identity of the exact tool
+                          version the view is bound to; tool and version are its readable coordinates.
+                        "version": "str",  # Optional. The tool version, for example ``v3``.
+                        "view_id": "str"  # Optional. Output view ID, for example ``ov_``
+                          followed by 32 hex digits. Empty on a preview.
+                    }
+                }
+                # response body for status code(s): 400, 404, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace
+    def create(self, body: Union[JSON, IO[bytes]], **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Create an Output View.
+
+        An output view is a named projection of one tool version's output: tool calls that use it
+        return only the listed fields, and its ``output_schema`` describes the result. The view is
+        bound to the tool version your catalog currently releases. Returns 409 when your team already
+        has a view with this name on the tool version, and 429 when your team already has the maximum
+        of 20 views on it.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "fields": [
+                        "str"  # Output paths to keep, 1 to 64 of them. Each is a dotted path
+                          of up to 8 segments made of ``[A-Za-z0-9_-]``"" , and must be declared by the
+                          tool's output schema; arrays are traversed element-wise. Paths may not repeat
+                          or be a prefix of one another. The tool version must declare an object output
+                          schema. Required.
+                    ],
+                    "name": "str",  # View name. Must match ``^``"" [a-z]"" ```[a-z0-9_-]``""
+                      {0,63}$` and be unique per tool version within your team. Required.
+                    "description": "str",  # Optional. Optional description. At most 512 bytes.
+                    "tool": "str",  # Optional. Exactly one of tool or ``tool_id`` selects the
+                      tool version. tool is a provider-qualified slug, optionally pinned as
+                      ``<tool>@<version>``. You can bind only the released version your catalog
+                      exposes: an unpinned slug resolves it and the response echoes it as version; a
+                      pin must equal it, and a ``tool_id`` (the opaque identity from tool search) must
+                      be that version. Any other version returns 404.
+                    "tool_id": "str"  # Optional. Opaque ID of the tool version; see tool.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "view": {
+                        "audit": {
+                            "createdAt": "2020-02-20 00:00:00",  # Optional. When the
+                              resource was created.
+                            "deletedAt": "2020-02-20 00:00:00",  # Optional. Set once the
+                              resource is deleted.
+                            "updatedAt": "2020-02-20 00:00:00"  # Optional. When the
+                              resource was last modified.
+                        },
+                        "description": "str",  # Optional. View description.
+                        "fields": [
+                            "str"  # Optional. The dotted output paths a projection
+                              keeps; arrays are traversed element-wise. Empty for a transform.
+                        ],
+                        "kind": "str",  # Optional. ``OUTPUT_VIEW_KIND_PROJECTION`` or
+                          ``OUTPUT_VIEW_KIND_TRANSFORM``. Known values are:
+                          "OUTPUT_VIEW_KIND_PROJECTION" and "OUTPUT_VIEW_KIND_TRANSFORM".
+                        "name": "str",  # Optional. View name, unique per tool version among
+                          its owner's views.
+                        "output_schema": {},  # Optional. The JSON Schema every result of
+                          this view satisfies.
+                        "team_id": "str",  # Optional. Your team's ID on your team's views,
+                          and empty for a view DigitalOcean publishes to every team.
+                        "tool": "str",  # Optional. The provider-qualified tool slug, for
+                          example ``exa_search``.
+                        "tool_id": "str",  # Optional. The opaque identity of the exact tool
+                          version the view is bound to; tool and version are its readable coordinates.
+                        "version": "str",  # Optional. The tool version, for example ``v3``.
+                        "view_id": "str"  # Optional. Output view ID, for example ``ov_``
+                          followed by 32 hex digits. Empty on a preview.
+                    }
+                }
+                # response body for status code(s): 400, 404, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_output_views_create_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404, 409]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def list(
+        self,
+        *,
+        tool: Optional[str] = None,
+        tool_id: Optional[str] = None,
+        page_size: int = 20,
+        page_token: Optional[str] = None,
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Output Views.
+
+        Returns the output views your team can use: views DigitalOcean publishes to every team, plus
+        your team's own. Cursor-paged with ``page_size`` and ``page_token``\\ ; no total is reported.
+
+        :keyword tool: At most one of tool or ``tool_id``\\ , as on create. With one set, the list is
+         the published views plus your team's own on that tool version. With neither, it is every live
+         view your team owns plus every published view on a tool version your catalog exposes, across
+         tools. Default value is None.
+        :paramtype tool: str
+        :keyword tool_id: Opaque ID of the tool version; see tool. Default value is None.
+        :paramtype tool_id: str
+        :keyword page_size: Page size, 1 to 100. Defaults to 20 when omitted or 0; other values are
+         rejected with 400. Default value is 20.
+        :paramtype page_size: int
+        :keyword page_token: ``next_page_token`` from the previous response. Valid only with the same
+         tool selection; otherwise the request is rejected with 400. Default value is None.
+        :paramtype page_token: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "next_page_token": "str",  # Optional. Empty on the last page.
+                    "tool": "str",  # Optional. Tool slug of that version. Empty when the request
+                      named no tool.
+                    "tool_id": "str",  # Optional. The tool version the views are bound to,
+                      echoed so an unpinned request learns which version it resolved. Empty when the
+                      request named no tool.
+                    "version": "str",  # Optional. Version of that tool, for example ``v3``.
+                      Empty when the request named no tool.
+                    "views": [
+                        {
+                            "audit": {
+                                "createdAt": "2020-02-20 00:00:00",  # Optional. When
+                                  the resource was created.
+                                "deletedAt": "2020-02-20 00:00:00",  # Optional. Set
+                                  once the resource is deleted.
+                                "updatedAt": "2020-02-20 00:00:00"  # Optional. When
+                                  the resource was last modified.
+                            },
+                            "description": "str",  # Optional. View description.
+                            "fields": [
+                                "str"  # Optional. The dotted output paths a
+                                  projection keeps; arrays are traversed element-wise. Empty for a
+                                  transform.
+                            ],
+                            "kind": "str",  # Optional. ``OUTPUT_VIEW_KIND_PROJECTION``
+                              or ``OUTPUT_VIEW_KIND_TRANSFORM``. Known values are:
+                              "OUTPUT_VIEW_KIND_PROJECTION" and "OUTPUT_VIEW_KIND_TRANSFORM".
+                            "name": "str",  # Optional. View name, unique per tool
+                              version among its owner's views.
+                            "output_schema": {},  # Optional. The JSON Schema every
+                              result of this view satisfies.
+                            "team_id": "str",  # Optional. Your team's ID on your team's
+                              views, and empty for a view DigitalOcean publishes to every team.
+                            "tool": "str",  # Optional. The provider-qualified tool slug,
+                              for example ``exa_search``.
+                            "tool_id": "str",  # Optional. The opaque identity of the
+                              exact tool version the view is bound to; tool and version are its
+                              readable coordinates.
+                            "version": "str",  # Optional. The tool version, for example
+                              ``v3``.
+                            "view_id": "str"  # Optional. Output view ID, for example
+                              ``ov_`` followed by 32 hex digits. Empty on a preview.
+                        }
+                    ]
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_output_views_list_request(
+            tool=tool,
+            tool_id=tool_id,
+            page_size=page_size,
+            page_token=page_token,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    def validate(
+        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Preview an Output View.
+
+        Validates a projection exactly as create does and returns the view it would produce, including
+        ``output_schema``\\ , without storing anything. name and description are optional here; name
+        uniqueness and the per-tool-version limit are not checked.
+
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "fields": [
+                        "str"  # Output paths to keep; as on create. Required.
+                    ],
+                    "description": "str",  # Optional. Optional description, validated as on
+                      create when present.
+                    "name": "str",  # Optional. Optional view name, validated as on create when
+                      present.
+                    "tool": "str",  # Optional. Tool slug, optionally pinned; as on create.
+                    "tool_id": "str"  # Optional. Opaque ID of the tool version; as on create.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "view": {
+                        "audit": {
+                            "createdAt": "2020-02-20 00:00:00",  # Optional. When the
+                              resource was created.
+                            "deletedAt": "2020-02-20 00:00:00",  # Optional. Set once the
+                              resource is deleted.
+                            "updatedAt": "2020-02-20 00:00:00"  # Optional. When the
+                              resource was last modified.
+                        },
+                        "description": "str",  # Optional. View description.
+                        "fields": [
+                            "str"  # Optional. The dotted output paths a projection
+                              keeps; arrays are traversed element-wise. Empty for a transform.
+                        ],
+                        "kind": "str",  # Optional. ``OUTPUT_VIEW_KIND_PROJECTION`` or
+                          ``OUTPUT_VIEW_KIND_TRANSFORM``. Known values are:
+                          "OUTPUT_VIEW_KIND_PROJECTION" and "OUTPUT_VIEW_KIND_TRANSFORM".
+                        "name": "str",  # Optional. View name, unique per tool version among
+                          its owner's views.
+                        "output_schema": {},  # Optional. The JSON Schema every result of
+                          this view satisfies.
+                        "team_id": "str",  # Optional. Your team's ID on your team's views,
+                          and empty for a view DigitalOcean publishes to every team.
+                        "tool": "str",  # Optional. The provider-qualified tool slug, for
+                          example ``exa_search``.
+                        "tool_id": "str",  # Optional. The opaque identity of the exact tool
+                          version the view is bound to; tool and version are its readable coordinates.
+                        "version": "str",  # Optional. The tool version, for example ``v3``.
+                        "view_id": "str"  # Optional. Output view ID, for example ``ov_``
+                          followed by 32 hex digits. Empty on a preview.
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    def validate(
+        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Preview an Output View.
+
+        Validates a projection exactly as create does and returns the view it would produce, including
+        ``output_schema``\\ , without storing anything. name and description are optional here; name
+        uniqueness and the per-tool-version limit are not checked.
+
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "view": {
+                        "audit": {
+                            "createdAt": "2020-02-20 00:00:00",  # Optional. When the
+                              resource was created.
+                            "deletedAt": "2020-02-20 00:00:00",  # Optional. Set once the
+                              resource is deleted.
+                            "updatedAt": "2020-02-20 00:00:00"  # Optional. When the
+                              resource was last modified.
+                        },
+                        "description": "str",  # Optional. View description.
+                        "fields": [
+                            "str"  # Optional. The dotted output paths a projection
+                              keeps; arrays are traversed element-wise. Empty for a transform.
+                        ],
+                        "kind": "str",  # Optional. ``OUTPUT_VIEW_KIND_PROJECTION`` or
+                          ``OUTPUT_VIEW_KIND_TRANSFORM``. Known values are:
+                          "OUTPUT_VIEW_KIND_PROJECTION" and "OUTPUT_VIEW_KIND_TRANSFORM".
+                        "name": "str",  # Optional. View name, unique per tool version among
+                          its owner's views.
+                        "output_schema": {},  # Optional. The JSON Schema every result of
+                          this view satisfies.
+                        "team_id": "str",  # Optional. Your team's ID on your team's views,
+                          and empty for a view DigitalOcean publishes to every team.
+                        "tool": "str",  # Optional. The provider-qualified tool slug, for
+                          example ``exa_search``.
+                        "tool_id": "str",  # Optional. The opaque identity of the exact tool
+                          version the view is bound to; tool and version are its readable coordinates.
+                        "version": "str",  # Optional. The tool version, for example ``v3``.
+                        "view_id": "str"  # Optional. Output view ID, for example ``ov_``
+                          followed by 32 hex digits. Empty on a preview.
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace
+    def validate(self, body: Union[JSON, IO[bytes]], **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Preview an Output View.
+
+        Validates a projection exactly as create does and returns the view it would produce, including
+        ``output_schema``\\ , without storing anything. name and description are optional here; name
+        uniqueness and the per-tool-version limit are not checked.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "fields": [
+                        "str"  # Output paths to keep; as on create. Required.
+                    ],
+                    "description": "str",  # Optional. Optional description, validated as on
+                      create when present.
+                    "name": "str",  # Optional. Optional view name, validated as on create when
+                      present.
+                    "tool": "str",  # Optional. Tool slug, optionally pinned; as on create.
+                    "tool_id": "str"  # Optional. Opaque ID of the tool version; as on create.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "view": {
+                        "audit": {
+                            "createdAt": "2020-02-20 00:00:00",  # Optional. When the
+                              resource was created.
+                            "deletedAt": "2020-02-20 00:00:00",  # Optional. Set once the
+                              resource is deleted.
+                            "updatedAt": "2020-02-20 00:00:00"  # Optional. When the
+                              resource was last modified.
+                        },
+                        "description": "str",  # Optional. View description.
+                        "fields": [
+                            "str"  # Optional. The dotted output paths a projection
+                              keeps; arrays are traversed element-wise. Empty for a transform.
+                        ],
+                        "kind": "str",  # Optional. ``OUTPUT_VIEW_KIND_PROJECTION`` or
+                          ``OUTPUT_VIEW_KIND_TRANSFORM``. Known values are:
+                          "OUTPUT_VIEW_KIND_PROJECTION" and "OUTPUT_VIEW_KIND_TRANSFORM".
+                        "name": "str",  # Optional. View name, unique per tool version among
+                          its owner's views.
+                        "output_schema": {},  # Optional. The JSON Schema every result of
+                          this view satisfies.
+                        "team_id": "str",  # Optional. Your team's ID on your team's views,
+                          and empty for a view DigitalOcean publishes to every team.
+                        "tool": "str",  # Optional. The provider-qualified tool slug, for
+                          example ``exa_search``.
+                        "tool_id": "str",  # Optional. The opaque identity of the exact tool
+                          version the view is bound to; tool and version are its readable coordinates.
+                        "version": "str",  # Optional. The tool version, for example ``v3``.
+                        "view_id": "str"  # Optional. Output view ID, for example ``ov_``
+                          followed by 32 hex digits. Empty on a preview.
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_output_views_validate_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def get(self, view_id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Get an Output View.
+
+        Returns one of your team's views, or a published view on a tool version your catalog exposes.
+        Returns 404 when the view does not exist, was deleted, or belongs to another team.
+
+        :param view_id: Output view ID. Required.
+        :type view_id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "view": {
+                        "audit": {
+                            "createdAt": "2020-02-20 00:00:00",  # Optional. When the
+                              resource was created.
+                            "deletedAt": "2020-02-20 00:00:00",  # Optional. Set once the
+                              resource is deleted.
+                            "updatedAt": "2020-02-20 00:00:00"  # Optional. When the
+                              resource was last modified.
+                        },
+                        "description": "str",  # Optional. View description.
+                        "fields": [
+                            "str"  # Optional. The dotted output paths a projection
+                              keeps; arrays are traversed element-wise. Empty for a transform.
+                        ],
+                        "kind": "str",  # Optional. ``OUTPUT_VIEW_KIND_PROJECTION`` or
+                          ``OUTPUT_VIEW_KIND_TRANSFORM``. Known values are:
+                          "OUTPUT_VIEW_KIND_PROJECTION" and "OUTPUT_VIEW_KIND_TRANSFORM".
+                        "name": "str",  # Optional. View name, unique per tool version among
+                          its owner's views.
+                        "output_schema": {},  # Optional. The JSON Schema every result of
+                          this view satisfies.
+                        "team_id": "str",  # Optional. Your team's ID on your team's views,
+                          and empty for a view DigitalOcean publishes to every team.
+                        "tool": "str",  # Optional. The provider-qualified tool slug, for
+                          example ``exa_search``.
+                        "tool_id": "str",  # Optional. The opaque identity of the exact tool
+                          version the view is bound to; tool and version are its readable coordinates.
+                        "version": "str",  # Optional. The tool version, for example ``v3``.
+                        "view_id": "str"  # Optional. Output view ID, for example ``ov_``
+                          followed by 32 hex digits. Empty on a preview.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_output_views_get_request(
+            view_id=view_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def delete(self, view_id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Delete an Output View.
+
+        Deletes one of your team's views and returns it with audit.deleted_at set; it can no longer be
+        used. Published views cannot be deleted. Returns 404 when the view does not exist, is already
+        deleted, or is not your team's.
+
+        :param view_id: Output view ID. Required.
+        :type view_id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "view": {
+                        "audit": {
+                            "createdAt": "2020-02-20 00:00:00",  # Optional. When the
+                              resource was created.
+                            "deletedAt": "2020-02-20 00:00:00",  # Optional. Set once the
+                              resource is deleted.
+                            "updatedAt": "2020-02-20 00:00:00"  # Optional. When the
+                              resource was last modified.
+                        },
+                        "description": "str",  # Optional. View description.
+                        "fields": [
+                            "str"  # Optional. The dotted output paths a projection
+                              keeps; arrays are traversed element-wise. Empty for a transform.
+                        ],
+                        "kind": "str",  # Optional. ``OUTPUT_VIEW_KIND_PROJECTION`` or
+                          ``OUTPUT_VIEW_KIND_TRANSFORM``. Known values are:
+                          "OUTPUT_VIEW_KIND_PROJECTION" and "OUTPUT_VIEW_KIND_TRANSFORM".
+                        "name": "str",  # Optional. View name, unique per tool version among
+                          its owner's views.
+                        "output_schema": {},  # Optional. The JSON Schema every result of
+                          this view satisfies.
+                        "team_id": "str",  # Optional. Your team's ID on your team's views,
+                          and empty for a view DigitalOcean publishes to every team.
+                        "tool": "str",  # Optional. The provider-qualified tool slug, for
+                          example ``exa_search``.
+                        "tool_id": "str",  # Optional. The opaque identity of the exact tool
+                          version the view is bound to; tool and version are its readable coordinates.
+                        "version": "str",  # Optional. The tool version, for example ``v3``.
+                        "view_id": "str"  # Optional. Output view ID, for example ``ov_``
+                          followed by 32 hex digits. Empty on a preview.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_output_views_delete_request(
+            view_id=view_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+
+class SessionsOperations:
+    """
+    .. warning::
+        **DO NOT** instantiate this class directly.
+
+        Instead, you should access the following operations through
+        :class:`~pydo.GeneratedClient`'s
+        :attr:`sessions` attribute.
+    """
+
+    def __init__(self, *args, **kwargs):
+        input_args = list(args)
+        self._client = input_args.pop(0) if input_args else kwargs.pop("client")
+        self._config = input_args.pop(0) if input_args else kwargs.pop("config")
+        self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
+        self._deserialize = (
+            input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        )
+
+    @overload
+    def create(
+        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Session.
+
+        Creates a session owned by your team, with a new session URN, and returns the MCP URL an agent
+        connects to. tools selects the tools and toolbelts the session exposes, and policy decides
+        which calls run, need approval, or are refused.
+
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "name": "str",  # Required human-readable session name. Required.
+                    "actorId": "str",  # Optional. Optional actor binding: the user whose
+                      connections the session's tool calls use, matched against connection ``user_id``.
+                      When set it must use the same alphabet as a connection's ``user_id``"" ,
+                      ``[A-Za-z0-9._-]``"" , at most 64 characters; anything else is rejected with 400.
+                    "config": {},  # Optional. Optional session options. config.preloadTools may
+                      contain concrete tool names (optionally version-pinned) and version-pinned
+                      toolbelt references. config.customInstructions is a string of at most 1000
+                      characters. config.outputViews maps up to 100 tool slugs to the name of an output
+                      view to apply to that tool's results.
+                    "insights": {
+                        "logs": bool,  # Optional. Whether the session's customer logs are
+                          sent to Insights.
+                        "metrics": bool,  # Optional. Accepted and stored for parity with the
+                          Insights schema.
+                        "traces": bool  # Optional. Whether the session's customer traces are
+                          sent to Insights.
+                    },
+                    "network": {
+                        "vpcUuid": "str"  # Optional. UUID of a VPC owned by your team, in a
+                          region that supports sessions.
+                    },
+                    "policy": {
+                        "defaultAction": "str",  # Optional. Action for calls no rule
+                          matches. Empty means ask; otherwise this must be allow, ask, or deny. Known
+                          values are: "allow", "ask", and "deny".
+                        "rules": [
+                            {
+                                "action": "str",  # Optional. Required: allow, ask,
+                                  or deny. Known values are: "allow", "ask", and "deny".
+                                "match": {
+                                    "str": "str"  # Optional. Optional argument
+                                      conditions, keyed by argument name; the rule applies only to
+                                      calls whose arguments match.
+                                },
+                                "tool": "str"  # Optional. Required. A tool slug,
+                                  optionally ``<tool_slug>@<version>``"" , or a toolbelt as
+                                  ``toolbelt:<name>@<version>``. When the session selects tools, the
+                                  rule must name one of them.
+                            }
+                        ]
+                    },
+                    "tools": [
+                        "str"  # Optional. Omitted enables every tool. An explicit empty
+                          array enables no tools. Direct tools may be ``<tool>`` or
+                          ``<tool>@<version>``"" , using provider-qualified tool slugs, and a pinned
+                          version must be the released one; toolbelt references must be version-pinned
+                          as ``toolbelt:<belt-name>@<version>``.
+                    ]
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "mcpUrl": "str",  # Optional. URL of the session's MCP endpoint, for the
+                      agent to connect to.
+                    "session": {
+                        "actorId": "str",  # Optional. Empty when the session is not bound to
+                          an actor.
+                        "agentName": "str",  # Optional. Name of the agent that started the
+                          session. Empty for sessions created through this API.
+                        "agentUrn": "str",  # Optional. URN of the agent that started the
+                          session. Empty for sessions created through this API.
+                        "config": {},  # Optional. Session options as supplied at creation.
+                          Omitted when none were supplied.
+                        "createdAt": "2020-02-20 00:00:00",  # Optional. When the session was
+                          created.
+                        "insights": {
+                            "logs": bool,  # Optional. Whether the session's customer
+                              logs are sent to Insights.
+                            "metrics": bool,  # Optional. Accepted and stored for parity
+                              with the Insights schema.
+                            "traces": bool  # Optional. Whether the session's customer
+                              traces are sent to Insights.
+                        },
+                        "name": "str",  # Optional. The required human-readable session name.
+                        "network": {
+                            "vpcUuid": "str"  # Optional. UUID of a VPC owned by your
+                              team, in a region that supports sessions.
+                        },
+                        "owning_user_id": "str",  # Optional. DigitalOcean user ID of the
+                          user who created the session, when recorded.
+                        "policy": {
+                            "defaultAction": "str",  # Optional. Action for calls no rule
+                              matches. Empty means ask; otherwise this must be allow, ask, or deny.
+                              Known values are: "allow", "ask", and "deny".
+                            "rules": [
+                                {
+                                    "action": "str",  # Optional. Required:
+                                      allow, ask, or deny. Known values are: "allow", "ask", and
+                                      "deny".
+                                    "match": {
+                                        "str": "str"  # Optional. Optional
+                                          argument conditions, keyed by argument name; the rule applies
+                                          only to calls whose arguments match.
+                                    },
+                                    "tool": "str"  # Optional. Required. A tool
+                                      slug, optionally ``<tool_slug>@<version>``"" , or a toolbelt as
+                                      ``toolbelt:<name>@<version>``. When the session selects tools,
+                                      the rule must name one of them.
+                                }
+                            ]
+                        },
+                        "sessionUrn": "str",  # Optional. Session URN, for example
+                          ``do:managed_agent_session:<uuid>``.
+                        "tools": {
+                            "references": [
+                                {
+                                    "kind": "str",  # Optional. Whether name is a
+                                      tool or a toolbelt. Known values are:
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                    "name": "str",  # Optional. Tool slug or
+                                      toolbelt name.
+                                    "version": "str"  # Optional. Pinned version.
+                                }
+                            ]
+                        },
+                        "updatedAt": "2020-02-20 00:00:00"  # Optional. When the session was
+                          last modified.
+                    },
+                    "tools": [
+                        "str"  # Optional. Canonical, version-pinned selected tool
+                          references. Empty when the session exposes every tool.
+                    ]
+                }
+                # response body for status code(s): 400
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    def create(
+        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Session.
+
+        Creates a session owned by your team, with a new session URN, and returns the MCP URL an agent
+        connects to. tools selects the tools and toolbelts the session exposes, and policy decides
+        which calls run, need approval, or are refused.
+
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "mcpUrl": "str",  # Optional. URL of the session's MCP endpoint, for the
+                      agent to connect to.
+                    "session": {
+                        "actorId": "str",  # Optional. Empty when the session is not bound to
+                          an actor.
+                        "agentName": "str",  # Optional. Name of the agent that started the
+                          session. Empty for sessions created through this API.
+                        "agentUrn": "str",  # Optional. URN of the agent that started the
+                          session. Empty for sessions created through this API.
+                        "config": {},  # Optional. Session options as supplied at creation.
+                          Omitted when none were supplied.
+                        "createdAt": "2020-02-20 00:00:00",  # Optional. When the session was
+                          created.
+                        "insights": {
+                            "logs": bool,  # Optional. Whether the session's customer
+                              logs are sent to Insights.
+                            "metrics": bool,  # Optional. Accepted and stored for parity
+                              with the Insights schema.
+                            "traces": bool  # Optional. Whether the session's customer
+                              traces are sent to Insights.
+                        },
+                        "name": "str",  # Optional. The required human-readable session name.
+                        "network": {
+                            "vpcUuid": "str"  # Optional. UUID of a VPC owned by your
+                              team, in a region that supports sessions.
+                        },
+                        "owning_user_id": "str",  # Optional. DigitalOcean user ID of the
+                          user who created the session, when recorded.
+                        "policy": {
+                            "defaultAction": "str",  # Optional. Action for calls no rule
+                              matches. Empty means ask; otherwise this must be allow, ask, or deny.
+                              Known values are: "allow", "ask", and "deny".
+                            "rules": [
+                                {
+                                    "action": "str",  # Optional. Required:
+                                      allow, ask, or deny. Known values are: "allow", "ask", and
+                                      "deny".
+                                    "match": {
+                                        "str": "str"  # Optional. Optional
+                                          argument conditions, keyed by argument name; the rule applies
+                                          only to calls whose arguments match.
+                                    },
+                                    "tool": "str"  # Optional. Required. A tool
+                                      slug, optionally ``<tool_slug>@<version>``"" , or a toolbelt as
+                                      ``toolbelt:<name>@<version>``. When the session selects tools,
+                                      the rule must name one of them.
+                                }
+                            ]
+                        },
+                        "sessionUrn": "str",  # Optional. Session URN, for example
+                          ``do:managed_agent_session:<uuid>``.
+                        "tools": {
+                            "references": [
+                                {
+                                    "kind": "str",  # Optional. Whether name is a
+                                      tool or a toolbelt. Known values are:
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                    "name": "str",  # Optional. Tool slug or
+                                      toolbelt name.
+                                    "version": "str"  # Optional. Pinned version.
+                                }
+                            ]
+                        },
+                        "updatedAt": "2020-02-20 00:00:00"  # Optional. When the session was
+                          last modified.
+                    },
+                    "tools": [
+                        "str"  # Optional. Canonical, version-pinned selected tool
+                          references. Empty when the session exposes every tool.
+                    ]
+                }
+                # response body for status code(s): 400
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace
+    def create(self, body: Union[JSON, IO[bytes]], **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Session.
+
+        Creates a session owned by your team, with a new session URN, and returns the MCP URL an agent
+        connects to. tools selects the tools and toolbelts the session exposes, and policy decides
+        which calls run, need approval, or are refused.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "name": "str",  # Required human-readable session name. Required.
+                    "actorId": "str",  # Optional. Optional actor binding: the user whose
+                      connections the session's tool calls use, matched against connection ``user_id``.
+                      When set it must use the same alphabet as a connection's ``user_id``"" ,
+                      ``[A-Za-z0-9._-]``"" , at most 64 characters; anything else is rejected with 400.
+                    "config": {},  # Optional. Optional session options. config.preloadTools may
+                      contain concrete tool names (optionally version-pinned) and version-pinned
+                      toolbelt references. config.customInstructions is a string of at most 1000
+                      characters. config.outputViews maps up to 100 tool slugs to the name of an output
+                      view to apply to that tool's results.
+                    "insights": {
+                        "logs": bool,  # Optional. Whether the session's customer logs are
+                          sent to Insights.
+                        "metrics": bool,  # Optional. Accepted and stored for parity with the
+                          Insights schema.
+                        "traces": bool  # Optional. Whether the session's customer traces are
+                          sent to Insights.
+                    },
+                    "network": {
+                        "vpcUuid": "str"  # Optional. UUID of a VPC owned by your team, in a
+                          region that supports sessions.
+                    },
+                    "policy": {
+                        "defaultAction": "str",  # Optional. Action for calls no rule
+                          matches. Empty means ask; otherwise this must be allow, ask, or deny. Known
+                          values are: "allow", "ask", and "deny".
+                        "rules": [
+                            {
+                                "action": "str",  # Optional. Required: allow, ask,
+                                  or deny. Known values are: "allow", "ask", and "deny".
+                                "match": {
+                                    "str": "str"  # Optional. Optional argument
+                                      conditions, keyed by argument name; the rule applies only to
+                                      calls whose arguments match.
+                                },
+                                "tool": "str"  # Optional. Required. A tool slug,
+                                  optionally ``<tool_slug>@<version>``"" , or a toolbelt as
+                                  ``toolbelt:<name>@<version>``. When the session selects tools, the
+                                  rule must name one of them.
+                            }
+                        ]
+                    },
+                    "tools": [
+                        "str"  # Optional. Omitted enables every tool. An explicit empty
+                          array enables no tools. Direct tools may be ``<tool>`` or
+                          ``<tool>@<version>``"" , using provider-qualified tool slugs, and a pinned
+                          version must be the released one; toolbelt references must be version-pinned
+                          as ``toolbelt:<belt-name>@<version>``.
+                    ]
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "mcpUrl": "str",  # Optional. URL of the session's MCP endpoint, for the
+                      agent to connect to.
+                    "session": {
+                        "actorId": "str",  # Optional. Empty when the session is not bound to
+                          an actor.
+                        "agentName": "str",  # Optional. Name of the agent that started the
+                          session. Empty for sessions created through this API.
+                        "agentUrn": "str",  # Optional. URN of the agent that started the
+                          session. Empty for sessions created through this API.
+                        "config": {},  # Optional. Session options as supplied at creation.
+                          Omitted when none were supplied.
+                        "createdAt": "2020-02-20 00:00:00",  # Optional. When the session was
+                          created.
+                        "insights": {
+                            "logs": bool,  # Optional. Whether the session's customer
+                              logs are sent to Insights.
+                            "metrics": bool,  # Optional. Accepted and stored for parity
+                              with the Insights schema.
+                            "traces": bool  # Optional. Whether the session's customer
+                              traces are sent to Insights.
+                        },
+                        "name": "str",  # Optional. The required human-readable session name.
+                        "network": {
+                            "vpcUuid": "str"  # Optional. UUID of a VPC owned by your
+                              team, in a region that supports sessions.
+                        },
+                        "owning_user_id": "str",  # Optional. DigitalOcean user ID of the
+                          user who created the session, when recorded.
+                        "policy": {
+                            "defaultAction": "str",  # Optional. Action for calls no rule
+                              matches. Empty means ask; otherwise this must be allow, ask, or deny.
+                              Known values are: "allow", "ask", and "deny".
+                            "rules": [
+                                {
+                                    "action": "str",  # Optional. Required:
+                                      allow, ask, or deny. Known values are: "allow", "ask", and
+                                      "deny".
+                                    "match": {
+                                        "str": "str"  # Optional. Optional
+                                          argument conditions, keyed by argument name; the rule applies
+                                          only to calls whose arguments match.
+                                    },
+                                    "tool": "str"  # Optional. Required. A tool
+                                      slug, optionally ``<tool_slug>@<version>``"" , or a toolbelt as
+                                      ``toolbelt:<name>@<version>``. When the session selects tools,
+                                      the rule must name one of them.
+                                }
+                            ]
+                        },
+                        "sessionUrn": "str",  # Optional. Session URN, for example
+                          ``do:managed_agent_session:<uuid>``.
+                        "tools": {
+                            "references": [
+                                {
+                                    "kind": "str",  # Optional. Whether name is a
+                                      tool or a toolbelt. Known values are:
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                    "name": "str",  # Optional. Tool slug or
+                                      toolbelt name.
+                                    "version": "str"  # Optional. Pinned version.
+                                }
+                            ]
+                        },
+                        "updatedAt": "2020-02-20 00:00:00"  # Optional. When the session was
+                          last modified.
+                    },
+                    "tools": [
+                        "str"  # Optional. Canonical, version-pinned selected tool
+                          references. Empty when the session exposes every tool.
+                    ]
+                }
+                # response body for status code(s): 400
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_sessions_create_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def list(
+        self,
+        *,
+        end_user_id: Optional[str] = None,
+        page: int = 1,
+        per_page: int = 20,
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Sessions.
+
+        Returns the sessions you can see, newest first. Offset-paged with page and ``per_page``\\ ;
+        ``end_user_id`` filters to one actor.
+
+        :keyword end_user_id: Optional ``actor_id``\\ , matched exactly. Default value is None.
+        :paramtype end_user_id: str
+        :keyword page: 1-based page number. Values below 1 are treated as 1. Default value is 1.
+        :paramtype page: int
+        :keyword per_page: Page size. Defaults to 20; values above 100 are capped at 100. Default value
+         is 20.
+        :paramtype per_page: int
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "pagination": {
+                        "page": 0,  # Optional. 1-based page number of this response.
+                        "per_page": 0,  # Optional. Page size applied to this response, after
+                          defaults and caps.
+                        "total": 0  # Optional. Number of matching items across all pages.
+                    },
+                    "sessions": [
+                        {
+                            "actorId": "str",  # Optional. Empty when the session is not
+                              bound to an actor.
+                            "agentName": "str",  # Optional. Name of the agent that
+                              started the session. Empty for sessions created through this API.
+                            "agentUrn": "str",  # Optional. URN of the agent that started
+                              the session. Empty for sessions created through this API.
+                            "config": {},  # Optional. Session options as supplied at
+                              creation. Omitted when none were supplied.
+                            "createdAt": "2020-02-20 00:00:00",  # Optional. When the
+                              session was created.
+                            "insights": {
+                                "logs": bool,  # Optional. Whether the session's
+                                  customer logs are sent to Insights.
+                                "metrics": bool,  # Optional. Accepted and stored for
+                                  parity with the Insights schema.
+                                "traces": bool  # Optional. Whether the session's
+                                  customer traces are sent to Insights.
+                            },
+                            "name": "str",  # Optional. The required human-readable
+                              session name.
+                            "network": {
+                                "vpcUuid": "str"  # Optional. UUID of a VPC owned by
+                                  your team, in a region that supports sessions.
+                            },
+                            "owning_user_id": "str",  # Optional. DigitalOcean user ID of
+                              the user who created the session, when recorded.
+                            "policy": {
+                                "defaultAction": "str",  # Optional. Action for calls
+                                  no rule matches. Empty means ask; otherwise this must be allow, ask,
+                                  or deny. Known values are: "allow", "ask", and "deny".
+                                "rules": [
+                                    {
+                                        "action": "str",  # Optional.
+                                          Required: allow, ask, or deny. Known values are: "allow",
+                                          "ask", and "deny".
+                                        "match": {
+                                            "str": "str"  # Optional.
+                                              Optional argument conditions, keyed by argument name; the
+                                              rule applies only to calls whose arguments match.
+                                        },
+                                        "tool": "str"  # Optional. Required.
+                                          A tool slug, optionally ``<tool_slug>@<version>``"" , or a
+                                          toolbelt as ``toolbelt:<name>@<version>``. When the session
+                                          selects tools, the rule must name one of them.
+                                    }
+                                ]
+                            },
+                            "sessionUrn": "str",  # Optional. Session URN, for example
+                              ``do:managed_agent_session:<uuid>``.
+                            "tools": {
+                                "references": [
+                                    {
+                                        "kind": "str",  # Optional. Whether
+                                          name is a tool or a toolbelt. Known values are:
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                        "name": "str",  # Optional. Tool slug
+                                          or toolbelt name.
+                                        "version": "str"  # Optional. Pinned
+                                          version.
+                                    }
+                                ]
+                            },
+                            "updatedAt": "2020-02-20 00:00:00"  # Optional. When the
+                              session was last modified.
+                        }
+                    ]
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_sessions_list_request(
+            end_user_id=end_user_id,
             page=page,
             per_page=per_page,
             headers=_headers,
@@ -19028,6 +24692,358 @@ class ToolbeltsOperations:
 
         return cast(JSON, deserialized)  # type: ignore
 
+    @distributed_trace
+    def list_search(
+        self,
+        *,
+        query: Optional[str] = None,
+        end_user_id: Optional[str] = None,
+        page_size: int = 20,
+        page_token: Optional[str] = None,
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Search Sessions.
+
+        Returns the sessions you can see whose name, ``actor_id``\\ , ``session_urn``\\ , or
+        ``agentName`` contains query, case-insensitively, ranked across the whole result set.
+        Cursor-paged with ``page_size`` and ``page_token``\\ ; no total is reported.
+
+        :keyword query: Matched case-insensitively as a substring of name, ``actor_id``\\ ,
+         ``session_urn``\\ , or ``agentName``. Empty matches every session you can see. Results are
+         ordered by match quality (an exact name, ``session_urn``\\ , or ``actor_id`` match, then a
+         prefix, then a substring), then by name, across the whole result set, so a client must not
+         re-sort a page to rank it. Default value is None.
+        :paramtype query: str
+        :keyword end_user_id: ``end_user_id``\\ , when set, is an exact filter on ``actor_id`` (the
+         same filter as on the session list) and combines with query as AND. Default value is None.
+        :paramtype end_user_id: str
+        :keyword page_size: Page size, 1 to 100. Defaults to 20 when omitted or 0; other values are
+         rejected with 400. Default value is 20.
+        :paramtype page_size: int
+        :keyword page_token: ``next_page_token`` from the previous response. Valid only with the same
+         query and ``end_user_id``\\ ; otherwise the request is rejected with 400. Default value is
+         None.
+        :paramtype page_token: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "next_page_token": "str",  # Optional. Token for the next page; empty on the
+                      last page.
+                    "sessions": [
+                        {
+                            "actorId": "str",  # Optional. Empty when the session is not
+                              bound to an actor.
+                            "agentName": "str",  # Optional. Name of the agent that
+                              started the session. Empty for sessions created through this API.
+                            "agentUrn": "str",  # Optional. URN of the agent that started
+                              the session. Empty for sessions created through this API.
+                            "config": {},  # Optional. Session options as supplied at
+                              creation. Omitted when none were supplied.
+                            "createdAt": "2020-02-20 00:00:00",  # Optional. When the
+                              session was created.
+                            "insights": {
+                                "logs": bool,  # Optional. Whether the session's
+                                  customer logs are sent to Insights.
+                                "metrics": bool,  # Optional. Accepted and stored for
+                                  parity with the Insights schema.
+                                "traces": bool  # Optional. Whether the session's
+                                  customer traces are sent to Insights.
+                            },
+                            "name": "str",  # Optional. The required human-readable
+                              session name.
+                            "network": {
+                                "vpcUuid": "str"  # Optional. UUID of a VPC owned by
+                                  your team, in a region that supports sessions.
+                            },
+                            "owning_user_id": "str",  # Optional. DigitalOcean user ID of
+                              the user who created the session, when recorded.
+                            "policy": {
+                                "defaultAction": "str",  # Optional. Action for calls
+                                  no rule matches. Empty means ask; otherwise this must be allow, ask,
+                                  or deny. Known values are: "allow", "ask", and "deny".
+                                "rules": [
+                                    {
+                                        "action": "str",  # Optional.
+                                          Required: allow, ask, or deny. Known values are: "allow",
+                                          "ask", and "deny".
+                                        "match": {
+                                            "str": "str"  # Optional.
+                                              Optional argument conditions, keyed by argument name; the
+                                              rule applies only to calls whose arguments match.
+                                        },
+                                        "tool": "str"  # Optional. Required.
+                                          A tool slug, optionally ``<tool_slug>@<version>``"" , or a
+                                          toolbelt as ``toolbelt:<name>@<version>``. When the session
+                                          selects tools, the rule must name one of them.
+                                    }
+                                ]
+                            },
+                            "sessionUrn": "str",  # Optional. Session URN, for example
+                              ``do:managed_agent_session:<uuid>``.
+                            "tools": {
+                                "references": [
+                                    {
+                                        "kind": "str",  # Optional. Whether
+                                          name is a tool or a toolbelt. Known values are:
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                        "name": "str",  # Optional. Tool slug
+                                          or toolbelt name.
+                                        "version": "str"  # Optional. Pinned
+                                          version.
+                                    }
+                                ]
+                            },
+                            "updatedAt": "2020-02-20 00:00:00"  # Optional. When the
+                              session was last modified.
+                        }
+                    ]
+                }
+                # response body for status code(s): 400
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_sessions_list_search_request(
+            query=query,
+            end_user_id=end_user_id,
+            page_size=page_size,
+            page_token=page_token,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def delete(self, session_urn: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Delete a Session.
+
+        Deletes the session and its policy. Succeeds without deleting anything when the session does
+        not exist or you cannot delete it, so repeating a delete also succeeds. A malformed
+        ``session_urn`` is rejected with 400.
+
+        :param session_urn: URN of the session, for example ``do:managed_agent_session:<uuid>``.
+         Required.
+        :type session_urn: str
+        :return: JSON or JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_sessions_delete_request(
+            session_urn=session_urn,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+
+class ToolbeltsOperations:
+    """
+    .. warning::
+        **DO NOT** instantiate this class directly.
+
+        Instead, you should access the following operations through
+        :class:`~pydo.GeneratedClient`'s
+        :attr:`toolbelts` attribute.
+    """
+
+    def __init__(self, *args, **kwargs):
+        input_args = list(args)
+        self._client = input_args.pop(0) if input_args else kwargs.pop("client")
+        self._config = input_args.pop(0) if input_args else kwargs.pop("config")
+        self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
+        self._deserialize = (
+            input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        )
+
     @overload
     def create(
         self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
@@ -19035,7 +25051,10 @@ class ToolbeltsOperations:
         # pylint: disable=line-too-long
         """Create a Toolbelt.
 
-        Creates a versioned collection of provider-qualified Action Gateway tool names.
+        A toolbelt is a named set of tools, each pinned to a version, that your team can attach to
+        sessions as ``toolbelt:<name>@<version>``. The first version is 1 unless version is set.
+        Returns 409 if an active toolbelt with the same name exists. The name of a deleted toolbelt can
+        be reused; its versions start again from the initial version.
 
         :param body: Required.
         :type body: JSON
@@ -19051,34 +25070,49 @@ class ToolbeltsOperations:
 
                 # JSON input template you can fill out and use as your body input.
                 body = {
-                    "name": "str",  # Required.
+                    "name": "str",  # Toolbelt name, unique among your team's active toolbelts.
+                      Must match ``^``"" [a-z]"" ```[a-z0-9_-]``"" {0,63}$"" ``;``"" search` is
+                      reserved. Required.
+                    "description": "str",  # Optional. Optional description. At most 255 bytes.
+                    "display_name": "str",  # Optional. Optional human-readable label, separate
+                      from name. At most 128 bytes.
                     "tools": [
-                        "str"  # Required.
+                        "str"  # Optional. Optional initial members, as catalog tool slugs
+                          ("" ``<provider>_<name>``"" ). Each may be pinned as
+                          ``<tool_slug>@<version>``"" ; a pin must equal the tool's current released
+                          version, and an unpinned tool is pinned to that version. Every tool must be
+                          an active catalog tool. Duplicates are merged; at most 500 tools. Empty
+                          creates a toolbelt with no tools.
                     ],
-                    "description": "str",  # Optional.
-                    "display_name": "str",  # Optional.
-                    "version": "1"  # Optional. Default value is "1".
+                    "version": "1"  # Optional. Default value is "1". Optional initial version
+                      number, a positive integer such as ``1``. Defaults to 1.
                 }
 
                 # response body for status code(s): 200
                 response == {
                     "toolbelt": {
-                        "created_at": "2020-02-20 00:00:00",  # Required.
-                        "name": "str",  # Required.
-                        "reference": "str",  # A reference pinned to this immutable toolbelt
-                          version. Required.
-                        "reference_latest": "str",  # An unversioned reference to the latest
-                          active version. Required.
-                        "status": "str",  # Required. Known values are: "active" and
-                          "deprecated".
-                        "tool_count": 0,  # Required.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. When this version
+                          was created, in RFC 3339 format.
+                        "description": "str",  # Optional. Team-authored description.
+                        "display_name": "str",  # Optional. Human-readable label.
+                        "name": "str",  # Optional. Toolbelt name, unique among your team's
+                          active toolbelts.
+                        "reference": "str",  # Optional. ``<name>@<version>``"" , identifying
+                          this exact version. Sessions reference it as ``toolbelt:<name>@<version>``.
+                        "reference_latest": "str",  # Optional. The toolbelt name, which
+                          refers to whichever version is latest.
+                        "status": "str",  # Optional. active, or deprecated once the toolbelt
+                          is deleted. Known values are: "active" and "deprecated".
+                        "tool_count": 0,  # Optional. Number of entries in tools.
                         "tools": [
-                            "str"  # Required.
+                            "str"  # Optional. Members, sorted, each as
+                              ``<tool_slug>@<version>``"" : the tool and the version this toolbelt
+                              version pins.
                         ],
-                        "updated_at": "2020-02-20 00:00:00",  # Required.
-                        "version": "str",  # Required.
-                        "description": "str",  # Optional. Required.
-                        "display_name": "str"  # Optional. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. When this version
+                          was last modified, in RFC 3339 format.
+                        "version": "str"  # Optional. Version number of this toolbelt
+                          version, as a string, for example ``3``.
                     }
                 }
                 # response body for status code(s): 400, 409
@@ -19101,7 +25135,10 @@ class ToolbeltsOperations:
         # pylint: disable=line-too-long
         """Create a Toolbelt.
 
-        Creates a versioned collection of provider-qualified Action Gateway tool names.
+        A toolbelt is a named set of tools, each pinned to a version, that your team can attach to
+        sessions as ``toolbelt:<name>@<version>``. The first version is 1 unless version is set.
+        Returns 409 if an active toolbelt with the same name exists. The name of a deleted toolbelt can
+        be reused; its versions start again from the initial version.
 
         :param body: Required.
         :type body: IO[bytes]
@@ -19118,22 +25155,28 @@ class ToolbeltsOperations:
                 # response body for status code(s): 200
                 response == {
                     "toolbelt": {
-                        "created_at": "2020-02-20 00:00:00",  # Required.
-                        "name": "str",  # Required.
-                        "reference": "str",  # A reference pinned to this immutable toolbelt
-                          version. Required.
-                        "reference_latest": "str",  # An unversioned reference to the latest
-                          active version. Required.
-                        "status": "str",  # Required. Known values are: "active" and
-                          "deprecated".
-                        "tool_count": 0,  # Required.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. When this version
+                          was created, in RFC 3339 format.
+                        "description": "str",  # Optional. Team-authored description.
+                        "display_name": "str",  # Optional. Human-readable label.
+                        "name": "str",  # Optional. Toolbelt name, unique among your team's
+                          active toolbelts.
+                        "reference": "str",  # Optional. ``<name>@<version>``"" , identifying
+                          this exact version. Sessions reference it as ``toolbelt:<name>@<version>``.
+                        "reference_latest": "str",  # Optional. The toolbelt name, which
+                          refers to whichever version is latest.
+                        "status": "str",  # Optional. active, or deprecated once the toolbelt
+                          is deleted. Known values are: "active" and "deprecated".
+                        "tool_count": 0,  # Optional. Number of entries in tools.
                         "tools": [
-                            "str"  # Required.
+                            "str"  # Optional. Members, sorted, each as
+                              ``<tool_slug>@<version>``"" : the tool and the version this toolbelt
+                              version pins.
                         ],
-                        "updated_at": "2020-02-20 00:00:00",  # Required.
-                        "version": "str",  # Required.
-                        "description": "str",  # Optional. Required.
-                        "display_name": "str"  # Optional. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. When this version
+                          was last modified, in RFC 3339 format.
+                        "version": "str"  # Optional. Version number of this toolbelt
+                          version, as a string, for example ``3``.
                     }
                 }
                 # response body for status code(s): 400, 409
@@ -19154,7 +25197,10 @@ class ToolbeltsOperations:
         # pylint: disable=line-too-long
         """Create a Toolbelt.
 
-        Creates a versioned collection of provider-qualified Action Gateway tool names.
+        A toolbelt is a named set of tools, each pinned to a version, that your team can attach to
+        sessions as ``toolbelt:<name>@<version>``. The first version is 1 unless version is set.
+        Returns 409 if an active toolbelt with the same name exists. The name of a deleted toolbelt can
+        be reused; its versions start again from the initial version.
 
         :param body: Is either a JSON type or a IO[bytes] type. Required.
         :type body: JSON or IO[bytes]
@@ -19167,34 +25213,49 @@ class ToolbeltsOperations:
 
                 # JSON input template you can fill out and use as your body input.
                 body = {
-                    "name": "str",  # Required.
+                    "name": "str",  # Toolbelt name, unique among your team's active toolbelts.
+                      Must match ``^``"" [a-z]"" ```[a-z0-9_-]``"" {0,63}$"" ``;``"" search` is
+                      reserved. Required.
+                    "description": "str",  # Optional. Optional description. At most 255 bytes.
+                    "display_name": "str",  # Optional. Optional human-readable label, separate
+                      from name. At most 128 bytes.
                     "tools": [
-                        "str"  # Required.
+                        "str"  # Optional. Optional initial members, as catalog tool slugs
+                          ("" ``<provider>_<name>``"" ). Each may be pinned as
+                          ``<tool_slug>@<version>``"" ; a pin must equal the tool's current released
+                          version, and an unpinned tool is pinned to that version. Every tool must be
+                          an active catalog tool. Duplicates are merged; at most 500 tools. Empty
+                          creates a toolbelt with no tools.
                     ],
-                    "description": "str",  # Optional.
-                    "display_name": "str",  # Optional.
-                    "version": "1"  # Optional. Default value is "1".
+                    "version": "1"  # Optional. Default value is "1". Optional initial version
+                      number, a positive integer such as ``1``. Defaults to 1.
                 }
 
                 # response body for status code(s): 200
                 response == {
                     "toolbelt": {
-                        "created_at": "2020-02-20 00:00:00",  # Required.
-                        "name": "str",  # Required.
-                        "reference": "str",  # A reference pinned to this immutable toolbelt
-                          version. Required.
-                        "reference_latest": "str",  # An unversioned reference to the latest
-                          active version. Required.
-                        "status": "str",  # Required. Known values are: "active" and
-                          "deprecated".
-                        "tool_count": 0,  # Required.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. When this version
+                          was created, in RFC 3339 format.
+                        "description": "str",  # Optional. Team-authored description.
+                        "display_name": "str",  # Optional. Human-readable label.
+                        "name": "str",  # Optional. Toolbelt name, unique among your team's
+                          active toolbelts.
+                        "reference": "str",  # Optional. ``<name>@<version>``"" , identifying
+                          this exact version. Sessions reference it as ``toolbelt:<name>@<version>``.
+                        "reference_latest": "str",  # Optional. The toolbelt name, which
+                          refers to whichever version is latest.
+                        "status": "str",  # Optional. active, or deprecated once the toolbelt
+                          is deleted. Known values are: "active" and "deprecated".
+                        "tool_count": 0,  # Optional. Number of entries in tools.
                         "tools": [
-                            "str"  # Required.
+                            "str"  # Optional. Members, sorted, each as
+                              ``<tool_slug>@<version>``"" : the tool and the version this toolbelt
+                              version pins.
                         ],
-                        "updated_at": "2020-02-20 00:00:00",  # Required.
-                        "version": "str",  # Required.
-                        "description": "str",  # Optional. Required.
-                        "display_name": "str"  # Optional. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. When this version
+                          was last modified, in RFC 3339 format.
+                        "version": "str"  # Optional. Version number of this toolbelt
+                          version, as a string, for example ``3``.
                     }
                 }
                 # response body for status code(s): 400, 409
@@ -19317,17 +25378,28 @@ class ToolbeltsOperations:
         return cast(JSON, deserialized)  # type: ignore
 
     @distributed_trace
-    def get(self, name: str, *, version: Optional[str] = None, **kwargs: Any) -> JSON:
+    def list(
+        self,
+        *,
+        status: str = "active",
+        page: int = 1,
+        per_page: int = 20,
+        **kwargs: Any,
+    ) -> JSON:
         # pylint: disable=line-too-long
-        """Retrieve a Toolbelt.
+        """List Toolbelts.
 
-        Retrieves the latest active version or a specified immutable version of a toolbelt.
+        Returns your team's toolbelts, one entry per name describing its latest version, sorted by
+        name. Offset-paged with page and ``per_page``\\ ; pagination reports the total.
 
-        :param name: The natural key identifying the toolbelt. Required.
-        :type name: str
-        :keyword version: An immutable numeric toolbelt version. Omit to retrieve the latest active
-         version. Default value is None.
-        :paramtype version: str
+        :keyword status: active (default), deprecated, or all. Case-insensitive. Known values are:
+         "active", "deprecated", and "all". Default value is "active".
+        :paramtype status: str
+        :keyword page: 1-based page number. Values below 1 are treated as 1. Default value is 1.
+        :paramtype page: int
+        :keyword per_page: Page size. Defaults to 20; values above 100 are capped at 100. Default value
+         is 20.
+        :paramtype per_page: int
         :return: JSON object
         :rtype: JSON
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -19337,26 +25409,373 @@ class ToolbeltsOperations:
 
                 # response body for status code(s): 200
                 response == {
+                    "pagination": {
+                        "page": 0,  # Optional. 1-based page number of this response.
+                        "per_page": 0,  # Optional. Page size applied to this response, after
+                          defaults and caps.
+                        "total": 0  # Optional. Number of matching items across all pages.
+                    },
+                    "toolbelts": [
+                        {
+                            "description": "str",  # Optional. Description of the latest
+                              version.
+                            "display_name": "str",  # Optional. Human-readable label of
+                              the latest version.
+                            "latest_version": "str",  # Optional. Latest version number,
+                              as a string.
+                            "name": "str",  # Optional. Toolbelt name.
+                            "reference_latest": "str",  # Optional. The toolbelt name,
+                              which refers to whichever version is latest.
+                            "status": "str",  # Optional. active, or deprecated once the
+                              toolbelt is deleted. Known values are: "active" and "deprecated".
+                            "tool_count": 0,  # Optional. Number of members in the latest
+                              version.
+                            "updated_at": "2020-02-20 00:00:00",  # Optional. When the
+                              latest version was last modified, in RFC 3339 format.
+                            "version_count": 0  # Optional. Number of versions recorded
+                              under this name, including versions from before the toolbelt was deleted
+                              and the name reused.
+                        }
+                    ]
+                }
+                # response body for status code(s): 400
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_toolbelts_list_request(
+            status=status,
+            page=page,
+            per_page=per_page,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def list_search(
+        self,
+        *,
+        query: Optional[str] = None,
+        status: str = "active",
+        page_size: int = 20,
+        page_token: Optional[str] = None,
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Search Toolbelts.
+
+        Returns your team's toolbelts whose name, display name, or description contains query,
+        case-insensitively, sorted by name. Cursor-paged with ``page_size`` and ``page_token``\\ ; no
+        total is reported.
+
+        :keyword query: Matched case-insensitively as a substring of name, ``display_name``\\ , or
+         description. Empty matches every toolbelt of your team. Default value is None.
+        :paramtype query: str
+        :keyword status: active (default), deprecated, or all. Case-insensitive. Known values are:
+         "active", "deprecated", and "all". Default value is "active".
+        :paramtype status: str
+        :keyword page_size: Page size, 1 to 100. Defaults to 20 when omitted or 0; other values are
+         rejected with 400. Default value is 20.
+        :paramtype page_size: int
+        :keyword page_token: ``next_page_token`` from the previous response. Valid only with the same
+         query and status; otherwise the request is rejected with 400. Default value is None.
+        :paramtype page_token: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "next_page_token": "str",  # Optional. Token for the next page; empty on the
+                      last page.
+                    "toolbelts": [
+                        {
+                            "description": "str",  # Optional. Description of the latest
+                              version.
+                            "display_name": "str",  # Optional. Human-readable label of
+                              the latest version.
+                            "latest_version": "str",  # Optional. Latest version number,
+                              as a string.
+                            "name": "str",  # Optional. Toolbelt name.
+                            "reference_latest": "str",  # Optional. The toolbelt name,
+                              which refers to whichever version is latest.
+                            "status": "str",  # Optional. active, or deprecated once the
+                              toolbelt is deleted. Known values are: "active" and "deprecated".
+                            "tool_count": 0,  # Optional. Number of members in the latest
+                              version.
+                            "updated_at": "2020-02-20 00:00:00",  # Optional. When the
+                              latest version was last modified, in RFC 3339 format.
+                            "version_count": 0  # Optional. Number of versions recorded
+                              under this name, including versions from before the toolbelt was deleted
+                              and the name reused.
+                        }
+                    ]
+                }
+                # response body for status code(s): 400
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_toolbelts_list_search_request(
+            query=query,
+            status=status,
+            page_size=page_size,
+            page_token=page_token,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def get(
+        self,
+        name: str,
+        *,
+        version: Optional[str] = None,
+        page_size: int = 20,
+        page_token: Optional[str] = None,
+        search: Optional[str] = None,
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Get a Toolbelt.
+
+        Returns the latest version of the named toolbelt, or the version requested, with catalog
+        metadata for one page of its members in ``tool_details``. A deleted toolbelt returns 404 unless
+        a version is requested.
+
+        :param name: Toolbelt name. Required.
+        :type name: str
+        :keyword version: Version number to read. Empty returns the latest version. Default value is
+         None.
+        :paramtype version: str
+        :keyword page_size: Page size for ``tool_details`` only; toolbelt.tools always lists every
+         member. Defaults to 20; values above 100 are capped at 100. Default value is 20.
+        :paramtype page_size: int
+        :keyword page_token: ``next_page_token`` from the previous response, to continue
+         ``tool_details``. Treat it as opaque, and send it only with the same toolbelt, version, and
+         search. Default value is None.
+        :paramtype page_token: str
+        :keyword search: Restricts ``tool_details`` to members whose tool slug, name, title,
+         description, provider, or category contains this value, case-insensitively. It does not filter
+         toolbelt.tools. This is a substring match, not a filter expression. Default value is None.
+        :paramtype search: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "next_page_token": "str",  # Optional. Token for the next page of
+                      ``tool_details``"" ; empty on the last page.
+                    "tool_details": [
+                        {
+                            "category": "str",  # Optional. Best-effort catalog metadata
+                              and is empty for a large share of the catalog. Do not rely on it being
+                              present.
+                            "description": "str",  # Optional. What the tool does.
+                            "name": "str",  # Optional. The unqualified tool name,
+                              without the provider prefix.
+                            "provider": "str",  # Optional. The ID of the provider that
+                              offers the tool, broken out so a client never has to split ``tool_slug``.
+                            "title": "str",  # Optional. Human-readable tool title.
+                            "tool_slug": "str",  # Optional. The provider-qualified,
+                              stable tool identifier ("" ``<provider>_<name>``"" ). Treat it as opaque
+                              and pass it back verbatim.
+                            "version": 0  # Optional. The version this toolbelt version
+                              pins for the member, matching the ``@<version>`` suffix in the
+                              corresponding toolbelt.tools entry.
+                        }
+                    ],
                     "toolbelt": {
-                        "created_at": "2020-02-20 00:00:00",  # Required.
-                        "name": "str",  # Required.
-                        "reference": "str",  # A reference pinned to this immutable toolbelt
-                          version. Required.
-                        "reference_latest": "str",  # An unversioned reference to the latest
-                          active version. Required.
-                        "status": "str",  # Required. Known values are: "active" and
-                          "deprecated".
-                        "tool_count": 0,  # Required.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. When this version
+                          was created, in RFC 3339 format.
+                        "description": "str",  # Optional. Team-authored description.
+                        "display_name": "str",  # Optional. Human-readable label.
+                        "name": "str",  # Optional. Toolbelt name, unique among your team's
+                          active toolbelts.
+                        "reference": "str",  # Optional. ``<name>@<version>``"" , identifying
+                          this exact version. Sessions reference it as ``toolbelt:<name>@<version>``.
+                        "reference_latest": "str",  # Optional. The toolbelt name, which
+                          refers to whichever version is latest.
+                        "status": "str",  # Optional. active, or deprecated once the toolbelt
+                          is deleted. Known values are: "active" and "deprecated".
+                        "tool_count": 0,  # Optional. Number of entries in tools.
                         "tools": [
-                            "str"  # Required.
+                            "str"  # Optional. Members, sorted, each as
+                              ``<tool_slug>@<version>``"" : the tool and the version this toolbelt
+                              version pins.
                         ],
-                        "updated_at": "2020-02-20 00:00:00",  # Required.
-                        "version": "str",  # Required.
-                        "description": "str",  # Optional. Required.
-                        "display_name": "str"  # Optional. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. When this version
+                          was last modified, in RFC 3339 format.
+                        "version": "str"  # Optional. Version number of this toolbelt
+                          version, as a string, for example ``3``.
                     }
                 }
-                # response body for status code(s): 404
+                # response body for status code(s): 400, 404
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -19389,6 +25808,9 @@ class ToolbeltsOperations:
         _request = build_toolbelts_get_request(
             name=name,
             version=version,
+            page_size=page_size,
+            page_token=page_token,
+            search=search,
             headers=_headers,
             params=_params,
         )
@@ -19403,7 +25825,7 @@ class ToolbeltsOperations:
 
         response = pipeline_response.http_response
 
-        if response.status_code not in [200, 404]:
+        if response.status_code not in [200, 400, 404]:
             if _stream:
                 response.read()  # Load the body in memory and close the socket
             map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
@@ -19411,6 +25833,22 @@ class ToolbeltsOperations:
 
         response_headers = {}
         if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
             response_headers["ratelimit-limit"] = self._deserialize(
                 "int", response.headers.get("ratelimit-limit")
             )
@@ -19452,9 +25890,12 @@ class ToolbeltsOperations:
         # pylint: disable=line-too-long
         """Delete a Toolbelt.
 
-        Deprecates the latest active version of a toolbelt.
+        Marks the toolbelt deleted and returns its latest version with status deprecated. Its versions
+        stay readable by explicit version until the name is reused. The name is free to reuse
+        immediately; a new toolbelt with it starts a fresh version history. Returns 404 when the
+        toolbelt does not exist or is already deleted.
 
-        :param name: The natural key identifying the toolbelt. Required.
+        :param name: Toolbelt name. Required.
         :type name: str
         :return: JSON object
         :rtype: JSON
@@ -19466,22 +25907,28 @@ class ToolbeltsOperations:
                 # response body for status code(s): 200
                 response == {
                     "toolbelt": {
-                        "created_at": "2020-02-20 00:00:00",  # Required.
-                        "name": "str",  # Required.
-                        "reference": "str",  # A reference pinned to this immutable toolbelt
-                          version. Required.
-                        "reference_latest": "str",  # An unversioned reference to the latest
-                          active version. Required.
-                        "status": "str",  # Required. Known values are: "active" and
-                          "deprecated".
-                        "tool_count": 0,  # Required.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. When this version
+                          was created, in RFC 3339 format.
+                        "description": "str",  # Optional. Team-authored description.
+                        "display_name": "str",  # Optional. Human-readable label.
+                        "name": "str",  # Optional. Toolbelt name, unique among your team's
+                          active toolbelts.
+                        "reference": "str",  # Optional. ``<name>@<version>``"" , identifying
+                          this exact version. Sessions reference it as ``toolbelt:<name>@<version>``.
+                        "reference_latest": "str",  # Optional. The toolbelt name, which
+                          refers to whichever version is latest.
+                        "status": "str",  # Optional. active, or deprecated once the toolbelt
+                          is deleted. Known values are: "active" and "deprecated".
+                        "tool_count": 0,  # Optional. Number of entries in tools.
                         "tools": [
-                            "str"  # Required.
+                            "str"  # Optional. Members, sorted, each as
+                              ``<tool_slug>@<version>``"" : the tool and the version this toolbelt
+                              version pins.
                         ],
-                        "updated_at": "2020-02-20 00:00:00",  # Required.
-                        "version": "str",  # Required.
-                        "description": "str",  # Optional. Required.
-                        "display_name": "str"  # Optional. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. When this version
+                          was last modified, in RFC 3339 format.
+                        "version": "str"  # Optional. Version number of this toolbelt
+                          version, as a string, for example ``3``.
                     }
                 }
                 # response body for status code(s): 404
@@ -19574,6 +26021,389 @@ class ToolbeltsOperations:
 
         return cast(JSON, deserialized)  # type: ignore
 
+    @distributed_trace
+    def list_providers(
+        self,
+        name: str,
+        *,
+        version: Optional[str] = None,
+        page: int = 1,
+        per_page: int = 20,
+        search: Optional[str] = None,
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List the Providers in a Toolbelt.
+
+        Returns the distinct providers of the toolbelt's members, each with its member count, sorted by
+        provider ID. List one provider's members with ``GET
+        .../toolbelts/{name}/providers/{provider}/tools``.
+
+        :param name: Toolbelt name. Required.
+        :type name: str
+        :keyword version: Version number to read. Empty reads the latest version. Default value is
+         None.
+        :paramtype version: str
+        :keyword page: 1-based page number. Values below 1 are treated as 1. Default value is 1.
+        :paramtype page: int
+        :keyword per_page: Page size. Defaults to 20; values above 100 are capped at 100. Default value
+         is 20.
+        :paramtype per_page: int
+        :keyword search: Restricts providers whose ID, name, or description contains this value,
+         case-insensitively. Default value is None.
+        :paramtype search: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "pagination": {
+                        "page": 0,  # Optional. 1-based page number of this response.
+                        "per_page": 0,  # Optional. Page size applied to this response, after
+                          defaults and caps.
+                        "total": 0  # Optional. Number of matching items across all pages.
+                    },
+                    "providers": [
+                        {
+                            "categories": [
+                                "str"  # Optional. The distinct tool categories among
+                                  this toolbelt's members for the provider (sorted). Empty for
+                                  ``_legacy`` or when no member has a category.
+                            ],
+                            "created_at": "2020-02-20 00:00:00",  # Optional. When the
+                              provider was added to the catalog. Unset for ``_legacy``.
+                            "description": "str",  # Optional. Provider description.
+                              Empty for ``_legacy``.
+                            "id": "str",  # Optional. Equals provider; present so the
+                              entry has the same shape as a toolkit.
+                            "name": "str",  # Optional. The provider's display name.
+                              Empty for ``_legacy``.
+                            "provider": "str",  # Optional. The provider ID. Members
+                              recorded without a provider are grouped under ``_legacy``"" , which is
+                              also accepted in the provider path.
+                            "tool_count": 0  # Optional. How many toolbelt members belong
+                              to this provider.
+                        }
+                    ],
+                    "toolbelt": {
+                        "created_at": "2020-02-20 00:00:00",  # Optional. When this version
+                          was created, in RFC 3339 format.
+                        "description": "str",  # Optional. Team-authored description.
+                        "display_name": "str",  # Optional. Human-readable label.
+                        "name": "str",  # Optional. Toolbelt name, unique among your team's
+                          active toolbelts.
+                        "reference": "str",  # Optional. ``<name>@<version>``"" , identifying
+                          this exact version. Sessions reference it as ``toolbelt:<name>@<version>``.
+                        "reference_latest": "str",  # Optional. The toolbelt name, which
+                          refers to whichever version is latest.
+                        "status": "str",  # Optional. active, or deprecated once the toolbelt
+                          is deleted. Known values are: "active" and "deprecated".
+                        "tool_count": 0,  # Optional. Number of entries in tools.
+                        "tools": [
+                            "str"  # Optional. Members, sorted, each as
+                              ``<tool_slug>@<version>``"" : the tool and the version this toolbelt
+                              version pins.
+                        ],
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. When this version
+                          was last modified, in RFC 3339 format.
+                        "version": "str"  # Optional. Version number of this toolbelt
+                          version, as a string, for example ``3``.
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_toolbelts_list_providers_request(
+            name=name,
+            version=version,
+            page=page,
+            per_page=per_page,
+            search=search,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def list_provider_tools(
+        self,
+        name: str,
+        provider: str,
+        *,
+        version: Optional[str] = None,
+        page: int = 1,
+        per_page: int = 20,
+        search: Optional[str] = None,
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List a Toolbelt's Tools from One Provider.
+
+        Returns a page of catalog metadata for the toolbelt's members from the named provider, sorted
+        by tool slug. An unknown provider returns an empty page.
+
+        :param name: Toolbelt name. Required.
+        :type name: str
+        :param provider: A provider ID from the toolbelt's provider list, or ``_legacy`` for members
+         recorded without a provider. Matched exactly. Required.
+        :type provider: str
+        :keyword version: Version number to read. Empty reads the latest version. Default value is
+         None.
+        :paramtype version: str
+        :keyword page: 1-based page number. Values below 1 are treated as 1. Default value is 1.
+        :paramtype page: int
+        :keyword per_page: Page size. Defaults to 20; values above 100 are capped at 100. Default value
+         is 20.
+        :paramtype per_page: int
+        :keyword search: Restricts tools whose slug, name, title, description, provider, or category
+         contains this value, case-insensitively, within the provider only. Default value is None.
+        :paramtype search: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "pagination": {
+                        "page": 0,  # Optional. 1-based page number of this response.
+                        "per_page": 0,  # Optional. Page size applied to this response, after
+                          defaults and caps.
+                        "total": 0  # Optional. Number of matching items across all pages.
+                    },
+                    "tools": [
+                        {
+                            "category": "str",  # Optional. Best-effort catalog metadata
+                              and is empty for a large share of the catalog. Do not rely on it being
+                              present.
+                            "description": "str",  # Optional. What the tool does.
+                            "name": "str",  # Optional. The unqualified tool name,
+                              without the provider prefix.
+                            "provider": "str",  # Optional. The ID of the provider that
+                              offers the tool, broken out so a client never has to split ``tool_slug``.
+                            "title": "str",  # Optional. Human-readable tool title.
+                            "tool_slug": "str",  # Optional. The provider-qualified,
+                              stable tool identifier ("" ``<provider>_<name>``"" ). Treat it as opaque
+                              and pass it back verbatim.
+                            "version": 0  # Optional. The version this toolbelt version
+                              pins for the member, matching the ``@<version>`` suffix in the
+                              corresponding toolbelt.tools entry.
+                        }
+                    ]
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_toolbelts_list_provider_tools_request(
+            name=name,
+            provider=provider,
+            version=version,
+            page=page,
+            per_page=per_page,
+            search=search,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
     @overload
     def add_tools(
         self,
@@ -19586,9 +26416,14 @@ class ToolbeltsOperations:
         # pylint: disable=line-too-long
         """Add Tools to a Toolbelt.
 
-        Adds provider-qualified tool names and creates a new immutable toolbelt version.
+        Adds the listed tools and returns the toolbelt. When membership changes, this creates a new
+        version that keeps the display name and description. Tools already in the toolbelt are left as
+        they are, so a request that adds nothing new returns the current version unchanged. Returns 400
+        when a tool is not an active catalog tool, when a pin differs from the tool's current released
+        version or from the version the toolbelt already holds, or when the toolbelt would exceed 500
+        tools. Returns 404 for an unknown or deleted toolbelt.
 
-        :param name: The natural key identifying the toolbelt. Required.
+        :param name: Toolbelt name, from the path. Required.
         :type name: str
         :param body: Required.
         :type body: JSON
@@ -19605,29 +26440,38 @@ class ToolbeltsOperations:
                 # JSON input template you can fill out and use as your body input.
                 body = {
                     "tools": [
-                        "str"  # Required.
+                        "str"  # Tool slugs ("" ``<provider>_<name>``"" ) to add or remove,
+                          each optionally pinned as ``<tool_slug>@<version>``. At least one is
+                          required. When adding, a pin must equal the tool's current released version.
+                          Required.
                     ]
                 }
 
                 # response body for status code(s): 200
                 response == {
                     "toolbelt": {
-                        "created_at": "2020-02-20 00:00:00",  # Required.
-                        "name": "str",  # Required.
-                        "reference": "str",  # A reference pinned to this immutable toolbelt
-                          version. Required.
-                        "reference_latest": "str",  # An unversioned reference to the latest
-                          active version. Required.
-                        "status": "str",  # Required. Known values are: "active" and
-                          "deprecated".
-                        "tool_count": 0,  # Required.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. When this version
+                          was created, in RFC 3339 format.
+                        "description": "str",  # Optional. Team-authored description.
+                        "display_name": "str",  # Optional. Human-readable label.
+                        "name": "str",  # Optional. Toolbelt name, unique among your team's
+                          active toolbelts.
+                        "reference": "str",  # Optional. ``<name>@<version>``"" , identifying
+                          this exact version. Sessions reference it as ``toolbelt:<name>@<version>``.
+                        "reference_latest": "str",  # Optional. The toolbelt name, which
+                          refers to whichever version is latest.
+                        "status": "str",  # Optional. active, or deprecated once the toolbelt
+                          is deleted. Known values are: "active" and "deprecated".
+                        "tool_count": 0,  # Optional. Number of entries in tools.
                         "tools": [
-                            "str"  # Required.
+                            "str"  # Optional. Members, sorted, each as
+                              ``<tool_slug>@<version>``"" : the tool and the version this toolbelt
+                              version pins.
                         ],
-                        "updated_at": "2020-02-20 00:00:00",  # Required.
-                        "version": "str",  # Required.
-                        "description": "str",  # Optional. Required.
-                        "display_name": "str"  # Optional. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. When this version
+                          was last modified, in RFC 3339 format.
+                        "version": "str"  # Optional. Version number of this toolbelt
+                          version, as a string, for example ``3``.
                     }
                 }
                 # response body for status code(s): 400, 404
@@ -19655,9 +26499,14 @@ class ToolbeltsOperations:
         # pylint: disable=line-too-long
         """Add Tools to a Toolbelt.
 
-        Adds provider-qualified tool names and creates a new immutable toolbelt version.
+        Adds the listed tools and returns the toolbelt. When membership changes, this creates a new
+        version that keeps the display name and description. Tools already in the toolbelt are left as
+        they are, so a request that adds nothing new returns the current version unchanged. Returns 400
+        when a tool is not an active catalog tool, when a pin differs from the tool's current released
+        version or from the version the toolbelt already holds, or when the toolbelt would exceed 500
+        tools. Returns 404 for an unknown or deleted toolbelt.
 
-        :param name: The natural key identifying the toolbelt. Required.
+        :param name: Toolbelt name, from the path. Required.
         :type name: str
         :param body: Required.
         :type body: IO[bytes]
@@ -19674,22 +26523,28 @@ class ToolbeltsOperations:
                 # response body for status code(s): 200
                 response == {
                     "toolbelt": {
-                        "created_at": "2020-02-20 00:00:00",  # Required.
-                        "name": "str",  # Required.
-                        "reference": "str",  # A reference pinned to this immutable toolbelt
-                          version. Required.
-                        "reference_latest": "str",  # An unversioned reference to the latest
-                          active version. Required.
-                        "status": "str",  # Required. Known values are: "active" and
-                          "deprecated".
-                        "tool_count": 0,  # Required.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. When this version
+                          was created, in RFC 3339 format.
+                        "description": "str",  # Optional. Team-authored description.
+                        "display_name": "str",  # Optional. Human-readable label.
+                        "name": "str",  # Optional. Toolbelt name, unique among your team's
+                          active toolbelts.
+                        "reference": "str",  # Optional. ``<name>@<version>``"" , identifying
+                          this exact version. Sessions reference it as ``toolbelt:<name>@<version>``.
+                        "reference_latest": "str",  # Optional. The toolbelt name, which
+                          refers to whichever version is latest.
+                        "status": "str",  # Optional. active, or deprecated once the toolbelt
+                          is deleted. Known values are: "active" and "deprecated".
+                        "tool_count": 0,  # Optional. Number of entries in tools.
                         "tools": [
-                            "str"  # Required.
+                            "str"  # Optional. Members, sorted, each as
+                              ``<tool_slug>@<version>``"" : the tool and the version this toolbelt
+                              version pins.
                         ],
-                        "updated_at": "2020-02-20 00:00:00",  # Required.
-                        "version": "str",  # Required.
-                        "description": "str",  # Optional. Required.
-                        "display_name": "str"  # Optional. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. When this version
+                          was last modified, in RFC 3339 format.
+                        "version": "str"  # Optional. Version number of this toolbelt
+                          version, as a string, for example ``3``.
                     }
                 }
                 # response body for status code(s): 400, 404
@@ -19710,9 +26565,14 @@ class ToolbeltsOperations:
         # pylint: disable=line-too-long
         """Add Tools to a Toolbelt.
 
-        Adds provider-qualified tool names and creates a new immutable toolbelt version.
+        Adds the listed tools and returns the toolbelt. When membership changes, this creates a new
+        version that keeps the display name and description. Tools already in the toolbelt are left as
+        they are, so a request that adds nothing new returns the current version unchanged. Returns 400
+        when a tool is not an active catalog tool, when a pin differs from the tool's current released
+        version or from the version the toolbelt already holds, or when the toolbelt would exceed 500
+        tools. Returns 404 for an unknown or deleted toolbelt.
 
-        :param name: The natural key identifying the toolbelt. Required.
+        :param name: Toolbelt name, from the path. Required.
         :type name: str
         :param body: Is either a JSON type or a IO[bytes] type. Required.
         :type body: JSON or IO[bytes]
@@ -19726,29 +26586,38 @@ class ToolbeltsOperations:
                 # JSON input template you can fill out and use as your body input.
                 body = {
                     "tools": [
-                        "str"  # Required.
+                        "str"  # Tool slugs ("" ``<provider>_<name>``"" ) to add or remove,
+                          each optionally pinned as ``<tool_slug>@<version>``. At least one is
+                          required. When adding, a pin must equal the tool's current released version.
+                          Required.
                     ]
                 }
 
                 # response body for status code(s): 200
                 response == {
                     "toolbelt": {
-                        "created_at": "2020-02-20 00:00:00",  # Required.
-                        "name": "str",  # Required.
-                        "reference": "str",  # A reference pinned to this immutable toolbelt
-                          version. Required.
-                        "reference_latest": "str",  # An unversioned reference to the latest
-                          active version. Required.
-                        "status": "str",  # Required. Known values are: "active" and
-                          "deprecated".
-                        "tool_count": 0,  # Required.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. When this version
+                          was created, in RFC 3339 format.
+                        "description": "str",  # Optional. Team-authored description.
+                        "display_name": "str",  # Optional. Human-readable label.
+                        "name": "str",  # Optional. Toolbelt name, unique among your team's
+                          active toolbelts.
+                        "reference": "str",  # Optional. ``<name>@<version>``"" , identifying
+                          this exact version. Sessions reference it as ``toolbelt:<name>@<version>``.
+                        "reference_latest": "str",  # Optional. The toolbelt name, which
+                          refers to whichever version is latest.
+                        "status": "str",  # Optional. active, or deprecated once the toolbelt
+                          is deleted. Known values are: "active" and "deprecated".
+                        "tool_count": 0,  # Optional. Number of entries in tools.
                         "tools": [
-                            "str"  # Required.
+                            "str"  # Optional. Members, sorted, each as
+                              ``<tool_slug>@<version>``"" : the tool and the version this toolbelt
+                              version pins.
                         ],
-                        "updated_at": "2020-02-20 00:00:00",  # Required.
-                        "version": "str",  # Required.
-                        "description": "str",  # Optional. Required.
-                        "display_name": "str"  # Optional. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. When this version
+                          was last modified, in RFC 3339 format.
+                        "version": "str"  # Optional. Version number of this toolbelt
+                          version, as a string, for example ``3``.
                     }
                 }
                 # response body for status code(s): 400, 404
@@ -19883,9 +26752,13 @@ class ToolbeltsOperations:
         # pylint: disable=line-too-long
         """Remove Tools from a Toolbelt.
 
-        Removes tool names and creates a new immutable toolbelt version.
+        Removes the listed tools and returns the toolbelt. When membership changes, this creates a new
+        version that keeps the display name and description. Tools that are not members are ignored,
+        and removing every tool is allowed; deleting the toolbelt itself is a separate DELETE. Returns
+        400 when a pin differs from the version the toolbelt holds, and 404 for an unknown or deleted
+        toolbelt.
 
-        :param name: The natural key identifying the toolbelt. Required.
+        :param name: Toolbelt name, from the path. Required.
         :type name: str
         :param body: Required.
         :type body: JSON
@@ -19902,29 +26775,38 @@ class ToolbeltsOperations:
                 # JSON input template you can fill out and use as your body input.
                 body = {
                     "tools": [
-                        "str"  # Required.
+                        "str"  # Tool slugs ("" ``<provider>_<name>``"" ) to add or remove,
+                          each optionally pinned as ``<tool_slug>@<version>``. At least one is
+                          required. When adding, a pin must equal the tool's current released version.
+                          Required.
                     ]
                 }
 
                 # response body for status code(s): 200
                 response == {
                     "toolbelt": {
-                        "created_at": "2020-02-20 00:00:00",  # Required.
-                        "name": "str",  # Required.
-                        "reference": "str",  # A reference pinned to this immutable toolbelt
-                          version. Required.
-                        "reference_latest": "str",  # An unversioned reference to the latest
-                          active version. Required.
-                        "status": "str",  # Required. Known values are: "active" and
-                          "deprecated".
-                        "tool_count": 0,  # Required.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. When this version
+                          was created, in RFC 3339 format.
+                        "description": "str",  # Optional. Team-authored description.
+                        "display_name": "str",  # Optional. Human-readable label.
+                        "name": "str",  # Optional. Toolbelt name, unique among your team's
+                          active toolbelts.
+                        "reference": "str",  # Optional. ``<name>@<version>``"" , identifying
+                          this exact version. Sessions reference it as ``toolbelt:<name>@<version>``.
+                        "reference_latest": "str",  # Optional. The toolbelt name, which
+                          refers to whichever version is latest.
+                        "status": "str",  # Optional. active, or deprecated once the toolbelt
+                          is deleted. Known values are: "active" and "deprecated".
+                        "tool_count": 0,  # Optional. Number of entries in tools.
                         "tools": [
-                            "str"  # Required.
+                            "str"  # Optional. Members, sorted, each as
+                              ``<tool_slug>@<version>``"" : the tool and the version this toolbelt
+                              version pins.
                         ],
-                        "updated_at": "2020-02-20 00:00:00",  # Required.
-                        "version": "str",  # Required.
-                        "description": "str",  # Optional. Required.
-                        "display_name": "str"  # Optional. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. When this version
+                          was last modified, in RFC 3339 format.
+                        "version": "str"  # Optional. Version number of this toolbelt
+                          version, as a string, for example ``3``.
                     }
                 }
                 # response body for status code(s): 400, 404
@@ -19952,9 +26834,13 @@ class ToolbeltsOperations:
         # pylint: disable=line-too-long
         """Remove Tools from a Toolbelt.
 
-        Removes tool names and creates a new immutable toolbelt version.
+        Removes the listed tools and returns the toolbelt. When membership changes, this creates a new
+        version that keeps the display name and description. Tools that are not members are ignored,
+        and removing every tool is allowed; deleting the toolbelt itself is a separate DELETE. Returns
+        400 when a pin differs from the version the toolbelt holds, and 404 for an unknown or deleted
+        toolbelt.
 
-        :param name: The natural key identifying the toolbelt. Required.
+        :param name: Toolbelt name, from the path. Required.
         :type name: str
         :param body: Required.
         :type body: IO[bytes]
@@ -19971,22 +26857,28 @@ class ToolbeltsOperations:
                 # response body for status code(s): 200
                 response == {
                     "toolbelt": {
-                        "created_at": "2020-02-20 00:00:00",  # Required.
-                        "name": "str",  # Required.
-                        "reference": "str",  # A reference pinned to this immutable toolbelt
-                          version. Required.
-                        "reference_latest": "str",  # An unversioned reference to the latest
-                          active version. Required.
-                        "status": "str",  # Required. Known values are: "active" and
-                          "deprecated".
-                        "tool_count": 0,  # Required.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. When this version
+                          was created, in RFC 3339 format.
+                        "description": "str",  # Optional. Team-authored description.
+                        "display_name": "str",  # Optional. Human-readable label.
+                        "name": "str",  # Optional. Toolbelt name, unique among your team's
+                          active toolbelts.
+                        "reference": "str",  # Optional. ``<name>@<version>``"" , identifying
+                          this exact version. Sessions reference it as ``toolbelt:<name>@<version>``.
+                        "reference_latest": "str",  # Optional. The toolbelt name, which
+                          refers to whichever version is latest.
+                        "status": "str",  # Optional. active, or deprecated once the toolbelt
+                          is deleted. Known values are: "active" and "deprecated".
+                        "tool_count": 0,  # Optional. Number of entries in tools.
                         "tools": [
-                            "str"  # Required.
+                            "str"  # Optional. Members, sorted, each as
+                              ``<tool_slug>@<version>``"" : the tool and the version this toolbelt
+                              version pins.
                         ],
-                        "updated_at": "2020-02-20 00:00:00",  # Required.
-                        "version": "str",  # Required.
-                        "description": "str",  # Optional. Required.
-                        "display_name": "str"  # Optional. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. When this version
+                          was last modified, in RFC 3339 format.
+                        "version": "str"  # Optional. Version number of this toolbelt
+                          version, as a string, for example ``3``.
                     }
                 }
                 # response body for status code(s): 400, 404
@@ -20009,9 +26901,13 @@ class ToolbeltsOperations:
         # pylint: disable=line-too-long
         """Remove Tools from a Toolbelt.
 
-        Removes tool names and creates a new immutable toolbelt version.
+        Removes the listed tools and returns the toolbelt. When membership changes, this creates a new
+        version that keeps the display name and description. Tools that are not members are ignored,
+        and removing every tool is allowed; deleting the toolbelt itself is a separate DELETE. Returns
+        400 when a pin differs from the version the toolbelt holds, and 404 for an unknown or deleted
+        toolbelt.
 
-        :param name: The natural key identifying the toolbelt. Required.
+        :param name: Toolbelt name, from the path. Required.
         :type name: str
         :param body: Is either a JSON type or a IO[bytes] type. Required.
         :type body: JSON or IO[bytes]
@@ -20025,29 +26921,38 @@ class ToolbeltsOperations:
                 # JSON input template you can fill out and use as your body input.
                 body = {
                     "tools": [
-                        "str"  # Required.
+                        "str"  # Tool slugs ("" ``<provider>_<name>``"" ) to add or remove,
+                          each optionally pinned as ``<tool_slug>@<version>``. At least one is
+                          required. When adding, a pin must equal the tool's current released version.
+                          Required.
                     ]
                 }
 
                 # response body for status code(s): 200
                 response == {
                     "toolbelt": {
-                        "created_at": "2020-02-20 00:00:00",  # Required.
-                        "name": "str",  # Required.
-                        "reference": "str",  # A reference pinned to this immutable toolbelt
-                          version. Required.
-                        "reference_latest": "str",  # An unversioned reference to the latest
-                          active version. Required.
-                        "status": "str",  # Required. Known values are: "active" and
-                          "deprecated".
-                        "tool_count": 0,  # Required.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. When this version
+                          was created, in RFC 3339 format.
+                        "description": "str",  # Optional. Team-authored description.
+                        "display_name": "str",  # Optional. Human-readable label.
+                        "name": "str",  # Optional. Toolbelt name, unique among your team's
+                          active toolbelts.
+                        "reference": "str",  # Optional. ``<name>@<version>``"" , identifying
+                          this exact version. Sessions reference it as ``toolbelt:<name>@<version>``.
+                        "reference_latest": "str",  # Optional. The toolbelt name, which
+                          refers to whichever version is latest.
+                        "status": "str",  # Optional. active, or deprecated once the toolbelt
+                          is deleted. Known values are: "active" and "deprecated".
+                        "tool_count": 0,  # Optional. Number of entries in tools.
                         "tools": [
-                            "str"  # Required.
+                            "str"  # Optional. Members, sorted, each as
+                              ``<tool_slug>@<version>``"" : the tool and the version this toolbelt
+                              version pins.
                         ],
-                        "updated_at": "2020-02-20 00:00:00",  # Required.
-                        "version": "str",  # Required.
-                        "description": "str",  # Optional. Required.
-                        "display_name": "str"  # Optional. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # Optional. When this version
+                          was last modified, in RFC 3339 format.
+                        "version": "str"  # Optional. Version number of this toolbelt
+                          version, as a string, for example ``3``.
                     }
                 }
                 # response body for status code(s): 400, 404
@@ -20171,14 +27076,14 @@ class ToolbeltsOperations:
         return cast(JSON, deserialized)  # type: ignore
 
 
-class ConnectionsOperations:
+class ToolsOperations:
     """
     .. warning::
         **DO NOT** instantiate this class directly.
 
         Instead, you should access the following operations through
         :class:`~pydo.GeneratedClient`'s
-        :attr:`connections` attribute.
+        :attr:`tools` attribute.
     """
 
     def __init__(self, *args, **kwargs):
@@ -20194,32 +27099,26 @@ class ConnectionsOperations:
     def list(
         self,
         *,
-        provider: Optional[str] = None,
-        user_id: Optional[str] = None,
-        status: Optional[str] = None,
-        sort: Optional[str] = None,
-        sort_direction: Optional[str] = None,
+        toolkit_id: Optional[str] = None,
         page: int = 1,
-        per_page: int = 20,
+        per_page: int = 100,
         **kwargs: Any,
     ) -> JSON:
-        """List Connections.
+        # pylint: disable=line-too-long
+        """List Tools.
 
-        Lists OAuth connections owned by the authenticated team.
+        Returns one page of the tools your team can use: released catalog tools plus the enabled tools
+        of your team's MCP servers. definitions[i] describes tools[i]. Offset-paged with page and
+        ``per_page``\\ ; an unknown ``toolkitId`` returns an empty page.
 
-        :keyword provider: Filter by provider name. Default value is None.
-        :paramtype provider: str
-        :keyword user_id: Filter by end-user identifier. Default value is None.
-        :paramtype user_id: str
-        :keyword status: Filter by connection status. Default value is None.
-        :paramtype status: str
-        :keyword sort: Field used to sort results. Default value is None.
-        :paramtype sort: str
-        :keyword sort_direction: Sort direction. Default value is None.
-        :paramtype sort_direction: str
-        :keyword page: Which 'page' of paginated results to return. Default value is 1.
+        :keyword toolkit_id: Restricts the page to one provider. It accepts the provider ID the catalog
+         returns, including the ``serverRef`` of one of your team's MCP servers. Default value is None.
+        :paramtype toolkit_id: str
+        :keyword page: 1-based page index; values below 1 are treated as 1. A page past the end returns
+         an empty tools list with the real total. Default value is 1.
         :paramtype page: int
-        :keyword per_page: Number of items returned per page. Default value is 20.
+        :keyword per_page: Page size. Defaults to 100 when omitted or 0; values above 100 are capped at
+         100. Default value is 100.
         :paramtype per_page: int
         :return: JSON object
         :rtype: JSON
@@ -20230,28 +27129,102 @@ class ConnectionsOperations:
 
                 # response body for status code(s): 200
                 response == {
-                    "connections": [
+                    "definitions": [
                         {
-                            "connection_parameters": {},  # Optional. Any object.
-                            "created_at": "2020-02-20 00:00:00",  # Optional.
-                            "granted_at": "2020-02-20 00:00:00",  # Optional.
-                            "id": "str",  # Optional.
-                            "provider": "str",  # Optional.
-                            "provider_display_name": "str",  # Optional.
-                            "revoked_at": "2020-02-20 00:00:00",  # Optional.
-                            "scopes": [
-                                "str"  # Optional.
-                            ],
-                            "status": "str",  # Optional.
-                            "updated_at": "2020-02-20 00:00:00",  # Optional.
-                            "user_id": "str"  # Optional.
+                            "annotations": {
+                                "destructiveHint": bool,  # Optional. The tool may
+                                  perform destructive updates.
+                                "idempotentHint": bool,  # Optional. Repeating a call
+                                  with the same arguments has no additional effect.
+                                "openWorldHint": bool,  # Optional. The tool
+                                  interacts with external systems beyond the provider's own data.
+                                "readOnlyHint": bool,  # Optional. The tool does not
+                                  modify anything.
+                                "title": "str"  # Optional. Human-readable tool
+                                  title.
+                            },
+                            "auth": {
+                                "modes": [
+                                    "str"  # Optional. Lists how the tool
+                                      authenticates: oauth (a user connection), ``user_token`` (a key
+                                      your team supplies), ``shared_key`` (a key DigitalOcean
+                                      supplies), or none.
+                                ],
+                                "provider": "str",  # Optional. The provider slug a
+                                  connection is created for. Empty when the tool needs no provider
+                                  account.
+                                "scopes": [
+                                    "str"  # Optional. The provider permissions
+                                      the tool requests.
+                                ]
+                            },
+                            "description": "str",  # Optional. What the tool does.
+                            "inputSchema": {},  # Optional. The JSON Schema the tool's
+                              arguments must satisfy.
+                            "name": "str",  # Optional. The tool name without the
+                              provider prefix.
+                            "outputSchema": {},  # Optional. The JSON Schema of the
+                              tool's result, when declared.
+                            "providerKind": "str",  # Optional. Classifies the provider:
+                              native, ``managed_api``"" , ``customer_mcp``"" , sandbox, or ``byo_mcp``
+                              (one of your team's MCP servers).
+                            "title": "str",  # Optional. Human-readable tool title.
+                            "toolId": "str",  # Optional. The opaque identity of this
+                              released tool version.
+                            "toolSlug": "str",  # Optional. The provider-qualified tool
+                              identifier ``<toolkit_id>_<name>``. Treat it as opaque and pass it back
+                              verbatim.
+                            "toolkitId": "str",  # Optional. The ID of the provider that
+                              offers the tool. For a tool from one of your team's MCP servers it is
+                              that server's ``serverRef``.
+                            "version": "str"  # Optional. The released version, for
+                              example ``v3``.
                         }
                     ],
                     "pagination": {
-                        "page": 0,  # Required.
-                        "per_page": 0,  # Required.
-                        "total": 0  # Required.
-                    }
+                        "page": 0,  # Optional. 1-based page number of this response.
+                        "per_page": 0,  # Optional. Page size applied to this response, after
+                          defaults and caps.
+                        "total": 0  # Optional. Number of matching items across all pages.
+                    },
+                    "tools": [
+                        {
+                            "annotations": {
+                                "destructiveHint": bool,  # Optional. The tool may
+                                  perform destructive updates.
+                                "idempotentHint": bool,  # Optional. Repeating a call
+                                  with the same arguments has no additional effect.
+                                "openWorldHint": bool,  # Optional. The tool
+                                  interacts with external systems beyond the provider's own data.
+                                "readOnlyHint": bool,  # Optional. The tool does not
+                                  modify anything.
+                                "title": "str"  # Optional. Human-readable tool
+                                  title.
+                            },
+                            "description": "str",  # Optional. What the tool does.
+                            "inputSchema": {},  # Optional. JSON Schema the tool's
+                              arguments must satisfy.
+                            "name": "str",  # Optional. Tool name, without the provider
+                              prefix.
+                            "outputSchema": {},  # Optional. JSON Schema of the tool's
+                              result, when declared.
+                            "parallelizable": bool,  # Optional. Catalog hint that calls
+                              to the tool may run in parallel.
+                            "streamingSafe": bool,  # Optional. Catalog hint that the
+                              tool's result can be streamed.
+                            "title": "str",  # Optional. Human-readable tool title.
+                            "toolSlug": "str",  # Optional. The provider-qualified,
+                              stable tool identifier ``<toolkit_id>_<name>``. Pass this value back
+                              verbatim to the toolbelt add/remove endpoints; clients should treat it as
+                              opaque rather than reconstructing it from ``toolkitId`` and name.
+                            "toolkitId": "str",  # Optional. ID of the provider that
+                              offers the tool. For a tool from one of your team's MCP servers it is
+                              that server's ``serverRef``.
+                            "version": "str"  # Optional. Released version, for example
+                              ``v3``.
+                        }
+                    ],
+                    "version": "str"  # Optional. Catalog version identifier, for example ``v1``.
                 }
         """
         error_map: MutableMapping[int, Type[HttpResponseError]] = {
@@ -20272,12 +27245,8 @@ class ConnectionsOperations:
 
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
-        _request = build_connections_list_request(
-            provider=provider,
-            user_id=user_id,
-            status=status,
-            sort=sort,
-            sort_direction=sort_direction,
+        _request = build_tools_list_request(
+            toolkit_id=toolkit_id,
             page=page,
             per_page=per_page,
             headers=_headers,
@@ -20321,245 +27290,44 @@ class ConnectionsOperations:
 
         return cast(JSON, deserialized)  # type: ignore
 
-    @overload
-    def create(
-        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Create a Connection.
-
-        Creates or begins authorization for an OAuth connection to an Action Gateway provider.
-
-        :param body: Required.
-        :type body: JSON
-        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
-         Default value is "application/json".
-        :paramtype content_type: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # JSON input template you can fill out and use as your body input.
-                body = {
-                    "connection_parameters": {},  # Optional. Any object.
-                    "provider": "str",  # Optional.
-                    "scopes": [
-                        "str"  # Optional.
-                    ],
-                    "user_id": "str"  # Optional.
-                }
-
-                # response body for status code(s): 200
-                response == {
-                    "authorization": {
-                        "connect_url": "str",  # Optional. ConnectionAuthorization is present
-                          only while a connection is pending. The UI sends the user to connect_url and
-                          polls GetConnection until the connection becomes active or expires. The
-                          Secrets Manager poll URL is never exposed.
-                        "expires_at": "2020-02-20 00:00:00",  # Optional.
-                          ConnectionAuthorization is present only while a connection is pending. The UI
-                          sends the user to connect_url and polls GetConnection until the connection
-                          becomes active or expires. The Secrets Manager poll URL is never exposed.
-                        "status": "str",  # Optional. ConnectionAuthorization is present only
-                          while a connection is pending. The UI sends the user to connect_url and polls
-                          GetConnection until the connection becomes active or expires. The Secrets
-                          Manager poll URL is never exposed.
-                        "verification_code": "str"  # Optional. ConnectionAuthorization is
-                          present only while a connection is pending. The UI sends the user to
-                          connect_url and polls GetConnection until the connection becomes active or
-                          expires. The Secrets Manager poll URL is never exposed.
-                    },
-                    "connection": {
-                        "connection_parameters": {},  # Optional. Any object.
-                        "created_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "granted_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "id": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider_display_name": "str",  # Optional. ----  OAuth connection
-                          resources --------------------------  OAuthConnection is the public,
-                          team-scoped connection metadata returned to the UI. It deliberately excludes
-                          the team ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                          authorization handle.
-                        "revoked_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "scopes": [
-                            "str"  # Optional. ----  OAuth connection resources
-                              --------------------------  OAuthConnection is the public, team-scoped
-                              connection metadata returned to the UI. It deliberately excludes the team
-                              ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                              authorization handle.
-                        ],
-                        "status": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "updated_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "user_id": "str"  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                    }
-                }
-                # response body for status code(s): 400, 409
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-
-    @overload
-    def create(
-        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Create a Connection.
-
-        Creates or begins authorization for an OAuth connection to an Action Gateway provider.
-
-        :param body: Required.
-        :type body: IO[bytes]
-        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
-         Default value is "application/json".
-        :paramtype content_type: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "authorization": {
-                        "connect_url": "str",  # Optional. ConnectionAuthorization is present
-                          only while a connection is pending. The UI sends the user to connect_url and
-                          polls GetConnection until the connection becomes active or expires. The
-                          Secrets Manager poll URL is never exposed.
-                        "expires_at": "2020-02-20 00:00:00",  # Optional.
-                          ConnectionAuthorization is present only while a connection is pending. The UI
-                          sends the user to connect_url and polls GetConnection until the connection
-                          becomes active or expires. The Secrets Manager poll URL is never exposed.
-                        "status": "str",  # Optional. ConnectionAuthorization is present only
-                          while a connection is pending. The UI sends the user to connect_url and polls
-                          GetConnection until the connection becomes active or expires. The Secrets
-                          Manager poll URL is never exposed.
-                        "verification_code": "str"  # Optional. ConnectionAuthorization is
-                          present only while a connection is pending. The UI sends the user to
-                          connect_url and polls GetConnection until the connection becomes active or
-                          expires. The Secrets Manager poll URL is never exposed.
-                    },
-                    "connection": {
-                        "connection_parameters": {},  # Optional. Any object.
-                        "created_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "granted_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "id": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider_display_name": "str",  # Optional. ----  OAuth connection
-                          resources --------------------------  OAuthConnection is the public,
-                          team-scoped connection metadata returned to the UI. It deliberately excludes
-                          the team ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                          authorization handle.
-                        "revoked_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "scopes": [
-                            "str"  # Optional. ----  OAuth connection resources
-                              --------------------------  OAuthConnection is the public, team-scoped
-                              connection metadata returned to the UI. It deliberately excludes the team
-                              ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                              authorization handle.
-                        ],
-                        "status": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "updated_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "user_id": "str"  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                    }
-                }
-                # response body for status code(s): 400, 409
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-
     @distributed_trace
-    def create(self, body: Union[JSON, IO[bytes]], **kwargs: Any) -> JSON:
+    def list_health(
+        self,
+        *,
+        provider: Optional[str] = None,
+        window: str = "HEALTH_WINDOW_TWENTY_FOUR_HOURS",
+        page: int = 1,
+        per_page: int = 20,
+        **kwargs: Any,
+    ) -> JSON:
         # pylint: disable=line-too-long
-        """Create a Connection.
+        """List Tool Health.
 
-        Creates or begins authorization for an OAuth connection to an Action Gateway provider.
+        Returns availability and latency for each catalog tool over the requested window, sorted by
+        provider and then tool slug. A tool with no calls in the window is listed with ``data_status``
+        ``HEALTH_DATA_STATUS_NO_DATA``. Metrics are aggregated across all customers; request volumes
+        are not reported. Tools of your team's MCP servers are not included. Offset-paged with page and
+        ``per_page``.
 
-        :param body: Is either a JSON type or a IO[bytes] type. Required.
-        :type body: JSON or IO[bytes]
+        :keyword provider: Optional provider ID, matched exactly, to return only that provider's tools.
+         Default value is None.
+        :paramtype provider: str
+        :keyword window: Window to aggregate over. Defaults to twenty-four hours.
+
+
+         * ``HEALTH_WINDOW_UNSPECIFIED``\\ : Twenty-four hours.
+         * ``HEALTH_WINDOW_ONE_HOUR``\\ : One hour; history points are 10 minutes.
+         * ``HEALTH_WINDOW_TWENTY_FOUR_HOURS``\\ : Twenty-four hours; history points are 1 hour.
+         * ``HEALTH_WINDOW_SEVEN_DAYS``\\ : Seven days; history points are 6 hours.
+         * ``HEALTH_WINDOW_THIRTY_DAYS``\\ : Thirty days; history points are 24 hours. Known values
+         are: "HEALTH_WINDOW_ONE_HOUR", "HEALTH_WINDOW_TWENTY_FOUR_HOURS", "HEALTH_WINDOW_SEVEN_DAYS",
+         and "HEALTH_WINDOW_THIRTY_DAYS". Default value is "HEALTH_WINDOW_TWENTY_FOUR_HOURS".
+        :paramtype window: str
+        :keyword page: 1-based page number. Values below 1 are treated as 1. Default value is 1.
+        :paramtype page: int
+        :keyword per_page: Page size. Defaults to 20; values above 100 are capped at 100. Default value
+         is 20.
+        :paramtype per_page: int
         :return: JSON object
         :rtype: JSON
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -20567,93 +27335,49 @@ class ConnectionsOperations:
         Example:
             .. code-block:: python
 
-                # JSON input template you can fill out and use as your body input.
-                body = {
-                    "connection_parameters": {},  # Optional. Any object.
-                    "provider": "str",  # Optional.
-                    "scopes": [
-                        "str"  # Optional.
-                    ],
-                    "user_id": "str"  # Optional.
-                }
-
                 # response body for status code(s): 200
                 response == {
-                    "authorization": {
-                        "connect_url": "str",  # Optional. ConnectionAuthorization is present
-                          only while a connection is pending. The UI sends the user to connect_url and
-                          polls GetConnection until the connection becomes active or expires. The
-                          Secrets Manager poll URL is never exposed.
-                        "expires_at": "2020-02-20 00:00:00",  # Optional.
-                          ConnectionAuthorization is present only while a connection is pending. The UI
-                          sends the user to connect_url and polls GetConnection until the connection
-                          becomes active or expires. The Secrets Manager poll URL is never exposed.
-                        "status": "str",  # Optional. ConnectionAuthorization is present only
-                          while a connection is pending. The UI sends the user to connect_url and polls
-                          GetConnection until the connection becomes active or expires. The Secrets
-                          Manager poll URL is never exposed.
-                        "verification_code": "str"  # Optional. ConnectionAuthorization is
-                          present only while a connection is pending. The UI sends the user to
-                          connect_url and polls GetConnection until the connection becomes active or
-                          expires. The Secrets Manager poll URL is never exposed.
+                    "pagination": {
+                        "page": 0,  # Optional. 1-based page number of this response.
+                        "per_page": 0,  # Optional. Page size applied to this response, after
+                          defaults and caps.
+                        "total": 0  # Optional. Number of matching items across all pages.
                     },
-                    "connection": {
-                        "connection_parameters": {},  # Optional. Any object.
-                        "created_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "granted_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "id": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider_display_name": "str",  # Optional. ----  OAuth connection
-                          resources --------------------------  OAuthConnection is the public,
-                          team-scoped connection metadata returned to the UI. It deliberately excludes
-                          the team ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                          authorization handle.
-                        "revoked_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "scopes": [
-                            "str"  # Optional. ----  OAuth connection resources
-                              --------------------------  OAuthConnection is the public, team-scoped
-                              connection metadata returned to the UI. It deliberately excludes the team
-                              ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                              authorization handle.
-                        ],
-                        "status": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "updated_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "user_id": "str"  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                    }
+                    "snapshot": {
+                        "measured_at": "2020-02-20 00:00:00",  # Optional. When the metrics
+                          were computed. They are recomputed at most every five minutes.
+                        "stale": bool,  # Optional. True when the latest recomputation failed
+                          and earlier metrics, up to 30 minutes old, are returned instead.
+                        "window": "str"  # Optional. Length of the window the metrics cover,
+                          ending at ``measured_at``.
+                    },
+                    "tools": [
+                        {
+                            "health": {
+                                "data_status": "str",  # Optional.
+                                  ``HEALTH_DATA_STATUS_AVAILABLE`` when the window has calls to
+                                  measure; ``HEALTH_DATA_STATUS_NO_DATA`` when it has none, in which
+                                  case the metrics are null. Do not treat no data as healthy. Known
+                                  values are: "HEALTH_DATA_STATUS_AVAILABLE" and
+                                  "HEALTH_DATA_STATUS_NO_DATA".
+                                "latency_p50_ms": 0.0,  # Optional. Median duration
+                                  of successful calls, in milliseconds. Durations above 40960 ms are
+                                  reported as 40960.
+                                "latency_p95_ms": 0.0,  # Optional. 95th-percentile
+                                  duration of successful calls, in milliseconds. Durations above 40960
+                                  ms are reported as 40960.
+                                "uptime_percentage": 0.0  # Optional. Percentage of
+                                  calls that did not fail because of the provider (an upstream error,
+                                  timeout, rate limit, or unavailability). Calls that failed for other
+                                  reasons are not counted.
+                            },
+                            "provider": "str",  # Optional. ID of the provider that
+                              offers the tool.
+                            "tool_slug": "str"  # Optional. Catalog tool slug.
+                        }
+                    ]
                 }
-                # response body for status code(s): 400, 409
+                # response body for status code(s): 400
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -20678,26 +27402,16 @@ class ConnectionsOperations:
         }
         error_map.update(kwargs.pop("error_map", {}) or {})
 
-        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _headers = kwargs.pop("headers", {}) or {}
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop(
-            "content_type", _headers.pop("Content-Type", None)
-        )
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
-        content_type = content_type or "application/json"
-        _json = None
-        _content = None
-        if isinstance(body, (IOBase, bytes)):
-            _content = body
-        else:
-            _json = body
-
-        _request = build_connections_create_request(
-            content_type=content_type,
-            json=_json,
-            content=_content,
+        _request = build_tools_list_health_request(
+            provider=provider,
+            window=window,
+            page=page,
+            per_page=per_page,
             headers=_headers,
             params=_params,
         )
@@ -20712,7 +27426,7 @@ class ConnectionsOperations:
 
         response = pipeline_response.http_response
 
-        if response.status_code not in [200, 400, 409]:
+        if response.status_code not in [200, 400]:
             if _stream:
                 response.read()  # Load the body in memory and close the socket
             map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
@@ -20751,36 +27465,47 @@ class ConnectionsOperations:
             else:
                 deserialized = None
 
-        if response.status_code == 409:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
         if cls:
             return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
 
         return cast(JSON, deserialized)  # type: ignore
 
     @distributed_trace
-    def get(self, id: str, **kwargs: Any) -> JSON:
+    def list_health_providers(
+        self,
+        *,
+        provider: Optional[str] = None,
+        window: str = "HEALTH_WINDOW_TWENTY_FOUR_HOURS",
+        page: int = 1,
+        per_page: int = 20,
+        **kwargs: Any,
+    ) -> JSON:
         # pylint: disable=line-too-long
-        """Retrieve a Connection.
+        """List Provider Health.
 
-        Retrieves an OAuth connection owned by the authenticated team.
+        Returns availability and latency for each catalog provider over the requested window, sorted by
+        provider ID. Metrics are aggregated across all customers; request volumes are not reported.
+        Tools of your team's MCP servers are not included. Offset-paged with page and ``per_page``.
 
-        :param id: The connection UUID. Required.
-        :type id: str
+        :keyword provider: Optional provider ID, matched exactly, to return only that provider. Default
+         value is None.
+        :paramtype provider: str
+        :keyword window: Window to aggregate over. Defaults to twenty-four hours.
+
+
+         * ``HEALTH_WINDOW_UNSPECIFIED``\\ : Twenty-four hours.
+         * ``HEALTH_WINDOW_ONE_HOUR``\\ : One hour; history points are 10 minutes.
+         * ``HEALTH_WINDOW_TWENTY_FOUR_HOURS``\\ : Twenty-four hours; history points are 1 hour.
+         * ``HEALTH_WINDOW_SEVEN_DAYS``\\ : Seven days; history points are 6 hours.
+         * ``HEALTH_WINDOW_THIRTY_DAYS``\\ : Thirty days; history points are 24 hours. Known values
+         are: "HEALTH_WINDOW_ONE_HOUR", "HEALTH_WINDOW_TWENTY_FOUR_HOURS", "HEALTH_WINDOW_SEVEN_DAYS",
+         and "HEALTH_WINDOW_THIRTY_DAYS". Default value is "HEALTH_WINDOW_TWENTY_FOUR_HOURS".
+        :paramtype window: str
+        :keyword page: 1-based page number. Values below 1 are treated as 1. Default value is 1.
+        :paramtype page: int
+        :keyword per_page: Page size. Defaults to 20; values above 100 are capped at 100. Default value
+         is 20.
+        :paramtype per_page: int
         :return: JSON object
         :rtype: JSON
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -20790,81 +27515,45 @@ class ConnectionsOperations:
 
                 # response body for status code(s): 200
                 response == {
-                    "authorization": {
-                        "connect_url": "str",  # Optional. ConnectionAuthorization is present
-                          only while a connection is pending. The UI sends the user to connect_url and
-                          polls GetConnection until the connection becomes active or expires. The
-                          Secrets Manager poll URL is never exposed.
-                        "expires_at": "2020-02-20 00:00:00",  # Optional.
-                          ConnectionAuthorization is present only while a connection is pending. The UI
-                          sends the user to connect_url and polls GetConnection until the connection
-                          becomes active or expires. The Secrets Manager poll URL is never exposed.
-                        "status": "str",  # Optional. ConnectionAuthorization is present only
-                          while a connection is pending. The UI sends the user to connect_url and polls
-                          GetConnection until the connection becomes active or expires. The Secrets
-                          Manager poll URL is never exposed.
-                        "verification_code": "str"  # Optional. ConnectionAuthorization is
-                          present only while a connection is pending. The UI sends the user to
-                          connect_url and polls GetConnection until the connection becomes active or
-                          expires. The Secrets Manager poll URL is never exposed.
+                    "pagination": {
+                        "page": 0,  # Optional. 1-based page number of this response.
+                        "per_page": 0,  # Optional. Page size applied to this response, after
+                          defaults and caps.
+                        "total": 0  # Optional. Number of matching items across all pages.
                     },
-                    "connection": {
-                        "connection_parameters": {},  # Optional. Any object.
-                        "created_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "granted_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "id": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider_display_name": "str",  # Optional. ----  OAuth connection
-                          resources --------------------------  OAuthConnection is the public,
-                          team-scoped connection metadata returned to the UI. It deliberately excludes
-                          the team ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                          authorization handle.
-                        "revoked_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "scopes": [
-                            "str"  # Optional. ----  OAuth connection resources
-                              --------------------------  OAuthConnection is the public, team-scoped
-                              connection metadata returned to the UI. It deliberately excludes the team
-                              ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                              authorization handle.
-                        ],
-                        "status": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "updated_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "user_id": "str"  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
+                    "providers": [
+                        {
+                            "health": {
+                                "data_status": "str",  # Optional.
+                                  ``HEALTH_DATA_STATUS_AVAILABLE`` when the window has calls to
+                                  measure; ``HEALTH_DATA_STATUS_NO_DATA`` when it has none, in which
+                                  case the metrics are null. Do not treat no data as healthy. Known
+                                  values are: "HEALTH_DATA_STATUS_AVAILABLE" and
+                                  "HEALTH_DATA_STATUS_NO_DATA".
+                                "latency_p50_ms": 0.0,  # Optional. Median duration
+                                  of successful calls, in milliseconds. Durations above 40960 ms are
+                                  reported as 40960.
+                                "latency_p95_ms": 0.0,  # Optional. 95th-percentile
+                                  duration of successful calls, in milliseconds. Durations above 40960
+                                  ms are reported as 40960.
+                                "uptime_percentage": 0.0  # Optional. Percentage of
+                                  calls that did not fail because of the provider (an upstream error,
+                                  timeout, rate limit, or unavailability). Calls that failed for other
+                                  reasons are not counted.
+                            },
+                            "provider": "str"  # Optional. Provider ID.
+                        }
+                    ],
+                    "snapshot": {
+                        "measured_at": "2020-02-20 00:00:00",  # Optional. When the metrics
+                          were computed. They are recomputed at most every five minutes.
+                        "stale": bool,  # Optional. True when the latest recomputation failed
+                          and earlier metrics, up to 30 minutes old, are returned instead.
+                        "window": "str"  # Optional. Length of the window the metrics cover,
+                          ending at ``measured_at``.
                     }
                 }
-                # response body for status code(s): 404
+                # response body for status code(s): 400
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -20894,8 +27583,11 @@ class ConnectionsOperations:
 
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
-        _request = build_connections_get_request(
-            id=id,
+        _request = build_tools_list_health_providers_request(
+            provider=provider,
+            window=window,
+            page=page,
+            per_page=per_page,
             headers=_headers,
             params=_params,
         )
@@ -20910,7 +27602,7 @@ class ConnectionsOperations:
 
         response = pipeline_response.http_response
 
-        if response.status_code not in [200, 404]:
+        if response.status_code not in [200, 400]:
             if _stream:
                 response.read()  # Load the body in memory and close the socket
             map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
@@ -20933,7 +27625,7 @@ class ConnectionsOperations:
             else:
                 deserialized = None
 
-        if response.status_code == 404:
+        if response.status_code == 400:
             response_headers["ratelimit-limit"] = self._deserialize(
                 "int", response.headers.get("ratelimit-limit")
             )
@@ -20954,221 +27646,38 @@ class ConnectionsOperations:
 
         return cast(JSON, deserialized)  # type: ignore
 
-    @overload
-    def update(
-        self,
-        id: str,
-        body: JSON,
-        *,
-        content_type: str = "application/json",
-        **kwargs: Any,
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Update Connection Parameters.
-
-        Updates non-sensitive connection parameters for an OAuth connection.
-
-        :param id: The connection UUID. Required.
-        :type id: str
-        :param body: Required.
-        :type body: JSON
-        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
-         Default value is "application/json".
-        :paramtype content_type: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # JSON input template you can fill out and use as your body input.
-                body = {
-                    "connection_parameters": {},  # Optional. Any object.
-                    "id": "str"  # Optional.
-                }
-
-                # response body for status code(s): 200
-                response == {
-                    "connection": {
-                        "connection_parameters": {},  # Optional. Any object.
-                        "created_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "granted_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "id": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider_display_name": "str",  # Optional. ----  OAuth connection
-                          resources --------------------------  OAuthConnection is the public,
-                          team-scoped connection metadata returned to the UI. It deliberately excludes
-                          the team ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                          authorization handle.
-                        "revoked_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "scopes": [
-                            "str"  # Optional. ----  OAuth connection resources
-                              --------------------------  OAuthConnection is the public, team-scoped
-                              connection metadata returned to the UI. It deliberately excludes the team
-                              ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                              authorization handle.
-                        ],
-                        "status": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "updated_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "user_id": "str"  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                    }
-                }
-                # response body for status code(s): 400, 404
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-
-    @overload
-    def update(
-        self,
-        id: str,
-        body: IO[bytes],
-        *,
-        content_type: str = "application/json",
-        **kwargs: Any,
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Update Connection Parameters.
-
-        Updates non-sensitive connection parameters for an OAuth connection.
-
-        :param id: The connection UUID. Required.
-        :type id: str
-        :param body: Required.
-        :type body: IO[bytes]
-        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
-         Default value is "application/json".
-        :paramtype content_type: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "connection": {
-                        "connection_parameters": {},  # Optional. Any object.
-                        "created_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "granted_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "id": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider_display_name": "str",  # Optional. ----  OAuth connection
-                          resources --------------------------  OAuthConnection is the public,
-                          team-scoped connection metadata returned to the UI. It deliberately excludes
-                          the team ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                          authorization handle.
-                        "revoked_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "scopes": [
-                            "str"  # Optional. ----  OAuth connection resources
-                              --------------------------  OAuthConnection is the public, team-scoped
-                              connection metadata returned to the UI. It deliberately excludes the team
-                              ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                              authorization handle.
-                        ],
-                        "status": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "updated_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "user_id": "str"  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                    }
-                }
-                # response body for status code(s): 400, 404
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-
     @distributed_trace
-    def update(self, id: str, body: Union[JSON, IO[bytes]], **kwargs: Any) -> JSON:
+    def get_health(
+        self,
+        tool_slug: str,
+        *,
+        window: str = "HEALTH_WINDOW_TWENTY_FOUR_HOURS",
+        include_history: bool = False,
+        **kwargs: Any,
+    ) -> JSON:
         # pylint: disable=line-too-long
-        """Update Connection Parameters.
+        """Get Tool Health.
 
-        Updates non-sensitive connection parameters for an OAuth connection.
+        Returns availability and latency for one catalog tool over the requested window, optionally
+        with a history series. Metrics are aggregated across all customers; request volumes are not
+        reported. Returns 404 when ``tool_slug`` is not a catalog tool.
 
-        :param id: The connection UUID. Required.
-        :type id: str
-        :param body: Is either a JSON type or a IO[bytes] type. Required.
-        :type body: JSON or IO[bytes]
+        :param tool_slug: Catalog tool slug, for example ``exa_search``. Required. Required.
+        :type tool_slug: str
+        :keyword window: Window to aggregate over. Defaults to twenty-four hours.
+
+
+         * ``HEALTH_WINDOW_UNSPECIFIED``\\ : Twenty-four hours.
+         * ``HEALTH_WINDOW_ONE_HOUR``\\ : One hour; history points are 10 minutes.
+         * ``HEALTH_WINDOW_TWENTY_FOUR_HOURS``\\ : Twenty-four hours; history points are 1 hour.
+         * ``HEALTH_WINDOW_SEVEN_DAYS``\\ : Seven days; history points are 6 hours.
+         * ``HEALTH_WINDOW_THIRTY_DAYS``\\ : Thirty days; history points are 24 hours. Known values
+         are: "HEALTH_WINDOW_ONE_HOUR", "HEALTH_WINDOW_TWENTY_FOUR_HOURS", "HEALTH_WINDOW_SEVEN_DAYS",
+         and "HEALTH_WINDOW_THIRTY_DAYS". Default value is "HEALTH_WINDOW_TWENTY_FOUR_HOURS".
+        :paramtype window: str
+        :keyword include_history: Additionally returns the window split into resolution-aligned points
+         (the history field below). Default value is False.
+        :paramtype include_history: bool
         :return: JSON object
         :rtype: JSON
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -21176,68 +27685,67 @@ class ConnectionsOperations:
         Example:
             .. code-block:: python
 
-                # JSON input template you can fill out and use as your body input.
-                body = {
-                    "connection_parameters": {},  # Optional. Any object.
-                    "id": "str"  # Optional.
-                }
-
                 # response body for status code(s): 200
                 response == {
-                    "connection": {
-                        "connection_parameters": {},  # Optional. Any object.
-                        "created_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "granted_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "id": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider_display_name": "str",  # Optional. ----  OAuth connection
-                          resources --------------------------  OAuthConnection is the public,
-                          team-scoped connection metadata returned to the UI. It deliberately excludes
-                          the team ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                          authorization handle.
-                        "revoked_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "scopes": [
-                            "str"  # Optional. ----  OAuth connection resources
-                              --------------------------  OAuthConnection is the public, team-scoped
-                              connection metadata returned to the UI. It deliberately excludes the team
-                              ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                              authorization handle.
+                    "history": {
+                        "points": [
+                            {
+                                "bucket_start": "2020-02-20 00:00:00",  # Optional.
+                                  Start of the slot.
+                                "health": {
+                                    "data_status": "str",  # Optional.
+                                      ``HEALTH_DATA_STATUS_AVAILABLE`` when the window has calls to
+                                      measure; ``HEALTH_DATA_STATUS_NO_DATA`` when it has none, in
+                                      which case the metrics are null. Do not treat no data as healthy.
+                                      Known values are: "HEALTH_DATA_STATUS_AVAILABLE" and
+                                      "HEALTH_DATA_STATUS_NO_DATA".
+                                    "latency_p50_ms": 0.0,  # Optional. Median
+                                      duration of successful calls, in milliseconds. Durations above
+                                      40960 ms are reported as 40960.
+                                    "latency_p95_ms": 0.0,  # Optional.
+                                      95th-percentile duration of successful calls, in milliseconds.
+                                      Durations above 40960 ms are reported as 40960.
+                                    "uptime_percentage": 0.0  # Optional.
+                                      Percentage of calls that did not fail because of the provider (an
+                                      upstream error, timeout, rate limit, or unavailability). Calls
+                                      that failed for other reasons are not counted.
+                                }
+                            }
                         ],
-                        "status": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "updated_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "user_id": "str"  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
+                        "resolution": "str",  # Optional. Length of each point.
+                        "stale": bool  # Optional. Means the same as HealthSnapshot.stale,
+                          for the history series. The series is refreshed independently, so a fresh
+                          snapshot can accompany an older history and vice versa.
+                    },
+                    "snapshot": {
+                        "measured_at": "2020-02-20 00:00:00",  # Optional. When the metrics
+                          were computed. They are recomputed at most every five minutes.
+                        "stale": bool,  # Optional. True when the latest recomputation failed
+                          and earlier metrics, up to 30 minutes old, are returned instead.
+                        "window": "str"  # Optional. Length of the window the metrics cover,
+                          ending at ``measured_at``.
+                    },
+                    "tool": {
+                        "health": {
+                            "data_status": "str",  # Optional.
+                              ``HEALTH_DATA_STATUS_AVAILABLE`` when the window has calls to measure;
+                              ``HEALTH_DATA_STATUS_NO_DATA`` when it has none, in which case the
+                              metrics are null. Do not treat no data as healthy. Known values are:
+                              "HEALTH_DATA_STATUS_AVAILABLE" and "HEALTH_DATA_STATUS_NO_DATA".
+                            "latency_p50_ms": 0.0,  # Optional. Median duration of
+                              successful calls, in milliseconds. Durations above 40960 ms are reported
+                              as 40960.
+                            "latency_p95_ms": 0.0,  # Optional. 95th-percentile duration
+                              of successful calls, in milliseconds. Durations above 40960 ms are
+                              reported as 40960.
+                            "uptime_percentage": 0.0  # Optional. Percentage of calls
+                              that did not fail because of the provider (an upstream error, timeout,
+                              rate limit, or unavailability). Calls that failed for other reasons are
+                              not counted.
+                        },
+                        "provider": "str",  # Optional. ID of the provider that offers the
+                          tool.
+                        "tool_slug": "str"  # Optional. Catalog tool slug.
                     }
                 }
                 # response body for status code(s): 400, 404
@@ -21265,27 +27773,15 @@ class ConnectionsOperations:
         }
         error_map.update(kwargs.pop("error_map", {}) or {})
 
-        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _headers = kwargs.pop("headers", {}) or {}
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop(
-            "content_type", _headers.pop("Content-Type", None)
-        )
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
-        content_type = content_type or "application/json"
-        _json = None
-        _content = None
-        if isinstance(body, (IOBase, bytes)):
-            _content = body
-        else:
-            _json = body
-
-        _request = build_connections_update_request(
-            id=id,
-            content_type=content_type,
-            json=_json,
-            content=_content,
+        _request = build_tools_get_health_request(
+            tool_slug=tool_slug,
+            window=window,
+            include_history=include_history,
             headers=_headers,
             params=_params,
         )
@@ -21361,14 +27857,14 @@ class ConnectionsOperations:
         return cast(JSON, deserialized)  # type: ignore
 
     @distributed_trace
-    def delete(self, id: str, **kwargs: Any) -> JSON:
+    def list_providers(self, **kwargs: Any) -> JSON:
         # pylint: disable=line-too-long
-        """Delete a Connection.
+        """List Providers.
 
-        Revokes and deletes an OAuth connection owned by the authenticated team.
+        Returns the active catalog providers with at least one released tool, sorted by display name,
+        with the credential kinds each accepts and the parameters a connection or team credential
+        needs. Your team's MCP servers are listed separately under ``/v2/action-gateway/mcp-servers``.
 
-        :param id: The connection UUID. Required.
-        :type id: str
         :return: JSON object
         :rtype: JSON
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -21378,527 +27874,102 @@ class ConnectionsOperations:
 
                 # response body for status code(s): 200
                 response == {
-                    "connection": {
-                        "connection_parameters": {},  # Optional. Any object.
-                        "created_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "granted_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "id": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "provider_display_name": "str",  # Optional. ----  OAuth connection
-                          resources --------------------------  OAuthConnection is the public,
-                          team-scoped connection metadata returned to the UI. It deliberately excludes
-                          the team ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                          authorization handle.
-                        "revoked_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "scopes": [
-                            "str"  # Optional. ----  OAuth connection resources
-                              --------------------------  OAuthConnection is the public, team-scoped
-                              connection metadata returned to the UI. It deliberately excludes the team
-                              ID, Secrets Manager assignment, actor identifiers, poll URL, and
-                              authorization handle.
-                        ],
-                        "status": "str",  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                        "updated_at": "2020-02-20 00:00:00",  # Optional. ----  OAuth
-                          connection resources --------------------------  OAuthConnection is the
-                          public, team-scoped connection metadata returned to the UI. It deliberately
-                          excludes the team ID, Secrets Manager assignment, actor identifiers, poll
-                          URL, and authorization handle.
-                        "user_id": "str"  # Optional. ----  OAuth connection resources
-                          --------------------------  OAuthConnection is the public, team-scoped
-                          connection metadata returned to the UI. It deliberately excludes the team ID,
-                          Secrets Manager assignment, actor identifiers, poll URL, and authorization
-                          handle.
-                    }
-                }
-                # response body for status code(s): 404
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = kwargs.pop("headers", {}) or {}
-        _params = kwargs.pop("params", {}) or {}
-
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        _request = build_connections_delete_request(
-            id=id,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200, 404]:
-            if _stream:
-                response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        if response.status_code == 200:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 404:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-
-class UsersOperations:
-    """
-    .. warning::
-        **DO NOT** instantiate this class directly.
-
-        Instead, you should access the following operations through
-        :class:`~pydo.GeneratedClient`'s
-        :attr:`users` attribute.
-    """
-
-    def __init__(self, *args, **kwargs):
-        input_args = list(args)
-        self._client = input_args.pop(0) if input_args else kwargs.pop("client")
-        self._config = input_args.pop(0) if input_args else kwargs.pop("config")
-        self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
-        self._deserialize = (
-            input_args.pop(0) if input_args else kwargs.pop("deserializer")
-        )
-
-    @distributed_trace
-    def list(self, *, page: int = 1, per_page: int = 20, **kwargs: Any) -> JSON:
-        """List Action Gateway Users.
-
-        Lists end-user identifiers derived from sessions and OAuth connections for the authenticated
-        team.
-
-        :keyword page: Which 'page' of paginated results to return. Default value is 1.
-        :paramtype page: int
-        :keyword per_page: Number of items returned per page. Default value is 20.
-        :paramtype per_page: int
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "pagination": {
-                        "page": 0,  # Required.
-                        "per_page": 0,  # Required.
-                        "total": 0  # Required.
-                    },
-                    "user_ids": [
-                        "str"  # Optional.
-                    ]
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = kwargs.pop("headers", {}) or {}
-        _params = kwargs.pop("params", {}) or {}
-
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        _request = build_users_list_request(
-            page=page,
-            per_page=per_page,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200]:
-            if _stream:
-                response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        response_headers["ratelimit-limit"] = self._deserialize(
-            "int", response.headers.get("ratelimit-limit")
-        )
-        response_headers["ratelimit-remaining"] = self._deserialize(
-            "int", response.headers.get("ratelimit-remaining")
-        )
-        response_headers["ratelimit-reset"] = self._deserialize(
-            "int", response.headers.get("ratelimit-reset")
-        )
-
-        if response.content:
-            deserialized = response.json()
-        else:
-            deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-    @distributed_trace
-    def get(self, user_id: str, **kwargs: Any) -> JSON:
-        # pylint: disable=line-too-long
-        """Retrieve an Action Gateway User.
-
-        Retrieves a derived end-user view containing its sessions and OAuth connections.
-
-        :param user_id: The end-user identifier. Required.
-        :type user_id: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "user": {
-                        "connections": [
-                            {
-                                "connection_parameters": {},  # Optional. Any object.
-                                "created_at": "2020-02-20 00:00:00",  # Optional.
-                                  User is a derived, team-scoped view across sessions and OAuth
-                                  connections.
-                                "granted_at": "2020-02-20 00:00:00",  # Optional.
-                                  User is a derived, team-scoped view across sessions and OAuth
-                                  connections.
-                                "id": "str",  # Optional. User is a derived,
-                                  team-scoped view across sessions and OAuth connections.
-                                "provider": "str",  # Optional. User is a derived,
-                                  team-scoped view across sessions and OAuth connections.
-                                "provider_display_name": "str",  # Optional. User is
-                                  a derived, team-scoped view across sessions and OAuth connections.
-                                "revoked_at": "2020-02-20 00:00:00",  # Optional.
-                                  User is a derived, team-scoped view across sessions and OAuth
-                                  connections.
-                                "scopes": [
-                                    "str"  # Optional. User is a derived,
-                                      team-scoped view across sessions and OAuth connections.
-                                ],
-                                "status": "str",  # Optional. User is a derived,
-                                  team-scoped view across sessions and OAuth connections.
-                                "updated_at": "2020-02-20 00:00:00",  # Optional.
-                                  User is a derived, team-scoped view across sessions and OAuth
-                                  connections.
-                                "user_id": "str"  # Optional. User is a derived,
-                                  team-scoped view across sessions and OAuth connections.
-                            }
-                        ],
-                        "sessions": [
-                            {
-                                "created_at": "2020-02-20 00:00:00",  # Optional.
-                                  User is a derived, team-scoped view across sessions and OAuth
-                                  connections.
-                                "name": "str",  # Optional. User is a derived,
-                                  team-scoped view across sessions and OAuth connections.
-                                "session_urn": "str",  # Optional. User is a derived,
-                                  team-scoped view across sessions and OAuth connections.
-                                "updated_at": "2020-02-20 00:00:00"  # Optional. User
-                                  is a derived, team-scoped view across sessions and OAuth connections.
-                            }
-                        ],
-                        "user_id": "str"  # Optional. User is a derived, team-scoped view
-                          across sessions and OAuth connections.
-                    }
-                }
-                # response body for status code(s): 404
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = kwargs.pop("headers", {}) or {}
-        _params = kwargs.pop("params", {}) or {}
-
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        _request = build_users_get_request(
-            user_id=user_id,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200, 404]:
-            if _stream:
-                response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        if response.status_code == 200:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 404:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-
-class SessionsOperations:
-    """
-    .. warning::
-        **DO NOT** instantiate this class directly.
-
-        Instead, you should access the following operations through
-        :class:`~pydo.GeneratedClient`'s
-        :attr:`sessions` attribute.
-    """
-
-    def __init__(self, *args, **kwargs):
-        input_args = list(args)
-        self._client = input_args.pop(0) if input_args else kwargs.pop("client")
-        self._config = input_args.pop(0) if input_args else kwargs.pop("config")
-        self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
-        self._deserialize = (
-            input_args.pop(0) if input_args else kwargs.pop("deserializer")
-        )
-
-    @distributed_trace
-    def list(
-        self,
-        *,
-        end_user_id: Optional[str] = None,
-        page: int = 1,
-        per_page: int = 20,
-        **kwargs: Any,
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """List Action Gateway Sessions.
-
-        Lists Action Gateway sessions owned by the authenticated team.
-
-        :keyword end_user_id: Filter sessions by actor identifier. Default value is None.
-        :paramtype end_user_id: str
-        :keyword page: Which 'page' of paginated results to return. Default value is 1.
-        :paramtype page: int
-        :keyword per_page: Number of items returned per page. Default value is 20.
-        :paramtype per_page: int
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "pagination": {
-                        "page": 0,  # Required.
-                        "per_page": 0,  # Required.
-                        "total": 0  # Required.
-                    },
-                    "sessions": [
+                    "providers": [
                         {
-                            "actorId": "str",  # Optional. actor_id is empty when the
-                              session is not bound to an actor.
-                            "config": {},  # Optional. Preserved as an opaque object.
-                              Gateway currently interprets config.preloadTools to add selected direct
-                              tools to the session MCP.
-                            "createdAt": "2020-02-20 00:00:00",  # Optional.
-                            "name": "str",  # Optional. name is the required
-                              human-readable session name.
-                            "policy": {
-                                "defaultAction": "ask",  # Optional. Default value is
-                                  "ask". SessionPolicyAction is the disposition applied to a tool call.
-                                  Lowercase values are canonical so ProtoJSON matches the public REST
-                                  vocabulary; the prefixed aliases preserve compatibility for existing
-                                  protobuf clients. Known values are: "allow", "ask", and "deny".
-                                "rules": [
-                                    {
-                                        "action": "ask",  # Optional. Default
-                                          value is "ask". SessionPolicyAction is the disposition
-                                          applied to a tool call. Lowercase values are canonical so
-                                          ProtoJSON matches the public REST vocabulary; the prefixed
-                                          aliases preserve compatibility for existing protobuf clients.
-                                          Known values are: "allow", "ask", and "deny".
-                                        "match": {
-                                            "str": "str"  # Optional.
-                                              Dictionary of :code:`<string>`.
-                                        },
-                                        "tool": "str"  # Optional.
-                                          SessionPolicySpec is the Gateway-relevant subset of a
-                                          session's permission policy. Filesystem and network policy
-                                          remain enforced by the sandbox.
-                                    }
-                                ]
-                            },
-                            "sessionUrn": "str",  # Optional.
-                            "tools": {
-                                "references": [
-                                    {
-                                        "kind": "str",  # Optional. Known
-                                          values are: "SESSION_TOOL_REFERENCE_KIND_TOOL" and
-                                          "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
-                                        "name": "str",  # Optional. Omitted
-                                          when the request omitted tools (all tools). A present
-                                          selection with no references represents tools: [].
-                                        "version": "str"  # Optional. Omitted
-                                          when the request omitted tools (all tools). A present
-                                          selection with no references represents tools: [].
-                                    }
-                                ]
-                            },
-                            "updatedAt": "2020-02-20 00:00:00"  # Optional.
+                            "auth_type": "str",  # Optional. Deprecated: read
+                              ``auth_types``"" , since a provider may accept more than one credential
+                              kind. This is the first entry of ``auth_types`` other than ``none``"" ,
+                              or ``none`` when that is the only entry.
+                            "auth_types": [
+                                "str"  # Optional. Credential kinds the provider
+                                  accepts, sorted: none|oauth|"" ``shared_api_key``"" |unknown|""
+                                  ``user_oauth_app``"" |"" ``user_token``.  ``none`` means the provider
+                                  needs no credential. ``oauth`` means users can connect through
+                                  DigitalOcean's shared OAuth application. ``user_oauth_app`` means
+                                  users can connect through an OAuth client your team registers as a
+                                  provider credential; without ``oauth`` alongside it, that is the only
+                                  way to connect. ``shared_api_key`` means DigitalOcean supplies the
+                                  key. ``user_token`` means your team or its users supply a key or
+                                  token.  ``unknown`` means the provider declares no kind this API
+                                  recognizes, including an OAuth provider whose shared application is
+                                  not available. It is never paired with another kind.
+                            ],
+                            "connection_parameters": [
+                                {
+                                    "allowed_host_suffixes": [
+                                        "str"  # Optional. For
+                                          ``https_origin`` inputs, the host suffixes the origin's host
+                                          must match.
+                                    ],
+                                    "allowed_values": [
+                                        "str"  # Optional. For enum inputs,
+                                          the accepted values.
+                                    ],
+                                    "description": "str",  # Optional. Help text.
+                                    "input_kind": "str",  # Optional. How the
+                                      value is entered: string, ``https_origin``"" , or enum. Known
+                                      values are: "string", "https_origin", and "enum".
+                                    "key": "str",  # Optional. Key of the value
+                                      in ``connection_parameters`` or ``credential_parameters``.
+                                    "label": "str",  # Optional. Display label.
+                                    "max_length": 0,  # Optional. Maximum length
+                                      of the value. 0 means the default maximum of 4096.
+                                    "normalization": "str",  # Optional. How the
+                                      value is normalized before it is validated and stored: trim,
+                                      lowercase, uppercase, or ``https_origin``.
+                                    "pattern": "str",  # Optional. Optional RE2
+                                      expression matched against the whole normalized value.
+                                    "required": bool  # Optional. Whether the
+                                      value must be supplied.
+                                }
+                            ],
+                            "credential_parameters": [
+                                {
+                                    "allowed_host_suffixes": [
+                                        "str"  # Optional. For
+                                          ``https_origin`` inputs, the host suffixes the origin's host
+                                          must match.
+                                    ],
+                                    "allowed_values": [
+                                        "str"  # Optional. For enum inputs,
+                                          the accepted values.
+                                    ],
+                                    "description": "str",  # Optional. Help text.
+                                    "input_kind": "str",  # Optional. How the
+                                      value is entered: string, ``https_origin``"" , or enum. Known
+                                      values are: "string", "https_origin", and "enum".
+                                    "key": "str",  # Optional. Key of the value
+                                      in ``connection_parameters`` or ``credential_parameters``.
+                                    "label": "str",  # Optional. Display label.
+                                    "max_length": 0,  # Optional. Maximum length
+                                      of the value. 0 means the default maximum of 4096.
+                                    "normalization": "str",  # Optional. How the
+                                      value is normalized before it is validated and stored: trim,
+                                      lowercase, uppercase, or ``https_origin``.
+                                    "pattern": "str",  # Optional. Optional RE2
+                                      expression matched against the whole normalized value.
+                                    "required": bool  # Optional. Whether the
+                                      value must be supplied.
+                                }
+                            ],
+                            "description": "str",  # Optional. Provider description.
+                            "display_name": "str",  # Optional. Human-readable provider
+                              name.
+                            "name": "str",  # Optional. Provider slug, used as provider
+                              when creating a connection or a provider credential.
+                            "oauth_client_setup_url": "str",  # Optional. HTTPS page at
+                              the provider where a team creates that OAuth client, such as its
+                              developer console or setup guide. Empty unless ``auth_types`` contains
+                              ``user_oauth_app`` and the provider declares one.
+                            "oauth_redirect_url": "str",  # Optional. Callback URL a team
+                              must register with the provider when it creates its own OAuth client. It
+                              is the same for every provider and cannot be changed per credential.
+                              Empty unless ``auth_types`` contains ``user_oauth_app``.
+                            "scopes": [
+                                "str"  # Optional. The OAuth scopes a connection may
+                                  request; a connection that requests none gets all of them. Set only
+                                  when ``auth_types`` contains ``oauth`` or ``user_oauth_app``.
+                            ]
                         }
                     ]
                 }
@@ -21921,10 +27992,7 @@ class SessionsOperations:
 
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
-        _request = build_sessions_list_request(
-            end_user_id=end_user_id,
-            page=page,
-            per_page=per_page,
+        _request = build_tools_list_providers_request(
             headers=_headers,
             params=_params,
         )
@@ -21966,250 +28034,33 @@ class SessionsOperations:
 
         return cast(JSON, deserialized)  # type: ignore
 
-    @overload
-    def create(
-        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Create an Action Gateway Session.
-
-        Creates a session with a tool selection, invocation policy, and optional direct-tool preload
-        configuration.
-
-        :param body: Required.
-        :type body: JSON
-        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
-         Default value is "application/json".
-        :paramtype content_type: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # JSON input template you can fill out and use as your body input.
-                body = {
-                    "actor_id": "str",  # Required.
-                    "name": "str",  # Required.
-                    "config": {
-                        "preloadTools": [
-                            "str"  # Optional. Concrete tools or pinned toolbelts to
-                              expose directly beside the session meta-tools.
-                        ]
-                    },
-                    "policy": {
-                        "defaultAction": "ask",  # Optional. Default value is "ask".
-                          SessionPolicyAction is the disposition applied to a tool call. Lowercase
-                          values are canonical so ProtoJSON matches the public REST vocabulary; the
-                          prefixed aliases preserve compatibility for existing protobuf clients. Known
-                          values are: "allow", "ask", and "deny".
-                        "rules": [
-                            {
-                                "action": "ask",  # Optional. Default value is "ask".
-                                  SessionPolicyAction is the disposition applied to a tool call.
-                                  Lowercase values are canonical so ProtoJSON matches the public REST
-                                  vocabulary; the prefixed aliases preserve compatibility for existing
-                                  protobuf clients. Known values are: "allow", "ask", and "deny".
-                                "match": {
-                                    "str": "str"  # Optional. Dictionary of
-                                      :code:`<string>`.
-                                },
-                                "tool": "str"  # Optional. Invocation policy. Omit to
-                                  use a default action of ask.
-                            }
-                        ]
-                    },
-                    "tools": [
-                        "str"  # Optional. Omitted enables every tool. An explicit empty
-                          array enables no tools. Direct tools may be :code:`<tool>` or
-                          <tool>@:code:`<version>`; toolbelt references must be version-pinned as
-                          toolbelt::code:`<belt-name>`@:code:`<version>`.
-                    ]
-                }
-
-                # response body for status code(s): 200
-                response == {
-                    "mcpUrl": "str",  # Public session-pinned MCP URL. Required.
-                    "session": {
-                        "actorId": "str",  # Optional. actor_id is empty when the session is
-                          not bound to an actor.
-                        "config": {},  # Optional. Preserved as an opaque object. Gateway
-                          currently interprets config.preloadTools to add selected direct tools to the
-                          session MCP.
-                        "createdAt": "2020-02-20 00:00:00",  # Optional. A session and the
-                          tool-permission policy bound to it. Required.
-                        "name": "str",  # Optional. name is the required human-readable
-                          session name.
-                        "policy": {
-                            "defaultAction": "ask",  # Optional. Default value is "ask".
-                              SessionPolicyAction is the disposition applied to a tool call. Lowercase
-                              values are canonical so ProtoJSON matches the public REST vocabulary; the
-                              prefixed aliases preserve compatibility for existing protobuf clients.
-                              Known values are: "allow", "ask", and "deny".
-                            "rules": [
-                                {
-                                    "action": "ask",  # Optional. Default value
-                                      is "ask". SessionPolicyAction is the disposition applied to a
-                                      tool call. Lowercase values are canonical so ProtoJSON matches
-                                      the public REST vocabulary; the prefixed aliases preserve
-                                      compatibility for existing protobuf clients. Known values are:
-                                      "allow", "ask", and "deny".
-                                    "match": {
-                                        "str": "str"  # Optional. Dictionary
-                                          of :code:`<string>`.
-                                    },
-                                    "tool": "str"  # Optional. SessionPolicySpec
-                                      is the Gateway-relevant subset of a session's permission policy.
-                                      Filesystem and network policy remain enforced by the sandbox.
-                                }
-                            ]
-                        },
-                        "sessionUrn": "str",  # Optional. A session and the tool-permission
-                          policy bound to it. Required.
-                        "tools": {
-                            "references": [
-                                {
-                                    "kind": "str",  # Optional. Known values are:
-                                      "SESSION_TOOL_REFERENCE_KIND_TOOL" and
-                                      "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
-                                    "name": "str",  # Optional. Omitted when the
-                                      request omitted tools (all tools). A present selection with no
-                                      references represents tools: [].
-                                    "version": "str"  # Optional. Omitted when
-                                      the request omitted tools (all tools). A present selection with
-                                      no references represents tools: [].
-                                }
-                            ]
-                        },
-                        "updatedAt": "2020-02-20 00:00:00"  # Optional. A session and the
-                          tool-permission policy bound to it. Required.
-                    },
-                    "tools": [
-                        "str"  # Canonical, version-pinned selected tool references.
-                          Required.
-                    ]
-                }
-                # response body for status code(s): 400
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-
-    @overload
-    def create(
-        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Create an Action Gateway Session.
-
-        Creates a session with a tool selection, invocation policy, and optional direct-tool preload
-        configuration.
-
-        :param body: Required.
-        :type body: IO[bytes]
-        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
-         Default value is "application/json".
-        :paramtype content_type: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "mcpUrl": "str",  # Public session-pinned MCP URL. Required.
-                    "session": {
-                        "actorId": "str",  # Optional. actor_id is empty when the session is
-                          not bound to an actor.
-                        "config": {},  # Optional. Preserved as an opaque object. Gateway
-                          currently interprets config.preloadTools to add selected direct tools to the
-                          session MCP.
-                        "createdAt": "2020-02-20 00:00:00",  # Optional. A session and the
-                          tool-permission policy bound to it. Required.
-                        "name": "str",  # Optional. name is the required human-readable
-                          session name.
-                        "policy": {
-                            "defaultAction": "ask",  # Optional. Default value is "ask".
-                              SessionPolicyAction is the disposition applied to a tool call. Lowercase
-                              values are canonical so ProtoJSON matches the public REST vocabulary; the
-                              prefixed aliases preserve compatibility for existing protobuf clients.
-                              Known values are: "allow", "ask", and "deny".
-                            "rules": [
-                                {
-                                    "action": "ask",  # Optional. Default value
-                                      is "ask". SessionPolicyAction is the disposition applied to a
-                                      tool call. Lowercase values are canonical so ProtoJSON matches
-                                      the public REST vocabulary; the prefixed aliases preserve
-                                      compatibility for existing protobuf clients. Known values are:
-                                      "allow", "ask", and "deny".
-                                    "match": {
-                                        "str": "str"  # Optional. Dictionary
-                                          of :code:`<string>`.
-                                    },
-                                    "tool": "str"  # Optional. SessionPolicySpec
-                                      is the Gateway-relevant subset of a session's permission policy.
-                                      Filesystem and network policy remain enforced by the sandbox.
-                                }
-                            ]
-                        },
-                        "sessionUrn": "str",  # Optional. A session and the tool-permission
-                          policy bound to it. Required.
-                        "tools": {
-                            "references": [
-                                {
-                                    "kind": "str",  # Optional. Known values are:
-                                      "SESSION_TOOL_REFERENCE_KIND_TOOL" and
-                                      "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
-                                    "name": "str",  # Optional. Omitted when the
-                                      request omitted tools (all tools). A present selection with no
-                                      references represents tools: [].
-                                    "version": "str"  # Optional. Omitted when
-                                      the request omitted tools (all tools). A present selection with
-                                      no references represents tools: [].
-                                }
-                            ]
-                        },
-                        "updatedAt": "2020-02-20 00:00:00"  # Optional. A session and the
-                          tool-permission policy bound to it. Required.
-                    },
-                    "tools": [
-                        "str"  # Canonical, version-pinned selected tool references.
-                          Required.
-                    ]
-                }
-                # response body for status code(s): 400
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-
     @distributed_trace
-    def create(self, body: Union[JSON, IO[bytes]], **kwargs: Any) -> JSON:
+    def list_search_providers(
+        self,
+        *,
+        query: Optional[str] = None,
+        page_size: int = 20,
+        page_token: Optional[str] = None,
+        **kwargs: Any,
+    ) -> JSON:
         # pylint: disable=line-too-long
-        """Create an Action Gateway Session.
+        """Search Providers.
 
-        Creates a session with a tool selection, invocation policy, and optional direct-tool preload
-        configuration.
+        Returns the providers of ``GET /v2/action-gateway/tools/providers`` whose name, display name,
+        or description contains query, case-insensitively, sorted by name. Cursor-paged with
+        ``page_size`` and ``page_token``\\ ; no total is reported.
 
-        :param body: Is either a JSON type or a IO[bytes] type. Required.
-        :type body: JSON or IO[bytes]
+        :keyword query: Matched case-insensitively as a substring of name, ``display_name``\\ , or
+         description. It does not match the titles of the tools a provider owns: "providers owning a
+         tool that matches" is a tool search grouped by the provider field of each result. Default value
+         is None.
+        :paramtype query: str
+        :keyword page_size: Page size, 1 to 100. Defaults to 20 when omitted or 0; other values are
+         rejected with 400. Default value is 20.
+        :paramtype page_size: int
+        :keyword page_token: ``next_page_token`` from the previous response. Valid only with the same
+         query; otherwise the request is rejected with 400. Default value is None.
+        :paramtype page_token: str
         :return: JSON object
         :rtype: JSON
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -22217,106 +28068,107 @@ class SessionsOperations:
         Example:
             .. code-block:: python
 
-                # JSON input template you can fill out and use as your body input.
-                body = {
-                    "actor_id": "str",  # Required.
-                    "name": "str",  # Required.
-                    "config": {
-                        "preloadTools": [
-                            "str"  # Optional. Concrete tools or pinned toolbelts to
-                              expose directly beside the session meta-tools.
-                        ]
-                    },
-                    "policy": {
-                        "defaultAction": "ask",  # Optional. Default value is "ask".
-                          SessionPolicyAction is the disposition applied to a tool call. Lowercase
-                          values are canonical so ProtoJSON matches the public REST vocabulary; the
-                          prefixed aliases preserve compatibility for existing protobuf clients. Known
-                          values are: "allow", "ask", and "deny".
-                        "rules": [
-                            {
-                                "action": "ask",  # Optional. Default value is "ask".
-                                  SessionPolicyAction is the disposition applied to a tool call.
-                                  Lowercase values are canonical so ProtoJSON matches the public REST
-                                  vocabulary; the prefixed aliases preserve compatibility for existing
-                                  protobuf clients. Known values are: "allow", "ask", and "deny".
-                                "match": {
-                                    "str": "str"  # Optional. Dictionary of
-                                      :code:`<string>`.
-                                },
-                                "tool": "str"  # Optional. Invocation policy. Omit to
-                                  use a default action of ask.
-                            }
-                        ]
-                    },
-                    "tools": [
-                        "str"  # Optional. Omitted enables every tool. An explicit empty
-                          array enables no tools. Direct tools may be :code:`<tool>` or
-                          <tool>@:code:`<version>`; toolbelt references must be version-pinned as
-                          toolbelt::code:`<belt-name>`@:code:`<version>`.
-                    ]
-                }
-
                 # response body for status code(s): 200
                 response == {
-                    "mcpUrl": "str",  # Public session-pinned MCP URL. Required.
-                    "session": {
-                        "actorId": "str",  # Optional. actor_id is empty when the session is
-                          not bound to an actor.
-                        "config": {},  # Optional. Preserved as an opaque object. Gateway
-                          currently interprets config.preloadTools to add selected direct tools to the
-                          session MCP.
-                        "createdAt": "2020-02-20 00:00:00",  # Optional. A session and the
-                          tool-permission policy bound to it. Required.
-                        "name": "str",  # Optional. name is the required human-readable
-                          session name.
-                        "policy": {
-                            "defaultAction": "ask",  # Optional. Default value is "ask".
-                              SessionPolicyAction is the disposition applied to a tool call. Lowercase
-                              values are canonical so ProtoJSON matches the public REST vocabulary; the
-                              prefixed aliases preserve compatibility for existing protobuf clients.
-                              Known values are: "allow", "ask", and "deny".
-                            "rules": [
+                    "next_page_token": "str",  # Optional. Token for the next page; empty on the
+                      last page.
+                    "providers": [
+                        {
+                            "auth_type": "str",  # Optional. Deprecated: read
+                              ``auth_types``"" , since a provider may accept more than one credential
+                              kind. This is the first entry of ``auth_types`` other than ``none``"" ,
+                              or ``none`` when that is the only entry.
+                            "auth_types": [
+                                "str"  # Optional. Credential kinds the provider
+                                  accepts, sorted: none|oauth|"" ``shared_api_key``"" |unknown|""
+                                  ``user_oauth_app``"" |"" ``user_token``.  ``none`` means the provider
+                                  needs no credential. ``oauth`` means users can connect through
+                                  DigitalOcean's shared OAuth application. ``user_oauth_app`` means
+                                  users can connect through an OAuth client your team registers as a
+                                  provider credential; without ``oauth`` alongside it, that is the only
+                                  way to connect. ``shared_api_key`` means DigitalOcean supplies the
+                                  key. ``user_token`` means your team or its users supply a key or
+                                  token.  ``unknown`` means the provider declares no kind this API
+                                  recognizes, including an OAuth provider whose shared application is
+                                  not available. It is never paired with another kind.
+                            ],
+                            "connection_parameters": [
                                 {
-                                    "action": "ask",  # Optional. Default value
-                                      is "ask". SessionPolicyAction is the disposition applied to a
-                                      tool call. Lowercase values are canonical so ProtoJSON matches
-                                      the public REST vocabulary; the prefixed aliases preserve
-                                      compatibility for existing protobuf clients. Known values are:
-                                      "allow", "ask", and "deny".
-                                    "match": {
-                                        "str": "str"  # Optional. Dictionary
-                                          of :code:`<string>`.
-                                    },
-                                    "tool": "str"  # Optional. SessionPolicySpec
-                                      is the Gateway-relevant subset of a session's permission policy.
-                                      Filesystem and network policy remain enforced by the sandbox.
+                                    "allowed_host_suffixes": [
+                                        "str"  # Optional. For
+                                          ``https_origin`` inputs, the host suffixes the origin's host
+                                          must match.
+                                    ],
+                                    "allowed_values": [
+                                        "str"  # Optional. For enum inputs,
+                                          the accepted values.
+                                    ],
+                                    "description": "str",  # Optional. Help text.
+                                    "input_kind": "str",  # Optional. How the
+                                      value is entered: string, ``https_origin``"" , or enum. Known
+                                      values are: "string", "https_origin", and "enum".
+                                    "key": "str",  # Optional. Key of the value
+                                      in ``connection_parameters`` or ``credential_parameters``.
+                                    "label": "str",  # Optional. Display label.
+                                    "max_length": 0,  # Optional. Maximum length
+                                      of the value. 0 means the default maximum of 4096.
+                                    "normalization": "str",  # Optional. How the
+                                      value is normalized before it is validated and stored: trim,
+                                      lowercase, uppercase, or ``https_origin``.
+                                    "pattern": "str",  # Optional. Optional RE2
+                                      expression matched against the whole normalized value.
+                                    "required": bool  # Optional. Whether the
+                                      value must be supplied.
                                 }
-                            ]
-                        },
-                        "sessionUrn": "str",  # Optional. A session and the tool-permission
-                          policy bound to it. Required.
-                        "tools": {
-                            "references": [
+                            ],
+                            "credential_parameters": [
                                 {
-                                    "kind": "str",  # Optional. Known values are:
-                                      "SESSION_TOOL_REFERENCE_KIND_TOOL" and
-                                      "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
-                                    "name": "str",  # Optional. Omitted when the
-                                      request omitted tools (all tools). A present selection with no
-                                      references represents tools: [].
-                                    "version": "str"  # Optional. Omitted when
-                                      the request omitted tools (all tools). A present selection with
-                                      no references represents tools: [].
+                                    "allowed_host_suffixes": [
+                                        "str"  # Optional. For
+                                          ``https_origin`` inputs, the host suffixes the origin's host
+                                          must match.
+                                    ],
+                                    "allowed_values": [
+                                        "str"  # Optional. For enum inputs,
+                                          the accepted values.
+                                    ],
+                                    "description": "str",  # Optional. Help text.
+                                    "input_kind": "str",  # Optional. How the
+                                      value is entered: string, ``https_origin``"" , or enum. Known
+                                      values are: "string", "https_origin", and "enum".
+                                    "key": "str",  # Optional. Key of the value
+                                      in ``connection_parameters`` or ``credential_parameters``.
+                                    "label": "str",  # Optional. Display label.
+                                    "max_length": 0,  # Optional. Maximum length
+                                      of the value. 0 means the default maximum of 4096.
+                                    "normalization": "str",  # Optional. How the
+                                      value is normalized before it is validated and stored: trim,
+                                      lowercase, uppercase, or ``https_origin``.
+                                    "pattern": "str",  # Optional. Optional RE2
+                                      expression matched against the whole normalized value.
+                                    "required": bool  # Optional. Whether the
+                                      value must be supplied.
                                 }
+                            ],
+                            "description": "str",  # Optional. Provider description.
+                            "display_name": "str",  # Optional. Human-readable provider
+                              name.
+                            "name": "str",  # Optional. Provider slug, used as provider
+                              when creating a connection or a provider credential.
+                            "oauth_client_setup_url": "str",  # Optional. HTTPS page at
+                              the provider where a team creates that OAuth client, such as its
+                              developer console or setup guide. Empty unless ``auth_types`` contains
+                              ``user_oauth_app`` and the provider declares one.
+                            "oauth_redirect_url": "str",  # Optional. Callback URL a team
+                              must register with the provider when it creates its own OAuth client. It
+                              is the same for every provider and cannot be changed per credential.
+                              Empty unless ``auth_types`` contains ``user_oauth_app``.
+                            "scopes": [
+                                "str"  # Optional. The OAuth scopes a connection may
+                                  request; a connection that requests none gets all of them. Set only
+                                  when ``auth_types`` contains ``oauth`` or ``user_oauth_app``.
                             ]
-                        },
-                        "updatedAt": "2020-02-20 00:00:00"  # Optional. A session and the
-                          tool-permission policy bound to it. Required.
-                    },
-                    "tools": [
-                        "str"  # Canonical, version-pinned selected tool references.
-                          Required.
+                        }
                     ]
                 }
                 # response body for status code(s): 400
@@ -22344,26 +28196,15 @@ class SessionsOperations:
         }
         error_map.update(kwargs.pop("error_map", {}) or {})
 
-        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _headers = kwargs.pop("headers", {}) or {}
         _params = kwargs.pop("params", {}) or {}
 
-        content_type: Optional[str] = kwargs.pop(
-            "content_type", _headers.pop("Content-Type", None)
-        )
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
-        content_type = content_type or "application/json"
-        _json = None
-        _content = None
-        if isinstance(body, (IOBase, bytes)):
-            _content = body
-        else:
-            _json = body
-
-        _request = build_sessions_create_request(
-            content_type=content_type,
-            json=_json,
-            content=_content,
+        _request = build_tools_list_search_providers_request(
+            query=query,
+            page_size=page_size,
+            page_token=page_token,
             headers=_headers,
             params=_params,
         )
@@ -22423,21 +28264,545 @@ class SessionsOperations:
         return cast(JSON, deserialized)  # type: ignore
 
     @distributed_trace
-    def delete(self, session_urn: str, **kwargs: Any) -> JSON:
+    def list_search(
+        self,
+        *,
+        query: Optional[str] = None,
+        provider: Optional[List[str]] = None,
+        toolbelt: Optional[str] = None,
+        page_size: int = 20,
+        page_token: Optional[str] = None,
+        **kwargs: Any,
+    ) -> JSON:
         # pylint: disable=line-too-long
-        """Delete an Action Gateway Session.
+        """Search Tools.
 
-        Deletes an Action Gateway session owned by the authenticated team.
+        Returns the tools your team can use that match query, optionally restricted to some providers
+        or to the members of one of your toolbelts. Results are ranked across the whole result set:
+        exact tool name matches first, then name or title prefixes, then name or title substrings, then
+        other matches. Cursor-paged with ``page_size`` and ``page_token``\\ ; no total is reported.
 
-        :param session_urn: The URL-encoded managed agents session URN. Required.
-        :type session_urn: str
-        :return: JSON or JSON object
+        :keyword query: Matched case- and accent-insensitively as a substring of the tool's name,
+         title, description, category, provider ID, or tool slug. Empty matches every tool your team can
+         use. Default value is None.
+        :paramtype query: str
+        :keyword provider: Restricts results to these provider IDs, OR'd together. Repeat the parameter
+         to select several. An unknown ID matches nothing. Default value is None.
+        :paramtype provider: list[str]
+        :keyword toolbelt: Restricts results to the members of that toolbelt of your team at its latest
+         version, combined with query and provider as AND. Members are matched at the version the
+         toolbelt pins, which is the same set and the same versions ``GET
+         /v2/action-gateway/toolbelts/{name}`` reports. An unknown or deleted toolbelt returns 404
+         rather than an empty page. Default value is None.
+        :paramtype toolbelt: str
+        :keyword page_size: Page size, 1 to 100. Defaults to 20 when omitted or 0; other values are
+         rejected with 400. Default value is 20.
+        :paramtype page_size: int
+        :keyword page_token: A ``next_page_token`` from the preceding response. It is pinned to the
+         query and filters that produced it: replaying one against a different search is rejected with
+         400, not a silent restart from the top. Default value is None.
+        :paramtype page_token: str
+        :return: JSON object
         :rtype: JSON
         :raises ~azure.core.exceptions.HttpResponseError:
 
         Example:
             .. code-block:: python
 
+                # response body for status code(s): 200
+                response == {
+                    "next_page_token": "str",  # Optional. Token for the next page; empty on the
+                      last page.
+                    "tools": [
+                        {
+                            "category": "str",  # Optional. Best-effort catalog metadata
+                              and is empty for a large share of the catalog. Do not rely on it being
+                              present.
+                            "description": "str",  # Optional. What the tool does.
+                            "name": "str",  # Optional. The unqualified tool name,
+                              without the provider prefix.
+                            "provider": "str",  # Optional. The owning toolkit ID, broken
+                              out so a client never has to split ``tool_slug``. It is what a client
+                              groups results by.
+                            "title": "str",  # Optional. Human-readable tool title.
+                            "tool_slug": "str",  # Optional. The provider-qualified,
+                              stable tool identifier ("" ``<provider>_<name>``"" ). Treat it as opaque
+                              and pass it back verbatim.
+                            "version": 0  # Optional. The released version number of the
+                              tool, for example 3.
+                        }
+                    ]
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_tools_list_search_request(
+            query=query,
+            provider=provider,
+            toolbelt=toolbelt,
+            page_size=page_size,
+            page_token=page_token,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def list_toolkits(self, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """List Toolkits.
+
+        Returns the providers (toolkits) whose tools your team can use: catalog providers with at least
+        one released tool, plus your team's registered MCP servers.
+
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "toolkits": [
+                        {
+                            "categories": [
+                                "str"  # Optional. Distinct categories of the
+                                  provider's released tools, sorted.
+                            ],
+                            "created_at": "2020-02-20 00:00:00",  # Optional. When the
+                              provider was added.
+                            "description": "str",  # Optional. Provider description.
+                            "id": "str",  # Optional. Provider ID. For one of your team's
+                              MCP servers it is normally the server's ``serverRef``"" ;
+                              ``provider_kind`` tells the two kinds apart.
+                            "name": "str",  # Optional. Human-readable provider name.
+                            "provider_kind": "str"  # Optional. Classifies the provider,
+                              for example ``managed_api`` or ``byo_mcp`` (one of your team's MCP
+                              servers). It is the same value as PublicToolDefinition.provider_kind for
+                              the provider's tools.
+                        }
+                    ],
+                    "version": "str"  # Optional. Catalog version identifier, for example ``v1``.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_tools_list_toolkits_request(
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        response_headers["ratelimit-limit"] = self._deserialize(
+            "int", response.headers.get("ratelimit-limit")
+        )
+        response_headers["ratelimit-remaining"] = self._deserialize(
+            "int", response.headers.get("ratelimit-remaining")
+        )
+        response_headers["ratelimit-reset"] = self._deserialize(
+            "int", response.headers.get("ratelimit-reset")
+        )
+
+        if response.content:
+            deserialized = response.json()
+        else:
+            deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+
+class UsersOperations:
+    """
+    .. warning::
+        **DO NOT** instantiate this class directly.
+
+        Instead, you should access the following operations through
+        :class:`~pydo.GeneratedClient`'s
+        :attr:`users` attribute.
+    """
+
+    def __init__(self, *args, **kwargs):
+        input_args = list(args)
+        self._client = input_args.pop(0) if input_args else kwargs.pop("client")
+        self._config = input_args.pop(0) if input_args else kwargs.pop("config")
+        self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
+        self._deserialize = (
+            input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        )
+
+    @distributed_trace
+    def list(
+        self,
+        *,
+        user_id: Optional[str] = None,
+        sort: str = "created_at",
+        sort_direction: Optional[str] = None,
+        page: int = 1,
+        per_page: int = 20,
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Users.
+
+        Returns the user IDs known for your team: session ``actor_id`` values, the ``user_id`` of
+        connections that are not revoked, and actors with limit overrides. Only sessions and
+        connections you can see count. Offset-paged with page and ``per_page``.
+
+        :keyword user_id: User ID prefix to return. An empty value returns all users. Default value is
+         None.
+        :paramtype user_id: str
+        :keyword sort: ``user_id``\\ |\\ ``created_at``\\ |\\ ``session_count``\\ |\\
+         ``connection_count``. ``created_at`` is the earliest creation time among the user's sessions,
+         connections, and limit overrides. Defaults to ``created_at``. Known values are: "created_at",
+         "user_id", "session_count", and "connection_count". Default value is "created_at".
+        :paramtype sort: str
+        :keyword sort_direction: asc|desc. Defaults to desc. Known values are: "asc" and "desc".
+         Default value is None.
+        :paramtype sort_direction: str
+        :keyword page: 1-based page number. Values below 1 are treated as 1. Default value is 1.
+        :paramtype page: int
+        :keyword per_page: Page size. Defaults to 20; values above 100 are capped at 100. Default value
+         is 20.
+        :paramtype per_page: int
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "pagination": {
+                        "page": 0,  # Optional. 1-based page number of this response.
+                        "per_page": 0,  # Optional. Page size applied to this response, after
+                          defaults and caps.
+                        "total": 0  # Optional. Number of matching items across all pages.
+                    },
+                    "user_ids": [
+                        "str"  # Optional. User IDs on this page.
+                    ]
+                }
+                # response body for status code(s): 400
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_users_list_request(
+            user_id=user_id,
+            sort=sort,
+            sort_direction=sort_direction,
+            page=page,
+            per_page=per_page,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def get(self, user_id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Get a User.
+
+        Returns the sessions and non-revoked connections of one user ID. Returns 404 when the user has
+        none you can see and no limit overrides.
+
+        :param user_id: User ID. Required.
+        :type user_id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "user": {
+                        "connections": [
+                            {
+                                "connection_parameters": {},  # Optional.
+                                  Non-sensitive provider configuration.
+                                "created_at": "2020-02-20 00:00:00",  # Optional.
+                                  When the connection was created.
+                                "credential_id": "str",  # Optional. ID of the team
+                                  provider credential the connection uses; empty for DigitalOcean's
+                                  shared application.
+                                "credential_kind": "str",  # Optional.
+                                  ``digitalocean_oauth``"" , ``private_oauth``"" , or ``team_api_key``.
+                                  Known values are: "digitalocean_oauth", "private_oauth", and
+                                  "team_api_key".
+                                "granted_at": "2020-02-20 00:00:00",  # Optional.
+                                  When the user completed authorization.
+                                "id": "str",  # Optional. Opaque connection ID.
+                                "network": {
+                                    "vpc": {
+                                        "destinations": [
+                                            {
+                                                "allowed_ip_cidrs": [
+                                                    "str"  #
+                                                      Optional. Optional CIDR ranges; when set, every
+                                                      address the host resolves to must fall within one
+                                                      of them.
+                                                ],
+                                                "host": "str",  #
+                                                  Optional. Host name or IP address. It must resolve
+                                                  only to private addresses.
+                                                "port": 0  #
+                                                  Optional. Port, 1 to 65535.
+                                            }
+                                        ],
+                                        "region": "str",  # Optional. Region
+                                          of the VPC. Set by DigitalOcean; do not send it.
+                                        "vpc_uuid": "str"  # Optional. UUID
+                                          of a VPC owned by your team.
+                                    }
+                                },
+                                "owning_user_id": "str",  # Optional. DigitalOcean
+                                  user ID of the user who created the connection, when recorded.
+                                "provider": "str",  # Optional. Provider slug, for
+                                  example ``jira``.
+                                "provider_display_name": "str",  # Optional.
+                                  Human-readable provider name, for example ``Jira``.
+                                "revoked_at": "2020-02-20 00:00:00",  # Optional.
+                                  When the connection was revoked.
+                                "scopes": [
+                                    "str"  # Optional. Provider scopes granted,
+                                      or requested while pending.
+                                ],
+                                "status": "str",  # Optional. pending, active,
+                                  revoked, or expired. Known values are: "pending", "active",
+                                  "revoked", and "expired".
+                                "updated_at": "2020-02-20 00:00:00",  # Optional.
+                                  When the connection was last modified.
+                                "user_id": "str"  # Optional. Your identifier for the
+                                  user the connection acts for.
+                            }
+                        ],
+                        "sessions": [
+                            {
+                                "created_at": "2020-02-20 00:00:00",  # Optional.
+                                  When the session was created.
+                                "name": "str",  # Optional. Session name.
+                                "session_urn": "str",  # Optional. Session URN.
+                                "updated_at": "2020-02-20 00:00:00"  # Optional. When
+                                  the session was last modified.
+                            }
+                        ],
+                        "user_id": "str"  # Optional. The user ID: a session ``actor_id`` or
+                          a connection ``user_id``.
+                    }
+                }
                 # response body for status code(s): 404
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
@@ -22468,8 +28833,8 @@ class SessionsOperations:
 
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
-        _request = build_sessions_delete_request(
-            session_urn=session_urn,
+        _request = build_users_get_request(
+            user_id=user_id,
             headers=_headers,
             params=_params,
         )
@@ -233937,6 +240302,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           # Optional. Time created at.
                                         "dataset_name": "str",  # Optional.
                                           Name of the dataset.
+                                        "dataset_paradigm":
+                                          "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                          Default value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                          EvaluationDatasetParadigm is the row/content shape of a
+                                          dataset, orthogonal to the surface in EvaluationDatasetType
+                                          (e.g. a model dataset can be single- or multi-turn). Known
+                                          values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_CODING", and
+                                          "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                         "dataset_type":
                                           "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value
                                           is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -233980,8 +240355,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_CORRECTNESS",
                                               "METRIC_CATEGORY_USER_OUTCOMES",
                                               "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                              "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                              "METRIC_CATEGORY_MODEL_FIT".
+                                              "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                              "METRIC_CATEGORY_MODEL_FIT", and
+                                              "METRIC_CATEGORY_CONVERSATIONAL".
                                             "custom_eval_config": {
                                                 "created_at":
                                                   "2020-02-20 00:00:00",  # Optional. Configuration for
@@ -235185,6 +241561,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           # Optional. Time created at.
                                         "dataset_name": "str",  # Optional.
                                           Name of the dataset.
+                                        "dataset_paradigm":
+                                          "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                          Default value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                          EvaluationDatasetParadigm is the row/content shape of a
+                                          dataset, orthogonal to the surface in EvaluationDatasetType
+                                          (e.g. a model dataset can be single- or multi-turn). Known
+                                          values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_CODING", and
+                                          "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                         "dataset_type":
                                           "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value
                                           is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -235228,8 +241614,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_CORRECTNESS",
                                               "METRIC_CATEGORY_USER_OUTCOMES",
                                               "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                              "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                              "METRIC_CATEGORY_MODEL_FIT".
+                                              "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                              "METRIC_CATEGORY_MODEL_FIT", and
+                                              "METRIC_CATEGORY_CONVERSATIONAL".
                                             "custom_eval_config": {
                                                 "created_at":
                                                   "2020-02-20 00:00:00",  # Optional. Configuration for
@@ -236480,6 +242867,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           # Optional. Time created at.
                                         "dataset_name": "str",  # Optional.
                                           Name of the dataset.
+                                        "dataset_paradigm":
+                                          "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                          Default value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                          EvaluationDatasetParadigm is the row/content shape of a
+                                          dataset, orthogonal to the surface in EvaluationDatasetType
+                                          (e.g. a model dataset can be single- or multi-turn). Known
+                                          values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_CODING", and
+                                          "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                         "dataset_type":
                                           "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value
                                           is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -236523,8 +242920,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_CORRECTNESS",
                                               "METRIC_CATEGORY_USER_OUTCOMES",
                                               "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                              "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                              "METRIC_CATEGORY_MODEL_FIT".
+                                              "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                              "METRIC_CATEGORY_MODEL_FIT", and
+                                              "METRIC_CATEGORY_CONVERSATIONAL".
                                             "custom_eval_config": {
                                                 "created_at":
                                                   "2020-02-20 00:00:00",  # Optional. Configuration for
@@ -238761,6 +245159,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           # Optional. Time created at.
                                         "dataset_name": "str",  # Optional.
                                           Name of the dataset.
+                                        "dataset_paradigm":
+                                          "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                          Default value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                          EvaluationDatasetParadigm is the row/content shape of a
+                                          dataset, orthogonal to the surface in EvaluationDatasetType
+                                          (e.g. a model dataset can be single- or multi-turn). Known
+                                          values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_CODING", and
+                                          "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                         "dataset_type":
                                           "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value
                                           is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -238804,8 +245212,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_CORRECTNESS",
                                               "METRIC_CATEGORY_USER_OUTCOMES",
                                               "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                              "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                              "METRIC_CATEGORY_MODEL_FIT".
+                                              "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                              "METRIC_CATEGORY_MODEL_FIT", and
+                                              "METRIC_CATEGORY_CONVERSATIONAL".
                                             "custom_eval_config": {
                                                 "created_at":
                                                   "2020-02-20 00:00:00",  # Optional. Configuration for
@@ -240012,6 +246421,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           # Optional. Time created at.
                                         "dataset_name": "str",  # Optional.
                                           Name of the dataset.
+                                        "dataset_paradigm":
+                                          "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                          Default value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                          EvaluationDatasetParadigm is the row/content shape of a
+                                          dataset, orthogonal to the surface in EvaluationDatasetType
+                                          (e.g. a model dataset can be single- or multi-turn). Known
+                                          values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_CODING", and
+                                          "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                         "dataset_type":
                                           "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value
                                           is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -240055,8 +246474,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_CORRECTNESS",
                                               "METRIC_CATEGORY_USER_OUTCOMES",
                                               "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                              "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                              "METRIC_CATEGORY_MODEL_FIT".
+                                              "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                              "METRIC_CATEGORY_MODEL_FIT", and
+                                              "METRIC_CATEGORY_CONVERSATIONAL".
                                             "custom_eval_config": {
                                                 "created_at":
                                                   "2020-02-20 00:00:00",  # Optional. Configuration for
@@ -241273,6 +247693,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           # Optional. Time created at.
                                         "dataset_name": "str",  # Optional.
                                           Name of the dataset.
+                                        "dataset_paradigm":
+                                          "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                          Default value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                          EvaluationDatasetParadigm is the row/content shape of a
+                                          dataset, orthogonal to the surface in EvaluationDatasetType
+                                          (e.g. a model dataset can be single- or multi-turn). Known
+                                          values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_CODING", and
+                                          "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                         "dataset_type":
                                           "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value
                                           is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -241316,8 +247746,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_CORRECTNESS",
                                               "METRIC_CATEGORY_USER_OUTCOMES",
                                               "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                              "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                              "METRIC_CATEGORY_MODEL_FIT".
+                                              "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                              "METRIC_CATEGORY_MODEL_FIT", and
+                                              "METRIC_CATEGORY_CONVERSATIONAL".
                                             "custom_eval_config": {
                                                 "created_at":
                                                   "2020-02-20 00:00:00",  # Optional. Configuration for
@@ -242637,6 +249068,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           # Optional. Time created at.
                                         "dataset_name": "str",  # Optional.
                                           Name of the dataset.
+                                        "dataset_paradigm":
+                                          "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                          Default value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                          EvaluationDatasetParadigm is the row/content shape of a
+                                          dataset, orthogonal to the surface in EvaluationDatasetType
+                                          (e.g. a model dataset can be single- or multi-turn). Known
+                                          values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_CODING", and
+                                          "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                         "dataset_type":
                                           "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value
                                           is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -242680,8 +249121,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_CORRECTNESS",
                                               "METRIC_CATEGORY_USER_OUTCOMES",
                                               "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                              "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                              "METRIC_CATEGORY_MODEL_FIT".
+                                              "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                              "METRIC_CATEGORY_MODEL_FIT", and
+                                              "METRIC_CATEGORY_CONVERSATIONAL".
                                             "custom_eval_config": {
                                                 "created_at":
                                                   "2020-02-20 00:00:00",  # Optional. Configuration for
@@ -243891,6 +250333,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           # Optional. Time created at.
                                         "dataset_name": "str",  # Optional.
                                           Name of the dataset.
+                                        "dataset_paradigm":
+                                          "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                          Default value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                          EvaluationDatasetParadigm is the row/content shape of a
+                                          dataset, orthogonal to the surface in EvaluationDatasetType
+                                          (e.g. a model dataset can be single- or multi-turn). Known
+                                          values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_CODING", and
+                                          "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                         "dataset_type":
                                           "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value
                                           is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -243934,8 +250386,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_CORRECTNESS",
                                               "METRIC_CATEGORY_USER_OUTCOMES",
                                               "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                              "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                              "METRIC_CATEGORY_MODEL_FIT".
+                                              "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                              "METRIC_CATEGORY_MODEL_FIT", and
+                                              "METRIC_CATEGORY_CONVERSATIONAL".
                                             "custom_eval_config": {
                                                 "created_at":
                                                   "2020-02-20 00:00:00",  # Optional. Configuration for
@@ -245156,6 +251609,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           # Optional. Time created at.
                                         "dataset_name": "str",  # Optional.
                                           Name of the dataset.
+                                        "dataset_paradigm":
+                                          "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                          Default value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                          EvaluationDatasetParadigm is the row/content shape of a
+                                          dataset, orthogonal to the surface in EvaluationDatasetType
+                                          (e.g. a model dataset can be single- or multi-turn). Known
+                                          values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_CODING", and
+                                          "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                         "dataset_type":
                                           "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value
                                           is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -245199,8 +251662,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_CORRECTNESS",
                                               "METRIC_CATEGORY_USER_OUTCOMES",
                                               "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                              "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                              "METRIC_CATEGORY_MODEL_FIT".
+                                              "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                              "METRIC_CATEGORY_MODEL_FIT", and
+                                              "METRIC_CATEGORY_CONVERSATIONAL".
                                             "custom_eval_config": {
                                                 "created_at":
                                                   "2020-02-20 00:00:00",  # Optional. Configuration for
@@ -246495,6 +252959,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           # Optional. Time created at.
                                         "dataset_name": "str",  # Optional.
                                           Name of the dataset.
+                                        "dataset_paradigm":
+                                          "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                          Default value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                          EvaluationDatasetParadigm is the row/content shape of a
+                                          dataset, orthogonal to the surface in EvaluationDatasetType
+                                          (e.g. a model dataset can be single- or multi-turn). Known
+                                          values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_CODING", and
+                                          "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                         "dataset_type":
                                           "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value
                                           is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -246538,8 +253012,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_CORRECTNESS",
                                               "METRIC_CATEGORY_USER_OUTCOMES",
                                               "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                              "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                              "METRIC_CATEGORY_MODEL_FIT".
+                                              "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                              "METRIC_CATEGORY_MODEL_FIT", and
+                                              "METRIC_CATEGORY_CONVERSATIONAL".
                                             "custom_eval_config": {
                                                 "created_at":
                                                   "2020-02-20 00:00:00",  # Optional. Configuration for
@@ -247835,6 +254310,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           # Optional. Time created at.
                                         "dataset_name": "str",  # Optional.
                                           Name of the dataset.
+                                        "dataset_paradigm":
+                                          "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                          Default value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                          EvaluationDatasetParadigm is the row/content shape of a
+                                          dataset, orthogonal to the surface in EvaluationDatasetType
+                                          (e.g. a model dataset can be single- or multi-turn). Known
+                                          values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_CODING", and
+                                          "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                         "dataset_type":
                                           "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value
                                           is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -247878,8 +254363,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_CORRECTNESS",
                                               "METRIC_CATEGORY_USER_OUTCOMES",
                                               "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                              "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                              "METRIC_CATEGORY_MODEL_FIT".
+                                              "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                              "METRIC_CATEGORY_MODEL_FIT", and
+                                              "METRIC_CATEGORY_CONVERSATIONAL".
                                             "custom_eval_config": {
                                                 "created_at":
                                                   "2020-02-20 00:00:00",  # Optional. Configuration for
@@ -249086,6 +255572,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           # Optional. Time created at.
                                         "dataset_name": "str",  # Optional.
                                           Name of the dataset.
+                                        "dataset_paradigm":
+                                          "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                          Default value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                          EvaluationDatasetParadigm is the row/content shape of a
+                                          dataset, orthogonal to the surface in EvaluationDatasetType
+                                          (e.g. a model dataset can be single- or multi-turn). Known
+                                          values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_CODING", and
+                                          "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                         "dataset_type":
                                           "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value
                                           is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -249129,8 +255625,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_CORRECTNESS",
                                               "METRIC_CATEGORY_USER_OUTCOMES",
                                               "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                              "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                              "METRIC_CATEGORY_MODEL_FIT".
+                                              "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                              "METRIC_CATEGORY_MODEL_FIT", and
+                                              "METRIC_CATEGORY_CONVERSATIONAL".
                                             "custom_eval_config": {
                                                 "created_at":
                                                   "2020-02-20 00:00:00",  # Optional. Configuration for
@@ -250343,6 +256840,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           # Optional. Time created at.
                                         "dataset_name": "str",  # Optional.
                                           Name of the dataset.
+                                        "dataset_paradigm":
+                                          "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                          Default value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                          EvaluationDatasetParadigm is the row/content shape of a
+                                          dataset, orthogonal to the surface in EvaluationDatasetType
+                                          (e.g. a model dataset can be single- or multi-turn). Known
+                                          values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_CODING", and
+                                          "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                         "dataset_type":
                                           "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value
                                           is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -250386,8 +256893,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_CORRECTNESS",
                                               "METRIC_CATEGORY_USER_OUTCOMES",
                                               "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                              "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                              "METRIC_CATEGORY_MODEL_FIT".
+                                              "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                              "METRIC_CATEGORY_MODEL_FIT", and
+                                              "METRIC_CATEGORY_CONVERSATIONAL".
                                             "custom_eval_config": {
                                                 "created_at":
                                                   "2020-02-20 00:00:00",  # Optional. Configuration for
@@ -251680,6 +258188,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           # Optional. Time created at.
                                         "dataset_name": "str",  # Optional.
                                           Name of the dataset.
+                                        "dataset_paradigm":
+                                          "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                          Default value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                          EvaluationDatasetParadigm is the row/content shape of a
+                                          dataset, orthogonal to the surface in EvaluationDatasetType
+                                          (e.g. a model dataset can be single- or multi-turn). Known
+                                          values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_CODING", and
+                                          "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                         "dataset_type":
                                           "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value
                                           is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -251723,8 +258241,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_CORRECTNESS",
                                               "METRIC_CATEGORY_USER_OUTCOMES",
                                               "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                              "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                              "METRIC_CATEGORY_MODEL_FIT".
+                                              "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                              "METRIC_CATEGORY_MODEL_FIT", and
+                                              "METRIC_CATEGORY_CONVERSATIONAL".
                                             "custom_eval_config": {
                                                 "created_at":
                                                   "2020-02-20 00:00:00",  # Optional. Configuration for
@@ -252997,6 +259516,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           # Optional. Time created at.
                                         "dataset_name": "str",  # Optional.
                                           Name of the dataset.
+                                        "dataset_paradigm":
+                                          "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                          Default value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                          EvaluationDatasetParadigm is the row/content shape of a
+                                          dataset, orthogonal to the surface in EvaluationDatasetType
+                                          (e.g. a model dataset can be single- or multi-turn). Known
+                                          values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_CODING", and
+                                          "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                         "dataset_type":
                                           "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value
                                           is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -253040,8 +259569,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_CORRECTNESS",
                                               "METRIC_CATEGORY_USER_OUTCOMES",
                                               "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                              "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                              "METRIC_CATEGORY_MODEL_FIT".
+                                              "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                              "METRIC_CATEGORY_MODEL_FIT", and
+                                              "METRIC_CATEGORY_CONVERSATIONAL".
                                             "custom_eval_config": {
                                                 "created_at":
                                                   "2020-02-20 00:00:00",  # Optional. Configuration for
@@ -254317,6 +260847,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           # Optional. Time created at.
                                         "dataset_name": "str",  # Optional.
                                           Name of the dataset.
+                                        "dataset_paradigm":
+                                          "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                          Default value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                          EvaluationDatasetParadigm is the row/content shape of a
+                                          dataset, orthogonal to the surface in EvaluationDatasetType
+                                          (e.g. a model dataset can be single- or multi-turn). Known
+                                          values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_CODING", and
+                                          "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                         "dataset_type":
                                           "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value
                                           is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -254360,8 +260900,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_CORRECTNESS",
                                               "METRIC_CATEGORY_USER_OUTCOMES",
                                               "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                              "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                              "METRIC_CATEGORY_MODEL_FIT".
+                                              "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                              "METRIC_CATEGORY_MODEL_FIT", and
+                                              "METRIC_CATEGORY_CONVERSATIONAL".
                                             "custom_eval_config": {
                                                 "created_at":
                                                   "2020-02-20 00:00:00",  # Optional. Configuration for
@@ -255638,6 +262179,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           # Optional. Time created at.
                                         "dataset_name": "str",  # Optional.
                                           Name of the dataset.
+                                        "dataset_paradigm":
+                                          "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                          Default value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                          EvaluationDatasetParadigm is the row/content shape of a
+                                          dataset, orthogonal to the surface in EvaluationDatasetType
+                                          (e.g. a model dataset can be single- or multi-turn). Known
+                                          values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_CODING", and
+                                          "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                         "dataset_type":
                                           "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value
                                           is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -255681,8 +262232,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_CORRECTNESS",
                                               "METRIC_CATEGORY_USER_OUTCOMES",
                                               "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                              "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                              "METRIC_CATEGORY_MODEL_FIT".
+                                              "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                              "METRIC_CATEGORY_MODEL_FIT", and
+                                              "METRIC_CATEGORY_CONVERSATIONAL".
                                             "custom_eval_config": {
                                                 "created_at":
                                                   "2020-02-20 00:00:00",  # Optional. Configuration for
@@ -257604,6 +264156,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           # Optional. Time created at.
                                         "dataset_name": "str",  # Optional.
                                           Name of the dataset.
+                                        "dataset_paradigm":
+                                          "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                          Default value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                          EvaluationDatasetParadigm is the row/content shape of a
+                                          dataset, orthogonal to the surface in EvaluationDatasetType
+                                          (e.g. a model dataset can be single- or multi-turn). Known
+                                          values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_CODING", and
+                                          "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                         "dataset_type":
                                           "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value
                                           is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -257647,8 +264209,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_CORRECTNESS",
                                               "METRIC_CATEGORY_USER_OUTCOMES",
                                               "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                              "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                              "METRIC_CATEGORY_MODEL_FIT".
+                                              "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                              "METRIC_CATEGORY_MODEL_FIT", and
+                                              "METRIC_CATEGORY_CONVERSATIONAL".
                                             "custom_eval_config": {
                                                 "created_at":
                                                   "2020-02-20 00:00:00",  # Optional. Configuration for
@@ -259012,6 +265575,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           # Optional. Time created at.
                                         "dataset_name": "str",  # Optional.
                                           Name of the dataset.
+                                        "dataset_paradigm":
+                                          "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                          Default value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                          EvaluationDatasetParadigm is the row/content shape of a
+                                          dataset, orthogonal to the surface in EvaluationDatasetType
+                                          (e.g. a model dataset can be single- or multi-turn). Known
+                                          values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_CODING", and
+                                          "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                         "dataset_type":
                                           "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value
                                           is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -259055,8 +265628,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_CORRECTNESS",
                                               "METRIC_CATEGORY_USER_OUTCOMES",
                                               "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                              "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                              "METRIC_CATEGORY_MODEL_FIT".
+                                              "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                              "METRIC_CATEGORY_MODEL_FIT", and
+                                              "METRIC_CATEGORY_CONVERSATIONAL".
                                             "custom_eval_config": {
                                                 "created_at":
                                                   "2020-02-20 00:00:00",  # Optional. Configuration for
@@ -260263,6 +266837,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           # Optional. Time created at.
                                         "dataset_name": "str",  # Optional.
                                           Name of the dataset.
+                                        "dataset_paradigm":
+                                          "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                          Default value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                          EvaluationDatasetParadigm is the row/content shape of a
+                                          dataset, orthogonal to the surface in EvaluationDatasetType
+                                          (e.g. a model dataset can be single- or multi-turn). Known
+                                          values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_CODING", and
+                                          "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                         "dataset_type":
                                           "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value
                                           is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -260306,8 +266890,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_CORRECTNESS",
                                               "METRIC_CATEGORY_USER_OUTCOMES",
                                               "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                              "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                              "METRIC_CATEGORY_MODEL_FIT".
+                                              "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                              "METRIC_CATEGORY_MODEL_FIT", and
+                                              "METRIC_CATEGORY_CONVERSATIONAL".
                                             "custom_eval_config": {
                                                 "created_at":
                                                   "2020-02-20 00:00:00",  # Optional. Configuration for
@@ -261586,6 +268171,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           # Optional. Time created at.
                                         "dataset_name": "str",  # Optional.
                                           Name of the dataset.
+                                        "dataset_paradigm":
+                                          "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                          Default value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                          EvaluationDatasetParadigm is the row/content shape of a
+                                          dataset, orthogonal to the surface in EvaluationDatasetType
+                                          (e.g. a model dataset can be single- or multi-turn). Known
+                                          values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_CODING", and
+                                          "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                         "dataset_type":
                                           "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value
                                           is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -261629,8 +268224,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_CORRECTNESS",
                                               "METRIC_CATEGORY_USER_OUTCOMES",
                                               "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                              "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                              "METRIC_CATEGORY_MODEL_FIT".
+                                              "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                              "METRIC_CATEGORY_MODEL_FIT", and
+                                              "METRIC_CATEGORY_CONVERSATIONAL".
                                             "custom_eval_config": {
                                                 "created_at":
                                                   "2020-02-20 00:00:00",  # Optional. Configuration for
@@ -262918,6 +269514,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           # Optional. Time created at.
                                         "dataset_name": "str",  # Optional.
                                           Name of the dataset.
+                                        "dataset_paradigm":
+                                          "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                          Default value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                          EvaluationDatasetParadigm is the row/content shape of a
+                                          dataset, orthogonal to the surface in EvaluationDatasetType
+                                          (e.g. a model dataset can be single- or multi-turn). Known
+                                          values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_CODING", and
+                                          "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                         "dataset_type":
                                           "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value
                                           is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -262961,8 +269567,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_CORRECTNESS",
                                               "METRIC_CATEGORY_USER_OUTCOMES",
                                               "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                              "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                              "METRIC_CATEGORY_MODEL_FIT".
+                                              "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                              "METRIC_CATEGORY_MODEL_FIT", and
+                                              "METRIC_CATEGORY_CONVERSATIONAL".
                                             "custom_eval_config": {
                                                 "created_at":
                                                   "2020-02-20 00:00:00",  # Optional. Configuration for
@@ -264296,6 +270903,18 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               00:00:00",  # Optional. Time created at.
                                             "dataset_name": "str",  #
                                               Optional. Name of the dataset.
+                                            "dataset_paradigm":
+                                              "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                              Default value is
+                                              "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                              EvaluationDatasetParadigm is the row/content shape of a
+                                              dataset, orthogonal to the surface in
+                                              EvaluationDatasetType (e.g. a model dataset can be
+                                              single- or multi-turn). Known values are:
+                                              "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                              "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                              "EVALUATION_DATASET_PARADIGM_CODING", and
+                                              "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                             "dataset_type":
                                               "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default
                                               value is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values
@@ -264339,8 +270958,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "METRIC_CATEGORY_CORRECTNESS",
                                                   "METRIC_CATEGORY_USER_OUTCOMES",
                                                   "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                                  "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                                  "METRIC_CATEGORY_MODEL_FIT".
+                                                  "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                                  "METRIC_CATEGORY_MODEL_FIT", and
+                                                  "METRIC_CATEGORY_CONVERSATIONAL".
                                                 "custom_eval_config":
                                                   {
                                                     "created_at":
@@ -265648,6 +272268,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           # Optional. Time created at.
                                         "dataset_name": "str",  # Optional.
                                           Name of the dataset.
+                                        "dataset_paradigm":
+                                          "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                          Default value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                          EvaluationDatasetParadigm is the row/content shape of a
+                                          dataset, orthogonal to the surface in EvaluationDatasetType
+                                          (e.g. a model dataset can be single- or multi-turn). Known
+                                          values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_CODING", and
+                                          "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                         "dataset_type":
                                           "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value
                                           is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -265691,8 +272321,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_CORRECTNESS",
                                               "METRIC_CATEGORY_USER_OUTCOMES",
                                               "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                              "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                              "METRIC_CATEGORY_MODEL_FIT".
+                                              "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                              "METRIC_CATEGORY_MODEL_FIT", and
+                                              "METRIC_CATEGORY_CONVERSATIONAL".
                                             "custom_eval_config": {
                                                 "created_at":
                                                   "2020-02-20 00:00:00",  # Optional. Configuration for
@@ -266899,6 +273530,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           # Optional. Time created at.
                                         "dataset_name": "str",  # Optional.
                                           Name of the dataset.
+                                        "dataset_paradigm":
+                                          "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                          Default value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                          EvaluationDatasetParadigm is the row/content shape of a
+                                          dataset, orthogonal to the surface in EvaluationDatasetType
+                                          (e.g. a model dataset can be single- or multi-turn). Known
+                                          values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_CODING", and
+                                          "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                         "dataset_type":
                                           "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value
                                           is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -266942,8 +273583,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_CORRECTNESS",
                                               "METRIC_CATEGORY_USER_OUTCOMES",
                                               "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                              "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                              "METRIC_CATEGORY_MODEL_FIT".
+                                              "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                              "METRIC_CATEGORY_MODEL_FIT", and
+                                              "METRIC_CATEGORY_CONVERSATIONAL".
                                             "custom_eval_config": {
                                                 "created_at":
                                                   "2020-02-20 00:00:00",  # Optional. Configuration for
@@ -268156,6 +274798,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           # Optional. Time created at.
                                         "dataset_name": "str",  # Optional.
                                           Name of the dataset.
+                                        "dataset_paradigm":
+                                          "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                          Default value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                          EvaluationDatasetParadigm is the row/content shape of a
+                                          dataset, orthogonal to the surface in EvaluationDatasetType
+                                          (e.g. a model dataset can be single- or multi-turn). Known
+                                          values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_CODING", and
+                                          "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                         "dataset_type":
                                           "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value
                                           is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -268199,8 +274851,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_CORRECTNESS",
                                               "METRIC_CATEGORY_USER_OUTCOMES",
                                               "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                              "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                              "METRIC_CATEGORY_MODEL_FIT".
+                                              "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                              "METRIC_CATEGORY_MODEL_FIT", and
+                                              "METRIC_CATEGORY_CONVERSATIONAL".
                                             "custom_eval_config": {
                                                 "created_at":
                                                   "2020-02-20 00:00:00",  # Optional. Configuration for
@@ -271114,6 +277767,18 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               00:00:00",  # Optional. Time created at.
                                             "dataset_name": "str",  #
                                               Optional. Name of the dataset.
+                                            "dataset_paradigm":
+                                              "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                              Default value is
+                                              "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                              EvaluationDatasetParadigm is the row/content shape of a
+                                              dataset, orthogonal to the surface in
+                                              EvaluationDatasetType (e.g. a model dataset can be
+                                              single- or multi-turn). Known values are:
+                                              "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                              "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                              "EVALUATION_DATASET_PARADIGM_CODING", and
+                                              "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                             "dataset_type":
                                               "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default
                                               value is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values
@@ -271157,8 +277822,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "METRIC_CATEGORY_CORRECTNESS",
                                                   "METRIC_CATEGORY_USER_OUTCOMES",
                                                   "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                                  "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                                  "METRIC_CATEGORY_MODEL_FIT".
+                                                  "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                                  "METRIC_CATEGORY_MODEL_FIT", and
+                                                  "METRIC_CATEGORY_CONVERSATIONAL".
                                                 "custom_eval_config":
                                                   {
                                                     "created_at":
@@ -273089,7 +279755,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
 
     @distributed_trace
     def list_evaluation_datasets(
-        self, *, dataset_type: str = "EVALUATION_DATASET_TYPE_UNKNOWN", **kwargs: Any
+        self,
+        *,
+        dataset_type: str = "EVALUATION_DATASET_TYPE_UNKNOWN",
+        dataset_paradigm: str = "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+        has_ground_truth: Optional[bool] = None,
+        **kwargs: Any,
     ) -> JSON:
         # pylint: disable=line-too-long
         """List Evaluation Datasets.
@@ -273101,6 +279772,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
          "EVALUATION_DATASET_TYPE_NON_ADK", and "EVALUATION_DATASET_TYPE_MODEL". Default value is
          "EVALUATION_DATASET_TYPE_UNKNOWN".
         :paramtype dataset_type: str
+        :keyword dataset_paradigm: Filter by evaluation dataset paradigm (row/content shape). Known
+         values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+         "EVALUATION_DATASET_PARADIGM_MULTI_TURN", "EVALUATION_DATASET_PARADIGM_CODING", and
+         "EVALUATION_DATASET_PARADIGM_N_PLUS_1". Default value is
+         "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+        :paramtype dataset_paradigm: str
+        :keyword has_ground_truth: Filter by whether the dataset includes ground-truth values. Default
+         value is None.
+        :paramtype has_ground_truth: bool
         :return: JSON object
         :rtype: JSON
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -273115,6 +279795,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "created_at": "2020-02-20 00:00:00",  # Optional. Time
                               created at.
                             "dataset_name": "str",  # Optional. Name of the dataset.
+                            "dataset_paradigm":
+                              "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional. Default value is
+                              "EVALUATION_DATASET_PARADIGM_SINGLE_TURN". EvaluationDatasetParadigm is
+                              the row/content shape of a dataset, orthogonal to the surface in
+                              EvaluationDatasetType (e.g. a model dataset can be single- or
+                              multi-turn). Known values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                              "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                              "EVALUATION_DATASET_PARADIGM_CODING", and
+                              "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                             "dataset_type": "EVALUATION_DATASET_TYPE_UNKNOWN",  #
                               Optional. Default value is "EVALUATION_DATASET_TYPE_UNKNOWN". Known
                               values are: "EVALUATION_DATASET_TYPE_UNKNOWN",
@@ -273161,6 +279850,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
 
         _request = build_genai_list_evaluation_datasets_request(
             dataset_type=dataset_type,
+            dataset_paradigm=dataset_paradigm,
+            has_ground_truth=has_ground_truth,
             headers=_headers,
             params=_params,
         )
@@ -273246,6 +279937,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
 
                 # JSON input template you can fill out and use as your body input.
                 body = {
+                    "dataset_paradigm": "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                      Default value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                      EvaluationDatasetParadigm is the row/content shape of a dataset, orthogonal to
+                      the surface in EvaluationDatasetType (e.g. a model dataset can be single- or
+                      multi-turn). Known values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                      "EVALUATION_DATASET_PARADIGM_MULTI_TURN", "EVALUATION_DATASET_PARADIGM_CODING",
+                      and "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                     "dataset_type": "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value
                       is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
                       "EVALUATION_DATASET_TYPE_UNKNOWN", "EVALUATION_DATASET_TYPE_ADK",
@@ -273338,6 +280036,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
 
                 # JSON input template you can fill out and use as your body input.
                 body = {
+                    "dataset_paradigm": "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                      Default value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                      EvaluationDatasetParadigm is the row/content shape of a dataset, orthogonal to
+                      the surface in EvaluationDatasetType (e.g. a model dataset can be single- or
+                      multi-turn). Known values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                      "EVALUATION_DATASET_PARADIGM_MULTI_TURN", "EVALUATION_DATASET_PARADIGM_CODING",
+                      and "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                     "dataset_type": "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value
                       is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
                       "EVALUATION_DATASET_TYPE_UNKNOWN", "EVALUATION_DATASET_TYPE_ADK",
@@ -273993,7 +280698,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               Default value is "METRIC_CATEGORY_UNSPECIFIED". Known values are:
                               "METRIC_CATEGORY_UNSPECIFIED", "METRIC_CATEGORY_CORRECTNESS",
                               "METRIC_CATEGORY_USER_OUTCOMES", "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                              "METRIC_CATEGORY_CONTEXT_QUALITY", and "METRIC_CATEGORY_MODEL_FIT".
+                              "METRIC_CATEGORY_CONTEXT_QUALITY", "METRIC_CATEGORY_MODEL_FIT", and
+                              "METRIC_CATEGORY_CONVERSATIONAL".
                             "custom_eval_config": {
                                 "created_at": "2020-02-20 00:00:00",  # Optional.
                                   Configuration for a custom model-evaluation metric scored by an LLM
@@ -274201,7 +280907,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           is "METRIC_CATEGORY_UNSPECIFIED". Known values are:
                           "METRIC_CATEGORY_UNSPECIFIED", "METRIC_CATEGORY_CORRECTNESS",
                           "METRIC_CATEGORY_USER_OUTCOMES", "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                          "METRIC_CATEGORY_CONTEXT_QUALITY", and "METRIC_CATEGORY_MODEL_FIT".
+                          "METRIC_CATEGORY_CONTEXT_QUALITY", "METRIC_CATEGORY_MODEL_FIT", and
+                          "METRIC_CATEGORY_CONVERSATIONAL".
                         "custom_eval_config": {
                             "created_at": "2020-02-20 00:00:00",  # Optional.
                               Configuration for a custom model-evaluation metric scored by an LLM
@@ -274304,7 +281011,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           is "METRIC_CATEGORY_UNSPECIFIED". Known values are:
                           "METRIC_CATEGORY_UNSPECIFIED", "METRIC_CATEGORY_CORRECTNESS",
                           "METRIC_CATEGORY_USER_OUTCOMES", "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                          "METRIC_CATEGORY_CONTEXT_QUALITY", and "METRIC_CATEGORY_MODEL_FIT".
+                          "METRIC_CATEGORY_CONTEXT_QUALITY", "METRIC_CATEGORY_MODEL_FIT", and
+                          "METRIC_CATEGORY_CONVERSATIONAL".
                         "custom_eval_config": {
                             "created_at": "2020-02-20 00:00:00",  # Optional.
                               Configuration for a custom model-evaluation metric scored by an LLM
@@ -274421,7 +281129,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           is "METRIC_CATEGORY_UNSPECIFIED". Known values are:
                           "METRIC_CATEGORY_UNSPECIFIED", "METRIC_CATEGORY_CORRECTNESS",
                           "METRIC_CATEGORY_USER_OUTCOMES", "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                          "METRIC_CATEGORY_CONTEXT_QUALITY", and "METRIC_CATEGORY_MODEL_FIT".
+                          "METRIC_CATEGORY_CONTEXT_QUALITY", "METRIC_CATEGORY_MODEL_FIT", and
+                          "METRIC_CATEGORY_CONVERSATIONAL".
                         "custom_eval_config": {
                             "created_at": "2020-02-20 00:00:00",  # Optional.
                               Configuration for a custom model-evaluation metric scored by an LLM
@@ -274642,7 +281351,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           is "METRIC_CATEGORY_UNSPECIFIED". Known values are:
                           "METRIC_CATEGORY_UNSPECIFIED", "METRIC_CATEGORY_CORRECTNESS",
                           "METRIC_CATEGORY_USER_OUTCOMES", "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                          "METRIC_CATEGORY_CONTEXT_QUALITY", and "METRIC_CATEGORY_MODEL_FIT".
+                          "METRIC_CATEGORY_CONTEXT_QUALITY", "METRIC_CATEGORY_MODEL_FIT", and
+                          "METRIC_CATEGORY_CONVERSATIONAL".
                         "custom_eval_config": {
                             "created_at": "2020-02-20 00:00:00",  # Optional.
                               Configuration for a custom model-evaluation metric scored by an LLM
@@ -274748,7 +281458,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           is "METRIC_CATEGORY_UNSPECIFIED". Known values are:
                           "METRIC_CATEGORY_UNSPECIFIED", "METRIC_CATEGORY_CORRECTNESS",
                           "METRIC_CATEGORY_USER_OUTCOMES", "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                          "METRIC_CATEGORY_CONTEXT_QUALITY", and "METRIC_CATEGORY_MODEL_FIT".
+                          "METRIC_CATEGORY_CONTEXT_QUALITY", "METRIC_CATEGORY_MODEL_FIT", and
+                          "METRIC_CATEGORY_CONVERSATIONAL".
                         "custom_eval_config": {
                             "created_at": "2020-02-20 00:00:00",  # Optional.
                               Configuration for a custom model-evaluation metric scored by an LLM
@@ -274871,7 +281582,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           is "METRIC_CATEGORY_UNSPECIFIED". Known values are:
                           "METRIC_CATEGORY_UNSPECIFIED", "METRIC_CATEGORY_CORRECTNESS",
                           "METRIC_CATEGORY_USER_OUTCOMES", "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                          "METRIC_CATEGORY_CONTEXT_QUALITY", and "METRIC_CATEGORY_MODEL_FIT".
+                          "METRIC_CATEGORY_CONTEXT_QUALITY", "METRIC_CATEGORY_MODEL_FIT", and
+                          "METRIC_CATEGORY_CONVERSATIONAL".
                         "custom_eval_config": {
                             "created_at": "2020-02-20 00:00:00",  # Optional.
                               Configuration for a custom model-evaluation metric scored by an LLM
@@ -276512,6 +283224,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   Time created at.
                                 "dataset_name": "str",  # Optional. Name of the
                                   dataset.
+                                "dataset_paradigm":
+                                  "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional. Default value
+                                  is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                  EvaluationDatasetParadigm is the row/content shape of a dataset,
+                                  orthogonal to the surface in EvaluationDatasetType (e.g. a model
+                                  dataset can be single- or multi-turn). Known values are:
+                                  "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                  "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                  "EVALUATION_DATASET_PARADIGM_CODING", and
+                                  "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                 "dataset_type": "EVALUATION_DATASET_TYPE_UNKNOWN",  #
                                   Optional. Default value is "EVALUATION_DATASET_TYPE_UNKNOWN". Known
                                   values are: "EVALUATION_DATASET_TYPE_UNKNOWN",
@@ -276554,8 +283276,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       values are: "METRIC_CATEGORY_UNSPECIFIED",
                                       "METRIC_CATEGORY_CORRECTNESS", "METRIC_CATEGORY_USER_OUTCOMES",
                                       "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                      "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                      "METRIC_CATEGORY_MODEL_FIT".
+                                      "METRIC_CATEGORY_CONTEXT_QUALITY", "METRIC_CATEGORY_MODEL_FIT",
+                                      and "METRIC_CATEGORY_CONVERSATIONAL".
                                     "custom_eval_config": {
                                         "created_at": "2020-02-20 00:00:00",
                                           # Optional. Configuration for a custom model-evaluation
@@ -277258,6 +283980,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "created_at": "2020-02-20 00:00:00",  # Optional. Time
                               created at.
                             "dataset_name": "str",  # Optional. Name of the dataset.
+                            "dataset_paradigm":
+                              "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional. Default value is
+                              "EVALUATION_DATASET_PARADIGM_SINGLE_TURN". EvaluationDatasetParadigm is
+                              the row/content shape of a dataset, orthogonal to the surface in
+                              EvaluationDatasetType (e.g. a model dataset can be single- or
+                              multi-turn). Known values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                              "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                              "EVALUATION_DATASET_PARADIGM_CODING", and
+                              "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                             "dataset_type": "EVALUATION_DATASET_TYPE_UNKNOWN",  #
                               Optional. Default value is "EVALUATION_DATASET_TYPE_UNKNOWN". Known
                               values are: "EVALUATION_DATASET_TYPE_UNKNOWN",
@@ -277290,7 +284021,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   values are: "METRIC_CATEGORY_UNSPECIFIED",
                                   "METRIC_CATEGORY_CORRECTNESS", "METRIC_CATEGORY_USER_OUTCOMES",
                                   "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                  "METRIC_CATEGORY_CONTEXT_QUALITY", and "METRIC_CATEGORY_MODEL_FIT".
+                                  "METRIC_CATEGORY_CONTEXT_QUALITY", "METRIC_CATEGORY_MODEL_FIT", and
+                                  "METRIC_CATEGORY_CONVERSATIONAL".
                                 "custom_eval_config": {
                                     "created_at": "2020-02-20 00:00:00",  #
                                       Optional. Configuration for a custom model-evaluation metric
@@ -283510,7 +290242,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               Default value is "METRIC_CATEGORY_UNSPECIFIED". Known values are:
                               "METRIC_CATEGORY_UNSPECIFIED", "METRIC_CATEGORY_CORRECTNESS",
                               "METRIC_CATEGORY_USER_OUTCOMES", "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                              "METRIC_CATEGORY_CONTEXT_QUALITY", and "METRIC_CATEGORY_MODEL_FIT".
+                              "METRIC_CATEGORY_CONTEXT_QUALITY", "METRIC_CATEGORY_MODEL_FIT", and
+                              "METRIC_CATEGORY_CONVERSATIONAL".
                             "custom_eval_config": {
                                 "created_at": "2020-02-20 00:00:00",  # Optional.
                                   Configuration for a custom model-evaluation metric scored by an LLM
@@ -283682,6 +290415,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                             "candidate_inference_config": {
                                 "max_tokens": 0,  # Optional. Inference configuration
                                   for the candidate model during evaluation.
+                                "reasoning_effort": "str",  # Optional. Reasoning
+                                  effort for reasoning-capable models (e.g. "low", "medium", "high").
+                                  Validated against the candidate model's supported values; a model
+                                  that advertises none rejects this field.
                                 "stop_token": "str",  # Optional. Inference
                                   configuration for the candidate model during evaluation.
                                 "system_prompt": "str",  # Optional. Inference
@@ -283694,10 +290431,11 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               saved.
                             "candidate_model_source":
                               "CANDIDATE_MODEL_SOURCE_SERVERLESS",  # Optional. Default value is
-                              "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether inference runs against the
-                              serverless platform, a dedicated deployment, or a model router. Known
-                              values are: "CANDIDATE_MODEL_SOURCE_SERVERLESS",
-                              "CANDIDATE_MODEL_SOURCE_DEDICATED", and "CANDIDATE_MODEL_SOURCE_ROUTER".
+                              "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether the candidate is a served
+                              model (serverless platform, a dedicated deployment, or a model router) or
+                              an OHS-hosted agent config. Known values are:
+                              "CANDIDATE_MODEL_SOURCE_SERVERLESS", "CANDIDATE_MODEL_SOURCE_DEDICATED",
+                              "CANDIDATE_MODEL_SOURCE_ROUTER", and "CANDIDATE_MODEL_SOURCE_AGENT".
                             "candidate_model_uuid": "str",  # Optional. UUID of the
                               candidate model stored on this preset. Empty when the CANDIDATE section
                               was not saved. For DEDICATED candidates this is the dedicated inference
@@ -283737,8 +290475,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       values are: "METRIC_CATEGORY_UNSPECIFIED",
                                       "METRIC_CATEGORY_CORRECTNESS", "METRIC_CATEGORY_USER_OUTCOMES",
                                       "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                      "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                      "METRIC_CATEGORY_MODEL_FIT".
+                                      "METRIC_CATEGORY_CONTEXT_QUALITY", "METRIC_CATEGORY_MODEL_FIT",
+                                      and "METRIC_CATEGORY_CONVERSATIONAL".
                                     "custom_eval_config": {
                                         "created_at": "2020-02-20 00:00:00",
                                           # Optional. Configuration for a custom model-evaluation
@@ -283942,6 +290680,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                         "candidate_inference_config": {
                             "max_tokens": 0,  # Optional. Inference configuration for the
                               candidate model during evaluation.
+                            "reasoning_effort": "str",  # Optional. Reasoning effort for
+                              reasoning-capable models (e.g. "low", "medium", "high"). Validated
+                              against the candidate model's supported values; a model that advertises
+                              none rejects this field.
                             "stop_token": "str",  # Optional. Inference configuration for
                               the candidate model during evaluation.
                             "system_prompt": "str",  # Optional. Inference configuration
@@ -283952,10 +290694,11 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                         "candidate_model_name": "str",  # Optional. Model slug used to call
                           the candidate model API. Empty when the CANDIDATE section was not saved.
                         "candidate_model_source": "CANDIDATE_MODEL_SOURCE_SERVERLESS",  #
-                          Optional. Default value is "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether
-                          inference runs against the serverless platform, a dedicated deployment, or a
-                          model router. Known values are: "CANDIDATE_MODEL_SOURCE_SERVERLESS",
-                          "CANDIDATE_MODEL_SOURCE_DEDICATED", and "CANDIDATE_MODEL_SOURCE_ROUTER".
+                          Optional. Default value is "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether the
+                          candidate is a served model (serverless platform, a dedicated deployment, or
+                          a model router) or an OHS-hosted agent config. Known values are:
+                          "CANDIDATE_MODEL_SOURCE_SERVERLESS", "CANDIDATE_MODEL_SOURCE_DEDICATED",
+                          "CANDIDATE_MODEL_SOURCE_ROUTER", and "CANDIDATE_MODEL_SOURCE_AGENT".
                         "candidate_model_uuid": "str",  # Optional. UUID of the candidate
                           model stored on this preset. Empty when the CANDIDATE section was not saved.
                           For DEDICATED candidates this is the dedicated inference deployment UUID.
@@ -283994,7 +290737,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   values are: "METRIC_CATEGORY_UNSPECIFIED",
                                   "METRIC_CATEGORY_CORRECTNESS", "METRIC_CATEGORY_USER_OUTCOMES",
                                   "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                  "METRIC_CATEGORY_CONTEXT_QUALITY", and "METRIC_CATEGORY_MODEL_FIT".
+                                  "METRIC_CATEGORY_CONTEXT_QUALITY", "METRIC_CATEGORY_MODEL_FIT", and
+                                  "METRIC_CATEGORY_CONVERSATIONAL".
                                 "custom_eval_config": {
                                     "created_at": "2020-02-20 00:00:00",  #
                                       Optional. Configuration for a custom model-evaluation metric
@@ -284374,10 +291118,11 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               candidate model being evaluated.
                             "candidate_model_source":
                               "CANDIDATE_MODEL_SOURCE_SERVERLESS",  # Optional. Default value is
-                              "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether inference runs against the
-                              serverless platform, a dedicated deployment, or a model router. Known
-                              values are: "CANDIDATE_MODEL_SOURCE_SERVERLESS",
-                              "CANDIDATE_MODEL_SOURCE_DEDICATED", and "CANDIDATE_MODEL_SOURCE_ROUTER".
+                              "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether the candidate is a served
+                              model (serverless platform, a dedicated deployment, or a model router) or
+                              an OHS-hosted agent config. Known values are:
+                              "CANDIDATE_MODEL_SOURCE_SERVERLESS", "CANDIDATE_MODEL_SOURCE_DEDICATED",
+                              "CANDIDATE_MODEL_SOURCE_ROUTER", and "CANDIDATE_MODEL_SOURCE_AGENT".
                             "candidate_model_uuid": "str",  # Optional. UUID of the
                               candidate model being evaluated.
                             "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp
@@ -284544,6 +291289,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                     "candidate_inference_config": {
                         "max_tokens": 0,  # Optional. Inference configuration for the
                           candidate model during evaluation.
+                        "reasoning_effort": "str",  # Optional. Reasoning effort for
+                          reasoning-capable models (e.g. "low", "medium", "high"). Validated against
+                          the candidate model's supported values; a model that advertises none rejects
+                          this field.
                         "stop_token": "str",  # Optional. Inference configuration for the
                           candidate model during evaluation.
                         "system_prompt": "str",  # Optional. Inference configuration for the
@@ -284555,14 +291304,20 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                       candidate model API. For dedicated inference, this is the model slug from the
                       deployment. For serverless, this should match the model's internal name.
                     "candidate_model_source": "CANDIDATE_MODEL_SOURCE_SERVERLESS",  # Optional.
-                      Default value is "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether inference runs
-                      against the serverless platform, a dedicated deployment, or a model router. Known
-                      values are: "CANDIDATE_MODEL_SOURCE_SERVERLESS",
-                      "CANDIDATE_MODEL_SOURCE_DEDICATED", and "CANDIDATE_MODEL_SOURCE_ROUTER".
+                      Default value is "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether the candidate is a
+                      served model (serverless platform, a dedicated deployment, or a model router) or
+                      an OHS-hosted agent config. Known values are:
+                      "CANDIDATE_MODEL_SOURCE_SERVERLESS", "CANDIDATE_MODEL_SOURCE_DEDICATED",
+                      "CANDIDATE_MODEL_SOURCE_ROUTER", and "CANDIDATE_MODEL_SOURCE_AGENT".
                     "candidate_model_uuid": "str",  # Optional. UUID of the candidate model to
                       evaluate.
                     "dataset_uuid": "str",  # Optional. UUID of the dataset to use for
                       evaluation.
+                    "epochs": 0,  # Optional. Number of times to evaluate each dataset row
+                      (n-pass/epochs), so the result reports avg@k/pass@k/cons@k instead of a single
+                      score. Defaults to 1 when unset. Capped at 3 until throughput/sharding work
+                      lands, since each extra epoch roughly multiplies wall-clock run time. Not
+                      persisted on presets.
                     "eval_preset_uuid": "str",  # Optional.
                     "judge_model_uuid": "str",  # Optional. UUID of the judge model used to score
                       responses.
@@ -284679,6 +291434,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                     "candidate_inference_config": {
                         "max_tokens": 0,  # Optional. Inference configuration for the
                           candidate model during evaluation.
+                        "reasoning_effort": "str",  # Optional. Reasoning effort for
+                          reasoning-capable models (e.g. "low", "medium", "high"). Validated against
+                          the candidate model's supported values; a model that advertises none rejects
+                          this field.
                         "stop_token": "str",  # Optional. Inference configuration for the
                           candidate model during evaluation.
                         "system_prompt": "str",  # Optional. Inference configuration for the
@@ -284690,14 +291449,20 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                       candidate model API. For dedicated inference, this is the model slug from the
                       deployment. For serverless, this should match the model's internal name.
                     "candidate_model_source": "CANDIDATE_MODEL_SOURCE_SERVERLESS",  # Optional.
-                      Default value is "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether inference runs
-                      against the serverless platform, a dedicated deployment, or a model router. Known
-                      values are: "CANDIDATE_MODEL_SOURCE_SERVERLESS",
-                      "CANDIDATE_MODEL_SOURCE_DEDICATED", and "CANDIDATE_MODEL_SOURCE_ROUTER".
+                      Default value is "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether the candidate is a
+                      served model (serverless platform, a dedicated deployment, or a model router) or
+                      an OHS-hosted agent config. Known values are:
+                      "CANDIDATE_MODEL_SOURCE_SERVERLESS", "CANDIDATE_MODEL_SOURCE_DEDICATED",
+                      "CANDIDATE_MODEL_SOURCE_ROUTER", and "CANDIDATE_MODEL_SOURCE_AGENT".
                     "candidate_model_uuid": "str",  # Optional. UUID of the candidate model to
                       evaluate.
                     "dataset_uuid": "str",  # Optional. UUID of the dataset to use for
                       evaluation.
+                    "epochs": 0,  # Optional. Number of times to evaluate each dataset row
+                      (n-pass/epochs), so the result reports avg@k/pass@k/cons@k instead of a single
+                      score. Defaults to 1 when unset. Capped at 3 until throughput/sharding work
+                      lands, since each extra epoch roughly multiplies wall-clock run time. Not
+                      persisted on presets.
                     "eval_preset_uuid": "str",  # Optional.
                     "judge_model_uuid": "str",  # Optional. UUID of the judge model used to score
                       responses.
@@ -284894,6 +291659,60 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               per-prompt evaluation results.
                             "candidate_routed_task": "str",  # Optional. Paginated
                               per-prompt evaluation results.
+                            "epoch": 0,  # Optional. Which pass over this dataset row
+                              produced this result, 1-indexed (1 = first pass). Always 0 (and omitted
+                              from JSON) when the run's epochs is 1 (the default) "u2014 per-attempt
+                              epoch numbering doesn't apply to single-pass runs. When epochs > 1, this
+                              always reflects epoch 1 (see epoch_results below).
+                            "epoch_results": {
+                                "str": {
+                                    "candidate_routed_task": "str",  # Optional.
+                                      Present only when the run's epochs > 1: every pass over this row
+                                      "u2014 including epoch 1, duplicated here for convenience "u2014
+                                      keyed by 1-indexed "epoch1"/"epoch2"/"epoch3" labels. Mirrors the
+                                      shape of the downloadable results file's epochResults object. The
+                                      top-level fields above (output, metric_results,
+                                      candidate_routed_task) always reflect epoch 1, so single-epoch
+                                      clients reading only those fields see no difference when epochs >
+                                      1.
+                                    "metric_results": [
+                                        {
+                                            "error_description": "str",
+                                              # Optional. Error description if the metric could not be
+                                              calculated.
+                                            "metric_name": "str",  #
+                                              Optional. Metric name.
+                                            "metric_uuid": "str",  #
+                                              Optional. Metric UUID (built-in or custom); stable key
+                                              for results UI and aggregation.
+                                            "metric_value_type":
+                                              "METRIC_VALUE_TYPE_UNSPECIFIED",  # Optional. Default
+                                              value is "METRIC_VALUE_TYPE_UNSPECIFIED". Known values
+                                              are: "METRIC_VALUE_TYPE_UNSPECIFIED",
+                                              "METRIC_VALUE_TYPE_NUMBER", "METRIC_VALUE_TYPE_STRING",
+                                              and "METRIC_VALUE_TYPE_PERCENTAGE".
+                                            "number_value": 0.0,  #
+                                              Optional. The value of the metric as a number.
+                                            "reasoning": "str",  #
+                                              Optional. Reasoning of the metric result.
+                                            "status":
+                                              "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",  #
+                                              Optional. Default value is
+                                              "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED". Outcome of
+                                              scoring a single metric for one prompt or span. Known
+                                              values are:
+                                              "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",
+                                              "EVALUATION_METRIC_RESULT_STATUS_COMPLETED",
+                                              "EVALUATION_METRIC_RESULT_STATUS_FAILED", and
+                                              "EVALUATION_METRIC_RESULT_STATUS_SKIPPED".
+                                            "string_value": "str"  #
+                                              Optional. The value of the metric as a string.
+                                        }
+                                    ],
+                                    "output": "str"  # Optional. The response
+                                      from the candidate model for this specific pass.
+                                }
+                            },
                             "ground_truth": "str",  # Optional. Paginated per-prompt
                               evaluation results.
                             "input": "str",  # Optional. The input query sent to the
@@ -284928,14 +291747,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       of the metric as a string.
                                 }
                             ],
-                            "output": "str"  # Optional. The response from the candidate
+                            "output": "str",  # Optional. The response from the candidate
                               model.
+                            "row_number": 0  # Optional. Which dataset row this result
+                              came from. Multiple results share a row_number when epochs > 1: one per
+                              pass over that row.
                         }
                     ],
                     "run": {
                         "candidate_inference_config": {
                             "max_tokens": 0,  # Optional. Inference configuration for the
                               candidate model during evaluation.
+                            "reasoning_effort": "str",  # Optional. Reasoning effort for
+                              reasoning-capable models (e.g. "low", "medium", "high"). Validated
+                              against the candidate model's supported values; a model that advertises
+                              none rejects this field.
                             "stop_token": "str",  # Optional. Inference configuration for
                               the candidate model during evaluation.
                             "system_prompt": "str",  # Optional. Inference configuration
@@ -284946,10 +291772,11 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                         "candidate_model_name": "str",  # Optional. Model Evaluation Run
                           Detail - full view returned when fetching a specific run.
                         "candidate_model_source": "CANDIDATE_MODEL_SOURCE_SERVERLESS",  #
-                          Optional. Default value is "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether
-                          inference runs against the serverless platform, a dedicated deployment, or a
-                          model router. Known values are: "CANDIDATE_MODEL_SOURCE_SERVERLESS",
-                          "CANDIDATE_MODEL_SOURCE_DEDICATED", and "CANDIDATE_MODEL_SOURCE_ROUTER".
+                          Optional. Default value is "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether the
+                          candidate is a served model (serverless platform, a dedicated deployment, or
+                          a model router) or an OHS-hosted agent config. Known values are:
+                          "CANDIDATE_MODEL_SOURCE_SERVERLESS", "CANDIDATE_MODEL_SOURCE_DEDICATED",
+                          "CANDIDATE_MODEL_SOURCE_ROUTER", and "CANDIDATE_MODEL_SOURCE_AGENT".
                         "candidate_model_uuid": "str",  # Optional. Candidate model being
                           evaluated.
                         "completed_at": "2020-02-20 00:00:00",  # Optional. Model Evaluation
@@ -284959,6 +291786,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                         "dataset_name": "str",  # Optional. Model Evaluation Run Detail -
                           full view returned when fetching a specific run.
                         "dataset_uuid": "str",  # Optional. Dataset used for the evaluation.
+                        "epochs": 0,  # Optional. Number of times each dataset row is
+                          evaluated (n-pass/epochs). 1 by default. Drives the avg@k/pass@k/cons@k
+                          aggregation in result_summary.
                         "error_description": "str",  # Optional. Error description if the run
                           failed or partially succeeded.
                         "eval_preset_name": "str",  # Optional. Model Evaluation Run Detail -
@@ -284986,7 +291816,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   values are: "METRIC_CATEGORY_UNSPECIFIED",
                                   "METRIC_CATEGORY_CORRECTNESS", "METRIC_CATEGORY_USER_OUTCOMES",
                                   "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                  "METRIC_CATEGORY_CONTEXT_QUALITY", and "METRIC_CATEGORY_MODEL_FIT".
+                                  "METRIC_CATEGORY_CONTEXT_QUALITY", "METRIC_CATEGORY_MODEL_FIT", and
+                                  "METRIC_CATEGORY_CONVERSATIONAL".
                                 "custom_eval_config": {
                                     "created_at": "2020-02-20 00:00:00",  #
                                       Optional. Configuration for a custom model-evaluation metric
@@ -285060,8 +291891,55 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                         "result_summary": {
                             "end_time": "2020-02-20 00:00:00",  # Optional. Aggregated
                               result summary for a completed model evaluation run.
+                            "epoch_summary": {
+                                "avg_at_k_percent": 0.0,  # Optional. Mean over rows
+                                  of (passing epochs / scored epochs) for the star metric. Equals
+                                  overall_score_percent; this is the primary result for a multi-epoch
+                                  run ("how often does it work").
+                                "cons_at_k_percent": 0.0,  # Optional. Fraction of
+                                  rows where a strict majority of scored epochs passed ("what does the
+                                  model typically answer"). An even-k tie counts as fail.
+                                "epochs": 0,  # Optional. Number of passes per
+                                  dataset row (k).
+                                "pass_at_k_percent": 0.0,  # Optional. Unbiased
+                                  estimate of the probability that at least one of k epochs passes
+                                  ("can it work at all, given retries"). Always the most generous of
+                                  the three.
+                                "per_epoch": [
+                                    {
+                                        "epoch": 0,  # Optional. 1-indexed
+                                          epoch number (1 = first pass).
+                                        "overall_score_percent": 0.0,  #
+                                          Optional. Each epoch's own standalone score, persisted next
+                                          to the aggregate.
+                                        "rows_scored": 0  # Optional. Each
+                                          epoch's own standalone score, persisted next to the
+                                          aggregate.
+                                    }
+                                ],
+                                "rows_excluded": 0,  # Optional. Rows where every
+                                  epoch failed or was skipped, so the row contributes to no score. Not
+                                  a random sample of difficulty "u2014 surface this explicitly.
+                                "rows_scored": 0,  # Optional. Rows with at least one
+                                  scored epoch. The effective N behind every percentage above; always
+                                  display alongside them.
+                                "score_stddev_percent": 0.0  # Optional. Population
+                                  standard deviation of the k per-epoch scores below "u2014 the signal
+                                  for whether a difference between runs is real or noise.
+                            },
+                            "epochs": 0,  # Optional. Number of times each dataset row
+                              was evaluated (n-pass/epochs). Mirrors ModelEvaluationRunDetail.epochs. 1
+                              for every existing run.
                             "metric_summaries": [
                                 {
+                                    "avg_at_k_percent": 0.0,  # Optional.
+                                      Row-level (not attempt-level) aggregation across epochs for this
+                                      metric, mirroring EpochResultSummary but scoped to one metric.
+                                      Only set when the run's epochs > 1; pass_percent/pass_count/etc.
+                                      above stay attempt-level (over row x epoch pairs) so they don't
+                                      desynchronize from the counts sitting next to them.
+                                    "cons_at_k_percent": 0.0,  # Optional.
+                                      Per-metric aggregated pass/fail statistics.
                                     "description": "str",  # Optional. Per-metric
                                       aggregated pass/fail statistics.
                                     "fail_count": 0,  # Optional. Rows where the
@@ -285072,6 +291950,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       aggregated pass/fail statistics.
                                     "metric_uuid": "str",  # Optional. Per-metric
                                       aggregated pass/fail statistics.
+                                    "pass_at_k_percent": 0.0,  # Optional.
+                                      Per-metric aggregated pass/fail statistics.
                                     "pass_count": 0,  # Optional. Rows where the
                                       metric completed and passed the configured threshold.
                                     "pass_percent": 0.0,  # Optional. Per-metric
@@ -285091,6 +291971,17 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                     {
                                         "metric_summaries": [
                                             {
+                                                "avg_at_k_percent":
+                                                  0.0,  # Optional. Row-level (not attempt-level)
+                                                  aggregation across epochs for this metric, mirroring
+                                                  EpochResultSummary but scoped to one metric. Only set
+                                                  when the run's epochs > 1;
+                                                  pass_percent/pass_count/etc. above stay attempt-level
+                                                  (over row x epoch pairs) so they don't desynchronize
+                                                  from the counts sitting next to them.
+                                                "cons_at_k_percent":
+                                                  0.0,  # Optional. Pass/fail rate for each metric,
+                                                  computed over only the prompts routed to this model.
                                                 "description": "str",
                                                   # Optional. Pass/fail rate for each metric, computed
                                                   over only the prompts routed to this model.
@@ -285106,6 +291997,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "metric_uuid": "str",
                                                   # Optional. Pass/fail rate for each metric, computed
                                                   over only the prompts routed to this model.
+                                                "pass_at_k_percent":
+                                                  0.0,  # Optional. Pass/fail rate for each metric,
+                                                  computed over only the prompts routed to this model.
                                                 "pass_count": 0,  #
                                                   Optional. Rows where the metric completed and passed
                                                   the configured threshold.
@@ -285174,6 +292068,17 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                     {
                                         "metric_summaries": [
                                             {
+                                                "avg_at_k_percent":
+                                                  0.0,  # Optional. Row-level (not attempt-level)
+                                                  aggregation across epochs for this metric, mirroring
+                                                  EpochResultSummary but scoped to one metric. Only set
+                                                  when the run's epochs > 1;
+                                                  pass_percent/pass_count/etc. above stay attempt-level
+                                                  (over row x epoch pairs) so they don't desynchronize
+                                                  from the counts sitting next to them.
+                                                "cons_at_k_percent":
+                                                  0.0,  # Optional. Pass/fail rate for each metric,
+                                                  computed over only the prompts in this task category.
                                                 "description": "str",
                                                   # Optional. Pass/fail rate for each metric, computed
                                                   over only the prompts in this task category.
@@ -285189,6 +292094,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "metric_uuid": "str",
                                                   # Optional. Pass/fail rate for each metric, computed
                                                   over only the prompts in this task category.
+                                                "pass_at_k_percent":
+                                                  0.0,  # Optional. Pass/fail rate for each metric,
+                                                  computed over only the prompts in this task category.
                                                 "pass_count": 0,  #
                                                   Optional. Rows where the metric completed and passed
                                                   the configured threshold.
@@ -285618,10 +292526,11 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                         "candidate_model_name": "str",  # Optional. Name of the candidate
                           model being evaluated.
                         "candidate_model_source": "CANDIDATE_MODEL_SOURCE_SERVERLESS",  #
-                          Optional. Default value is "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether
-                          inference runs against the serverless platform, a dedicated deployment, or a
-                          model router. Known values are: "CANDIDATE_MODEL_SOURCE_SERVERLESS",
-                          "CANDIDATE_MODEL_SOURCE_DEDICATED", and "CANDIDATE_MODEL_SOURCE_ROUTER".
+                          Optional. Default value is "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether the
+                          candidate is a served model (serverless platform, a dedicated deployment, or
+                          a model router) or an OHS-hosted agent config. Known values are:
+                          "CANDIDATE_MODEL_SOURCE_SERVERLESS", "CANDIDATE_MODEL_SOURCE_DEDICATED",
+                          "CANDIDATE_MODEL_SOURCE_ROUTER", and "CANDIDATE_MODEL_SOURCE_AGENT".
                         "candidate_model_uuid": "str",  # Optional. UUID of the candidate
                           model being evaluated.
                         "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp when the
@@ -285705,10 +292614,11 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                         "candidate_model_name": "str",  # Optional. Name of the candidate
                           model being evaluated.
                         "candidate_model_source": "CANDIDATE_MODEL_SOURCE_SERVERLESS",  #
-                          Optional. Default value is "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether
-                          inference runs against the serverless platform, a dedicated deployment, or a
-                          model router. Known values are: "CANDIDATE_MODEL_SOURCE_SERVERLESS",
-                          "CANDIDATE_MODEL_SOURCE_DEDICATED", and "CANDIDATE_MODEL_SOURCE_ROUTER".
+                          Optional. Default value is "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether the
+                          candidate is a served model (serverless platform, a dedicated deployment, or
+                          a model router) or an OHS-hosted agent config. Known values are:
+                          "CANDIDATE_MODEL_SOURCE_SERVERLESS", "CANDIDATE_MODEL_SOURCE_DEDICATED",
+                          "CANDIDATE_MODEL_SOURCE_ROUTER", and "CANDIDATE_MODEL_SOURCE_AGENT".
                         "candidate_model_uuid": "str",  # Optional. UUID of the candidate
                           model being evaluated.
                         "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp when the
@@ -285796,10 +292706,11 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                         "candidate_model_name": "str",  # Optional. Name of the candidate
                           model being evaluated.
                         "candidate_model_source": "CANDIDATE_MODEL_SOURCE_SERVERLESS",  #
-                          Optional. Default value is "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether
-                          inference runs against the serverless platform, a dedicated deployment, or a
-                          model router. Known values are: "CANDIDATE_MODEL_SOURCE_SERVERLESS",
-                          "CANDIDATE_MODEL_SOURCE_DEDICATED", and "CANDIDATE_MODEL_SOURCE_ROUTER".
+                          Optional. Default value is "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether the
+                          candidate is a served model (serverless platform, a dedicated deployment, or
+                          a model router) or an OHS-hosted agent config. Known values are:
+                          "CANDIDATE_MODEL_SOURCE_SERVERLESS", "CANDIDATE_MODEL_SOURCE_DEDICATED",
+                          "CANDIDATE_MODEL_SOURCE_ROUTER", and "CANDIDATE_MODEL_SOURCE_AGENT".
                         "candidate_model_uuid": "str",  # Optional. UUID of the candidate
                           model being evaluated.
                         "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp when the
@@ -285987,10 +292898,11 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                         "candidate_model_name": "str",  # Optional. Name of the candidate
                           model being evaluated.
                         "candidate_model_source": "CANDIDATE_MODEL_SOURCE_SERVERLESS",  #
-                          Optional. Default value is "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether
-                          inference runs against the serverless platform, a dedicated deployment, or a
-                          model router. Known values are: "CANDIDATE_MODEL_SOURCE_SERVERLESS",
-                          "CANDIDATE_MODEL_SOURCE_DEDICATED", and "CANDIDATE_MODEL_SOURCE_ROUTER".
+                          Optional. Default value is "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether the
+                          candidate is a served model (serverless platform, a dedicated deployment, or
+                          a model router) or an OHS-hosted agent config. Known values are:
+                          "CANDIDATE_MODEL_SOURCE_SERVERLESS", "CANDIDATE_MODEL_SOURCE_DEDICATED",
+                          "CANDIDATE_MODEL_SOURCE_ROUTER", and "CANDIDATE_MODEL_SOURCE_AGENT".
                         "candidate_model_uuid": "str",  # Optional. UUID of the candidate
                           model being evaluated.
                         "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp when the
@@ -286076,10 +292988,11 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                         "candidate_model_name": "str",  # Optional. Name of the candidate
                           model being evaluated.
                         "candidate_model_source": "CANDIDATE_MODEL_SOURCE_SERVERLESS",  #
-                          Optional. Default value is "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether
-                          inference runs against the serverless platform, a dedicated deployment, or a
-                          model router. Known values are: "CANDIDATE_MODEL_SOURCE_SERVERLESS",
-                          "CANDIDATE_MODEL_SOURCE_DEDICATED", and "CANDIDATE_MODEL_SOURCE_ROUTER".
+                          Optional. Default value is "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether the
+                          candidate is a served model (serverless platform, a dedicated deployment, or
+                          a model router) or an OHS-hosted agent config. Known values are:
+                          "CANDIDATE_MODEL_SOURCE_SERVERLESS", "CANDIDATE_MODEL_SOURCE_DEDICATED",
+                          "CANDIDATE_MODEL_SOURCE_ROUTER", and "CANDIDATE_MODEL_SOURCE_AGENT".
                         "candidate_model_uuid": "str",  # Optional. UUID of the candidate
                           model being evaluated.
                         "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp when the
@@ -286168,10 +293081,11 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                         "candidate_model_name": "str",  # Optional. Name of the candidate
                           model being evaluated.
                         "candidate_model_source": "CANDIDATE_MODEL_SOURCE_SERVERLESS",  #
-                          Optional. Default value is "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether
-                          inference runs against the serverless platform, a dedicated deployment, or a
-                          model router. Known values are: "CANDIDATE_MODEL_SOURCE_SERVERLESS",
-                          "CANDIDATE_MODEL_SOURCE_DEDICATED", and "CANDIDATE_MODEL_SOURCE_ROUTER".
+                          Optional. Default value is "CANDIDATE_MODEL_SOURCE_SERVERLESS". Whether the
+                          candidate is a served model (serverless platform, a dedicated deployment, or
+                          a model router) or an OHS-hosted agent config. Known values are:
+                          "CANDIDATE_MODEL_SOURCE_SERVERLESS", "CANDIDATE_MODEL_SOURCE_DEDICATED",
+                          "CANDIDATE_MODEL_SOURCE_ROUTER", and "CANDIDATE_MODEL_SOURCE_AGENT".
                         "candidate_model_uuid": "str",  # Optional. UUID of the candidate
                           model being evaluated.
                         "created_at": "2020-02-20 00:00:00",  # Optional. Timestamp when the
@@ -293407,6 +300321,18 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               00:00:00",  # Optional. Time created at.
                                             "dataset_name": "str",  #
                                               Optional. Name of the dataset.
+                                            "dataset_paradigm":
+                                              "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                              Default value is
+                                              "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                              EvaluationDatasetParadigm is the row/content shape of a
+                                              dataset, orthogonal to the surface in
+                                              EvaluationDatasetType (e.g. a model dataset can be
+                                              single- or multi-turn). Known values are:
+                                              "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                              "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                              "EVALUATION_DATASET_PARADIGM_CODING", and
+                                              "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                             "dataset_type":
                                               "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default
                                               value is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values
@@ -293450,8 +300376,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "METRIC_CATEGORY_CORRECTNESS",
                                                   "METRIC_CATEGORY_USER_OUTCOMES",
                                                   "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                                  "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                                  "METRIC_CATEGORY_MODEL_FIT".
+                                                  "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                                  "METRIC_CATEGORY_MODEL_FIT", and
+                                                  "METRIC_CATEGORY_CONVERSATIONAL".
                                                 "custom_eval_config":
                                                   {
                                                     "created_at":
@@ -302336,6 +309263,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           # Optional. Time created at.
                                         "dataset_name": "str",  # Optional.
                                           Name of the dataset.
+                                        "dataset_paradigm":
+                                          "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                          Default value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                          EvaluationDatasetParadigm is the row/content shape of a
+                                          dataset, orthogonal to the surface in EvaluationDatasetType
+                                          (e.g. a model dataset can be single- or multi-turn). Known
+                                          values are: "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                          "EVALUATION_DATASET_PARADIGM_CODING", and
+                                          "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                         "dataset_type":
                                           "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value
                                           is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -302379,8 +309316,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               "METRIC_CATEGORY_CORRECTNESS",
                                               "METRIC_CATEGORY_USER_OUTCOMES",
                                               "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                              "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                              "METRIC_CATEGORY_MODEL_FIT".
+                                              "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                              "METRIC_CATEGORY_MODEL_FIT", and
+                                              "METRIC_CATEGORY_CONVERSATIONAL".
                                             "custom_eval_config": {
                                                 "created_at":
                                                   "2020-02-20 00:00:00",  # Optional. Configuration for
@@ -303785,6 +310723,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       Optional. Time created at.
                                     "dataset_name": "str",  # Optional. Name of
                                       the dataset.
+                                    "dataset_paradigm":
+                                      "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional. Default
+                                      value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                      EvaluationDatasetParadigm is the row/content shape of a dataset,
+                                      orthogonal to the surface in EvaluationDatasetType (e.g. a model
+                                      dataset can be single- or multi-turn). Known values are:
+                                      "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                      "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                      "EVALUATION_DATASET_PARADIGM_CODING", and
+                                      "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                     "dataset_type":
                                       "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value is
                                       "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -303823,8 +310771,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           "METRIC_CATEGORY_UNSPECIFIED", "METRIC_CATEGORY_CORRECTNESS",
                                           "METRIC_CATEGORY_USER_OUTCOMES",
                                           "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                          "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                          "METRIC_CATEGORY_MODEL_FIT".
+                                          "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                          "METRIC_CATEGORY_MODEL_FIT", and
+                                          "METRIC_CATEGORY_CONVERSATIONAL".
                                         "custom_eval_config": {
                                             "created_at": "2020-02-20
                                               00:00:00",  # Optional. Configuration for a custom
@@ -305137,6 +312086,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       Optional. Time created at.
                                     "dataset_name": "str",  # Optional. Name of
                                       the dataset.
+                                    "dataset_paradigm":
+                                      "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional. Default
+                                      value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                      EvaluationDatasetParadigm is the row/content shape of a dataset,
+                                      orthogonal to the surface in EvaluationDatasetType (e.g. a model
+                                      dataset can be single- or multi-turn). Known values are:
+                                      "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                      "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                      "EVALUATION_DATASET_PARADIGM_CODING", and
+                                      "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                     "dataset_type":
                                       "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value is
                                       "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -305175,8 +312134,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           "METRIC_CATEGORY_UNSPECIFIED", "METRIC_CATEGORY_CORRECTNESS",
                                           "METRIC_CATEGORY_USER_OUTCOMES",
                                           "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                          "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                          "METRIC_CATEGORY_MODEL_FIT".
+                                          "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                          "METRIC_CATEGORY_MODEL_FIT", and
+                                          "METRIC_CATEGORY_CONVERSATIONAL".
                                         "custom_eval_config": {
                                             "created_at": "2020-02-20
                                               00:00:00",  # Optional. Configuration for a custom
@@ -306491,6 +313451,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       Optional. Time created at.
                                     "dataset_name": "str",  # Optional. Name of
                                       the dataset.
+                                    "dataset_paradigm":
+                                      "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional. Default
+                                      value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                      EvaluationDatasetParadigm is the row/content shape of a dataset,
+                                      orthogonal to the surface in EvaluationDatasetType (e.g. a model
+                                      dataset can be single- or multi-turn). Known values are:
+                                      "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                      "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                      "EVALUATION_DATASET_PARADIGM_CODING", and
+                                      "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                     "dataset_type":
                                       "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value is
                                       "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -306529,8 +313499,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           "METRIC_CATEGORY_UNSPECIFIED", "METRIC_CATEGORY_CORRECTNESS",
                                           "METRIC_CATEGORY_USER_OUTCOMES",
                                           "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                          "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                          "METRIC_CATEGORY_MODEL_FIT".
+                                          "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                          "METRIC_CATEGORY_MODEL_FIT", and
+                                          "METRIC_CATEGORY_CONVERSATIONAL".
                                         "custom_eval_config": {
                                             "created_at": "2020-02-20
                                               00:00:00",  # Optional. Configuration for a custom
@@ -307927,6 +314898,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       Optional. Time created at.
                                     "dataset_name": "str",  # Optional. Name of
                                       the dataset.
+                                    "dataset_paradigm":
+                                      "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional. Default
+                                      value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                      EvaluationDatasetParadigm is the row/content shape of a dataset,
+                                      orthogonal to the surface in EvaluationDatasetType (e.g. a model
+                                      dataset can be single- or multi-turn). Known values are:
+                                      "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                      "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                      "EVALUATION_DATASET_PARADIGM_CODING", and
+                                      "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                     "dataset_type":
                                       "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value is
                                       "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -307965,8 +314946,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           "METRIC_CATEGORY_UNSPECIFIED", "METRIC_CATEGORY_CORRECTNESS",
                                           "METRIC_CATEGORY_USER_OUTCOMES",
                                           "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                          "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                          "METRIC_CATEGORY_MODEL_FIT".
+                                          "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                          "METRIC_CATEGORY_MODEL_FIT", and
+                                          "METRIC_CATEGORY_CONVERSATIONAL".
                                         "custom_eval_config": {
                                             "created_at": "2020-02-20
                                               00:00:00",  # Optional. Configuration for a custom
@@ -309366,6 +316348,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       Optional. Time created at.
                                     "dataset_name": "str",  # Optional. Name of
                                       the dataset.
+                                    "dataset_paradigm":
+                                      "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional. Default
+                                      value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                      EvaluationDatasetParadigm is the row/content shape of a dataset,
+                                      orthogonal to the surface in EvaluationDatasetType (e.g. a model
+                                      dataset can be single- or multi-turn). Known values are:
+                                      "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                      "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                      "EVALUATION_DATASET_PARADIGM_CODING", and
+                                      "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                     "dataset_type":
                                       "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value is
                                       "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -309404,8 +316396,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           "METRIC_CATEGORY_UNSPECIFIED", "METRIC_CATEGORY_CORRECTNESS",
                                           "METRIC_CATEGORY_USER_OUTCOMES",
                                           "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                          "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                          "METRIC_CATEGORY_MODEL_FIT".
+                                          "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                          "METRIC_CATEGORY_MODEL_FIT", and
+                                          "METRIC_CATEGORY_CONVERSATIONAL".
                                         "custom_eval_config": {
                                             "created_at": "2020-02-20
                                               00:00:00",  # Optional. Configuration for a custom
@@ -310721,6 +317714,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       Optional. Time created at.
                                     "dataset_name": "str",  # Optional. Name of
                                       the dataset.
+                                    "dataset_paradigm":
+                                      "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional. Default
+                                      value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                      EvaluationDatasetParadigm is the row/content shape of a dataset,
+                                      orthogonal to the surface in EvaluationDatasetType (e.g. a model
+                                      dataset can be single- or multi-turn). Known values are:
+                                      "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                      "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                      "EVALUATION_DATASET_PARADIGM_CODING", and
+                                      "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                     "dataset_type":
                                       "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value is
                                       "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -310759,8 +317762,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           "METRIC_CATEGORY_UNSPECIFIED", "METRIC_CATEGORY_CORRECTNESS",
                                           "METRIC_CATEGORY_USER_OUTCOMES",
                                           "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                          "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                          "METRIC_CATEGORY_MODEL_FIT".
+                                          "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                          "METRIC_CATEGORY_MODEL_FIT", and
+                                          "METRIC_CATEGORY_CONVERSATIONAL".
                                         "custom_eval_config": {
                                             "created_at": "2020-02-20
                                               00:00:00",  # Optional. Configuration for a custom
@@ -312078,6 +319082,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       Optional. Time created at.
                                     "dataset_name": "str",  # Optional. Name of
                                       the dataset.
+                                    "dataset_paradigm":
+                                      "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional. Default
+                                      value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                      EvaluationDatasetParadigm is the row/content shape of a dataset,
+                                      orthogonal to the surface in EvaluationDatasetType (e.g. a model
+                                      dataset can be single- or multi-turn). Known values are:
+                                      "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                      "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                      "EVALUATION_DATASET_PARADIGM_CODING", and
+                                      "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                     "dataset_type":
                                       "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value is
                                       "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -312116,8 +319130,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           "METRIC_CATEGORY_UNSPECIFIED", "METRIC_CATEGORY_CORRECTNESS",
                                           "METRIC_CATEGORY_USER_OUTCOMES",
                                           "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                          "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                          "METRIC_CATEGORY_MODEL_FIT".
+                                          "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                          "METRIC_CATEGORY_MODEL_FIT", and
+                                          "METRIC_CATEGORY_CONVERSATIONAL".
                                         "custom_eval_config": {
                                             "created_at": "2020-02-20
                                               00:00:00",  # Optional. Configuration for a custom
@@ -313583,6 +320598,18 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               00:00:00",  # Optional. Time created at.
                                             "dataset_name": "str",  #
                                               Optional. Name of the dataset.
+                                            "dataset_paradigm":
+                                              "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional.
+                                              Default value is
+                                              "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                              EvaluationDatasetParadigm is the row/content shape of a
+                                              dataset, orthogonal to the surface in
+                                              EvaluationDatasetType (e.g. a model dataset can be
+                                              single- or multi-turn). Known values are:
+                                              "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                              "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                              "EVALUATION_DATASET_PARADIGM_CODING", and
+                                              "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                             "dataset_type":
                                               "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default
                                               value is "EVALUATION_DATASET_TYPE_UNKNOWN". Known values
@@ -313626,8 +320653,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "METRIC_CATEGORY_CORRECTNESS",
                                                   "METRIC_CATEGORY_USER_OUTCOMES",
                                                   "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                                  "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                                  "METRIC_CATEGORY_MODEL_FIT".
+                                                  "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                                  "METRIC_CATEGORY_MODEL_FIT", and
+                                                  "METRIC_CATEGORY_CONVERSATIONAL".
                                                 "custom_eval_config":
                                                   {
                                                     "created_at":
@@ -315061,6 +322089,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       Optional. Time created at.
                                     "dataset_name": "str",  # Optional. Name of
                                       the dataset.
+                                    "dataset_paradigm":
+                                      "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional. Default
+                                      value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                      EvaluationDatasetParadigm is the row/content shape of a dataset,
+                                      orthogonal to the surface in EvaluationDatasetType (e.g. a model
+                                      dataset can be single- or multi-turn). Known values are:
+                                      "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                      "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                      "EVALUATION_DATASET_PARADIGM_CODING", and
+                                      "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                     "dataset_type":
                                       "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value is
                                       "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -315099,8 +322137,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           "METRIC_CATEGORY_UNSPECIFIED", "METRIC_CATEGORY_CORRECTNESS",
                                           "METRIC_CATEGORY_USER_OUTCOMES",
                                           "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                          "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                          "METRIC_CATEGORY_MODEL_FIT".
+                                          "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                          "METRIC_CATEGORY_MODEL_FIT", and
+                                          "METRIC_CATEGORY_CONVERSATIONAL".
                                         "custom_eval_config": {
                                             "created_at": "2020-02-20
                                               00:00:00",  # Optional. Configuration for a custom
@@ -316416,6 +323455,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       Optional. Time created at.
                                     "dataset_name": "str",  # Optional. Name of
                                       the dataset.
+                                    "dataset_paradigm":
+                                      "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional. Default
+                                      value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                      EvaluationDatasetParadigm is the row/content shape of a dataset,
+                                      orthogonal to the surface in EvaluationDatasetType (e.g. a model
+                                      dataset can be single- or multi-turn). Known values are:
+                                      "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                      "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                      "EVALUATION_DATASET_PARADIGM_CODING", and
+                                      "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                     "dataset_type":
                                       "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value is
                                       "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -316454,8 +323503,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           "METRIC_CATEGORY_UNSPECIFIED", "METRIC_CATEGORY_CORRECTNESS",
                                           "METRIC_CATEGORY_USER_OUTCOMES",
                                           "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                          "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                          "METRIC_CATEGORY_MODEL_FIT".
+                                          "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                          "METRIC_CATEGORY_MODEL_FIT", and
+                                          "METRIC_CATEGORY_CONVERSATIONAL".
                                         "custom_eval_config": {
                                             "created_at": "2020-02-20
                                               00:00:00",  # Optional. Configuration for a custom
@@ -317774,6 +324824,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       Optional. Time created at.
                                     "dataset_name": "str",  # Optional. Name of
                                       the dataset.
+                                    "dataset_paradigm":
+                                      "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional. Default
+                                      value is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                      EvaluationDatasetParadigm is the row/content shape of a dataset,
+                                      orthogonal to the surface in EvaluationDatasetType (e.g. a model
+                                      dataset can be single- or multi-turn). Known values are:
+                                      "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                      "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                      "EVALUATION_DATASET_PARADIGM_CODING", and
+                                      "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                     "dataset_type":
                                       "EVALUATION_DATASET_TYPE_UNKNOWN",  # Optional. Default value is
                                       "EVALUATION_DATASET_TYPE_UNKNOWN". Known values are:
@@ -317812,8 +324872,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           "METRIC_CATEGORY_UNSPECIFIED", "METRIC_CATEGORY_CORRECTNESS",
                                           "METRIC_CATEGORY_USER_OUTCOMES",
                                           "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                          "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                          "METRIC_CATEGORY_MODEL_FIT".
+                                          "METRIC_CATEGORY_CONTEXT_QUALITY",
+                                          "METRIC_CATEGORY_MODEL_FIT", and
+                                          "METRIC_CATEGORY_CONVERSATIONAL".
                                         "custom_eval_config": {
                                             "created_at": "2020-02-20
                                               00:00:00",  # Optional. Configuration for a custom
@@ -318050,6 +325111,16 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   Time created at.
                                 "dataset_name": "str",  # Optional. Name of the
                                   dataset.
+                                "dataset_paradigm":
+                                  "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",  # Optional. Default value
+                                  is "EVALUATION_DATASET_PARADIGM_SINGLE_TURN".
+                                  EvaluationDatasetParadigm is the row/content shape of a dataset,
+                                  orthogonal to the surface in EvaluationDatasetType (e.g. a model
+                                  dataset can be single- or multi-turn). Known values are:
+                                  "EVALUATION_DATASET_PARADIGM_SINGLE_TURN",
+                                  "EVALUATION_DATASET_PARADIGM_MULTI_TURN",
+                                  "EVALUATION_DATASET_PARADIGM_CODING", and
+                                  "EVALUATION_DATASET_PARADIGM_N_PLUS_1".
                                 "dataset_type": "EVALUATION_DATASET_TYPE_UNKNOWN",  #
                                   Optional. Default value is "EVALUATION_DATASET_TYPE_UNKNOWN". Known
                                   values are: "EVALUATION_DATASET_TYPE_UNKNOWN",
@@ -318084,8 +325155,8 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       values are: "METRIC_CATEGORY_UNSPECIFIED",
                                       "METRIC_CATEGORY_CORRECTNESS", "METRIC_CATEGORY_USER_OUTCOMES",
                                       "METRIC_CATEGORY_SAFETY_AND_SECURITY",
-                                      "METRIC_CATEGORY_CONTEXT_QUALITY", and
-                                      "METRIC_CATEGORY_MODEL_FIT".
+                                      "METRIC_CATEGORY_CONTEXT_QUALITY", "METRIC_CATEGORY_MODEL_FIT",
+                                      and "METRIC_CATEGORY_CONVERSATIONAL".
                                     "custom_eval_config": {
                                         "created_at": "2020-02-20 00:00:00",
                                           # Optional. Configuration for a custom model-evaluation

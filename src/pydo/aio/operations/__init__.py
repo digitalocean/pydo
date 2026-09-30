@@ -4,11 +4,14 @@
 # Changes may cause incorrect behavior and will be lost if the code is regenerated.
 # --------------------------------------------------------------------------
 
-from ._operations import ToolsOperations
-from ._operations import ToolbeltsOperations
+from ._operations import ActorLimitsOperations
 from ._operations import ConnectionsOperations
-from ._operations import UsersOperations
+from ._operations import McpServersOperations
+from ._operations import OutputViewsOperations
 from ._operations import SessionsOperations
+from ._operations import ToolbeltsOperations
+from ._operations import ToolsOperations
+from ._operations import UsersOperations
 from ._operations import OneClicksOperations
 from ._operations import AccountOperations
 from ._operations import SshKeysOperations
@@ -74,11 +77,14 @@ from ._patch import *  # pylint: disable=unused-wildcard-import
 from ._patch import patch_sdk as _patch_sdk
 
 __all__ = [
-    "ToolsOperations",
-    "ToolbeltsOperations",
+    "ActorLimitsOperations",
     "ConnectionsOperations",
-    "UsersOperations",
+    "McpServersOperations",
+    "OutputViewsOperations",
     "SessionsOperations",
+    "ToolbeltsOperations",
+    "ToolsOperations",
+    "UsersOperations",
     "OneClicksOperations",
     "AccountOperations",
     "SshKeysOperations",
