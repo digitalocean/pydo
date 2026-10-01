@@ -188,3 +188,33 @@ async def test_async_rotate_secret_zero_grace():
     assert call.request.method == "POST"
     assert "grace_period_seconds=0" in call.request.url
     assert rotated.previous_secret_revoked is True
+
+
+@pytest.mark.asyncio
+async def test_async_cancel_execution():
+    resources = _make_async_resources(
+        [
+            _FakeAsyncResponse(
+                200, {"execution": {"execution_id": "e1", "status": "failed"}}
+            ),
+            _FakeAsyncResponse(
+                200, {"execution": {"execution_id": "e2", "status": "failed"}}
+            ),
+        ]
+    )
+
+    plain = await resources.triggers.cancel_execution("t1", "e1")
+    plain_call = resources._proxy._original._pipeline.calls[0]
+    assert plain_call.request.method == "POST"
+    assert plain_call.request.url.split("?", 1)[0].endswith(
+        "/v2/agents/triggers/t1/executions/e1/cancel"
+    )
+    assert "force" not in plain_call.request.url
+    assert plain.execution.status == "failed"
+
+    # See the sync test of the same name: a bare Python bool would serialize
+    # as "True", which the server does not match.
+    await resources.triggers.cancel_execution("t1", "e2", force=True)
+    forced_call = resources._proxy._original._pipeline.calls[1]
+    assert "force=true" in forced_call.request.url
+    assert "force=True" not in forced_call.request.url

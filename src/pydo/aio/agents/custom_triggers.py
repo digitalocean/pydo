@@ -178,6 +178,30 @@ class AsyncTriggersOperations:
             ),
         )
 
+    async def cancel_execution(
+        self,
+        trigger_id: str,
+        execution_id: str,
+        *,
+        force: Optional[bool] = None,
+    ) -> Any:
+        """End a running execution (``POST .../executions/{id}/cancel``).
+
+        See :meth:`~pydo.agents.custom_triggers.TriggersOperations.cancel_execution`
+        for the full behavior (fresh vs. reuse mode, the 409/``force`` guard).
+        """
+        return await self._parse_json(
+            await self._send(
+                "POST",
+                (
+                    f"{_TRIGGERS_PATH}/{_quote(trigger_id)}"
+                    f"/executions/{_quote(execution_id)}/cancel"
+                ),
+                # See the sync twin for why this can't be a bare Python bool.
+                params={"force": "true" if force else None},
+            ),
+        )
+
     async def get_by_session(self, session_id: str) -> Any:
         """Reverse-look-up the trigger that produced or binds a session."""
         return await self._parse_json(
