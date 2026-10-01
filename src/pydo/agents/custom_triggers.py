@@ -223,6 +223,43 @@ class TriggersOperations:
             ),
         )
 
+    def cancel_execution(
+        self,
+        trigger_id: str,
+        execution_id: str,
+        *,
+        force: Optional[bool] = None,
+    ) -> Any:
+        """End a running execution (``POST .../executions/{id}/cancel``).
+
+        Fails the execution and frees the trigger's in-flight slot. A
+        fresh-mode session is destroyed outright; a reuse-mode session is
+        only paused, since the API has no run-interrupt call -- the agent's
+        turn may still be in flight server-side. Cancelling a non-running
+        execution is a no-op that still succeeds.
+
+        A freshly-claimed execution briefly has no run yet while the worker
+        dispatches it; cancelling in that window is guarded against a race
+        with the in-flight dispatch and raises for ``409`` unless
+        ``force=True`` is passed. That window self-resolves within 15
+        minutes regardless, via the platform's own reclaim sweep.
+        """
+        return self._parse_json(
+            self._send(
+                "POST",
+                (
+                    f"{_TRIGGERS_PATH}/{_quote(trigger_id)}"
+                    f"/executions/{_quote(execution_id)}/cancel"
+                ),
+                # The API matches the literal lowercase "true"; a bare Python
+                # bool would serialize as "True"/"False" via HttpRequest's
+                # query encoding and the server would silently never see it
+                # as forced. Omit the param instead of sending force=false --
+                # absence already means "don't force".
+                params={"force": "true" if force else None},
+            ),
+        )
+
     # ------------------------------------------------------------------
     # Lookups & helpers
     # ------------------------------------------------------------------
