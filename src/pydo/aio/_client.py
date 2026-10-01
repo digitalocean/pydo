@@ -40,6 +40,7 @@ from .operations import (
     ImageActionsOperations,
     ImagesOperations,
     InferenceOperations,
+    InsightsOperations,
     InvoicesOperations,
     KubernetesOperations,
     LoadBalancersOperations,
@@ -157,6 +158,8 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype images: pydo.aio.operations.ImagesOperations
     :ivar image_actions: ImageActionsOperations operations
     :vartype image_actions: pydo.aio.operations.ImageActionsOperations
+    :ivar insights: InsightsOperations operations
+    :vartype insights: pydo.aio.operations.InsightsOperations
     :ivar kubernetes: KubernetesOperations operations
     :vartype kubernetes: pydo.aio.operations.KubernetesOperations
     :ivar load_balancers: LoadBalancersOperations operations
@@ -364,6 +367,9 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.image_actions = ImageActionsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.insights = InsightsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.kubernetes = KubernetesOperations(
