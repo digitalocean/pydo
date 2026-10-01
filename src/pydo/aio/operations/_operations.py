@@ -168933,14 +168933,7 @@ class LoadBalancersOperations:
             .. code-block:: python
 
                 # JSON input template you can fill out and use as your body input.
-                body = {
-                    "ip": "str"  # Optional. An optional IP address to assign to the load
-                      balancer from one of your Bring Your Own IP (BYOIP) prefixes. The address must be
-                      an unassigned BYOIP address on your account in the same region as the load
-                      balancer. If omitted, DigitalOcean assigns a public IP address automatically.
-                      This field is only applied when creating the load balancer, cannot be changed
-                      afterward, and is not supported for ``GLOBAL`` or ``INTERNAL`` load balancers.
-                }
+                body = {}
 
                 # response body for status code(s): 202
                 response == {
@@ -168996,6 +168989,10 @@ class LoadBalancersOperations:
                                 "name": "str"  # Optional. FQDN to associate with a
                                   Global load balancer.
                             }
+                        ],
+                        "droplet_ids": [
+                            0  # Optional. An array containing the IDs of the Droplets
+                              assigned to the load balancer.
                         ],
                         "enable_backend_keepalive": False,  # Optional. Default value is
                           False. A boolean value indicating whether HTTP keepalive connections are
@@ -169085,6 +169082,24 @@ class LoadBalancersOperations:
                         "redirect_http_to_https": False,  # Optional. Default value is False.
                           A boolean value indicating whether HTTP requests to the load balancer on port
                           80 will be redirected to HTTPS on port 443.
+                        "region": {
+                            "available": bool,  # This is a boolean value that represents
+                              whether new Droplets can be created in this region. Required.
+                            "features": [
+                                "str"  # This attribute is set to an array which
+                                  contains features available in this region. Required.
+                            ],
+                            "name": "str",  # The display name of the region.  This will
+                              be a full name that is used in the control panel and other interfaces.
+                              Required.
+                            "sizes": [
+                                "str"  # This attribute is set to an array which
+                                  contains the identifying slugs for the sizes available in this
+                                  region. sizes:read is required to view. Required.
+                            ],
+                            "slug": "str"  # A human-readable string that is used as a
+                              unique identifier for each region. Required.
+                        },
                         "size": "lb-small",  # Optional. Default value is "lb-small". This
                           field has been replaced by the ``size_unit`` field for all regions except in
                           AMS2, NYC2, and SFO1. Each available load balancer size now equates to the
@@ -169226,6 +169241,10 @@ class LoadBalancersOperations:
                                   Global load balancer.
                             }
                         ],
+                        "droplet_ids": [
+                            0  # Optional. An array containing the IDs of the Droplets
+                              assigned to the load balancer.
+                        ],
                         "enable_backend_keepalive": False,  # Optional. Default value is
                           False. A boolean value indicating whether HTTP keepalive connections are
                           maintained to target Droplets.
@@ -169314,6 +169333,24 @@ class LoadBalancersOperations:
                         "redirect_http_to_https": False,  # Optional. Default value is False.
                           A boolean value indicating whether HTTP requests to the load balancer on port
                           80 will be redirected to HTTPS on port 443.
+                        "region": {
+                            "available": bool,  # This is a boolean value that represents
+                              whether new Droplets can be created in this region. Required.
+                            "features": [
+                                "str"  # This attribute is set to an array which
+                                  contains features available in this region. Required.
+                            ],
+                            "name": "str",  # The display name of the region.  This will
+                              be a full name that is used in the control panel and other interfaces.
+                              Required.
+                            "sizes": [
+                                "str"  # This attribute is set to an array which
+                                  contains the identifying slugs for the sizes available in this
+                                  region. sizes:read is required to view. Required.
+                            ],
+                            "slug": "str"  # A human-readable string that is used as a
+                              unique identifier for each region. Required.
+                        },
                         "size": "lb-small",  # Optional. Default value is "lb-small". This
                           field has been replaced by the ``size_unit`` field for all regions except in
                           AMS2, NYC2, and SFO1. Each available load balancer size now equates to the
@@ -169396,14 +169433,7 @@ class LoadBalancersOperations:
             .. code-block:: python
 
                 # JSON input template you can fill out and use as your body input.
-                body = {
-                    "ip": "str"  # Optional. An optional IP address to assign to the load
-                      balancer from one of your Bring Your Own IP (BYOIP) prefixes. The address must be
-                      an unassigned BYOIP address on your account in the same region as the load
-                      balancer. If omitted, DigitalOcean assigns a public IP address automatically.
-                      This field is only applied when creating the load balancer, cannot be changed
-                      afterward, and is not supported for ``GLOBAL`` or ``INTERNAL`` load balancers.
-                }
+                body = {}
 
                 # response body for status code(s): 202
                 response == {
@@ -169459,6 +169489,10 @@ class LoadBalancersOperations:
                                 "name": "str"  # Optional. FQDN to associate with a
                                   Global load balancer.
                             }
+                        ],
+                        "droplet_ids": [
+                            0  # Optional. An array containing the IDs of the Droplets
+                              assigned to the load balancer.
                         ],
                         "enable_backend_keepalive": False,  # Optional. Default value is
                           False. A boolean value indicating whether HTTP keepalive connections are
@@ -169548,6 +169582,24 @@ class LoadBalancersOperations:
                         "redirect_http_to_https": False,  # Optional. Default value is False.
                           A boolean value indicating whether HTTP requests to the load balancer on port
                           80 will be redirected to HTTPS on port 443.
+                        "region": {
+                            "available": bool,  # This is a boolean value that represents
+                              whether new Droplets can be created in this region. Required.
+                            "features": [
+                                "str"  # This attribute is set to an array which
+                                  contains features available in this region. Required.
+                            ],
+                            "name": "str",  # The display name of the region.  This will
+                              be a full name that is used in the control panel and other interfaces.
+                              Required.
+                            "sizes": [
+                                "str"  # This attribute is set to an array which
+                                  contains the identifying slugs for the sizes available in this
+                                  region. sizes:read is required to view. Required.
+                            ],
+                            "slug": "str"  # A human-readable string that is used as a
+                              unique identifier for each region. Required.
+                        },
                         "size": "lb-small",  # Optional. Default value is "lb-small". This
                           field has been replaced by the ``size_unit`` field for all regions except in
                           AMS2, NYC2, and SFO1. Each available load balancer size now equates to the
@@ -169759,6 +169811,10 @@ class LoadBalancersOperations:
                                       with a Global load balancer.
                                 }
                             ],
+                            "droplet_ids": [
+                                0  # Optional. An array containing the IDs of the
+                                  Droplets assigned to the load balancer.
+                            ],
                             "enable_backend_keepalive": False,  # Optional. Default value
                               is False. A boolean value indicating whether HTTP keepalive connections
                               are maintained to target Droplets.
@@ -169851,6 +169907,25 @@ class LoadBalancersOperations:
                             "redirect_http_to_https": False,  # Optional. Default value
                               is False. A boolean value indicating whether HTTP requests to the load
                               balancer on port 80 will be redirected to HTTPS on port 443.
+                            "region": {
+                                "available": bool,  # This is a boolean value that
+                                  represents whether new Droplets can be created in this region.
+                                  Required.
+                                "features": [
+                                    "str"  # This attribute is set to an array
+                                      which contains features available in this region. Required.
+                                ],
+                                "name": "str",  # The display name of the region.
+                                  This will be a full name that is used in the control panel and other
+                                  interfaces. Required.
+                                "sizes": [
+                                    "str"  # This attribute is set to an array
+                                      which contains the identifying slugs for the sizes available in
+                                      this region. sizes:read is required to view. Required.
+                                ],
+                                "slug": "str"  # A human-readable string that is used
+                                  as a unique identifier for each region. Required.
+                            },
                             "size": "lb-small",  # Optional. Default value is "lb-small".
                               This field has been replaced by the ``size_unit`` field for all regions
                               except in AMS2, NYC2, and SFO1. Each available load balancer size now
@@ -170041,6 +170116,10 @@ class LoadBalancersOperations:
                                   Global load balancer.
                             }
                         ],
+                        "droplet_ids": [
+                            0  # Optional. An array containing the IDs of the Droplets
+                              assigned to the load balancer.
+                        ],
                         "enable_backend_keepalive": False,  # Optional. Default value is
                           False. A boolean value indicating whether HTTP keepalive connections are
                           maintained to target Droplets.
@@ -170129,6 +170208,24 @@ class LoadBalancersOperations:
                         "redirect_http_to_https": False,  # Optional. Default value is False.
                           A boolean value indicating whether HTTP requests to the load balancer on port
                           80 will be redirected to HTTPS on port 443.
+                        "region": {
+                            "available": bool,  # This is a boolean value that represents
+                              whether new Droplets can be created in this region. Required.
+                            "features": [
+                                "str"  # This attribute is set to an array which
+                                  contains features available in this region. Required.
+                            ],
+                            "name": "str",  # The display name of the region.  This will
+                              be a full name that is used in the control panel and other interfaces.
+                              Required.
+                            "sizes": [
+                                "str"  # This attribute is set to an array which
+                                  contains the identifying slugs for the sizes available in this
+                                  region. sizes:read is required to view. Required.
+                            ],
+                            "slug": "str"  # A human-readable string that is used as a
+                              unique identifier for each region. Required.
+                        },
                         "size": "lb-small",  # Optional. Default value is "lb-small". This
                           field has been replaced by the ``size_unit`` field for all regions except in
                           AMS2, NYC2, and SFO1. Each available load balancer size now equates to the
@@ -170361,6 +170458,10 @@ class LoadBalancersOperations:
                                   Global load balancer.
                             }
                         ],
+                        "droplet_ids": [
+                            0  # Optional. An array containing the IDs of the Droplets
+                              assigned to the load balancer.
+                        ],
                         "enable_backend_keepalive": False,  # Optional. Default value is
                           False. A boolean value indicating whether HTTP keepalive connections are
                           maintained to target Droplets.
@@ -170449,6 +170550,24 @@ class LoadBalancersOperations:
                         "redirect_http_to_https": False,  # Optional. Default value is False.
                           A boolean value indicating whether HTTP requests to the load balancer on port
                           80 will be redirected to HTTPS on port 443.
+                        "region": {
+                            "available": bool,  # This is a boolean value that represents
+                              whether new Droplets can be created in this region. Required.
+                            "features": [
+                                "str"  # This attribute is set to an array which
+                                  contains features available in this region. Required.
+                            ],
+                            "name": "str",  # The display name of the region.  This will
+                              be a full name that is used in the control panel and other interfaces.
+                              Required.
+                            "sizes": [
+                                "str"  # This attribute is set to an array which
+                                  contains the identifying slugs for the sizes available in this
+                                  region. sizes:read is required to view. Required.
+                            ],
+                            "slug": "str"  # A human-readable string that is used as a
+                              unique identifier for each region. Required.
+                        },
                         "size": "lb-small",  # Optional. Default value is "lb-small". This
                           field has been replaced by the ``size_unit`` field for all regions except in
                           AMS2, NYC2, and SFO1. Each available load balancer size now equates to the
@@ -170601,6 +170720,10 @@ class LoadBalancersOperations:
                                   Global load balancer.
                             }
                         ],
+                        "droplet_ids": [
+                            0  # Optional. An array containing the IDs of the Droplets
+                              assigned to the load balancer.
+                        ],
                         "enable_backend_keepalive": False,  # Optional. Default value is
                           False. A boolean value indicating whether HTTP keepalive connections are
                           maintained to target Droplets.
@@ -170689,6 +170812,24 @@ class LoadBalancersOperations:
                         "redirect_http_to_https": False,  # Optional. Default value is False.
                           A boolean value indicating whether HTTP requests to the load balancer on port
                           80 will be redirected to HTTPS on port 443.
+                        "region": {
+                            "available": bool,  # This is a boolean value that represents
+                              whether new Droplets can be created in this region. Required.
+                            "features": [
+                                "str"  # This attribute is set to an array which
+                                  contains features available in this region. Required.
+                            ],
+                            "name": "str",  # The display name of the region.  This will
+                              be a full name that is used in the control panel and other interfaces.
+                              Required.
+                            "sizes": [
+                                "str"  # This attribute is set to an array which
+                                  contains the identifying slugs for the sizes available in this
+                                  region. sizes:read is required to view. Required.
+                            ],
+                            "slug": "str"  # A human-readable string that is used as a
+                              unique identifier for each region. Required.
+                        },
                         "size": "lb-small",  # Optional. Default value is "lb-small". This
                           field has been replaced by the ``size_unit`` field for all regions except in
                           AMS2, NYC2, and SFO1. Each available load balancer size now equates to the
@@ -170836,6 +170977,10 @@ class LoadBalancersOperations:
                                   Global load balancer.
                             }
                         ],
+                        "droplet_ids": [
+                            0  # Optional. An array containing the IDs of the Droplets
+                              assigned to the load balancer.
+                        ],
                         "enable_backend_keepalive": False,  # Optional. Default value is
                           False. A boolean value indicating whether HTTP keepalive connections are
                           maintained to target Droplets.
@@ -170924,6 +171069,24 @@ class LoadBalancersOperations:
                         "redirect_http_to_https": False,  # Optional. Default value is False.
                           A boolean value indicating whether HTTP requests to the load balancer on port
                           80 will be redirected to HTTPS on port 443.
+                        "region": {
+                            "available": bool,  # This is a boolean value that represents
+                              whether new Droplets can be created in this region. Required.
+                            "features": [
+                                "str"  # This attribute is set to an array which
+                                  contains features available in this region. Required.
+                            ],
+                            "name": "str",  # The display name of the region.  This will
+                              be a full name that is used in the control panel and other interfaces.
+                              Required.
+                            "sizes": [
+                                "str"  # This attribute is set to an array which
+                                  contains the identifying slugs for the sizes available in this
+                                  region. sizes:read is required to view. Required.
+                            ],
+                            "slug": "str"  # A human-readable string that is used as a
+                              unique identifier for each region. Required.
+                        },
                         "size": "lb-small",  # Optional. Default value is "lb-small". This
                           field has been replaced by the ``size_unit`` field for all regions except in
                           AMS2, NYC2, and SFO1. Each available load balancer size now equates to the
@@ -171332,8 +171495,8 @@ class LoadBalancersOperations:
                 # JSON input template you can fill out and use as your body input.
                 body = {
                     "droplet_ids": [
-                        0  # An array containing the IDs of the Droplets assigned to the load
-                          balancer. Required.
+                        0  # Optional. An array containing the IDs of the Droplets assigned
+                          to the load balancer.
                     ]
                 }
 
@@ -171432,8 +171595,8 @@ class LoadBalancersOperations:
                 # JSON input template you can fill out and use as your body input.
                 body = {
                     "droplet_ids": [
-                        0  # An array containing the IDs of the Droplets assigned to the load
-                          balancer. Required.
+                        0  # Optional. An array containing the IDs of the Droplets assigned
+                          to the load balancer.
                     ]
                 }
 
@@ -171574,8 +171737,8 @@ class LoadBalancersOperations:
                 # JSON input template you can fill out and use as your body input.
                 body = {
                     "droplet_ids": [
-                        0  # An array containing the IDs of the Droplets assigned to the load
-                          balancer. Required.
+                        0  # Optional. An array containing the IDs of the Droplets assigned
+                          to the load balancer.
                     ]
                 }
 
@@ -171668,8 +171831,8 @@ class LoadBalancersOperations:
                 # JSON input template you can fill out and use as your body input.
                 body = {
                     "droplet_ids": [
-                        0  # An array containing the IDs of the Droplets assigned to the load
-                          balancer. Required.
+                        0  # Optional. An array containing the IDs of the Droplets assigned
+                          to the load balancer.
                     ]
                 }
 
