@@ -430,6 +430,24 @@ from ...operations._operations import (
     build_inference_list_batches_request,
     build_inference_list_models_request,
     build_inference_upload_batch_file_request,
+    build_insights_create_alert_rule_request,
+    build_insights_create_notification_channel_request,
+    build_insights_delete_alert_rule_request,
+    build_insights_delete_notification_channel_request,
+    build_insights_get_alert_instance_request,
+    build_insights_get_alert_rule_request,
+    build_insights_get_notification_channel_request,
+    build_insights_get_prom_label_values_request,
+    build_insights_get_prom_labels_request,
+    build_insights_get_prom_query_range_request,
+    build_insights_get_prom_query_request,
+    build_insights_get_prom_series_request,
+    build_insights_list_alert_instances_request,
+    build_insights_list_alert_rules_request,
+    build_insights_list_notification_channels_request,
+    build_insights_post_logs_search_request,
+    build_insights_update_alert_rule_request,
+    build_insights_update_notification_channel_request,
     build_invoices_get_by_uuid_request,
     build_invoices_get_csv_by_uuid_request,
     build_invoices_get_pdf_by_uuid_request,
@@ -160858,6 +160876,5403 @@ class ImageActionsOperations:
         return cast(JSON, deserialized)  # type: ignore
 
 
+class InsightsOperations:
+    """
+    .. warning::
+        **DO NOT** instantiate this class directly.
+
+        Instead, you should access the following operations through
+        :class:`~pydo.aio.GeneratedClient`'s
+        :attr:`insights` attribute.
+    """
+
+    def __init__(self, *args, **kwargs) -> None:
+        input_args = list(args)
+        self._client = input_args.pop(0) if input_args else kwargs.pop("client")
+        self._config = input_args.pop(0) if input_args else kwargs.pop("config")
+        self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
+        self._deserialize = (
+            input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        )
+
+    @distributed_trace_async
+    async def list_alert_instances(
+        self,
+        *,
+        per_page: int = 20,
+        page: int = 1,
+        status: Optional[str] = None,
+        rule_id: Optional[str] = None,
+        resource_urn: Optional[str] = None,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Alert Instances.
+
+        To list alert instances for your account, send a GET request to
+        ``/v2/insights/alert-instances``. Alert instances are read-only records of
+        alert rule firings against your resources.
+
+        Results can optionally be filtered by ``status``\\ , ``rule_id``\\ , or
+        ``resource_urn``.
+
+        Results are ordered by ``triggered_at`` descending (newest first). Because
+        the list is append-only and continuously growing, offset-based pagination
+        is best-effort: newly triggered instances may shift older rows onto
+        subsequent pages between fetches. For stable pagination, filter by
+        ``rule_id`` or a fixed time window on the client side.
+
+        :keyword per_page: Number of items returned per page. Default value is 20.
+        :paramtype per_page: int
+        :keyword page: Which 'page' of paginated results to return. Default value is 1.
+        :paramtype page: int
+        :keyword status: Optional filter. When set, only alert instances with this status are
+         returned. Known values are: "active" and "resolved". Default value is None.
+        :paramtype status: str
+        :keyword rule_id: Optional filter. When set, only alert instances fired by the alert rule
+         with this ID are returned. Default value is None.
+        :paramtype rule_id: str
+        :keyword resource_urn: Optional filter. When set, only resources associated with this resource
+         URN
+         are returned. Default value is None.
+        :paramtype resource_urn: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "meta": {
+                        "total": 0  # Optional. Number of objects returned by the request.
+                    },
+                    "alert_instances": [
+                        {
+                            "id": "str",  # A unique identifier for the alert instance.
+                              Required.
+                            "last_triggered_at": "2020-02-20 00:00:00",  # Time the alert
+                              instance most recently fired. Required.
+                            "rule_id": "str",  # ID of the alert rule that fired this
+                              alert instance. Required.
+                            "severity": "str",  # Severity of the breached threshold.
+                              Required. Known values are: "warning" and "critical".
+                            "status": "str",  # Current status of the alert instance.
+                              Required. Known values are: "active" and "resolved".
+                            "triggered_at": "2020-02-20 00:00:00",  # Time the alert
+                              instance first fired. Required.
+                            "value": 0.0,  # The observed metric value that breached the
+                              threshold. Required.
+                            "last_notified_at": "2020-02-20 00:00:00",  # Optional. Time
+                              a notification was last sent for this alert instance.
+                            "resolved_at": "2020-02-20 00:00:00",  # Optional. Time the
+                              alert instance resolved. Only present when ``status`` is ``resolved``.
+                            "resource_urn": "str"  # Optional. URN of the DigitalOcean
+                              resource the alert fired for. May be an empty string for alerts fired on
+                              non-resource-bound signals (for example, cluster/pod/namespace-scoped
+                              Kubernetes alerts).
+                        }
+                    ],
+                    "links": {
+                        "pages": {}
+                    }
+                }
+                # response body for status code(s): 400
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_insights_list_alert_instances_request(
+            per_page=per_page,
+            page=page,
+            status=status,
+            rule_id=rule_id,
+            resource_urn=resource_urn,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_alert_instance(self, id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve an Alert Instance.
+
+        To retrieve a single alert instance, send a GET request to
+        ``/v2/insights/alert-instances/{id}``.
+
+        :param id: A unique identifier for an alert instance. Required.
+        :type id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "alert_instance": {
+                        "id": "str",  # A unique identifier for the alert instance. Required.
+                        "last_triggered_at": "2020-02-20 00:00:00",  # Time the alert
+                          instance most recently fired. Required.
+                        "rule_id": "str",  # ID of the alert rule that fired this alert
+                          instance. Required.
+                        "severity": "str",  # Severity of the breached threshold. Required.
+                          Known values are: "warning" and "critical".
+                        "status": "str",  # Current status of the alert instance. Required.
+                          Known values are: "active" and "resolved".
+                        "triggered_at": "2020-02-20 00:00:00",  # Time the alert instance
+                          first fired. Required.
+                        "value": 0.0,  # The observed metric value that breached the
+                          threshold. Required.
+                        "last_notified_at": "2020-02-20 00:00:00",  # Optional. Time a
+                          notification was last sent for this alert instance.
+                        "resolved_at": "2020-02-20 00:00:00",  # Optional. Time the alert
+                          instance resolved. Only present when ``status`` is ``resolved``.
+                        "resource_urn": "str"  # Optional. URN of the DigitalOcean resource
+                          the alert fired for. May be an empty string for alerts fired on
+                          non-resource-bound signals (for example, cluster/pod/namespace-scoped
+                          Kubernetes alerts).
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_insights_get_alert_instance_request(
+            id=id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def list_alert_rules(
+        self,
+        *,
+        page: int = 1,
+        per_page: int = 20,
+        resource_urn: Optional[str] = None,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Alert Rules.
+
+        To list alert rules for your account, send a GET request to
+        ``/v2/insights/alert-rules``. Results are paginated with ``page`` and ``per_page``
+        (default ``20``\\ , maximum ``200``\\ ). Optionally filter by ``resource_urn``.
+
+        :keyword page: Which 'page' of paginated results to return. Default value is 1.
+        :paramtype page: int
+        :keyword per_page: Number of items returned per page. Default value is 20.
+        :paramtype per_page: int
+        :keyword resource_urn: Optional filter. When set, only resources associated with this resource
+         URN
+         are returned. Default value is None.
+        :paramtype resource_urn: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "alert_rules": [
+                        {
+                            "created_at": "2020-02-20 00:00:00",  # Time the alert rule
+                              was created. Required.
+                            "id": "str",  # A unique identifier for the alert rule.
+                              Required.
+                            "spec": {
+                                "name": "str",  # A human-readable name for the alert
+                                  rule. Required.
+                                "query": {
+                                    "metric": "str",  # Dotted OpenTelemetry
+                                      metric name to evaluate (for example
+                                      ``do.droplets.cpu_utilization``"" ). Required.
+                                    "filters": [
+                                        {
+                                            "field": "str",  # The metric
+                                              label or field to filter on. Required.
+                                            "operator": "str",  #
+                                              Comparison operator for the filter. Allowed values:   *
+                                              ``FILTER_OPERATOR_EQUAL`` = equal *
+                                              ``FILTER_OPERATOR_NOT_EQUAL`` = ``not_equal`` *
+                                              ``FILTER_OPERATOR_LESS_THAN`` = ``less_than`` *
+                                              ``FILTER_OPERATOR_LESS_THAN_OR_EQUAL`` =
+                                              ``less_than_or_equal`` * ``FILTER_OPERATOR_GREATER_THAN``
+                                              = ``greater_than`` *
+                                              ``FILTER_OPERATOR_GREATER_THAN_OR_EQUAL`` =
+                                              ``greater_than_or_equal``. Required. Known values are:
+                                              "FILTER_OPERATOR_EQUAL", "FILTER_OPERATOR_NOT_EQUAL",
+                                              "FILTER_OPERATOR_LESS_THAN",
+                                              "FILTER_OPERATOR_LESS_THAN_OR_EQUAL",
+                                              "FILTER_OPERATOR_GREATER_THAN", and
+                                              "FILTER_OPERATOR_GREATER_THAN_OR_EQUAL".
+                                            "value": "str"  # Value
+                                              compared against the field. Required.
+                                        }
+                                    ],
+                                    "resource_urns": [
+                                        "str"  # Optional. Optional list of
+                                          DigitalOcean resource URNs the rule applies to. Empty or
+                                          omitted means the rule is not scoped to specific resources.
+                                    ],
+                                    "tags": [
+                                        "str"  # Optional. Optional resource
+                                          tags used to select matching resources.
+                                    ]
+                                },
+                                "thresholds": {
+                                    "operator": "str",  # Comparison operator
+                                      applied to the aggregated metric value. Allowed values:   *
+                                      ``THRESHOLD_OPERATOR_EQUAL`` = equal *
+                                      ``THRESHOLD_OPERATOR_LESS_THAN_OR_EQUAL`` =
+                                      ``less_than_or_equal`` * ``THRESHOLD_OPERATOR_LESS_THAN`` =
+                                      ``less_than`` * ``THRESHOLD_OPERATOR_GREATER_THAN`` =
+                                      ``greater_than`` * ``THRESHOLD_OPERATOR_GREATER_THAN_OR_EQUAL`` =
+                                      ``greater_than_or_equal`` * ``THRESHOLD_OPERATOR_NOT_EQUAL`` =
+                                      ``not_equal``. Required. Known values are:
+                                      "THRESHOLD_OPERATOR_EQUAL",
+                                      "THRESHOLD_OPERATOR_LESS_THAN_OR_EQUAL",
+                                      "THRESHOLD_OPERATOR_LESS_THAN",
+                                      "THRESHOLD_OPERATOR_GREATER_THAN",
+                                      "THRESHOLD_OPERATOR_GREATER_THAN_OR_EQUAL", and
+                                      "THRESHOLD_OPERATOR_NOT_EQUAL".
+                                    "critical": 0.0,  # Optional. Critical
+                                      threshold value.
+                                    "warning": 0.0  # Optional. Warning threshold
+                                      value.
+                                },
+                                "condition": {
+                                    "window": "str"  # Optional. Time window over
+                                      which the metric is evaluated. Allowed values:   *
+                                      ``EVALUATION_WINDOW_1M`` = ``1m`` * ``EVALUATION_WINDOW_5M`` =
+                                      ``5m`` * ``EVALUATION_WINDOW_10M`` = ``10m`` *
+                                      ``EVALUATION_WINDOW_15M`` = ``15m`` * ``EVALUATION_WINDOW_30M`` =
+                                      ``30m`` * ``EVALUATION_WINDOW_1H`` = ``1h``. Known values are:
+                                      "EVALUATION_WINDOW_1M", "EVALUATION_WINDOW_5M",
+                                      "EVALUATION_WINDOW_10M", "EVALUATION_WINDOW_15M",
+                                      "EVALUATION_WINDOW_30M", and "EVALUATION_WINDOW_1H".
+                                },
+                                "notification_channels": [
+                                    {
+                                        "notification_channel_id": "str",  #
+                                          ID of an existing notification channel owned by the account.
+                                          Required.
+                                        "notify_on": [
+                                            "str"  # Optional. Severities
+                                              that trigger this channel. Allowed values:   *
+                                              ``SEVERITY_WARNING`` = warning * ``SEVERITY_CRITICAL`` =
+                                              critical.
+                                        ]
+                                    }
+                                ],
+                                "re_alert_duration": "str"  # Optional. Minimum wait
+                                  before re-notifying a still-firing alert. Defaults to
+                                  ``RE_ALERT_DURATION_4H`` on create when omitted. Allowed values:   *
+                                  ``RE_ALERT_DURATION_30M`` = ``30m`` * ``RE_ALERT_DURATION_1H`` =
+                                  ``1h`` * ``RE_ALERT_DURATION_4H`` = ``4h`` *
+                                  ``RE_ALERT_DURATION_NEVER`` = never. Known values are:
+                                  "RE_ALERT_DURATION_30M", "RE_ALERT_DURATION_1H",
+                                  "RE_ALERT_DURATION_4H", and "RE_ALERT_DURATION_NEVER".
+                            },
+                            "status": "str",  # Current alert rule status. Allowed
+                              values:   * ``ALERT_RULE_STATUS_ACTIVE`` = active *
+                              ``ALERT_RULE_STATUS_PAUSED`` = paused. Required. Known values are:
+                              "ALERT_RULE_STATUS_ACTIVE" and "ALERT_RULE_STATUS_PAUSED".
+                            "updated_at": "2020-02-20 00:00:00"  # Time the alert rule
+                              was last updated. Required.
+                        }
+                    ],
+                    "meta": {
+                        "total": 0  # Optional. Number of objects returned by the request.
+                    },
+                    "links": {
+                        "pages": {}
+                    }
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_insights_list_alert_rules_request(
+            page=page,
+            per_page=per_page,
+            resource_urn=resource_urn,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        response_headers["ratelimit-limit"] = self._deserialize(
+            "int", response.headers.get("ratelimit-limit")
+        )
+        response_headers["ratelimit-remaining"] = self._deserialize(
+            "int", response.headers.get("ratelimit-remaining")
+        )
+        response_headers["ratelimit-reset"] = self._deserialize(
+            "int", response.headers.get("ratelimit-reset")
+        )
+
+        if response.content:
+            deserialized = response.json()
+        else:
+            deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def create_alert_rule(
+        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create an Alert Rule.
+
+        To create an alert rule, send a POST request to ``/v2/insights/alert-rules``
+        with a ``spec`` containing ``name``\\ , ``query``\\ , ``thresholds``\\ , and at least one
+        ``notification_channels`` binding. ``status`` defaults to
+        ``ALERT_RULE_STATUS_ACTIVE`` when omitted. ``re_alert_duration`` defaults to
+        ``RE_ALERT_DURATION_4H`` when omitted.
+
+        ``query.metric`` must be a dotted OpenTelemetry name such as
+        ``do.droplets.cpu_utilization``. Underscored Prometheus-style names are
+        rejected with ``422 Unprocessable Entity``.
+
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "spec": {
+                        "name": "str",  # A human-readable name for the alert rule. Required.
+                        "query": {
+                            "metric": "str",  # Dotted OpenTelemetry metric name to
+                              evaluate (for example ``do.droplets.cpu_utilization``"" ). Required.
+                            "filters": [
+                                {
+                                    "field": "str",  # The metric label or field
+                                      to filter on. Required.
+                                    "operator": "str",  # Comparison operator for
+                                      the filter. Allowed values:   * ``FILTER_OPERATOR_EQUAL`` = equal
+                                      * ``FILTER_OPERATOR_NOT_EQUAL`` = ``not_equal`` *
+                                      ``FILTER_OPERATOR_LESS_THAN`` = ``less_than`` *
+                                      ``FILTER_OPERATOR_LESS_THAN_OR_EQUAL`` = ``less_than_or_equal`` *
+                                      ``FILTER_OPERATOR_GREATER_THAN`` = ``greater_than`` *
+                                      ``FILTER_OPERATOR_GREATER_THAN_OR_EQUAL`` =
+                                      ``greater_than_or_equal``. Required. Known values are:
+                                      "FILTER_OPERATOR_EQUAL", "FILTER_OPERATOR_NOT_EQUAL",
+                                      "FILTER_OPERATOR_LESS_THAN",
+                                      "FILTER_OPERATOR_LESS_THAN_OR_EQUAL",
+                                      "FILTER_OPERATOR_GREATER_THAN", and
+                                      "FILTER_OPERATOR_GREATER_THAN_OR_EQUAL".
+                                    "value": "str"  # Value compared against the
+                                      field. Required.
+                                }
+                            ],
+                            "resource_urns": [
+                                "str"  # Optional. Optional list of DigitalOcean
+                                  resource URNs the rule applies to. Empty or omitted means the rule is
+                                  not scoped to specific resources.
+                            ],
+                            "tags": [
+                                "str"  # Optional. Optional resource tags used to
+                                  select matching resources.
+                            ]
+                        },
+                        "thresholds": {
+                            "operator": "str",  # Comparison operator applied to the
+                              aggregated metric value. Allowed values:   * ``THRESHOLD_OPERATOR_EQUAL``
+                              = equal * ``THRESHOLD_OPERATOR_LESS_THAN_OR_EQUAL`` =
+                              ``less_than_or_equal`` * ``THRESHOLD_OPERATOR_LESS_THAN`` = ``less_than``
+                              * ``THRESHOLD_OPERATOR_GREATER_THAN`` = ``greater_than`` *
+                              ``THRESHOLD_OPERATOR_GREATER_THAN_OR_EQUAL`` = ``greater_than_or_equal``
+                              * ``THRESHOLD_OPERATOR_NOT_EQUAL`` = ``not_equal``. Required. Known
+                              values are: "THRESHOLD_OPERATOR_EQUAL",
+                              "THRESHOLD_OPERATOR_LESS_THAN_OR_EQUAL", "THRESHOLD_OPERATOR_LESS_THAN",
+                              "THRESHOLD_OPERATOR_GREATER_THAN",
+                              "THRESHOLD_OPERATOR_GREATER_THAN_OR_EQUAL", and
+                              "THRESHOLD_OPERATOR_NOT_EQUAL".
+                            "critical": 0.0,  # Optional. Critical threshold value.
+                            "warning": 0.0  # Optional. Warning threshold value.
+                        },
+                        "condition": {
+                            "window": "str"  # Optional. Time window over which the
+                              metric is evaluated. Allowed values:   * ``EVALUATION_WINDOW_1M`` =
+                              ``1m`` * ``EVALUATION_WINDOW_5M`` = ``5m`` * ``EVALUATION_WINDOW_10M`` =
+                              ``10m`` * ``EVALUATION_WINDOW_15M`` = ``15m`` * ``EVALUATION_WINDOW_30M``
+                              = ``30m`` * ``EVALUATION_WINDOW_1H`` = ``1h``. Known values are:
+                              "EVALUATION_WINDOW_1M", "EVALUATION_WINDOW_5M", "EVALUATION_WINDOW_10M",
+                              "EVALUATION_WINDOW_15M", "EVALUATION_WINDOW_30M", and
+                              "EVALUATION_WINDOW_1H".
+                        },
+                        "notification_channels": [
+                            {
+                                "notification_channel_id": "str",  # ID of an
+                                  existing notification channel owned by the account. Required.
+                                "notify_on": [
+                                    "str"  # Optional. Severities that trigger
+                                      this channel. Allowed values:   * ``SEVERITY_WARNING`` = warning
+                                      * ``SEVERITY_CRITICAL`` = critical.
+                                ]
+                            }
+                        ],
+                        "re_alert_duration": "str"  # Optional. Minimum wait before
+                          re-notifying a still-firing alert. Defaults to ``RE_ALERT_DURATION_4H`` on
+                          create when omitted. Allowed values:   * ``RE_ALERT_DURATION_30M`` = ``30m``
+                          * ``RE_ALERT_DURATION_1H`` = ``1h`` * ``RE_ALERT_DURATION_4H`` = ``4h`` *
+                          ``RE_ALERT_DURATION_NEVER`` = never. Known values are:
+                          "RE_ALERT_DURATION_30M", "RE_ALERT_DURATION_1H", "RE_ALERT_DURATION_4H", and
+                          "RE_ALERT_DURATION_NEVER".
+                    },
+                    "status": "str"  # Optional. Desired alert rule status. Allowed values:   *
+                      ``ALERT_RULE_STATUS_ACTIVE`` = active * ``ALERT_RULE_STATUS_PAUSED`` = paused.
+                      Known values are: "ALERT_RULE_STATUS_ACTIVE" and "ALERT_RULE_STATUS_PAUSED".
+                }
+
+                # response body for status code(s): 201
+                response == {
+                    "alert_rule": {
+                        "created_at": "2020-02-20 00:00:00",  # Time the alert rule was
+                          created. Required.
+                        "id": "str",  # A unique identifier for the alert rule. Required.
+                        "spec": {
+                            "name": "str",  # A human-readable name for the alert rule.
+                              Required.
+                            "query": {
+                                "metric": "str",  # Dotted OpenTelemetry metric name
+                                  to evaluate (for example ``do.droplets.cpu_utilization``"" ).
+                                  Required.
+                                "filters": [
+                                    {
+                                        "field": "str",  # The metric label
+                                          or field to filter on. Required.
+                                        "operator": "str",  # Comparison
+                                          operator for the filter. Allowed values:   *
+                                          ``FILTER_OPERATOR_EQUAL`` = equal *
+                                          ``FILTER_OPERATOR_NOT_EQUAL`` = ``not_equal`` *
+                                          ``FILTER_OPERATOR_LESS_THAN`` = ``less_than`` *
+                                          ``FILTER_OPERATOR_LESS_THAN_OR_EQUAL`` =
+                                          ``less_than_or_equal`` * ``FILTER_OPERATOR_GREATER_THAN`` =
+                                          ``greater_than`` * ``FILTER_OPERATOR_GREATER_THAN_OR_EQUAL``
+                                          = ``greater_than_or_equal``. Required. Known values are:
+                                          "FILTER_OPERATOR_EQUAL", "FILTER_OPERATOR_NOT_EQUAL",
+                                          "FILTER_OPERATOR_LESS_THAN",
+                                          "FILTER_OPERATOR_LESS_THAN_OR_EQUAL",
+                                          "FILTER_OPERATOR_GREATER_THAN", and
+                                          "FILTER_OPERATOR_GREATER_THAN_OR_EQUAL".
+                                        "value": "str"  # Value compared
+                                          against the field. Required.
+                                    }
+                                ],
+                                "resource_urns": [
+                                    "str"  # Optional. Optional list of
+                                      DigitalOcean resource URNs the rule applies to. Empty or omitted
+                                      means the rule is not scoped to specific resources.
+                                ],
+                                "tags": [
+                                    "str"  # Optional. Optional resource tags
+                                      used to select matching resources.
+                                ]
+                            },
+                            "thresholds": {
+                                "operator": "str",  # Comparison operator applied to
+                                  the aggregated metric value. Allowed values:   *
+                                  ``THRESHOLD_OPERATOR_EQUAL`` = equal *
+                                  ``THRESHOLD_OPERATOR_LESS_THAN_OR_EQUAL`` = ``less_than_or_equal`` *
+                                  ``THRESHOLD_OPERATOR_LESS_THAN`` = ``less_than`` *
+                                  ``THRESHOLD_OPERATOR_GREATER_THAN`` = ``greater_than`` *
+                                  ``THRESHOLD_OPERATOR_GREATER_THAN_OR_EQUAL`` =
+                                  ``greater_than_or_equal`` * ``THRESHOLD_OPERATOR_NOT_EQUAL`` =
+                                  ``not_equal``. Required. Known values are:
+                                  "THRESHOLD_OPERATOR_EQUAL", "THRESHOLD_OPERATOR_LESS_THAN_OR_EQUAL",
+                                  "THRESHOLD_OPERATOR_LESS_THAN", "THRESHOLD_OPERATOR_GREATER_THAN",
+                                  "THRESHOLD_OPERATOR_GREATER_THAN_OR_EQUAL", and
+                                  "THRESHOLD_OPERATOR_NOT_EQUAL".
+                                "critical": 0.0,  # Optional. Critical threshold
+                                  value.
+                                "warning": 0.0  # Optional. Warning threshold value.
+                            },
+                            "condition": {
+                                "window": "str"  # Optional. Time window over which
+                                  the metric is evaluated. Allowed values:   * ``EVALUATION_WINDOW_1M``
+                                  = ``1m`` * ``EVALUATION_WINDOW_5M`` = ``5m`` *
+                                  ``EVALUATION_WINDOW_10M`` = ``10m`` * ``EVALUATION_WINDOW_15M`` =
+                                  ``15m`` * ``EVALUATION_WINDOW_30M`` = ``30m`` *
+                                  ``EVALUATION_WINDOW_1H`` = ``1h``. Known values are:
+                                  "EVALUATION_WINDOW_1M", "EVALUATION_WINDOW_5M",
+                                  "EVALUATION_WINDOW_10M", "EVALUATION_WINDOW_15M",
+                                  "EVALUATION_WINDOW_30M", and "EVALUATION_WINDOW_1H".
+                            },
+                            "notification_channels": [
+                                {
+                                    "notification_channel_id": "str",  # ID of an
+                                      existing notification channel owned by the account. Required.
+                                    "notify_on": [
+                                        "str"  # Optional. Severities that
+                                          trigger this channel. Allowed values:   *
+                                          ``SEVERITY_WARNING`` = warning * ``SEVERITY_CRITICAL`` =
+                                          critical.
+                                    ]
+                                }
+                            ],
+                            "re_alert_duration": "str"  # Optional. Minimum wait before
+                              re-notifying a still-firing alert. Defaults to ``RE_ALERT_DURATION_4H``
+                              on create when omitted. Allowed values:   * ``RE_ALERT_DURATION_30M`` =
+                              ``30m`` * ``RE_ALERT_DURATION_1H`` = ``1h`` * ``RE_ALERT_DURATION_4H`` =
+                              ``4h`` * ``RE_ALERT_DURATION_NEVER`` = never. Known values are:
+                              "RE_ALERT_DURATION_30M", "RE_ALERT_DURATION_1H", "RE_ALERT_DURATION_4H",
+                              and "RE_ALERT_DURATION_NEVER".
+                        },
+                        "status": "str",  # Current alert rule status. Allowed values:   *
+                          ``ALERT_RULE_STATUS_ACTIVE`` = active * ``ALERT_RULE_STATUS_PAUSED`` =
+                          paused. Required. Known values are: "ALERT_RULE_STATUS_ACTIVE" and
+                          "ALERT_RULE_STATUS_PAUSED".
+                        "updated_at": "2020-02-20 00:00:00"  # Time the alert rule was last
+                          updated. Required.
+                    }
+                }
+                # response body for status code(s): 400, 422
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def create_alert_rule(
+        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create an Alert Rule.
+
+        To create an alert rule, send a POST request to ``/v2/insights/alert-rules``
+        with a ``spec`` containing ``name``\\ , ``query``\\ , ``thresholds``\\ , and at least one
+        ``notification_channels`` binding. ``status`` defaults to
+        ``ALERT_RULE_STATUS_ACTIVE`` when omitted. ``re_alert_duration`` defaults to
+        ``RE_ALERT_DURATION_4H`` when omitted.
+
+        ``query.metric`` must be a dotted OpenTelemetry name such as
+        ``do.droplets.cpu_utilization``. Underscored Prometheus-style names are
+        rejected with ``422 Unprocessable Entity``.
+
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 201
+                response == {
+                    "alert_rule": {
+                        "created_at": "2020-02-20 00:00:00",  # Time the alert rule was
+                          created. Required.
+                        "id": "str",  # A unique identifier for the alert rule. Required.
+                        "spec": {
+                            "name": "str",  # A human-readable name for the alert rule.
+                              Required.
+                            "query": {
+                                "metric": "str",  # Dotted OpenTelemetry metric name
+                                  to evaluate (for example ``do.droplets.cpu_utilization``"" ).
+                                  Required.
+                                "filters": [
+                                    {
+                                        "field": "str",  # The metric label
+                                          or field to filter on. Required.
+                                        "operator": "str",  # Comparison
+                                          operator for the filter. Allowed values:   *
+                                          ``FILTER_OPERATOR_EQUAL`` = equal *
+                                          ``FILTER_OPERATOR_NOT_EQUAL`` = ``not_equal`` *
+                                          ``FILTER_OPERATOR_LESS_THAN`` = ``less_than`` *
+                                          ``FILTER_OPERATOR_LESS_THAN_OR_EQUAL`` =
+                                          ``less_than_or_equal`` * ``FILTER_OPERATOR_GREATER_THAN`` =
+                                          ``greater_than`` * ``FILTER_OPERATOR_GREATER_THAN_OR_EQUAL``
+                                          = ``greater_than_or_equal``. Required. Known values are:
+                                          "FILTER_OPERATOR_EQUAL", "FILTER_OPERATOR_NOT_EQUAL",
+                                          "FILTER_OPERATOR_LESS_THAN",
+                                          "FILTER_OPERATOR_LESS_THAN_OR_EQUAL",
+                                          "FILTER_OPERATOR_GREATER_THAN", and
+                                          "FILTER_OPERATOR_GREATER_THAN_OR_EQUAL".
+                                        "value": "str"  # Value compared
+                                          against the field. Required.
+                                    }
+                                ],
+                                "resource_urns": [
+                                    "str"  # Optional. Optional list of
+                                      DigitalOcean resource URNs the rule applies to. Empty or omitted
+                                      means the rule is not scoped to specific resources.
+                                ],
+                                "tags": [
+                                    "str"  # Optional. Optional resource tags
+                                      used to select matching resources.
+                                ]
+                            },
+                            "thresholds": {
+                                "operator": "str",  # Comparison operator applied to
+                                  the aggregated metric value. Allowed values:   *
+                                  ``THRESHOLD_OPERATOR_EQUAL`` = equal *
+                                  ``THRESHOLD_OPERATOR_LESS_THAN_OR_EQUAL`` = ``less_than_or_equal`` *
+                                  ``THRESHOLD_OPERATOR_LESS_THAN`` = ``less_than`` *
+                                  ``THRESHOLD_OPERATOR_GREATER_THAN`` = ``greater_than`` *
+                                  ``THRESHOLD_OPERATOR_GREATER_THAN_OR_EQUAL`` =
+                                  ``greater_than_or_equal`` * ``THRESHOLD_OPERATOR_NOT_EQUAL`` =
+                                  ``not_equal``. Required. Known values are:
+                                  "THRESHOLD_OPERATOR_EQUAL", "THRESHOLD_OPERATOR_LESS_THAN_OR_EQUAL",
+                                  "THRESHOLD_OPERATOR_LESS_THAN", "THRESHOLD_OPERATOR_GREATER_THAN",
+                                  "THRESHOLD_OPERATOR_GREATER_THAN_OR_EQUAL", and
+                                  "THRESHOLD_OPERATOR_NOT_EQUAL".
+                                "critical": 0.0,  # Optional. Critical threshold
+                                  value.
+                                "warning": 0.0  # Optional. Warning threshold value.
+                            },
+                            "condition": {
+                                "window": "str"  # Optional. Time window over which
+                                  the metric is evaluated. Allowed values:   * ``EVALUATION_WINDOW_1M``
+                                  = ``1m`` * ``EVALUATION_WINDOW_5M`` = ``5m`` *
+                                  ``EVALUATION_WINDOW_10M`` = ``10m`` * ``EVALUATION_WINDOW_15M`` =
+                                  ``15m`` * ``EVALUATION_WINDOW_30M`` = ``30m`` *
+                                  ``EVALUATION_WINDOW_1H`` = ``1h``. Known values are:
+                                  "EVALUATION_WINDOW_1M", "EVALUATION_WINDOW_5M",
+                                  "EVALUATION_WINDOW_10M", "EVALUATION_WINDOW_15M",
+                                  "EVALUATION_WINDOW_30M", and "EVALUATION_WINDOW_1H".
+                            },
+                            "notification_channels": [
+                                {
+                                    "notification_channel_id": "str",  # ID of an
+                                      existing notification channel owned by the account. Required.
+                                    "notify_on": [
+                                        "str"  # Optional. Severities that
+                                          trigger this channel. Allowed values:   *
+                                          ``SEVERITY_WARNING`` = warning * ``SEVERITY_CRITICAL`` =
+                                          critical.
+                                    ]
+                                }
+                            ],
+                            "re_alert_duration": "str"  # Optional. Minimum wait before
+                              re-notifying a still-firing alert. Defaults to ``RE_ALERT_DURATION_4H``
+                              on create when omitted. Allowed values:   * ``RE_ALERT_DURATION_30M`` =
+                              ``30m`` * ``RE_ALERT_DURATION_1H`` = ``1h`` * ``RE_ALERT_DURATION_4H`` =
+                              ``4h`` * ``RE_ALERT_DURATION_NEVER`` = never. Known values are:
+                              "RE_ALERT_DURATION_30M", "RE_ALERT_DURATION_1H", "RE_ALERT_DURATION_4H",
+                              and "RE_ALERT_DURATION_NEVER".
+                        },
+                        "status": "str",  # Current alert rule status. Allowed values:   *
+                          ``ALERT_RULE_STATUS_ACTIVE`` = active * ``ALERT_RULE_STATUS_PAUSED`` =
+                          paused. Required. Known values are: "ALERT_RULE_STATUS_ACTIVE" and
+                          "ALERT_RULE_STATUS_PAUSED".
+                        "updated_at": "2020-02-20 00:00:00"  # Time the alert rule was last
+                          updated. Required.
+                    }
+                }
+                # response body for status code(s): 400, 422
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def create_alert_rule(
+        self, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create an Alert Rule.
+
+        To create an alert rule, send a POST request to ``/v2/insights/alert-rules``
+        with a ``spec`` containing ``name``\\ , ``query``\\ , ``thresholds``\\ , and at least one
+        ``notification_channels`` binding. ``status`` defaults to
+        ``ALERT_RULE_STATUS_ACTIVE`` when omitted. ``re_alert_duration`` defaults to
+        ``RE_ALERT_DURATION_4H`` when omitted.
+
+        ``query.metric`` must be a dotted OpenTelemetry name such as
+        ``do.droplets.cpu_utilization``. Underscored Prometheus-style names are
+        rejected with ``422 Unprocessable Entity``.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "spec": {
+                        "name": "str",  # A human-readable name for the alert rule. Required.
+                        "query": {
+                            "metric": "str",  # Dotted OpenTelemetry metric name to
+                              evaluate (for example ``do.droplets.cpu_utilization``"" ). Required.
+                            "filters": [
+                                {
+                                    "field": "str",  # The metric label or field
+                                      to filter on. Required.
+                                    "operator": "str",  # Comparison operator for
+                                      the filter. Allowed values:   * ``FILTER_OPERATOR_EQUAL`` = equal
+                                      * ``FILTER_OPERATOR_NOT_EQUAL`` = ``not_equal`` *
+                                      ``FILTER_OPERATOR_LESS_THAN`` = ``less_than`` *
+                                      ``FILTER_OPERATOR_LESS_THAN_OR_EQUAL`` = ``less_than_or_equal`` *
+                                      ``FILTER_OPERATOR_GREATER_THAN`` = ``greater_than`` *
+                                      ``FILTER_OPERATOR_GREATER_THAN_OR_EQUAL`` =
+                                      ``greater_than_or_equal``. Required. Known values are:
+                                      "FILTER_OPERATOR_EQUAL", "FILTER_OPERATOR_NOT_EQUAL",
+                                      "FILTER_OPERATOR_LESS_THAN",
+                                      "FILTER_OPERATOR_LESS_THAN_OR_EQUAL",
+                                      "FILTER_OPERATOR_GREATER_THAN", and
+                                      "FILTER_OPERATOR_GREATER_THAN_OR_EQUAL".
+                                    "value": "str"  # Value compared against the
+                                      field. Required.
+                                }
+                            ],
+                            "resource_urns": [
+                                "str"  # Optional. Optional list of DigitalOcean
+                                  resource URNs the rule applies to. Empty or omitted means the rule is
+                                  not scoped to specific resources.
+                            ],
+                            "tags": [
+                                "str"  # Optional. Optional resource tags used to
+                                  select matching resources.
+                            ]
+                        },
+                        "thresholds": {
+                            "operator": "str",  # Comparison operator applied to the
+                              aggregated metric value. Allowed values:   * ``THRESHOLD_OPERATOR_EQUAL``
+                              = equal * ``THRESHOLD_OPERATOR_LESS_THAN_OR_EQUAL`` =
+                              ``less_than_or_equal`` * ``THRESHOLD_OPERATOR_LESS_THAN`` = ``less_than``
+                              * ``THRESHOLD_OPERATOR_GREATER_THAN`` = ``greater_than`` *
+                              ``THRESHOLD_OPERATOR_GREATER_THAN_OR_EQUAL`` = ``greater_than_or_equal``
+                              * ``THRESHOLD_OPERATOR_NOT_EQUAL`` = ``not_equal``. Required. Known
+                              values are: "THRESHOLD_OPERATOR_EQUAL",
+                              "THRESHOLD_OPERATOR_LESS_THAN_OR_EQUAL", "THRESHOLD_OPERATOR_LESS_THAN",
+                              "THRESHOLD_OPERATOR_GREATER_THAN",
+                              "THRESHOLD_OPERATOR_GREATER_THAN_OR_EQUAL", and
+                              "THRESHOLD_OPERATOR_NOT_EQUAL".
+                            "critical": 0.0,  # Optional. Critical threshold value.
+                            "warning": 0.0  # Optional. Warning threshold value.
+                        },
+                        "condition": {
+                            "window": "str"  # Optional. Time window over which the
+                              metric is evaluated. Allowed values:   * ``EVALUATION_WINDOW_1M`` =
+                              ``1m`` * ``EVALUATION_WINDOW_5M`` = ``5m`` * ``EVALUATION_WINDOW_10M`` =
+                              ``10m`` * ``EVALUATION_WINDOW_15M`` = ``15m`` * ``EVALUATION_WINDOW_30M``
+                              = ``30m`` * ``EVALUATION_WINDOW_1H`` = ``1h``. Known values are:
+                              "EVALUATION_WINDOW_1M", "EVALUATION_WINDOW_5M", "EVALUATION_WINDOW_10M",
+                              "EVALUATION_WINDOW_15M", "EVALUATION_WINDOW_30M", and
+                              "EVALUATION_WINDOW_1H".
+                        },
+                        "notification_channels": [
+                            {
+                                "notification_channel_id": "str",  # ID of an
+                                  existing notification channel owned by the account. Required.
+                                "notify_on": [
+                                    "str"  # Optional. Severities that trigger
+                                      this channel. Allowed values:   * ``SEVERITY_WARNING`` = warning
+                                      * ``SEVERITY_CRITICAL`` = critical.
+                                ]
+                            }
+                        ],
+                        "re_alert_duration": "str"  # Optional. Minimum wait before
+                          re-notifying a still-firing alert. Defaults to ``RE_ALERT_DURATION_4H`` on
+                          create when omitted. Allowed values:   * ``RE_ALERT_DURATION_30M`` = ``30m``
+                          * ``RE_ALERT_DURATION_1H`` = ``1h`` * ``RE_ALERT_DURATION_4H`` = ``4h`` *
+                          ``RE_ALERT_DURATION_NEVER`` = never. Known values are:
+                          "RE_ALERT_DURATION_30M", "RE_ALERT_DURATION_1H", "RE_ALERT_DURATION_4H", and
+                          "RE_ALERT_DURATION_NEVER".
+                    },
+                    "status": "str"  # Optional. Desired alert rule status. Allowed values:   *
+                      ``ALERT_RULE_STATUS_ACTIVE`` = active * ``ALERT_RULE_STATUS_PAUSED`` = paused.
+                      Known values are: "ALERT_RULE_STATUS_ACTIVE" and "ALERT_RULE_STATUS_PAUSED".
+                }
+
+                # response body for status code(s): 201
+                response == {
+                    "alert_rule": {
+                        "created_at": "2020-02-20 00:00:00",  # Time the alert rule was
+                          created. Required.
+                        "id": "str",  # A unique identifier for the alert rule. Required.
+                        "spec": {
+                            "name": "str",  # A human-readable name for the alert rule.
+                              Required.
+                            "query": {
+                                "metric": "str",  # Dotted OpenTelemetry metric name
+                                  to evaluate (for example ``do.droplets.cpu_utilization``"" ).
+                                  Required.
+                                "filters": [
+                                    {
+                                        "field": "str",  # The metric label
+                                          or field to filter on. Required.
+                                        "operator": "str",  # Comparison
+                                          operator for the filter. Allowed values:   *
+                                          ``FILTER_OPERATOR_EQUAL`` = equal *
+                                          ``FILTER_OPERATOR_NOT_EQUAL`` = ``not_equal`` *
+                                          ``FILTER_OPERATOR_LESS_THAN`` = ``less_than`` *
+                                          ``FILTER_OPERATOR_LESS_THAN_OR_EQUAL`` =
+                                          ``less_than_or_equal`` * ``FILTER_OPERATOR_GREATER_THAN`` =
+                                          ``greater_than`` * ``FILTER_OPERATOR_GREATER_THAN_OR_EQUAL``
+                                          = ``greater_than_or_equal``. Required. Known values are:
+                                          "FILTER_OPERATOR_EQUAL", "FILTER_OPERATOR_NOT_EQUAL",
+                                          "FILTER_OPERATOR_LESS_THAN",
+                                          "FILTER_OPERATOR_LESS_THAN_OR_EQUAL",
+                                          "FILTER_OPERATOR_GREATER_THAN", and
+                                          "FILTER_OPERATOR_GREATER_THAN_OR_EQUAL".
+                                        "value": "str"  # Value compared
+                                          against the field. Required.
+                                    }
+                                ],
+                                "resource_urns": [
+                                    "str"  # Optional. Optional list of
+                                      DigitalOcean resource URNs the rule applies to. Empty or omitted
+                                      means the rule is not scoped to specific resources.
+                                ],
+                                "tags": [
+                                    "str"  # Optional. Optional resource tags
+                                      used to select matching resources.
+                                ]
+                            },
+                            "thresholds": {
+                                "operator": "str",  # Comparison operator applied to
+                                  the aggregated metric value. Allowed values:   *
+                                  ``THRESHOLD_OPERATOR_EQUAL`` = equal *
+                                  ``THRESHOLD_OPERATOR_LESS_THAN_OR_EQUAL`` = ``less_than_or_equal`` *
+                                  ``THRESHOLD_OPERATOR_LESS_THAN`` = ``less_than`` *
+                                  ``THRESHOLD_OPERATOR_GREATER_THAN`` = ``greater_than`` *
+                                  ``THRESHOLD_OPERATOR_GREATER_THAN_OR_EQUAL`` =
+                                  ``greater_than_or_equal`` * ``THRESHOLD_OPERATOR_NOT_EQUAL`` =
+                                  ``not_equal``. Required. Known values are:
+                                  "THRESHOLD_OPERATOR_EQUAL", "THRESHOLD_OPERATOR_LESS_THAN_OR_EQUAL",
+                                  "THRESHOLD_OPERATOR_LESS_THAN", "THRESHOLD_OPERATOR_GREATER_THAN",
+                                  "THRESHOLD_OPERATOR_GREATER_THAN_OR_EQUAL", and
+                                  "THRESHOLD_OPERATOR_NOT_EQUAL".
+                                "critical": 0.0,  # Optional. Critical threshold
+                                  value.
+                                "warning": 0.0  # Optional. Warning threshold value.
+                            },
+                            "condition": {
+                                "window": "str"  # Optional. Time window over which
+                                  the metric is evaluated. Allowed values:   * ``EVALUATION_WINDOW_1M``
+                                  = ``1m`` * ``EVALUATION_WINDOW_5M`` = ``5m`` *
+                                  ``EVALUATION_WINDOW_10M`` = ``10m`` * ``EVALUATION_WINDOW_15M`` =
+                                  ``15m`` * ``EVALUATION_WINDOW_30M`` = ``30m`` *
+                                  ``EVALUATION_WINDOW_1H`` = ``1h``. Known values are:
+                                  "EVALUATION_WINDOW_1M", "EVALUATION_WINDOW_5M",
+                                  "EVALUATION_WINDOW_10M", "EVALUATION_WINDOW_15M",
+                                  "EVALUATION_WINDOW_30M", and "EVALUATION_WINDOW_1H".
+                            },
+                            "notification_channels": [
+                                {
+                                    "notification_channel_id": "str",  # ID of an
+                                      existing notification channel owned by the account. Required.
+                                    "notify_on": [
+                                        "str"  # Optional. Severities that
+                                          trigger this channel. Allowed values:   *
+                                          ``SEVERITY_WARNING`` = warning * ``SEVERITY_CRITICAL`` =
+                                          critical.
+                                    ]
+                                }
+                            ],
+                            "re_alert_duration": "str"  # Optional. Minimum wait before
+                              re-notifying a still-firing alert. Defaults to ``RE_ALERT_DURATION_4H``
+                              on create when omitted. Allowed values:   * ``RE_ALERT_DURATION_30M`` =
+                              ``30m`` * ``RE_ALERT_DURATION_1H`` = ``1h`` * ``RE_ALERT_DURATION_4H`` =
+                              ``4h`` * ``RE_ALERT_DURATION_NEVER`` = never. Known values are:
+                              "RE_ALERT_DURATION_30M", "RE_ALERT_DURATION_1H", "RE_ALERT_DURATION_4H",
+                              and "RE_ALERT_DURATION_NEVER".
+                        },
+                        "status": "str",  # Current alert rule status. Allowed values:   *
+                          ``ALERT_RULE_STATUS_ACTIVE`` = active * ``ALERT_RULE_STATUS_PAUSED`` =
+                          paused. Required. Known values are: "ALERT_RULE_STATUS_ACTIVE" and
+                          "ALERT_RULE_STATUS_PAUSED".
+                        "updated_at": "2020-02-20 00:00:00"  # Time the alert rule was last
+                          updated. Required.
+                    }
+                }
+                # response body for status code(s): 400, 422
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_insights_create_alert_rule_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [201, 400, 422]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 201:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 422:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_alert_rule(self, id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve an Alert Rule.
+
+        To retrieve an alert rule, send a GET request to
+        ``/v2/insights/alert-rules/{id}``.
+
+        :param id: A unique identifier for an alert rule. Required.
+        :type id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "alert_rule": {
+                        "created_at": "2020-02-20 00:00:00",  # Time the alert rule was
+                          created. Required.
+                        "id": "str",  # A unique identifier for the alert rule. Required.
+                        "spec": {
+                            "name": "str",  # A human-readable name for the alert rule.
+                              Required.
+                            "query": {
+                                "metric": "str",  # Dotted OpenTelemetry metric name
+                                  to evaluate (for example ``do.droplets.cpu_utilization``"" ).
+                                  Required.
+                                "filters": [
+                                    {
+                                        "field": "str",  # The metric label
+                                          or field to filter on. Required.
+                                        "operator": "str",  # Comparison
+                                          operator for the filter. Allowed values:   *
+                                          ``FILTER_OPERATOR_EQUAL`` = equal *
+                                          ``FILTER_OPERATOR_NOT_EQUAL`` = ``not_equal`` *
+                                          ``FILTER_OPERATOR_LESS_THAN`` = ``less_than`` *
+                                          ``FILTER_OPERATOR_LESS_THAN_OR_EQUAL`` =
+                                          ``less_than_or_equal`` * ``FILTER_OPERATOR_GREATER_THAN`` =
+                                          ``greater_than`` * ``FILTER_OPERATOR_GREATER_THAN_OR_EQUAL``
+                                          = ``greater_than_or_equal``. Required. Known values are:
+                                          "FILTER_OPERATOR_EQUAL", "FILTER_OPERATOR_NOT_EQUAL",
+                                          "FILTER_OPERATOR_LESS_THAN",
+                                          "FILTER_OPERATOR_LESS_THAN_OR_EQUAL",
+                                          "FILTER_OPERATOR_GREATER_THAN", and
+                                          "FILTER_OPERATOR_GREATER_THAN_OR_EQUAL".
+                                        "value": "str"  # Value compared
+                                          against the field. Required.
+                                    }
+                                ],
+                                "resource_urns": [
+                                    "str"  # Optional. Optional list of
+                                      DigitalOcean resource URNs the rule applies to. Empty or omitted
+                                      means the rule is not scoped to specific resources.
+                                ],
+                                "tags": [
+                                    "str"  # Optional. Optional resource tags
+                                      used to select matching resources.
+                                ]
+                            },
+                            "thresholds": {
+                                "operator": "str",  # Comparison operator applied to
+                                  the aggregated metric value. Allowed values:   *
+                                  ``THRESHOLD_OPERATOR_EQUAL`` = equal *
+                                  ``THRESHOLD_OPERATOR_LESS_THAN_OR_EQUAL`` = ``less_than_or_equal`` *
+                                  ``THRESHOLD_OPERATOR_LESS_THAN`` = ``less_than`` *
+                                  ``THRESHOLD_OPERATOR_GREATER_THAN`` = ``greater_than`` *
+                                  ``THRESHOLD_OPERATOR_GREATER_THAN_OR_EQUAL`` =
+                                  ``greater_than_or_equal`` * ``THRESHOLD_OPERATOR_NOT_EQUAL`` =
+                                  ``not_equal``. Required. Known values are:
+                                  "THRESHOLD_OPERATOR_EQUAL", "THRESHOLD_OPERATOR_LESS_THAN_OR_EQUAL",
+                                  "THRESHOLD_OPERATOR_LESS_THAN", "THRESHOLD_OPERATOR_GREATER_THAN",
+                                  "THRESHOLD_OPERATOR_GREATER_THAN_OR_EQUAL", and
+                                  "THRESHOLD_OPERATOR_NOT_EQUAL".
+                                "critical": 0.0,  # Optional. Critical threshold
+                                  value.
+                                "warning": 0.0  # Optional. Warning threshold value.
+                            },
+                            "condition": {
+                                "window": "str"  # Optional. Time window over which
+                                  the metric is evaluated. Allowed values:   * ``EVALUATION_WINDOW_1M``
+                                  = ``1m`` * ``EVALUATION_WINDOW_5M`` = ``5m`` *
+                                  ``EVALUATION_WINDOW_10M`` = ``10m`` * ``EVALUATION_WINDOW_15M`` =
+                                  ``15m`` * ``EVALUATION_WINDOW_30M`` = ``30m`` *
+                                  ``EVALUATION_WINDOW_1H`` = ``1h``. Known values are:
+                                  "EVALUATION_WINDOW_1M", "EVALUATION_WINDOW_5M",
+                                  "EVALUATION_WINDOW_10M", "EVALUATION_WINDOW_15M",
+                                  "EVALUATION_WINDOW_30M", and "EVALUATION_WINDOW_1H".
+                            },
+                            "notification_channels": [
+                                {
+                                    "notification_channel_id": "str",  # ID of an
+                                      existing notification channel owned by the account. Required.
+                                    "notify_on": [
+                                        "str"  # Optional. Severities that
+                                          trigger this channel. Allowed values:   *
+                                          ``SEVERITY_WARNING`` = warning * ``SEVERITY_CRITICAL`` =
+                                          critical.
+                                    ]
+                                }
+                            ],
+                            "re_alert_duration": "str"  # Optional. Minimum wait before
+                              re-notifying a still-firing alert. Defaults to ``RE_ALERT_DURATION_4H``
+                              on create when omitted. Allowed values:   * ``RE_ALERT_DURATION_30M`` =
+                              ``30m`` * ``RE_ALERT_DURATION_1H`` = ``1h`` * ``RE_ALERT_DURATION_4H`` =
+                              ``4h`` * ``RE_ALERT_DURATION_NEVER`` = never. Known values are:
+                              "RE_ALERT_DURATION_30M", "RE_ALERT_DURATION_1H", "RE_ALERT_DURATION_4H",
+                              and "RE_ALERT_DURATION_NEVER".
+                        },
+                        "status": "str",  # Current alert rule status. Allowed values:   *
+                          ``ALERT_RULE_STATUS_ACTIVE`` = active * ``ALERT_RULE_STATUS_PAUSED`` =
+                          paused. Required. Known values are: "ALERT_RULE_STATUS_ACTIVE" and
+                          "ALERT_RULE_STATUS_PAUSED".
+                        "updated_at": "2020-02-20 00:00:00"  # Time the alert rule was last
+                          updated. Required.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_insights_get_alert_rule_request(
+            id=id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def update_alert_rule(
+        self,
+        id: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update an Alert Rule.
+
+        This PUT endpoint uses merge semantics. To update an alert rule, send a
+        request to ``/v2/insights/alert-rules/{id}`` with a full ``spec``. Omit
+        ``notification_channels`` to keep existing bindings. Omit ``status`` or
+        ``re_alert_duration`` to keep those existing values.
+
+        :param id: A unique identifier for an alert rule. Required.
+        :type id: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "spec": {
+                        "name": "str",  # A human-readable name for the alert rule. Required.
+                        "query": {
+                            "metric": "str",  # Dotted OpenTelemetry metric name to
+                              evaluate (for example ``do.droplets.cpu_utilization``"" ). Required.
+                            "filters": [
+                                {
+                                    "field": "str",  # The metric label or field
+                                      to filter on. Required.
+                                    "operator": "str",  # Comparison operator for
+                                      the filter. Allowed values:   * ``FILTER_OPERATOR_EQUAL`` = equal
+                                      * ``FILTER_OPERATOR_NOT_EQUAL`` = ``not_equal`` *
+                                      ``FILTER_OPERATOR_LESS_THAN`` = ``less_than`` *
+                                      ``FILTER_OPERATOR_LESS_THAN_OR_EQUAL`` = ``less_than_or_equal`` *
+                                      ``FILTER_OPERATOR_GREATER_THAN`` = ``greater_than`` *
+                                      ``FILTER_OPERATOR_GREATER_THAN_OR_EQUAL`` =
+                                      ``greater_than_or_equal``. Required. Known values are:
+                                      "FILTER_OPERATOR_EQUAL", "FILTER_OPERATOR_NOT_EQUAL",
+                                      "FILTER_OPERATOR_LESS_THAN",
+                                      "FILTER_OPERATOR_LESS_THAN_OR_EQUAL",
+                                      "FILTER_OPERATOR_GREATER_THAN", and
+                                      "FILTER_OPERATOR_GREATER_THAN_OR_EQUAL".
+                                    "value": "str"  # Value compared against the
+                                      field. Required.
+                                }
+                            ],
+                            "resource_urns": [
+                                "str"  # Optional. Optional list of DigitalOcean
+                                  resource URNs the rule applies to. Empty or omitted means the rule is
+                                  not scoped to specific resources.
+                            ],
+                            "tags": [
+                                "str"  # Optional. Optional resource tags used to
+                                  select matching resources.
+                            ]
+                        },
+                        "thresholds": {
+                            "operator": "str",  # Comparison operator applied to the
+                              aggregated metric value. Allowed values:   * ``THRESHOLD_OPERATOR_EQUAL``
+                              = equal * ``THRESHOLD_OPERATOR_LESS_THAN_OR_EQUAL`` =
+                              ``less_than_or_equal`` * ``THRESHOLD_OPERATOR_LESS_THAN`` = ``less_than``
+                              * ``THRESHOLD_OPERATOR_GREATER_THAN`` = ``greater_than`` *
+                              ``THRESHOLD_OPERATOR_GREATER_THAN_OR_EQUAL`` = ``greater_than_or_equal``
+                              * ``THRESHOLD_OPERATOR_NOT_EQUAL`` = ``not_equal``. Required. Known
+                              values are: "THRESHOLD_OPERATOR_EQUAL",
+                              "THRESHOLD_OPERATOR_LESS_THAN_OR_EQUAL", "THRESHOLD_OPERATOR_LESS_THAN",
+                              "THRESHOLD_OPERATOR_GREATER_THAN",
+                              "THRESHOLD_OPERATOR_GREATER_THAN_OR_EQUAL", and
+                              "THRESHOLD_OPERATOR_NOT_EQUAL".
+                            "critical": 0.0,  # Optional. Critical threshold value.
+                            "warning": 0.0  # Optional. Warning threshold value.
+                        },
+                        "condition": {
+                            "window": "str"  # Optional. Time window over which the
+                              metric is evaluated. Allowed values:   * ``EVALUATION_WINDOW_1M`` =
+                              ``1m`` * ``EVALUATION_WINDOW_5M`` = ``5m`` * ``EVALUATION_WINDOW_10M`` =
+                              ``10m`` * ``EVALUATION_WINDOW_15M`` = ``15m`` * ``EVALUATION_WINDOW_30M``
+                              = ``30m`` * ``EVALUATION_WINDOW_1H`` = ``1h``. Known values are:
+                              "EVALUATION_WINDOW_1M", "EVALUATION_WINDOW_5M", "EVALUATION_WINDOW_10M",
+                              "EVALUATION_WINDOW_15M", "EVALUATION_WINDOW_30M", and
+                              "EVALUATION_WINDOW_1H".
+                        },
+                        "notification_channels": [
+                            {
+                                "notification_channel_id": "str",  # ID of an
+                                  existing notification channel owned by the account. Required.
+                                "notify_on": [
+                                    "str"  # Optional. Severities that trigger
+                                      this channel. Allowed values:   * ``SEVERITY_WARNING`` = warning
+                                      * ``SEVERITY_CRITICAL`` = critical.
+                                ]
+                            }
+                        ],
+                        "re_alert_duration": "str"  # Optional. Minimum wait before
+                          re-notifying a still-firing alert. Defaults to ``RE_ALERT_DURATION_4H`` on
+                          create when omitted. Allowed values:   * ``RE_ALERT_DURATION_30M`` = ``30m``
+                          * ``RE_ALERT_DURATION_1H`` = ``1h`` * ``RE_ALERT_DURATION_4H`` = ``4h`` *
+                          ``RE_ALERT_DURATION_NEVER`` = never. Known values are:
+                          "RE_ALERT_DURATION_30M", "RE_ALERT_DURATION_1H", "RE_ALERT_DURATION_4H", and
+                          "RE_ALERT_DURATION_NEVER".
+                    },
+                    "status": "str"  # Optional. Desired alert rule status. Allowed values:   *
+                      ``ALERT_RULE_STATUS_ACTIVE`` = active * ``ALERT_RULE_STATUS_PAUSED`` = paused.
+                      Known values are: "ALERT_RULE_STATUS_ACTIVE" and "ALERT_RULE_STATUS_PAUSED".
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "alert_rule": {
+                        "created_at": "2020-02-20 00:00:00",  # Time the alert rule was
+                          created. Required.
+                        "id": "str",  # A unique identifier for the alert rule. Required.
+                        "spec": {
+                            "name": "str",  # A human-readable name for the alert rule.
+                              Required.
+                            "query": {
+                                "metric": "str",  # Dotted OpenTelemetry metric name
+                                  to evaluate (for example ``do.droplets.cpu_utilization``"" ).
+                                  Required.
+                                "filters": [
+                                    {
+                                        "field": "str",  # The metric label
+                                          or field to filter on. Required.
+                                        "operator": "str",  # Comparison
+                                          operator for the filter. Allowed values:   *
+                                          ``FILTER_OPERATOR_EQUAL`` = equal *
+                                          ``FILTER_OPERATOR_NOT_EQUAL`` = ``not_equal`` *
+                                          ``FILTER_OPERATOR_LESS_THAN`` = ``less_than`` *
+                                          ``FILTER_OPERATOR_LESS_THAN_OR_EQUAL`` =
+                                          ``less_than_or_equal`` * ``FILTER_OPERATOR_GREATER_THAN`` =
+                                          ``greater_than`` * ``FILTER_OPERATOR_GREATER_THAN_OR_EQUAL``
+                                          = ``greater_than_or_equal``. Required. Known values are:
+                                          "FILTER_OPERATOR_EQUAL", "FILTER_OPERATOR_NOT_EQUAL",
+                                          "FILTER_OPERATOR_LESS_THAN",
+                                          "FILTER_OPERATOR_LESS_THAN_OR_EQUAL",
+                                          "FILTER_OPERATOR_GREATER_THAN", and
+                                          "FILTER_OPERATOR_GREATER_THAN_OR_EQUAL".
+                                        "value": "str"  # Value compared
+                                          against the field. Required.
+                                    }
+                                ],
+                                "resource_urns": [
+                                    "str"  # Optional. Optional list of
+                                      DigitalOcean resource URNs the rule applies to. Empty or omitted
+                                      means the rule is not scoped to specific resources.
+                                ],
+                                "tags": [
+                                    "str"  # Optional. Optional resource tags
+                                      used to select matching resources.
+                                ]
+                            },
+                            "thresholds": {
+                                "operator": "str",  # Comparison operator applied to
+                                  the aggregated metric value. Allowed values:   *
+                                  ``THRESHOLD_OPERATOR_EQUAL`` = equal *
+                                  ``THRESHOLD_OPERATOR_LESS_THAN_OR_EQUAL`` = ``less_than_or_equal`` *
+                                  ``THRESHOLD_OPERATOR_LESS_THAN`` = ``less_than`` *
+                                  ``THRESHOLD_OPERATOR_GREATER_THAN`` = ``greater_than`` *
+                                  ``THRESHOLD_OPERATOR_GREATER_THAN_OR_EQUAL`` =
+                                  ``greater_than_or_equal`` * ``THRESHOLD_OPERATOR_NOT_EQUAL`` =
+                                  ``not_equal``. Required. Known values are:
+                                  "THRESHOLD_OPERATOR_EQUAL", "THRESHOLD_OPERATOR_LESS_THAN_OR_EQUAL",
+                                  "THRESHOLD_OPERATOR_LESS_THAN", "THRESHOLD_OPERATOR_GREATER_THAN",
+                                  "THRESHOLD_OPERATOR_GREATER_THAN_OR_EQUAL", and
+                                  "THRESHOLD_OPERATOR_NOT_EQUAL".
+                                "critical": 0.0,  # Optional. Critical threshold
+                                  value.
+                                "warning": 0.0  # Optional. Warning threshold value.
+                            },
+                            "condition": {
+                                "window": "str"  # Optional. Time window over which
+                                  the metric is evaluated. Allowed values:   * ``EVALUATION_WINDOW_1M``
+                                  = ``1m`` * ``EVALUATION_WINDOW_5M`` = ``5m`` *
+                                  ``EVALUATION_WINDOW_10M`` = ``10m`` * ``EVALUATION_WINDOW_15M`` =
+                                  ``15m`` * ``EVALUATION_WINDOW_30M`` = ``30m`` *
+                                  ``EVALUATION_WINDOW_1H`` = ``1h``. Known values are:
+                                  "EVALUATION_WINDOW_1M", "EVALUATION_WINDOW_5M",
+                                  "EVALUATION_WINDOW_10M", "EVALUATION_WINDOW_15M",
+                                  "EVALUATION_WINDOW_30M", and "EVALUATION_WINDOW_1H".
+                            },
+                            "notification_channels": [
+                                {
+                                    "notification_channel_id": "str",  # ID of an
+                                      existing notification channel owned by the account. Required.
+                                    "notify_on": [
+                                        "str"  # Optional. Severities that
+                                          trigger this channel. Allowed values:   *
+                                          ``SEVERITY_WARNING`` = warning * ``SEVERITY_CRITICAL`` =
+                                          critical.
+                                    ]
+                                }
+                            ],
+                            "re_alert_duration": "str"  # Optional. Minimum wait before
+                              re-notifying a still-firing alert. Defaults to ``RE_ALERT_DURATION_4H``
+                              on create when omitted. Allowed values:   * ``RE_ALERT_DURATION_30M`` =
+                              ``30m`` * ``RE_ALERT_DURATION_1H`` = ``1h`` * ``RE_ALERT_DURATION_4H`` =
+                              ``4h`` * ``RE_ALERT_DURATION_NEVER`` = never. Known values are:
+                              "RE_ALERT_DURATION_30M", "RE_ALERT_DURATION_1H", "RE_ALERT_DURATION_4H",
+                              and "RE_ALERT_DURATION_NEVER".
+                        },
+                        "status": "str",  # Current alert rule status. Allowed values:   *
+                          ``ALERT_RULE_STATUS_ACTIVE`` = active * ``ALERT_RULE_STATUS_PAUSED`` =
+                          paused. Required. Known values are: "ALERT_RULE_STATUS_ACTIVE" and
+                          "ALERT_RULE_STATUS_PAUSED".
+                        "updated_at": "2020-02-20 00:00:00"  # Time the alert rule was last
+                          updated. Required.
+                    }
+                }
+                # response body for status code(s): 400, 404, 422
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def update_alert_rule(
+        self,
+        id: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update an Alert Rule.
+
+        This PUT endpoint uses merge semantics. To update an alert rule, send a
+        request to ``/v2/insights/alert-rules/{id}`` with a full ``spec``. Omit
+        ``notification_channels`` to keep existing bindings. Omit ``status`` or
+        ``re_alert_duration`` to keep those existing values.
+
+        :param id: A unique identifier for an alert rule. Required.
+        :type id: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "alert_rule": {
+                        "created_at": "2020-02-20 00:00:00",  # Time the alert rule was
+                          created. Required.
+                        "id": "str",  # A unique identifier for the alert rule. Required.
+                        "spec": {
+                            "name": "str",  # A human-readable name for the alert rule.
+                              Required.
+                            "query": {
+                                "metric": "str",  # Dotted OpenTelemetry metric name
+                                  to evaluate (for example ``do.droplets.cpu_utilization``"" ).
+                                  Required.
+                                "filters": [
+                                    {
+                                        "field": "str",  # The metric label
+                                          or field to filter on. Required.
+                                        "operator": "str",  # Comparison
+                                          operator for the filter. Allowed values:   *
+                                          ``FILTER_OPERATOR_EQUAL`` = equal *
+                                          ``FILTER_OPERATOR_NOT_EQUAL`` = ``not_equal`` *
+                                          ``FILTER_OPERATOR_LESS_THAN`` = ``less_than`` *
+                                          ``FILTER_OPERATOR_LESS_THAN_OR_EQUAL`` =
+                                          ``less_than_or_equal`` * ``FILTER_OPERATOR_GREATER_THAN`` =
+                                          ``greater_than`` * ``FILTER_OPERATOR_GREATER_THAN_OR_EQUAL``
+                                          = ``greater_than_or_equal``. Required. Known values are:
+                                          "FILTER_OPERATOR_EQUAL", "FILTER_OPERATOR_NOT_EQUAL",
+                                          "FILTER_OPERATOR_LESS_THAN",
+                                          "FILTER_OPERATOR_LESS_THAN_OR_EQUAL",
+                                          "FILTER_OPERATOR_GREATER_THAN", and
+                                          "FILTER_OPERATOR_GREATER_THAN_OR_EQUAL".
+                                        "value": "str"  # Value compared
+                                          against the field. Required.
+                                    }
+                                ],
+                                "resource_urns": [
+                                    "str"  # Optional. Optional list of
+                                      DigitalOcean resource URNs the rule applies to. Empty or omitted
+                                      means the rule is not scoped to specific resources.
+                                ],
+                                "tags": [
+                                    "str"  # Optional. Optional resource tags
+                                      used to select matching resources.
+                                ]
+                            },
+                            "thresholds": {
+                                "operator": "str",  # Comparison operator applied to
+                                  the aggregated metric value. Allowed values:   *
+                                  ``THRESHOLD_OPERATOR_EQUAL`` = equal *
+                                  ``THRESHOLD_OPERATOR_LESS_THAN_OR_EQUAL`` = ``less_than_or_equal`` *
+                                  ``THRESHOLD_OPERATOR_LESS_THAN`` = ``less_than`` *
+                                  ``THRESHOLD_OPERATOR_GREATER_THAN`` = ``greater_than`` *
+                                  ``THRESHOLD_OPERATOR_GREATER_THAN_OR_EQUAL`` =
+                                  ``greater_than_or_equal`` * ``THRESHOLD_OPERATOR_NOT_EQUAL`` =
+                                  ``not_equal``. Required. Known values are:
+                                  "THRESHOLD_OPERATOR_EQUAL", "THRESHOLD_OPERATOR_LESS_THAN_OR_EQUAL",
+                                  "THRESHOLD_OPERATOR_LESS_THAN", "THRESHOLD_OPERATOR_GREATER_THAN",
+                                  "THRESHOLD_OPERATOR_GREATER_THAN_OR_EQUAL", and
+                                  "THRESHOLD_OPERATOR_NOT_EQUAL".
+                                "critical": 0.0,  # Optional. Critical threshold
+                                  value.
+                                "warning": 0.0  # Optional. Warning threshold value.
+                            },
+                            "condition": {
+                                "window": "str"  # Optional. Time window over which
+                                  the metric is evaluated. Allowed values:   * ``EVALUATION_WINDOW_1M``
+                                  = ``1m`` * ``EVALUATION_WINDOW_5M`` = ``5m`` *
+                                  ``EVALUATION_WINDOW_10M`` = ``10m`` * ``EVALUATION_WINDOW_15M`` =
+                                  ``15m`` * ``EVALUATION_WINDOW_30M`` = ``30m`` *
+                                  ``EVALUATION_WINDOW_1H`` = ``1h``. Known values are:
+                                  "EVALUATION_WINDOW_1M", "EVALUATION_WINDOW_5M",
+                                  "EVALUATION_WINDOW_10M", "EVALUATION_WINDOW_15M",
+                                  "EVALUATION_WINDOW_30M", and "EVALUATION_WINDOW_1H".
+                            },
+                            "notification_channels": [
+                                {
+                                    "notification_channel_id": "str",  # ID of an
+                                      existing notification channel owned by the account. Required.
+                                    "notify_on": [
+                                        "str"  # Optional. Severities that
+                                          trigger this channel. Allowed values:   *
+                                          ``SEVERITY_WARNING`` = warning * ``SEVERITY_CRITICAL`` =
+                                          critical.
+                                    ]
+                                }
+                            ],
+                            "re_alert_duration": "str"  # Optional. Minimum wait before
+                              re-notifying a still-firing alert. Defaults to ``RE_ALERT_DURATION_4H``
+                              on create when omitted. Allowed values:   * ``RE_ALERT_DURATION_30M`` =
+                              ``30m`` * ``RE_ALERT_DURATION_1H`` = ``1h`` * ``RE_ALERT_DURATION_4H`` =
+                              ``4h`` * ``RE_ALERT_DURATION_NEVER`` = never. Known values are:
+                              "RE_ALERT_DURATION_30M", "RE_ALERT_DURATION_1H", "RE_ALERT_DURATION_4H",
+                              and "RE_ALERT_DURATION_NEVER".
+                        },
+                        "status": "str",  # Current alert rule status. Allowed values:   *
+                          ``ALERT_RULE_STATUS_ACTIVE`` = active * ``ALERT_RULE_STATUS_PAUSED`` =
+                          paused. Required. Known values are: "ALERT_RULE_STATUS_ACTIVE" and
+                          "ALERT_RULE_STATUS_PAUSED".
+                        "updated_at": "2020-02-20 00:00:00"  # Time the alert rule was last
+                          updated. Required.
+                    }
+                }
+                # response body for status code(s): 400, 404, 422
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def update_alert_rule(
+        self, id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update an Alert Rule.
+
+        This PUT endpoint uses merge semantics. To update an alert rule, send a
+        request to ``/v2/insights/alert-rules/{id}`` with a full ``spec``. Omit
+        ``notification_channels`` to keep existing bindings. Omit ``status`` or
+        ``re_alert_duration`` to keep those existing values.
+
+        :param id: A unique identifier for an alert rule. Required.
+        :type id: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "spec": {
+                        "name": "str",  # A human-readable name for the alert rule. Required.
+                        "query": {
+                            "metric": "str",  # Dotted OpenTelemetry metric name to
+                              evaluate (for example ``do.droplets.cpu_utilization``"" ). Required.
+                            "filters": [
+                                {
+                                    "field": "str",  # The metric label or field
+                                      to filter on. Required.
+                                    "operator": "str",  # Comparison operator for
+                                      the filter. Allowed values:   * ``FILTER_OPERATOR_EQUAL`` = equal
+                                      * ``FILTER_OPERATOR_NOT_EQUAL`` = ``not_equal`` *
+                                      ``FILTER_OPERATOR_LESS_THAN`` = ``less_than`` *
+                                      ``FILTER_OPERATOR_LESS_THAN_OR_EQUAL`` = ``less_than_or_equal`` *
+                                      ``FILTER_OPERATOR_GREATER_THAN`` = ``greater_than`` *
+                                      ``FILTER_OPERATOR_GREATER_THAN_OR_EQUAL`` =
+                                      ``greater_than_or_equal``. Required. Known values are:
+                                      "FILTER_OPERATOR_EQUAL", "FILTER_OPERATOR_NOT_EQUAL",
+                                      "FILTER_OPERATOR_LESS_THAN",
+                                      "FILTER_OPERATOR_LESS_THAN_OR_EQUAL",
+                                      "FILTER_OPERATOR_GREATER_THAN", and
+                                      "FILTER_OPERATOR_GREATER_THAN_OR_EQUAL".
+                                    "value": "str"  # Value compared against the
+                                      field. Required.
+                                }
+                            ],
+                            "resource_urns": [
+                                "str"  # Optional. Optional list of DigitalOcean
+                                  resource URNs the rule applies to. Empty or omitted means the rule is
+                                  not scoped to specific resources.
+                            ],
+                            "tags": [
+                                "str"  # Optional. Optional resource tags used to
+                                  select matching resources.
+                            ]
+                        },
+                        "thresholds": {
+                            "operator": "str",  # Comparison operator applied to the
+                              aggregated metric value. Allowed values:   * ``THRESHOLD_OPERATOR_EQUAL``
+                              = equal * ``THRESHOLD_OPERATOR_LESS_THAN_OR_EQUAL`` =
+                              ``less_than_or_equal`` * ``THRESHOLD_OPERATOR_LESS_THAN`` = ``less_than``
+                              * ``THRESHOLD_OPERATOR_GREATER_THAN`` = ``greater_than`` *
+                              ``THRESHOLD_OPERATOR_GREATER_THAN_OR_EQUAL`` = ``greater_than_or_equal``
+                              * ``THRESHOLD_OPERATOR_NOT_EQUAL`` = ``not_equal``. Required. Known
+                              values are: "THRESHOLD_OPERATOR_EQUAL",
+                              "THRESHOLD_OPERATOR_LESS_THAN_OR_EQUAL", "THRESHOLD_OPERATOR_LESS_THAN",
+                              "THRESHOLD_OPERATOR_GREATER_THAN",
+                              "THRESHOLD_OPERATOR_GREATER_THAN_OR_EQUAL", and
+                              "THRESHOLD_OPERATOR_NOT_EQUAL".
+                            "critical": 0.0,  # Optional. Critical threshold value.
+                            "warning": 0.0  # Optional. Warning threshold value.
+                        },
+                        "condition": {
+                            "window": "str"  # Optional. Time window over which the
+                              metric is evaluated. Allowed values:   * ``EVALUATION_WINDOW_1M`` =
+                              ``1m`` * ``EVALUATION_WINDOW_5M`` = ``5m`` * ``EVALUATION_WINDOW_10M`` =
+                              ``10m`` * ``EVALUATION_WINDOW_15M`` = ``15m`` * ``EVALUATION_WINDOW_30M``
+                              = ``30m`` * ``EVALUATION_WINDOW_1H`` = ``1h``. Known values are:
+                              "EVALUATION_WINDOW_1M", "EVALUATION_WINDOW_5M", "EVALUATION_WINDOW_10M",
+                              "EVALUATION_WINDOW_15M", "EVALUATION_WINDOW_30M", and
+                              "EVALUATION_WINDOW_1H".
+                        },
+                        "notification_channels": [
+                            {
+                                "notification_channel_id": "str",  # ID of an
+                                  existing notification channel owned by the account. Required.
+                                "notify_on": [
+                                    "str"  # Optional. Severities that trigger
+                                      this channel. Allowed values:   * ``SEVERITY_WARNING`` = warning
+                                      * ``SEVERITY_CRITICAL`` = critical.
+                                ]
+                            }
+                        ],
+                        "re_alert_duration": "str"  # Optional. Minimum wait before
+                          re-notifying a still-firing alert. Defaults to ``RE_ALERT_DURATION_4H`` on
+                          create when omitted. Allowed values:   * ``RE_ALERT_DURATION_30M`` = ``30m``
+                          * ``RE_ALERT_DURATION_1H`` = ``1h`` * ``RE_ALERT_DURATION_4H`` = ``4h`` *
+                          ``RE_ALERT_DURATION_NEVER`` = never. Known values are:
+                          "RE_ALERT_DURATION_30M", "RE_ALERT_DURATION_1H", "RE_ALERT_DURATION_4H", and
+                          "RE_ALERT_DURATION_NEVER".
+                    },
+                    "status": "str"  # Optional. Desired alert rule status. Allowed values:   *
+                      ``ALERT_RULE_STATUS_ACTIVE`` = active * ``ALERT_RULE_STATUS_PAUSED`` = paused.
+                      Known values are: "ALERT_RULE_STATUS_ACTIVE" and "ALERT_RULE_STATUS_PAUSED".
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "alert_rule": {
+                        "created_at": "2020-02-20 00:00:00",  # Time the alert rule was
+                          created. Required.
+                        "id": "str",  # A unique identifier for the alert rule. Required.
+                        "spec": {
+                            "name": "str",  # A human-readable name for the alert rule.
+                              Required.
+                            "query": {
+                                "metric": "str",  # Dotted OpenTelemetry metric name
+                                  to evaluate (for example ``do.droplets.cpu_utilization``"" ).
+                                  Required.
+                                "filters": [
+                                    {
+                                        "field": "str",  # The metric label
+                                          or field to filter on. Required.
+                                        "operator": "str",  # Comparison
+                                          operator for the filter. Allowed values:   *
+                                          ``FILTER_OPERATOR_EQUAL`` = equal *
+                                          ``FILTER_OPERATOR_NOT_EQUAL`` = ``not_equal`` *
+                                          ``FILTER_OPERATOR_LESS_THAN`` = ``less_than`` *
+                                          ``FILTER_OPERATOR_LESS_THAN_OR_EQUAL`` =
+                                          ``less_than_or_equal`` * ``FILTER_OPERATOR_GREATER_THAN`` =
+                                          ``greater_than`` * ``FILTER_OPERATOR_GREATER_THAN_OR_EQUAL``
+                                          = ``greater_than_or_equal``. Required. Known values are:
+                                          "FILTER_OPERATOR_EQUAL", "FILTER_OPERATOR_NOT_EQUAL",
+                                          "FILTER_OPERATOR_LESS_THAN",
+                                          "FILTER_OPERATOR_LESS_THAN_OR_EQUAL",
+                                          "FILTER_OPERATOR_GREATER_THAN", and
+                                          "FILTER_OPERATOR_GREATER_THAN_OR_EQUAL".
+                                        "value": "str"  # Value compared
+                                          against the field. Required.
+                                    }
+                                ],
+                                "resource_urns": [
+                                    "str"  # Optional. Optional list of
+                                      DigitalOcean resource URNs the rule applies to. Empty or omitted
+                                      means the rule is not scoped to specific resources.
+                                ],
+                                "tags": [
+                                    "str"  # Optional. Optional resource tags
+                                      used to select matching resources.
+                                ]
+                            },
+                            "thresholds": {
+                                "operator": "str",  # Comparison operator applied to
+                                  the aggregated metric value. Allowed values:   *
+                                  ``THRESHOLD_OPERATOR_EQUAL`` = equal *
+                                  ``THRESHOLD_OPERATOR_LESS_THAN_OR_EQUAL`` = ``less_than_or_equal`` *
+                                  ``THRESHOLD_OPERATOR_LESS_THAN`` = ``less_than`` *
+                                  ``THRESHOLD_OPERATOR_GREATER_THAN`` = ``greater_than`` *
+                                  ``THRESHOLD_OPERATOR_GREATER_THAN_OR_EQUAL`` =
+                                  ``greater_than_or_equal`` * ``THRESHOLD_OPERATOR_NOT_EQUAL`` =
+                                  ``not_equal``. Required. Known values are:
+                                  "THRESHOLD_OPERATOR_EQUAL", "THRESHOLD_OPERATOR_LESS_THAN_OR_EQUAL",
+                                  "THRESHOLD_OPERATOR_LESS_THAN", "THRESHOLD_OPERATOR_GREATER_THAN",
+                                  "THRESHOLD_OPERATOR_GREATER_THAN_OR_EQUAL", and
+                                  "THRESHOLD_OPERATOR_NOT_EQUAL".
+                                "critical": 0.0,  # Optional. Critical threshold
+                                  value.
+                                "warning": 0.0  # Optional. Warning threshold value.
+                            },
+                            "condition": {
+                                "window": "str"  # Optional. Time window over which
+                                  the metric is evaluated. Allowed values:   * ``EVALUATION_WINDOW_1M``
+                                  = ``1m`` * ``EVALUATION_WINDOW_5M`` = ``5m`` *
+                                  ``EVALUATION_WINDOW_10M`` = ``10m`` * ``EVALUATION_WINDOW_15M`` =
+                                  ``15m`` * ``EVALUATION_WINDOW_30M`` = ``30m`` *
+                                  ``EVALUATION_WINDOW_1H`` = ``1h``. Known values are:
+                                  "EVALUATION_WINDOW_1M", "EVALUATION_WINDOW_5M",
+                                  "EVALUATION_WINDOW_10M", "EVALUATION_WINDOW_15M",
+                                  "EVALUATION_WINDOW_30M", and "EVALUATION_WINDOW_1H".
+                            },
+                            "notification_channels": [
+                                {
+                                    "notification_channel_id": "str",  # ID of an
+                                      existing notification channel owned by the account. Required.
+                                    "notify_on": [
+                                        "str"  # Optional. Severities that
+                                          trigger this channel. Allowed values:   *
+                                          ``SEVERITY_WARNING`` = warning * ``SEVERITY_CRITICAL`` =
+                                          critical.
+                                    ]
+                                }
+                            ],
+                            "re_alert_duration": "str"  # Optional. Minimum wait before
+                              re-notifying a still-firing alert. Defaults to ``RE_ALERT_DURATION_4H``
+                              on create when omitted. Allowed values:   * ``RE_ALERT_DURATION_30M`` =
+                              ``30m`` * ``RE_ALERT_DURATION_1H`` = ``1h`` * ``RE_ALERT_DURATION_4H`` =
+                              ``4h`` * ``RE_ALERT_DURATION_NEVER`` = never. Known values are:
+                              "RE_ALERT_DURATION_30M", "RE_ALERT_DURATION_1H", "RE_ALERT_DURATION_4H",
+                              and "RE_ALERT_DURATION_NEVER".
+                        },
+                        "status": "str",  # Current alert rule status. Allowed values:   *
+                          ``ALERT_RULE_STATUS_ACTIVE`` = active * ``ALERT_RULE_STATUS_PAUSED`` =
+                          paused. Required. Known values are: "ALERT_RULE_STATUS_ACTIVE" and
+                          "ALERT_RULE_STATUS_PAUSED".
+                        "updated_at": "2020-02-20 00:00:00"  # Time the alert rule was last
+                          updated. Required.
+                    }
+                }
+                # response body for status code(s): 400, 404, 422
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_insights_update_alert_rule_request(
+            id=id,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404, 422]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 422:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def delete_alert_rule(self, id: str, **kwargs: Any) -> Optional[JSON]:
+        # pylint: disable=line-too-long
+        """Delete an Alert Rule.
+
+        To delete an alert rule, send a DELETE request to
+        ``/v2/insights/alert-rules/{id}``.
+
+        :param id: A unique identifier for an alert rule. Required.
+        :type id: str
+        :return: JSON object or None
+        :rtype: JSON or None
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[Optional[JSON]] = kwargs.pop("cls", None)
+
+        _request = build_insights_delete_alert_rule_request(
+            id=id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [204, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        deserialized = None
+        response_headers = {}
+        if response.status_code == 204:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, deserialized, response_headers)  # type: ignore
+
+        return deserialized  # type: ignore
+
+    @distributed_trace_async
+    async def list_notification_channels(
+        self, *, page: int = 1, per_page: int = 20, **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Notification Channels.
+
+        To list all notification channels for your account, send a GET request to
+        ``/v2/insights/notification-channels``. Results are paginated with ``page`` and
+        ``per_page`` (default ``20``\\ , maximum ``200``\\ ).
+
+        :keyword page: Which 'page' of paginated results to return. Default value is 1.
+        :paramtype page: int
+        :keyword per_page: Number of items returned per page. Default value is 20.
+        :paramtype per_page: int
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "meta": {
+                        "total": 0  # Optional. Number of objects returned by the request.
+                    },
+                    "notification_channels": [
+                        {
+                            "channel_type": "str",  # The configured channel type.
+                              Allowed values:   * ``CHANNEL_TYPE_EMAIL`` = email *
+                              ``CHANNEL_TYPE_SLACK`` = slack * ``CHANNEL_TYPE_WEBHOOK`` = webhook.
+                              Required. Known values are: "CHANNEL_TYPE_EMAIL", "CHANNEL_TYPE_SLACK",
+                              and "CHANNEL_TYPE_WEBHOOK".
+                            "created_at": "2020-02-20 00:00:00",  # Time the notification
+                              channel was created. Required.
+                            "id": "str",  # A unique identifier for the notification
+                              channel. Required.
+                            "name": "str",  # A human-readable name for the notification
+                              channel. Required.
+                            "updated_at": "2020-02-20 00:00:00",  # Time the notification
+                              channel was last updated. Required.
+                            "email": {
+                                "to": "str"  # One or more recipient email addresses,
+                                  separated by commas, semicolons, or spaces. Required.
+                            },
+                            "slack": {
+                                "channel": "str",  # The Slack channel name to
+                                  notify. Required.
+                                "webhook_url": "str"  # Optional. Slack incoming
+                                  webhook URL. Write-only secret "u2014 full value on create/update;
+                                  masked as ``********`` on read. Omit on update to retain the existing
+                                  value.
+                            },
+                            "usage": {
+                                "rule_count": 0  # Optional. Number of alert rules
+                                  that reference this channel.
+                            },
+                            "webhook": {
+                                "url": "str",  # HTTPS URL that receives webhook
+                                  deliveries. Returned in full on read. Required.
+                                "basic_auth": {
+                                    "username": "str",  # Basic auth username.
+                                      Required.
+                                    "password": "str"  # Optional. Basic auth
+                                      password. Write-only secret "u2014 full value on create/update;
+                                      masked as ``********`` on read.
+                                },
+                                "bearer_token": {
+                                    "token": "str"  # Optional. Bearer token
+                                      value sent in the Authorization header. Write-only secret "u2014
+                                      full value on create/update; masked as ``********`` on read.
+                                },
+                                "headers": {
+                                    "str": "str"  # Optional. Optional custom
+                                      HTTP headers to include on webhook deliveries. At most 20 headers
+                                      are allowed. Reserved header names such as ``host``"" ,
+                                      ``content-type``"" , and ``proxy-*`` are rejected.
+                                },
+                                "signature": {
+                                    "secret": "str"  # Optional. Shared secret
+                                      used to sign webhook payloads. Write-only secret "u2014 full
+                                      value on create/update; masked as ``********`` on read.
+                                }
+                            }
+                        }
+                    ],
+                    "links": {
+                        "pages": {}
+                    }
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_insights_list_notification_channels_request(
+            page=page,
+            per_page=per_page,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        response_headers["ratelimit-limit"] = self._deserialize(
+            "int", response.headers.get("ratelimit-limit")
+        )
+        response_headers["ratelimit-remaining"] = self._deserialize(
+            "int", response.headers.get("ratelimit-remaining")
+        )
+        response_headers["ratelimit-reset"] = self._deserialize(
+            "int", response.headers.get("ratelimit-reset")
+        )
+
+        if response.content:
+            deserialized = response.json()
+        else:
+            deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def create_notification_channel(
+        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Notification Channel.
+
+        To create a notification channel, send a POST request to
+        ``/v2/insights/notification-channels`` with a ``name`` and exactly one of
+        ``email``\\ , ``slack``\\ , or ``webhook``.
+
+        Email recipients must be verified team member addresses. Webhook URLs must
+        use HTTPS. Secret fields (\\ ``slack.webhook_url``\\ , webhook credentials) are
+        write-only and returned masked on subsequent reads.
+
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "name": "str",  # A human-readable name for the notification channel.
+                      Required.
+                    "email": {
+                        "to": "str"  # One or more recipient email addresses, separated by
+                          commas, semicolons, or spaces. Required.
+                    },
+                    "slack": {
+                        "channel": "str",  # The Slack channel name to notify. Required.
+                        "webhook_url": "str"  # Optional. Slack incoming webhook URL.
+                          Write-only secret "u2014 full value on create/update; masked as ``********``
+                          on read. Omit on update to retain the existing value.
+                    },
+                    "webhook": {
+                        "url": "str",  # HTTPS URL that receives webhook deliveries. Returned
+                          in full on read. Required.
+                        "basic_auth": {
+                            "username": "str",  # Basic auth username. Required.
+                            "password": "str"  # Optional. Basic auth password.
+                              Write-only secret "u2014 full value on create/update; masked as
+                              ``********`` on read.
+                        },
+                        "bearer_token": {
+                            "token": "str"  # Optional. Bearer token value sent in the
+                              Authorization header. Write-only secret "u2014 full value on
+                              create/update; masked as ``********`` on read.
+                        },
+                        "headers": {
+                            "str": "str"  # Optional. Optional custom HTTP headers to
+                              include on webhook deliveries. At most 20 headers are allowed. Reserved
+                              header names such as ``host``"" , ``content-type``"" , and ``proxy-*``
+                              are rejected.
+                        },
+                        "signature": {
+                            "secret": "str"  # Optional. Shared secret used to sign
+                              webhook payloads. Write-only secret "u2014 full value on create/update;
+                              masked as ``********`` on read.
+                        }
+                    }
+                }
+
+                # response body for status code(s): 201
+                response == {
+                    "notification_channel": {
+                        "channel_type": "str",  # The configured channel type. Allowed
+                          values:   * ``CHANNEL_TYPE_EMAIL`` = email * ``CHANNEL_TYPE_SLACK`` = slack *
+                          ``CHANNEL_TYPE_WEBHOOK`` = webhook. Required. Known values are:
+                          "CHANNEL_TYPE_EMAIL", "CHANNEL_TYPE_SLACK", and "CHANNEL_TYPE_WEBHOOK".
+                        "created_at": "2020-02-20 00:00:00",  # Time the notification channel
+                          was created. Required.
+                        "id": "str",  # A unique identifier for the notification channel.
+                          Required.
+                        "name": "str",  # A human-readable name for the notification channel.
+                          Required.
+                        "updated_at": "2020-02-20 00:00:00",  # Time the notification channel
+                          was last updated. Required.
+                        "email": {
+                            "to": "str"  # One or more recipient email addresses,
+                              separated by commas, semicolons, or spaces. Required.
+                        },
+                        "slack": {
+                            "channel": "str",  # The Slack channel name to notify.
+                              Required.
+                            "webhook_url": "str"  # Optional. Slack incoming webhook URL.
+                              Write-only secret "u2014 full value on create/update; masked as
+                              ``********`` on read. Omit on update to retain the existing value.
+                        },
+                        "usage": {
+                            "rule_count": 0  # Optional. Number of alert rules that
+                              reference this channel.
+                        },
+                        "webhook": {
+                            "url": "str",  # HTTPS URL that receives webhook deliveries.
+                              Returned in full on read. Required.
+                            "basic_auth": {
+                                "username": "str",  # Basic auth username. Required.
+                                "password": "str"  # Optional. Basic auth password.
+                                  Write-only secret "u2014 full value on create/update; masked as
+                                  ``********`` on read.
+                            },
+                            "bearer_token": {
+                                "token": "str"  # Optional. Bearer token value sent
+                                  in the Authorization header. Write-only secret "u2014 full value on
+                                  create/update; masked as ``********`` on read.
+                            },
+                            "headers": {
+                                "str": "str"  # Optional. Optional custom HTTP
+                                  headers to include on webhook deliveries. At most 20 headers are
+                                  allowed. Reserved header names such as ``host``"" ,
+                                  ``content-type``"" , and ``proxy-*`` are rejected.
+                            },
+                            "signature": {
+                                "secret": "str"  # Optional. Shared secret used to
+                                  sign webhook payloads. Write-only secret "u2014 full value on
+                                  create/update; masked as ``********`` on read.
+                            }
+                        }
+                    }
+                }
+                # response body for status code(s): 400
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def create_notification_channel(
+        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Notification Channel.
+
+        To create a notification channel, send a POST request to
+        ``/v2/insights/notification-channels`` with a ``name`` and exactly one of
+        ``email``\\ , ``slack``\\ , or ``webhook``.
+
+        Email recipients must be verified team member addresses. Webhook URLs must
+        use HTTPS. Secret fields (\\ ``slack.webhook_url``\\ , webhook credentials) are
+        write-only and returned masked on subsequent reads.
+
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 201
+                response == {
+                    "notification_channel": {
+                        "channel_type": "str",  # The configured channel type. Allowed
+                          values:   * ``CHANNEL_TYPE_EMAIL`` = email * ``CHANNEL_TYPE_SLACK`` = slack *
+                          ``CHANNEL_TYPE_WEBHOOK`` = webhook. Required. Known values are:
+                          "CHANNEL_TYPE_EMAIL", "CHANNEL_TYPE_SLACK", and "CHANNEL_TYPE_WEBHOOK".
+                        "created_at": "2020-02-20 00:00:00",  # Time the notification channel
+                          was created. Required.
+                        "id": "str",  # A unique identifier for the notification channel.
+                          Required.
+                        "name": "str",  # A human-readable name for the notification channel.
+                          Required.
+                        "updated_at": "2020-02-20 00:00:00",  # Time the notification channel
+                          was last updated. Required.
+                        "email": {
+                            "to": "str"  # One or more recipient email addresses,
+                              separated by commas, semicolons, or spaces. Required.
+                        },
+                        "slack": {
+                            "channel": "str",  # The Slack channel name to notify.
+                              Required.
+                            "webhook_url": "str"  # Optional. Slack incoming webhook URL.
+                              Write-only secret "u2014 full value on create/update; masked as
+                              ``********`` on read. Omit on update to retain the existing value.
+                        },
+                        "usage": {
+                            "rule_count": 0  # Optional. Number of alert rules that
+                              reference this channel.
+                        },
+                        "webhook": {
+                            "url": "str",  # HTTPS URL that receives webhook deliveries.
+                              Returned in full on read. Required.
+                            "basic_auth": {
+                                "username": "str",  # Basic auth username. Required.
+                                "password": "str"  # Optional. Basic auth password.
+                                  Write-only secret "u2014 full value on create/update; masked as
+                                  ``********`` on read.
+                            },
+                            "bearer_token": {
+                                "token": "str"  # Optional. Bearer token value sent
+                                  in the Authorization header. Write-only secret "u2014 full value on
+                                  create/update; masked as ``********`` on read.
+                            },
+                            "headers": {
+                                "str": "str"  # Optional. Optional custom HTTP
+                                  headers to include on webhook deliveries. At most 20 headers are
+                                  allowed. Reserved header names such as ``host``"" ,
+                                  ``content-type``"" , and ``proxy-*`` are rejected.
+                            },
+                            "signature": {
+                                "secret": "str"  # Optional. Shared secret used to
+                                  sign webhook payloads. Write-only secret "u2014 full value on
+                                  create/update; masked as ``********`` on read.
+                            }
+                        }
+                    }
+                }
+                # response body for status code(s): 400
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def create_notification_channel(
+        self, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Notification Channel.
+
+        To create a notification channel, send a POST request to
+        ``/v2/insights/notification-channels`` with a ``name`` and exactly one of
+        ``email``\\ , ``slack``\\ , or ``webhook``.
+
+        Email recipients must be verified team member addresses. Webhook URLs must
+        use HTTPS. Secret fields (\\ ``slack.webhook_url``\\ , webhook credentials) are
+        write-only and returned masked on subsequent reads.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "name": "str",  # A human-readable name for the notification channel.
+                      Required.
+                    "email": {
+                        "to": "str"  # One or more recipient email addresses, separated by
+                          commas, semicolons, or spaces. Required.
+                    },
+                    "slack": {
+                        "channel": "str",  # The Slack channel name to notify. Required.
+                        "webhook_url": "str"  # Optional. Slack incoming webhook URL.
+                          Write-only secret "u2014 full value on create/update; masked as ``********``
+                          on read. Omit on update to retain the existing value.
+                    },
+                    "webhook": {
+                        "url": "str",  # HTTPS URL that receives webhook deliveries. Returned
+                          in full on read. Required.
+                        "basic_auth": {
+                            "username": "str",  # Basic auth username. Required.
+                            "password": "str"  # Optional. Basic auth password.
+                              Write-only secret "u2014 full value on create/update; masked as
+                              ``********`` on read.
+                        },
+                        "bearer_token": {
+                            "token": "str"  # Optional. Bearer token value sent in the
+                              Authorization header. Write-only secret "u2014 full value on
+                              create/update; masked as ``********`` on read.
+                        },
+                        "headers": {
+                            "str": "str"  # Optional. Optional custom HTTP headers to
+                              include on webhook deliveries. At most 20 headers are allowed. Reserved
+                              header names such as ``host``"" , ``content-type``"" , and ``proxy-*``
+                              are rejected.
+                        },
+                        "signature": {
+                            "secret": "str"  # Optional. Shared secret used to sign
+                              webhook payloads. Write-only secret "u2014 full value on create/update;
+                              masked as ``********`` on read.
+                        }
+                    }
+                }
+
+                # response body for status code(s): 201
+                response == {
+                    "notification_channel": {
+                        "channel_type": "str",  # The configured channel type. Allowed
+                          values:   * ``CHANNEL_TYPE_EMAIL`` = email * ``CHANNEL_TYPE_SLACK`` = slack *
+                          ``CHANNEL_TYPE_WEBHOOK`` = webhook. Required. Known values are:
+                          "CHANNEL_TYPE_EMAIL", "CHANNEL_TYPE_SLACK", and "CHANNEL_TYPE_WEBHOOK".
+                        "created_at": "2020-02-20 00:00:00",  # Time the notification channel
+                          was created. Required.
+                        "id": "str",  # A unique identifier for the notification channel.
+                          Required.
+                        "name": "str",  # A human-readable name for the notification channel.
+                          Required.
+                        "updated_at": "2020-02-20 00:00:00",  # Time the notification channel
+                          was last updated. Required.
+                        "email": {
+                            "to": "str"  # One or more recipient email addresses,
+                              separated by commas, semicolons, or spaces. Required.
+                        },
+                        "slack": {
+                            "channel": "str",  # The Slack channel name to notify.
+                              Required.
+                            "webhook_url": "str"  # Optional. Slack incoming webhook URL.
+                              Write-only secret "u2014 full value on create/update; masked as
+                              ``********`` on read. Omit on update to retain the existing value.
+                        },
+                        "usage": {
+                            "rule_count": 0  # Optional. Number of alert rules that
+                              reference this channel.
+                        },
+                        "webhook": {
+                            "url": "str",  # HTTPS URL that receives webhook deliveries.
+                              Returned in full on read. Required.
+                            "basic_auth": {
+                                "username": "str",  # Basic auth username. Required.
+                                "password": "str"  # Optional. Basic auth password.
+                                  Write-only secret "u2014 full value on create/update; masked as
+                                  ``********`` on read.
+                            },
+                            "bearer_token": {
+                                "token": "str"  # Optional. Bearer token value sent
+                                  in the Authorization header. Write-only secret "u2014 full value on
+                                  create/update; masked as ``********`` on read.
+                            },
+                            "headers": {
+                                "str": "str"  # Optional. Optional custom HTTP
+                                  headers to include on webhook deliveries. At most 20 headers are
+                                  allowed. Reserved header names such as ``host``"" ,
+                                  ``content-type``"" , and ``proxy-*`` are rejected.
+                            },
+                            "signature": {
+                                "secret": "str"  # Optional. Shared secret used to
+                                  sign webhook payloads. Write-only secret "u2014 full value on
+                                  create/update; masked as ``********`` on read.
+                            }
+                        }
+                    }
+                }
+                # response body for status code(s): 400
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_insights_create_notification_channel_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [201, 400]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 201:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_notification_channel(self, id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve a Notification Channel.
+
+        To retrieve a notification channel, send a GET request to
+        ``/v2/insights/notification-channels/{id}``. Secret fields are returned masked
+        as ``********``.
+
+        :param id: A unique identifier for a notification channel. Required.
+        :type id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "notification_channel": {
+                        "channel_type": "str",  # The configured channel type. Allowed
+                          values:   * ``CHANNEL_TYPE_EMAIL`` = email * ``CHANNEL_TYPE_SLACK`` = slack *
+                          ``CHANNEL_TYPE_WEBHOOK`` = webhook. Required. Known values are:
+                          "CHANNEL_TYPE_EMAIL", "CHANNEL_TYPE_SLACK", and "CHANNEL_TYPE_WEBHOOK".
+                        "created_at": "2020-02-20 00:00:00",  # Time the notification channel
+                          was created. Required.
+                        "id": "str",  # A unique identifier for the notification channel.
+                          Required.
+                        "name": "str",  # A human-readable name for the notification channel.
+                          Required.
+                        "updated_at": "2020-02-20 00:00:00",  # Time the notification channel
+                          was last updated. Required.
+                        "email": {
+                            "to": "str"  # One or more recipient email addresses,
+                              separated by commas, semicolons, or spaces. Required.
+                        },
+                        "slack": {
+                            "channel": "str",  # The Slack channel name to notify.
+                              Required.
+                            "webhook_url": "str"  # Optional. Slack incoming webhook URL.
+                              Write-only secret "u2014 full value on create/update; masked as
+                              ``********`` on read. Omit on update to retain the existing value.
+                        },
+                        "usage": {
+                            "rule_count": 0  # Optional. Number of alert rules that
+                              reference this channel.
+                        },
+                        "webhook": {
+                            "url": "str",  # HTTPS URL that receives webhook deliveries.
+                              Returned in full on read. Required.
+                            "basic_auth": {
+                                "username": "str",  # Basic auth username. Required.
+                                "password": "str"  # Optional. Basic auth password.
+                                  Write-only secret "u2014 full value on create/update; masked as
+                                  ``********`` on read.
+                            },
+                            "bearer_token": {
+                                "token": "str"  # Optional. Bearer token value sent
+                                  in the Authorization header. Write-only secret "u2014 full value on
+                                  create/update; masked as ``********`` on read.
+                            },
+                            "headers": {
+                                "str": "str"  # Optional. Optional custom HTTP
+                                  headers to include on webhook deliveries. At most 20 headers are
+                                  allowed. Reserved header names such as ``host``"" ,
+                                  ``content-type``"" , and ``proxy-*`` are rejected.
+                            },
+                            "signature": {
+                                "secret": "str"  # Optional. Shared secret used to
+                                  sign webhook payloads. Write-only secret "u2014 full value on
+                                  create/update; masked as ``********`` on read.
+                            }
+                        }
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_insights_get_notification_channel_request(
+            id=id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def update_notification_channel(
+        self,
+        id: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update a Notification Channel.
+
+        To update a notification channel, send a PUT request to
+        ``/v2/insights/notification-channels/{id}`` with a ``name`` and exactly one of
+        ``email``\\ , ``slack``\\ , or ``webhook``.
+
+        Sending a secret field rotates it; omitting the secret field keeps the
+        existing value.
+
+        :param id: A unique identifier for a notification channel. Required.
+        :type id: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "name": "str",  # A human-readable name for the notification channel.
+                      Required.
+                    "email": {
+                        "to": "str"  # One or more recipient email addresses, separated by
+                          commas, semicolons, or spaces. Required.
+                    },
+                    "slack": {
+                        "channel": "str",  # The Slack channel name to notify. Required.
+                        "webhook_url": "str"  # Optional. Slack incoming webhook URL.
+                          Write-only secret "u2014 full value on create/update; masked as ``********``
+                          on read. Omit on update to retain the existing value.
+                    },
+                    "webhook": {
+                        "url": "str",  # HTTPS URL that receives webhook deliveries. Returned
+                          in full on read. Required.
+                        "basic_auth": {
+                            "username": "str",  # Basic auth username. Required.
+                            "password": "str"  # Optional. Basic auth password.
+                              Write-only secret "u2014 full value on create/update; masked as
+                              ``********`` on read.
+                        },
+                        "bearer_token": {
+                            "token": "str"  # Optional. Bearer token value sent in the
+                              Authorization header. Write-only secret "u2014 full value on
+                              create/update; masked as ``********`` on read.
+                        },
+                        "headers": {
+                            "str": "str"  # Optional. Optional custom HTTP headers to
+                              include on webhook deliveries. At most 20 headers are allowed. Reserved
+                              header names such as ``host``"" , ``content-type``"" , and ``proxy-*``
+                              are rejected.
+                        },
+                        "signature": {
+                            "secret": "str"  # Optional. Shared secret used to sign
+                              webhook payloads. Write-only secret "u2014 full value on create/update;
+                              masked as ``********`` on read.
+                        }
+                    }
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "notification_channel": {
+                        "channel_type": "str",  # The configured channel type. Allowed
+                          values:   * ``CHANNEL_TYPE_EMAIL`` = email * ``CHANNEL_TYPE_SLACK`` = slack *
+                          ``CHANNEL_TYPE_WEBHOOK`` = webhook. Required. Known values are:
+                          "CHANNEL_TYPE_EMAIL", "CHANNEL_TYPE_SLACK", and "CHANNEL_TYPE_WEBHOOK".
+                        "created_at": "2020-02-20 00:00:00",  # Time the notification channel
+                          was created. Required.
+                        "id": "str",  # A unique identifier for the notification channel.
+                          Required.
+                        "name": "str",  # A human-readable name for the notification channel.
+                          Required.
+                        "updated_at": "2020-02-20 00:00:00",  # Time the notification channel
+                          was last updated. Required.
+                        "email": {
+                            "to": "str"  # One or more recipient email addresses,
+                              separated by commas, semicolons, or spaces. Required.
+                        },
+                        "slack": {
+                            "channel": "str",  # The Slack channel name to notify.
+                              Required.
+                            "webhook_url": "str"  # Optional. Slack incoming webhook URL.
+                              Write-only secret "u2014 full value on create/update; masked as
+                              ``********`` on read. Omit on update to retain the existing value.
+                        },
+                        "usage": {
+                            "rule_count": 0  # Optional. Number of alert rules that
+                              reference this channel.
+                        },
+                        "webhook": {
+                            "url": "str",  # HTTPS URL that receives webhook deliveries.
+                              Returned in full on read. Required.
+                            "basic_auth": {
+                                "username": "str",  # Basic auth username. Required.
+                                "password": "str"  # Optional. Basic auth password.
+                                  Write-only secret "u2014 full value on create/update; masked as
+                                  ``********`` on read.
+                            },
+                            "bearer_token": {
+                                "token": "str"  # Optional. Bearer token value sent
+                                  in the Authorization header. Write-only secret "u2014 full value on
+                                  create/update; masked as ``********`` on read.
+                            },
+                            "headers": {
+                                "str": "str"  # Optional. Optional custom HTTP
+                                  headers to include on webhook deliveries. At most 20 headers are
+                                  allowed. Reserved header names such as ``host``"" ,
+                                  ``content-type``"" , and ``proxy-*`` are rejected.
+                            },
+                            "signature": {
+                                "secret": "str"  # Optional. Shared secret used to
+                                  sign webhook payloads. Write-only secret "u2014 full value on
+                                  create/update; masked as ``********`` on read.
+                            }
+                        }
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def update_notification_channel(
+        self,
+        id: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update a Notification Channel.
+
+        To update a notification channel, send a PUT request to
+        ``/v2/insights/notification-channels/{id}`` with a ``name`` and exactly one of
+        ``email``\\ , ``slack``\\ , or ``webhook``.
+
+        Sending a secret field rotates it; omitting the secret field keeps the
+        existing value.
+
+        :param id: A unique identifier for a notification channel. Required.
+        :type id: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "notification_channel": {
+                        "channel_type": "str",  # The configured channel type. Allowed
+                          values:   * ``CHANNEL_TYPE_EMAIL`` = email * ``CHANNEL_TYPE_SLACK`` = slack *
+                          ``CHANNEL_TYPE_WEBHOOK`` = webhook. Required. Known values are:
+                          "CHANNEL_TYPE_EMAIL", "CHANNEL_TYPE_SLACK", and "CHANNEL_TYPE_WEBHOOK".
+                        "created_at": "2020-02-20 00:00:00",  # Time the notification channel
+                          was created. Required.
+                        "id": "str",  # A unique identifier for the notification channel.
+                          Required.
+                        "name": "str",  # A human-readable name for the notification channel.
+                          Required.
+                        "updated_at": "2020-02-20 00:00:00",  # Time the notification channel
+                          was last updated. Required.
+                        "email": {
+                            "to": "str"  # One or more recipient email addresses,
+                              separated by commas, semicolons, or spaces. Required.
+                        },
+                        "slack": {
+                            "channel": "str",  # The Slack channel name to notify.
+                              Required.
+                            "webhook_url": "str"  # Optional. Slack incoming webhook URL.
+                              Write-only secret "u2014 full value on create/update; masked as
+                              ``********`` on read. Omit on update to retain the existing value.
+                        },
+                        "usage": {
+                            "rule_count": 0  # Optional. Number of alert rules that
+                              reference this channel.
+                        },
+                        "webhook": {
+                            "url": "str",  # HTTPS URL that receives webhook deliveries.
+                              Returned in full on read. Required.
+                            "basic_auth": {
+                                "username": "str",  # Basic auth username. Required.
+                                "password": "str"  # Optional. Basic auth password.
+                                  Write-only secret "u2014 full value on create/update; masked as
+                                  ``********`` on read.
+                            },
+                            "bearer_token": {
+                                "token": "str"  # Optional. Bearer token value sent
+                                  in the Authorization header. Write-only secret "u2014 full value on
+                                  create/update; masked as ``********`` on read.
+                            },
+                            "headers": {
+                                "str": "str"  # Optional. Optional custom HTTP
+                                  headers to include on webhook deliveries. At most 20 headers are
+                                  allowed. Reserved header names such as ``host``"" ,
+                                  ``content-type``"" , and ``proxy-*`` are rejected.
+                            },
+                            "signature": {
+                                "secret": "str"  # Optional. Shared secret used to
+                                  sign webhook payloads. Write-only secret "u2014 full value on
+                                  create/update; masked as ``********`` on read.
+                            }
+                        }
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def update_notification_channel(
+        self, id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update a Notification Channel.
+
+        To update a notification channel, send a PUT request to
+        ``/v2/insights/notification-channels/{id}`` with a ``name`` and exactly one of
+        ``email``\\ , ``slack``\\ , or ``webhook``.
+
+        Sending a secret field rotates it; omitting the secret field keeps the
+        existing value.
+
+        :param id: A unique identifier for a notification channel. Required.
+        :type id: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "name": "str",  # A human-readable name for the notification channel.
+                      Required.
+                    "email": {
+                        "to": "str"  # One or more recipient email addresses, separated by
+                          commas, semicolons, or spaces. Required.
+                    },
+                    "slack": {
+                        "channel": "str",  # The Slack channel name to notify. Required.
+                        "webhook_url": "str"  # Optional. Slack incoming webhook URL.
+                          Write-only secret "u2014 full value on create/update; masked as ``********``
+                          on read. Omit on update to retain the existing value.
+                    },
+                    "webhook": {
+                        "url": "str",  # HTTPS URL that receives webhook deliveries. Returned
+                          in full on read. Required.
+                        "basic_auth": {
+                            "username": "str",  # Basic auth username. Required.
+                            "password": "str"  # Optional. Basic auth password.
+                              Write-only secret "u2014 full value on create/update; masked as
+                              ``********`` on read.
+                        },
+                        "bearer_token": {
+                            "token": "str"  # Optional. Bearer token value sent in the
+                              Authorization header. Write-only secret "u2014 full value on
+                              create/update; masked as ``********`` on read.
+                        },
+                        "headers": {
+                            "str": "str"  # Optional. Optional custom HTTP headers to
+                              include on webhook deliveries. At most 20 headers are allowed. Reserved
+                              header names such as ``host``"" , ``content-type``"" , and ``proxy-*``
+                              are rejected.
+                        },
+                        "signature": {
+                            "secret": "str"  # Optional. Shared secret used to sign
+                              webhook payloads. Write-only secret "u2014 full value on create/update;
+                              masked as ``********`` on read.
+                        }
+                    }
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "notification_channel": {
+                        "channel_type": "str",  # The configured channel type. Allowed
+                          values:   * ``CHANNEL_TYPE_EMAIL`` = email * ``CHANNEL_TYPE_SLACK`` = slack *
+                          ``CHANNEL_TYPE_WEBHOOK`` = webhook. Required. Known values are:
+                          "CHANNEL_TYPE_EMAIL", "CHANNEL_TYPE_SLACK", and "CHANNEL_TYPE_WEBHOOK".
+                        "created_at": "2020-02-20 00:00:00",  # Time the notification channel
+                          was created. Required.
+                        "id": "str",  # A unique identifier for the notification channel.
+                          Required.
+                        "name": "str",  # A human-readable name for the notification channel.
+                          Required.
+                        "updated_at": "2020-02-20 00:00:00",  # Time the notification channel
+                          was last updated. Required.
+                        "email": {
+                            "to": "str"  # One or more recipient email addresses,
+                              separated by commas, semicolons, or spaces. Required.
+                        },
+                        "slack": {
+                            "channel": "str",  # The Slack channel name to notify.
+                              Required.
+                            "webhook_url": "str"  # Optional. Slack incoming webhook URL.
+                              Write-only secret "u2014 full value on create/update; masked as
+                              ``********`` on read. Omit on update to retain the existing value.
+                        },
+                        "usage": {
+                            "rule_count": 0  # Optional. Number of alert rules that
+                              reference this channel.
+                        },
+                        "webhook": {
+                            "url": "str",  # HTTPS URL that receives webhook deliveries.
+                              Returned in full on read. Required.
+                            "basic_auth": {
+                                "username": "str",  # Basic auth username. Required.
+                                "password": "str"  # Optional. Basic auth password.
+                                  Write-only secret "u2014 full value on create/update; masked as
+                                  ``********`` on read.
+                            },
+                            "bearer_token": {
+                                "token": "str"  # Optional. Bearer token value sent
+                                  in the Authorization header. Write-only secret "u2014 full value on
+                                  create/update; masked as ``********`` on read.
+                            },
+                            "headers": {
+                                "str": "str"  # Optional. Optional custom HTTP
+                                  headers to include on webhook deliveries. At most 20 headers are
+                                  allowed. Reserved header names such as ``host``"" ,
+                                  ``content-type``"" , and ``proxy-*`` are rejected.
+                            },
+                            "signature": {
+                                "secret": "str"  # Optional. Shared secret used to
+                                  sign webhook payloads. Write-only secret "u2014 full value on
+                                  create/update; masked as ``********`` on read.
+                            }
+                        }
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_insights_update_notification_channel_request(
+            id=id,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def delete_notification_channel(
+        self, id: str, **kwargs: Any
+    ) -> Optional[JSON]:
+        # pylint: disable=line-too-long
+        """Delete a Notification Channel.
+
+        To delete a notification channel, send a DELETE request to
+        ``/v2/insights/notification-channels/{id}``.
+
+        Deleting a channel that is still referenced by one or more alert rules
+        returns ``409 Conflict``.
+
+        :param id: A unique identifier for a notification channel. Required.
+        :type id: str
+        :return: JSON object or None
+        :rtype: JSON or None
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 404, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[Optional[JSON]] = kwargs.pop("cls", None)
+
+        _request = build_insights_delete_notification_channel_request(
+            id=id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [204, 404, 409]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        deserialized = None
+        response_headers = {}
+        if response.status_code == 204:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, deserialized, response_headers)  # type: ignore
+
+        return deserialized  # type: ignore
+
+    @distributed_trace_async
+    async def get_prom_query(
+        self,
+        region: str,
+        *,
+        query: str,
+        time: Optional[str] = None,
+        timeout: Optional[str] = None,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Execute an instant PromQL query.
+
+        To evaluate a PromQL expression at a single point in time, send a GET request to
+        ``/v2/insights/query/{region}/prom/api/v1/query``.
+
+        :param region: The datacenter region slug for the query. Required.
+        :type region: str
+        :keyword query: A PromQL expression. This may be a metric selector (for example
+         ``do.droplets.cpu_time``\\ ) or a fuller expression (for example
+         ``rate(do.droplets.cpu_time[5m])``\\ ). Required.
+        :paramtype query: str
+        :keyword time: Evaluation timestamp for an instant query. Accepts a RFC3339 string or a UNIX
+         timestamp. Defaults to now when omitted. Default value is None.
+        :paramtype time: str
+        :keyword timeout: Optional evaluation timeout as a Prometheus duration string. Default value is
+         None.
+        :paramtype timeout: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "data": {
+                        "result": {},
+                        "resultType": "str"  # Required. Known values are: "vector",
+                          "matrix", "scalar", and "string".
+                    },
+                    "status": "str"  # Required. "success"
+                }
+                # response body for status code(s): 400, 422, 500, 503
+                response == {
+                    "error": "str",  # Human-readable error message. Required.
+                    "errorType": "str",  # Prometheus error category. Required. Known values are:
+                      "bad_data", "internal", "timeout", "canceled", "execution", and "unavailable".
+                    "status": "str"  # Required. "error"
+                }
+                # response body for status code(s): 403, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_insights_get_prom_query_request(
+            region=region,
+            query=query,
+            time=time,
+            timeout=timeout,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404, 422, 500, 503]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 422:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 500:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 503:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_prom_query_range(
+        self,
+        region: str,
+        *,
+        query: str,
+        start: str,
+        end: str,
+        step: str,
+        timeout: Optional[str] = None,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Execute a range PromQL query.
+
+        To evaluate a PromQL expression over a time range, send a GET request to
+        ``/v2/insights/query/{region}/prom/api/v1/query_range``.
+
+        :param region: The datacenter region slug for the query. Required.
+        :type region: str
+        :keyword query: A PromQL expression. This may be a metric selector (for example
+         ``do.droplets.cpu_time``\\ ) or a fuller expression (for example
+         ``rate(do.droplets.cpu_time[5m])``\\ ). Required.
+        :paramtype query: str
+        :keyword start: Start timestamp (inclusive). Accepts a RFC3339 string or a UNIX timestamp.
+         Required.
+        :paramtype start: str
+        :keyword end: End timestamp (inclusive). Accepts a RFC3339 string or a UNIX timestamp.
+         Required.
+        :paramtype end: str
+        :keyword step: Query resolution step width as a Prometheus duration string (for example
+         ``15s``\\ , ``1m``\\ , ``1h``\\ ). Required.
+        :paramtype step: str
+        :keyword timeout: Optional evaluation timeout as a Prometheus duration string. Default value is
+         None.
+        :paramtype timeout: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "data": {
+                        "result": [
+                            {
+                                "metric": {
+                                    "str": "str"  # Metric labels as key/value
+                                      pairs. By default, metric names in responses use Prometheus
+                                      underscored spelling (for example ``do_droplets_cpu_time``"" ),
+                                      even when the request used a dotted selector (for example
+                                      ``do.droplets.cpu_time``"" ). Required.
+                                },
+                                "values": [
+                                    [
+                                        {}
+                                    ]
+                                ]
+                            }
+                        ],
+                        "resultType": "str"  # Required. "matrix"
+                    },
+                    "status": "str"  # Required. "success"
+                }
+                # response body for status code(s): 400, 422, 500, 503
+                response == {
+                    "error": "str",  # Human-readable error message. Required.
+                    "errorType": "str",  # Prometheus error category. Required. Known values are:
+                      "bad_data", "internal", "timeout", "canceled", "execution", and "unavailable".
+                    "status": "str"  # Required. "error"
+                }
+                # response body for status code(s): 403, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_insights_get_prom_query_range_request(
+            region=region,
+            query=query,
+            start=start,
+            end=end,
+            step=step,
+            timeout=timeout,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404, 422, 500, 503]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 422:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 500:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 503:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_prom_labels(
+        self,
+        region: str,
+        *,
+        start: Optional[str] = None,
+        end: Optional[str] = None,
+        match: Optional[List[str]] = None,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List label names.
+
+        To list label names, send a GET request to ``/v2/insights/query/{region}/prom/api/v1/labels``.
+
+        :param region: The datacenter region slug for the query. Required.
+        :type region: str
+        :keyword start: Optional start timestamp (inclusive). Accepts a RFC3339 string or a UNIX
+         timestamp. Default value is None.
+        :paramtype start: str
+        :keyword end: Optional end timestamp (inclusive). Accepts a RFC3339 string or a UNIX timestamp.
+         Default value is None.
+        :paramtype end: str
+        :keyword match: One or more series selectors. Repeat the parameter for multiple matchers.
+         Default value is None.
+        :paramtype match: list[str]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "data": [
+                        "str"  # Required.
+                    ],
+                    "status": "str"  # Required. "success"
+                }
+                # response body for status code(s): 400, 422, 500, 503
+                response == {
+                    "error": "str",  # Human-readable error message. Required.
+                    "errorType": "str",  # Prometheus error category. Required. Known values are:
+                      "bad_data", "internal", "timeout", "canceled", "execution", and "unavailable".
+                    "status": "str"  # Required. "error"
+                }
+                # response body for status code(s): 403, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_insights_get_prom_labels_request(
+            region=region,
+            start=start,
+            end=end,
+            match=match,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404, 422, 500, 503]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 422:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 500:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 503:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_prom_label_values(
+        self,
+        region: str,
+        name: str,
+        *,
+        start: Optional[str] = None,
+        end: Optional[str] = None,
+        match: Optional[List[str]] = None,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List values for a label.
+
+        To list values for a label name, send a GET request to
+        ``/v2/insights/query/{region}/prom/api/v1/label/{name}/values``.
+
+        :param region: The datacenter region slug for the query. Required.
+        :type region: str
+        :param name: The label name whose values should be listed. Required.
+        :type name: str
+        :keyword start: Optional start timestamp (inclusive). Accepts a RFC3339 string or a UNIX
+         timestamp. Default value is None.
+        :paramtype start: str
+        :keyword end: Optional end timestamp (inclusive). Accepts a RFC3339 string or a UNIX timestamp.
+         Default value is None.
+        :paramtype end: str
+        :keyword match: One or more series selectors. Repeat the parameter for multiple matchers.
+         Default value is None.
+        :paramtype match: list[str]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "data": [
+                        "str"  # Required.
+                    ],
+                    "status": "str"  # Required. "success"
+                }
+                # response body for status code(s): 400, 422, 500, 503
+                response == {
+                    "error": "str",  # Human-readable error message. Required.
+                    "errorType": "str",  # Prometheus error category. Required. Known values are:
+                      "bad_data", "internal", "timeout", "canceled", "execution", and "unavailable".
+                    "status": "str"  # Required. "error"
+                }
+                # response body for status code(s): 403, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_insights_get_prom_label_values_request(
+            region=region,
+            name=name,
+            start=start,
+            end=end,
+            match=match,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404, 422, 500, 503]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 422:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 500:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 503:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_prom_series(
+        self,
+        region: str,
+        *,
+        match: List[str],
+        start: Optional[str] = None,
+        end: Optional[str] = None,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Find series by label selectors.
+
+        To find series matching one or more selectors, send a GET request to
+        ``/v2/insights/query/{region}/prom/api/v1/series``.
+
+        :param region: The datacenter region slug for the query. Required.
+        :type region: str
+        :keyword match: One or more series selectors. At least one matcher is required. Repeat the
+         parameter for multiple matchers. Required.
+        :paramtype match: list[str]
+        :keyword start: Optional start timestamp (inclusive). Accepts a RFC3339 string or a UNIX
+         timestamp. Default value is None.
+        :paramtype start: str
+        :keyword end: Optional end timestamp (inclusive). Accepts a RFC3339 string or a UNIX timestamp.
+         Default value is None.
+        :paramtype end: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "data": [
+                        {
+                            "str": "str"  # Required.
+                        }
+                    ],
+                    "status": "str"  # Required. "success"
+                }
+                # response body for status code(s): 400, 422, 500, 503
+                response == {
+                    "error": "str",  # Human-readable error message. Required.
+                    "errorType": "str",  # Prometheus error category. Required. Known values are:
+                      "bad_data", "internal", "timeout", "canceled", "execution", and "unavailable".
+                    "status": "str"  # Required. "error"
+                }
+                # response body for status code(s): 403, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_insights_get_prom_series_request(
+            region=region,
+            match=match,
+            start=start,
+            end=end,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404, 422, 500, 503]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 422:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 500:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 503:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def post_logs_search(
+        self,
+        region: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Search logs.
+
+        To search log records in a region, send a POST request to
+        ``/v2/insights/query/{region}/logs/search`` with a JSON body describing the time range,
+        optional filter, ordering, and pagination.
+        The time range must not exceed 7 days. ``pagination.limit`` defaults to 100 and is clamped to
+        1000. Cursor pagination requires ordering by ``timestamp`` alone; other sort orders return
+        ``has_more: false`` and cannot be paged.
+
+        :param region: The datacenter region slug for the query. Required.
+        :type region: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "time_range": {
+                        "from": {
+                            "absolute": "2020-02-20 00:00:00",  # Optional. An absolute
+                              timestamp. Accepts RFC3339/RFC3339Nano strings or Unix
+                              seconds/nanoseconds as decimal strings.
+                            "relative": "str",  # Optional. A relative time. Use ``now``
+                              for the current time, a bare duration such as ``1h`` or ``7d`` to look
+                              back from now, or an offset such as ``now-1h`` or ``now+30m``. Supported
+                              units are ``s``"" , ``m``"" , ``h``"" , ``d``"" , and ``w``.
+                            "unix_nano": "str"  # Optional. A Unix nanosecond timestamp,
+                              encoded as a string to preserve 64-bit precision.
+                        },
+                        "to": {
+                            "absolute": "2020-02-20 00:00:00",  # Optional. An absolute
+                              timestamp. Accepts RFC3339/RFC3339Nano strings or Unix
+                              seconds/nanoseconds as decimal strings.
+                            "relative": "str",  # Optional. A relative time. Use ``now``
+                              for the current time, a bare duration such as ``1h`` or ``7d`` to look
+                              back from now, or an offset such as ``now-1h`` or ``now+30m``. Supported
+                              units are ``s``"" , ``m``"" , ``h``"" , ``d``"" , and ``w``.
+                            "unix_nano": "str"  # Optional. A Unix nanosecond timestamp,
+                              encoded as a string to preserve 64-bit precision.
+                        }
+                    },
+                    "filter": {
+                        "and": {
+                            "expressions": [
+                                ...
+                            ]
+                        },
+                        "condition": {
+                            "field": {
+                                "name": "str",  # The field name. Intrinsic columns
+                                  include ``timestamp``"" , ``severity_text``"" , ``severity_number``""
+                                  , ``body``"" , ``trace_id``"" , ``span_id``"" , and ``trace_flags``.
+                                  The dotted shorthands ``service.name``"" , ``resource.type``"" , and
+                                  ``resource.urn`` are also supported. Arbitrary resource or log
+                                  attributes can be accessed with ``ResourceAttributes['key']`` or
+                                  ``LogAttributes['key']``. Required.
+                                "scope": "str"  # Optional. The attribute scope to
+                                  resolve the field against. Omit to let the server apply its default
+                                  mapping for the field name. Known values are: "FIELD_SCOPE_RESOURCE"
+                                  and "FIELD_SCOPE_ATTRIBUTES".
+                            },
+                            "operator": "str",  # The comparison operator. Required.
+                              Known values are: "FILTER_OPERATOR_EQ", "FILTER_OPERATOR_NEQ",
+                              "FILTER_OPERATOR_IN", "FILTER_OPERATOR_EXISTS", "FILTER_OPERATOR_GTE",
+                              and "FILTER_OPERATOR_LTE".
+                            "value": {
+                                "bool_value": bool,  # Optional. A typed literal or
+                                  list value for a filter condition. Exactly one kind is set per
+                                  message.
+                                "number_array_value": {
+                                    "values": [
+                                        0.0  # Required.
+                                    ]
+                                },
+                                "number_value": 0.0,  # Optional. A typed literal or
+                                  list value for a filter condition. Exactly one kind is set per
+                                  message.
+                                "string_array_value": {
+                                    "values": [
+                                        "str"  # Required.
+                                    ]
+                                },
+                                "string_value": "str"  # Optional. A typed literal or
+                                  list value for a filter condition. Exactly one kind is set per
+                                  message.
+                            }
+                        },
+                        "not": ...,
+                        "or": {
+                            "expressions": [
+                                ...
+                            ]
+                        },
+                        "text_search": {
+                            "query": "str"  # The search string. Required.
+                        }
+                    },
+                    "order_by": [
+                        {
+                            "field": {
+                                "name": "str",  # The field name. Intrinsic columns
+                                  include ``timestamp``"" , ``severity_text``"" , ``severity_number``""
+                                  , ``body``"" , ``trace_id``"" , ``span_id``"" , and ``trace_flags``.
+                                  The dotted shorthands ``service.name``"" , ``resource.type``"" , and
+                                  ``resource.urn`` are also supported. Arbitrary resource or log
+                                  attributes can be accessed with ``ResourceAttributes['key']`` or
+                                  ``LogAttributes['key']``. Required.
+                                "scope": "str"  # Optional. The attribute scope to
+                                  resolve the field against. Omit to let the server apply its default
+                                  mapping for the field name. Known values are: "FIELD_SCOPE_RESOURCE"
+                                  and "FIELD_SCOPE_ATTRIBUTES".
+                            },
+                            "direction": "str"  # Optional. The sort direction. Omit to
+                              use the server default. Known values are: "SORT_DIRECTION_ASC" and
+                              "SORT_DIRECTION_DESC".
+                        }
+                    ],
+                    "pagination": {
+                        "cursor": "str",  # Optional. Opaque cursor from a previous response.
+                        "limit": 100  # Optional. Default value is 100. Maximum number of
+                          results to return. Defaults to 100 and is clamped to 1000.
+                    }
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "data": [
+                        {
+                            "timestamp": "2020-02-20 00:00:00",  # The log record
+                              timestamp. Required.
+                            "attributes": {
+                                "str": "str"  # Optional. Log attributes.
+                            },
+                            "body": "str",  # Optional. The log message body. Omitted
+                              when empty.
+                            "resource": {
+                                "str": "str"  # Optional. Resource attributes
+                                  associated with the log.
+                            },
+                            "service_name": "str",  # Optional. The service name that
+                              emitted the log.
+                            "severity_number": 0,  # Optional. The numeric severity
+                              level.
+                            "severity_text": "str",  # Optional. The textual severity
+                              level.
+                            "span_id": "str",  # Optional. The span ID if present.
+                            "trace_id": "str"  # Optional. The trace ID if present.
+                        }
+                    ],
+                    "pagination": {
+                        "has_more": bool,  # Optional. Whether more results are available.
+                        "next_cursor": "str"  # Optional. Opaque cursor to fetch the next
+                          page.
+                    }
+                }
+                # response body for status code(s): 400, 403, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def post_logs_search(
+        self,
+        region: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Search logs.
+
+        To search log records in a region, send a POST request to
+        ``/v2/insights/query/{region}/logs/search`` with a JSON body describing the time range,
+        optional filter, ordering, and pagination.
+        The time range must not exceed 7 days. ``pagination.limit`` defaults to 100 and is clamped to
+        1000. Cursor pagination requires ordering by ``timestamp`` alone; other sort orders return
+        ``has_more: false`` and cannot be paged.
+
+        :param region: The datacenter region slug for the query. Required.
+        :type region: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "data": [
+                        {
+                            "timestamp": "2020-02-20 00:00:00",  # The log record
+                              timestamp. Required.
+                            "attributes": {
+                                "str": "str"  # Optional. Log attributes.
+                            },
+                            "body": "str",  # Optional. The log message body. Omitted
+                              when empty.
+                            "resource": {
+                                "str": "str"  # Optional. Resource attributes
+                                  associated with the log.
+                            },
+                            "service_name": "str",  # Optional. The service name that
+                              emitted the log.
+                            "severity_number": 0,  # Optional. The numeric severity
+                              level.
+                            "severity_text": "str",  # Optional. The textual severity
+                              level.
+                            "span_id": "str",  # Optional. The span ID if present.
+                            "trace_id": "str"  # Optional. The trace ID if present.
+                        }
+                    ],
+                    "pagination": {
+                        "has_more": bool,  # Optional. Whether more results are available.
+                        "next_cursor": "str"  # Optional. Opaque cursor to fetch the next
+                          page.
+                    }
+                }
+                # response body for status code(s): 400, 403, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def post_logs_search(
+        self, region: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Search logs.
+
+        To search log records in a region, send a POST request to
+        ``/v2/insights/query/{region}/logs/search`` with a JSON body describing the time range,
+        optional filter, ordering, and pagination.
+        The time range must not exceed 7 days. ``pagination.limit`` defaults to 100 and is clamped to
+        1000. Cursor pagination requires ordering by ``timestamp`` alone; other sort orders return
+        ``has_more: false`` and cannot be paged.
+
+        :param region: The datacenter region slug for the query. Required.
+        :type region: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "time_range": {
+                        "from": {
+                            "absolute": "2020-02-20 00:00:00",  # Optional. An absolute
+                              timestamp. Accepts RFC3339/RFC3339Nano strings or Unix
+                              seconds/nanoseconds as decimal strings.
+                            "relative": "str",  # Optional. A relative time. Use ``now``
+                              for the current time, a bare duration such as ``1h`` or ``7d`` to look
+                              back from now, or an offset such as ``now-1h`` or ``now+30m``. Supported
+                              units are ``s``"" , ``m``"" , ``h``"" , ``d``"" , and ``w``.
+                            "unix_nano": "str"  # Optional. A Unix nanosecond timestamp,
+                              encoded as a string to preserve 64-bit precision.
+                        },
+                        "to": {
+                            "absolute": "2020-02-20 00:00:00",  # Optional. An absolute
+                              timestamp. Accepts RFC3339/RFC3339Nano strings or Unix
+                              seconds/nanoseconds as decimal strings.
+                            "relative": "str",  # Optional. A relative time. Use ``now``
+                              for the current time, a bare duration such as ``1h`` or ``7d`` to look
+                              back from now, or an offset such as ``now-1h`` or ``now+30m``. Supported
+                              units are ``s``"" , ``m``"" , ``h``"" , ``d``"" , and ``w``.
+                            "unix_nano": "str"  # Optional. A Unix nanosecond timestamp,
+                              encoded as a string to preserve 64-bit precision.
+                        }
+                    },
+                    "filter": {
+                        "and": {
+                            "expressions": [
+                                ...
+                            ]
+                        },
+                        "condition": {
+                            "field": {
+                                "name": "str",  # The field name. Intrinsic columns
+                                  include ``timestamp``"" , ``severity_text``"" , ``severity_number``""
+                                  , ``body``"" , ``trace_id``"" , ``span_id``"" , and ``trace_flags``.
+                                  The dotted shorthands ``service.name``"" , ``resource.type``"" , and
+                                  ``resource.urn`` are also supported. Arbitrary resource or log
+                                  attributes can be accessed with ``ResourceAttributes['key']`` or
+                                  ``LogAttributes['key']``. Required.
+                                "scope": "str"  # Optional. The attribute scope to
+                                  resolve the field against. Omit to let the server apply its default
+                                  mapping for the field name. Known values are: "FIELD_SCOPE_RESOURCE"
+                                  and "FIELD_SCOPE_ATTRIBUTES".
+                            },
+                            "operator": "str",  # The comparison operator. Required.
+                              Known values are: "FILTER_OPERATOR_EQ", "FILTER_OPERATOR_NEQ",
+                              "FILTER_OPERATOR_IN", "FILTER_OPERATOR_EXISTS", "FILTER_OPERATOR_GTE",
+                              and "FILTER_OPERATOR_LTE".
+                            "value": {
+                                "bool_value": bool,  # Optional. A typed literal or
+                                  list value for a filter condition. Exactly one kind is set per
+                                  message.
+                                "number_array_value": {
+                                    "values": [
+                                        0.0  # Required.
+                                    ]
+                                },
+                                "number_value": 0.0,  # Optional. A typed literal or
+                                  list value for a filter condition. Exactly one kind is set per
+                                  message.
+                                "string_array_value": {
+                                    "values": [
+                                        "str"  # Required.
+                                    ]
+                                },
+                                "string_value": "str"  # Optional. A typed literal or
+                                  list value for a filter condition. Exactly one kind is set per
+                                  message.
+                            }
+                        },
+                        "not": ...,
+                        "or": {
+                            "expressions": [
+                                ...
+                            ]
+                        },
+                        "text_search": {
+                            "query": "str"  # The search string. Required.
+                        }
+                    },
+                    "order_by": [
+                        {
+                            "field": {
+                                "name": "str",  # The field name. Intrinsic columns
+                                  include ``timestamp``"" , ``severity_text``"" , ``severity_number``""
+                                  , ``body``"" , ``trace_id``"" , ``span_id``"" , and ``trace_flags``.
+                                  The dotted shorthands ``service.name``"" , ``resource.type``"" , and
+                                  ``resource.urn`` are also supported. Arbitrary resource or log
+                                  attributes can be accessed with ``ResourceAttributes['key']`` or
+                                  ``LogAttributes['key']``. Required.
+                                "scope": "str"  # Optional. The attribute scope to
+                                  resolve the field against. Omit to let the server apply its default
+                                  mapping for the field name. Known values are: "FIELD_SCOPE_RESOURCE"
+                                  and "FIELD_SCOPE_ATTRIBUTES".
+                            },
+                            "direction": "str"  # Optional. The sort direction. Omit to
+                              use the server default. Known values are: "SORT_DIRECTION_ASC" and
+                              "SORT_DIRECTION_DESC".
+                        }
+                    ],
+                    "pagination": {
+                        "cursor": "str",  # Optional. Opaque cursor from a previous response.
+                        "limit": 100  # Optional. Default value is 100. Maximum number of
+                          results to return. Defaults to 100 and is clamped to 1000.
+                    }
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "data": [
+                        {
+                            "timestamp": "2020-02-20 00:00:00",  # The log record
+                              timestamp. Required.
+                            "attributes": {
+                                "str": "str"  # Optional. Log attributes.
+                            },
+                            "body": "str",  # Optional. The log message body. Omitted
+                              when empty.
+                            "resource": {
+                                "str": "str"  # Optional. Resource attributes
+                                  associated with the log.
+                            },
+                            "service_name": "str",  # Optional. The service name that
+                              emitted the log.
+                            "severity_number": 0,  # Optional. The numeric severity
+                              level.
+                            "severity_text": "str",  # Optional. The textual severity
+                              level.
+                            "span_id": "str",  # Optional. The span ID if present.
+                            "trace_id": "str"  # Optional. The trace ID if present.
+                        }
+                    ],
+                    "pagination": {
+                        "has_more": bool,  # Optional. Whether more results are available.
+                        "next_cursor": "str"  # Optional. Opaque cursor to fetch the next
+                          page.
+                    }
+                }
+                # response body for status code(s): 400, 403, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_insights_post_logs_search_request(
+            region=region,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+
 class KubernetesOperations:  # pylint: disable=too-many-public-methods
     """
     .. warning::
@@ -168933,14 +174348,7 @@ class LoadBalancersOperations:
             .. code-block:: python
 
                 # JSON input template you can fill out and use as your body input.
-                body = {
-                    "ip": "str"  # Optional. An optional IP address to assign to the load
-                      balancer from one of your Bring Your Own IP (BYOIP) prefixes. The address must be
-                      an unassigned BYOIP address on your account in the same region as the load
-                      balancer. If omitted, DigitalOcean assigns a public IP address automatically.
-                      This field is only applied when creating the load balancer, cannot be changed
-                      afterward, and is not supported for ``GLOBAL`` or ``INTERNAL`` load balancers.
-                }
+                body = {}
 
                 # response body for status code(s): 202
                 response == {
@@ -168996,6 +174404,10 @@ class LoadBalancersOperations:
                                 "name": "str"  # Optional. FQDN to associate with a
                                   Global load balancer.
                             }
+                        ],
+                        "droplet_ids": [
+                            0  # Optional. An array containing the IDs of the Droplets
+                              assigned to the load balancer.
                         ],
                         "enable_backend_keepalive": False,  # Optional. Default value is
                           False. A boolean value indicating whether HTTP keepalive connections are
@@ -169085,6 +174497,24 @@ class LoadBalancersOperations:
                         "redirect_http_to_https": False,  # Optional. Default value is False.
                           A boolean value indicating whether HTTP requests to the load balancer on port
                           80 will be redirected to HTTPS on port 443.
+                        "region": {
+                            "available": bool,  # This is a boolean value that represents
+                              whether new Droplets can be created in this region. Required.
+                            "features": [
+                                "str"  # This attribute is set to an array which
+                                  contains features available in this region. Required.
+                            ],
+                            "name": "str",  # The display name of the region.  This will
+                              be a full name that is used in the control panel and other interfaces.
+                              Required.
+                            "sizes": [
+                                "str"  # This attribute is set to an array which
+                                  contains the identifying slugs for the sizes available in this
+                                  region. sizes:read is required to view. Required.
+                            ],
+                            "slug": "str"  # A human-readable string that is used as a
+                              unique identifier for each region. Required.
+                        },
                         "size": "lb-small",  # Optional. Default value is "lb-small". This
                           field has been replaced by the ``size_unit`` field for all regions except in
                           AMS2, NYC2, and SFO1. Each available load balancer size now equates to the
@@ -169226,6 +174656,10 @@ class LoadBalancersOperations:
                                   Global load balancer.
                             }
                         ],
+                        "droplet_ids": [
+                            0  # Optional. An array containing the IDs of the Droplets
+                              assigned to the load balancer.
+                        ],
                         "enable_backend_keepalive": False,  # Optional. Default value is
                           False. A boolean value indicating whether HTTP keepalive connections are
                           maintained to target Droplets.
@@ -169314,6 +174748,24 @@ class LoadBalancersOperations:
                         "redirect_http_to_https": False,  # Optional. Default value is False.
                           A boolean value indicating whether HTTP requests to the load balancer on port
                           80 will be redirected to HTTPS on port 443.
+                        "region": {
+                            "available": bool,  # This is a boolean value that represents
+                              whether new Droplets can be created in this region. Required.
+                            "features": [
+                                "str"  # This attribute is set to an array which
+                                  contains features available in this region. Required.
+                            ],
+                            "name": "str",  # The display name of the region.  This will
+                              be a full name that is used in the control panel and other interfaces.
+                              Required.
+                            "sizes": [
+                                "str"  # This attribute is set to an array which
+                                  contains the identifying slugs for the sizes available in this
+                                  region. sizes:read is required to view. Required.
+                            ],
+                            "slug": "str"  # A human-readable string that is used as a
+                              unique identifier for each region. Required.
+                        },
                         "size": "lb-small",  # Optional. Default value is "lb-small". This
                           field has been replaced by the ``size_unit`` field for all regions except in
                           AMS2, NYC2, and SFO1. Each available load balancer size now equates to the
@@ -169396,14 +174848,7 @@ class LoadBalancersOperations:
             .. code-block:: python
 
                 # JSON input template you can fill out and use as your body input.
-                body = {
-                    "ip": "str"  # Optional. An optional IP address to assign to the load
-                      balancer from one of your Bring Your Own IP (BYOIP) prefixes. The address must be
-                      an unassigned BYOIP address on your account in the same region as the load
-                      balancer. If omitted, DigitalOcean assigns a public IP address automatically.
-                      This field is only applied when creating the load balancer, cannot be changed
-                      afterward, and is not supported for ``GLOBAL`` or ``INTERNAL`` load balancers.
-                }
+                body = {}
 
                 # response body for status code(s): 202
                 response == {
@@ -169459,6 +174904,10 @@ class LoadBalancersOperations:
                                 "name": "str"  # Optional. FQDN to associate with a
                                   Global load balancer.
                             }
+                        ],
+                        "droplet_ids": [
+                            0  # Optional. An array containing the IDs of the Droplets
+                              assigned to the load balancer.
                         ],
                         "enable_backend_keepalive": False,  # Optional. Default value is
                           False. A boolean value indicating whether HTTP keepalive connections are
@@ -169548,6 +174997,24 @@ class LoadBalancersOperations:
                         "redirect_http_to_https": False,  # Optional. Default value is False.
                           A boolean value indicating whether HTTP requests to the load balancer on port
                           80 will be redirected to HTTPS on port 443.
+                        "region": {
+                            "available": bool,  # This is a boolean value that represents
+                              whether new Droplets can be created in this region. Required.
+                            "features": [
+                                "str"  # This attribute is set to an array which
+                                  contains features available in this region. Required.
+                            ],
+                            "name": "str",  # The display name of the region.  This will
+                              be a full name that is used in the control panel and other interfaces.
+                              Required.
+                            "sizes": [
+                                "str"  # This attribute is set to an array which
+                                  contains the identifying slugs for the sizes available in this
+                                  region. sizes:read is required to view. Required.
+                            ],
+                            "slug": "str"  # A human-readable string that is used as a
+                              unique identifier for each region. Required.
+                        },
                         "size": "lb-small",  # Optional. Default value is "lb-small". This
                           field has been replaced by the ``size_unit`` field for all regions except in
                           AMS2, NYC2, and SFO1. Each available load balancer size now equates to the
@@ -169759,6 +175226,10 @@ class LoadBalancersOperations:
                                       with a Global load balancer.
                                 }
                             ],
+                            "droplet_ids": [
+                                0  # Optional. An array containing the IDs of the
+                                  Droplets assigned to the load balancer.
+                            ],
                             "enable_backend_keepalive": False,  # Optional. Default value
                               is False. A boolean value indicating whether HTTP keepalive connections
                               are maintained to target Droplets.
@@ -169851,6 +175322,25 @@ class LoadBalancersOperations:
                             "redirect_http_to_https": False,  # Optional. Default value
                               is False. A boolean value indicating whether HTTP requests to the load
                               balancer on port 80 will be redirected to HTTPS on port 443.
+                            "region": {
+                                "available": bool,  # This is a boolean value that
+                                  represents whether new Droplets can be created in this region.
+                                  Required.
+                                "features": [
+                                    "str"  # This attribute is set to an array
+                                      which contains features available in this region. Required.
+                                ],
+                                "name": "str",  # The display name of the region.
+                                  This will be a full name that is used in the control panel and other
+                                  interfaces. Required.
+                                "sizes": [
+                                    "str"  # This attribute is set to an array
+                                      which contains the identifying slugs for the sizes available in
+                                      this region. sizes:read is required to view. Required.
+                                ],
+                                "slug": "str"  # A human-readable string that is used
+                                  as a unique identifier for each region. Required.
+                            },
                             "size": "lb-small",  # Optional. Default value is "lb-small".
                               This field has been replaced by the ``size_unit`` field for all regions
                               except in AMS2, NYC2, and SFO1. Each available load balancer size now
@@ -170041,6 +175531,10 @@ class LoadBalancersOperations:
                                   Global load balancer.
                             }
                         ],
+                        "droplet_ids": [
+                            0  # Optional. An array containing the IDs of the Droplets
+                              assigned to the load balancer.
+                        ],
                         "enable_backend_keepalive": False,  # Optional. Default value is
                           False. A boolean value indicating whether HTTP keepalive connections are
                           maintained to target Droplets.
@@ -170129,6 +175623,24 @@ class LoadBalancersOperations:
                         "redirect_http_to_https": False,  # Optional. Default value is False.
                           A boolean value indicating whether HTTP requests to the load balancer on port
                           80 will be redirected to HTTPS on port 443.
+                        "region": {
+                            "available": bool,  # This is a boolean value that represents
+                              whether new Droplets can be created in this region. Required.
+                            "features": [
+                                "str"  # This attribute is set to an array which
+                                  contains features available in this region. Required.
+                            ],
+                            "name": "str",  # The display name of the region.  This will
+                              be a full name that is used in the control panel and other interfaces.
+                              Required.
+                            "sizes": [
+                                "str"  # This attribute is set to an array which
+                                  contains the identifying slugs for the sizes available in this
+                                  region. sizes:read is required to view. Required.
+                            ],
+                            "slug": "str"  # A human-readable string that is used as a
+                              unique identifier for each region. Required.
+                        },
                         "size": "lb-small",  # Optional. Default value is "lb-small". This
                           field has been replaced by the ``size_unit`` field for all regions except in
                           AMS2, NYC2, and SFO1. Each available load balancer size now equates to the
@@ -170361,6 +175873,10 @@ class LoadBalancersOperations:
                                   Global load balancer.
                             }
                         ],
+                        "droplet_ids": [
+                            0  # Optional. An array containing the IDs of the Droplets
+                              assigned to the load balancer.
+                        ],
                         "enable_backend_keepalive": False,  # Optional. Default value is
                           False. A boolean value indicating whether HTTP keepalive connections are
                           maintained to target Droplets.
@@ -170449,6 +175965,24 @@ class LoadBalancersOperations:
                         "redirect_http_to_https": False,  # Optional. Default value is False.
                           A boolean value indicating whether HTTP requests to the load balancer on port
                           80 will be redirected to HTTPS on port 443.
+                        "region": {
+                            "available": bool,  # This is a boolean value that represents
+                              whether new Droplets can be created in this region. Required.
+                            "features": [
+                                "str"  # This attribute is set to an array which
+                                  contains features available in this region. Required.
+                            ],
+                            "name": "str",  # The display name of the region.  This will
+                              be a full name that is used in the control panel and other interfaces.
+                              Required.
+                            "sizes": [
+                                "str"  # This attribute is set to an array which
+                                  contains the identifying slugs for the sizes available in this
+                                  region. sizes:read is required to view. Required.
+                            ],
+                            "slug": "str"  # A human-readable string that is used as a
+                              unique identifier for each region. Required.
+                        },
                         "size": "lb-small",  # Optional. Default value is "lb-small". This
                           field has been replaced by the ``size_unit`` field for all regions except in
                           AMS2, NYC2, and SFO1. Each available load balancer size now equates to the
@@ -170601,6 +176135,10 @@ class LoadBalancersOperations:
                                   Global load balancer.
                             }
                         ],
+                        "droplet_ids": [
+                            0  # Optional. An array containing the IDs of the Droplets
+                              assigned to the load balancer.
+                        ],
                         "enable_backend_keepalive": False,  # Optional. Default value is
                           False. A boolean value indicating whether HTTP keepalive connections are
                           maintained to target Droplets.
@@ -170689,6 +176227,24 @@ class LoadBalancersOperations:
                         "redirect_http_to_https": False,  # Optional. Default value is False.
                           A boolean value indicating whether HTTP requests to the load balancer on port
                           80 will be redirected to HTTPS on port 443.
+                        "region": {
+                            "available": bool,  # This is a boolean value that represents
+                              whether new Droplets can be created in this region. Required.
+                            "features": [
+                                "str"  # This attribute is set to an array which
+                                  contains features available in this region. Required.
+                            ],
+                            "name": "str",  # The display name of the region.  This will
+                              be a full name that is used in the control panel and other interfaces.
+                              Required.
+                            "sizes": [
+                                "str"  # This attribute is set to an array which
+                                  contains the identifying slugs for the sizes available in this
+                                  region. sizes:read is required to view. Required.
+                            ],
+                            "slug": "str"  # A human-readable string that is used as a
+                              unique identifier for each region. Required.
+                        },
                         "size": "lb-small",  # Optional. Default value is "lb-small". This
                           field has been replaced by the ``size_unit`` field for all regions except in
                           AMS2, NYC2, and SFO1. Each available load balancer size now equates to the
@@ -170836,6 +176392,10 @@ class LoadBalancersOperations:
                                   Global load balancer.
                             }
                         ],
+                        "droplet_ids": [
+                            0  # Optional. An array containing the IDs of the Droplets
+                              assigned to the load balancer.
+                        ],
                         "enable_backend_keepalive": False,  # Optional. Default value is
                           False. A boolean value indicating whether HTTP keepalive connections are
                           maintained to target Droplets.
@@ -170924,6 +176484,24 @@ class LoadBalancersOperations:
                         "redirect_http_to_https": False,  # Optional. Default value is False.
                           A boolean value indicating whether HTTP requests to the load balancer on port
                           80 will be redirected to HTTPS on port 443.
+                        "region": {
+                            "available": bool,  # This is a boolean value that represents
+                              whether new Droplets can be created in this region. Required.
+                            "features": [
+                                "str"  # This attribute is set to an array which
+                                  contains features available in this region. Required.
+                            ],
+                            "name": "str",  # The display name of the region.  This will
+                              be a full name that is used in the control panel and other interfaces.
+                              Required.
+                            "sizes": [
+                                "str"  # This attribute is set to an array which
+                                  contains the identifying slugs for the sizes available in this
+                                  region. sizes:read is required to view. Required.
+                            ],
+                            "slug": "str"  # A human-readable string that is used as a
+                              unique identifier for each region. Required.
+                        },
                         "size": "lb-small",  # Optional. Default value is "lb-small". This
                           field has been replaced by the ``size_unit`` field for all regions except in
                           AMS2, NYC2, and SFO1. Each available load balancer size now equates to the
@@ -171332,8 +176910,8 @@ class LoadBalancersOperations:
                 # JSON input template you can fill out and use as your body input.
                 body = {
                     "droplet_ids": [
-                        0  # An array containing the IDs of the Droplets assigned to the load
-                          balancer. Required.
+                        0  # Optional. An array containing the IDs of the Droplets assigned
+                          to the load balancer.
                     ]
                 }
 
@@ -171432,8 +177010,8 @@ class LoadBalancersOperations:
                 # JSON input template you can fill out and use as your body input.
                 body = {
                     "droplet_ids": [
-                        0  # An array containing the IDs of the Droplets assigned to the load
-                          balancer. Required.
+                        0  # Optional. An array containing the IDs of the Droplets assigned
+                          to the load balancer.
                     ]
                 }
 
@@ -171574,8 +177152,8 @@ class LoadBalancersOperations:
                 # JSON input template you can fill out and use as your body input.
                 body = {
                     "droplet_ids": [
-                        0  # An array containing the IDs of the Droplets assigned to the load
-                          balancer. Required.
+                        0  # Optional. An array containing the IDs of the Droplets assigned
+                          to the load balancer.
                     ]
                 }
 
@@ -171668,8 +177246,8 @@ class LoadBalancersOperations:
                 # JSON input template you can fill out and use as your body input.
                 body = {
                     "droplet_ids": [
-                        0  # An array containing the IDs of the Droplets assigned to the load
-                          balancer. Required.
+                        0  # Optional. An array containing the IDs of the Droplets assigned
+                          to the load balancer.
                     ]
                 }
 
