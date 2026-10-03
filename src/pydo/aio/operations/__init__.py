@@ -37,6 +37,7 @@ from ._operations import FunctionsOperations
 from ._operations import FunctionsAccessKeyOperations
 from ._operations import ImagesOperations
 from ._operations import ImageActionsOperations
+from ._operations import InsightsOperations
 from ._operations import KubernetesOperations
 from ._operations import LoadBalancersOperations
 from ._operations import MonitoringOperations
@@ -110,6 +111,7 @@ __all__ = [
     "FunctionsAccessKeyOperations",
     "ImagesOperations",
     "ImageActionsOperations",
+    "InsightsOperations",
     "KubernetesOperations",
     "LoadBalancersOperations",
     "MonitoringOperations",
