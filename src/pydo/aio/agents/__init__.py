@@ -55,11 +55,12 @@ class AsyncAgentsResources:
         openai_environment_id: Optional[str] = None,
         openai_remote_url: Optional[str] = None,
         openai_base_url: Optional[str] = None,
-        workspace_id: Optional[str] = None,
     ) -> AsyncAgentSession:
         """Create a session from an ``agents.yaml`` manifest and return a handle.
 
-        See :meth:`pydo.agents.AgentsResources.start`.
+        See :meth:`pydo.agents.AgentsResources.start`. A persistent workspace
+        cannot be attached when creating from a manifest; use
+        ``sessions.create_from_config(..., workspace_id=...)``.
         """
         resolved: "str | bytes" = manifest
         oai_session_id = openai_session_id
@@ -77,7 +78,6 @@ class AsyncAgentsResources:
         resp = await self.sessions.create_from_manifest(
             resolved,
             openai_session_id=oai_session_id,
-            workspace_id=workspace_id,
         )
         emit_session_create_warnings(session_create_warnings(resp), stacklevel=2)
         get = getattr(resp, "get", None)

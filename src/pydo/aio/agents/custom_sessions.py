@@ -242,26 +242,25 @@ class AsyncSessionsOperations:
         manifest: Union[str, bytes],
         *,
         openai_session_id: Optional[str] = None,
-        workspace_id: Optional[str] = None,
         timeout: Optional[float] = None,
     ) -> Any:
         """Create a session from an ``agents.yaml`` manifest.
 
         See :meth:`pydo.agents.custom_sessions.SessionsOperations.create_from_manifest`.
+        A persistent workspace cannot be attached when creating from a manifest;
+        use :meth:`create_from_config` with ``workspace_id``.
         """
         data = _manifest_bytes(manifest)
-        params: Dict[str, Any] = {}
+        params: Optional[Dict[str, Any]] = None
         if openai_session_id:
-            params["openai_session_id"] = openai_session_id
-        if workspace_id:
-            params["workspace_id"] = workspace_id
+            params = {"openai_session_id": openai_session_id}
         return await self._parse_json(
             await self._send(
                 "POST",
                 _BASE_PATH,
                 content=data,
                 content_type=_YAML_MEDIA_TYPE,
-                params=params or None,
+                params=params,
                 timeout=(
                     _DEFAULT_CREATE_TIMEOUT if timeout is None else float(timeout)
                 ),

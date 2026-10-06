@@ -300,42 +300,29 @@ def test_create_session_from_config_omits_workspace_id_by_default():
     }
 
 
-def test_create_session_from_manifest_sends_workspace_id_as_query():
+def test_create_session_from_manifest_has_no_workspace_id():
     manifest = "kind: Agent\nmetadata:\n  name: demo\n"
-    resources = _make_resources(
-        [_FakeResponse(200, {"session": {"session_id": "s-1", "workspace_id": "ws-1"}})]
-    )
+    resources = _make_resources([_FakeResponse(200, {"session": {"session_id": "s"}})])
 
-    resp = resources.sessions.create_from_manifest(manifest, workspace_id="ws-1")
+    with pytest.raises(TypeError):
+        resources.sessions.create_from_manifest(manifest, workspace_id="ws-1")
+
+    resources.sessions.create_from_manifest(manifest)
 
     call = _last_call(resources)
     assert call.request.headers.get("Content-Type") == "application/x-yaml"
-    assert "workspace_id=ws-1" in call.request.url
-    content = call.request.content
-    if isinstance(content, bytes):
-        content = content.decode("utf-8")
-    assert content == manifest
-    assert "workspace_id" not in content
-    assert resp.session.workspace_id == "ws-1"
+    assert "workspace_id" not in call.request.url
 
 
-def test_create_session_from_manifest_omits_workspace_id_by_default():
+def test_start_has_no_workspace_id():
     resources = _make_resources([_FakeResponse(200, {"session": {"session_id": "s"}})])
 
-    resources.sessions.create_from_manifest("kind: Agent\n")
+    with pytest.raises(TypeError):
+        resources.start("kind: Agent\n", workspace_id="ws-1")
+
+    resources.start("kind: Agent\n")
 
     assert "workspace_id" not in _last_call(resources).request.url
-
-
-def test_start_passes_workspace_id_to_manifest_create():
-    resources = _make_resources(
-        [_FakeResponse(200, {"session": {"session_id": "s-1", "workspace_id": "ws-1"}})]
-    )
-
-    agent = resources.start("kind: Agent\n", workspace_id="ws-1")
-
-    assert agent.session_id == "s-1"
-    assert "workspace_id=ws-1" in _last_call(resources).request.url
 
 
 @pytest.mark.parametrize("status", [409, 501])

@@ -192,7 +192,7 @@ async def test_async_create_session_from_config_sends_workspace_id_in_body():
 
 
 @pytest.mark.asyncio
-async def test_async_create_session_from_manifest_sends_workspace_id_as_query():
+async def test_async_manifest_create_and_start_have_no_workspace_id():
     resources = _make_async_resources(
         [
             _FakeAsyncResponse(200, {"session": {"session_id": "s-1"}}),
@@ -200,10 +200,17 @@ async def test_async_create_session_from_manifest_sends_workspace_id_as_query():
         ]
     )
 
-    await resources.sessions.create_from_manifest("kind: Agent\n", workspace_id="ws-1")
+    with pytest.raises(TypeError):
+        await resources.sessions.create_from_manifest(
+            "kind: Agent\n", workspace_id="ws-1"
+        )
+    with pytest.raises(TypeError):
+        await resources.start("kind: Agent\n", workspace_id="ws-1")
+
+    await resources.sessions.create_from_manifest("kind: Agent\n")
     call = _last_call(resources)
     assert call.request.headers.get("Content-Type") == "application/x-yaml"
-    assert "workspace_id=ws-1" in call.request.url
+    assert "workspace_id" not in call.request.url
 
-    await resources.start("kind: Agent\n", workspace_id="ws-2")
-    assert "workspace_id=ws-2" in _last_call(resources).request.url
+    await resources.start("kind: Agent\n")
+    assert "workspace_id" not in _last_call(resources).request.url

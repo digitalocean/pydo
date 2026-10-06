@@ -131,7 +131,6 @@ class AgentsResources:
         openai_environment_id: Optional[str] = None,
         openai_remote_url: Optional[str] = None,
         openai_base_url: Optional[str] = None,
-        workspace_id: Optional[str] = None,
     ) -> AgentSession:
         """Create a session from an ``agents.yaml`` manifest and return a handle.
 
@@ -145,8 +144,10 @@ class AgentsResources:
         ``spec.env``, then create the DO session with ``openai_session_id`` as
         a query param.
 
-        Pass ``workspace_id`` to attach a persistent workspace (see
-        :attr:`workspaces`); it is a per-session setting, not part of the manifest.
+        A persistent workspace cannot be attached when creating from a
+        manifest; save the manifest as a config and use
+        :meth:`pydo.agents.custom_sessions.SessionsOperations.create_from_config`
+        with ``workspace_id``.
 
         Use as a context manager to auto-destroy on exit::
 
@@ -169,7 +170,6 @@ class AgentsResources:
         resp = self.sessions.create_from_manifest(
             resolved,
             openai_session_id=oai_session_id,
-            workspace_id=workspace_id,
         )
         # Mirror doctl: surface create-time advisories (policy fidelity, etc.).
         emit_session_create_warnings(session_create_warnings(resp), stacklevel=2)
