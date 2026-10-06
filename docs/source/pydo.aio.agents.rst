@@ -36,6 +36,14 @@ pydo.aio.agents.custom\_triggers module
    :undoc-members:
    :show-inheritance:
 
+pydo.aio.agents.custom\_workspaces module
+-----------------------------------------
+
+.. automodule:: pydo.aio.agents.custom_workspaces
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pydo.aio.agents.session module
 ------------------------------
 

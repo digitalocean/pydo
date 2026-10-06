@@ -26,6 +26,7 @@ from .custom_sessions import (
 from .custom_configs import AsyncConfigsOperations
 from .custom_templates import AsyncTemplatesOperations
 from .custom_triggers import AsyncTriggersOperations
+from .custom_workspaces import AsyncWorkspacesOperations
 from .session import AsyncAgentSession, AsyncRunStream
 
 
@@ -39,6 +40,7 @@ class AsyncAgentsResources:
         self.configs = AsyncConfigsOperations(self._proxy)
         self.templates = AsyncTemplatesOperations(self._proxy)
         self.triggers = AsyncTriggersOperations(self._proxy)
+        self.workspaces = AsyncWorkspacesOperations(self._proxy)
 
     @property
     def base_url(self) -> str:
@@ -53,6 +55,7 @@ class AsyncAgentsResources:
         openai_environment_id: Optional[str] = None,
         openai_remote_url: Optional[str] = None,
         openai_base_url: Optional[str] = None,
+        workspace_id: Optional[str] = None,
     ) -> AsyncAgentSession:
         """Create a session from an ``agents.yaml`` manifest and return a handle.
 
@@ -74,6 +77,7 @@ class AsyncAgentsResources:
         resp = await self.sessions.create_from_manifest(
             resolved,
             openai_session_id=oai_session_id,
+            workspace_id=workspace_id,
         )
         emit_session_create_warnings(session_create_warnings(resp), stacklevel=2)
         get = getattr(resp, "get", None)
@@ -174,6 +178,7 @@ __all__ = [
     "AsyncConfigsOperations",
     "AsyncTemplatesOperations",
     "AsyncTriggersOperations",
+    "AsyncWorkspacesOperations",
     "AsyncHarnessEventStream",
     "AsyncWorkspaceDownload",
 ]

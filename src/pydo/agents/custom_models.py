@@ -188,6 +188,20 @@ class CheckpointKind:
     IMPLICIT = "implicit"
 
 
+class WorkspaceState:
+    """Lifecycle state of a persistent workspace.
+
+    The API may add states over time; treat the ``state`` field as a plain
+    string and do not assume this list is exhaustive.
+    """
+
+    AVAILABLE = "AVAILABLE"
+    ATTACHING = "ATTACHING"
+    ATTACHED = "ATTACHED"
+    RELEASING = "RELEASING"
+    FAILED = "FAILED"
+
+
 # ---------------------------------------------------------------------------
 # Sandbox templates (OHS / harness-api)
 # ---------------------------------------------------------------------------
@@ -232,6 +246,7 @@ __all__ = [
     "SignatureScheme",
     "CheckpointStatus",
     "CheckpointKind",
+    "WorkspaceState",
     "TemplateStatus",
     "TemplateBuildStatus",
 ]

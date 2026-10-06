@@ -242,6 +242,7 @@ class AsyncSessionsOperations:
         manifest: Union[str, bytes],
         *,
         openai_session_id: Optional[str] = None,
+        workspace_id: Optional[str] = None,
         timeout: Optional[float] = None,
     ) -> Any:
         """Create a session from an ``agents.yaml`` manifest.
@@ -249,16 +250,18 @@ class AsyncSessionsOperations:
         See :meth:`pydo.agents.custom_sessions.SessionsOperations.create_from_manifest`.
         """
         data = _manifest_bytes(manifest)
-        params: Optional[Dict[str, Any]] = None
+        params: Dict[str, Any] = {}
         if openai_session_id:
-            params = {"openai_session_id": openai_session_id}
+            params["openai_session_id"] = openai_session_id
+        if workspace_id:
+            params["workspace_id"] = workspace_id
         return await self._parse_json(
             await self._send(
                 "POST",
                 _BASE_PATH,
                 content=data,
                 content_type=_YAML_MEDIA_TYPE,
-                params=params,
+                params=params or None,
                 timeout=(
                     _DEFAULT_CREATE_TIMEOUT if timeout is None else float(timeout)
                 ),
@@ -270,6 +273,7 @@ class AsyncSessionsOperations:
         *,
         name: str,
         config_id: str,
+        workspace_id: Optional[str] = None,
         timeout: Optional[float] = None,
     ) -> Any:
         """Create a session from a durable Agent Config.
@@ -278,11 +282,14 @@ class AsyncSessionsOperations:
         """
         if not name or not config_id:
             raise ValueError("name and config_id are required")
+        body: Dict[str, Any] = {"name": name, "config_id": config_id}
+        if workspace_id:
+            body["workspace_id"] = workspace_id
         return await self._parse_json(
             await self._send(
                 "POST",
                 _BASE_PATH,
-                body={"name": name, "config_id": config_id},
+                body=body,
                 timeout=(
                     _DEFAULT_CREATE_TIMEOUT if timeout is None else float(timeout)
                 ),

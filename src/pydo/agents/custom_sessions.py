@@ -549,6 +549,7 @@ class SessionsOperations:
         manifest: Union[str, bytes],
         *,
         openai_session_id: Optional[str] = None,
+        workspace_id: Optional[str] = None,
         timeout: Optional[float] = None,
     ) -> Any:
         """Create a session from an ``agents.yaml`` manifest.
@@ -567,6 +568,10 @@ class SessionsOperations:
 
         :param manifest: The agent spec as a YAML ``str`` or ``bytes`` document.
         :param openai_session_id: Optional OpenAI session id query param.
+        :param workspace_id: Optional persistent workspace to attach, sent as the
+            ``workspace_id`` query parameter (it is never part of the manifest).
+            The workspace must be ``AVAILABLE`` (``409`` otherwise); ``501``
+            means workspaces are not enabled for the team.
         :param timeout: HTTP timeout in seconds (defaults to 600 for create —
             sandbox boot can exceed the client-wide 120s default).
         :returns: Create envelope ``{"session": {...}}``. The session may
@@ -575,16 +580,18 @@ class SessionsOperations:
             :func:`session_create_warnings`.
         """
         data = _manifest_bytes(manifest)
-        params: Optional[Dict[str, Any]] = None
+        params: Dict[str, Any] = {}
         if openai_session_id:
-            params = {"openai_session_id": openai_session_id}
+            params["openai_session_id"] = openai_session_id
+        if workspace_id:
+            params["workspace_id"] = workspace_id
         return self._parse_json(
             self._send(
                 "POST",
                 _BASE_PATH,
                 content=data,
                 content_type=_YAML_MEDIA_TYPE,
-                params=params,
+                params=params or None,
                 timeout=(
                     _DEFAULT_CREATE_TIMEOUT if timeout is None else float(timeout)
                 ),
@@ -596,6 +603,7 @@ class SessionsOperations:
         *,
         name: str,
         config_id: str,
+        workspace_id: Optional[str] = None,
         timeout: Optional[float] = None,
     ) -> Any:
         """Create a session from a durable Agent Config (``POST /v2/agents/sessions``).
@@ -603,14 +611,20 @@ class SessionsOperations:
         Sends ``application/json`` with ``name`` and ``config_id``. The server
         loads the config, resolves credentials from Secrets Manager, and
         provisions the sandbox. No inline secrets are accepted.
+
+        Pass ``workspace_id`` to attach a persistent workspace; it is sent as
+        a JSON body field and must be ``AVAILABLE`` (``409`` otherwise).
         """
         if not name or not config_id:
             raise ValueError("name and config_id are required")
+        body: Dict[str, Any] = {"name": name, "config_id": config_id}
+        if workspace_id:
+            body["workspace_id"] = workspace_id
         return self._parse_json(
             self._send(
                 "POST",
                 _BASE_PATH,
-                body={"name": name, "config_id": config_id},
+                body=body,
                 timeout=(
                     _DEFAULT_CREATE_TIMEOUT if timeout is None else float(timeout)
                 ),
