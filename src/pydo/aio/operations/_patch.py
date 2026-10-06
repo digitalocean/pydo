@@ -99,6 +99,26 @@ if _HAS_AGENT_INFERENCE:
 
 
 # ---------------------------------------------------------------------------
+# Insights PromQL form posts (async)
+# ---------------------------------------------------------------------------
+
+try:
+    from ._operations import InsightsOperations as _GeneratedInsightsOperations
+
+    _HAS_INSIGHTS = True
+except ImportError:
+    _HAS_INSIGHTS = False
+
+if _HAS_INSIGHTS:
+    from pydo.custom_insights_prom import AsyncPromFormMixin
+
+    class InsightsOperations(  # pylint: disable=too-few-public-methods
+        AsyncPromFormMixin, _GeneratedInsightsOperations
+    ):
+        """Async Insights operations, including form-urlencoded PromQL posts."""
+
+
+# ---------------------------------------------------------------------------
 # Exports
 # ---------------------------------------------------------------------------
 
@@ -107,6 +127,8 @@ if _HAS_INFERENCE:
     __all__.append("InferenceOperations")
 if _HAS_AGENT_INFERENCE:
     __all__.append("AgentInferenceOperations")
+if _HAS_INSIGHTS:
+    __all__.append("InsightsOperations")
 
 
 def patch_sdk():
