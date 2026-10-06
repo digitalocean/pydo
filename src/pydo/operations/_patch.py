@@ -112,6 +112,28 @@ if _HAS_AGENT_INFERENCE:
 
 
 # ---------------------------------------------------------------------------
+# Insights PromQL form posts
+# ---------------------------------------------------------------------------
+# AutoRest marks application/x-www-form-urlencoded operations abstract.
+# This subclass exists once `make generate` emits InsightsOperations.
+
+try:
+    from ._operations import InsightsOperations as _GeneratedInsightsOperations
+
+    _HAS_INSIGHTS = True
+except ImportError:
+    _HAS_INSIGHTS = False
+
+if _HAS_INSIGHTS:
+    from pydo.custom_insights_prom import PromFormMixin
+
+    class InsightsOperations(  # pylint: disable=too-few-public-methods
+        PromFormMixin, _GeneratedInsightsOperations
+    ):
+        """Insights operations, including form-urlencoded PromQL posts."""
+
+
+# ---------------------------------------------------------------------------
 # Exports
 # ---------------------------------------------------------------------------
 
@@ -120,6 +142,8 @@ if _HAS_INFERENCE:
     __all__.append("InferenceOperations")
 if _HAS_AGENT_INFERENCE:
     __all__.append("AgentInferenceOperations")
+if _HAS_INSIGHTS:
+    __all__.append("InsightsOperations")
 
 
 def patch_sdk():
