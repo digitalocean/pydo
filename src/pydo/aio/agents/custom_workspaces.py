@@ -91,13 +91,23 @@ class AsyncWorkspacesOperations:
         *,
         page_size: Optional[int] = None,
         page_token: Optional[str] = None,
+        state: Optional[str] = None,
     ) -> Any:
-        """List the team's workspaces (keyset-paginated)."""
+        """List the team's workspaces (keyset-paginated).
+
+        ``state`` lists only workspaces in that state. A page can hold fewer
+        workspaces than ``page_size``, even none, while ``next_page_token`` is
+        not empty: keep requesting pages until it is empty.
+        """
         return await self._parse_json(
             await self._send(
                 "GET",
                 _WORKSPACES_PATH,
-                params={"page_size": page_size, "page_token": page_token},
+                params={
+                    "page_size": page_size,
+                    "page_token": page_token,
+                    "state": state,
+                },
             ),
         )
 

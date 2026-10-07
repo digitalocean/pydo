@@ -166,6 +166,38 @@ def test_list_workspaces_paging_params():
     assert resp.next_page_token == "next"
 
 
+def test_list_workspaces_state_filter():
+    resources = _make_resources(
+        [_FakeResponse(200, {"workspaces": [_WORKSPACE], "next_page_token": ""})]
+    )
+
+    resp = resources.workspaces.list(state=WorkspaceState.AVAILABLE)
+
+    url = _last_call(resources).request.url
+    assert "state=AVAILABLE" in url
+    assert "page_size" not in url
+    assert "page_token" not in url
+    assert resp.workspaces[0].workspace_id == "ws-1"
+
+
+def test_list_workspaces_state_with_paging():
+    resources = _make_resources(
+        [_FakeResponse(200, {"workspaces": [], "next_page_token": "next"})]
+    )
+
+    resp = resources.workspaces.list(
+        page_size=25, page_token="tok", state=WorkspaceState.ATTACHED
+    )
+
+    url = _last_call(resources).request.url
+    assert "state=ATTACHED" in url
+    assert "page_size=25" in url
+    assert "page_token=tok" in url
+    # A page can be empty while more follow.
+    assert resp.workspaces == []
+    assert resp.next_page_token == "next"
+
+
 def test_list_workspaces_without_params_sends_no_query():
     resources = _make_resources(
         [_FakeResponse(200, {"workspaces": [], "next_page_token": ""})]

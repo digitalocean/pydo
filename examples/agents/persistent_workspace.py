@@ -56,6 +56,20 @@ workspace = client.agents.workspaces.create(
 ).workspace
 print("created workspace", workspace.workspace_id, workspace.state)
 
+# The workspaces a new session can attach are the AVAILABLE ones. A page can be
+# shorter than page_size, even empty, while next_page_token is not empty, so
+# keep requesting pages until it is empty.
+page_token = None
+while True:
+    page = client.agents.workspaces.list(
+        state=WorkspaceState.AVAILABLE, page_token=page_token
+    )
+    for available in page.workspaces:
+        print("available workspace:", available.workspace_id, available.name)
+    page_token = page.next_page_token
+    if not page_token:
+        break
+
 try:
     for run in (1, 2):
         session = client.agents.sessions.create_from_config(

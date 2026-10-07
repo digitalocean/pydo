@@ -142,6 +142,22 @@ async def test_async_list_get_delete_workspace():
 
 
 @pytest.mark.asyncio
+async def test_async_list_workspaces_state_filter():
+    resources = _make_async_resources(
+        [_FakeAsyncResponse(200, {"workspaces": [], "next_page_token": "next"})]
+    )
+
+    listed = await resources.workspaces.list(state="AVAILABLE", page_size=25)
+
+    url = resources._proxy._original._pipeline.calls[0].request.url
+    assert "state=AVAILABLE" in url
+    assert "page_size=25" in url
+    assert "page_token" not in url
+    assert listed.workspaces == []
+    assert listed.next_page_token == "next"
+
+
+@pytest.mark.asyncio
 @pytest.mark.filterwarnings("ignore:coroutine .* was never awaited:RuntimeWarning")
 async def test_async_workspace_errors():
     resources = _make_async_resources(

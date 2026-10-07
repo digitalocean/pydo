@@ -128,18 +128,29 @@ class WorkspacesOperations:
         *,
         page_size: Optional[int] = None,
         page_token: Optional[str] = None,
+        state: Optional[str] = None,
     ) -> Any:
         """List the team's workspaces (``GET /v2/agents/workspaces``).
 
         Keyset-paginated: pass the previous response's ``next_page_token`` as
         ``page_token``. ``page_size`` defaults to 50 server-side (max 200). An
         empty ``next_page_token`` marks the last page.
+
+        ``state`` lists only workspaces in that state, one of the
+        ``WorkspaceState`` values (for example ``WorkspaceState.AVAILABLE``);
+        any other value is a ``400``. A page can hold fewer workspaces than
+        ``page_size``, even none, while ``next_page_token`` is not empty, so keep
+        requesting pages until it is empty.
         """
         return self._parse_json(
             self._send(
                 "GET",
                 _WORKSPACES_PATH,
-                params={"page_size": page_size, "page_token": page_token},
+                params={
+                    "page_size": page_size,
+                    "page_token": page_token,
+                    "state": state,
+                },
             ),
         )
 
