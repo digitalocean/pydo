@@ -127,9 +127,9 @@ except ImportError:
 if _HAS_INSIGHTS:
     from pydo.custom_insights_prom import PromFormMixin
 
-    class InsightsOperations(  # pylint: disable=too-few-public-methods
+    class InsightsOperations(
         PromFormMixin, _GeneratedInsightsOperations
-    ):
+    ):  # pylint: disable=too-few-public-methods
         """Insights operations, including form-urlencoded PromQL posts."""
 
 
