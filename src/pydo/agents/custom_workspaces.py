@@ -110,8 +110,10 @@ class WorkspacesOperations:
             only sent when a key is given.
         :returns: ``{"workspace": {...}}``. ``201`` for a new workspace, ``200``
             for an idempotent replay. Raises ``ResourceExistsError`` (``409``)
-            when the team's workspace limit is reached and ``HttpResponseError``
-            for ``501`` when workspaces are not enabled for the team.
+            when the team's workspace limit is reached, or when the key belongs
+            to a workspace that is being deleted (retry in a moment and the key
+            then creates a new workspace), and ``HttpResponseError`` for ``501``
+            when workspaces are not enabled for the team.
         """
         headers = {_IDEMPOTENCY_HEADER: idempotency_key} if idempotency_key else None
         return self._parse_json(
@@ -166,8 +168,10 @@ class WorkspacesOperations:
     def delete(self, workspace_id: str) -> None:
         """Delete a workspace (``DELETE /v2/agents/workspaces/{workspace_id}``).
 
-        Returns ``204`` with no body. Raises ``ResourceNotFoundError`` (``404``)
-        when it does not exist and ``ResourceExistsError`` (``409``) unless the
-        workspace is ``AVAILABLE`` or ``FAILED``.
+        Returns ``204`` with no body once the workspace's files are gone. Raises
+        ``ResourceNotFoundError`` (``404``) when it does not exist, or was
+        already deleted, and ``ResourceExistsError`` (``409``) while a session
+        holds it or it is attaching or being saved; retry after the session is
+        removed or the save ends.
         """
         self._send("DELETE", f"{_WORKSPACES_PATH}/{_quote(workspace_id)}")

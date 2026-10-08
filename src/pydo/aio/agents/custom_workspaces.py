@@ -118,5 +118,8 @@ class AsyncWorkspacesOperations:
         )
 
     async def delete(self, workspace_id: str) -> None:
-        """Delete a workspace."""
+        """Delete a workspace.
+
+        See :meth:`pydo.agents.custom_workspaces.WorkspacesOperations.delete`.
+        """
         await self._send("DELETE", f"{_WORKSPACES_PATH}/{_quote(workspace_id)}")

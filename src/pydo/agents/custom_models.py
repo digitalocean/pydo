@@ -200,6 +200,9 @@ class WorkspaceState:
     ATTACHED = "ATTACHED"
     RELEASING = "RELEASING"
     FAILED = "FAILED"
+    # Shown while a delete runs. The workspace cannot be attached or deleted
+    # again until the delete finishes.
+    DELETING = "DELETING"
 
 
 # ---------------------------------------------------------------------------

@@ -365,3 +365,14 @@ def test_create_session_workspace_errors(status):
         resources.sessions.create_from_config(
             name="run-1", config_id="cfg-1", workspace_id="ws-1"
         )
+
+
+def test_workspace_state_has_the_six_api_states():
+    assert {
+        WorkspaceState.AVAILABLE,
+        WorkspaceState.ATTACHING,
+        WorkspaceState.ATTACHED,
+        WorkspaceState.RELEASING,
+        WorkspaceState.FAILED,
+        WorkspaceState.DELETING,
+    } == {"AVAILABLE", "ATTACHING", "ATTACHED", "RELEASING", "FAILED", "DELETING"}
