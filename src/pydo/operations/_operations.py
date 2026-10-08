@@ -36,6 +36,7 @@ from azure.core.tracing.decorator import distributed_trace
 from azure.core.utils import case_insensitive_dict
 
 from .._serialization import Serializer
+from .._vendor import raise_if_not_implemented
 
 if sys.version_info >= (3, 9):
     from collections.abc import MutableMapping
@@ -42149,7 +42150,8 @@ class AppsOperations:  # pylint: disable=too-many-public-methods
                     },
                     "project_id": "str"  # Optional. The ID of the project the app should be
                       assigned to. If omitted, it will be assigned to your default project.
-                      :code:`<br>`:code:`<br>`Requires ``project:assign_resource`` scope.
+                      :code:`<br>`:code:`<br>`Requires ``project:assign_resource`` and
+                      ``project:update`` scopes.
                 }
 
                 # response body for status code(s): 200
@@ -58872,7 +58874,8 @@ class AppsOperations:  # pylint: disable=too-many-public-methods
                     },
                     "project_id": "str"  # Optional. The ID of the project the app should be
                       assigned to. If omitted, it will be assigned to your default project.
-                      :code:`<br>`:code:`<br>`Requires ``project:assign_resource`` scope.
+                      :code:`<br>`:code:`<br>`Requires ``project:assign_resource`` and
+                      ``project:update`` scopes.
                 }
 
                 # response body for status code(s): 200
@@ -179195,7 +179198,7 @@ class ImageActionsOperations:
         return cast(JSON, deserialized)  # type: ignore
 
 
-class InsightsOperations:
+class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-many-public-methods
     """
     .. warning::
         **DO NOT** instantiate this class directly.
@@ -179212,6 +179215,16 @@ class InsightsOperations:
         self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
         self._deserialize = (
             input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        )
+
+        raise_if_not_implemented(
+            self.__class__,
+            [
+                "post_prom_query",
+                "post_prom_query_range",
+                "post_prom_labels",
+                "post_prom_series",
+            ],
         )
 
     @distributed_trace
@@ -181535,10 +181548,10 @@ class InsightsOperations:
                             "slack": {
                                 "channel": "str",  # The Slack channel name to
                                   notify. Required.
-                                "webhook_url": "str"  # Optional. Slack incoming
-                                  webhook URL. Write-only secret "u2014 full value on create/update;
-                                  masked as ``********`` on read. Omit on update to retain the existing
-                                  value.
+                                "webhook_url_status": {
+                                    "configured": bool  # Whether the secret is
+                                      configured. Required.
+                                }
                             },
                             "usage": {
                                 "rule_count": 0  # Optional. Number of alert rules
@@ -181546,29 +181559,31 @@ class InsightsOperations:
                             },
                             "webhook": {
                                 "url": "str",  # HTTPS URL that receives webhook
-                                  deliveries. Returned in full on read. Required.
+                                  deliveries. Required.
                                 "basic_auth": {
                                     "username": "str",  # Basic auth username.
                                       Required.
-                                    "password": "str"  # Optional. Basic auth
-                                      password. Write-only secret "u2014 full value on create/update;
-                                      masked as ``********`` on read.
+                                    "password_status": {
+                                        "configured": bool  # Whether the
+                                          secret is configured. Required.
+                                    }
                                 },
                                 "bearer_token": {
-                                    "token": "str"  # Optional. Bearer token
-                                      value sent in the Authorization header. Write-only secret "u2014
-                                      full value on create/update; masked as ``********`` on read.
+                                    "token_status": {
+                                        "configured": bool  # Whether the
+                                          secret is configured. Required.
+                                    }
                                 },
                                 "headers": {
                                     "str": "str"  # Optional. Optional custom
-                                      HTTP headers to include on webhook deliveries. At most 20 headers
-                                      are allowed. Reserved header names such as ``host``"" ,
-                                      ``content-type``"" , and ``proxy-*`` are rejected.
+                                      HTTP headers included on webhook deliveries. At most 20 headers
+                                      are allowed.
                                 },
                                 "signature": {
-                                    "secret": "str"  # Optional. Shared secret
-                                      used to sign webhook payloads. Write-only secret "u2014 full
-                                      value on create/update; masked as ``********`` on read.
+                                    "secret_status": {
+                                        "configured": bool  # Whether the
+                                          secret is configured. Required.
+                                    }
                                 }
                             }
                         }
@@ -181653,7 +181668,8 @@ class InsightsOperations:
 
         Email recipients must be verified team member addresses. Webhook URLs must
         use HTTPS. Secret fields (\\ ``slack.webhook_url``\\ , webhook credentials) are
-        write-only and returned masked on subsequent reads.
+        write-only. Subsequent reads never return secret values; they include
+        optional ``*_status`` objects when a secret is configured.
 
         :param body: Required.
         :type body: JSON
@@ -181678,8 +181694,8 @@ class InsightsOperations:
                     "slack": {
                         "channel": "str",  # The Slack channel name to notify. Required.
                         "webhook_url": "str"  # Optional. Slack incoming webhook URL.
-                          Write-only secret "u2014 full value on create/update; masked as ``********``
-                          on read. Omit on update to retain the existing value.
+                          Write-only secret "u2014 send the full value on create or update. Omit on
+                          update to retain the existing value. Never returned in responses.
                     },
                     "webhook": {
                         "url": "str",  # HTTPS URL that receives webhook deliveries. Returned
@@ -181687,13 +181703,14 @@ class InsightsOperations:
                         "basic_auth": {
                             "username": "str",  # Basic auth username. Required.
                             "password": "str"  # Optional. Basic auth password.
-                              Write-only secret "u2014 full value on create/update; masked as
-                              ``********`` on read.
+                              Write-only secret "u2014 send the full value on create or update. Omit on
+                              update to retain the existing value. Never returned in responses.
                         },
                         "bearer_token": {
                             "token": "str"  # Optional. Bearer token value sent in the
-                              Authorization header. Write-only secret "u2014 full value on
-                              create/update; masked as ``********`` on read.
+                              Authorization header. Write-only secret "u2014 send the full value on
+                              create or update. Omit on update to retain the existing value. Never
+                              returned in responses.
                         },
                         "headers": {
                             "str": "str"  # Optional. Optional custom HTTP headers to
@@ -181703,8 +181720,9 @@ class InsightsOperations:
                         },
                         "signature": {
                             "secret": "str"  # Optional. Shared secret used to sign
-                              webhook payloads. Write-only secret "u2014 full value on create/update;
-                              masked as ``********`` on read.
+                              webhook payloads. Write-only secret "u2014 send the full value on create
+                              or update. Omit on update to retain the existing value. Never returned in
+                              responses.
                         }
                     }
                 }
@@ -181731,9 +181749,10 @@ class InsightsOperations:
                         "slack": {
                             "channel": "str",  # The Slack channel name to notify.
                               Required.
-                            "webhook_url": "str"  # Optional. Slack incoming webhook URL.
-                              Write-only secret "u2014 full value on create/update; masked as
-                              ``********`` on read. Omit on update to retain the existing value.
+                            "webhook_url_status": {
+                                "configured": bool  # Whether the secret is
+                                  configured. Required.
+                            }
                         },
                         "usage": {
                             "rule_count": 0  # Optional. Number of alert rules that
@@ -181741,28 +181760,30 @@ class InsightsOperations:
                         },
                         "webhook": {
                             "url": "str",  # HTTPS URL that receives webhook deliveries.
-                              Returned in full on read. Required.
+                              Required.
                             "basic_auth": {
                                 "username": "str",  # Basic auth username. Required.
-                                "password": "str"  # Optional. Basic auth password.
-                                  Write-only secret "u2014 full value on create/update; masked as
-                                  ``********`` on read.
+                                "password_status": {
+                                    "configured": bool  # Whether the secret is
+                                      configured. Required.
+                                }
                             },
                             "bearer_token": {
-                                "token": "str"  # Optional. Bearer token value sent
-                                  in the Authorization header. Write-only secret "u2014 full value on
-                                  create/update; masked as ``********`` on read.
+                                "token_status": {
+                                    "configured": bool  # Whether the secret is
+                                      configured. Required.
+                                }
                             },
                             "headers": {
                                 "str": "str"  # Optional. Optional custom HTTP
-                                  headers to include on webhook deliveries. At most 20 headers are
-                                  allowed. Reserved header names such as ``host``"" ,
-                                  ``content-type``"" , and ``proxy-*`` are rejected.
+                                  headers included on webhook deliveries. At most 20 headers are
+                                  allowed.
                             },
                             "signature": {
-                                "secret": "str"  # Optional. Shared secret used to
-                                  sign webhook payloads. Write-only secret "u2014 full value on
-                                  create/update; masked as ``********`` on read.
+                                "secret_status": {
+                                    "configured": bool  # Whether the secret is
+                                      configured. Required.
+                                }
                             }
                         }
                     }
@@ -181793,7 +181814,8 @@ class InsightsOperations:
 
         Email recipients must be verified team member addresses. Webhook URLs must
         use HTTPS. Secret fields (\\ ``slack.webhook_url``\\ , webhook credentials) are
-        write-only and returned masked on subsequent reads.
+        write-only. Subsequent reads never return secret values; they include
+        optional ``*_status`` objects when a secret is configured.
 
         :param body: Required.
         :type body: IO[bytes]
@@ -181829,9 +181851,10 @@ class InsightsOperations:
                         "slack": {
                             "channel": "str",  # The Slack channel name to notify.
                               Required.
-                            "webhook_url": "str"  # Optional. Slack incoming webhook URL.
-                              Write-only secret "u2014 full value on create/update; masked as
-                              ``********`` on read. Omit on update to retain the existing value.
+                            "webhook_url_status": {
+                                "configured": bool  # Whether the secret is
+                                  configured. Required.
+                            }
                         },
                         "usage": {
                             "rule_count": 0  # Optional. Number of alert rules that
@@ -181839,28 +181862,30 @@ class InsightsOperations:
                         },
                         "webhook": {
                             "url": "str",  # HTTPS URL that receives webhook deliveries.
-                              Returned in full on read. Required.
+                              Required.
                             "basic_auth": {
                                 "username": "str",  # Basic auth username. Required.
-                                "password": "str"  # Optional. Basic auth password.
-                                  Write-only secret "u2014 full value on create/update; masked as
-                                  ``********`` on read.
+                                "password_status": {
+                                    "configured": bool  # Whether the secret is
+                                      configured. Required.
+                                }
                             },
                             "bearer_token": {
-                                "token": "str"  # Optional. Bearer token value sent
-                                  in the Authorization header. Write-only secret "u2014 full value on
-                                  create/update; masked as ``********`` on read.
+                                "token_status": {
+                                    "configured": bool  # Whether the secret is
+                                      configured. Required.
+                                }
                             },
                             "headers": {
                                 "str": "str"  # Optional. Optional custom HTTP
-                                  headers to include on webhook deliveries. At most 20 headers are
-                                  allowed. Reserved header names such as ``host``"" ,
-                                  ``content-type``"" , and ``proxy-*`` are rejected.
+                                  headers included on webhook deliveries. At most 20 headers are
+                                  allowed.
                             },
                             "signature": {
-                                "secret": "str"  # Optional. Shared secret used to
-                                  sign webhook payloads. Write-only secret "u2014 full value on
-                                  create/update; masked as ``********`` on read.
+                                "secret_status": {
+                                    "configured": bool  # Whether the secret is
+                                      configured. Required.
+                                }
                             }
                         }
                     }
@@ -181891,7 +181916,8 @@ class InsightsOperations:
 
         Email recipients must be verified team member addresses. Webhook URLs must
         use HTTPS. Secret fields (\\ ``slack.webhook_url``\\ , webhook credentials) are
-        write-only and returned masked on subsequent reads.
+        write-only. Subsequent reads never return secret values; they include
+        optional ``*_status`` objects when a secret is configured.
 
         :param body: Is either a JSON type or a IO[bytes] type. Required.
         :type body: JSON or IO[bytes]
@@ -181913,8 +181939,8 @@ class InsightsOperations:
                     "slack": {
                         "channel": "str",  # The Slack channel name to notify. Required.
                         "webhook_url": "str"  # Optional. Slack incoming webhook URL.
-                          Write-only secret "u2014 full value on create/update; masked as ``********``
-                          on read. Omit on update to retain the existing value.
+                          Write-only secret "u2014 send the full value on create or update. Omit on
+                          update to retain the existing value. Never returned in responses.
                     },
                     "webhook": {
                         "url": "str",  # HTTPS URL that receives webhook deliveries. Returned
@@ -181922,13 +181948,14 @@ class InsightsOperations:
                         "basic_auth": {
                             "username": "str",  # Basic auth username. Required.
                             "password": "str"  # Optional. Basic auth password.
-                              Write-only secret "u2014 full value on create/update; masked as
-                              ``********`` on read.
+                              Write-only secret "u2014 send the full value on create or update. Omit on
+                              update to retain the existing value. Never returned in responses.
                         },
                         "bearer_token": {
                             "token": "str"  # Optional. Bearer token value sent in the
-                              Authorization header. Write-only secret "u2014 full value on
-                              create/update; masked as ``********`` on read.
+                              Authorization header. Write-only secret "u2014 send the full value on
+                              create or update. Omit on update to retain the existing value. Never
+                              returned in responses.
                         },
                         "headers": {
                             "str": "str"  # Optional. Optional custom HTTP headers to
@@ -181938,8 +181965,9 @@ class InsightsOperations:
                         },
                         "signature": {
                             "secret": "str"  # Optional. Shared secret used to sign
-                              webhook payloads. Write-only secret "u2014 full value on create/update;
-                              masked as ``********`` on read.
+                              webhook payloads. Write-only secret "u2014 send the full value on create
+                              or update. Omit on update to retain the existing value. Never returned in
+                              responses.
                         }
                     }
                 }
@@ -181966,9 +181994,10 @@ class InsightsOperations:
                         "slack": {
                             "channel": "str",  # The Slack channel name to notify.
                               Required.
-                            "webhook_url": "str"  # Optional. Slack incoming webhook URL.
-                              Write-only secret "u2014 full value on create/update; masked as
-                              ``********`` on read. Omit on update to retain the existing value.
+                            "webhook_url_status": {
+                                "configured": bool  # Whether the secret is
+                                  configured. Required.
+                            }
                         },
                         "usage": {
                             "rule_count": 0  # Optional. Number of alert rules that
@@ -181976,28 +182005,30 @@ class InsightsOperations:
                         },
                         "webhook": {
                             "url": "str",  # HTTPS URL that receives webhook deliveries.
-                              Returned in full on read. Required.
+                              Required.
                             "basic_auth": {
                                 "username": "str",  # Basic auth username. Required.
-                                "password": "str"  # Optional. Basic auth password.
-                                  Write-only secret "u2014 full value on create/update; masked as
-                                  ``********`` on read.
+                                "password_status": {
+                                    "configured": bool  # Whether the secret is
+                                      configured. Required.
+                                }
                             },
                             "bearer_token": {
-                                "token": "str"  # Optional. Bearer token value sent
-                                  in the Authorization header. Write-only secret "u2014 full value on
-                                  create/update; masked as ``********`` on read.
+                                "token_status": {
+                                    "configured": bool  # Whether the secret is
+                                      configured. Required.
+                                }
                             },
                             "headers": {
                                 "str": "str"  # Optional. Optional custom HTTP
-                                  headers to include on webhook deliveries. At most 20 headers are
-                                  allowed. Reserved header names such as ``host``"" ,
-                                  ``content-type``"" , and ``proxy-*`` are rejected.
+                                  headers included on webhook deliveries. At most 20 headers are
+                                  allowed.
                             },
                             "signature": {
-                                "secret": "str"  # Optional. Shared secret used to
-                                  sign webhook payloads. Write-only secret "u2014 full value on
-                                  create/update; masked as ``********`` on read.
+                                "secret_status": {
+                                    "configured": bool  # Whether the secret is
+                                      configured. Required.
+                                }
                             }
                         }
                     }
@@ -182111,8 +182142,10 @@ class InsightsOperations:
         """Retrieve a Notification Channel.
 
         To retrieve a notification channel, send a GET request to
-        ``/v2/insights/notification-channels/{id}``. Secret fields are returned masked
-        as ``********``.
+        ``/v2/insights/notification-channels/{id}``. Secret credentials are never
+        returned. When a secret is configured, the response includes an optional
+        ``*_status`` object (for example ``webhook_url_status``\\ ) with
+        ``configured: true``.
 
         :param id: A unique identifier for a notification channel. Required.
         :type id: str
@@ -182145,9 +182178,10 @@ class InsightsOperations:
                         "slack": {
                             "channel": "str",  # The Slack channel name to notify.
                               Required.
-                            "webhook_url": "str"  # Optional. Slack incoming webhook URL.
-                              Write-only secret "u2014 full value on create/update; masked as
-                              ``********`` on read. Omit on update to retain the existing value.
+                            "webhook_url_status": {
+                                "configured": bool  # Whether the secret is
+                                  configured. Required.
+                            }
                         },
                         "usage": {
                             "rule_count": 0  # Optional. Number of alert rules that
@@ -182155,28 +182189,30 @@ class InsightsOperations:
                         },
                         "webhook": {
                             "url": "str",  # HTTPS URL that receives webhook deliveries.
-                              Returned in full on read. Required.
+                              Required.
                             "basic_auth": {
                                 "username": "str",  # Basic auth username. Required.
-                                "password": "str"  # Optional. Basic auth password.
-                                  Write-only secret "u2014 full value on create/update; masked as
-                                  ``********`` on read.
+                                "password_status": {
+                                    "configured": bool  # Whether the secret is
+                                      configured. Required.
+                                }
                             },
                             "bearer_token": {
-                                "token": "str"  # Optional. Bearer token value sent
-                                  in the Authorization header. Write-only secret "u2014 full value on
-                                  create/update; masked as ``********`` on read.
+                                "token_status": {
+                                    "configured": bool  # Whether the secret is
+                                      configured. Required.
+                                }
                             },
                             "headers": {
                                 "str": "str"  # Optional. Optional custom HTTP
-                                  headers to include on webhook deliveries. At most 20 headers are
-                                  allowed. Reserved header names such as ``host``"" ,
-                                  ``content-type``"" , and ``proxy-*`` are rejected.
+                                  headers included on webhook deliveries. At most 20 headers are
+                                  allowed.
                             },
                             "signature": {
-                                "secret": "str"  # Optional. Shared secret used to
-                                  sign webhook payloads. Write-only secret "u2014 full value on
-                                  create/update; masked as ``********`` on read.
+                                "secret_status": {
+                                    "configured": bool  # Whether the secret is
+                                      configured. Required.
+                                }
                             }
                         }
                     }
@@ -182288,7 +182324,8 @@ class InsightsOperations:
         ``email``\\ , ``slack``\\ , or ``webhook``.
 
         Sending a secret field rotates it; omitting the secret field keeps the
-        existing value.
+        existing value. Responses never return secret values; they include optional
+        ``*_status`` objects when a secret is configured.
 
         :param id: A unique identifier for a notification channel. Required.
         :type id: str
@@ -182315,8 +182352,8 @@ class InsightsOperations:
                     "slack": {
                         "channel": "str",  # The Slack channel name to notify. Required.
                         "webhook_url": "str"  # Optional. Slack incoming webhook URL.
-                          Write-only secret "u2014 full value on create/update; masked as ``********``
-                          on read. Omit on update to retain the existing value.
+                          Write-only secret "u2014 send the full value on create or update. Omit on
+                          update to retain the existing value. Never returned in responses.
                     },
                     "webhook": {
                         "url": "str",  # HTTPS URL that receives webhook deliveries. Returned
@@ -182324,13 +182361,14 @@ class InsightsOperations:
                         "basic_auth": {
                             "username": "str",  # Basic auth username. Required.
                             "password": "str"  # Optional. Basic auth password.
-                              Write-only secret "u2014 full value on create/update; masked as
-                              ``********`` on read.
+                              Write-only secret "u2014 send the full value on create or update. Omit on
+                              update to retain the existing value. Never returned in responses.
                         },
                         "bearer_token": {
                             "token": "str"  # Optional. Bearer token value sent in the
-                              Authorization header. Write-only secret "u2014 full value on
-                              create/update; masked as ``********`` on read.
+                              Authorization header. Write-only secret "u2014 send the full value on
+                              create or update. Omit on update to retain the existing value. Never
+                              returned in responses.
                         },
                         "headers": {
                             "str": "str"  # Optional. Optional custom HTTP headers to
@@ -182340,8 +182378,9 @@ class InsightsOperations:
                         },
                         "signature": {
                             "secret": "str"  # Optional. Shared secret used to sign
-                              webhook payloads. Write-only secret "u2014 full value on create/update;
-                              masked as ``********`` on read.
+                              webhook payloads. Write-only secret "u2014 send the full value on create
+                              or update. Omit on update to retain the existing value. Never returned in
+                              responses.
                         }
                     }
                 }
@@ -182368,9 +182407,10 @@ class InsightsOperations:
                         "slack": {
                             "channel": "str",  # The Slack channel name to notify.
                               Required.
-                            "webhook_url": "str"  # Optional. Slack incoming webhook URL.
-                              Write-only secret "u2014 full value on create/update; masked as
-                              ``********`` on read. Omit on update to retain the existing value.
+                            "webhook_url_status": {
+                                "configured": bool  # Whether the secret is
+                                  configured. Required.
+                            }
                         },
                         "usage": {
                             "rule_count": 0  # Optional. Number of alert rules that
@@ -182378,28 +182418,30 @@ class InsightsOperations:
                         },
                         "webhook": {
                             "url": "str",  # HTTPS URL that receives webhook deliveries.
-                              Returned in full on read. Required.
+                              Required.
                             "basic_auth": {
                                 "username": "str",  # Basic auth username. Required.
-                                "password": "str"  # Optional. Basic auth password.
-                                  Write-only secret "u2014 full value on create/update; masked as
-                                  ``********`` on read.
+                                "password_status": {
+                                    "configured": bool  # Whether the secret is
+                                      configured. Required.
+                                }
                             },
                             "bearer_token": {
-                                "token": "str"  # Optional. Bearer token value sent
-                                  in the Authorization header. Write-only secret "u2014 full value on
-                                  create/update; masked as ``********`` on read.
+                                "token_status": {
+                                    "configured": bool  # Whether the secret is
+                                      configured. Required.
+                                }
                             },
                             "headers": {
                                 "str": "str"  # Optional. Optional custom HTTP
-                                  headers to include on webhook deliveries. At most 20 headers are
-                                  allowed. Reserved header names such as ``host``"" ,
-                                  ``content-type``"" , and ``proxy-*`` are rejected.
+                                  headers included on webhook deliveries. At most 20 headers are
+                                  allowed.
                             },
                             "signature": {
-                                "secret": "str"  # Optional. Shared secret used to
-                                  sign webhook payloads. Write-only secret "u2014 full value on
-                                  create/update; masked as ``********`` on read.
+                                "secret_status": {
+                                    "configured": bool  # Whether the secret is
+                                      configured. Required.
+                                }
                             }
                         }
                     }
@@ -182434,7 +182476,8 @@ class InsightsOperations:
         ``email``\\ , ``slack``\\ , or ``webhook``.
 
         Sending a secret field rotates it; omitting the secret field keeps the
-        existing value.
+        existing value. Responses never return secret values; they include optional
+        ``*_status`` objects when a secret is configured.
 
         :param id: A unique identifier for a notification channel. Required.
         :type id: str
@@ -182472,9 +182515,10 @@ class InsightsOperations:
                         "slack": {
                             "channel": "str",  # The Slack channel name to notify.
                               Required.
-                            "webhook_url": "str"  # Optional. Slack incoming webhook URL.
-                              Write-only secret "u2014 full value on create/update; masked as
-                              ``********`` on read. Omit on update to retain the existing value.
+                            "webhook_url_status": {
+                                "configured": bool  # Whether the secret is
+                                  configured. Required.
+                            }
                         },
                         "usage": {
                             "rule_count": 0  # Optional. Number of alert rules that
@@ -182482,28 +182526,30 @@ class InsightsOperations:
                         },
                         "webhook": {
                             "url": "str",  # HTTPS URL that receives webhook deliveries.
-                              Returned in full on read. Required.
+                              Required.
                             "basic_auth": {
                                 "username": "str",  # Basic auth username. Required.
-                                "password": "str"  # Optional. Basic auth password.
-                                  Write-only secret "u2014 full value on create/update; masked as
-                                  ``********`` on read.
+                                "password_status": {
+                                    "configured": bool  # Whether the secret is
+                                      configured. Required.
+                                }
                             },
                             "bearer_token": {
-                                "token": "str"  # Optional. Bearer token value sent
-                                  in the Authorization header. Write-only secret "u2014 full value on
-                                  create/update; masked as ``********`` on read.
+                                "token_status": {
+                                    "configured": bool  # Whether the secret is
+                                      configured. Required.
+                                }
                             },
                             "headers": {
                                 "str": "str"  # Optional. Optional custom HTTP
-                                  headers to include on webhook deliveries. At most 20 headers are
-                                  allowed. Reserved header names such as ``host``"" ,
-                                  ``content-type``"" , and ``proxy-*`` are rejected.
+                                  headers included on webhook deliveries. At most 20 headers are
+                                  allowed.
                             },
                             "signature": {
-                                "secret": "str"  # Optional. Shared secret used to
-                                  sign webhook payloads. Write-only secret "u2014 full value on
-                                  create/update; masked as ``********`` on read.
+                                "secret_status": {
+                                    "configured": bool  # Whether the secret is
+                                      configured. Required.
+                                }
                             }
                         }
                     }
@@ -182533,7 +182579,8 @@ class InsightsOperations:
         ``email``\\ , ``slack``\\ , or ``webhook``.
 
         Sending a secret field rotates it; omitting the secret field keeps the
-        existing value.
+        existing value. Responses never return secret values; they include optional
+        ``*_status`` objects when a secret is configured.
 
         :param id: A unique identifier for a notification channel. Required.
         :type id: str
@@ -182557,8 +182604,8 @@ class InsightsOperations:
                     "slack": {
                         "channel": "str",  # The Slack channel name to notify. Required.
                         "webhook_url": "str"  # Optional. Slack incoming webhook URL.
-                          Write-only secret "u2014 full value on create/update; masked as ``********``
-                          on read. Omit on update to retain the existing value.
+                          Write-only secret "u2014 send the full value on create or update. Omit on
+                          update to retain the existing value. Never returned in responses.
                     },
                     "webhook": {
                         "url": "str",  # HTTPS URL that receives webhook deliveries. Returned
@@ -182566,13 +182613,14 @@ class InsightsOperations:
                         "basic_auth": {
                             "username": "str",  # Basic auth username. Required.
                             "password": "str"  # Optional. Basic auth password.
-                              Write-only secret "u2014 full value on create/update; masked as
-                              ``********`` on read.
+                              Write-only secret "u2014 send the full value on create or update. Omit on
+                              update to retain the existing value. Never returned in responses.
                         },
                         "bearer_token": {
                             "token": "str"  # Optional. Bearer token value sent in the
-                              Authorization header. Write-only secret "u2014 full value on
-                              create/update; masked as ``********`` on read.
+                              Authorization header. Write-only secret "u2014 send the full value on
+                              create or update. Omit on update to retain the existing value. Never
+                              returned in responses.
                         },
                         "headers": {
                             "str": "str"  # Optional. Optional custom HTTP headers to
@@ -182582,8 +182630,9 @@ class InsightsOperations:
                         },
                         "signature": {
                             "secret": "str"  # Optional. Shared secret used to sign
-                              webhook payloads. Write-only secret "u2014 full value on create/update;
-                              masked as ``********`` on read.
+                              webhook payloads. Write-only secret "u2014 send the full value on create
+                              or update. Omit on update to retain the existing value. Never returned in
+                              responses.
                         }
                     }
                 }
@@ -182610,9 +182659,10 @@ class InsightsOperations:
                         "slack": {
                             "channel": "str",  # The Slack channel name to notify.
                               Required.
-                            "webhook_url": "str"  # Optional. Slack incoming webhook URL.
-                              Write-only secret "u2014 full value on create/update; masked as
-                              ``********`` on read. Omit on update to retain the existing value.
+                            "webhook_url_status": {
+                                "configured": bool  # Whether the secret is
+                                  configured. Required.
+                            }
                         },
                         "usage": {
                             "rule_count": 0  # Optional. Number of alert rules that
@@ -182620,28 +182670,30 @@ class InsightsOperations:
                         },
                         "webhook": {
                             "url": "str",  # HTTPS URL that receives webhook deliveries.
-                              Returned in full on read. Required.
+                              Required.
                             "basic_auth": {
                                 "username": "str",  # Basic auth username. Required.
-                                "password": "str"  # Optional. Basic auth password.
-                                  Write-only secret "u2014 full value on create/update; masked as
-                                  ``********`` on read.
+                                "password_status": {
+                                    "configured": bool  # Whether the secret is
+                                      configured. Required.
+                                }
                             },
                             "bearer_token": {
-                                "token": "str"  # Optional. Bearer token value sent
-                                  in the Authorization header. Write-only secret "u2014 full value on
-                                  create/update; masked as ``********`` on read.
+                                "token_status": {
+                                    "configured": bool  # Whether the secret is
+                                      configured. Required.
+                                }
                             },
                             "headers": {
                                 "str": "str"  # Optional. Optional custom HTTP
-                                  headers to include on webhook deliveries. At most 20 headers are
-                                  allowed. Reserved header names such as ``host``"" ,
-                                  ``content-type``"" , and ``proxy-*`` are rejected.
+                                  headers included on webhook deliveries. At most 20 headers are
+                                  allowed.
                             },
                             "signature": {
-                                "secret": "str"  # Optional. Shared secret used to
-                                  sign webhook payloads. Write-only secret "u2014 full value on
-                                  create/update; masked as ``********`` on read.
+                                "secret_status": {
+                                    "configured": bool  # Whether the secret is
+                                      configured. Required.
+                                }
                             }
                         }
                     }
