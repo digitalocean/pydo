@@ -680,6 +680,16 @@ from ...operations._operations import (
     build_sessions_delete_request,
     build_sessions_list_request,
     build_sessions_list_search_request,
+    build_signals_create_export_request,
+    build_signals_get_consent_request,
+    build_signals_get_export_download_request,
+    build_signals_get_export_options_request,
+    build_signals_get_export_request,
+    build_signals_list_agent_sessions_request,
+    build_signals_list_consents_request,
+    build_signals_list_exports_request,
+    build_signals_list_session_dialogues_request,
+    build_signals_update_consent_request,
     build_sizes_list_request,
     build_snapshots_delete_request,
     build_snapshots_get_request,
@@ -23816,7 +23826,8 @@ class AppsOperations:  # pylint: disable=too-many-public-methods
                     },
                     "project_id": "str"  # Optional. The ID of the project the app should be
                       assigned to. If omitted, it will be assigned to your default project.
-                      :code:`<br>`:code:`<br>`Requires ``project:assign_resource`` scope.
+                      :code:`<br>`:code:`<br>`Requires ``project:assign_resource`` and
+                      ``project:update`` scopes.
                 }
 
                 # response body for status code(s): 200
@@ -40539,7 +40550,8 @@ class AppsOperations:  # pylint: disable=too-many-public-methods
                     },
                     "project_id": "str"  # Optional. The ID of the project the app should be
                       assigned to. If omitted, it will be assigned to your default project.
-                      :code:`<br>`:code:`<br>`Requires ``project:assign_resource`` scope.
+                      :code:`<br>`:code:`<br>`Requires ``project:assign_resource`` and
+                      ``project:update`` scopes.
                 }
 
                 # response body for status code(s): 200
@@ -166305,6 +166317,1633 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                 deserialized = None
 
         if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+
+class SignalsOperations:
+    """
+    .. warning::
+        **DO NOT** instantiate this class directly.
+
+        Instead, you should access the following operations through
+        :class:`~pydo.aio.GeneratedClient`'s
+        :attr:`signals` attribute.
+    """
+
+    def __init__(self, *args, **kwargs) -> None:
+        input_args = list(args)
+        self._client = input_args.pop(0) if input_args else kwargs.pop("client")
+        self._config = input_args.pop(0) if input_args else kwargs.pop("config")
+        self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
+        self._deserialize = (
+            input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        )
+
+    @distributed_trace_async
+    async def list_consents(self, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """List All Consent Records.
+
+        To list all signals consent records for your team, send a GET request to
+        ``/v1/consent``. Each record indicates whether signals collection is enabled
+        for a specific agent.
+
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "consents": [
+                        {
+                            "agent_id": "str",  # The unique identifier of the agent. For
+                              Harness Runtime, this is the Environment Config ID. Required.
+                            "enabled": bool,  # Whether signals collection is enabled for
+                              this agent. Required.
+                            "id": 0,  # The unique numeric identifier for the consent
+                              record. Required.
+                            "team_id": 0,  # The team ID that owns this consent record.
+                              Required.
+                            "updated_at": "2020-02-20 00:00:00"  # A time value given in
+                              ISO8601 combined date and time format. Required.
+                        }
+                    ]
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_signals_list_consents_request(
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        response_headers["ratelimit-limit"] = self._deserialize(
+            "int", response.headers.get("ratelimit-limit")
+        )
+        response_headers["ratelimit-remaining"] = self._deserialize(
+            "int", response.headers.get("ratelimit-remaining")
+        )
+        response_headers["ratelimit-reset"] = self._deserialize(
+            "int", response.headers.get("ratelimit-reset")
+        )
+
+        if response.content:
+            deserialized = response.json()
+        else:
+            deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_consent(self, agent_id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve Consent for an Agent.
+
+        To retrieve the consent record for a specific agent, send a GET
+        request to ``/v1/consent/{agent_id}``. The response includes an ``allowed``
+        field indicating whether the team is permitted to use signals for this agent.
+
+        :param agent_id: A unique identifier for an agent. For Harness Runtime, this is the Environment
+         Config ID. Required.
+        :type agent_id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "agent_id": "str",  # The unique identifier of the agent. For Harness
+                      Runtime, this is the Environment Config ID. Required.
+                    "allowed": bool,  # Whether the team is permitted to use signals for this
+                      agent. This is determined by the platform and cannot be set by the user.
+                      Required.
+                    "enabled": bool,  # Whether signals collection is enabled for this agent.
+                      Required.
+                    "id": 0,  # The unique numeric identifier for the consent record. Required.
+                    "team_id": 0,  # The team ID that owns this consent record. Required.
+                    "updated_at": "2020-02-20 00:00:00"  # A time value given in ISO8601 combined
+                      date and time format. Required.
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_signals_get_consent_request(
+            agent_id=agent_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def update_consent(
+        self,
+        agent_id: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Consent for an Agent.
+
+        To enable or disable signals collection for a specific agent, send a
+        PUT request to ``/v1/consent/{agent_id}`` with an ``enabled`` boolean in the
+        request body.
+
+        :param agent_id: A unique identifier for an agent. For Harness Runtime, this is the Environment
+         Config ID. Required.
+        :type agent_id: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "enabled": bool  # Whether to enable signals collection for this agent.
+                      Required.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "consent": {
+                        "agent_id": "str",  # The unique identifier of the agent. For Harness
+                          Runtime, this is the Environment Config ID. Required.
+                        "enabled": bool,  # Whether signals collection is enabled for this
+                          agent. Required.
+                        "id": 0,  # The unique numeric identifier for the consent record.
+                          Required.
+                        "team_id": 0,  # The team ID that owns this consent record. Required.
+                        "updated_at": "2020-02-20 00:00:00"  # A time value given in ISO8601
+                          combined date and time format. Required.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def update_consent(
+        self,
+        agent_id: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Consent for an Agent.
+
+        To enable or disable signals collection for a specific agent, send a
+        PUT request to ``/v1/consent/{agent_id}`` with an ``enabled`` boolean in the
+        request body.
+
+        :param agent_id: A unique identifier for an agent. For Harness Runtime, this is the Environment
+         Config ID. Required.
+        :type agent_id: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "consent": {
+                        "agent_id": "str",  # The unique identifier of the agent. For Harness
+                          Runtime, this is the Environment Config ID. Required.
+                        "enabled": bool,  # Whether signals collection is enabled for this
+                          agent. Required.
+                        "id": 0,  # The unique numeric identifier for the consent record.
+                          Required.
+                        "team_id": 0,  # The team ID that owns this consent record. Required.
+                        "updated_at": "2020-02-20 00:00:00"  # A time value given in ISO8601
+                          combined date and time format. Required.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def update_consent(
+        self, agent_id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Consent for an Agent.
+
+        To enable or disable signals collection for a specific agent, send a
+        PUT request to ``/v1/consent/{agent_id}`` with an ``enabled`` boolean in the
+        request body.
+
+        :param agent_id: A unique identifier for an agent. For Harness Runtime, this is the Environment
+         Config ID. Required.
+        :type agent_id: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "enabled": bool  # Whether to enable signals collection for this agent.
+                      Required.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "consent": {
+                        "agent_id": "str",  # The unique identifier of the agent. For Harness
+                          Runtime, this is the Environment Config ID. Required.
+                        "enabled": bool,  # Whether signals collection is enabled for this
+                          agent. Required.
+                        "id": 0,  # The unique numeric identifier for the consent record.
+                          Required.
+                        "team_id": 0,  # The team ID that owns this consent record. Required.
+                        "updated_at": "2020-02-20 00:00:00"  # A time value given in ISO8601
+                          combined date and time format. Required.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_signals_update_consent_request(
+            agent_id=agent_id,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def list_agent_sessions(
+        self,
+        agent_id: str,
+        *,
+        limit: int = 20,
+        after: Optional[str] = None,
+        start_time: Optional[datetime.datetime] = None,
+        end_time: Optional[datetime.datetime] = None,
+        signal_type: Optional[str] = None,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Sessions for an Agent.
+
+        To list signals sessions for a specific agent, send a GET request to
+        ``/v1/signals/agents/{agent_id}/sessions``. Results are paginated using cursor-based
+        pagination with ``limit`` and ``after`` parameters.
+
+        :param agent_id: A unique identifier for an agent. For Harness Runtime, this is the Environment
+         Config ID. Required.
+        :type agent_id: str
+        :keyword limit: Maximum number of items to return per page. Default value is 20.
+        :paramtype limit: int
+        :keyword after: An opaque cursor string returned from a previous page. Pass this value to
+         retrieve the next page of results. Default value is None.
+        :paramtype after: str
+        :keyword start_time: Filter results to those occurring at or after this timestamp (RFC 3339).
+         Default value is None.
+        :paramtype start_time: ~datetime.datetime
+        :keyword end_time: Filter results to those occurring at or before this timestamp (RFC 3339).
+         Default value is None.
+        :paramtype end_time: ~datetime.datetime
+        :keyword signal_type: Filter results by signal type. Use the export options endpoint to list
+         available signal types. Default value is None.
+        :paramtype signal_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "edges": [
+                        {
+                            "cursor": "str",  # Optional. An opaque cursor for
+                              pagination.
+                            "node": {
+                                "session_id": "str",  # The unique identifier for the
+                                  session. Required.
+                                "duration_seconds": 0.0,  # Optional. The duration of
+                                  the session in seconds.
+                                "signal_count": 0,  # Optional. The number of signals
+                                  detected in this session.
+                                "started_at": "2020-02-20 00:00:00",  # Optional.
+                                  When the session started.
+                                "total_turns": 0  # Optional. The total number of
+                                  conversation turns in this session.
+                            }
+                        }
+                    ],
+                    "page_info": {
+                        "has_next_page": bool  # Optional. Whether there are more results
+                          after this page.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_signals_list_agent_sessions_request(
+            agent_id=agent_id,
+            limit=limit,
+            after=after,
+            start_time=start_time,
+            end_time=end_time,
+            signal_type=signal_type,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def list_session_dialogues(
+        self,
+        session_id: str,
+        *,
+        limit: int = 20,
+        after: Optional[str] = None,
+        start_time: Optional[datetime.datetime] = None,
+        end_time: Optional[datetime.datetime] = None,
+        signal_type: Optional[str] = None,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Dialogues for a Session.
+
+        To list the dialogue turns within a specific session, send a GET request to
+        ``/v1/signals/sessions/{session_id}/dialogues``. Each dialogue represents a
+        single turn of conversation between a user and the agent, along with
+        any signals detected. Results are paginated using cursor-based pagination.
+
+        :param session_id: A unique identifier for a signals session. Required.
+        :type session_id: str
+        :keyword limit: Maximum number of items to return per page. Default value is 20.
+        :paramtype limit: int
+        :keyword after: An opaque cursor string returned from a previous page. Pass this value to
+         retrieve the next page of results. Default value is None.
+        :paramtype after: str
+        :keyword start_time: Filter results to those occurring at or after this timestamp (RFC 3339).
+         Default value is None.
+        :paramtype start_time: ~datetime.datetime
+        :keyword end_time: Filter results to those occurring at or before this timestamp (RFC 3339).
+         Default value is None.
+        :paramtype end_time: ~datetime.datetime
+        :keyword signal_type: Filter results by signal type. Use the export options endpoint to list
+         available signal types. Default value is None.
+        :paramtype signal_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "edges": [
+                        {
+                            "cursor": "str",  # Optional. An opaque cursor for
+                              pagination.
+                            "node": {
+                                "id": "str",  # The unique identifier for the
+                                  dialogue. Required.
+                                "run_status": "str",  # Optional. The execution
+                                  status of this dialogue turn.
+                                "sequence": 0,  # Optional. The sequence number of
+                                  this dialogue within the session.
+                                "signals": [
+                                    "str"  # Optional. A list of signal types
+                                      detected in this dialogue.
+                                ],
+                                "user_message": "str"  # Optional. The user's message
+                                  in this dialogue turn.
+                            }
+                        }
+                    ],
+                    "page_info": {
+                        "has_next_page": bool  # Optional. Whether there are more results
+                          after this page.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_signals_list_session_dialogues_request(
+            session_id=session_id,
+            limit=limit,
+            after=after,
+            start_time=start_time,
+            end_time=end_time,
+            signal_type=signal_type,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def list_exports(
+        self, *, limit: int = 20, after: Optional[str] = None, **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Export Jobs.
+
+        To list signals export jobs for your team, send a GET request to
+        ``/v1/signals/exports``. Results are paginated using cursor-based pagination
+        with ``limit`` and ``after`` parameters.
+
+        :keyword limit: Maximum number of items to return per page. Default value is 20.
+        :paramtype limit: int
+        :keyword after: An opaque cursor string returned from a previous page. Pass this value to
+         retrieve the next page of results. Default value is None.
+        :paramtype after: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "edges": [
+                        {
+                            "cursor": "str",  # Optional. An opaque cursor for
+                              pagination.
+                            "node": {
+                                "agent_id": "str",  # The agent whose data is being
+                                  exported. For Harness Runtime, this is the Environment Config ID.
+                                  Required.
+                                "created_at": 0,  # Unix timestamp when the export
+                                  was created. Required.
+                                "export_id": "str",  # The unique identifier for the
+                                  export job. Required.
+                                "status": "str",  # The current status of the export
+                                  job. Required. Known values are: "pending", "processing", "complete",
+                                  and "failed".
+                                "completed_at": 0,  # Optional. Unix timestamp when
+                                  the export completed, or null if still in progress.
+                                "error_message": "str",  # Optional. Error message if
+                                  the export failed, or null on success.
+                                "expires_at": 0,  # Optional. Unix timestamp when the
+                                  export download link expires.
+                                "filters": {
+                                    "session_ids": [
+                                        "str"  # Optional. Specific session
+                                          IDs included in the export.
+                                    ],
+                                    "signal_type": [
+                                        "str"  # Optional. Signal types
+                                          included in the export.
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    "page_info": {
+                        "has_next_page": bool  # Optional. Whether there are more results
+                          after this page.
+                    }
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_signals_list_exports_request(
+            limit=limit,
+            after=after,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        response_headers["ratelimit-limit"] = self._deserialize(
+            "int", response.headers.get("ratelimit-limit")
+        )
+        response_headers["ratelimit-remaining"] = self._deserialize(
+            "int", response.headers.get("ratelimit-remaining")
+        )
+        response_headers["ratelimit-reset"] = self._deserialize(
+            "int", response.headers.get("ratelimit-reset")
+        )
+
+        if response.content:
+            deserialized = response.json()
+        else:
+            deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def create_export(
+        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create an Export Job.
+
+        To create a new signals data export, send a POST request to
+        ``/v1/signals/exports`` with an ``agent_id`` in the request body. You may
+        optionally filter the export by ``signal_type``\\ , ``session_ids``\\ , ``start_time``\\ ,
+        and ``end_time``. Use the export options endpoint to discover available signal
+        types.
+
+        The export job runs asynchronously. Poll the get export endpoint to check
+        its status. When complete, use the download endpoint to retrieve a
+        pre-signed URL.
+
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "agent_id": "str",  # The agent whose data should be exported. For Harness
+                      Runtime, this is the Environment Config ID. Required.
+                    "end_time": "2020-02-20 00:00:00",  # Optional. Include only sessions that
+                      started at or before this timestamp.
+                    "session_ids": [
+                        "str"  # Optional. Optional list of specific session IDs to include
+                          in the export.
+                    ],
+                    "signal_type": [
+                        "str"  # Optional. Filter the export to only include the specified
+                          signal types. Use the export options endpoint to list available values.
+                    ],
+                    "start_time": "2020-02-20 00:00:00"  # Optional. Include only sessions that
+                      started at or after this timestamp.
+                }
+
+                # response body for status code(s): 201
+                response == {
+                    "agent_id": "str",  # The agent whose data is being exported. For Harness
+                      Runtime, this is the Environment Config ID. Required.
+                    "created_at": 0,  # Unix timestamp when the export was created. Required.
+                    "export_id": "str",  # The unique identifier for the export job. Required.
+                    "status": "str",  # The current status of the export job. Required. Known
+                      values are: "pending", "processing", "complete", and "failed".
+                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
+                      null if still in progress.
+                    "error_message": "str",  # Optional. Error message if the export failed, or
+                      null on success.
+                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
+                      expires.
+                    "filters": {
+                        "session_ids": [
+                            "str"  # Optional. Specific session IDs included in the
+                              export.
+                        ],
+                        "signal_type": [
+                            "str"  # Optional. Signal types included in the export.
+                        ]
+                    }
+                }
+                # response body for status code(s): 400, 422
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def create_export(
+        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create an Export Job.
+
+        To create a new signals data export, send a POST request to
+        ``/v1/signals/exports`` with an ``agent_id`` in the request body. You may
+        optionally filter the export by ``signal_type``\\ , ``session_ids``\\ , ``start_time``\\ ,
+        and ``end_time``. Use the export options endpoint to discover available signal
+        types.
+
+        The export job runs asynchronously. Poll the get export endpoint to check
+        its status. When complete, use the download endpoint to retrieve a
+        pre-signed URL.
+
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 201
+                response == {
+                    "agent_id": "str",  # The agent whose data is being exported. For Harness
+                      Runtime, this is the Environment Config ID. Required.
+                    "created_at": 0,  # Unix timestamp when the export was created. Required.
+                    "export_id": "str",  # The unique identifier for the export job. Required.
+                    "status": "str",  # The current status of the export job. Required. Known
+                      values are: "pending", "processing", "complete", and "failed".
+                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
+                      null if still in progress.
+                    "error_message": "str",  # Optional. Error message if the export failed, or
+                      null on success.
+                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
+                      expires.
+                    "filters": {
+                        "session_ids": [
+                            "str"  # Optional. Specific session IDs included in the
+                              export.
+                        ],
+                        "signal_type": [
+                            "str"  # Optional. Signal types included in the export.
+                        ]
+                    }
+                }
+                # response body for status code(s): 400, 422
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def create_export(self, body: Union[JSON, IO[bytes]], **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Create an Export Job.
+
+        To create a new signals data export, send a POST request to
+        ``/v1/signals/exports`` with an ``agent_id`` in the request body. You may
+        optionally filter the export by ``signal_type``\\ , ``session_ids``\\ , ``start_time``\\ ,
+        and ``end_time``. Use the export options endpoint to discover available signal
+        types.
+
+        The export job runs asynchronously. Poll the get export endpoint to check
+        its status. When complete, use the download endpoint to retrieve a
+        pre-signed URL.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "agent_id": "str",  # The agent whose data should be exported. For Harness
+                      Runtime, this is the Environment Config ID. Required.
+                    "end_time": "2020-02-20 00:00:00",  # Optional. Include only sessions that
+                      started at or before this timestamp.
+                    "session_ids": [
+                        "str"  # Optional. Optional list of specific session IDs to include
+                          in the export.
+                    ],
+                    "signal_type": [
+                        "str"  # Optional. Filter the export to only include the specified
+                          signal types. Use the export options endpoint to list available values.
+                    ],
+                    "start_time": "2020-02-20 00:00:00"  # Optional. Include only sessions that
+                      started at or after this timestamp.
+                }
+
+                # response body for status code(s): 201
+                response == {
+                    "agent_id": "str",  # The agent whose data is being exported. For Harness
+                      Runtime, this is the Environment Config ID. Required.
+                    "created_at": 0,  # Unix timestamp when the export was created. Required.
+                    "export_id": "str",  # The unique identifier for the export job. Required.
+                    "status": "str",  # The current status of the export job. Required. Known
+                      values are: "pending", "processing", "complete", and "failed".
+                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
+                      null if still in progress.
+                    "error_message": "str",  # Optional. Error message if the export failed, or
+                      null on success.
+                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
+                      expires.
+                    "filters": {
+                        "session_ids": [
+                            "str"  # Optional. Specific session IDs included in the
+                              export.
+                        ],
+                        "signal_type": [
+                            "str"  # Optional. Signal types included in the export.
+                        ]
+                    }
+                }
+                # response body for status code(s): 400, 422
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_signals_create_export_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [201, 400, 422]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 201:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 422:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_export_options(self, **kwargs: Any) -> JSON:
+        """Get Export Options.
+
+        To retrieve the available filter options for creating an export, send a GET
+        request to ``/v1/signals/exports/options``. The response lists valid signal
+        types that can be used in the ``signal_type`` filter when creating an export.
+
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "filters": {
+                        "signal_type": [
+                            "str"  # The list of valid signal type values that can be
+                              used when creating an export. Required.
+                        ]
+                    }
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_signals_get_export_options_request(
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        response_headers["ratelimit-limit"] = self._deserialize(
+            "int", response.headers.get("ratelimit-limit")
+        )
+        response_headers["ratelimit-remaining"] = self._deserialize(
+            "int", response.headers.get("ratelimit-remaining")
+        )
+        response_headers["ratelimit-reset"] = self._deserialize(
+            "int", response.headers.get("ratelimit-reset")
+        )
+
+        if response.content:
+            deserialized = response.json()
+        else:
+            deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_export(self, export_id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve an Export Job.
+
+        To retrieve the status and details of a signals export job, send a GET
+        request to ``/v1/signals/exports/{export_id}``.
+
+        :param export_id: A unique identifier for an export job. Required.
+        :type export_id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "agent_id": "str",  # The agent whose data is being exported. For Harness
+                      Runtime, this is the Environment Config ID. Required.
+                    "created_at": 0,  # Unix timestamp when the export was created. Required.
+                    "export_id": "str",  # The unique identifier for the export job. Required.
+                    "status": "str",  # The current status of the export job. Required. Known
+                      values are: "pending", "processing", "complete", and "failed".
+                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
+                      null if still in progress.
+                    "error_message": "str",  # Optional. Error message if the export failed, or
+                      null on success.
+                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
+                      expires.
+                    "filters": {
+                        "session_ids": [
+                            "str"  # Optional. Specific session IDs included in the
+                              export.
+                        ],
+                        "signal_type": [
+                            "str"  # Optional. Signal types included in the export.
+                        ]
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_signals_get_export_request(
+            export_id=export_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_export_download(self, export_id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Get Export Download URL.
+
+        To retrieve a pre-signed download URL for a completed export, send a GET
+        request to ``/v1/signals/exports/{export_id}/download``. The export must have
+        a ``complete`` status. The URL is temporary and will expire.
+
+        :param export_id: A unique identifier for an export job. Required.
+        :type export_id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "download_url": "str",  # A temporary pre-signed URL to download the export
+                      archive. Required.
+                    "expires_at": 0  # Unix timestamp when the download URL expires. The URL is
+                      valid for 15 minutes. Required.
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_signals_get_export_download_request(
+            export_id=export_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
             response_headers["ratelimit-limit"] = self._deserialize(
                 "int", response.headers.get("ratelimit-limit")
             )
