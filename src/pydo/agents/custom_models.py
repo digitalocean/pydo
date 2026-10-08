@@ -188,6 +188,23 @@ class CheckpointKind:
     IMPLICIT = "implicit"
 
 
+class WorkspaceState:
+    """Lifecycle state of a persistent workspace.
+
+    The API may add states over time; treat the ``state`` field as a plain
+    string and do not assume this list is exhaustive.
+    """
+
+    AVAILABLE = "AVAILABLE"
+    ATTACHING = "ATTACHING"
+    ATTACHED = "ATTACHED"
+    RELEASING = "RELEASING"
+    FAILED = "FAILED"
+    # Shown while a delete runs. The workspace cannot be attached or deleted
+    # again until the delete finishes.
+    DELETING = "DELETING"
+
+
 # ---------------------------------------------------------------------------
 # Sandbox templates (OHS / harness-api)
 # ---------------------------------------------------------------------------
@@ -232,6 +249,7 @@ __all__ = [
     "SignatureScheme",
     "CheckpointStatus",
     "CheckpointKind",
+    "WorkspaceState",
     "TemplateStatus",
     "TemplateBuildStatus",
 ]
