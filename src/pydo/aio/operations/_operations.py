@@ -442,10 +442,13 @@ from ...operations._operations import (
     build_insights_get_prom_query_range_request,
     build_insights_get_prom_query_request,
     build_insights_get_prom_series_request,
+    build_insights_get_trace_request,
     build_insights_list_alert_instances_request,
     build_insights_list_alert_rules_request,
     build_insights_list_notification_channels_request,
     build_insights_post_logs_search_request,
+    build_insights_post_spans_search_request,
+    build_insights_post_traces_search_request,
     build_insights_update_alert_rule_request,
     build_insights_update_notification_channel_request,
     build_invoices_get_by_uuid_request,
@@ -680,6 +683,19 @@ from ...operations._operations import (
     build_sessions_delete_request,
     build_sessions_list_request,
     build_sessions_list_search_request,
+    build_signals_create_deletion_request,
+    build_signals_create_export_request,
+    build_signals_get_consent_request,
+    build_signals_get_deletion_request,
+    build_signals_get_export_download_request,
+    build_signals_get_export_options_request,
+    build_signals_get_export_request,
+    build_signals_list_agent_sessions_request,
+    build_signals_list_consents_request,
+    build_signals_list_deletions_request,
+    build_signals_list_exports_request,
+    build_signals_list_session_dialogues_request,
+    build_signals_update_consent_request,
     build_sizes_list_request,
     build_snapshots_delete_request,
     build_snapshots_get_request,
@@ -23816,7 +23832,8 @@ class AppsOperations:  # pylint: disable=too-many-public-methods
                     },
                     "project_id": "str"  # Optional. The ID of the project the app should be
                       assigned to. If omitted, it will be assigned to your default project.
-                      :code:`<br>`:code:`<br>`Requires ``project:assign_resource`` scope.
+                      :code:`<br>`:code:`<br>`Requires ``project:assign_resource`` and
+                      ``project:update`` scopes.
                 }
 
                 # response body for status code(s): 200
@@ -40539,7 +40556,8 @@ class AppsOperations:  # pylint: disable=too-many-public-methods
                     },
                     "project_id": "str"  # Optional. The ID of the project the app should be
                       assigned to. If omitted, it will be assigned to your default project.
-                      :code:`<br>`:code:`<br>`Requires ``project:assign_resource`` scope.
+                      :code:`<br>`:code:`<br>`Requires ``project:assign_resource`` and
+                      ``project:update`` scopes.
                 }
 
                 # response body for status code(s): 200
@@ -166305,6 +166323,3713 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                 deserialized = None
 
         if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def post_traces_search(
+        self,
+        region: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> Union[JSON, str]:
+        # pylint: disable=line-too-long
+        """Search traces.
+
+        To search traces in a region, send a POST request to
+        ``/v2/insights/query/{region}/traces/search`` with a JSON body describing the time range,
+        optional filter, ordering, and pagination.
+        Each result is one trace, aggregated from all of its spans in the time range. A trace is
+        included when at least one of its spans matches ``filter``. The time range must not exceed 7
+        days (\\ ``168h``\\ ). ``pagination.limit`` defaults to 100 (also used when ``limit`` is
+        ``0``\\ ) and must be between 0 and 1000. Results are ordered by ``started`` descending unless
+        ``orderBy`` is set.
+        JSON field names are camelCase (\\ ``timeRange``\\ , ``orderBy``\\ , ``hasMore``\\ ,
+        ``traceId``\\ ). Unknown request properties, invalid filters, and out-of-range values are
+        rejected with ``400``.
+        Each request searches a single region; there is no multi-region search. Supported regions are
+        ``ams2``\\ , ``ams3``\\ , ``atl1``\\ , ``blr1``\\ , ``fra1``\\ , ``lon1``\\ , ``mem1``\\ ,
+        ``nyc1``\\ , ``nyc2``\\ , ``nyc3``\\ , ``ric1``\\ , ``sfo1``\\ , ``sfo2``\\ , ``sfo3``\\ ,
+        ``sgp1``\\ , ``syd1``\\ , and ``tor1``. Requests time out after 60 seconds.
+        Errors produced by the traces service (\\ ``400``\\ ) have a ``text/plain`` body containing a
+        short message. Authentication and authorization errors (\\ ``401``\\ , ``403``\\ ), rate
+        limiting (\\ ``429``\\ ), and routing errors (for example, ``404`` for an unknown region) come
+        from the API gateway and use the standard JSON error object with ``id`` and ``message``.
+        ``403`` is also returned for accounts that are in a trial or not in good standing. If the
+        regional traces backend cannot be reached, the response is ``502`` with a ``text/plain`` body.
+
+        :param region: The datacenter region slug for the query. Required.
+        :type region: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object or str
+        :rtype: JSON or str
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "timeRange": {
+                        "from": {
+                            "absolute": "str",  # Optional. An absolute timestamp, either
+                              RFC3339 (with optional fractional seconds) or a Unix epoch integer as a
+                              decimal string. Epoch precision is inferred from magnitude: seconds,
+                              milliseconds, microseconds, or nanoseconds.
+                            "relative": "str"  # Optional. A time relative to now. Use
+                              ``now`` for the current time, a bare duration such as ``15m`` or ``24h``
+                              to look back from now, or an offset such as ``now-2h`` or ``now+30m``.
+                              Supported units are ``s``"" , ``m``"" , ``h``"" , ``d``"" , and ``w``"" ;
+                              decimal amounts such as ``1.5h`` are allowed.
+                        },
+                        "to": {
+                            "absolute": "str",  # Optional. An absolute timestamp, either
+                              RFC3339 (with optional fractional seconds) or a Unix epoch integer as a
+                              decimal string. Epoch precision is inferred from magnitude: seconds,
+                              milliseconds, microseconds, or nanoseconds.
+                            "relative": "str"  # Optional. A time relative to now. Use
+                              ``now`` for the current time, a bare duration such as ``15m`` or ``24h``
+                              to look back from now, or an offset such as ``now-2h`` or ``now+30m``.
+                              Supported units are ``s``"" , ``m``"" , ``h``"" , ``d``"" , and ``w``"" ;
+                              decimal amounts such as ``1.5h`` are allowed.
+                        }
+                    },
+                    "filter": {
+                        "expressions": [
+                            ...
+                        ],
+                        "field": {
+                            "name": "str",  # The field name. Without ``scope``"" , these
+                              names (case-insensitive) resolve to built-in span columns: `traceId`
+                              (`trace.id`, `trace_id`), `spanId` (`span.id`, `span_id`), `parentSpanId`
+                              (`parent.span.id`, `parent_span_id`), `startTime` (`start_time`,
+                              `timestamp`), `endTime` (`end_time`), `durationNs` (`duration`, in
+                              nanoseconds), `name` (`span.name`), `kind` (`span.kind`), `statusCode`
+                              (`status.code`, `status_code`), `statusMessage` (`status.message`,
+                              `status_message`), and `serviceName` (`service.name`, `service_name`).
+                              Any other name is looked up as a span attribute, falling back to a
+                              resource attribute. With `scope` set, `name` is always treated as an
+                              attribute key. Attribute keys may contain only letters, digits, and `.`,
+                              `_`, `-`, `/`, `:`, `@`.  In traces ``orderBy``"" , ``name`` must be a
+                              trace-level sort field instead; see the ``orderBy`` field description.
+                              Required.
+                            "scope": "str"  # Optional. Restricts the lookup to one
+                              attribute map (case-insensitive). ``resource`` (or
+                              ``resource.attributes``"" ) reads resource attributes; ``attribute`` (or
+                              ``attributes``"" , ``span.attributes``"" ) reads span attributes. Omit to
+                              use the built-in column mapping described for ``name``. Ignored in traces
+                              ``orderBy``. Known values are: "resource", "resource.attributes",
+                              "attribute", "attributes", and "span.attributes".
+                        },
+                        "operator": "str",  # Optional. The comparison operator for a
+                          ``condition`` node. Matching is case-insensitive, and the symbol forms
+                          ``=``"" , ``!=``"" , ``>``"" , ``>=``"" , ``<``"" , and ``<=`` are accepted
+                          as aliases for ``eq``"" , ``neq``"" , ``gt``"" , ``gte``"" , ``lt``"" , and
+                          ``lte``. ``exists`` matches spans where the field is present and non-empty
+                          and ignores ``value``. ``in`` requires an array ``value`` with 1 to 100
+                          entries. ``neq`` on string fields also matches spans where the field is
+                          absent. Known values are: "eq", "neq", "in", "exists", "gt", "gte", "lt", and
+                          "lte".
+                        "query": "str",  # Optional. The search string for a ``text_search``
+                          node. Leading and trailing whitespace is trimmed; the trimmed string must be
+                          non-empty.
+                        "type": "condition",  # Optional. Default value is "condition". The
+                          node type. Matching is case-insensitive. Known values are: "condition",
+                          "and", "or", "not", and "text_search".
+                        "value": {}
+                    },
+                    "orderBy": [
+                        {
+                            "field": {
+                                "name": "str",  # The field name. Without ``scope``""
+                                  , these names (case-insensitive) resolve to built-in span columns:
+                                  `traceId` (`trace.id`, `trace_id`), `spanId` (`span.id`, `span_id`),
+                                  `parentSpanId` (`parent.span.id`, `parent_span_id`), `startTime`
+                                  (`start_time`, `timestamp`), `endTime` (`end_time`), `durationNs`
+                                  (`duration`, in nanoseconds), `name` (`span.name`), `kind`
+                                  (`span.kind`), `statusCode` (`status.code`, `status_code`),
+                                  `statusMessage` (`status.message`, `status_message`), and
+                                  `serviceName` (`service.name`, `service_name`). Any other name is
+                                  looked up as a span attribute, falling back to a resource attribute.
+                                  With `scope` set, `name` is always treated as an attribute key.
+                                  Attribute keys may contain only letters, digits, and `.`, `_`, `-`,
+                                  `/`, `:`, `@`.  In traces ``orderBy``"" , ``name`` must be a
+                                  trace-level sort field instead; see the ``orderBy`` field
+                                  description. Required.
+                                "scope": "str"  # Optional. Restricts the lookup to
+                                  one attribute map (case-insensitive). ``resource`` (or
+                                  ``resource.attributes``"" ) reads resource attributes; ``attribute``
+                                  (or ``attributes``"" , ``span.attributes``"" ) reads span attributes.
+                                  Omit to use the built-in column mapping described for ``name``.
+                                  Ignored in traces ``orderBy``. Known values are: "resource",
+                                  "resource.attributes", "attribute", "attributes", and
+                                  "span.attributes".
+                            },
+                            "direction": "desc"  # Optional. Default value is "desc". The
+                              sort direction (case-insensitive). Defaults to ``desc``. Known values
+                              are: "asc" and "desc".
+                        }
+                    ],
+                    "pagination": {
+                        "limit": 100  # Optional. Default value is 100. Maximum number of
+                          traces to return. Omitted or ``0`` uses the default of 100. Negative values
+                          or values above 1000 return ``400``"" ; they are not clamped.
+                    }
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "data": [
+                        {
+                            "traceId": "str",  # The trace identifier. Required.
+                            "durationNs": 0,  # Optional. Wall-clock duration of the
+                              trace in nanoseconds.
+                            "errorCount": 0,  # Optional. The number of spans in the
+                              trace with an ``Error`` status code. Omitted when zero.
+                            "serviceName": "str",  # Optional. The service that emitted
+                              the root span. Omitted when the root span has no service.name resource
+                              attribute.
+                            "spanCount": 0,  # Optional. The number of spans in the
+                              trace.
+                            "spanNames": [
+                                "str"  # Optional. The distinct span names present in
+                                  the trace.
+                            ],
+                            "started": "2020-02-20 00:00:00",  # Optional. The start time
+                              of the earliest span in the trace, in RFC 3339 format.
+                            "status": "str"  # Optional. The rolled-up status of the
+                              trace. ``Error`` if any span has an ``Error`` status code, otherwise
+                              ``Ok``. Known values are: "Ok" and "Error".
+                        }
+                    ],
+                    "pagination": {
+                        "hasMore": bool  # Whether more results matched the query than were
+                          returned. Required.
+                    }
+                }
+                # response body for status code(s): 403, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def post_traces_search(
+        self,
+        region: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> Union[JSON, str]:
+        # pylint: disable=line-too-long
+        """Search traces.
+
+        To search traces in a region, send a POST request to
+        ``/v2/insights/query/{region}/traces/search`` with a JSON body describing the time range,
+        optional filter, ordering, and pagination.
+        Each result is one trace, aggregated from all of its spans in the time range. A trace is
+        included when at least one of its spans matches ``filter``. The time range must not exceed 7
+        days (\\ ``168h``\\ ). ``pagination.limit`` defaults to 100 (also used when ``limit`` is
+        ``0``\\ ) and must be between 0 and 1000. Results are ordered by ``started`` descending unless
+        ``orderBy`` is set.
+        JSON field names are camelCase (\\ ``timeRange``\\ , ``orderBy``\\ , ``hasMore``\\ ,
+        ``traceId``\\ ). Unknown request properties, invalid filters, and out-of-range values are
+        rejected with ``400``.
+        Each request searches a single region; there is no multi-region search. Supported regions are
+        ``ams2``\\ , ``ams3``\\ , ``atl1``\\ , ``blr1``\\ , ``fra1``\\ , ``lon1``\\ , ``mem1``\\ ,
+        ``nyc1``\\ , ``nyc2``\\ , ``nyc3``\\ , ``ric1``\\ , ``sfo1``\\ , ``sfo2``\\ , ``sfo3``\\ ,
+        ``sgp1``\\ , ``syd1``\\ , and ``tor1``. Requests time out after 60 seconds.
+        Errors produced by the traces service (\\ ``400``\\ ) have a ``text/plain`` body containing a
+        short message. Authentication and authorization errors (\\ ``401``\\ , ``403``\\ ), rate
+        limiting (\\ ``429``\\ ), and routing errors (for example, ``404`` for an unknown region) come
+        from the API gateway and use the standard JSON error object with ``id`` and ``message``.
+        ``403`` is also returned for accounts that are in a trial or not in good standing. If the
+        regional traces backend cannot be reached, the response is ``502`` with a ``text/plain`` body.
+
+        :param region: The datacenter region slug for the query. Required.
+        :type region: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object or str
+        :rtype: JSON or str
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "data": [
+                        {
+                            "traceId": "str",  # The trace identifier. Required.
+                            "durationNs": 0,  # Optional. Wall-clock duration of the
+                              trace in nanoseconds.
+                            "errorCount": 0,  # Optional. The number of spans in the
+                              trace with an ``Error`` status code. Omitted when zero.
+                            "serviceName": "str",  # Optional. The service that emitted
+                              the root span. Omitted when the root span has no service.name resource
+                              attribute.
+                            "spanCount": 0,  # Optional. The number of spans in the
+                              trace.
+                            "spanNames": [
+                                "str"  # Optional. The distinct span names present in
+                                  the trace.
+                            ],
+                            "started": "2020-02-20 00:00:00",  # Optional. The start time
+                              of the earliest span in the trace, in RFC 3339 format.
+                            "status": "str"  # Optional. The rolled-up status of the
+                              trace. ``Error`` if any span has an ``Error`` status code, otherwise
+                              ``Ok``. Known values are: "Ok" and "Error".
+                        }
+                    ],
+                    "pagination": {
+                        "hasMore": bool  # Whether more results matched the query than were
+                          returned. Required.
+                    }
+                }
+                # response body for status code(s): 403, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def post_traces_search(
+        self, region: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> Union[JSON, str]:
+        # pylint: disable=line-too-long
+        """Search traces.
+
+        To search traces in a region, send a POST request to
+        ``/v2/insights/query/{region}/traces/search`` with a JSON body describing the time range,
+        optional filter, ordering, and pagination.
+        Each result is one trace, aggregated from all of its spans in the time range. A trace is
+        included when at least one of its spans matches ``filter``. The time range must not exceed 7
+        days (\\ ``168h``\\ ). ``pagination.limit`` defaults to 100 (also used when ``limit`` is
+        ``0``\\ ) and must be between 0 and 1000. Results are ordered by ``started`` descending unless
+        ``orderBy`` is set.
+        JSON field names are camelCase (\\ ``timeRange``\\ , ``orderBy``\\ , ``hasMore``\\ ,
+        ``traceId``\\ ). Unknown request properties, invalid filters, and out-of-range values are
+        rejected with ``400``.
+        Each request searches a single region; there is no multi-region search. Supported regions are
+        ``ams2``\\ , ``ams3``\\ , ``atl1``\\ , ``blr1``\\ , ``fra1``\\ , ``lon1``\\ , ``mem1``\\ ,
+        ``nyc1``\\ , ``nyc2``\\ , ``nyc3``\\ , ``ric1``\\ , ``sfo1``\\ , ``sfo2``\\ , ``sfo3``\\ ,
+        ``sgp1``\\ , ``syd1``\\ , and ``tor1``. Requests time out after 60 seconds.
+        Errors produced by the traces service (\\ ``400``\\ ) have a ``text/plain`` body containing a
+        short message. Authentication and authorization errors (\\ ``401``\\ , ``403``\\ ), rate
+        limiting (\\ ``429``\\ ), and routing errors (for example, ``404`` for an unknown region) come
+        from the API gateway and use the standard JSON error object with ``id`` and ``message``.
+        ``403`` is also returned for accounts that are in a trial or not in good standing. If the
+        regional traces backend cannot be reached, the response is ``502`` with a ``text/plain`` body.
+
+        :param region: The datacenter region slug for the query. Required.
+        :type region: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object or str
+        :rtype: JSON or str
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "timeRange": {
+                        "from": {
+                            "absolute": "str",  # Optional. An absolute timestamp, either
+                              RFC3339 (with optional fractional seconds) or a Unix epoch integer as a
+                              decimal string. Epoch precision is inferred from magnitude: seconds,
+                              milliseconds, microseconds, or nanoseconds.
+                            "relative": "str"  # Optional. A time relative to now. Use
+                              ``now`` for the current time, a bare duration such as ``15m`` or ``24h``
+                              to look back from now, or an offset such as ``now-2h`` or ``now+30m``.
+                              Supported units are ``s``"" , ``m``"" , ``h``"" , ``d``"" , and ``w``"" ;
+                              decimal amounts such as ``1.5h`` are allowed.
+                        },
+                        "to": {
+                            "absolute": "str",  # Optional. An absolute timestamp, either
+                              RFC3339 (with optional fractional seconds) or a Unix epoch integer as a
+                              decimal string. Epoch precision is inferred from magnitude: seconds,
+                              milliseconds, microseconds, or nanoseconds.
+                            "relative": "str"  # Optional. A time relative to now. Use
+                              ``now`` for the current time, a bare duration such as ``15m`` or ``24h``
+                              to look back from now, or an offset such as ``now-2h`` or ``now+30m``.
+                              Supported units are ``s``"" , ``m``"" , ``h``"" , ``d``"" , and ``w``"" ;
+                              decimal amounts such as ``1.5h`` are allowed.
+                        }
+                    },
+                    "filter": {
+                        "expressions": [
+                            ...
+                        ],
+                        "field": {
+                            "name": "str",  # The field name. Without ``scope``"" , these
+                              names (case-insensitive) resolve to built-in span columns: `traceId`
+                              (`trace.id`, `trace_id`), `spanId` (`span.id`, `span_id`), `parentSpanId`
+                              (`parent.span.id`, `parent_span_id`), `startTime` (`start_time`,
+                              `timestamp`), `endTime` (`end_time`), `durationNs` (`duration`, in
+                              nanoseconds), `name` (`span.name`), `kind` (`span.kind`), `statusCode`
+                              (`status.code`, `status_code`), `statusMessage` (`status.message`,
+                              `status_message`), and `serviceName` (`service.name`, `service_name`).
+                              Any other name is looked up as a span attribute, falling back to a
+                              resource attribute. With `scope` set, `name` is always treated as an
+                              attribute key. Attribute keys may contain only letters, digits, and `.`,
+                              `_`, `-`, `/`, `:`, `@`.  In traces ``orderBy``"" , ``name`` must be a
+                              trace-level sort field instead; see the ``orderBy`` field description.
+                              Required.
+                            "scope": "str"  # Optional. Restricts the lookup to one
+                              attribute map (case-insensitive). ``resource`` (or
+                              ``resource.attributes``"" ) reads resource attributes; ``attribute`` (or
+                              ``attributes``"" , ``span.attributes``"" ) reads span attributes. Omit to
+                              use the built-in column mapping described for ``name``. Ignored in traces
+                              ``orderBy``. Known values are: "resource", "resource.attributes",
+                              "attribute", "attributes", and "span.attributes".
+                        },
+                        "operator": "str",  # Optional. The comparison operator for a
+                          ``condition`` node. Matching is case-insensitive, and the symbol forms
+                          ``=``"" , ``!=``"" , ``>``"" , ``>=``"" , ``<``"" , and ``<=`` are accepted
+                          as aliases for ``eq``"" , ``neq``"" , ``gt``"" , ``gte``"" , ``lt``"" , and
+                          ``lte``. ``exists`` matches spans where the field is present and non-empty
+                          and ignores ``value``. ``in`` requires an array ``value`` with 1 to 100
+                          entries. ``neq`` on string fields also matches spans where the field is
+                          absent. Known values are: "eq", "neq", "in", "exists", "gt", "gte", "lt", and
+                          "lte".
+                        "query": "str",  # Optional. The search string for a ``text_search``
+                          node. Leading and trailing whitespace is trimmed; the trimmed string must be
+                          non-empty.
+                        "type": "condition",  # Optional. Default value is "condition". The
+                          node type. Matching is case-insensitive. Known values are: "condition",
+                          "and", "or", "not", and "text_search".
+                        "value": {}
+                    },
+                    "orderBy": [
+                        {
+                            "field": {
+                                "name": "str",  # The field name. Without ``scope``""
+                                  , these names (case-insensitive) resolve to built-in span columns:
+                                  `traceId` (`trace.id`, `trace_id`), `spanId` (`span.id`, `span_id`),
+                                  `parentSpanId` (`parent.span.id`, `parent_span_id`), `startTime`
+                                  (`start_time`, `timestamp`), `endTime` (`end_time`), `durationNs`
+                                  (`duration`, in nanoseconds), `name` (`span.name`), `kind`
+                                  (`span.kind`), `statusCode` (`status.code`, `status_code`),
+                                  `statusMessage` (`status.message`, `status_message`), and
+                                  `serviceName` (`service.name`, `service_name`). Any other name is
+                                  looked up as a span attribute, falling back to a resource attribute.
+                                  With `scope` set, `name` is always treated as an attribute key.
+                                  Attribute keys may contain only letters, digits, and `.`, `_`, `-`,
+                                  `/`, `:`, `@`.  In traces ``orderBy``"" , ``name`` must be a
+                                  trace-level sort field instead; see the ``orderBy`` field
+                                  description. Required.
+                                "scope": "str"  # Optional. Restricts the lookup to
+                                  one attribute map (case-insensitive). ``resource`` (or
+                                  ``resource.attributes``"" ) reads resource attributes; ``attribute``
+                                  (or ``attributes``"" , ``span.attributes``"" ) reads span attributes.
+                                  Omit to use the built-in column mapping described for ``name``.
+                                  Ignored in traces ``orderBy``. Known values are: "resource",
+                                  "resource.attributes", "attribute", "attributes", and
+                                  "span.attributes".
+                            },
+                            "direction": "desc"  # Optional. Default value is "desc". The
+                              sort direction (case-insensitive). Defaults to ``desc``. Known values
+                              are: "asc" and "desc".
+                        }
+                    ],
+                    "pagination": {
+                        "limit": 100  # Optional. Default value is 100. Maximum number of
+                          traces to return. Omitted or ``0`` uses the default of 100. Negative values
+                          or values above 1000 return ``400``"" ; they are not clamped.
+                    }
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "data": [
+                        {
+                            "traceId": "str",  # The trace identifier. Required.
+                            "durationNs": 0,  # Optional. Wall-clock duration of the
+                              trace in nanoseconds.
+                            "errorCount": 0,  # Optional. The number of spans in the
+                              trace with an ``Error`` status code. Omitted when zero.
+                            "serviceName": "str",  # Optional. The service that emitted
+                              the root span. Omitted when the root span has no service.name resource
+                              attribute.
+                            "spanCount": 0,  # Optional. The number of spans in the
+                              trace.
+                            "spanNames": [
+                                "str"  # Optional. The distinct span names present in
+                                  the trace.
+                            ],
+                            "started": "2020-02-20 00:00:00",  # Optional. The start time
+                              of the earliest span in the trace, in RFC 3339 format.
+                            "status": "str"  # Optional. The rolled-up status of the
+                              trace. ``Error`` if any span has an ``Error`` status code, otherwise
+                              ``Ok``. Known values are: "Ok" and "Error".
+                        }
+                    ],
+                    "pagination": {
+                        "hasMore": bool  # Whether more results matched the query than were
+                          returned. Required.
+                    }
+                }
+                # response body for status code(s): 403, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[Union[JSON, str]] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_insights_post_traces_search_request(
+            region=region,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404, 404, 502]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 502:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(Union[JSON, str], deserialized), response_headers)  # type: ignore
+
+        return cast(Union[JSON, str], deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_trace(
+        self,
+        region: str,
+        trace_id: str,
+        *,
+        from_parameter: Optional[str] = None,
+        to: Optional[str] = None,
+        **kwargs: Any
+    ) -> Union[JSON, str]:
+        # pylint: disable=line-too-long
+        """Retrieve an existing trace.
+
+        To retrieve a single trace and all of its spans, send a GET request to
+        ``/v2/insights/query/{region}/traces/{trace_id}``.
+        Only spans that started within the lookup window are returned. The window defaults to the last
+        7 days and can be narrowed with the ``from`` and ``to`` query parameters; it must not exceed 7
+        days, and ``from`` must not be after ``to``. Spans are returned ordered by start time. At most
+        10,000 spans are returned; ``truncated`` is ``true`` when the trace has more.
+        A trace ID with no spans in the window returns ``404``\\ , as do malformed or uppercase trace
+        IDs. A trace is only resolvable in the region that ingested it; querying another region also
+        returns ``404``.
+        Supported regions are ``ams2``\\ , ``ams3``\\ , ``atl1``\\ , ``blr1``\\ , ``fra1``\\ ,
+        ``lon1``\\ , ``mem1``\\ , ``nyc1``\\ , ``nyc2``\\ , ``nyc3``\\ , ``ric1``\\ , ``sfo1``\\ ,
+        ``sfo2``\\ , ``sfo3``\\ , ``sgp1``\\ , ``syd1``\\ , and ``tor1``. Requests time out after 60
+        seconds.
+        Errors produced by the traces service (\\ ``400``\\ , and ``404`` when no trace is found) have
+        a ``text/plain`` body containing a short message. Authentication and authorization errors (\\
+        ``401``\\ , ``403``\\ ), rate limiting (\\ ``429``\\ ), and routing errors (for example,
+        ``404`` for an unknown region) come from the API gateway and use the standard JSON error object
+        with ``id`` and ``message``. ``403`` is also returned for accounts that are in a trial or not
+        in good standing. If the regional traces backend cannot be reached, the response is ``502``
+        with a ``text/plain`` body.
+        JSON field names are camelCase (\\ ``traceId``\\ , ``spanId``\\ , ``startTime``\\ ,
+        ``endTime``\\ , ``durationNs``\\ , ``serviceName``\\ , ``statusCode``\\ , ``parentSpanId``\\ ).
+
+        :param region: The datacenter region slug for the query. Required.
+        :type region: str
+        :param trace_id: The OpenTelemetry trace ID to retrieve, as 32 lowercase hexadecimal
+         characters. IDs are matched exactly; an ID with no spans in the lookup window returns ``404``.
+         Malformed or uppercase IDs are not rejected with ``400``\\ ; they also return ``404``.
+         Required.
+        :type trace_id: str
+        :keyword from_parameter: Start of the trace lookup window. Accepts a relative time (\\
+         ``now``\\ , a bare duration such as ``24h`` to look back from now, or ``now-2h``\\ ) or an
+         absolute time (RFC3339, or a Unix epoch integer in seconds, milliseconds, microseconds, or
+         nanoseconds). Defaults to 7 days before now. Default value is None.
+        :paramtype from_parameter: str
+        :keyword to: End of the trace lookup window, in the same formats as ``from``. Defaults to now.
+         Default value is None.
+        :paramtype to: str
+        :return: JSON object or str
+        :rtype: JSON or str
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "spans": [
+                        {
+                            "spanId": "str",  # The span identifier. Required.
+                            "traceId": "str",  # The trace this span belongs to.
+                              Required.
+                            "attributes": {
+                                "str": "str"  # Optional. Span attributes. Omitted
+                                  when empty.
+                            },
+                            "durationNs": 0,  # Optional. Span duration in nanoseconds.
+                            "endTime": "2020-02-20 00:00:00",  # Optional. The span end
+                              time.
+                            "kind": "str",  # Optional. The OpenTelemetry span kind as a
+                              string, for example ``Server``"" , ``Client``"" , or ``Internal``.
+                            "name": "str",  # Optional. The span name, typically the
+                              operation being performed.
+                            "parentSpanId": "str",  # Optional. The parent span
+                              identifier. Omitted for the root span.
+                            "resource": {
+                                "str": "str"  # Optional. Resource attributes
+                                  associated with the span.
+                            },
+                            "serviceName": "str",  # Optional. The service that emitted
+                              the span. Omitted when the span has no service.name resource attribute.
+                            "startTime": "2020-02-20 00:00:00",  # Optional. The span
+                              start time.
+                            "statusCode": "str",  # Optional. The OpenTelemetry span
+                              status code as a string: ``Unset``"" , ``Ok``"" , or ``Error``.
+                            "statusMessage": "str"  # Optional. The status description.
+                              Omitted when empty.
+                        }
+                    ],
+                    "traceId": "str",  # Optional. The trace identifier.
+                    "truncated": bool  # Optional. True when the trace has more spans than were
+                      returned in this response. Omitted when false.
+                }
+                # response body for status code(s): 403, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[Union[JSON, str]] = kwargs.pop("cls", None)
+
+        _request = build_insights_get_trace_request(
+            region=region,
+            trace_id=trace_id,
+            from_parameter=from_parameter,
+            to=to,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404, 404, 502]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 502:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(Union[JSON, str], deserialized), response_headers)  # type: ignore
+
+        return cast(Union[JSON, str], deserialized)  # type: ignore
+
+    @overload
+    async def post_spans_search(
+        self,
+        region: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Search spans.
+
+        To search spans in a region, send a POST request to
+        ``/v2/insights/query/{region}/spans/search`` with a JSON body describing the time range,
+        optional filter, ordering, and pagination.
+        The time range must not exceed 7 days. ``pagination.limit`` defaults to 100 and must be between
+        1 and 1000. Results are ordered by ``startTime`` descending by default. Cursor-based pagination
+        is not yet supported; ``pagination.hasMore`` indicates whether additional spans matched beyond
+        the returned page.
+
+        :param region: The datacenter region slug for the query. Required.
+        :type region: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "timeRange": {
+                        "from": {
+                            "absolute": "str",  # Optional. An absolute timestamp.
+                              Accepts an RFC3339/RFC3339Nano string or a Unix timestamp (seconds,
+                              milliseconds, microseconds, or nanoseconds) encoded as a decimal string.
+                            "relative": "str"  # Optional. A relative time. Use ``now``
+                              for the current time, a bare duration such as ``1h`` or ``7d`` to look
+                              back from now, or an offset such as ``now-15m`` or ``now+30m``. Supported
+                              units are ``s``"" , ``m``"" , ``h``"" , ``d``"" , and ``w``.
+                        },
+                        "to": {
+                            "absolute": "str",  # Optional. An absolute timestamp.
+                              Accepts an RFC3339/RFC3339Nano string or a Unix timestamp (seconds,
+                              milliseconds, microseconds, or nanoseconds) encoded as a decimal string.
+                            "relative": "str"  # Optional. A relative time. Use ``now``
+                              for the current time, a bare duration such as ``1h`` or ``7d`` to look
+                              back from now, or an offset such as ``now-15m`` or ``now+30m``. Supported
+                              units are ``s``"" , ``m``"" , ``h``"" , ``d``"" , and ``w``.
+                        }
+                    },
+                    "filter": {
+                        "type": "str",  # The node kind. Required. Known values are:
+                          "condition", "and", "or", "not", and "text_search".
+                        "expressions": [
+                            ...
+                        ],
+                        "field": {
+                            "name": "str",  # The field name. Well-known span fields
+                              include ``traceId``"" , ``spanId``"" , ``parentSpanId``"" ,
+                              ``startTime``"" , ``endTime``"" , ``durationNs``"" , ``name``"" ,
+                              ``serviceName``"" , ``kind``"" , ``statusCode``"" , and
+                              ``statusMessage``. Any other value is treated as a span or resource
+                              attribute key. Required.
+                            "scope": "str"  # Optional. Optional attribute scope. Use
+                              ``resource`` to match a resource attribute or ``attributes`` to match a
+                              span attribute. Omit for well-known fields or to search both attribute
+                              maps. Known values are: "resource" and "attributes".
+                        },
+                        "operator": "str",  # Optional. The comparison operator for a
+                          ``condition`` node. Known values are: "eq", "neq", "gt", "gte", "lt", "lte",
+                          "in", and "exists".
+                        "query": "str",  # Optional. The substring to match for a
+                          ``text_search`` node.
+                        "value": {}
+                    },
+                    "orderBy": [
+                        {
+                            "field": {
+                                "name": "str",  # The field name. Well-known span
+                                  fields include ``traceId``"" , ``spanId``"" , ``parentSpanId``"" ,
+                                  ``startTime``"" , ``endTime``"" , ``durationNs``"" , ``name``"" ,
+                                  ``serviceName``"" , ``kind``"" , ``statusCode``"" , and
+                                  ``statusMessage``. Any other value is treated as a span or resource
+                                  attribute key. Required.
+                                "scope": "str"  # Optional. Optional attribute scope.
+                                  Use ``resource`` to match a resource attribute or ``attributes`` to
+                                  match a span attribute. Omit for well-known fields or to search both
+                                  attribute maps. Known values are: "resource" and "attributes".
+                            },
+                            "direction": "str"  # Optional. The sort direction. Defaults
+                              to ``desc`` when omitted. Known values are: "asc" and "desc".
+                        }
+                    ],
+                    "pagination": {
+                        "limit": 100  # Optional. Default value is 100. Maximum number of
+                          spans to return. Defaults to 100 and must be between 1 and 1000.
+                    }
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "data": [
+                        {
+                            "attributes": {
+                                "str": "str"  # Optional. Span attributes.
+                            },
+                            "durationNs": 0,  # Optional. The span duration in
+                              nanoseconds.
+                            "endTime": "2020-02-20 00:00:00",  # Optional. The span end
+                              time.
+                            "kind": "str",  # Optional. The span kind.
+                            "name": "str",  # Optional. The span name.
+                            "parentSpanId": "str",  # Optional. The parent span
+                              identifier. Omitted for root spans.
+                            "region": "str",  # Optional. The datacenter region slug the
+                              span was queried from.
+                            "resource": {
+                                "str": "str"  # Optional. Resource attributes
+                                  associated with the span.
+                            },
+                            "serviceName": "str",  # Optional. The name of the service
+                              that emitted the span.
+                            "spanId": "str",  # Optional. The span identifier.
+                            "startTime": "2020-02-20 00:00:00",  # Optional. The span
+                              start time.
+                            "statusCode": "str",  # Optional. The span status code.
+                            "statusMessage": "str",  # Optional. The span status message.
+                              Omitted when empty.
+                            "traceId": "str"  # Optional. The trace identifier the span
+                              belongs to.
+                        }
+                    ],
+                    "pagination": {
+                        "hasMore": bool  # Optional. Whether more spans matched than were
+                          returned in this page. Cursor-based continuation is not yet supported.
+                    }
+                }
+                # response body for status code(s): 400, 403, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def post_spans_search(
+        self,
+        region: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Search spans.
+
+        To search spans in a region, send a POST request to
+        ``/v2/insights/query/{region}/spans/search`` with a JSON body describing the time range,
+        optional filter, ordering, and pagination.
+        The time range must not exceed 7 days. ``pagination.limit`` defaults to 100 and must be between
+        1 and 1000. Results are ordered by ``startTime`` descending by default. Cursor-based pagination
+        is not yet supported; ``pagination.hasMore`` indicates whether additional spans matched beyond
+        the returned page.
+
+        :param region: The datacenter region slug for the query. Required.
+        :type region: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "data": [
+                        {
+                            "attributes": {
+                                "str": "str"  # Optional. Span attributes.
+                            },
+                            "durationNs": 0,  # Optional. The span duration in
+                              nanoseconds.
+                            "endTime": "2020-02-20 00:00:00",  # Optional. The span end
+                              time.
+                            "kind": "str",  # Optional. The span kind.
+                            "name": "str",  # Optional. The span name.
+                            "parentSpanId": "str",  # Optional. The parent span
+                              identifier. Omitted for root spans.
+                            "region": "str",  # Optional. The datacenter region slug the
+                              span was queried from.
+                            "resource": {
+                                "str": "str"  # Optional. Resource attributes
+                                  associated with the span.
+                            },
+                            "serviceName": "str",  # Optional. The name of the service
+                              that emitted the span.
+                            "spanId": "str",  # Optional. The span identifier.
+                            "startTime": "2020-02-20 00:00:00",  # Optional. The span
+                              start time.
+                            "statusCode": "str",  # Optional. The span status code.
+                            "statusMessage": "str",  # Optional. The span status message.
+                              Omitted when empty.
+                            "traceId": "str"  # Optional. The trace identifier the span
+                              belongs to.
+                        }
+                    ],
+                    "pagination": {
+                        "hasMore": bool  # Optional. Whether more spans matched than were
+                          returned in this page. Cursor-based continuation is not yet supported.
+                    }
+                }
+                # response body for status code(s): 400, 403, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def post_spans_search(
+        self, region: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Search spans.
+
+        To search spans in a region, send a POST request to
+        ``/v2/insights/query/{region}/spans/search`` with a JSON body describing the time range,
+        optional filter, ordering, and pagination.
+        The time range must not exceed 7 days. ``pagination.limit`` defaults to 100 and must be between
+        1 and 1000. Results are ordered by ``startTime`` descending by default. Cursor-based pagination
+        is not yet supported; ``pagination.hasMore`` indicates whether additional spans matched beyond
+        the returned page.
+
+        :param region: The datacenter region slug for the query. Required.
+        :type region: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "timeRange": {
+                        "from": {
+                            "absolute": "str",  # Optional. An absolute timestamp.
+                              Accepts an RFC3339/RFC3339Nano string or a Unix timestamp (seconds,
+                              milliseconds, microseconds, or nanoseconds) encoded as a decimal string.
+                            "relative": "str"  # Optional. A relative time. Use ``now``
+                              for the current time, a bare duration such as ``1h`` or ``7d`` to look
+                              back from now, or an offset such as ``now-15m`` or ``now+30m``. Supported
+                              units are ``s``"" , ``m``"" , ``h``"" , ``d``"" , and ``w``.
+                        },
+                        "to": {
+                            "absolute": "str",  # Optional. An absolute timestamp.
+                              Accepts an RFC3339/RFC3339Nano string or a Unix timestamp (seconds,
+                              milliseconds, microseconds, or nanoseconds) encoded as a decimal string.
+                            "relative": "str"  # Optional. A relative time. Use ``now``
+                              for the current time, a bare duration such as ``1h`` or ``7d`` to look
+                              back from now, or an offset such as ``now-15m`` or ``now+30m``. Supported
+                              units are ``s``"" , ``m``"" , ``h``"" , ``d``"" , and ``w``.
+                        }
+                    },
+                    "filter": {
+                        "type": "str",  # The node kind. Required. Known values are:
+                          "condition", "and", "or", "not", and "text_search".
+                        "expressions": [
+                            ...
+                        ],
+                        "field": {
+                            "name": "str",  # The field name. Well-known span fields
+                              include ``traceId``"" , ``spanId``"" , ``parentSpanId``"" ,
+                              ``startTime``"" , ``endTime``"" , ``durationNs``"" , ``name``"" ,
+                              ``serviceName``"" , ``kind``"" , ``statusCode``"" , and
+                              ``statusMessage``. Any other value is treated as a span or resource
+                              attribute key. Required.
+                            "scope": "str"  # Optional. Optional attribute scope. Use
+                              ``resource`` to match a resource attribute or ``attributes`` to match a
+                              span attribute. Omit for well-known fields or to search both attribute
+                              maps. Known values are: "resource" and "attributes".
+                        },
+                        "operator": "str",  # Optional. The comparison operator for a
+                          ``condition`` node. Known values are: "eq", "neq", "gt", "gte", "lt", "lte",
+                          "in", and "exists".
+                        "query": "str",  # Optional. The substring to match for a
+                          ``text_search`` node.
+                        "value": {}
+                    },
+                    "orderBy": [
+                        {
+                            "field": {
+                                "name": "str",  # The field name. Well-known span
+                                  fields include ``traceId``"" , ``spanId``"" , ``parentSpanId``"" ,
+                                  ``startTime``"" , ``endTime``"" , ``durationNs``"" , ``name``"" ,
+                                  ``serviceName``"" , ``kind``"" , ``statusCode``"" , and
+                                  ``statusMessage``. Any other value is treated as a span or resource
+                                  attribute key. Required.
+                                "scope": "str"  # Optional. Optional attribute scope.
+                                  Use ``resource`` to match a resource attribute or ``attributes`` to
+                                  match a span attribute. Omit for well-known fields or to search both
+                                  attribute maps. Known values are: "resource" and "attributes".
+                            },
+                            "direction": "str"  # Optional. The sort direction. Defaults
+                              to ``desc`` when omitted. Known values are: "asc" and "desc".
+                        }
+                    ],
+                    "pagination": {
+                        "limit": 100  # Optional. Default value is 100. Maximum number of
+                          spans to return. Defaults to 100 and must be between 1 and 1000.
+                    }
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "data": [
+                        {
+                            "attributes": {
+                                "str": "str"  # Optional. Span attributes.
+                            },
+                            "durationNs": 0,  # Optional. The span duration in
+                              nanoseconds.
+                            "endTime": "2020-02-20 00:00:00",  # Optional. The span end
+                              time.
+                            "kind": "str",  # Optional. The span kind.
+                            "name": "str",  # Optional. The span name.
+                            "parentSpanId": "str",  # Optional. The parent span
+                              identifier. Omitted for root spans.
+                            "region": "str",  # Optional. The datacenter region slug the
+                              span was queried from.
+                            "resource": {
+                                "str": "str"  # Optional. Resource attributes
+                                  associated with the span.
+                            },
+                            "serviceName": "str",  # Optional. The name of the service
+                              that emitted the span.
+                            "spanId": "str",  # Optional. The span identifier.
+                            "startTime": "2020-02-20 00:00:00",  # Optional. The span
+                              start time.
+                            "statusCode": "str",  # Optional. The span status code.
+                            "statusMessage": "str",  # Optional. The span status message.
+                              Omitted when empty.
+                            "traceId": "str"  # Optional. The trace identifier the span
+                              belongs to.
+                        }
+                    ],
+                    "pagination": {
+                        "hasMore": bool  # Optional. Whether more spans matched than were
+                          returned in this page. Cursor-based continuation is not yet supported.
+                    }
+                }
+                # response body for status code(s): 400, 403, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_insights_post_spans_search_request(
+            region=region,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+
+class SignalsOperations:
+    """
+    .. warning::
+        **DO NOT** instantiate this class directly.
+
+        Instead, you should access the following operations through
+        :class:`~pydo.aio.GeneratedClient`'s
+        :attr:`signals` attribute.
+    """
+
+    def __init__(self, *args, **kwargs) -> None:
+        input_args = list(args)
+        self._client = input_args.pop(0) if input_args else kwargs.pop("client")
+        self._config = input_args.pop(0) if input_args else kwargs.pop("config")
+        self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
+        self._deserialize = (
+            input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        )
+
+    @distributed_trace_async
+    async def list_consents(self, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """List All Consent Records.
+
+        To list all signals consent records for your team, send a GET request to
+        ``/v1/consent``. Each record indicates whether signals collection is enabled
+        for a specific agent.
+
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "consents": [
+                        {
+                            "agent_id": "str",  # The unique identifier of the agent. For
+                              Harness Runtime, this is the Environment Config ID. Required.
+                            "enabled": bool,  # Whether signals collection is enabled for
+                              this agent. Required.
+                            "id": 0,  # The unique numeric identifier for the consent
+                              record. Required.
+                            "team_id": 0,  # The team ID that owns this consent record.
+                              Required.
+                            "updated_at": "2020-02-20 00:00:00"  # A time value given in
+                              ISO8601 combined date and time format. Required.
+                        }
+                    ]
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_signals_list_consents_request(
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        response_headers["ratelimit-limit"] = self._deserialize(
+            "int", response.headers.get("ratelimit-limit")
+        )
+        response_headers["ratelimit-remaining"] = self._deserialize(
+            "int", response.headers.get("ratelimit-remaining")
+        )
+        response_headers["ratelimit-reset"] = self._deserialize(
+            "int", response.headers.get("ratelimit-reset")
+        )
+
+        if response.content:
+            deserialized = response.json()
+        else:
+            deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_consent(self, agent_id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve Consent for an Agent.
+
+        To retrieve the consent record for a specific agent, send a GET
+        request to ``/v1/consent/{agent_id}``. The response includes an ``allowed``
+        field indicating whether the team is permitted to use signals for this agent.
+
+        :param agent_id: A unique identifier for an agent. For Harness Runtime, this is the Environment
+         Config ID. Required.
+        :type agent_id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "agent_id": "str",  # The unique identifier of the agent. For Harness
+                      Runtime, this is the Environment Config ID. Required.
+                    "allowed": bool,  # Whether the team is permitted to use signals for this
+                      agent. This is determined by the platform and cannot be set by the user.
+                      Required.
+                    "enabled": bool,  # Whether signals collection is enabled for this agent.
+                      Required.
+                    "id": 0,  # The unique numeric identifier for the consent record. Required.
+                    "team_id": 0,  # The team ID that owns this consent record. Required.
+                    "updated_at": "2020-02-20 00:00:00"  # A time value given in ISO8601 combined
+                      date and time format. Required.
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_signals_get_consent_request(
+            agent_id=agent_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def update_consent(
+        self,
+        agent_id: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Consent for an Agent.
+
+        To enable or disable signals collection for a specific agent, send a
+        PUT request to ``/v1/consent/{agent_id}`` with an ``enabled`` boolean in the
+        request body.
+
+        :param agent_id: A unique identifier for an agent. For Harness Runtime, this is the Environment
+         Config ID. Required.
+        :type agent_id: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "enabled": bool  # Whether to enable signals collection for this agent.
+                      Required.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "consent": {
+                        "agent_id": "str",  # The unique identifier of the agent. For Harness
+                          Runtime, this is the Environment Config ID. Required.
+                        "enabled": bool,  # Whether signals collection is enabled for this
+                          agent. Required.
+                        "id": 0,  # The unique numeric identifier for the consent record.
+                          Required.
+                        "team_id": 0,  # The team ID that owns this consent record. Required.
+                        "updated_at": "2020-02-20 00:00:00"  # A time value given in ISO8601
+                          combined date and time format. Required.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def update_consent(
+        self,
+        agent_id: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Consent for an Agent.
+
+        To enable or disable signals collection for a specific agent, send a
+        PUT request to ``/v1/consent/{agent_id}`` with an ``enabled`` boolean in the
+        request body.
+
+        :param agent_id: A unique identifier for an agent. For Harness Runtime, this is the Environment
+         Config ID. Required.
+        :type agent_id: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "consent": {
+                        "agent_id": "str",  # The unique identifier of the agent. For Harness
+                          Runtime, this is the Environment Config ID. Required.
+                        "enabled": bool,  # Whether signals collection is enabled for this
+                          agent. Required.
+                        "id": 0,  # The unique numeric identifier for the consent record.
+                          Required.
+                        "team_id": 0,  # The team ID that owns this consent record. Required.
+                        "updated_at": "2020-02-20 00:00:00"  # A time value given in ISO8601
+                          combined date and time format. Required.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def update_consent(
+        self, agent_id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Consent for an Agent.
+
+        To enable or disable signals collection for a specific agent, send a
+        PUT request to ``/v1/consent/{agent_id}`` with an ``enabled`` boolean in the
+        request body.
+
+        :param agent_id: A unique identifier for an agent. For Harness Runtime, this is the Environment
+         Config ID. Required.
+        :type agent_id: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "enabled": bool  # Whether to enable signals collection for this agent.
+                      Required.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "consent": {
+                        "agent_id": "str",  # The unique identifier of the agent. For Harness
+                          Runtime, this is the Environment Config ID. Required.
+                        "enabled": bool,  # Whether signals collection is enabled for this
+                          agent. Required.
+                        "id": 0,  # The unique numeric identifier for the consent record.
+                          Required.
+                        "team_id": 0,  # The team ID that owns this consent record. Required.
+                        "updated_at": "2020-02-20 00:00:00"  # A time value given in ISO8601
+                          combined date and time format. Required.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_signals_update_consent_request(
+            agent_id=agent_id,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def list_agent_sessions(
+        self,
+        agent_id: str,
+        *,
+        limit: int = 20,
+        after: Optional[str] = None,
+        start_time: Optional[datetime.datetime] = None,
+        end_time: Optional[datetime.datetime] = None,
+        signal_type: Optional[str] = None,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Sessions for an Agent.
+
+        To list signals sessions for a specific agent, send a GET request to
+        ``/v1/signals/agents/{agent_id}/sessions``. Results are paginated using cursor-based
+        pagination with ``limit`` and ``after`` parameters.
+
+        :param agent_id: A unique identifier for an agent. For Harness Runtime, this is the Environment
+         Config ID. Required.
+        :type agent_id: str
+        :keyword limit: Maximum number of items to return per page. Default value is 20.
+        :paramtype limit: int
+        :keyword after: An opaque cursor string returned from a previous page. Pass this value to
+         retrieve the next page of results. Default value is None.
+        :paramtype after: str
+        :keyword start_time: Filter results to those occurring at or after this timestamp (RFC 3339).
+         Default value is None.
+        :paramtype start_time: ~datetime.datetime
+        :keyword end_time: Filter results to those occurring at or before this timestamp (RFC 3339).
+         Default value is None.
+        :paramtype end_time: ~datetime.datetime
+        :keyword signal_type: Filter results by signal type. Use the export options endpoint to list
+         available signal types. Default value is None.
+        :paramtype signal_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "edges": [
+                        {
+                            "cursor": "str",  # Optional. An opaque cursor for
+                              pagination.
+                            "node": {
+                                "session_id": "str",  # The unique identifier for the
+                                  session. Required.
+                                "duration_seconds": 0.0,  # Optional. The duration of
+                                  the session in seconds.
+                                "signal_count": 0,  # Optional. The number of signals
+                                  detected in this session.
+                                "started_at": "2020-02-20 00:00:00",  # Optional.
+                                  When the session started.
+                                "total_turns": 0  # Optional. The total number of
+                                  conversation turns in this session.
+                            }
+                        }
+                    ],
+                    "page_info": {
+                        "has_next_page": bool  # Optional. Whether there are more results
+                          after this page.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_signals_list_agent_sessions_request(
+            agent_id=agent_id,
+            limit=limit,
+            after=after,
+            start_time=start_time,
+            end_time=end_time,
+            signal_type=signal_type,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def list_session_dialogues(
+        self,
+        session_id: str,
+        *,
+        limit: int = 20,
+        after: Optional[str] = None,
+        start_time: Optional[datetime.datetime] = None,
+        end_time: Optional[datetime.datetime] = None,
+        signal_type: Optional[str] = None,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Dialogues for a Session.
+
+        To list the dialogue turns within a specific session, send a GET request to
+        ``/v1/signals/sessions/{session_id}/dialogues``. Each dialogue represents a
+        single turn of conversation between a user and the agent, along with
+        any signals detected. Results are paginated using cursor-based pagination.
+
+        :param session_id: A unique identifier for a signals session. Required.
+        :type session_id: str
+        :keyword limit: Maximum number of items to return per page. Default value is 20.
+        :paramtype limit: int
+        :keyword after: An opaque cursor string returned from a previous page. Pass this value to
+         retrieve the next page of results. Default value is None.
+        :paramtype after: str
+        :keyword start_time: Filter results to those occurring at or after this timestamp (RFC 3339).
+         Default value is None.
+        :paramtype start_time: ~datetime.datetime
+        :keyword end_time: Filter results to those occurring at or before this timestamp (RFC 3339).
+         Default value is None.
+        :paramtype end_time: ~datetime.datetime
+        :keyword signal_type: Filter results by signal type. Use the export options endpoint to list
+         available signal types. Default value is None.
+        :paramtype signal_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "edges": [
+                        {
+                            "cursor": "str",  # Optional. An opaque cursor for
+                              pagination.
+                            "node": {
+                                "id": "str",  # The unique identifier for the
+                                  dialogue. Required.
+                                "run_status": "str",  # Optional. The execution
+                                  status of this dialogue turn.
+                                "sequence": 0,  # Optional. The sequence number of
+                                  this dialogue within the session.
+                                "signals": [
+                                    "str"  # Optional. A list of signal types
+                                      detected in this dialogue.
+                                ],
+                                "user_message": "str"  # Optional. The user's message
+                                  in this dialogue turn.
+                            }
+                        }
+                    ],
+                    "page_info": {
+                        "has_next_page": bool  # Optional. Whether there are more results
+                          after this page.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_signals_list_session_dialogues_request(
+            session_id=session_id,
+            limit=limit,
+            after=after,
+            start_time=start_time,
+            end_time=end_time,
+            signal_type=signal_type,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def list_exports(
+        self, *, limit: int = 20, after: Optional[str] = None, **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Export Jobs.
+
+        To list signals export jobs for your team, send a GET request to
+        ``/v1/signals/exports``. Results are paginated using cursor-based pagination
+        with ``limit`` and ``after`` parameters.
+
+        :keyword limit: Maximum number of items to return per page. Default value is 20.
+        :paramtype limit: int
+        :keyword after: An opaque cursor string returned from a previous page. Pass this value to
+         retrieve the next page of results. Default value is None.
+        :paramtype after: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "edges": [
+                        {
+                            "cursor": "str",  # Optional. An opaque cursor for
+                              pagination.
+                            "node": {
+                                "agent_id": "str",  # The agent whose data is being
+                                  exported. For Harness Runtime, this is the Environment Config ID.
+                                  Required.
+                                "created_at": 0,  # Unix timestamp when the export
+                                  was created. Required.
+                                "export_id": "str",  # The unique identifier for the
+                                  export job. Required.
+                                "status": "str",  # The current status of the export
+                                  job. Required. Known values are: "pending", "processing", "complete",
+                                  and "failed".
+                                "completed_at": 0,  # Optional. Unix timestamp when
+                                  the export completed, or null if still in progress.
+                                "error_message": "str",  # Optional. Error message if
+                                  the export failed, or null on success.
+                                "expires_at": 0,  # Optional. Unix timestamp when the
+                                  export download link expires.
+                                "filters": {
+                                    "session_ids": [
+                                        "str"  # Optional. Specific session
+                                          IDs included in the export.
+                                    ],
+                                    "signal_type": [
+                                        "str"  # Optional. Signal types
+                                          included in the export.
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    "page_info": {
+                        "has_next_page": bool  # Optional. Whether there are more results
+                          after this page.
+                    }
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_signals_list_exports_request(
+            limit=limit,
+            after=after,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        response_headers["ratelimit-limit"] = self._deserialize(
+            "int", response.headers.get("ratelimit-limit")
+        )
+        response_headers["ratelimit-remaining"] = self._deserialize(
+            "int", response.headers.get("ratelimit-remaining")
+        )
+        response_headers["ratelimit-reset"] = self._deserialize(
+            "int", response.headers.get("ratelimit-reset")
+        )
+
+        if response.content:
+            deserialized = response.json()
+        else:
+            deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def create_export(
+        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create an Export Job.
+
+        To create a new signals data export, send a POST request to
+        ``/v1/signals/exports`` with an ``agent_id`` in the request body. You may
+        optionally filter the export by ``signal_type``\\ , ``session_ids``\\ , ``start_time``\\ ,
+        and ``end_time``. Use the export options endpoint to discover available signal
+        types.
+
+        The export job runs asynchronously. Poll the get export endpoint to check
+        its status. When complete, use the download endpoint to retrieve a
+        pre-signed URL.
+
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "agent_id": "str",  # The agent whose data should be exported. For Harness
+                      Runtime, this is the Environment Config ID. Required.
+                    "end_time": "2020-02-20 00:00:00",  # Optional. Include only sessions that
+                      started at or before this timestamp.
+                    "session_ids": [
+                        "str"  # Optional. Optional list of specific session IDs to include
+                          in the export.
+                    ],
+                    "signal_type": [
+                        "str"  # Optional. Filter the export to only include the specified
+                          signal types. Use the export options endpoint to list available values.
+                    ],
+                    "start_time": "2020-02-20 00:00:00"  # Optional. Include only sessions that
+                      started at or after this timestamp.
+                }
+
+                # response body for status code(s): 201
+                response == {
+                    "agent_id": "str",  # The agent whose data is being exported. For Harness
+                      Runtime, this is the Environment Config ID. Required.
+                    "created_at": 0,  # Unix timestamp when the export was created. Required.
+                    "export_id": "str",  # The unique identifier for the export job. Required.
+                    "status": "str",  # The current status of the export job. Required. Known
+                      values are: "pending", "processing", "complete", and "failed".
+                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
+                      null if still in progress.
+                    "error_message": "str",  # Optional. Error message if the export failed, or
+                      null on success.
+                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
+                      expires.
+                    "filters": {
+                        "session_ids": [
+                            "str"  # Optional. Specific session IDs included in the
+                              export.
+                        ],
+                        "signal_type": [
+                            "str"  # Optional. Signal types included in the export.
+                        ]
+                    }
+                }
+                # response body for status code(s): 400, 422
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def create_export(
+        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create an Export Job.
+
+        To create a new signals data export, send a POST request to
+        ``/v1/signals/exports`` with an ``agent_id`` in the request body. You may
+        optionally filter the export by ``signal_type``\\ , ``session_ids``\\ , ``start_time``\\ ,
+        and ``end_time``. Use the export options endpoint to discover available signal
+        types.
+
+        The export job runs asynchronously. Poll the get export endpoint to check
+        its status. When complete, use the download endpoint to retrieve a
+        pre-signed URL.
+
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 201
+                response == {
+                    "agent_id": "str",  # The agent whose data is being exported. For Harness
+                      Runtime, this is the Environment Config ID. Required.
+                    "created_at": 0,  # Unix timestamp when the export was created. Required.
+                    "export_id": "str",  # The unique identifier for the export job. Required.
+                    "status": "str",  # The current status of the export job. Required. Known
+                      values are: "pending", "processing", "complete", and "failed".
+                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
+                      null if still in progress.
+                    "error_message": "str",  # Optional. Error message if the export failed, or
+                      null on success.
+                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
+                      expires.
+                    "filters": {
+                        "session_ids": [
+                            "str"  # Optional. Specific session IDs included in the
+                              export.
+                        ],
+                        "signal_type": [
+                            "str"  # Optional. Signal types included in the export.
+                        ]
+                    }
+                }
+                # response body for status code(s): 400, 422
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def create_export(self, body: Union[JSON, IO[bytes]], **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Create an Export Job.
+
+        To create a new signals data export, send a POST request to
+        ``/v1/signals/exports`` with an ``agent_id`` in the request body. You may
+        optionally filter the export by ``signal_type``\\ , ``session_ids``\\ , ``start_time``\\ ,
+        and ``end_time``. Use the export options endpoint to discover available signal
+        types.
+
+        The export job runs asynchronously. Poll the get export endpoint to check
+        its status. When complete, use the download endpoint to retrieve a
+        pre-signed URL.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "agent_id": "str",  # The agent whose data should be exported. For Harness
+                      Runtime, this is the Environment Config ID. Required.
+                    "end_time": "2020-02-20 00:00:00",  # Optional. Include only sessions that
+                      started at or before this timestamp.
+                    "session_ids": [
+                        "str"  # Optional. Optional list of specific session IDs to include
+                          in the export.
+                    ],
+                    "signal_type": [
+                        "str"  # Optional. Filter the export to only include the specified
+                          signal types. Use the export options endpoint to list available values.
+                    ],
+                    "start_time": "2020-02-20 00:00:00"  # Optional. Include only sessions that
+                      started at or after this timestamp.
+                }
+
+                # response body for status code(s): 201
+                response == {
+                    "agent_id": "str",  # The agent whose data is being exported. For Harness
+                      Runtime, this is the Environment Config ID. Required.
+                    "created_at": 0,  # Unix timestamp when the export was created. Required.
+                    "export_id": "str",  # The unique identifier for the export job. Required.
+                    "status": "str",  # The current status of the export job. Required. Known
+                      values are: "pending", "processing", "complete", and "failed".
+                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
+                      null if still in progress.
+                    "error_message": "str",  # Optional. Error message if the export failed, or
+                      null on success.
+                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
+                      expires.
+                    "filters": {
+                        "session_ids": [
+                            "str"  # Optional. Specific session IDs included in the
+                              export.
+                        ],
+                        "signal_type": [
+                            "str"  # Optional. Signal types included in the export.
+                        ]
+                    }
+                }
+                # response body for status code(s): 400, 422
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_signals_create_export_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [201, 400, 422]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 201:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 422:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_export_options(self, **kwargs: Any) -> JSON:
+        """Get Export Options.
+
+        To retrieve the available filter options for creating an export, send a GET
+        request to ``/v1/signals/exports/options``. The response lists valid signal
+        types that can be used in the ``signal_type`` filter when creating an export.
+
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "filters": {
+                        "signal_type": [
+                            "str"  # The list of valid signal type values that can be
+                              used when creating an export. Required.
+                        ]
+                    }
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_signals_get_export_options_request(
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        response_headers["ratelimit-limit"] = self._deserialize(
+            "int", response.headers.get("ratelimit-limit")
+        )
+        response_headers["ratelimit-remaining"] = self._deserialize(
+            "int", response.headers.get("ratelimit-remaining")
+        )
+        response_headers["ratelimit-reset"] = self._deserialize(
+            "int", response.headers.get("ratelimit-reset")
+        )
+
+        if response.content:
+            deserialized = response.json()
+        else:
+            deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_export(self, export_id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve an Export Job.
+
+        To retrieve the status and details of a signals export job, send a GET
+        request to ``/v1/signals/exports/{export_id}``.
+
+        :param export_id: A unique identifier for an export job. Required.
+        :type export_id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "agent_id": "str",  # The agent whose data is being exported. For Harness
+                      Runtime, this is the Environment Config ID. Required.
+                    "created_at": 0,  # Unix timestamp when the export was created. Required.
+                    "export_id": "str",  # The unique identifier for the export job. Required.
+                    "status": "str",  # The current status of the export job. Required. Known
+                      values are: "pending", "processing", "complete", and "failed".
+                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
+                      null if still in progress.
+                    "error_message": "str",  # Optional. Error message if the export failed, or
+                      null on success.
+                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
+                      expires.
+                    "filters": {
+                        "session_ids": [
+                            "str"  # Optional. Specific session IDs included in the
+                              export.
+                        ],
+                        "signal_type": [
+                            "str"  # Optional. Signal types included in the export.
+                        ]
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_signals_get_export_request(
+            export_id=export_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_export_download(self, export_id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Get Export Download URL.
+
+        To retrieve a pre-signed download URL for a completed export, send a GET
+        request to ``/v1/signals/exports/{export_id}/download``. The export must have
+        a ``complete`` status. The URL is temporary and will expire.
+
+        :param export_id: A unique identifier for an export job. Required.
+        :type export_id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "download_url": "str",  # A temporary pre-signed URL to download the export
+                      archive. Required.
+                    "expires_at": 0  # Unix timestamp when the download URL expires. The URL is
+                      valid for 15 minutes. Required.
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_signals_get_export_download_request(
+            export_id=export_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def list_deletions(
+        self, *, limit: int = 20, after: Optional[str] = None, **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Data Deletion Jobs.
+
+        To list signals data deletion jobs for your team, newest first, send a GET
+        request to ``/v1/signals/deletions``. Results are paginated using
+        cursor-based pagination with ``limit`` and ``after`` parameters.
+
+        :keyword limit: Maximum number of items to return per page. Default value is 20.
+        :paramtype limit: int
+        :keyword after: An opaque cursor string returned from a previous page. Pass this value to
+         retrieve the next page of results. Default value is None.
+        :paramtype after: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "edges": [
+                        {
+                            "cursor": "str",  # Optional. An opaque cursor for
+                              pagination.
+                            "node": {
+                                "created_at": 0,  # Unix timestamp when the deletion
+                                  job was created. Required.
+                                "deletion_id": "str",  # The unique identifier for
+                                  the deletion job (ULID). Required.
+                                "status": "str",  # The current status of the
+                                  deletion job. Required. Known values are: "queued", "running",
+                                  "complete", and "failed".
+                                "team_id": 0,  # The team that owns the deletion job.
+                                  Required.
+                                "type": "str",  # The scope of the deletion.
+                                  ``agent`` deletes data for one agent. ``inference`` deletes data for
+                                  the team's Serverless Inference requests. Required. Known values are:
+                                  "agent" and "inference".
+                                "agent_id": "str",  # Optional. The agent whose data
+                                  is being deleted. For Harness Runtime, this is the Environment Config
+                                  ID. Only present for ``agent`` deletions.
+                                "completed_at": 0,  # Optional. Unix timestamp when
+                                  the deletion finished, or null if still in progress.
+                                "error_message": "str",  # Optional. Error message if
+                                  the deletion failed, or null otherwise.
+                                "started_at": 0  # Optional. Unix timestamp when
+                                  processing started, or null if still queued.
+                            }
+                        }
+                    ],
+                    "page_info": {
+                        "end_cursor": "str",  # Optional. Cursor of the last item. Pass as
+                          ``after`` to fetch the next page. Present only when there are more results.
+                        "has_next_page": bool  # Optional. Whether there are more results
+                          after this page.
+                    }
+                }
+                # response body for status code(s): 400
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_signals_list_deletions_request(
+            limit=limit,
+            after=after,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def create_deletion(
+        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Data Deletion Job.
+
+        To permanently delete signals data, send a POST request to
+        ``/v1/signals/deletions``.
+
+        Two deletion types are supported:
+
+
+        * ``agent`` — deletes sessions, dialogues, and signal reports for one agent.
+          Requires ``agent_id``. The agent's data is hidden immediately and signals
+          collection is disabled for the agent, even if the job later fails. Wait
+          until the job is complete before enabling signals for the agent again.
+        * ``inference`` — deletes sessions, dialogues, and signal reports for the
+          team's Serverless Inference requests made before the deletion. Signals
+          continues to analyze new requests.
+
+        Deletion is permanent and cannot be undone. The job runs asynchronously;
+        poll the get endpoint to check status. To retry a failed job, send the same
+        request again. Export files created earlier are not deleted and remain
+        available until they expire.
+
+        The endpoint is idempotent: if a queued or running job already exists for
+        the same target, it is returned with ``200 OK``. A new job returns
+        ``202 Accepted``. Each team can have a limited number of active jobs;
+        requests beyond that limit return ``429 Too Many Requests``.
+
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "team_id": 0,  # The team whose data should be deleted. Must match the
+                      authenticated team. Required.
+                    "type": "str",  # The scope of the deletion. ``agent`` deletes data for one
+                      agent and requires ``agent_id``. ``inference`` deletes data for the team's
+                      Serverless Inference requests. Required. Known values are: "agent" and
+                      "inference".
+                    "agent_id": "str"  # Optional. The agent whose data should be deleted. For
+                      Harness Runtime, this is the Environment Config ID. Required when ``type`` is
+                      ``agent``"" ; must be omitted when ``type`` is ``inference``.
+                }
+
+                # response body for status code(s): 200, 202
+                response == {
+                    "created_at": 0,  # Unix timestamp when the deletion job was created.
+                      Required.
+                    "deletion_id": "str",  # The unique identifier for the deletion job (ULID).
+                      Required.
+                    "status": "str",  # The current status of the deletion job. Required. Known
+                      values are: "queued", "running", "complete", and "failed".
+                    "team_id": 0,  # The team that owns the deletion job. Required.
+                    "type": "str",  # The scope of the deletion. ``agent`` deletes data for one
+                      agent. ``inference`` deletes data for the team's Serverless Inference requests.
+                      Required. Known values are: "agent" and "inference".
+                    "agent_id": "str",  # Optional. The agent whose data is being deleted. For
+                      Harness Runtime, this is the Environment Config ID. Only present for ``agent``
+                      deletions.
+                    "completed_at": 0,  # Optional. Unix timestamp when the deletion finished, or
+                      null if still in progress.
+                    "error_message": "str",  # Optional. Error message if the deletion failed, or
+                      null otherwise.
+                    "started_at": 0  # Optional. Unix timestamp when processing started, or null
+                      if still queued.
+                }
+                # response body for status code(s): 400, 403, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def create_deletion(
+        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Data Deletion Job.
+
+        To permanently delete signals data, send a POST request to
+        ``/v1/signals/deletions``.
+
+        Two deletion types are supported:
+
+
+        * ``agent`` — deletes sessions, dialogues, and signal reports for one agent.
+          Requires ``agent_id``. The agent's data is hidden immediately and signals
+          collection is disabled for the agent, even if the job later fails. Wait
+          until the job is complete before enabling signals for the agent again.
+        * ``inference`` — deletes sessions, dialogues, and signal reports for the
+          team's Serverless Inference requests made before the deletion. Signals
+          continues to analyze new requests.
+
+        Deletion is permanent and cannot be undone. The job runs asynchronously;
+        poll the get endpoint to check status. To retry a failed job, send the same
+        request again. Export files created earlier are not deleted and remain
+        available until they expire.
+
+        The endpoint is idempotent: if a queued or running job already exists for
+        the same target, it is returned with ``200 OK``. A new job returns
+        ``202 Accepted``. Each team can have a limited number of active jobs;
+        requests beyond that limit return ``429 Too Many Requests``.
+
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200, 202
+                response == {
+                    "created_at": 0,  # Unix timestamp when the deletion job was created.
+                      Required.
+                    "deletion_id": "str",  # The unique identifier for the deletion job (ULID).
+                      Required.
+                    "status": "str",  # The current status of the deletion job. Required. Known
+                      values are: "queued", "running", "complete", and "failed".
+                    "team_id": 0,  # The team that owns the deletion job. Required.
+                    "type": "str",  # The scope of the deletion. ``agent`` deletes data for one
+                      agent. ``inference`` deletes data for the team's Serverless Inference requests.
+                      Required. Known values are: "agent" and "inference".
+                    "agent_id": "str",  # Optional. The agent whose data is being deleted. For
+                      Harness Runtime, this is the Environment Config ID. Only present for ``agent``
+                      deletions.
+                    "completed_at": 0,  # Optional. Unix timestamp when the deletion finished, or
+                      null if still in progress.
+                    "error_message": "str",  # Optional. Error message if the deletion failed, or
+                      null otherwise.
+                    "started_at": 0  # Optional. Unix timestamp when processing started, or null
+                      if still queued.
+                }
+                # response body for status code(s): 400, 403, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def create_deletion(
+        self, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Data Deletion Job.
+
+        To permanently delete signals data, send a POST request to
+        ``/v1/signals/deletions``.
+
+        Two deletion types are supported:
+
+
+        * ``agent`` — deletes sessions, dialogues, and signal reports for one agent.
+          Requires ``agent_id``. The agent's data is hidden immediately and signals
+          collection is disabled for the agent, even if the job later fails. Wait
+          until the job is complete before enabling signals for the agent again.
+        * ``inference`` — deletes sessions, dialogues, and signal reports for the
+          team's Serverless Inference requests made before the deletion. Signals
+          continues to analyze new requests.
+
+        Deletion is permanent and cannot be undone. The job runs asynchronously;
+        poll the get endpoint to check status. To retry a failed job, send the same
+        request again. Export files created earlier are not deleted and remain
+        available until they expire.
+
+        The endpoint is idempotent: if a queued or running job already exists for
+        the same target, it is returned with ``200 OK``. A new job returns
+        ``202 Accepted``. Each team can have a limited number of active jobs;
+        requests beyond that limit return ``429 Too Many Requests``.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "team_id": 0,  # The team whose data should be deleted. Must match the
+                      authenticated team. Required.
+                    "type": "str",  # The scope of the deletion. ``agent`` deletes data for one
+                      agent and requires ``agent_id``. ``inference`` deletes data for the team's
+                      Serverless Inference requests. Required. Known values are: "agent" and
+                      "inference".
+                    "agent_id": "str"  # Optional. The agent whose data should be deleted. For
+                      Harness Runtime, this is the Environment Config ID. Required when ``type`` is
+                      ``agent``"" ; must be omitted when ``type`` is ``inference``.
+                }
+
+                # response body for status code(s): 200, 202
+                response == {
+                    "created_at": 0,  # Unix timestamp when the deletion job was created.
+                      Required.
+                    "deletion_id": "str",  # The unique identifier for the deletion job (ULID).
+                      Required.
+                    "status": "str",  # The current status of the deletion job. Required. Known
+                      values are: "queued", "running", "complete", and "failed".
+                    "team_id": 0,  # The team that owns the deletion job. Required.
+                    "type": "str",  # The scope of the deletion. ``agent`` deletes data for one
+                      agent. ``inference`` deletes data for the team's Serverless Inference requests.
+                      Required. Known values are: "agent" and "inference".
+                    "agent_id": "str",  # Optional. The agent whose data is being deleted. For
+                      Harness Runtime, this is the Environment Config ID. Only present for ``agent``
+                      deletions.
+                    "completed_at": 0,  # Optional. Unix timestamp when the deletion finished, or
+                      null if still in progress.
+                    "error_message": "str",  # Optional. Error message if the deletion failed, or
+                      null otherwise.
+                    "started_at": 0  # Optional. Unix timestamp when processing started, or null
+                      if still queued.
+                }
+                # response body for status code(s): 400, 403, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_signals_create_deletion_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 202, 400, 403, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 202:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_deletion(self, deletion_id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve a Data Deletion Job.
+
+        To retrieve the status of a signals data deletion job, send a GET request
+        to ``/v1/signals/deletions/{deletion_id}``.
+
+        :param deletion_id: A unique identifier for a data deletion job. Required.
+        :type deletion_id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "created_at": 0,  # Unix timestamp when the deletion job was created.
+                      Required.
+                    "deletion_id": "str",  # The unique identifier for the deletion job (ULID).
+                      Required.
+                    "status": "str",  # The current status of the deletion job. Required. Known
+                      values are: "queued", "running", "complete", and "failed".
+                    "team_id": 0,  # The team that owns the deletion job. Required.
+                    "type": "str",  # The scope of the deletion. ``agent`` deletes data for one
+                      agent. ``inference`` deletes data for the team's Serverless Inference requests.
+                      Required. Known values are: "agent" and "inference".
+                    "agent_id": "str",  # Optional. The agent whose data is being deleted. For
+                      Harness Runtime, this is the Environment Config ID. Only present for ``agent``
+                      deletions.
+                    "completed_at": 0,  # Optional. Unix timestamp when the deletion finished, or
+                      null if still in progress.
+                    "error_message": "str",  # Optional. Error message if the deletion failed, or
+                      null otherwise.
+                    "started_at": 0  # Optional. Unix timestamp when processing started, or null
+                      if still queued.
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_signals_get_deletion_request(
+            deletion_id=deletion_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
             response_headers["ratelimit-limit"] = self._deserialize(
                 "int", response.headers.get("ratelimit-limit")
             )
