@@ -63,6 +63,7 @@ from .operations import (
     ReservedIPv6Operations,
     SecurityOperations,
     SessionsOperations,
+    SignalsOperations,
     SizesOperations,
     SnapshotsOperations,
     SpacesKeyOperations,
@@ -160,6 +161,8 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype image_actions: pydo.operations.ImageActionsOperations
     :ivar insights: InsightsOperations operations
     :vartype insights: pydo.operations.InsightsOperations
+    :ivar signals: SignalsOperations operations
+    :vartype signals: pydo.operations.SignalsOperations
     :ivar kubernetes: KubernetesOperations operations
     :vartype kubernetes: pydo.operations.KubernetesOperations
     :ivar load_balancers: LoadBalancersOperations operations
@@ -370,6 +373,9 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.insights = InsightsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.signals = SignalsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.kubernetes = KubernetesOperations(
