@@ -45,6 +45,8 @@ from .operations import (
     KubernetesOperations,
     LoadBalancersOperations,
     McpServersOperations,
+    MicrovmCheckpointsOperations,
+    MicrovmsOperations,
     MonitoringOperations,
     NfsOperations,
     OneClicksOperations,
@@ -63,6 +65,7 @@ from .operations import (
     ReservedIPv6Operations,
     SecurityOperations,
     SessionsOperations,
+    SignalsOperations,
     SizesOperations,
     SnapshotsOperations,
     SpacesKeyOperations,
@@ -160,10 +163,16 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype image_actions: pydo.aio.operations.ImageActionsOperations
     :ivar insights: InsightsOperations operations
     :vartype insights: pydo.aio.operations.InsightsOperations
+    :ivar signals: SignalsOperations operations
+    :vartype signals: pydo.aio.operations.SignalsOperations
     :ivar kubernetes: KubernetesOperations operations
     :vartype kubernetes: pydo.aio.operations.KubernetesOperations
     :ivar load_balancers: LoadBalancersOperations operations
     :vartype load_balancers: pydo.aio.operations.LoadBalancersOperations
+    :ivar microvms: MicrovmsOperations operations
+    :vartype microvms: pydo.aio.operations.MicrovmsOperations
+    :ivar microvm_checkpoints: MicrovmCheckpointsOperations operations
+    :vartype microvm_checkpoints: pydo.aio.operations.MicrovmCheckpointsOperations
     :ivar monitoring: MonitoringOperations operations
     :vartype monitoring: pydo.aio.operations.MonitoringOperations
     :ivar nfs: NfsOperations operations
@@ -372,10 +381,19 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
         self.insights = InsightsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
+        self.signals = SignalsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
         self.kubernetes = KubernetesOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.load_balancers = LoadBalancersOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.microvms = MicrovmsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.microvm_checkpoints = MicrovmCheckpointsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.monitoring = MonitoringOperations(
