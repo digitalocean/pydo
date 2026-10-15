@@ -936,6 +936,100 @@ class SessionsOperations:
             ),
         )
 
+    def list_connections(
+        self,
+        provider: str,
+        *,
+        user_id: Optional[str] = None,
+        status: Optional[str] = None,
+        page: Optional[int] = None,
+        per_page: Optional[int] = None,
+    ) -> Any:
+        """List the team's external-provider connections (actor-scoped auth).
+
+        ``GET /v2/agents/auth/{provider}/connections``. This is the newer
+        actor-scoped flow, separate from the team-wide
+        :meth:`start_provider_auth`. Each connection binds a ``user_id`` (the
+        actor a manifest's oauth slot references) to the provider and holds the
+        OAuth grant server-side. Optional filters: ``user_id`` (single actor),
+        ``status`` (``active``/``pending``/``expired``), and ``page`` /
+        ``per_page``. Returns ``{"connections": [...], "pagination": {...}}``.
+        """
+        return self._parse_json(
+            self._send(
+                "GET",
+                f"/v2/agents/auth/{_quote(provider)}/connections",
+                params={
+                    "user_id": user_id,
+                    "status": status,
+                    "page": page,
+                    "per_page": per_page,
+                },
+            ),
+        )
+
+    def create_connection(
+        self,
+        provider: str,
+        *,
+        user_id: str,
+        scopes: Optional[Sequence[str]] = None,
+    ) -> Any:
+        """Create (or resume) a connection for an actor.
+
+        ``POST /v2/agents/auth/{provider}/connections`` with ``{"user_id":
+        ..., "scopes": [...]}``. ``user_id`` is the actor the connection acts
+        for (required). Omit ``scopes`` to request the provider's full
+        configured scope set. A new connection comes back ``pending`` with an
+        ``authorization`` block (``connect_url`` / ``verification_code``) for
+        the browser step; an already-connected actor comes back ``active`` with
+        no authorization. Returns ``{"connection": {...}, "authorization": {...}?}``.
+        """
+        if not user_id or not str(user_id).strip():
+            raise ValueError("user_id is required")
+        body: Dict[str, Any] = {"user_id": user_id}
+        if scopes:
+            body["scopes"] = [str(s) for s in scopes]
+        return self._parse_json(
+            self._send(
+                "POST",
+                f"/v2/agents/auth/{_quote(provider)}/connections",
+                body=body,
+            ),
+        )
+
+    def get_connection(self, provider: str, connection_id: str) -> Any:
+        """Get one connection by id (``GET .../connections/{id}``).
+
+        Useful to check a pending connection's status after authorizing.
+        Returns ``{"connection": {...}}``.
+        """
+        if not connection_id:
+            raise ValueError("connection_id is required")
+        return self._parse_json(
+            self._send(
+                "GET",
+                f"/v2/agents/auth/{_quote(provider)}/connections/"
+                f"{_quote(connection_id)}",
+            ),
+        )
+
+    def delete_connection(self, provider: str, connection_id: str) -> Any:
+        """Revoke a connection by id (``DELETE .../connections/{id}``).
+
+        Agents referencing its actor can no longer act through it. Returns the
+        connection envelope for the revoked connection.
+        """
+        if not connection_id:
+            raise ValueError("connection_id is required")
+        return self._parse_json(
+            self._send(
+                "DELETE",
+                f"/v2/agents/auth/{_quote(provider)}/connections/"
+                f"{_quote(connection_id)}",
+            ),
+        )
+
     def stream(
         self,
         session_id: str,

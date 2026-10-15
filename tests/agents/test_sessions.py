@@ -506,6 +506,130 @@ def test_poll_provider_auth_requires_poll_url():
         resources.sessions.poll_provider_auth(OAuthProvider.GITHUB, "")
 
 
+def test_list_connections_forwards_filters():
+    body = {
+        "connections": [
+            {
+                "id": "conn_1",
+                "provider": "github",
+                "user_id": "alice",
+                "status": "active",
+                "oauth": {"scopes": ["repo"]},
+            }
+        ],
+        "pagination": {"page": 2, "per_page": 10, "total": 1},
+    }
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    resp = resources.sessions.list_connections(
+        OAuthProvider.GITHUB,
+        user_id="alice",
+        status="active",
+        page=2,
+        per_page=10,
+    )
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "GET"
+    url = call.request.url
+    assert "/v2/agents/auth/github/connections" in url
+    assert "user_id=alice" in url
+    assert "status=active" in url
+    assert "page=2" in url
+    assert "per_page=10" in url
+    assert resp.connections[0].user_id == "alice"
+    assert resp.pagination.total == 1
+
+
+def test_create_connection_sends_user_id_and_scopes():
+    body = {
+        "connection": {
+            "id": "conn_1",
+            "provider": "github",
+            "user_id": "alice",
+            "status": "pending",
+        },
+        "authorization": {
+            "status": "pending",
+            "connect_url": "https://cloud.digitalocean.com/security/connectlinks/confirm?token=abc",
+            "verification_code": "k5r2cprq",
+        },
+    }
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    resp = resources.sessions.create_connection(
+        OAuthProvider.GITHUB,
+        user_id="alice",
+        scopes=["repo", "read:org"],
+    )
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "POST"
+    assert call.request.url.endswith("/v2/agents/auth/github/connections")
+    assert json.loads(call.request.content) == {
+        "user_id": "alice",
+        "scopes": ["repo", "read:org"],
+    }
+    assert resp.connection.status == "pending"
+    assert resp.authorization.connect_url.endswith("token=abc")
+
+
+def test_create_connection_requires_user_id():
+    resources = _make_resources([])
+    with pytest.raises(ValueError):
+        resources.sessions.create_connection(OAuthProvider.GITHUB, user_id="")
+
+
+def test_get_connection():
+    body = {
+        "connection": {
+            "id": "conn_1",
+            "provider": "github",
+            "user_id": "alice",
+            "status": "active",
+        }
+    }
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    resp = resources.sessions.get_connection(OAuthProvider.GITHUB, "conn_1")
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "GET"
+    assert call.request.url.endswith("/v2/agents/auth/github/connections/conn_1")
+    assert resp.connection.id == "conn_1"
+
+
+def test_get_connection_requires_id():
+    resources = _make_resources([])
+    with pytest.raises(ValueError):
+        resources.sessions.get_connection(OAuthProvider.GITHUB, "")
+
+
+def test_delete_connection():
+    body = {
+        "connection": {
+            "id": "conn_1",
+            "provider": "github",
+            "user_id": "alice",
+            "status": "expired",
+        }
+    }
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    resp = resources.sessions.delete_connection(OAuthProvider.GITHUB, "conn_1")
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "DELETE"
+    assert call.request.url.endswith("/v2/agents/auth/github/connections/conn_1")
+    assert resp.connection.status == "expired"
+
+
+def test_delete_connection_requires_id():
+    resources = _make_resources([])
+    with pytest.raises(ValueError):
+        resources.sessions.delete_connection(OAuthProvider.GITHUB, "")
+
+
 # ---------------------------------------------------------------------------
 # Streaming
 # ---------------------------------------------------------------------------
