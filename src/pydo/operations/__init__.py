@@ -17,6 +17,7 @@ from ._operations import AccountOperations
 from ._operations import SshKeysOperations
 from ._operations import ActionsOperations
 from ._operations import AddonsOperations
+from ._operations import HarnessOperations
 from ._operations import AppsOperations
 from ._operations import CdnOperations
 from ._operations import CertificatesOperations
@@ -38,8 +39,11 @@ from ._operations import FunctionsAccessKeyOperations
 from ._operations import ImagesOperations
 from ._operations import ImageActionsOperations
 from ._operations import InsightsOperations
+from ._operations import SignalsOperations
 from ._operations import KubernetesOperations
 from ._operations import LoadBalancersOperations
+from ._operations import MicrovmsOperations
+from ._operations import MicrovmCheckpointsOperations
 from ._operations import MonitoringOperations
 from ._operations import NfsOperations
 from ._operations import OrganizationsOperations
@@ -91,6 +95,7 @@ __all__ = [
     "SshKeysOperations",
     "ActionsOperations",
     "AddonsOperations",
+    "HarnessOperations",
     "AppsOperations",
     "CdnOperations",
     "CertificatesOperations",
@@ -112,8 +117,11 @@ __all__ = [
     "ImagesOperations",
     "ImageActionsOperations",
     "InsightsOperations",
+    "SignalsOperations",
     "KubernetesOperations",
     "LoadBalancersOperations",
+    "MicrovmsOperations",
+    "MicrovmCheckpointsOperations",
     "MonitoringOperations",
     "NfsOperations",
     "OrganizationsOperations",
