@@ -74,6 +74,19 @@ directive:
     transform: >
       $["parameters"] = [];
 
+  # agents.create_session accepts either a JSON CreateSessionDefinitionRequest
+  # or a raw agents.yaml manifest under YAML content types. Autorest cannot
+  # generate an operation with mixed JSON and YAML request bodies (it emits an
+  # unimplemented method, which makes the client raise NotImplementedError on
+  # construction), so generate the JSON form only.
+  - from: openapi-document
+    where: '$.paths."/v2/agents/sessions".post.requestBody.content'
+    transform: >
+      delete $["application/x-yaml"];
+      delete $["application/yaml"];
+      delete $["text/yaml"];
+      delete $["text/x-yaml"];
+
   # Strip path-level and operation-level "servers" overrides from all paths.
   # Without this, Autorest generates a duplicate `endpoint` parameter in
   # GeneratedClient.__init__ (one per unique server URL), which is a Python
