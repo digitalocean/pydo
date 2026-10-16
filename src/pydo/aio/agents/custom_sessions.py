@@ -247,6 +247,8 @@ class AsyncSessionsOperations:
         """Create a session from an ``agents.yaml`` manifest.
 
         See :meth:`pydo.agents.custom_sessions.SessionsOperations.create_from_manifest`.
+        A persistent workspace cannot be attached when creating from a manifest;
+        use :meth:`create_from_config` with ``workspace_id``.
         """
         data = _manifest_bytes(manifest)
         params: Optional[Dict[str, Any]] = None
@@ -270,6 +272,7 @@ class AsyncSessionsOperations:
         *,
         name: str,
         config_id: str,
+        workspace_id: Optional[str] = None,
         timeout: Optional[float] = None,
     ) -> Any:
         """Create a session from a durable Agent Config.
@@ -278,11 +281,14 @@ class AsyncSessionsOperations:
         """
         if not name or not config_id:
             raise ValueError("name and config_id are required")
+        body: Dict[str, Any] = {"name": name, "config_id": config_id}
+        if workspace_id:
+            body["workspace_id"] = workspace_id
         return await self._parse_json(
             await self._send(
                 "POST",
                 _BASE_PATH,
-                body={"name": name, "config_id": config_id},
+                body=body,
                 timeout=(
                     _DEFAULT_CREATE_TIMEOUT if timeout is None else float(timeout)
                 ),

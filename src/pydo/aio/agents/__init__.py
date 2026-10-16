@@ -26,6 +26,7 @@ from .custom_sessions import (
 from .custom_configs import AsyncConfigsOperations
 from .custom_templates import AsyncTemplatesOperations
 from .custom_triggers import AsyncTriggersOperations
+from .custom_workspaces import AsyncWorkspacesOperations
 from .session import AsyncAgentSession, AsyncRunStream
 
 
@@ -39,6 +40,7 @@ class AsyncAgentsResources:
         self.configs = AsyncConfigsOperations(self._proxy)
         self.templates = AsyncTemplatesOperations(self._proxy)
         self.triggers = AsyncTriggersOperations(self._proxy)
+        self.workspaces = AsyncWorkspacesOperations(self._proxy)
 
     @property
     def base_url(self) -> str:
@@ -56,7 +58,9 @@ class AsyncAgentsResources:
     ) -> AsyncAgentSession:
         """Create a session from an ``agents.yaml`` manifest and return a handle.
 
-        See :meth:`pydo.agents.AgentsResources.start`.
+        See :meth:`pydo.agents.AgentsResources.start`. A persistent workspace
+        cannot be attached when creating from a manifest; use
+        ``sessions.create_from_config(..., workspace_id=...)``.
         """
         resolved: "str | bytes" = manifest
         oai_session_id = openai_session_id
@@ -174,6 +178,7 @@ __all__ = [
     "AsyncConfigsOperations",
     "AsyncTemplatesOperations",
     "AsyncTriggersOperations",
+    "AsyncWorkspacesOperations",
     "AsyncHarnessEventStream",
     "AsyncWorkspaceDownload",
 ]
