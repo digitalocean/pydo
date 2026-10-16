@@ -21341,6 +21341,90 @@ def build_inference_create_async_invoke_request(
     return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
 
 
+def build_inference_create_speech_request(**kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop(
+        "Accept", "application/json, audio/mpeg, audio/wav, audio/mp3"
+    )
+
+    # Construct URL
+    _url = "/v1/audio/speech"
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_inference_create_video_request(**kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v1/videos"
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_inference_get_video_request(video_id: str, **kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v1/videos/{video_id}"
+    path_format_arguments = {
+        "video_id": _SERIALIZER.url("video_id", video_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
+
+
+def build_inference_get_video_content_request(  # pylint: disable=name-too-long
+    video_id: str, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "video/mp4, application/json")
+
+    # Construct URL
+    _url = "/v1/videos/{video_id}/content"
+    path_format_arguments = {
+        "video_id": _SERIALIZER.url("video_id", video_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
+
+
 def build_inference_create_batch_file_request(
     **kwargs: Any,
 ) -> HttpRequest:  # pylint: disable=name-too-long
@@ -363043,6 +363127,655 @@ class InferenceOperations:
             return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
 
         return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    def create_speech(
+        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
+    ) -> Union[JSON, Iterator[bytes]]:
+        # pylint: disable=line-too-long
+        """Generate speech from text.
+
+        Convert text input to speech audio. The response may be raw audio bytes (\\ ``audio/mpeg``\\ ,
+        ``audio/wav``\\ , and similar) or a JSON envelope with base64-encoded audio in
+        ``data[].b64_json``.
+
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object or Iterator[bytes]
+        :rtype: JSON or Iterator[bytes]
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "input": "str",  # The text to convert to speech. Required.
+                    "model": "str",  # The text-to-speech model to use. Required.
+                    "instructions": "str",  # Optional. Optional style or delivery instructions
+                      for the synthesizer.
+                    "response_format": "str",  # Optional. The audio format to return. Supported
+                      values include ``mp3`` and ``wav``. The API may return raw audio bytes or a JSON
+                      envelope with base64-encoded audio.
+                    "voice": "str"  # Optional. The voice to use for synthesis.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "data": [
+                        {
+                            "b64_json": "str"  # Base64-encoded audio bytes. Required.
+                        }
+                    ],
+                    "created": 0  # Optional. Unix timestamp (in seconds) of when the audio was
+                      created.
+                }
+        """
+
+    @overload
+    def create_speech(
+        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
+    ) -> Union[JSON, Iterator[bytes]]:
+        """Generate speech from text.
+
+        Convert text input to speech audio. The response may be raw audio bytes (\\ ``audio/mpeg``\\ ,
+        ``audio/wav``\\ , and similar) or a JSON envelope with base64-encoded audio in
+        ``data[].b64_json``.
+
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object or Iterator[bytes]
+        :rtype: JSON or Iterator[bytes]
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "data": [
+                        {
+                            "b64_json": "str"  # Base64-encoded audio bytes. Required.
+                        }
+                    ],
+                    "created": 0  # Optional. Unix timestamp (in seconds) of when the audio was
+                      created.
+                }
+        """
+
+    @distributed_trace
+    def create_speech(
+        self, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> Union[JSON, Iterator[bytes]]:
+        # pylint: disable=line-too-long
+        """Generate speech from text.
+
+        Convert text input to speech audio. The response may be raw audio bytes (\\ ``audio/mpeg``\\ ,
+        ``audio/wav``\\ , and similar) or a JSON envelope with base64-encoded audio in
+        ``data[].b64_json``.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object or Iterator[bytes]
+        :rtype: JSON or Iterator[bytes]
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "input": "str",  # The text to convert to speech. Required.
+                    "model": "str",  # The text-to-speech model to use. Required.
+                    "instructions": "str",  # Optional. Optional style or delivery instructions
+                      for the synthesizer.
+                    "response_format": "str",  # Optional. The audio format to return. Supported
+                      values include ``mp3`` and ``wav``. The API may return raw audio bytes or a JSON
+                      envelope with base64-encoded audio.
+                    "voice": "str"  # Optional. The voice to use for synthesis.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "data": [
+                        {
+                            "b64_json": "str"  # Base64-encoded audio bytes. Required.
+                        }
+                    ],
+                    "created": 0  # Optional. Unix timestamp (in seconds) of when the audio was
+                      created.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[Union[JSON, Iterator[bytes]]] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_inference_create_speech_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = True
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 200]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if cls:
+            return cls(pipeline_response, cast(Union[JSON, Iterator[bytes]], deserialized), response_headers)  # type: ignore
+
+        return cast(Union[JSON, Iterator[bytes]], deserialized)  # type: ignore
+
+    @overload
+    def create_video(
+        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Start a video generation job.
+
+        Start an asynchronous video generation job from a text prompt. Poll ``GET
+        /v1/videos/{video_id}`` until the job reaches a terminal status, then download the MP4 with
+        ``GET /v1/videos/{video_id}/content`` or from ``output.url`` when present.
+
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "model": "str",  # The video generation model to use. Required.
+                    "prompt": "str",  # A text description of the desired video. Required.
+                    "fps": 0,  # Optional. Frames per second for the generated video.
+                    "size": "str"  # Optional. The output resolution, for example ``1280x720``.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "id": "str",  # The video generation job identifier. Required.
+                    "status": "str",  # Job status. Poll until the value is a terminal state such
+                      as ``completed`` or ``failed``. Required.
+                    "created_at": 0,  # Optional. Unix timestamp (in seconds) of when the job was
+                      created.
+                    "error": {
+                        "str": {}  # Optional. Error details when status is ``failed``.
+                    },
+                    "model": "str",  # Optional. The model used for generation.
+                    "object": "str",  # Optional. Object type returned by the API.
+                    "output": {
+                        "url": "str"  # Optional. Presigned URL for the generated MP4.
+                    },
+                    "x_request_id": "str"  # Optional. Request correlation identifier when
+                      provided by the API.
+                }
+        """
+
+    @overload
+    def create_video(
+        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Start a video generation job.
+
+        Start an asynchronous video generation job from a text prompt. Poll ``GET
+        /v1/videos/{video_id}`` until the job reaches a terminal status, then download the MP4 with
+        ``GET /v1/videos/{video_id}/content`` or from ``output.url`` when present.
+
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "id": "str",  # The video generation job identifier. Required.
+                    "status": "str",  # Job status. Poll until the value is a terminal state such
+                      as ``completed`` or ``failed``. Required.
+                    "created_at": 0,  # Optional. Unix timestamp (in seconds) of when the job was
+                      created.
+                    "error": {
+                        "str": {}  # Optional. Error details when status is ``failed``.
+                    },
+                    "model": "str",  # Optional. The model used for generation.
+                    "object": "str",  # Optional. Object type returned by the API.
+                    "output": {
+                        "url": "str"  # Optional. Presigned URL for the generated MP4.
+                    },
+                    "x_request_id": "str"  # Optional. Request correlation identifier when
+                      provided by the API.
+                }
+        """
+
+    @distributed_trace
+    def create_video(self, body: Union[JSON, IO[bytes]], **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Start a video generation job.
+
+        Start an asynchronous video generation job from a text prompt. Poll ``GET
+        /v1/videos/{video_id}`` until the job reaches a terminal status, then download the MP4 with
+        ``GET /v1/videos/{video_id}/content`` or from ``output.url`` when present.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "model": "str",  # The video generation model to use. Required.
+                    "prompt": "str",  # A text description of the desired video. Required.
+                    "fps": 0,  # Optional. Frames per second for the generated video.
+                    "size": "str"  # Optional. The output resolution, for example ``1280x720``.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "id": "str",  # The video generation job identifier. Required.
+                    "status": "str",  # Job status. Poll until the value is a terminal state such
+                      as ``completed`` or ``failed``. Required.
+                    "created_at": 0,  # Optional. Unix timestamp (in seconds) of when the job was
+                      created.
+                    "error": {
+                        "str": {}  # Optional. Error details when status is ``failed``.
+                    },
+                    "model": "str",  # Optional. The model used for generation.
+                    "object": "str",  # Optional. Object type returned by the API.
+                    "output": {
+                        "url": "str"  # Optional. Presigned URL for the generated MP4.
+                    },
+                    "x_request_id": "str"  # Optional. Request correlation identifier when
+                      provided by the API.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_inference_create_video_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        response_headers["ratelimit-limit"] = self._deserialize(
+            "int", response.headers.get("ratelimit-limit")
+        )
+        response_headers["ratelimit-remaining"] = self._deserialize(
+            "int", response.headers.get("ratelimit-remaining")
+        )
+        response_headers["ratelimit-reset"] = self._deserialize(
+            "int", response.headers.get("ratelimit-reset")
+        )
+
+        if response.content:
+            deserialized = response.json()
+        else:
+            deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def get_video(self, video_id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve a video generation job.
+
+        Returns the current state of a video generation job. Poll until ``status`` reaches a terminal
+        value such as ``completed`` or ``failed``.
+
+        :param video_id: The video generation job identifier. Required.
+        :type video_id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "id": "str",  # The video generation job identifier. Required.
+                    "status": "str",  # Job status. Poll until the value is a terminal state such
+                      as ``completed`` or ``failed``. Required.
+                    "created_at": 0,  # Optional. Unix timestamp (in seconds) of when the job was
+                      created.
+                    "error": {
+                        "str": {}  # Optional. Error details when status is ``failed``.
+                    },
+                    "model": "str",  # Optional. The model used for generation.
+                    "object": "str",  # Optional. Object type returned by the API.
+                    "output": {
+                        "url": "str"  # Optional. Presigned URL for the generated MP4.
+                    },
+                    "x_request_id": "str"  # Optional. Request correlation identifier when
+                      provided by the API.
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_inference_get_video_request(
+            video_id=video_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def get_video_content(
+        self, video_id: str, **kwargs: Any
+    ) -> Union[Iterator[bytes], JSON]:
+        # pylint: disable=line-too-long
+        """Download generated video content.
+
+        Downloads the generated MP4 for a completed video generation job.
+
+        :param video_id: The video generation job identifier. Required.
+        :type video_id: str
+        :return: Iterator[bytes] or JSON object
+        :rtype: Iterator[bytes] or JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[Union[Iterator[bytes], JSON]] = kwargs.pop("cls", None)
+
+        _request = build_inference_get_video_content_request(
+            video_id=video_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = True
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if cls:
+            return cls(pipeline_response, cast(Union[Iterator[bytes], JSON], deserialized), response_headers)  # type: ignore
+
+        return cast(Union[Iterator[bytes], JSON], deserialized)  # type: ignore
 
     @overload
     def create_batch_file(
