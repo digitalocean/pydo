@@ -394,3 +394,123 @@ async def test_async_agent_session_history_binds_session_id():
     url = resources._proxy._original._pipeline.calls[0].request.url
     assert "/v2/agents/sessions/s1/stream" in url
     assert page.next_before == "e10"
+
+
+# ---------------------------------------------------------------------------
+# External-provider connections (actor-scoped auth)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+async def test_async_list_connections_forwards_filters():
+    body = {
+        "connections": [
+            {
+                "id": "conn_1",
+                "provider": "github",
+                "user_id": "alice",
+                "status": "active",
+            }
+        ],
+        "pagination": {"page": 2, "per_page": 10, "total": 1},
+    }
+    resources = _make_async_resources([_FakeAsyncResponse(200, body)])
+
+    resp = await resources.sessions.list_connections(
+        "github", user_id="alice", status="active", page=2, per_page=10
+    )
+
+    url = resources._proxy._original._pipeline.calls[0].request.url
+    assert "/v2/agents/auth/github/connections" in url
+    assert "user_id=alice" in url
+    assert "status=active" in url
+    assert resp.connections[0].user_id == "alice"
+    assert resp.pagination.total == 1
+
+
+@pytest.mark.asyncio
+async def test_async_create_connection_sends_user_id_and_scopes():
+    body = {
+        "connection": {
+            "id": "conn_1",
+            "provider": "github",
+            "user_id": "alice",
+            "status": "pending",
+        },
+        "authorization": {
+            "status": "pending",
+            "connect_url": "https://x/confirm?token=abc",
+        },
+    }
+    resources = _make_async_resources([_FakeAsyncResponse(200, body)])
+
+    resp = await resources.sessions.create_connection(
+        "github", user_id="alice", scopes=["repo"]
+    )
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "POST"
+    assert call.request.url.endswith("/v2/agents/auth/github/connections")
+    assert json.loads(call.request.content) == {"user_id": "alice", "scopes": ["repo"]}
+    assert resp.connection.status == "pending"
+
+
+@pytest.mark.asyncio
+async def test_async_create_connection_requires_user_id():
+    resources = _make_async_resources([])
+    with pytest.raises(ValueError):
+        await resources.sessions.create_connection("github", user_id="")
+
+
+@pytest.mark.asyncio
+async def test_async_get_connection():
+    body = {
+        "connection": {
+            "id": "conn_1",
+            "provider": "github",
+            "user_id": "alice",
+            "status": "active",
+        }
+    }
+    resources = _make_async_resources([_FakeAsyncResponse(200, body)])
+
+    resp = await resources.sessions.get_connection("github", "conn_1")
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "GET"
+    assert call.request.url.endswith("/v2/agents/auth/github/connections/conn_1")
+    assert resp.connection.id == "conn_1"
+
+
+@pytest.mark.asyncio
+async def test_async_get_connection_requires_id():
+    resources = _make_async_resources([])
+    with pytest.raises(ValueError):
+        await resources.sessions.get_connection("github", "")
+
+
+@pytest.mark.asyncio
+async def test_async_delete_connection():
+    body = {
+        "connection": {
+            "id": "conn_1",
+            "provider": "github",
+            "user_id": "alice",
+            "status": "expired",
+        }
+    }
+    resources = _make_async_resources([_FakeAsyncResponse(200, body)])
+
+    resp = await resources.sessions.delete_connection("github", "conn_1")
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "DELETE"
+    assert call.request.url.endswith("/v2/agents/auth/github/connections/conn_1")
+    assert resp.connection.status == "expired"
+
+
+@pytest.mark.asyncio
+async def test_async_delete_connection_requires_id():
+    resources = _make_async_resources([])
+    with pytest.raises(ValueError):
+        await resources.sessions.delete_connection("github", "")
