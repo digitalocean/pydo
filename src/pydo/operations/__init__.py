@@ -12,11 +12,16 @@ from ._operations import SessionsOperations
 from ._operations import ToolbeltsOperations
 from ._operations import ToolsOperations
 from ._operations import UsersOperations
+from ._operations import GatewayToolsOperations
+from ._operations import GatewayCodeOperations
+from ._operations import GatewaySessionApprovalsOperations
+from ._operations import GatewayApprovalsOperations
 from ._operations import OneClicksOperations
 from ._operations import AccountOperations
 from ._operations import SshKeysOperations
 from ._operations import ActionsOperations
 from ._operations import AddonsOperations
+from ._operations import HarnessOperations
 from ._operations import AppsOperations
 from ._operations import CdnOperations
 from ._operations import CertificatesOperations
@@ -38,8 +43,11 @@ from ._operations import FunctionsAccessKeyOperations
 from ._operations import ImagesOperations
 from ._operations import ImageActionsOperations
 from ._operations import InsightsOperations
+from ._operations import SignalsOperations
 from ._operations import KubernetesOperations
 from ._operations import LoadBalancersOperations
+from ._operations import MicrovmsOperations
+from ._operations import MicrovmCheckpointsOperations
 from ._operations import MonitoringOperations
 from ._operations import NfsOperations
 from ._operations import OrganizationsOperations
@@ -86,11 +94,16 @@ __all__ = [
     "ToolbeltsOperations",
     "ToolsOperations",
     "UsersOperations",
+    "GatewayToolsOperations",
+    "GatewayCodeOperations",
+    "GatewaySessionApprovalsOperations",
+    "GatewayApprovalsOperations",
     "OneClicksOperations",
     "AccountOperations",
     "SshKeysOperations",
     "ActionsOperations",
     "AddonsOperations",
+    "HarnessOperations",
     "AppsOperations",
     "CdnOperations",
     "CertificatesOperations",
@@ -112,8 +125,11 @@ __all__ = [
     "ImagesOperations",
     "ImageActionsOperations",
     "InsightsOperations",
+    "SignalsOperations",
     "KubernetesOperations",
     "LoadBalancersOperations",
+    "MicrovmsOperations",
+    "MicrovmCheckpointsOperations",
     "MonitoringOperations",
     "NfsOperations",
     "OrganizationsOperations",

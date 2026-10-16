@@ -36,7 +36,12 @@ from .operations import (
     FirewallsOperations,
     FunctionsAccessKeyOperations,
     FunctionsOperations,
+    GatewayApprovalsOperations,
+    GatewayCodeOperations,
+    GatewaySessionApprovalsOperations,
+    GatewayToolsOperations,
     GenaiOperations,
+    HarnessOperations,
     ImageActionsOperations,
     ImagesOperations,
     InferenceOperations,
@@ -45,6 +50,8 @@ from .operations import (
     KubernetesOperations,
     LoadBalancersOperations,
     McpServersOperations,
+    MicrovmCheckpointsOperations,
+    MicrovmsOperations,
     MonitoringOperations,
     NfsOperations,
     OneClicksOperations,
@@ -63,6 +70,7 @@ from .operations import (
     ReservedIPv6Operations,
     SecurityOperations,
     SessionsOperations,
+    SignalsOperations,
     SizesOperations,
     SnapshotsOperations,
     SpacesKeyOperations,
@@ -108,6 +116,14 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype tools: pydo.operations.ToolsOperations
     :ivar users: UsersOperations operations
     :vartype users: pydo.operations.UsersOperations
+    :ivar gateway_tools: GatewayToolsOperations operations
+    :vartype gateway_tools: pydo.operations.GatewayToolsOperations
+    :ivar gateway_code: GatewayCodeOperations operations
+    :vartype gateway_code: pydo.operations.GatewayCodeOperations
+    :ivar gateway_session_approvals: GatewaySessionApprovalsOperations operations
+    :vartype gateway_session_approvals: pydo.operations.GatewaySessionApprovalsOperations
+    :ivar gateway_approvals: GatewayApprovalsOperations operations
+    :vartype gateway_approvals: pydo.operations.GatewayApprovalsOperations
     :ivar one_clicks: OneClicksOperations operations
     :vartype one_clicks: pydo.operations.OneClicksOperations
     :ivar account: AccountOperations operations
@@ -118,6 +134,8 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype actions: pydo.operations.ActionsOperations
     :ivar addons: AddonsOperations operations
     :vartype addons: pydo.operations.AddonsOperations
+    :ivar harness: HarnessOperations operations
+    :vartype harness: pydo.operations.HarnessOperations
     :ivar apps: AppsOperations operations
     :vartype apps: pydo.operations.AppsOperations
     :ivar cdn: CdnOperations operations
@@ -160,10 +178,16 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype image_actions: pydo.operations.ImageActionsOperations
     :ivar insights: InsightsOperations operations
     :vartype insights: pydo.operations.InsightsOperations
+    :ivar signals: SignalsOperations operations
+    :vartype signals: pydo.operations.SignalsOperations
     :ivar kubernetes: KubernetesOperations operations
     :vartype kubernetes: pydo.operations.KubernetesOperations
     :ivar load_balancers: LoadBalancersOperations operations
     :vartype load_balancers: pydo.operations.LoadBalancersOperations
+    :ivar microvms: MicrovmsOperations operations
+    :vartype microvms: pydo.operations.MicrovmsOperations
+    :ivar microvm_checkpoints: MicrovmCheckpointsOperations operations
+    :vartype microvm_checkpoints: pydo.operations.MicrovmCheckpointsOperations
     :ivar monitoring: MonitoringOperations operations
     :vartype monitoring: pydo.operations.MonitoringOperations
     :ivar nfs: NfsOperations operations
@@ -294,6 +318,18 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
         self.users = UsersOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
+        self.gateway_tools = GatewayToolsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.gateway_code = GatewayCodeOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.gateway_session_approvals = GatewaySessionApprovalsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.gateway_approvals = GatewayApprovalsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
         self.one_clicks = OneClicksOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
@@ -307,6 +343,9 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.addons = AddonsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.harness = HarnessOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.apps = AppsOperations(
@@ -372,10 +411,19 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
         self.insights = InsightsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
+        self.signals = SignalsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
         self.kubernetes = KubernetesOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.load_balancers = LoadBalancersOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.microvms = MicrovmsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.microvm_checkpoints = MicrovmCheckpointsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.monitoring = MonitoringOperations(
