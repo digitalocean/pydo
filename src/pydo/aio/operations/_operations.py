@@ -486,9 +486,13 @@ from ...operations._operations import (
     build_inference_create_image_request,
     build_inference_create_messages_request,
     build_inference_create_response_request,
+    build_inference_create_speech_request,
     build_inference_create_systemone_request,
+    build_inference_create_video_request,
     build_inference_get_batch_request,
     build_inference_get_batch_results_request,
+    build_inference_get_video_content_request,
+    build_inference_get_video_request,
     build_inference_list_batches_request,
     build_inference_list_models_request,
     build_inference_upload_batch_file_request,
@@ -504,15 +508,18 @@ from ...operations._operations import (
     build_insights_get_prom_query_range_request,
     build_insights_get_prom_query_request,
     build_insights_get_prom_series_request,
+    build_insights_get_resource_request,
     build_insights_get_trace_request,
     build_insights_list_alert_instances_request,
     build_insights_list_alert_rules_request,
     build_insights_list_notification_channels_request,
+    build_insights_list_resources_request,
     build_insights_post_logs_search_request,
     build_insights_post_spans_search_request,
     build_insights_post_traces_search_request,
     build_insights_update_alert_rule_request,
     build_insights_update_notification_channel_request,
+    build_insights_update_resource_signals_request,
     build_invoices_get_by_uuid_request,
     build_invoices_get_csv_by_uuid_request,
     build_invoices_get_pdf_by_uuid_request,
@@ -187225,6 +187232,718 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
 
         return cast(JSON, deserialized)  # type: ignore
 
+    @distributed_trace_async
+    async def list_resources(
+        self,
+        *,
+        filter_product_types: Optional[List[str]] = None,
+        filter_regions: Optional[List[str]] = None,
+        pagination_page: int = 1,
+        pagination_per_page: int = 20,
+        pagination_sort: Optional[str] = None,
+        pagination_sort_direction: Optional[str] = None,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Resource Signal Enablement.
+
+        To list the resources in your account that have telemetry signal enablement
+        recorded, along with the current state of their metrics, logs, and traces
+        signals, send a GET request to ``/v2/insights/resources``.
+
+        Results are paginated with ``pagination.page`` and ``pagination.per_page``
+        (default ``20``\\ , maximum ``200``\\ ) and can be sorted with ``pagination.sort`` and
+        ``pagination.sort_direction``. Optionally filter by ``filter.product_types`` and
+        ``filter.regions``.
+
+        A signal is omitted from a resource when no explicit enablement has ever been
+        recorded for it.
+
+        :keyword filter_product_types: Optional filter. When set, only resources of these product types
+         are returned. Repeat the parameter for multiple product types. Default value is None.
+        :paramtype filter_product_types: list[str]
+        :keyword filter_regions: Optional filter. When set, only resources in these regions are
+         returned. Repeat the parameter for multiple regions. Default value is None.
+        :paramtype filter_regions: list[str]
+        :keyword pagination_page: Which 'page' of paginated results to return. Default value is 1.
+        :paramtype pagination_page: int
+        :keyword pagination_per_page: Number of items returned per page. Default value is 20.
+        :paramtype pagination_per_page: int
+        :keyword pagination_sort: Field to sort by. Defaults to ``resource_urn``. Known values are:
+         "resource_urn" and "effective_at". Default value is None.
+        :paramtype pagination_sort: str
+        :keyword pagination_sort_direction: Sort direction. Defaults to ``asc``. Known values are:
+         "asc" and "desc". Default value is None.
+        :paramtype pagination_sort_direction: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "pagination": {
+                        "page": 0,  # Optional. The current page number.
+                        "pages": 0,  # Optional. The total number of pages. Omitted when
+                          there are no results.
+                        "per_page": 0,  # Optional. The number of items per page.
+                        "total": 0  # Optional. The total number of resources across all
+                          pages. Omitted when there are no results.
+                    },
+                    "resources": [
+                        {
+                            "product_type": "str",  # The product type of the resource,
+                              for example ``droplet`` or ``kubernetes``. Required.
+                            "resource_urn": "str",  # The uniform resource name (URN) of
+                              the resource. Required.
+                            "logs": {
+                                "effective_at": "2020-02-20 00:00:00",  # Optional.
+                                  When this signal state last changed.
+                                "enabled": bool  # Optional. Whether the signal is
+                                  enabled for the resource.
+                            },
+                            "metrics": {
+                                "effective_at": "2020-02-20 00:00:00",  # Optional.
+                                  When this signal state last changed.
+                                "enabled": bool  # Optional. Whether the signal is
+                                  enabled for the resource.
+                            },
+                            "region": "str",  # Optional. The region slug for
+                              region-specific resources. Omitted when the resource has no region.
+                            "traces": {
+                                "effective_at": "2020-02-20 00:00:00",  # Optional.
+                                  When this signal state last changed.
+                                "enabled": bool  # Optional. Whether the signal is
+                                  enabled for the resource.
+                            }
+                        }
+                    ]
+                }
+                # response body for status code(s): 400
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_insights_list_resources_request(
+            filter_product_types=filter_product_types,
+            filter_regions=filter_regions,
+            pagination_page=pagination_page,
+            pagination_per_page=pagination_per_page,
+            pagination_sort=pagination_sort,
+            pagination_sort_direction=pagination_sort_direction,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_resource(self, resource_urn: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve Resource Signal Enablement.
+
+        To retrieve the current metrics, logs, and traces signal enablement for a
+        single resource, send a GET request to
+        ``/v2/insights/resources/{resource_urn}``.
+
+        A ``404`` is returned when no signal enablement has been recorded for the
+        resource.
+
+        :param resource_urn: The uniform resource name (URN) of the resource, for example
+         ``do:droplet:12345``. Required.
+        :type resource_urn: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "resource": {
+                        "product_type": "str",  # The product type of the resource, for
+                          example ``droplet`` or ``kubernetes``. Required.
+                        "resource_urn": "str",  # The uniform resource name (URN) of the
+                          resource. Required.
+                        "logs": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        },
+                        "metrics": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        },
+                        "region": "str",  # Optional. The region slug for region-specific
+                          resources. Omitted when the resource has no region.
+                        "traces": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        }
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_insights_get_resource_request(
+            resource_urn=resource_urn,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def update_resource_signals(
+        self,
+        resource_urn: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Resource Signal Enablement.
+
+        To enable or disable telemetry signals for a resource, send a PUT request to
+        ``/v2/insights/resources/{resource_urn}/signals``.
+
+        This endpoint uses merge semantics. Set ``metrics``\\ , ``logs``\\ , or ``traces`` to
+        ``true`` or ``false`` to change that signal; omit a signal to leave it unchanged.
+        At least one signal must be set.
+
+        ``region`` is only used when the resource has no existing enablement. On later
+        updates, omit it or send the stored value; changing the region is rejected
+        with a ``400``.
+
+        Requires both the ``insights:update`` and ``insights:create`` scopes.
+
+        :param resource_urn: The uniform resource name (URN) of the resource, for example
+         ``do:droplet:12345``. Required.
+        :type resource_urn: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "logs": bool,  # Optional. Enable or disable the logs signal. Omit to leave
+                      unchanged.
+                    "metrics": bool,  # Optional. Enable or disable the metrics signal. Omit to
+                      leave unchanged.
+                    "region": "str",  # Optional. The region slug for region-specific resources.
+                      Only used when the resource has no existing enablement. On later updates, omit it
+                      or send the stored value; changing the region is rejected.
+                    "traces": bool  # Optional. Enable or disable the traces signal. Omit to
+                      leave unchanged.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "resource": {
+                        "product_type": "str",  # The product type of the resource, for
+                          example ``droplet`` or ``kubernetes``. Required.
+                        "resource_urn": "str",  # The uniform resource name (URN) of the
+                          resource. Required.
+                        "logs": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        },
+                        "metrics": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        },
+                        "region": "str",  # Optional. The region slug for region-specific
+                          resources. Omitted when the resource has no region.
+                        "traces": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        }
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def update_resource_signals(
+        self,
+        resource_urn: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Resource Signal Enablement.
+
+        To enable or disable telemetry signals for a resource, send a PUT request to
+        ``/v2/insights/resources/{resource_urn}/signals``.
+
+        This endpoint uses merge semantics. Set ``metrics``\\ , ``logs``\\ , or ``traces`` to
+        ``true`` or ``false`` to change that signal; omit a signal to leave it unchanged.
+        At least one signal must be set.
+
+        ``region`` is only used when the resource has no existing enablement. On later
+        updates, omit it or send the stored value; changing the region is rejected
+        with a ``400``.
+
+        Requires both the ``insights:update`` and ``insights:create`` scopes.
+
+        :param resource_urn: The uniform resource name (URN) of the resource, for example
+         ``do:droplet:12345``. Required.
+        :type resource_urn: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "resource": {
+                        "product_type": "str",  # The product type of the resource, for
+                          example ``droplet`` or ``kubernetes``. Required.
+                        "resource_urn": "str",  # The uniform resource name (URN) of the
+                          resource. Required.
+                        "logs": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        },
+                        "metrics": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        },
+                        "region": "str",  # Optional. The region slug for region-specific
+                          resources. Omitted when the resource has no region.
+                        "traces": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        }
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def update_resource_signals(
+        self, resource_urn: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Resource Signal Enablement.
+
+        To enable or disable telemetry signals for a resource, send a PUT request to
+        ``/v2/insights/resources/{resource_urn}/signals``.
+
+        This endpoint uses merge semantics. Set ``metrics``\\ , ``logs``\\ , or ``traces`` to
+        ``true`` or ``false`` to change that signal; omit a signal to leave it unchanged.
+        At least one signal must be set.
+
+        ``region`` is only used when the resource has no existing enablement. On later
+        updates, omit it or send the stored value; changing the region is rejected
+        with a ``400``.
+
+        Requires both the ``insights:update`` and ``insights:create`` scopes.
+
+        :param resource_urn: The uniform resource name (URN) of the resource, for example
+         ``do:droplet:12345``. Required.
+        :type resource_urn: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "logs": bool,  # Optional. Enable or disable the logs signal. Omit to leave
+                      unchanged.
+                    "metrics": bool,  # Optional. Enable or disable the metrics signal. Omit to
+                      leave unchanged.
+                    "region": "str",  # Optional. The region slug for region-specific resources.
+                      Only used when the resource has no existing enablement. On later updates, omit it
+                      or send the stored value; changing the region is rejected.
+                    "traces": bool  # Optional. Enable or disable the traces signal. Omit to
+                      leave unchanged.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "resource": {
+                        "product_type": "str",  # The product type of the resource, for
+                          example ``droplet`` or ``kubernetes``. Required.
+                        "resource_urn": "str",  # The uniform resource name (URN) of the
+                          resource. Required.
+                        "logs": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        },
+                        "metrics": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        },
+                        "region": "str",  # Optional. The region slug for region-specific
+                          resources. Omitted when the resource has no region.
+                        "traces": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        }
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_insights_update_resource_signals_request(
+            resource_urn=resource_urn,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
 
 class SignalsOperations:
     """
@@ -342498,6 +343217,655 @@ class InferenceOperations:
             return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
 
         return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def create_speech(
+        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
+    ) -> Union[JSON, AsyncIterator[bytes]]:
+        # pylint: disable=line-too-long
+        """Generate speech from text.
+
+        Convert text input to speech audio. The response may be raw audio bytes (\\ ``audio/mpeg``\\ ,
+        ``audio/wav``\\ , and similar) or a JSON envelope with base64-encoded audio in
+        ``data[].b64_json``.
+
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object or AsyncIterator[bytes]
+        :rtype: JSON or AsyncIterator[bytes]
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "input": "str",  # The text to convert to speech. Required.
+                    "model": "str",  # The text-to-speech model to use. Required.
+                    "instructions": "str",  # Optional. Optional style or delivery instructions
+                      for the synthesizer.
+                    "response_format": "str",  # Optional. The audio format to return. Supported
+                      values include ``mp3`` and ``wav``. The API may return raw audio bytes or a JSON
+                      envelope with base64-encoded audio.
+                    "voice": "str"  # Optional. The voice to use for synthesis.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "data": [
+                        {
+                            "b64_json": "str"  # Base64-encoded audio bytes. Required.
+                        }
+                    ],
+                    "created": 0  # Optional. Unix timestamp (in seconds) of when the audio was
+                      created.
+                }
+        """
+
+    @overload
+    async def create_speech(
+        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
+    ) -> Union[JSON, AsyncIterator[bytes]]:
+        """Generate speech from text.
+
+        Convert text input to speech audio. The response may be raw audio bytes (\\ ``audio/mpeg``\\ ,
+        ``audio/wav``\\ , and similar) or a JSON envelope with base64-encoded audio in
+        ``data[].b64_json``.
+
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object or AsyncIterator[bytes]
+        :rtype: JSON or AsyncIterator[bytes]
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "data": [
+                        {
+                            "b64_json": "str"  # Base64-encoded audio bytes. Required.
+                        }
+                    ],
+                    "created": 0  # Optional. Unix timestamp (in seconds) of when the audio was
+                      created.
+                }
+        """
+
+    @distributed_trace_async
+    async def create_speech(
+        self, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> Union[JSON, AsyncIterator[bytes]]:
+        # pylint: disable=line-too-long
+        """Generate speech from text.
+
+        Convert text input to speech audio. The response may be raw audio bytes (\\ ``audio/mpeg``\\ ,
+        ``audio/wav``\\ , and similar) or a JSON envelope with base64-encoded audio in
+        ``data[].b64_json``.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object or AsyncIterator[bytes]
+        :rtype: JSON or AsyncIterator[bytes]
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "input": "str",  # The text to convert to speech. Required.
+                    "model": "str",  # The text-to-speech model to use. Required.
+                    "instructions": "str",  # Optional. Optional style or delivery instructions
+                      for the synthesizer.
+                    "response_format": "str",  # Optional. The audio format to return. Supported
+                      values include ``mp3`` and ``wav``. The API may return raw audio bytes or a JSON
+                      envelope with base64-encoded audio.
+                    "voice": "str"  # Optional. The voice to use for synthesis.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "data": [
+                        {
+                            "b64_json": "str"  # Base64-encoded audio bytes. Required.
+                        }
+                    ],
+                    "created": 0  # Optional. Unix timestamp (in seconds) of when the audio was
+                      created.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[Union[JSON, AsyncIterator[bytes]]] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_inference_create_speech_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = True
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 200]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if cls:
+            return cls(pipeline_response, cast(Union[JSON, AsyncIterator[bytes]], deserialized), response_headers)  # type: ignore
+
+        return cast(Union[JSON, AsyncIterator[bytes]], deserialized)  # type: ignore
+
+    @overload
+    async def create_video(
+        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Start a video generation job.
+
+        Start an asynchronous video generation job from a text prompt. Poll ``GET
+        /v1/videos/{video_id}`` until the job reaches a terminal status, then download the MP4 with
+        ``GET /v1/videos/{video_id}/content`` or from ``output.url`` when present.
+
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "model": "str",  # The video generation model to use. Required.
+                    "prompt": "str",  # A text description of the desired video. Required.
+                    "fps": 0,  # Optional. Frames per second for the generated video.
+                    "size": "str"  # Optional. The output resolution, for example ``1280x720``.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "id": "str",  # The video generation job identifier. Required.
+                    "status": "str",  # Job status. Poll until the value is a terminal state such
+                      as ``completed`` or ``failed``. Required.
+                    "created_at": 0,  # Optional. Unix timestamp (in seconds) of when the job was
+                      created.
+                    "error": {
+                        "str": {}  # Optional. Error details when status is ``failed``.
+                    },
+                    "model": "str",  # Optional. The model used for generation.
+                    "object": "str",  # Optional. Object type returned by the API.
+                    "output": {
+                        "url": "str"  # Optional. Presigned URL for the generated MP4.
+                    },
+                    "x_request_id": "str"  # Optional. Request correlation identifier when
+                      provided by the API.
+                }
+        """
+
+    @overload
+    async def create_video(
+        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Start a video generation job.
+
+        Start an asynchronous video generation job from a text prompt. Poll ``GET
+        /v1/videos/{video_id}`` until the job reaches a terminal status, then download the MP4 with
+        ``GET /v1/videos/{video_id}/content`` or from ``output.url`` when present.
+
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "id": "str",  # The video generation job identifier. Required.
+                    "status": "str",  # Job status. Poll until the value is a terminal state such
+                      as ``completed`` or ``failed``. Required.
+                    "created_at": 0,  # Optional. Unix timestamp (in seconds) of when the job was
+                      created.
+                    "error": {
+                        "str": {}  # Optional. Error details when status is ``failed``.
+                    },
+                    "model": "str",  # Optional. The model used for generation.
+                    "object": "str",  # Optional. Object type returned by the API.
+                    "output": {
+                        "url": "str"  # Optional. Presigned URL for the generated MP4.
+                    },
+                    "x_request_id": "str"  # Optional. Request correlation identifier when
+                      provided by the API.
+                }
+        """
+
+    @distributed_trace_async
+    async def create_video(self, body: Union[JSON, IO[bytes]], **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Start a video generation job.
+
+        Start an asynchronous video generation job from a text prompt. Poll ``GET
+        /v1/videos/{video_id}`` until the job reaches a terminal status, then download the MP4 with
+        ``GET /v1/videos/{video_id}/content`` or from ``output.url`` when present.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "model": "str",  # The video generation model to use. Required.
+                    "prompt": "str",  # A text description of the desired video. Required.
+                    "fps": 0,  # Optional. Frames per second for the generated video.
+                    "size": "str"  # Optional. The output resolution, for example ``1280x720``.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "id": "str",  # The video generation job identifier. Required.
+                    "status": "str",  # Job status. Poll until the value is a terminal state such
+                      as ``completed`` or ``failed``. Required.
+                    "created_at": 0,  # Optional. Unix timestamp (in seconds) of when the job was
+                      created.
+                    "error": {
+                        "str": {}  # Optional. Error details when status is ``failed``.
+                    },
+                    "model": "str",  # Optional. The model used for generation.
+                    "object": "str",  # Optional. Object type returned by the API.
+                    "output": {
+                        "url": "str"  # Optional. Presigned URL for the generated MP4.
+                    },
+                    "x_request_id": "str"  # Optional. Request correlation identifier when
+                      provided by the API.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_inference_create_video_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        response_headers["ratelimit-limit"] = self._deserialize(
+            "int", response.headers.get("ratelimit-limit")
+        )
+        response_headers["ratelimit-remaining"] = self._deserialize(
+            "int", response.headers.get("ratelimit-remaining")
+        )
+        response_headers["ratelimit-reset"] = self._deserialize(
+            "int", response.headers.get("ratelimit-reset")
+        )
+
+        if response.content:
+            deserialized = response.json()
+        else:
+            deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_video(self, video_id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve a video generation job.
+
+        Returns the current state of a video generation job. Poll until ``status`` reaches a terminal
+        value such as ``completed`` or ``failed``.
+
+        :param video_id: The video generation job identifier. Required.
+        :type video_id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "id": "str",  # The video generation job identifier. Required.
+                    "status": "str",  # Job status. Poll until the value is a terminal state such
+                      as ``completed`` or ``failed``. Required.
+                    "created_at": 0,  # Optional. Unix timestamp (in seconds) of when the job was
+                      created.
+                    "error": {
+                        "str": {}  # Optional. Error details when status is ``failed``.
+                    },
+                    "model": "str",  # Optional. The model used for generation.
+                    "object": "str",  # Optional. Object type returned by the API.
+                    "output": {
+                        "url": "str"  # Optional. Presigned URL for the generated MP4.
+                    },
+                    "x_request_id": "str"  # Optional. Request correlation identifier when
+                      provided by the API.
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_inference_get_video_request(
+            video_id=video_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_video_content(
+        self, video_id: str, **kwargs: Any
+    ) -> Union[AsyncIterator[bytes], JSON]:
+        # pylint: disable=line-too-long
+        """Download generated video content.
+
+        Downloads the generated MP4 for a completed video generation job.
+
+        :param video_id: The video generation job identifier. Required.
+        :type video_id: str
+        :return: AsyncIterator[bytes] or JSON object
+        :rtype: AsyncIterator[bytes] or JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[Union[AsyncIterator[bytes], JSON]] = kwargs.pop("cls", None)
+
+        _request = build_inference_get_video_content_request(
+            video_id=video_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = True
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if cls:
+            return cls(pipeline_response, cast(Union[AsyncIterator[bytes], JSON], deserialized), response_headers)  # type: ignore
+
+        return cast(Union[AsyncIterator[bytes], JSON], deserialized)  # type: ignore
 
     @overload
     async def create_batch_file(
