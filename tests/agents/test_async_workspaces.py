@@ -24,7 +24,7 @@ from pydo.aio.agents import AsyncAgentsResources
 _WORKSPACE = {
     "workspace_id": "ws-1",
     "state": "AVAILABLE",
-    "size_gibibytes": 10,
+    "size_limit_gib": 10,
     "bytes_used": 0,
     "created_at": "2026-01-01T00:00:00Z",
     "updated_at": "2026-01-01T00:00:00Z",
@@ -91,7 +91,7 @@ async def test_async_create_workspace_and_idempotency_key():
     assert call.request.method == "POST"
     assert call.request.url.endswith("/v2/agents/workspaces")
     assert json.loads(call.request.content) == {
-        "size_gibibytes": 10,
+        "size_limit_gib": 10,
         "name": "scratch",
     }
     assert "Idempotency-Key" not in call.request.headers
@@ -107,7 +107,7 @@ async def test_async_create_workspace_and_idempotency_key():
 @pytest.mark.asyncio
 async def test_async_create_workspace_rejects_invalid_size():
     resources = _make_async_resources([])
-    with pytest.raises(ValueError, match="size_gibibytes"):
+    with pytest.raises(ValueError, match="size_limit_gib"):
         await resources.workspaces.create(0)
 
 
@@ -133,7 +133,7 @@ async def test_async_list_get_delete_workspace():
     got = await resources.workspaces.get("ws-1")
     get_call = resources._proxy._original._pipeline.calls[1]
     assert get_call.request.url.endswith("/v2/agents/workspaces/ws-1")
-    assert got.workspace.size_gibibytes == 10
+    assert got.workspace.size_limit_gib == 10
 
     assert await resources.workspaces.delete("ws-1") is None
     delete_call = resources._proxy._original._pipeline.calls[2]

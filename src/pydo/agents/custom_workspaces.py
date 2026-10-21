@@ -30,12 +30,12 @@ def _quote(value: str) -> str:
     return quote(str(value), safe="")
 
 
-def _create_body(size_gibibytes: int, name: Optional[str]) -> Dict[str, Any]:
-    if isinstance(size_gibibytes, bool) or not isinstance(size_gibibytes, int):
-        raise ValueError("size_gibibytes must be an integer")
-    if size_gibibytes < 1:
-        raise ValueError("size_gibibytes must be at least 1")
-    body: Dict[str, Any] = {"size_gibibytes": size_gibibytes}
+def _create_body(size_limit_gib: int, name: Optional[str]) -> Dict[str, Any]:
+    if isinstance(size_limit_gib, bool) or not isinstance(size_limit_gib, int):
+        raise ValueError("size_limit_gib must be an integer")
+    if size_limit_gib < 1:
+        raise ValueError("size_limit_gib must be at least 1")
+    body: Dict[str, Any] = {"size_limit_gib": size_limit_gib}
     if name:
         body["name"] = name
     return body
@@ -94,14 +94,14 @@ class WorkspacesOperations:
 
     def create(
         self,
-        size_gibibytes: int,
+        size_limit_gib: int,
         *,
         name: Optional[str] = None,
         idempotency_key: Optional[str] = None,
     ) -> Any:
         """Create a workspace (``POST /v2/agents/workspaces``).
 
-        :param size_gibibytes: Size in GiB (the API accepts 1 to 100).
+        :param size_limit_gib: Size limit of the workspace in GiB (the API accepts 1 to 100).
         :param name: Optional display name.
         :param idempotency_key: Optional ``Idempotency-Key`` header value.
             Retrying with the same key and body within 24 hours returns the
@@ -120,7 +120,7 @@ class WorkspacesOperations:
             self._send(
                 "POST",
                 _WORKSPACES_PATH,
-                body=_create_body(size_gibibytes, name),
+                body=_create_body(size_limit_gib, name),
                 headers=headers,
             ),
         )

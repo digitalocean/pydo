@@ -67,7 +67,7 @@ class AsyncWorkspacesOperations:
 
     async def create(
         self,
-        size_gibibytes: int,
+        size_limit_gib: int,
         *,
         name: Optional[str] = None,
         idempotency_key: Optional[str] = None,
@@ -81,7 +81,7 @@ class AsyncWorkspacesOperations:
             await self._send(
                 "POST",
                 _WORKSPACES_PATH,
-                body=_create_body(size_gibibytes, name),
+                body=_create_body(size_limit_gib, name),
                 headers=headers,
             ),
         )

@@ -26,7 +26,7 @@ _WORKSPACE = {
     "workspace_id": "ws-1",
     "name": "scratch",
     "state": "AVAILABLE",
-    "size_gibibytes": 10,
+    "size_limit_gib": 10,
     "bytes_used": 0,
     "created_at": "2026-01-01T00:00:00Z",
     "updated_at": "2026-01-01T00:00:00Z",
@@ -96,7 +96,7 @@ def test_create_workspace_201():
     assert _path(call.request.url).endswith("/v2/agents/workspaces")
     assert call.request.headers.get("Content-Type") == "application/json"
     assert json.loads(call.request.content) == {
-        "size_gibibytes": 10,
+        "size_limit_gib": 10,
         "name": "scratch",
     }
     assert resp.workspace.workspace_id == "ws-1"
@@ -108,7 +108,7 @@ def test_create_workspace_omits_name_when_not_given():
 
     resources.workspaces.create(5)
 
-    assert json.loads(_last_call(resources).request.content) == {"size_gibibytes": 5}
+    assert json.loads(_last_call(resources).request.content) == {"size_limit_gib": 5}
 
 
 def test_create_workspace_sends_idempotency_key_only_when_given():
@@ -146,7 +146,7 @@ def test_create_workspace_keeps_unknown_state_as_string():
 @pytest.mark.parametrize("size", [0, -1, "10", 1.5, True, None])
 def test_create_workspace_rejects_invalid_size(size):
     resources = _make_resources([])
-    with pytest.raises(ValueError, match="size_gibibytes"):
+    with pytest.raises(ValueError, match="size_limit_gib"):
         resources.workspaces.create(size)
     assert not resources._proxy._original._pipeline.calls
 
@@ -216,7 +216,7 @@ def test_get_workspace():
     call = _last_call(resources)
     assert call.request.method == "GET"
     assert _path(call.request.url).endswith("/v2/agents/workspaces/ws-1")
-    assert resp.workspace.size_gibibytes == 10
+    assert resp.workspace.size_limit_gib == 10
 
 
 def test_get_workspace_escapes_id():
