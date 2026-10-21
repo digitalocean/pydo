@@ -565,6 +565,10 @@ class SessionsOperations:
         ``${REMOTE_URL}`` / ``${OPENAI_API_KEY}`` client-side before calling
         this method.
 
+        A persistent workspace cannot be attached when creating from a
+        manifest; save the manifest as a config and use
+        :meth:`create_from_config` with ``workspace_id``.
+
         :param manifest: The agent spec as a YAML ``str`` or ``bytes`` document.
         :param openai_session_id: Optional OpenAI session id query param.
         :param timeout: HTTP timeout in seconds (defaults to 600 for create —
@@ -596,6 +600,7 @@ class SessionsOperations:
         *,
         name: str,
         config_id: str,
+        workspace_id: Optional[str] = None,
         timeout: Optional[float] = None,
     ) -> Any:
         """Create a session from a durable Agent Config (``POST /v2/agents/sessions``).
@@ -603,14 +608,20 @@ class SessionsOperations:
         Sends ``application/json`` with ``name`` and ``config_id``. The server
         loads the config, resolves credentials from Secrets Manager, and
         provisions the sandbox. No inline secrets are accepted.
+
+        Pass ``workspace_id`` to attach a persistent workspace; it is sent as
+        a JSON body field and must be ``AVAILABLE`` (``409`` otherwise).
         """
         if not name or not config_id:
             raise ValueError("name and config_id are required")
+        body: Dict[str, Any] = {"name": name, "config_id": config_id}
+        if workspace_id:
+            body["workspace_id"] = workspace_id
         return self._parse_json(
             self._send(
                 "POST",
                 _BASE_PATH,
-                body={"name": name, "config_id": config_id},
+                body=body,
                 timeout=(
                     _DEFAULT_CREATE_TIMEOUT if timeout is None else float(timeout)
                 ),
