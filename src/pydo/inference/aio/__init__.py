@@ -36,6 +36,7 @@ _INFERENCE_NAMESPACES: tuple = (
     "responses",
     "speech",
     "systemone",
+    "videos",
 )
 
 
