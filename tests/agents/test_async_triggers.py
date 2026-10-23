@@ -92,7 +92,9 @@ async def test_async_list_and_create_triggers():
     assert listed.triggers[0].trigger_id == "t1"
     list_call = resources._proxy._original._pipeline.calls[0]
     assert list_call.request.method == "GET"
-    assert list_call.request.url.split("?", 1)[0].endswith("/v2/harness-runtime/triggers")
+    assert list_call.request.url.split("?", 1)[0].endswith(
+        "/v2/harness-runtime/triggers"
+    )
     assert "kind=cron" in list_call.request.url
 
     created = await resources.triggers.create(

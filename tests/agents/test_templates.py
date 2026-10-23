@@ -200,7 +200,9 @@ def test_list_builds():
 
     call = _last_call(resources)
     assert call.request.method == "GET"
-    assert _path(call.request.url).endswith("/v2/harness-runtime/templates/tmpl-1/builds")
+    assert _path(call.request.url).endswith(
+        "/v2/harness-runtime/templates/tmpl-1/builds"
+    )
     assert "page_size=10" in call.request.url
     assert resp.builds[0].build_id == "bld-1"
 
@@ -220,7 +222,9 @@ def test_get_build():
 
     call = _last_call(resources)
     assert call.request.method == "GET"
-    assert _path(call.request.url).endswith("/v2/harness-runtime/templates/tmpl-1/builds/bld-1")
+    assert _path(call.request.url).endswith(
+        "/v2/harness-runtime/templates/tmpl-1/builds/bld-1"
+    )
     assert resp.build.error == "boom"
 
 

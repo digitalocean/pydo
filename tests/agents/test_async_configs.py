@@ -83,7 +83,9 @@ async def test_async_configs_crud_and_sessions():
     assert listed.configs[0].id == "cfg-1"
     list_call = resources._proxy._original._pipeline.calls[0]
     assert list_call.request.method == "GET"
-    assert list_call.request.url.split("?", 1)[0].endswith("/v2/harness-runtime/configs")
+    assert list_call.request.url.split("?", 1)[0].endswith(
+        "/v2/harness-runtime/configs"
+    )
 
     created = await resources.configs.create(
         {"name": "new", "manifest_yaml": "kind: Agent\n"}

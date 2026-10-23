@@ -151,7 +151,9 @@ def test_list_config_sessions_with_status_filter():
 
     call = _last_call(resources)
     assert call.request.method == "GET"
-    assert _path(call.request.url).endswith("/v2/harness-runtime/configs/cfg-1/sessions")
+    assert _path(call.request.url).endswith(
+        "/v2/harness-runtime/configs/cfg-1/sessions"
+    )
     assert "status=SESSION_STATUS_ALL" in call.request.url
     assert resp.sessions[0].session_id == "sess-1"
 

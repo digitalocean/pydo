@@ -478,7 +478,9 @@ async def test_async_get_connection():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "GET"
-    assert call.request.url.endswith("/v2/harness-runtime/auth/github/connections/conn_1")
+    assert call.request.url.endswith(
+        "/v2/harness-runtime/auth/github/connections/conn_1"
+    )
     assert resp.connection.id == "conn_1"
 
 
@@ -505,7 +507,9 @@ async def test_async_delete_connection():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "DELETE"
-    assert call.request.url.endswith("/v2/harness-runtime/auth/github/connections/conn_1")
+    assert call.request.url.endswith(
+        "/v2/harness-runtime/auth/github/connections/conn_1"
+    )
     assert resp.connection.status == "expired"
 
 

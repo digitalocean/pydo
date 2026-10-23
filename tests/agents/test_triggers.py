@@ -221,7 +221,9 @@ def test_rotate_secret_zero_grace():
 
     call = _last_call(resources)
     assert call.request.method == "POST"
-    assert _path(call.request.url).endswith("/v2/harness-runtime/triggers/t1/rotate-secret")
+    assert _path(call.request.url).endswith(
+        "/v2/harness-runtime/triggers/t1/rotate-secret"
+    )
     assert "grace_period_seconds=0" in call.request.url
     assert resp.previous_secret_revoked is True
 
@@ -256,7 +258,9 @@ def test_list_executions():
 
     call = _last_call(resources)
     assert call.request.method == "GET"
-    assert _path(call.request.url).endswith("/v2/harness-runtime/triggers/t1/executions")
+    assert _path(call.request.url).endswith(
+        "/v2/harness-runtime/triggers/t1/executions"
+    )
     assert "page_size=5" in call.request.url
     assert "status=succeeded" in call.request.url
     assert resp.executions[0].execution_id == "e1"
@@ -345,7 +349,9 @@ def test_list_reusable_sessions():
     resp = resources.triggers.list_reusable_sessions(page_size=20)
 
     call = _last_call(resources)
-    assert _path(call.request.url).endswith("/v2/harness-runtime/triggers/reusable-sessions")
+    assert _path(call.request.url).endswith(
+        "/v2/harness-runtime/triggers/reusable-sessions"
+    )
     assert "page_size=20" in call.request.url
     assert resp.sessions[0].session_id == "s1"
 

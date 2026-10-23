@@ -595,7 +595,9 @@ def test_get_connection():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "GET"
-    assert call.request.url.endswith("/v2/harness-runtime/auth/github/connections/conn_1")
+    assert call.request.url.endswith(
+        "/v2/harness-runtime/auth/github/connections/conn_1"
+    )
     assert resp.connection.id == "conn_1"
 
 
@@ -620,7 +622,9 @@ def test_delete_connection():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "DELETE"
-    assert call.request.url.endswith("/v2/harness-runtime/auth/github/connections/conn_1")
+    assert call.request.url.endswith(
+        "/v2/harness-runtime/auth/github/connections/conn_1"
+    )
     assert resp.connection.status == "expired"
 
 
@@ -889,7 +893,9 @@ def test_validate_policy_uploads_yaml():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "POST"
-    assert _path(call.request.url).endswith("/v2/harness-runtime/sessions/policy/validate")
+    assert _path(call.request.url).endswith(
+        "/v2/harness-runtime/sessions/policy/validate"
+    )
     assert call.request.headers.get("Content-Type") == "application/x-yaml"
     assert resp.ok is True
 
@@ -902,7 +908,9 @@ def test_list_sandbox_sizes():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "GET"
-    assert _path(call.request.url).endswith("/v2/harness-runtime/sessions/sandbox/sizes")
+    assert _path(call.request.url).endswith(
+        "/v2/harness-runtime/sessions/sandbox/sizes"
+    )
     assert resp.sizes[0].slug == "s-1vcpu-1gb"
 
 
@@ -916,7 +924,9 @@ def test_exec_in_sandbox():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "POST"
-    assert _path(call.request.url).endswith("/v2/harness-runtime/sessions/s1/sandbox/exec")
+    assert _path(call.request.url).endswith(
+        "/v2/harness-runtime/sessions/s1/sandbox/exec"
+    )
     assert json.loads(call.request.content) == {
         "argv": ["ls", "-la"],
         "workdir": "/workspace",
