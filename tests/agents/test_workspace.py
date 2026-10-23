@@ -124,7 +124,7 @@ def test_create_transfer_upload():
     )
     call = _calls(resources)[0]
     assert call.request.method == "POST"
-    assert call.request.url.endswith("/v2/agents/sessions/s1/workspace/transfers")
+    assert call.request.url.endswith("/v2/harness-runtime/sessions/s1/workspace/transfers")
     body = _request_json(call)
     assert body == {
         "direction": "upload",

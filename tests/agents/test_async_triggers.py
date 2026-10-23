@@ -92,7 +92,7 @@ async def test_async_list_and_create_triggers():
     assert listed.triggers[0].trigger_id == "t1"
     list_call = resources._proxy._original._pipeline.calls[0]
     assert list_call.request.method == "GET"
-    assert list_call.request.url.split("?", 1)[0].endswith("/v2/agents/triggers")
+    assert list_call.request.url.split("?", 1)[0].endswith("/v2/harness-runtime/triggers")
     assert "kind=cron" in list_call.request.url
 
     created = await resources.triggers.create(
@@ -158,17 +158,17 @@ async def test_async_update_delete_rotate_and_executions():
     by_session = await resources.triggers.get_by_session("s1")
     assert by_session.trigger.trigger_id == "t1"
     assert resources._proxy._original._pipeline.calls[5].request.url.endswith(
-        "/v2/agents/triggers/by-session/s1"
+        "/v2/harness-runtime/triggers/by-session/s1"
     )
 
     await resources.triggers.list_reusable_sessions()
     assert resources._proxy._original._pipeline.calls[6].request.url.endswith(
-        "/v2/agents/triggers/reusable-sessions"
+        "/v2/harness-runtime/triggers/reusable-sessions"
     )
 
     await resources.triggers.list_webhook_providers()
     assert resources._proxy._original._pipeline.calls[7].request.url.endswith(
-        "/v2/agents/webhook-providers"
+        "/v2/harness-runtime/webhook-providers"
     )
 
 
@@ -207,7 +207,7 @@ async def test_async_cancel_execution():
     plain_call = resources._proxy._original._pipeline.calls[0]
     assert plain_call.request.method == "POST"
     assert plain_call.request.url.split("?", 1)[0].endswith(
-        "/v2/agents/triggers/t1/executions/e1/cancel"
+        "/v2/harness-runtime/triggers/t1/executions/e1/cancel"
     )
     assert "force" not in plain_call.request.url
     assert plain.execution.status == "failed"

@@ -104,7 +104,7 @@ def test_list_triggers_with_filters():
 
     call = _last_call(resources)
     assert call.request.method == "GET"
-    assert _path(call.request.url).endswith("/v2/agents/triggers")
+    assert _path(call.request.url).endswith("/v2/harness-runtime/triggers")
     assert "page_size=10" in call.request.url
     assert "page_token=tok" in call.request.url
     assert "kind=webhook" in call.request.url
@@ -123,7 +123,7 @@ def test_create_webhook_trigger_returns_secret_once():
             "session_mode": TriggerSessionMode.FRESH,
             "webhook": {
                 "provider": WebhookProviderKey.GITHUB,
-                "webhook_url": "https://api.digitalocean.com/v2/agents/triggers/t-new/webhook",
+                "webhook_url": "https://api.digitalocean.com/v2/harness-runtime/triggers/t-new/webhook",
             },
         },
         "webhook_secret": "whsec_shown_once",
@@ -143,7 +143,7 @@ def test_create_webhook_trigger_returns_secret_once():
 
     call = _last_call(resources)
     assert call.request.method == "POST"
-    assert call.request.url.endswith("/v2/agents/triggers")
+    assert call.request.url.endswith("/v2/harness-runtime/triggers")
     assert call.request.headers.get("Content-Type") == "application/json"
     assert json.loads(call.request.content) == create_body
     assert resp.trigger.trigger_id == "t-new"
@@ -164,7 +164,7 @@ def test_get_trigger():
 
     call = _last_call(resources)
     assert call.request.method == "GET"
-    assert call.request.url.endswith("/v2/agents/triggers/t1")
+    assert call.request.url.endswith("/v2/harness-runtime/triggers/t1")
     assert resp.trigger.name == "nightly"
 
 
@@ -181,7 +181,7 @@ def test_update_pause_trigger():
 
     call = _last_call(resources)
     assert call.request.method == "PATCH"
-    assert call.request.url.endswith("/v2/agents/triggers/t1")
+    assert call.request.url.endswith("/v2/harness-runtime/triggers/t1")
     assert json.loads(call.request.content) == {"status": "paused"}
     assert resp.trigger.status == "paused"
 
@@ -193,7 +193,7 @@ def test_delete_trigger_returns_none_on_204():
 
     call = _last_call(resources)
     assert call.request.method == "DELETE"
-    assert call.request.url.endswith("/v2/agents/triggers/t1")
+    assert call.request.url.endswith("/v2/harness-runtime/triggers/t1")
 
 
 def test_rotate_secret():
@@ -207,7 +207,7 @@ def test_rotate_secret():
 
     call = _last_call(resources)
     assert call.request.method == "POST"
-    assert call.request.url.endswith("/v2/agents/triggers/t1/rotate-secret")
+    assert call.request.url.endswith("/v2/harness-runtime/triggers/t1/rotate-secret")
     assert "grace_period_seconds" not in call.request.url
     assert resp.webhook_secret == "whsec_rotated"
     assert resp.previous_secret_expires_at == "2026-07-01T12:05:00Z"
@@ -221,7 +221,7 @@ def test_rotate_secret_zero_grace():
 
     call = _last_call(resources)
     assert call.request.method == "POST"
-    assert _path(call.request.url).endswith("/v2/agents/triggers/t1/rotate-secret")
+    assert _path(call.request.url).endswith("/v2/harness-runtime/triggers/t1/rotate-secret")
     assert "grace_period_seconds=0" in call.request.url
     assert resp.previous_secret_revoked is True
 
@@ -256,7 +256,7 @@ def test_list_executions():
 
     call = _last_call(resources)
     assert call.request.method == "GET"
-    assert _path(call.request.url).endswith("/v2/agents/triggers/t1/executions")
+    assert _path(call.request.url).endswith("/v2/harness-runtime/triggers/t1/executions")
     assert "page_size=5" in call.request.url
     assert "status=succeeded" in call.request.url
     assert resp.executions[0].execution_id == "e1"
@@ -276,7 +276,7 @@ def test_get_execution_includes_payload():
     resp = resources.triggers.get_execution("t1", "e1")
 
     call = _last_call(resources)
-    assert call.request.url.endswith("/v2/agents/triggers/t1/executions/e1")
+    assert call.request.url.endswith("/v2/harness-runtime/triggers/t1/executions/e1")
     assert resp.execution.payload == '{"action":"opened"}'
     assert resp.execution.output_text == "done"
 
@@ -290,7 +290,7 @@ def test_cancel_execution_plain():
     call = _last_call(resources)
     assert call.request.method == "POST"
     assert _path(call.request.url).endswith(
-        "/v2/agents/triggers/t1/executions/e1/cancel"
+        "/v2/harness-runtime/triggers/t1/executions/e1/cancel"
     )
     assert "force" not in call.request.url
     assert resp.execution.status == "failed"
@@ -327,7 +327,7 @@ def test_get_by_session():
     resp = resources.triggers.get_by_session("s1")
 
     call = _last_call(resources)
-    assert call.request.url.endswith("/v2/agents/triggers/by-session/s1")
+    assert call.request.url.endswith("/v2/harness-runtime/triggers/by-session/s1")
     assert resp.trigger.trigger_id == "t1"
 
 
@@ -345,7 +345,7 @@ def test_list_reusable_sessions():
     resp = resources.triggers.list_reusable_sessions(page_size=20)
 
     call = _last_call(resources)
-    assert _path(call.request.url).endswith("/v2/agents/triggers/reusable-sessions")
+    assert _path(call.request.url).endswith("/v2/harness-runtime/triggers/reusable-sessions")
     assert "page_size=20" in call.request.url
     assert resp.sessions[0].session_id == "s1"
 
@@ -369,7 +369,7 @@ def test_list_webhook_providers():
 
     call = _last_call(resources)
     assert call.request.method == "GET"
-    assert call.request.url.endswith("/v2/agents/webhook-providers")
+    assert call.request.url.endswith("/v2/harness-runtime/webhook-providers")
     assert resp.providers[0].key == "github"
 
 
@@ -380,7 +380,7 @@ def test_path_segments_are_url_encoded():
     resources.triggers.get("a/b")
 
     call = _last_call(resources)
-    assert call.request.url.endswith("/v2/agents/triggers/a%2Fb")
+    assert call.request.url.endswith("/v2/harness-runtime/triggers/a%2Fb")
 
 
 def test_404_maps_to_resource_not_found():

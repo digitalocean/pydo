@@ -104,7 +104,7 @@ def test_create_from_manifest_uploads_yaml_verbatim():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "POST"
-    assert call.request.url.endswith("/v2/agents/sessions")
+    assert call.request.url.endswith("/v2/harness-runtime/sessions")
     assert call.request.headers.get("Content-Type") == "application/x-yaml"
     content = call.request.content
     if isinstance(content, bytes):
@@ -269,7 +269,7 @@ def test_get_session_url_encodes_id():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "GET"
-    assert call.request.url.endswith("/v2/agents/sessions/x%2Fy")
+    assert call.request.url.endswith("/v2/harness-runtime/sessions/x%2Fy")
 
 
 def test_get_session_strips_team_id_and_tenant_id():
@@ -295,7 +295,7 @@ def test_destroy_session():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "DELETE"
-    assert call.request.url.endswith("/v2/agents/sessions/abc-123")
+    assert call.request.url.endswith("/v2/harness-runtime/sessions/abc-123")
 
 
 def test_pause_session():
@@ -306,7 +306,7 @@ def test_pause_session():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "POST"
-    assert call.request.url.endswith("/v2/agents/sessions/abc-123/pause")
+    assert call.request.url.endswith("/v2/harness-runtime/sessions/abc-123/pause")
 
 
 def test_pause_session_strips_team_id_and_tenant_id():
@@ -333,7 +333,7 @@ def test_resume_session():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "POST"
-    assert call.request.url.endswith("/v2/agents/sessions/abc-123/resume")
+    assert call.request.url.endswith("/v2/harness-runtime/sessions/abc-123/resume")
 
 
 def test_resume_session_strips_team_id_and_tenant_id():
@@ -439,7 +439,7 @@ def test_send_input_body_shape():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "POST"
-    assert call.request.url.endswith("/v2/agents/sessions/s1/input")
+    assert call.request.url.endswith("/v2/harness-runtime/sessions/s1/input")
     assert json.loads(call.request.content) == {"text": "hello world"}
     assert resp.run_id == "r1"
 
@@ -455,7 +455,7 @@ def test_resolve_hitl_url_and_body():
     )
 
     call = resources._proxy._original._pipeline.calls[0]
-    assert call.request.url.endswith("/v2/agents/sessions/s1/hitl/req-9")
+    assert call.request.url.endswith("/v2/harness-runtime/sessions/s1/hitl/req-9")
     assert json.loads(call.request.content) == {
         "outcome": "HITL_OUTCOME_APPROVE",
         "reason": "looks safe",
@@ -477,7 +477,7 @@ def test_start_provider_auth():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "POST"
-    assert call.request.url.endswith("/v2/agents/auth/github")
+    assert call.request.url.endswith("/v2/harness-runtime/auth/github")
     assert json.loads(call.request.content) == {}
     assert resp.status == "pending"
     assert resp.connect_url.endswith("token=abc")
@@ -495,7 +495,7 @@ def test_poll_provider_auth():
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "GET"
     url = call.request.url
-    assert "/v2/agents/auth/github/poll" in url
+    assert "/v2/harness-runtime/auth/github/poll" in url
     assert "poll_url=" in url
     assert resp.status == "success"
 
@@ -532,7 +532,7 @@ def test_list_connections_forwards_filters():
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "GET"
     url = call.request.url
-    assert "/v2/agents/auth/github/connections" in url
+    assert "/v2/harness-runtime/auth/github/connections" in url
     assert "user_id=alice" in url
     assert "status=active" in url
     assert "page=2" in url
@@ -565,7 +565,7 @@ def test_create_connection_sends_user_id_and_scopes():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "POST"
-    assert call.request.url.endswith("/v2/agents/auth/github/connections")
+    assert call.request.url.endswith("/v2/harness-runtime/auth/github/connections")
     assert json.loads(call.request.content) == {
         "user_id": "alice",
         "scopes": ["repo", "read:org"],
@@ -595,7 +595,7 @@ def test_get_connection():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "GET"
-    assert call.request.url.endswith("/v2/agents/auth/github/connections/conn_1")
+    assert call.request.url.endswith("/v2/harness-runtime/auth/github/connections/conn_1")
     assert resp.connection.id == "conn_1"
 
 
@@ -620,7 +620,7 @@ def test_delete_connection():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "DELETE"
-    assert call.request.url.endswith("/v2/agents/auth/github/connections/conn_1")
+    assert call.request.url.endswith("/v2/harness-runtime/auth/github/connections/conn_1")
     assert resp.connection.status == "expired"
 
 
@@ -840,7 +840,7 @@ def test_agent_session_history_binds_session_id():
     page = resources.attach("s1").history(before="evt-12")
 
     url = resources._proxy._original._pipeline.calls[0].request.url
-    assert "/v2/agents/sessions/s1/stream" in url
+    assert "/v2/harness-runtime/sessions/s1/stream" in url
     assert "before=evt-12" in url
     assert page.next_before == "e10"
 
@@ -870,7 +870,7 @@ def test_update_session_resume_on_topoff():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "PATCH"
-    assert _path(call.request.url).endswith("/v2/agents/sessions/s1")
+    assert _path(call.request.url).endswith("/v2/harness-runtime/sessions/s1")
     assert json.loads(call.request.content) == {"resume_on_topoff": True}
     assert resp.session.resume_on_topoff is True
 
@@ -889,7 +889,7 @@ def test_validate_policy_uploads_yaml():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "POST"
-    assert _path(call.request.url).endswith("/v2/agents/sessions/policy/validate")
+    assert _path(call.request.url).endswith("/v2/harness-runtime/sessions/policy/validate")
     assert call.request.headers.get("Content-Type") == "application/x-yaml"
     assert resp.ok is True
 
@@ -902,7 +902,7 @@ def test_list_sandbox_sizes():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "GET"
-    assert _path(call.request.url).endswith("/v2/agents/sessions/sandbox/sizes")
+    assert _path(call.request.url).endswith("/v2/harness-runtime/sessions/sandbox/sizes")
     assert resp.sizes[0].slug == "s-1vcpu-1gb"
 
 
@@ -916,7 +916,7 @@ def test_exec_in_sandbox():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "POST"
-    assert _path(call.request.url).endswith("/v2/agents/sessions/s1/sandbox/exec")
+    assert _path(call.request.url).endswith("/v2/harness-runtime/sessions/s1/sandbox/exec")
     assert json.loads(call.request.content) == {
         "argv": ["ls", "-la"],
         "workdir": "/workspace",
@@ -943,7 +943,7 @@ def test_relay_request_base64_encodes_source_raw():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "POST"
-    assert _path(call.request.url).endswith("/v2/agents/sessions/s1/request")
+    assert _path(call.request.url).endswith("/v2/harness-runtime/sessions/s1/request")
     assert json.loads(call.request.content) == {
         "source_raw": base64.b64encode(frame).decode("ascii")
     }
@@ -979,14 +979,14 @@ def test_create_list_get_delete_checkpoint():
     pipeline = resources._proxy._original._pipeline
     assert pipeline.calls[0].request.method == "POST"
     assert _path(pipeline.calls[0].request.url).endswith(
-        "/v2/agents/sessions/s1/checkpoints"
+        "/v2/harness-runtime/sessions/s1/checkpoints"
     )
     assert json.loads(pipeline.calls[0].request.content) == {"label": "before-refactor"}
     assert pipeline.calls[1].request.method == "GET"
     assert "page_size=10" in pipeline.calls[1].request.url
     assert pipeline.calls[2].request.method == "GET"
     assert _path(pipeline.calls[2].request.url).endswith(
-        "/v2/agents/sessions/s1/checkpoints/cp1"
+        "/v2/harness-runtime/sessions/s1/checkpoints/cp1"
     )
     assert pipeline.calls[3].request.method == "DELETE"
     assert created.checkpoint.checkpoint_id == "cp1"
@@ -1004,7 +1004,7 @@ def test_rollback_to_checkpoint():
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "POST"
     assert _path(call.request.url).endswith(
-        "/v2/agents/sessions/s1/checkpoints/cp1/rollback"
+        "/v2/harness-runtime/sessions/s1/checkpoints/cp1/rollback"
     )
     assert resp.session.session_id == "s1"
 
@@ -1022,7 +1022,7 @@ def test_fork_session():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "POST"
-    assert _path(call.request.url).endswith("/v2/agents/sessions/s1/fork")
+    assert _path(call.request.url).endswith("/v2/harness-runtime/sessions/s1/fork")
     assert json.loads(call.request.content) == {
         "count": 2,
         "from_checkpoint_id": "cp1",
@@ -1043,7 +1043,7 @@ def test_port_forward_url():
     url = resources.sessions.port_forward_url("sess-1", 3000)
     assert (
         url
-        == "wss://api.stage2.digitalocean.com/v2/agents/sessions/sess-1/port-forward/3000"
+        == "wss://api.stage2.digitalocean.com/v2/harness-runtime/sessions/sess-1/port-forward/3000"
     )
     with pytest.raises(ValueError, match="1024"):
         resources.sessions.port_forward_url("sess-1", 80)
