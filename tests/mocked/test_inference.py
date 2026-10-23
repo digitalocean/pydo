@@ -220,7 +220,7 @@ def test_models_list(mock_client: Client, mock_client_url):
                 "owned_by": "minimax",
             },
             {
-                "id": "openai-gpt-image-1",
+                "id": "openai-gpt-image-2",
                 "object": "model",
                 "created": 1699000200,
                 "owned_by": "openai",
@@ -292,7 +292,7 @@ def test_images_generate(mock_client: Client, mock_client_url):
     )
 
     resp = mock_client.images.generate(
-        model="openai-gpt-image-1",
+        model="openai-gpt-image-2",
         prompt="A futuristic cityscape at sunset",
         n=1,
     )
@@ -327,7 +327,7 @@ def test_images_generate_multiple(mock_client: Client, mock_client_url):
     )
 
     resp = mock_client.images.generate(
-        model="openai-gpt-image-1",
+        model="openai-gpt-image-2",
         prompt="A red rose",
         n=2,
     )
@@ -850,7 +850,7 @@ def test_images_generate_422(mock_client: Client, mock_client_url):
 
     with pytest.raises(Exception, match="Invalid prompt"):
         mock_client.images.generate(
-            model="openai-gpt-image-1",
+            model="openai-gpt-image-2",
             prompt="",
         )
 

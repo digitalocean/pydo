@@ -19,7 +19,7 @@ def main() -> None:
     client = Client(token=os.environ["DIGITALOCEAN_TOKEN"])
 
     result = client.images.generate(
-        model="openai-gpt-image-1",
+        model="openai-gpt-image-2",
         prompt="A friendly shark typing on a laptop at a sunny beach",
         n=1,
     )

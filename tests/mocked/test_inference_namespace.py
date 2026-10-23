@@ -181,7 +181,7 @@ def test_namespace_images_generate():
         status=200,
     )
 
-    resp = client.images.generate(model="openai-gpt-image-1", prompt="A sunset", n=1)
+    resp = client.images.generate(model="openai-gpt-image-2", prompt="A sunset", n=1)
     assert resp.data[0].b64_json == "abc=="
 
 
