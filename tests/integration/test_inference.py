@@ -182,7 +182,7 @@ class TestImagesGenerate:
     @pytest.mark.real_billing
     def test_images_generate(self, inference_client):
         resp = inference_client.images.generate(
-            model="openai-gpt-image-1",
+            model="openai-gpt-image-2",
             prompt="A simple red circle on white background",
             n=1,
         )
