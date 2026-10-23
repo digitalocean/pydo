@@ -79,7 +79,7 @@ async def test_async_create_from_manifest_uploads_yaml_verbatim():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "POST"
-    assert call.request.url.endswith("/v2/agents/sessions")
+    assert call.request.url.endswith("/v2/harness-runtime/sessions")
     assert call.request.headers.get("Content-Type") == "application/x-yaml"
     content = call.request.content
     if isinstance(content, bytes):
@@ -122,7 +122,7 @@ async def test_async_pause_session():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "POST"
-    assert call.request.url.endswith("/v2/agents/sessions/abc-123/pause")
+    assert call.request.url.endswith("/v2/harness-runtime/sessions/abc-123/pause")
 
 
 @pytest.mark.asyncio
@@ -151,7 +151,7 @@ async def test_async_resume_session():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "POST"
-    assert call.request.url.endswith("/v2/agents/sessions/abc-123/resume")
+    assert call.request.url.endswith("/v2/harness-runtime/sessions/abc-123/resume")
 
 
 @pytest.mark.asyncio
@@ -392,7 +392,7 @@ async def test_async_agent_session_history_binds_session_id():
     page = await resources.attach("s1").history(before="evt-12")
 
     url = resources._proxy._original._pipeline.calls[0].request.url
-    assert "/v2/agents/sessions/s1/stream" in url
+    assert "/v2/harness-runtime/sessions/s1/stream" in url
     assert page.next_before == "e10"
 
 
@@ -421,7 +421,7 @@ async def test_async_list_connections_forwards_filters():
     )
 
     url = resources._proxy._original._pipeline.calls[0].request.url
-    assert "/v2/agents/auth/github/connections" in url
+    assert "/v2/harness-runtime/auth/github/connections" in url
     assert "user_id=alice" in url
     assert "status=active" in url
     assert resp.connections[0].user_id == "alice"
@@ -450,7 +450,7 @@ async def test_async_create_connection_sends_user_id_and_scopes():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "POST"
-    assert call.request.url.endswith("/v2/agents/auth/github/connections")
+    assert call.request.url.endswith("/v2/harness-runtime/auth/github/connections")
     assert json.loads(call.request.content) == {"user_id": "alice", "scopes": ["repo"]}
     assert resp.connection.status == "pending"
 
@@ -478,7 +478,9 @@ async def test_async_get_connection():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "GET"
-    assert call.request.url.endswith("/v2/agents/auth/github/connections/conn_1")
+    assert call.request.url.endswith(
+        "/v2/harness-runtime/auth/github/connections/conn_1"
+    )
     assert resp.connection.id == "conn_1"
 
 
@@ -505,7 +507,9 @@ async def test_async_delete_connection():
 
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "DELETE"
-    assert call.request.url.endswith("/v2/agents/auth/github/connections/conn_1")
+    assert call.request.url.endswith(
+        "/v2/harness-runtime/auth/github/connections/conn_1"
+    )
     assert resp.connection.status == "expired"
 
 

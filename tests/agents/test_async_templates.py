@@ -163,10 +163,10 @@ async def test_async_templates_crud_and_builds():
     methods = [c.request.method for c in pipeline.calls]
     paths = [_path(c.request.url) for c in pipeline.calls]
     assert methods == ["GET", "POST", "PUT", "DELETE", "GET", "GET", "GET"]
-    assert paths[0].endswith("/v2/agents/templates")
-    assert paths[1].endswith("/v2/agents/templates")
-    assert paths[2].endswith("/v2/agents/templates/tmpl-2")
-    assert paths[3].endswith("/v2/agents/templates/tmpl-2")
-    assert paths[4].endswith("/v2/agents/templates/tmpl-2/builds")
-    assert paths[5].endswith("/v2/agents/templates/tmpl-2/builds/bld-1")
-    assert paths[6].endswith("/v2/agents/templates/tmpl-2/builds/bld-1/logs")
+    assert paths[0].endswith("/v2/harness-runtime/templates")
+    assert paths[1].endswith("/v2/harness-runtime/templates")
+    assert paths[2].endswith("/v2/harness-runtime/templates/tmpl-2")
+    assert paths[3].endswith("/v2/harness-runtime/templates/tmpl-2")
+    assert paths[4].endswith("/v2/harness-runtime/templates/tmpl-2/builds")
+    assert paths[5].endswith("/v2/harness-runtime/templates/tmpl-2/builds/bld-1")
+    assert paths[6].endswith("/v2/harness-runtime/templates/tmpl-2/builds/bld-1/logs")

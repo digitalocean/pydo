@@ -2,11 +2,11 @@
 """Exercise Agent Config endpoints against a live Harness API.
 
 Flow:
-  1. POST /v2/agents/configs           — create durable config from agents.yaml
-  2. GET  /v2/agents/configs           — list team configs
-  3. GET  /v2/agents/configs/{id}      — fetch config + sanitized manifest
-  4. POST /v2/agents/sessions          — start session from config (JSON body)
-  5. GET  /v2/agents/configs/{id}/sessions — list sessions for this config
+  1. POST /v2/harness-runtime/configs           — create durable config from agents.yaml
+  2. GET  /v2/harness-runtime/configs           — list team configs
+  3. GET  /v2/harness-runtime/configs/{id}      — fetch config + sanitized manifest
+  4. POST /v2/harness-runtime/sessions          — start session from config (JSON body)
+  5. GET  /v2/harness-runtime/configs/{id}/sessions — list sessions for this config
 
 Required env:
   DIGITALOCEAN_TOKEN

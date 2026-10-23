@@ -1,6 +1,6 @@
 """Look up a hosted-agent session by name (instead of by id).
 
-Sessions can be filtered server-side by name (``GET /v2/agents/sessions?name=``).
+Sessions can be filtered server-side by name (``GET /v2/harness-runtime/sessions?name=``).
 This script lists the matches and resolves the name to a session handle via
 ``client.agents.attach_by_name(...)``.
 
