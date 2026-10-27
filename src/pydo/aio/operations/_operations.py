@@ -486,9 +486,13 @@ from ...operations._operations import (
     build_inference_create_image_request,
     build_inference_create_messages_request,
     build_inference_create_response_request,
+    build_inference_create_speech_request,
     build_inference_create_systemone_request,
+    build_inference_create_video_request,
     build_inference_get_batch_request,
     build_inference_get_batch_results_request,
+    build_inference_get_video_content_request,
+    build_inference_get_video_request,
     build_inference_list_batches_request,
     build_inference_list_models_request,
     build_inference_upload_batch_file_request,
@@ -504,15 +508,18 @@ from ...operations._operations import (
     build_insights_get_prom_query_range_request,
     build_insights_get_prom_query_request,
     build_insights_get_prom_series_request,
+    build_insights_get_resource_request,
     build_insights_get_trace_request,
     build_insights_list_alert_instances_request,
     build_insights_list_alert_rules_request,
     build_insights_list_notification_channels_request,
+    build_insights_list_resources_request,
     build_insights_post_logs_search_request,
     build_insights_post_spans_search_request,
     build_insights_post_traces_search_request,
     build_insights_update_alert_rule_request,
     build_insights_update_notification_channel_request,
+    build_insights_update_resource_signals_request,
     build_invoices_get_by_uuid_request,
     build_invoices_get_csv_by_uuid_request,
     build_invoices_get_pdf_by_uuid_request,
@@ -163953,6 +163960,8 @@ class DropletsOperations:
                                 "gpu_info": {
                                     "count": 0,  # Optional. The number of GPUs
                                       allocated to the Droplet.
+                                    "fabric": bool,  # Optional. If GPU fabric
+                                      networking is enabled.
                                     "model": "str",  # Optional. The model of the
                                       GPU.
                                     "vram": {
@@ -164000,6 +164009,8 @@ class DropletsOperations:
                             "gpu_info": {
                                 "count": 0,  # Optional. The number of GPUs allocated
                                   to the Droplet.
+                                "fabric": bool,  # Optional. If GPU fabric networking
+                                  is enabled.
                                 "model": "str",  # Optional. The model of the GPU.
                                 "vram": {
                                     "amount": 0,  # Optional. The amount of VRAM
@@ -164629,6 +164640,8 @@ class DropletsOperations:
                             "gpu_info": {
                                 "count": 0,  # Optional. The number of GPUs allocated
                                   to the Droplet.
+                                "fabric": bool,  # Optional. If GPU fabric networking
+                                  is enabled.
                                 "model": "str",  # Optional. The model of the GPU.
                                 "vram": {
                                     "amount": 0,  # Optional. The amount of VRAM
@@ -164674,6 +164687,8 @@ class DropletsOperations:
                         "gpu_info": {
                             "count": 0,  # Optional. The number of GPUs allocated to the
                               Droplet.
+                            "fabric": bool,  # Optional. If GPU fabric networking is
+                              enabled.
                             "model": "str",  # Optional. The model of the GPU.
                             "vram": {
                                 "amount": 0,  # Optional. The amount of VRAM
@@ -166216,6 +166231,8 @@ class DropletsOperations:
                                 "gpu_info": {
                                     "count": 0,  # Optional. The number of GPUs
                                       allocated to the Droplet.
+                                    "fabric": bool,  # Optional. If GPU fabric
+                                      networking is enabled.
                                     "model": "str",  # Optional. The model of the
                                       GPU.
                                     "vram": {
@@ -166263,6 +166280,8 @@ class DropletsOperations:
                             "gpu_info": {
                                 "count": 0,  # Optional. The number of GPUs allocated
                                   to the Droplet.
+                                "fabric": bool,  # Optional. If GPU fabric networking
+                                  is enabled.
                                 "model": "str",  # Optional. The model of the GPU.
                                 "vram": {
                                     "amount": 0,  # Optional. The amount of VRAM
@@ -185841,9 +185860,9 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
         included when at least one of its spans matches ``filter``. The time range must not exceed 7
         days (\\ ``168h``\\ ). ``pagination.limit`` defaults to 100 (also used when ``limit`` is
         ``0``\\ ) and must be between 0 and 1000. Results are ordered by ``started`` descending unless
-        ``orderBy`` is set.
-        JSON field names are camelCase (\\ ``timeRange``\\ , ``orderBy``\\ , ``hasMore``\\ ,
-        ``traceId``\\ ). Unknown request properties, invalid filters, and out-of-range values are
+        ``order_by`` is set.
+        JSON field names use snake_case (\\ ``time_range``\\ , ``order_by``\\ , ``has_more``\\ ,
+        ``trace_id``\\ ). Unknown request properties, invalid filters, and out-of-range values are
         rejected with ``400``.
         Each request searches a single region; there is no multi-region search. Supported regions are
         ``ams2``\\ , ``ams3``\\ , ``atl1``\\ , ``blr1``\\ , ``fra1``\\ , ``lon1``\\ , ``mem1``\\ ,
@@ -185872,7 +185891,7 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
 
                 # JSON input template you can fill out and use as your body input.
                 body = {
-                    "timeRange": {
+                    "time_range": {
                         "from": {
                             "absolute": "str",  # Optional. An absolute timestamp, either
                               RFC3339 (with optional fractional seconds) or a Unix epoch integer as a
@@ -185897,79 +185916,100 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                         }
                     },
                     "filter": {
-                        "expressions": [
-                            ...
-                        ],
-                        "field": {
-                            "name": "str",  # The field name. Without ``scope``"" , these
-                              names (case-insensitive) resolve to built-in span columns: `traceId`
-                              (`trace.id`, `trace_id`), `spanId` (`span.id`, `span_id`), `parentSpanId`
-                              (`parent.span.id`, `parent_span_id`), `startTime` (`start_time`,
-                              `timestamp`), `endTime` (`end_time`), `durationNs` (`duration`, in
-                              nanoseconds), `name` (`span.name`), `kind` (`span.kind`), `statusCode`
-                              (`status.code`, `status_code`), `statusMessage` (`status.message`,
-                              `status_message`), and `serviceName` (`service.name`, `service_name`).
-                              Any other name is looked up as a span attribute, falling back to a
-                              resource attribute. With `scope` set, `name` is always treated as an
-                              attribute key. Attribute keys may contain only letters, digits, and `.`,
-                              `_`, `-`, `/`, `:`, `@`.  In traces ``orderBy``"" , ``name`` must be a
-                              trace-level sort field instead; see the ``orderBy`` field description.
-                              Required.
-                            "scope": "str"  # Optional. Restricts the lookup to one
-                              attribute map (case-insensitive). ``resource`` (or
-                              ``resource.attributes``"" ) reads resource attributes; ``attribute`` (or
-                              ``attributes``"" , ``span.attributes``"" ) reads span attributes. Omit to
-                              use the built-in column mapping described for ``name``. Ignored in traces
-                              ``orderBy``. Known values are: "resource", "resource.attributes",
-                              "attribute", "attributes", and "span.attributes".
+                        "and": {
+                            "expressions": [
+                                ...
+                            ]
                         },
-                        "operator": "str",  # Optional. The comparison operator for a
-                          ``condition`` node. Matching is case-insensitive, and the symbol forms
-                          ``=``"" , ``!=``"" , ``>``"" , ``>=``"" , ``<``"" , and ``<=`` are accepted
-                          as aliases for ``eq``"" , ``neq``"" , ``gt``"" , ``gte``"" , ``lt``"" , and
-                          ``lte``. ``exists`` matches spans where the field is present and non-empty
-                          and ignores ``value``. ``in`` requires an array ``value`` with 1 to 100
-                          entries. ``neq`` on string fields also matches spans where the field is
-                          absent. Known values are: "eq", "neq", "in", "exists", "gt", "gte", "lt", and
-                          "lte".
-                        "query": "str",  # Optional. The search string for a ``text_search``
-                          node. Leading and trailing whitespace is trimmed; the trimmed string must be
-                          non-empty.
-                        "type": "condition",  # Optional. Default value is "condition". The
-                          node type. Matching is case-insensitive. Known values are: "condition",
-                          "and", "or", "not", and "text_search".
-                        "value": {}
+                        "condition": {
+                            "field": {
+                                "name": "str",  # The field name. Without ``scope``""
+                                  , these names (case-insensitive) resolve to built-in span columns:
+                                  `trace_id`, `span_id`, `parent_span_id`, `start_time`, `end_time`,
+                                  `duration_ns`, `name` (`span.name`), `kind` (`span.kind`),
+                                  `status_code` (`status.code`, `status_code`), `status_message`, and
+                                  `service_name` (`service.name`). Any other name is looked up as a
+                                  span attribute, falling back to a resource attribute. With `scope`
+                                  set, `name` is always treated as an attribute key. Attribute keys may
+                                  contain only letters, digits, and `.`, `_`, `-`, `/`, `:`, `@`.  In
+                                  traces ``order_by``"" , ``name`` must be a trace-level sort field
+                                  instead; see the ``order_by`` field description. Required.
+                                "scope": "str"  # Optional. Restricts the lookup to
+                                  one attribute map and is matched case-insensitively.
+                                  ``FIELD_SCOPE_RESOURCE`` reads resource attributes and accepts
+                                  ``resource`` or ``resource.attributes`` as aliases.
+                                  ``FIELD_SCOPE_ATTRIBUTES`` reads span attributes and accepts
+                                  ``attribute``"" , ``attributes``"" , or ``span.attributes`` as
+                                  aliases. Omit to use the built-in column mapping described for
+                                  ``name``. Ignored in traces ``order_by``. Known values are:
+                                  "FIELD_SCOPE_RESOURCE", "FIELD_SCOPE_ATTRIBUTES", "resource",
+                                  "resource.attributes", "attribute", "attributes", and
+                                  "span.attributes".
+                            },
+                            "operator": "str",  # The comparison operator. Required.
+                              Known values are: "FILTER_OPERATOR_EQ", "FILTER_OPERATOR_NEQ",
+                              "FILTER_OPERATOR_IN", "FILTER_OPERATOR_EXISTS", "FILTER_OPERATOR_GTE",
+                              and "FILTER_OPERATOR_LTE".
+                            "value": {
+                                "number_array_value": {
+                                    "values": [
+                                        0.0  # Required.
+                                    ]
+                                },
+                                "number_value": 0.0,  # Optional. A typed literal or
+                                  list value for a traces filter condition. Exactly one kind is set per
+                                  message.
+                                "string_array_value": {
+                                    "values": [
+                                        "str"  # Required.
+                                    ]
+                                },
+                                "string_value": "str"  # Optional. A typed literal or
+                                  list value for a traces filter condition. Exactly one kind is set per
+                                  message.
+                            }
+                        },
+                        "not": ...,
+                        "or": {
+                            "expressions": [
+                                ...
+                            ]
+                        },
+                        "text_search": {
+                            "query": "str"  # The search string. Leading and trailing
+                              whitespace is trimmed, and the remaining string must not be empty.
+                              Required.
+                        }
                     },
-                    "orderBy": [
+                    "order_by": [
                         {
                             "field": {
                                 "name": "str",  # The field name. Without ``scope``""
                                   , these names (case-insensitive) resolve to built-in span columns:
-                                  `traceId` (`trace.id`, `trace_id`), `spanId` (`span.id`, `span_id`),
-                                  `parentSpanId` (`parent.span.id`, `parent_span_id`), `startTime`
-                                  (`start_time`, `timestamp`), `endTime` (`end_time`), `durationNs`
-                                  (`duration`, in nanoseconds), `name` (`span.name`), `kind`
-                                  (`span.kind`), `statusCode` (`status.code`, `status_code`),
-                                  `statusMessage` (`status.message`, `status_message`), and
-                                  `serviceName` (`service.name`, `service_name`). Any other name is
-                                  looked up as a span attribute, falling back to a resource attribute.
-                                  With `scope` set, `name` is always treated as an attribute key.
-                                  Attribute keys may contain only letters, digits, and `.`, `_`, `-`,
-                                  `/`, `:`, `@`.  In traces ``orderBy``"" , ``name`` must be a
-                                  trace-level sort field instead; see the ``orderBy`` field
-                                  description. Required.
+                                  `trace_id`, `span_id`, `parent_span_id`, `start_time`, `end_time`,
+                                  `duration_ns`, `name` (`span.name`), `kind` (`span.kind`),
+                                  `status_code` (`status.code`, `status_code`), `status_message`, and
+                                  `service_name` (`service.name`). Any other name is looked up as a
+                                  span attribute, falling back to a resource attribute. With `scope`
+                                  set, `name` is always treated as an attribute key. Attribute keys may
+                                  contain only letters, digits, and `.`, `_`, `-`, `/`, `:`, `@`.  In
+                                  traces ``order_by``"" , ``name`` must be a trace-level sort field
+                                  instead; see the ``order_by`` field description. Required.
                                 "scope": "str"  # Optional. Restricts the lookup to
-                                  one attribute map (case-insensitive). ``resource`` (or
-                                  ``resource.attributes``"" ) reads resource attributes; ``attribute``
-                                  (or ``attributes``"" , ``span.attributes``"" ) reads span attributes.
-                                  Omit to use the built-in column mapping described for ``name``.
-                                  Ignored in traces ``orderBy``. Known values are: "resource",
+                                  one attribute map and is matched case-insensitively.
+                                  ``FIELD_SCOPE_RESOURCE`` reads resource attributes and accepts
+                                  ``resource`` or ``resource.attributes`` as aliases.
+                                  ``FIELD_SCOPE_ATTRIBUTES`` reads span attributes and accepts
+                                  ``attribute``"" , ``attributes``"" , or ``span.attributes`` as
+                                  aliases. Omit to use the built-in column mapping described for
+                                  ``name``. Ignored in traces ``order_by``. Known values are:
+                                  "FIELD_SCOPE_RESOURCE", "FIELD_SCOPE_ATTRIBUTES", "resource",
                                   "resource.attributes", "attribute", "attributes", and
                                   "span.attributes".
                             },
-                            "direction": "desc"  # Optional. Default value is "desc". The
-                              sort direction (case-insensitive). Defaults to ``desc``. Known values
-                              are: "asc" and "desc".
+                            "direction": "str"  # Optional. The sort direction, matched
+                              case-insensitively. Omit to use the server default. Known values are:
+                              "asc" and "desc".
                         }
                     ],
                     "pagination": {
@@ -185983,17 +186023,17 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                 response == {
                     "data": [
                         {
-                            "traceId": "str",  # The trace identifier. Required.
-                            "durationNs": 0,  # Optional. Wall-clock duration of the
+                            "trace_id": "str",  # The trace identifier. Required.
+                            "duration_ns": 0,  # Optional. Wall-clock duration of the
                               trace in nanoseconds.
-                            "errorCount": 0,  # Optional. The number of spans in the
+                            "error_count": 0,  # Optional. The number of spans in the
                               trace with an ``Error`` status code. Omitted when zero.
-                            "serviceName": "str",  # Optional. The service that emitted
+                            "service_name": "str",  # Optional. The service that emitted
                               the root span. Omitted when the root span has no service.name resource
                               attribute.
-                            "spanCount": 0,  # Optional. The number of spans in the
+                            "span_count": 0,  # Optional. The number of spans in the
                               trace.
-                            "spanNames": [
+                            "span_names": [
                                 "str"  # Optional. The distinct span names present in
                                   the trace.
                             ],
@@ -186005,7 +186045,7 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                         }
                     ],
                     "pagination": {
-                        "hasMore": bool  # Whether more results matched the query than were
+                        "has_more": bool  # Whether more results matched the query than were
                           returned. Required.
                     }
                 }
@@ -186041,9 +186081,9 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
         included when at least one of its spans matches ``filter``. The time range must not exceed 7
         days (\\ ``168h``\\ ). ``pagination.limit`` defaults to 100 (also used when ``limit`` is
         ``0``\\ ) and must be between 0 and 1000. Results are ordered by ``started`` descending unless
-        ``orderBy`` is set.
-        JSON field names are camelCase (\\ ``timeRange``\\ , ``orderBy``\\ , ``hasMore``\\ ,
-        ``traceId``\\ ). Unknown request properties, invalid filters, and out-of-range values are
+        ``order_by`` is set.
+        JSON field names use snake_case (\\ ``time_range``\\ , ``order_by``\\ , ``has_more``\\ ,
+        ``trace_id``\\ ). Unknown request properties, invalid filters, and out-of-range values are
         rejected with ``400``.
         Each request searches a single region; there is no multi-region search. Supported regions are
         ``ams2``\\ , ``ams3``\\ , ``atl1``\\ , ``blr1``\\ , ``fra1``\\ , ``lon1``\\ , ``mem1``\\ ,
@@ -186074,17 +186114,17 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                 response == {
                     "data": [
                         {
-                            "traceId": "str",  # The trace identifier. Required.
-                            "durationNs": 0,  # Optional. Wall-clock duration of the
+                            "trace_id": "str",  # The trace identifier. Required.
+                            "duration_ns": 0,  # Optional. Wall-clock duration of the
                               trace in nanoseconds.
-                            "errorCount": 0,  # Optional. The number of spans in the
+                            "error_count": 0,  # Optional. The number of spans in the
                               trace with an ``Error`` status code. Omitted when zero.
-                            "serviceName": "str",  # Optional. The service that emitted
+                            "service_name": "str",  # Optional. The service that emitted
                               the root span. Omitted when the root span has no service.name resource
                               attribute.
-                            "spanCount": 0,  # Optional. The number of spans in the
+                            "span_count": 0,  # Optional. The number of spans in the
                               trace.
-                            "spanNames": [
+                            "span_names": [
                                 "str"  # Optional. The distinct span names present in
                                   the trace.
                             ],
@@ -186096,7 +186136,7 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                         }
                     ],
                     "pagination": {
-                        "hasMore": bool  # Whether more results matched the query than were
+                        "has_more": bool  # Whether more results matched the query than were
                           returned. Required.
                     }
                 }
@@ -186127,9 +186167,9 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
         included when at least one of its spans matches ``filter``. The time range must not exceed 7
         days (\\ ``168h``\\ ). ``pagination.limit`` defaults to 100 (also used when ``limit`` is
         ``0``\\ ) and must be between 0 and 1000. Results are ordered by ``started`` descending unless
-        ``orderBy`` is set.
-        JSON field names are camelCase (\\ ``timeRange``\\ , ``orderBy``\\ , ``hasMore``\\ ,
-        ``traceId``\\ ). Unknown request properties, invalid filters, and out-of-range values are
+        ``order_by`` is set.
+        JSON field names use snake_case (\\ ``time_range``\\ , ``order_by``\\ , ``has_more``\\ ,
+        ``trace_id``\\ ). Unknown request properties, invalid filters, and out-of-range values are
         rejected with ``400``.
         Each request searches a single region; there is no multi-region search. Supported regions are
         ``ams2``\\ , ``ams3``\\ , ``atl1``\\ , ``blr1``\\ , ``fra1``\\ , ``lon1``\\ , ``mem1``\\ ,
@@ -186155,7 +186195,7 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
 
                 # JSON input template you can fill out and use as your body input.
                 body = {
-                    "timeRange": {
+                    "time_range": {
                         "from": {
                             "absolute": "str",  # Optional. An absolute timestamp, either
                               RFC3339 (with optional fractional seconds) or a Unix epoch integer as a
@@ -186180,79 +186220,100 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                         }
                     },
                     "filter": {
-                        "expressions": [
-                            ...
-                        ],
-                        "field": {
-                            "name": "str",  # The field name. Without ``scope``"" , these
-                              names (case-insensitive) resolve to built-in span columns: `traceId`
-                              (`trace.id`, `trace_id`), `spanId` (`span.id`, `span_id`), `parentSpanId`
-                              (`parent.span.id`, `parent_span_id`), `startTime` (`start_time`,
-                              `timestamp`), `endTime` (`end_time`), `durationNs` (`duration`, in
-                              nanoseconds), `name` (`span.name`), `kind` (`span.kind`), `statusCode`
-                              (`status.code`, `status_code`), `statusMessage` (`status.message`,
-                              `status_message`), and `serviceName` (`service.name`, `service_name`).
-                              Any other name is looked up as a span attribute, falling back to a
-                              resource attribute. With `scope` set, `name` is always treated as an
-                              attribute key. Attribute keys may contain only letters, digits, and `.`,
-                              `_`, `-`, `/`, `:`, `@`.  In traces ``orderBy``"" , ``name`` must be a
-                              trace-level sort field instead; see the ``orderBy`` field description.
-                              Required.
-                            "scope": "str"  # Optional. Restricts the lookup to one
-                              attribute map (case-insensitive). ``resource`` (or
-                              ``resource.attributes``"" ) reads resource attributes; ``attribute`` (or
-                              ``attributes``"" , ``span.attributes``"" ) reads span attributes. Omit to
-                              use the built-in column mapping described for ``name``. Ignored in traces
-                              ``orderBy``. Known values are: "resource", "resource.attributes",
-                              "attribute", "attributes", and "span.attributes".
+                        "and": {
+                            "expressions": [
+                                ...
+                            ]
                         },
-                        "operator": "str",  # Optional. The comparison operator for a
-                          ``condition`` node. Matching is case-insensitive, and the symbol forms
-                          ``=``"" , ``!=``"" , ``>``"" , ``>=``"" , ``<``"" , and ``<=`` are accepted
-                          as aliases for ``eq``"" , ``neq``"" , ``gt``"" , ``gte``"" , ``lt``"" , and
-                          ``lte``. ``exists`` matches spans where the field is present and non-empty
-                          and ignores ``value``. ``in`` requires an array ``value`` with 1 to 100
-                          entries. ``neq`` on string fields also matches spans where the field is
-                          absent. Known values are: "eq", "neq", "in", "exists", "gt", "gte", "lt", and
-                          "lte".
-                        "query": "str",  # Optional. The search string for a ``text_search``
-                          node. Leading and trailing whitespace is trimmed; the trimmed string must be
-                          non-empty.
-                        "type": "condition",  # Optional. Default value is "condition". The
-                          node type. Matching is case-insensitive. Known values are: "condition",
-                          "and", "or", "not", and "text_search".
-                        "value": {}
+                        "condition": {
+                            "field": {
+                                "name": "str",  # The field name. Without ``scope``""
+                                  , these names (case-insensitive) resolve to built-in span columns:
+                                  `trace_id`, `span_id`, `parent_span_id`, `start_time`, `end_time`,
+                                  `duration_ns`, `name` (`span.name`), `kind` (`span.kind`),
+                                  `status_code` (`status.code`, `status_code`), `status_message`, and
+                                  `service_name` (`service.name`). Any other name is looked up as a
+                                  span attribute, falling back to a resource attribute. With `scope`
+                                  set, `name` is always treated as an attribute key. Attribute keys may
+                                  contain only letters, digits, and `.`, `_`, `-`, `/`, `:`, `@`.  In
+                                  traces ``order_by``"" , ``name`` must be a trace-level sort field
+                                  instead; see the ``order_by`` field description. Required.
+                                "scope": "str"  # Optional. Restricts the lookup to
+                                  one attribute map and is matched case-insensitively.
+                                  ``FIELD_SCOPE_RESOURCE`` reads resource attributes and accepts
+                                  ``resource`` or ``resource.attributes`` as aliases.
+                                  ``FIELD_SCOPE_ATTRIBUTES`` reads span attributes and accepts
+                                  ``attribute``"" , ``attributes``"" , or ``span.attributes`` as
+                                  aliases. Omit to use the built-in column mapping described for
+                                  ``name``. Ignored in traces ``order_by``. Known values are:
+                                  "FIELD_SCOPE_RESOURCE", "FIELD_SCOPE_ATTRIBUTES", "resource",
+                                  "resource.attributes", "attribute", "attributes", and
+                                  "span.attributes".
+                            },
+                            "operator": "str",  # The comparison operator. Required.
+                              Known values are: "FILTER_OPERATOR_EQ", "FILTER_OPERATOR_NEQ",
+                              "FILTER_OPERATOR_IN", "FILTER_OPERATOR_EXISTS", "FILTER_OPERATOR_GTE",
+                              and "FILTER_OPERATOR_LTE".
+                            "value": {
+                                "number_array_value": {
+                                    "values": [
+                                        0.0  # Required.
+                                    ]
+                                },
+                                "number_value": 0.0,  # Optional. A typed literal or
+                                  list value for a traces filter condition. Exactly one kind is set per
+                                  message.
+                                "string_array_value": {
+                                    "values": [
+                                        "str"  # Required.
+                                    ]
+                                },
+                                "string_value": "str"  # Optional. A typed literal or
+                                  list value for a traces filter condition. Exactly one kind is set per
+                                  message.
+                            }
+                        },
+                        "not": ...,
+                        "or": {
+                            "expressions": [
+                                ...
+                            ]
+                        },
+                        "text_search": {
+                            "query": "str"  # The search string. Leading and trailing
+                              whitespace is trimmed, and the remaining string must not be empty.
+                              Required.
+                        }
                     },
-                    "orderBy": [
+                    "order_by": [
                         {
                             "field": {
                                 "name": "str",  # The field name. Without ``scope``""
                                   , these names (case-insensitive) resolve to built-in span columns:
-                                  `traceId` (`trace.id`, `trace_id`), `spanId` (`span.id`, `span_id`),
-                                  `parentSpanId` (`parent.span.id`, `parent_span_id`), `startTime`
-                                  (`start_time`, `timestamp`), `endTime` (`end_time`), `durationNs`
-                                  (`duration`, in nanoseconds), `name` (`span.name`), `kind`
-                                  (`span.kind`), `statusCode` (`status.code`, `status_code`),
-                                  `statusMessage` (`status.message`, `status_message`), and
-                                  `serviceName` (`service.name`, `service_name`). Any other name is
-                                  looked up as a span attribute, falling back to a resource attribute.
-                                  With `scope` set, `name` is always treated as an attribute key.
-                                  Attribute keys may contain only letters, digits, and `.`, `_`, `-`,
-                                  `/`, `:`, `@`.  In traces ``orderBy``"" , ``name`` must be a
-                                  trace-level sort field instead; see the ``orderBy`` field
-                                  description. Required.
+                                  `trace_id`, `span_id`, `parent_span_id`, `start_time`, `end_time`,
+                                  `duration_ns`, `name` (`span.name`), `kind` (`span.kind`),
+                                  `status_code` (`status.code`, `status_code`), `status_message`, and
+                                  `service_name` (`service.name`). Any other name is looked up as a
+                                  span attribute, falling back to a resource attribute. With `scope`
+                                  set, `name` is always treated as an attribute key. Attribute keys may
+                                  contain only letters, digits, and `.`, `_`, `-`, `/`, `:`, `@`.  In
+                                  traces ``order_by``"" , ``name`` must be a trace-level sort field
+                                  instead; see the ``order_by`` field description. Required.
                                 "scope": "str"  # Optional. Restricts the lookup to
-                                  one attribute map (case-insensitive). ``resource`` (or
-                                  ``resource.attributes``"" ) reads resource attributes; ``attribute``
-                                  (or ``attributes``"" , ``span.attributes``"" ) reads span attributes.
-                                  Omit to use the built-in column mapping described for ``name``.
-                                  Ignored in traces ``orderBy``. Known values are: "resource",
+                                  one attribute map and is matched case-insensitively.
+                                  ``FIELD_SCOPE_RESOURCE`` reads resource attributes and accepts
+                                  ``resource`` or ``resource.attributes`` as aliases.
+                                  ``FIELD_SCOPE_ATTRIBUTES`` reads span attributes and accepts
+                                  ``attribute``"" , ``attributes``"" , or ``span.attributes`` as
+                                  aliases. Omit to use the built-in column mapping described for
+                                  ``name``. Ignored in traces ``order_by``. Known values are:
+                                  "FIELD_SCOPE_RESOURCE", "FIELD_SCOPE_ATTRIBUTES", "resource",
                                   "resource.attributes", "attribute", "attributes", and
                                   "span.attributes".
                             },
-                            "direction": "desc"  # Optional. Default value is "desc". The
-                              sort direction (case-insensitive). Defaults to ``desc``. Known values
-                              are: "asc" and "desc".
+                            "direction": "str"  # Optional. The sort direction, matched
+                              case-insensitively. Omit to use the server default. Known values are:
+                              "asc" and "desc".
                         }
                     ],
                     "pagination": {
@@ -186266,17 +186327,17 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                 response == {
                     "data": [
                         {
-                            "traceId": "str",  # The trace identifier. Required.
-                            "durationNs": 0,  # Optional. Wall-clock duration of the
+                            "trace_id": "str",  # The trace identifier. Required.
+                            "duration_ns": 0,  # Optional. Wall-clock duration of the
                               trace in nanoseconds.
-                            "errorCount": 0,  # Optional. The number of spans in the
+                            "error_count": 0,  # Optional. The number of spans in the
                               trace with an ``Error`` status code. Omitted when zero.
-                            "serviceName": "str",  # Optional. The service that emitted
+                            "service_name": "str",  # Optional. The service that emitted
                               the root span. Omitted when the root span has no service.name resource
                               attribute.
-                            "spanCount": 0,  # Optional. The number of spans in the
+                            "span_count": 0,  # Optional. The number of spans in the
                               trace.
-                            "spanNames": [
+                            "span_names": [
                                 "str"  # Optional. The distinct span names present in
                                   the trace.
                             ],
@@ -186288,7 +186349,7 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                         }
                     ],
                     "pagination": {
-                        "hasMore": bool  # Whether more results matched the query than were
+                        "has_more": bool  # Whether more results matched the query than were
                           returned. Required.
                     }
                 }
@@ -186493,8 +186554,9 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
         with ``id`` and ``message``. ``403`` is also returned for accounts that are in a trial or not
         in good standing. If the regional traces backend cannot be reached, the response is ``502``
         with a ``text/plain`` body.
-        JSON field names are camelCase (\\ ``traceId``\\ , ``spanId``\\ , ``startTime``\\ ,
-        ``endTime``\\ , ``durationNs``\\ , ``serviceName``\\ , ``statusCode``\\ , ``parentSpanId``\\ ).
+        JSON field names use snake_case (\\ ``trace_id``\\ , ``span_id``\\ , ``start_time``\\ ,
+        ``end_time``\\ , ``duration_ns``\\ , ``service_name``\\ , ``status_code``\\ ,
+        ``parent_span_id``\\ ).
 
         :param region: The datacenter region slug for the query. Required.
         :type region: str
@@ -186522,37 +186584,37 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                 response == {
                     "spans": [
                         {
-                            "spanId": "str",  # The span identifier. Required.
-                            "traceId": "str",  # The trace this span belongs to.
+                            "span_id": "str",  # The span identifier. Required.
+                            "trace_id": "str",  # The trace this span belongs to.
                               Required.
                             "attributes": {
                                 "str": "str"  # Optional. Span attributes. Omitted
                                   when empty.
                             },
-                            "durationNs": 0,  # Optional. Span duration in nanoseconds.
-                            "endTime": "2020-02-20 00:00:00",  # Optional. The span end
+                            "duration_ns": 0,  # Optional. Span duration in nanoseconds.
+                            "end_time": "2020-02-20 00:00:00",  # Optional. The span end
                               time.
                             "kind": "str",  # Optional. The OpenTelemetry span kind as a
                               string, for example ``Server``"" , ``Client``"" , or ``Internal``.
                             "name": "str",  # Optional. The span name, typically the
                               operation being performed.
-                            "parentSpanId": "str",  # Optional. The parent span
+                            "parent_span_id": "str",  # Optional. The parent span
                               identifier. Omitted for the root span.
                             "resource": {
                                 "str": "str"  # Optional. Resource attributes
                                   associated with the span.
                             },
-                            "serviceName": "str",  # Optional. The service that emitted
+                            "service_name": "str",  # Optional. The service that emitted
                               the span. Omitted when the span has no service.name resource attribute.
-                            "startTime": "2020-02-20 00:00:00",  # Optional. The span
+                            "start_time": "2020-02-20 00:00:00",  # Optional. The span
                               start time.
-                            "statusCode": "str",  # Optional. The OpenTelemetry span
+                            "status_code": "str",  # Optional. The OpenTelemetry span
                               status code as a string: ``Unset``"" , ``Ok``"" , or ``Error``.
-                            "statusMessage": "str"  # Optional. The status description.
+                            "status_message": "str"  # Optional. The status description.
                               Omitted when empty.
                         }
                     ],
-                    "traceId": "str",  # Optional. The trace identifier.
+                    "trace_id": "str",  # Optional. The trace identifier.
                     "truncated": bool  # Optional. True when the trace has more spans than were
                       returned in this response. Omitted when false.
                 }
@@ -186729,9 +186791,9 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
         ``/v2/insights/query/{region}/spans/search`` with a JSON body describing the time range,
         optional filter, ordering, and pagination.
         The time range must not exceed 7 days. ``pagination.limit`` defaults to 100 and must be between
-        1 and 1000. Results are ordered by ``startTime`` descending by default. Cursor-based pagination
-        is not yet supported; ``pagination.hasMore`` indicates whether additional spans matched beyond
-        the returned page.
+        1 and 1000. Results are ordered by ``start_time`` descending by default. Cursor-based
+        pagination is not yet supported; ``pagination.has_more`` indicates whether additional spans
+        matched beyond the returned page.
 
         :param region: The datacenter region slug for the query. Required.
         :type region: str
@@ -186749,7 +186811,7 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
 
                 # JSON input template you can fill out and use as your body input.
                 body = {
-                    "timeRange": {
+                    "time_range": {
                         "from": {
                             "absolute": "str",  # Optional. An absolute timestamp.
                               Accepts an RFC3339/RFC3339Nano string or a Unix timestamp (seconds,
@@ -186770,46 +186832,88 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                         }
                     },
                     "filter": {
-                        "type": "str",  # The node kind. Required. Known values are:
-                          "condition", "and", "or", "not", and "text_search".
-                        "expressions": [
-                            ...
-                        ],
-                        "field": {
-                            "name": "str",  # The field name. Well-known span fields
-                              include ``traceId``"" , ``spanId``"" , ``parentSpanId``"" ,
-                              ``startTime``"" , ``endTime``"" , ``durationNs``"" , ``name``"" ,
-                              ``serviceName``"" , ``kind``"" , ``statusCode``"" , and
-                              ``statusMessage``. Any other value is treated as a span or resource
-                              attribute key. Required.
-                            "scope": "str"  # Optional. Optional attribute scope. Use
-                              ``resource`` to match a resource attribute or ``attributes`` to match a
-                              span attribute. Omit for well-known fields or to search both attribute
-                              maps. Known values are: "resource" and "attributes".
+                        "and": {
+                            "expressions": [
+                                ...
+                            ]
                         },
-                        "operator": "str",  # Optional. The comparison operator for a
-                          ``condition`` node. Known values are: "eq", "neq", "gt", "gte", "lt", "lte",
-                          "in", and "exists".
-                        "query": "str",  # Optional. The substring to match for a
-                          ``text_search`` node.
-                        "value": {}
+                        "condition": {
+                            "field": {
+                                "name": "str",  # The field name. Well-known span
+                                  fields include ``trace_id``"" , ``span_id``"" , ``parent_span_id``""
+                                  , ``start_time``"" , ``end_time``"" , ``duration_ns``"" , ``name``""
+                                  , ``service_name``"" , ``kind``"" , ``status_code``"" , and
+                                  ``status_message``. Any other value is treated as a span or resource
+                                  attribute key. Required.
+                                "scope": "str"  # Optional. Optional attribute scope,
+                                  matched case-insensitively. Use ``FIELD_SCOPE_RESOURCE`` to match a
+                                  resource attribute or ``FIELD_SCOPE_ATTRIBUTES`` to match a span
+                                  attribute. The aliases ``resource`` and ``resource.attributes`` are
+                                  accepted for resource attributes; ``attribute``"" , ``attributes``""
+                                  , and ``span.attributes`` are accepted for span attributes. Omit for
+                                  well-known fields or to search both attribute maps. Known values are:
+                                  "FIELD_SCOPE_RESOURCE", "FIELD_SCOPE_ATTRIBUTES", "resource",
+                                  "resource.attributes", "attribute", "attributes", and
+                                  "span.attributes".
+                            },
+                            "operator": "str",  # The comparison operator. Required.
+                              Known values are: "FILTER_OPERATOR_EQ", "FILTER_OPERATOR_NEQ",
+                              "FILTER_OPERATOR_IN", "FILTER_OPERATOR_EXISTS", "FILTER_OPERATOR_GTE",
+                              and "FILTER_OPERATOR_LTE".
+                            "value": {
+                                "number_array_value": {
+                                    "values": [
+                                        0.0  # Required.
+                                    ]
+                                },
+                                "number_value": 0.0,  # Optional. A typed literal or
+                                  list value for a spans filter condition. Exactly one kind is set per
+                                  message.
+                                "string_array_value": {
+                                    "values": [
+                                        "str"  # Required.
+                                    ]
+                                },
+                                "string_value": "str"  # Optional. A typed literal or
+                                  list value for a spans filter condition. Exactly one kind is set per
+                                  message.
+                            }
+                        },
+                        "not": ...,
+                        "or": {
+                            "expressions": [
+                                ...
+                            ]
+                        },
+                        "text_search": {
+                            "query": "str"  # The search string. Leading and trailing
+                              whitespace is trimmed, and the remaining string must not be empty.
+                              Required.
+                        }
                     },
-                    "orderBy": [
+                    "order_by": [
                         {
                             "field": {
                                 "name": "str",  # The field name. Well-known span
-                                  fields include ``traceId``"" , ``spanId``"" , ``parentSpanId``"" ,
-                                  ``startTime``"" , ``endTime``"" , ``durationNs``"" , ``name``"" ,
-                                  ``serviceName``"" , ``kind``"" , ``statusCode``"" , and
-                                  ``statusMessage``. Any other value is treated as a span or resource
+                                  fields include ``trace_id``"" , ``span_id``"" , ``parent_span_id``""
+                                  , ``start_time``"" , ``end_time``"" , ``duration_ns``"" , ``name``""
+                                  , ``service_name``"" , ``kind``"" , ``status_code``"" , and
+                                  ``status_message``. Any other value is treated as a span or resource
                                   attribute key. Required.
-                                "scope": "str"  # Optional. Optional attribute scope.
-                                  Use ``resource`` to match a resource attribute or ``attributes`` to
-                                  match a span attribute. Omit for well-known fields or to search both
-                                  attribute maps. Known values are: "resource" and "attributes".
+                                "scope": "str"  # Optional. Optional attribute scope,
+                                  matched case-insensitively. Use ``FIELD_SCOPE_RESOURCE`` to match a
+                                  resource attribute or ``FIELD_SCOPE_ATTRIBUTES`` to match a span
+                                  attribute. The aliases ``resource`` and ``resource.attributes`` are
+                                  accepted for resource attributes; ``attribute``"" , ``attributes``""
+                                  , and ``span.attributes`` are accepted for span attributes. Omit for
+                                  well-known fields or to search both attribute maps. Known values are:
+                                  "FIELD_SCOPE_RESOURCE", "FIELD_SCOPE_ATTRIBUTES", "resource",
+                                  "resource.attributes", "attribute", "attributes", and
+                                  "span.attributes".
                             },
-                            "direction": "str"  # Optional. The sort direction. Defaults
-                              to ``desc`` when omitted. Known values are: "asc" and "desc".
+                            "direction": "str"  # Optional. The sort direction, matched
+                              case-insensitively. Omit to use the server default. Known values are:
+                              "asc" and "desc".
                         }
                     ],
                     "pagination": {
@@ -186825,13 +186929,13 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                             "attributes": {
                                 "str": "str"  # Optional. Span attributes.
                             },
-                            "durationNs": 0,  # Optional. The span duration in
+                            "duration_ns": 0,  # Optional. The span duration in
                               nanoseconds.
-                            "endTime": "2020-02-20 00:00:00",  # Optional. The span end
+                            "end_time": "2020-02-20 00:00:00",  # Optional. The span end
                               time.
                             "kind": "str",  # Optional. The span kind.
                             "name": "str",  # Optional. The span name.
-                            "parentSpanId": "str",  # Optional. The parent span
+                            "parent_span_id": "str",  # Optional. The parent span
                               identifier. Omitted for root spans.
                             "region": "str",  # Optional. The datacenter region slug the
                               span was queried from.
@@ -186839,20 +186943,20 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                                 "str": "str"  # Optional. Resource attributes
                                   associated with the span.
                             },
-                            "serviceName": "str",  # Optional. The name of the service
+                            "service_name": "str",  # Optional. The name of the service
                               that emitted the span.
-                            "spanId": "str",  # Optional. The span identifier.
-                            "startTime": "2020-02-20 00:00:00",  # Optional. The span
+                            "span_id": "str",  # Optional. The span identifier.
+                            "start_time": "2020-02-20 00:00:00",  # Optional. The span
                               start time.
-                            "statusCode": "str",  # Optional. The span status code.
-                            "statusMessage": "str",  # Optional. The span status message.
-                              Omitted when empty.
-                            "traceId": "str"  # Optional. The trace identifier the span
+                            "status_code": "str",  # Optional. The span status code.
+                            "status_message": "str",  # Optional. The span status
+                              message. Omitted when empty.
+                            "trace_id": "str"  # Optional. The trace identifier the span
                               belongs to.
                         }
                     ],
                     "pagination": {
-                        "hasMore": bool  # Optional. Whether more spans matched than were
+                        "has_more": bool  # Optional. Whether more spans matched than were
                           returned in this page. Cursor-based continuation is not yet supported.
                     }
                 }
@@ -186885,9 +186989,9 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
         ``/v2/insights/query/{region}/spans/search`` with a JSON body describing the time range,
         optional filter, ordering, and pagination.
         The time range must not exceed 7 days. ``pagination.limit`` defaults to 100 and must be between
-        1 and 1000. Results are ordered by ``startTime`` descending by default. Cursor-based pagination
-        is not yet supported; ``pagination.hasMore`` indicates whether additional spans matched beyond
-        the returned page.
+        1 and 1000. Results are ordered by ``start_time`` descending by default. Cursor-based
+        pagination is not yet supported; ``pagination.has_more`` indicates whether additional spans
+        matched beyond the returned page.
 
         :param region: The datacenter region slug for the query. Required.
         :type region: str
@@ -186910,13 +187014,13 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                             "attributes": {
                                 "str": "str"  # Optional. Span attributes.
                             },
-                            "durationNs": 0,  # Optional. The span duration in
+                            "duration_ns": 0,  # Optional. The span duration in
                               nanoseconds.
-                            "endTime": "2020-02-20 00:00:00",  # Optional. The span end
+                            "end_time": "2020-02-20 00:00:00",  # Optional. The span end
                               time.
                             "kind": "str",  # Optional. The span kind.
                             "name": "str",  # Optional. The span name.
-                            "parentSpanId": "str",  # Optional. The parent span
+                            "parent_span_id": "str",  # Optional. The parent span
                               identifier. Omitted for root spans.
                             "region": "str",  # Optional. The datacenter region slug the
                               span was queried from.
@@ -186924,20 +187028,20 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                                 "str": "str"  # Optional. Resource attributes
                                   associated with the span.
                             },
-                            "serviceName": "str",  # Optional. The name of the service
+                            "service_name": "str",  # Optional. The name of the service
                               that emitted the span.
-                            "spanId": "str",  # Optional. The span identifier.
-                            "startTime": "2020-02-20 00:00:00",  # Optional. The span
+                            "span_id": "str",  # Optional. The span identifier.
+                            "start_time": "2020-02-20 00:00:00",  # Optional. The span
                               start time.
-                            "statusCode": "str",  # Optional. The span status code.
-                            "statusMessage": "str",  # Optional. The span status message.
-                              Omitted when empty.
-                            "traceId": "str"  # Optional. The trace identifier the span
+                            "status_code": "str",  # Optional. The span status code.
+                            "status_message": "str",  # Optional. The span status
+                              message. Omitted when empty.
+                            "trace_id": "str"  # Optional. The trace identifier the span
                               belongs to.
                         }
                     ],
                     "pagination": {
-                        "hasMore": bool  # Optional. Whether more spans matched than were
+                        "has_more": bool  # Optional. Whether more spans matched than were
                           returned in this page. Cursor-based continuation is not yet supported.
                     }
                 }
@@ -186965,9 +187069,9 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
         ``/v2/insights/query/{region}/spans/search`` with a JSON body describing the time range,
         optional filter, ordering, and pagination.
         The time range must not exceed 7 days. ``pagination.limit`` defaults to 100 and must be between
-        1 and 1000. Results are ordered by ``startTime`` descending by default. Cursor-based pagination
-        is not yet supported; ``pagination.hasMore`` indicates whether additional spans matched beyond
-        the returned page.
+        1 and 1000. Results are ordered by ``start_time`` descending by default. Cursor-based
+        pagination is not yet supported; ``pagination.has_more`` indicates whether additional spans
+        matched beyond the returned page.
 
         :param region: The datacenter region slug for the query. Required.
         :type region: str
@@ -186982,7 +187086,7 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
 
                 # JSON input template you can fill out and use as your body input.
                 body = {
-                    "timeRange": {
+                    "time_range": {
                         "from": {
                             "absolute": "str",  # Optional. An absolute timestamp.
                               Accepts an RFC3339/RFC3339Nano string or a Unix timestamp (seconds,
@@ -187003,46 +187107,88 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                         }
                     },
                     "filter": {
-                        "type": "str",  # The node kind. Required. Known values are:
-                          "condition", "and", "or", "not", and "text_search".
-                        "expressions": [
-                            ...
-                        ],
-                        "field": {
-                            "name": "str",  # The field name. Well-known span fields
-                              include ``traceId``"" , ``spanId``"" , ``parentSpanId``"" ,
-                              ``startTime``"" , ``endTime``"" , ``durationNs``"" , ``name``"" ,
-                              ``serviceName``"" , ``kind``"" , ``statusCode``"" , and
-                              ``statusMessage``. Any other value is treated as a span or resource
-                              attribute key. Required.
-                            "scope": "str"  # Optional. Optional attribute scope. Use
-                              ``resource`` to match a resource attribute or ``attributes`` to match a
-                              span attribute. Omit for well-known fields or to search both attribute
-                              maps. Known values are: "resource" and "attributes".
+                        "and": {
+                            "expressions": [
+                                ...
+                            ]
                         },
-                        "operator": "str",  # Optional. The comparison operator for a
-                          ``condition`` node. Known values are: "eq", "neq", "gt", "gte", "lt", "lte",
-                          "in", and "exists".
-                        "query": "str",  # Optional. The substring to match for a
-                          ``text_search`` node.
-                        "value": {}
+                        "condition": {
+                            "field": {
+                                "name": "str",  # The field name. Well-known span
+                                  fields include ``trace_id``"" , ``span_id``"" , ``parent_span_id``""
+                                  , ``start_time``"" , ``end_time``"" , ``duration_ns``"" , ``name``""
+                                  , ``service_name``"" , ``kind``"" , ``status_code``"" , and
+                                  ``status_message``. Any other value is treated as a span or resource
+                                  attribute key. Required.
+                                "scope": "str"  # Optional. Optional attribute scope,
+                                  matched case-insensitively. Use ``FIELD_SCOPE_RESOURCE`` to match a
+                                  resource attribute or ``FIELD_SCOPE_ATTRIBUTES`` to match a span
+                                  attribute. The aliases ``resource`` and ``resource.attributes`` are
+                                  accepted for resource attributes; ``attribute``"" , ``attributes``""
+                                  , and ``span.attributes`` are accepted for span attributes. Omit for
+                                  well-known fields or to search both attribute maps. Known values are:
+                                  "FIELD_SCOPE_RESOURCE", "FIELD_SCOPE_ATTRIBUTES", "resource",
+                                  "resource.attributes", "attribute", "attributes", and
+                                  "span.attributes".
+                            },
+                            "operator": "str",  # The comparison operator. Required.
+                              Known values are: "FILTER_OPERATOR_EQ", "FILTER_OPERATOR_NEQ",
+                              "FILTER_OPERATOR_IN", "FILTER_OPERATOR_EXISTS", "FILTER_OPERATOR_GTE",
+                              and "FILTER_OPERATOR_LTE".
+                            "value": {
+                                "number_array_value": {
+                                    "values": [
+                                        0.0  # Required.
+                                    ]
+                                },
+                                "number_value": 0.0,  # Optional. A typed literal or
+                                  list value for a spans filter condition. Exactly one kind is set per
+                                  message.
+                                "string_array_value": {
+                                    "values": [
+                                        "str"  # Required.
+                                    ]
+                                },
+                                "string_value": "str"  # Optional. A typed literal or
+                                  list value for a spans filter condition. Exactly one kind is set per
+                                  message.
+                            }
+                        },
+                        "not": ...,
+                        "or": {
+                            "expressions": [
+                                ...
+                            ]
+                        },
+                        "text_search": {
+                            "query": "str"  # The search string. Leading and trailing
+                              whitespace is trimmed, and the remaining string must not be empty.
+                              Required.
+                        }
                     },
-                    "orderBy": [
+                    "order_by": [
                         {
                             "field": {
                                 "name": "str",  # The field name. Well-known span
-                                  fields include ``traceId``"" , ``spanId``"" , ``parentSpanId``"" ,
-                                  ``startTime``"" , ``endTime``"" , ``durationNs``"" , ``name``"" ,
-                                  ``serviceName``"" , ``kind``"" , ``statusCode``"" , and
-                                  ``statusMessage``. Any other value is treated as a span or resource
+                                  fields include ``trace_id``"" , ``span_id``"" , ``parent_span_id``""
+                                  , ``start_time``"" , ``end_time``"" , ``duration_ns``"" , ``name``""
+                                  , ``service_name``"" , ``kind``"" , ``status_code``"" , and
+                                  ``status_message``. Any other value is treated as a span or resource
                                   attribute key. Required.
-                                "scope": "str"  # Optional. Optional attribute scope.
-                                  Use ``resource`` to match a resource attribute or ``attributes`` to
-                                  match a span attribute. Omit for well-known fields or to search both
-                                  attribute maps. Known values are: "resource" and "attributes".
+                                "scope": "str"  # Optional. Optional attribute scope,
+                                  matched case-insensitively. Use ``FIELD_SCOPE_RESOURCE`` to match a
+                                  resource attribute or ``FIELD_SCOPE_ATTRIBUTES`` to match a span
+                                  attribute. The aliases ``resource`` and ``resource.attributes`` are
+                                  accepted for resource attributes; ``attribute``"" , ``attributes``""
+                                  , and ``span.attributes`` are accepted for span attributes. Omit for
+                                  well-known fields or to search both attribute maps. Known values are:
+                                  "FIELD_SCOPE_RESOURCE", "FIELD_SCOPE_ATTRIBUTES", "resource",
+                                  "resource.attributes", "attribute", "attributes", and
+                                  "span.attributes".
                             },
-                            "direction": "str"  # Optional. The sort direction. Defaults
-                              to ``desc`` when omitted. Known values are: "asc" and "desc".
+                            "direction": "str"  # Optional. The sort direction, matched
+                              case-insensitively. Omit to use the server default. Known values are:
+                              "asc" and "desc".
                         }
                     ],
                     "pagination": {
@@ -187058,13 +187204,13 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                             "attributes": {
                                 "str": "str"  # Optional. Span attributes.
                             },
-                            "durationNs": 0,  # Optional. The span duration in
+                            "duration_ns": 0,  # Optional. The span duration in
                               nanoseconds.
-                            "endTime": "2020-02-20 00:00:00",  # Optional. The span end
+                            "end_time": "2020-02-20 00:00:00",  # Optional. The span end
                               time.
                             "kind": "str",  # Optional. The span kind.
                             "name": "str",  # Optional. The span name.
-                            "parentSpanId": "str",  # Optional. The parent span
+                            "parent_span_id": "str",  # Optional. The parent span
                               identifier. Omitted for root spans.
                             "region": "str",  # Optional. The datacenter region slug the
                               span was queried from.
@@ -187072,20 +187218,20 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                                 "str": "str"  # Optional. Resource attributes
                                   associated with the span.
                             },
-                            "serviceName": "str",  # Optional. The name of the service
+                            "service_name": "str",  # Optional. The name of the service
                               that emitted the span.
-                            "spanId": "str",  # Optional. The span identifier.
-                            "startTime": "2020-02-20 00:00:00",  # Optional. The span
+                            "span_id": "str",  # Optional. The span identifier.
+                            "start_time": "2020-02-20 00:00:00",  # Optional. The span
                               start time.
-                            "statusCode": "str",  # Optional. The span status code.
-                            "statusMessage": "str",  # Optional. The span status message.
-                              Omitted when empty.
-                            "traceId": "str"  # Optional. The trace identifier the span
+                            "status_code": "str",  # Optional. The span status code.
+                            "status_message": "str",  # Optional. The span status
+                              message. Omitted when empty.
+                            "trace_id": "str"  # Optional. The trace identifier the span
                               belongs to.
                         }
                     ],
                     "pagination": {
-                        "hasMore": bool  # Optional. Whether more spans matched than were
+                        "has_more": bool  # Optional. Whether more spans matched than were
                           returned in this page. Cursor-based continuation is not yet supported.
                     }
                 }
@@ -187225,6 +187371,718 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
 
         return cast(JSON, deserialized)  # type: ignore
 
+    @distributed_trace_async
+    async def list_resources(
+        self,
+        *,
+        filter_product_types: Optional[List[str]] = None,
+        filter_regions: Optional[List[str]] = None,
+        pagination_page: int = 1,
+        pagination_per_page: int = 20,
+        pagination_sort: Optional[str] = None,
+        pagination_sort_direction: Optional[str] = None,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Resource Signal Enablement.
+
+        To list the resources in your account that have telemetry signal enablement
+        recorded, along with the current state of their metrics, logs, and traces
+        signals, send a GET request to ``/v2/insights/resources``.
+
+        Results are paginated with ``pagination.page`` and ``pagination.per_page``
+        (default ``20``\\ , maximum ``200``\\ ) and can be sorted with ``pagination.sort`` and
+        ``pagination.sort_direction``. Optionally filter by ``filter.product_types`` and
+        ``filter.regions``.
+
+        A signal is omitted from a resource when no explicit enablement has ever been
+        recorded for it.
+
+        :keyword filter_product_types: Optional filter. When set, only resources of these product types
+         are returned. Repeat the parameter for multiple product types. Default value is None.
+        :paramtype filter_product_types: list[str]
+        :keyword filter_regions: Optional filter. When set, only resources in these regions are
+         returned. Repeat the parameter for multiple regions. Default value is None.
+        :paramtype filter_regions: list[str]
+        :keyword pagination_page: Which 'page' of paginated results to return. Default value is 1.
+        :paramtype pagination_page: int
+        :keyword pagination_per_page: Number of items returned per page. Default value is 20.
+        :paramtype pagination_per_page: int
+        :keyword pagination_sort: Field to sort by. Defaults to ``resource_urn``. Known values are:
+         "resource_urn" and "effective_at". Default value is None.
+        :paramtype pagination_sort: str
+        :keyword pagination_sort_direction: Sort direction. Defaults to ``asc``. Known values are:
+         "asc" and "desc". Default value is None.
+        :paramtype pagination_sort_direction: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "pagination": {
+                        "page": 0,  # Optional. The current page number.
+                        "pages": 0,  # Optional. The total number of pages. Omitted when
+                          there are no results.
+                        "per_page": 0,  # Optional. The number of items per page.
+                        "total": 0  # Optional. The total number of resources across all
+                          pages. Omitted when there are no results.
+                    },
+                    "resources": [
+                        {
+                            "product_type": "str",  # The product type of the resource,
+                              for example ``droplet`` or ``kubernetes``. Required.
+                            "resource_urn": "str",  # The uniform resource name (URN) of
+                              the resource. Required.
+                            "logs": {
+                                "effective_at": "2020-02-20 00:00:00",  # Optional.
+                                  When this signal state last changed.
+                                "enabled": bool  # Optional. Whether the signal is
+                                  enabled for the resource.
+                            },
+                            "metrics": {
+                                "effective_at": "2020-02-20 00:00:00",  # Optional.
+                                  When this signal state last changed.
+                                "enabled": bool  # Optional. Whether the signal is
+                                  enabled for the resource.
+                            },
+                            "region": "str",  # Optional. The region slug for
+                              region-specific resources. Omitted when the resource has no region.
+                            "traces": {
+                                "effective_at": "2020-02-20 00:00:00",  # Optional.
+                                  When this signal state last changed.
+                                "enabled": bool  # Optional. Whether the signal is
+                                  enabled for the resource.
+                            }
+                        }
+                    ]
+                }
+                # response body for status code(s): 400
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_insights_list_resources_request(
+            filter_product_types=filter_product_types,
+            filter_regions=filter_regions,
+            pagination_page=pagination_page,
+            pagination_per_page=pagination_per_page,
+            pagination_sort=pagination_sort,
+            pagination_sort_direction=pagination_sort_direction,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_resource(self, resource_urn: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve Resource Signal Enablement.
+
+        To retrieve the current metrics, logs, and traces signal enablement for a
+        single resource, send a GET request to
+        ``/v2/insights/resources/{resource_urn}``.
+
+        A ``404`` is returned when no signal enablement has been recorded for the
+        resource.
+
+        :param resource_urn: The uniform resource name (URN) of the resource, for example
+         ``do:droplet:12345``. Required.
+        :type resource_urn: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "resource": {
+                        "product_type": "str",  # The product type of the resource, for
+                          example ``droplet`` or ``kubernetes``. Required.
+                        "resource_urn": "str",  # The uniform resource name (URN) of the
+                          resource. Required.
+                        "logs": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        },
+                        "metrics": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        },
+                        "region": "str",  # Optional. The region slug for region-specific
+                          resources. Omitted when the resource has no region.
+                        "traces": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        }
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_insights_get_resource_request(
+            resource_urn=resource_urn,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def update_resource_signals(
+        self,
+        resource_urn: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Resource Signal Enablement.
+
+        To enable or disable telemetry signals for a resource, send a PUT request to
+        ``/v2/insights/resources/{resource_urn}/signals``.
+
+        This endpoint uses merge semantics. Set ``metrics``\\ , ``logs``\\ , or ``traces`` to
+        ``true`` or ``false`` to change that signal; omit a signal to leave it unchanged.
+        At least one signal must be set.
+
+        ``region`` is only used when the resource has no existing enablement. On later
+        updates, omit it or send the stored value; changing the region is rejected
+        with a ``400``.
+
+        Requires both the ``insights:update`` and ``insights:create`` scopes.
+
+        :param resource_urn: The uniform resource name (URN) of the resource, for example
+         ``do:droplet:12345``. Required.
+        :type resource_urn: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "logs": bool,  # Optional. Enable or disable the logs signal. Omit to leave
+                      unchanged.
+                    "metrics": bool,  # Optional. Enable or disable the metrics signal. Omit to
+                      leave unchanged.
+                    "region": "str",  # Optional. The region slug for region-specific resources.
+                      Only used when the resource has no existing enablement. On later updates, omit it
+                      or send the stored value; changing the region is rejected.
+                    "traces": bool  # Optional. Enable or disable the traces signal. Omit to
+                      leave unchanged.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "resource": {
+                        "product_type": "str",  # The product type of the resource, for
+                          example ``droplet`` or ``kubernetes``. Required.
+                        "resource_urn": "str",  # The uniform resource name (URN) of the
+                          resource. Required.
+                        "logs": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        },
+                        "metrics": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        },
+                        "region": "str",  # Optional. The region slug for region-specific
+                          resources. Omitted when the resource has no region.
+                        "traces": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        }
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def update_resource_signals(
+        self,
+        resource_urn: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Resource Signal Enablement.
+
+        To enable or disable telemetry signals for a resource, send a PUT request to
+        ``/v2/insights/resources/{resource_urn}/signals``.
+
+        This endpoint uses merge semantics. Set ``metrics``\\ , ``logs``\\ , or ``traces`` to
+        ``true`` or ``false`` to change that signal; omit a signal to leave it unchanged.
+        At least one signal must be set.
+
+        ``region`` is only used when the resource has no existing enablement. On later
+        updates, omit it or send the stored value; changing the region is rejected
+        with a ``400``.
+
+        Requires both the ``insights:update`` and ``insights:create`` scopes.
+
+        :param resource_urn: The uniform resource name (URN) of the resource, for example
+         ``do:droplet:12345``. Required.
+        :type resource_urn: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "resource": {
+                        "product_type": "str",  # The product type of the resource, for
+                          example ``droplet`` or ``kubernetes``. Required.
+                        "resource_urn": "str",  # The uniform resource name (URN) of the
+                          resource. Required.
+                        "logs": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        },
+                        "metrics": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        },
+                        "region": "str",  # Optional. The region slug for region-specific
+                          resources. Omitted when the resource has no region.
+                        "traces": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        }
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def update_resource_signals(
+        self, resource_urn: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Resource Signal Enablement.
+
+        To enable or disable telemetry signals for a resource, send a PUT request to
+        ``/v2/insights/resources/{resource_urn}/signals``.
+
+        This endpoint uses merge semantics. Set ``metrics``\\ , ``logs``\\ , or ``traces`` to
+        ``true`` or ``false`` to change that signal; omit a signal to leave it unchanged.
+        At least one signal must be set.
+
+        ``region`` is only used when the resource has no existing enablement. On later
+        updates, omit it or send the stored value; changing the region is rejected
+        with a ``400``.
+
+        Requires both the ``insights:update`` and ``insights:create`` scopes.
+
+        :param resource_urn: The uniform resource name (URN) of the resource, for example
+         ``do:droplet:12345``. Required.
+        :type resource_urn: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "logs": bool,  # Optional. Enable or disable the logs signal. Omit to leave
+                      unchanged.
+                    "metrics": bool,  # Optional. Enable or disable the metrics signal. Omit to
+                      leave unchanged.
+                    "region": "str",  # Optional. The region slug for region-specific resources.
+                      Only used when the resource has no existing enablement. On later updates, omit it
+                      or send the stored value; changing the region is rejected.
+                    "traces": bool  # Optional. Enable or disable the traces signal. Omit to
+                      leave unchanged.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "resource": {
+                        "product_type": "str",  # The product type of the resource, for
+                          example ``droplet`` or ``kubernetes``. Required.
+                        "resource_urn": "str",  # The uniform resource name (URN) of the
+                          resource. Required.
+                        "logs": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        },
+                        "metrics": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        },
+                        "region": "str",  # Optional. The region slug for region-specific
+                          resources. Omitted when the resource has no region.
+                        "traces": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        }
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_insights_update_resource_signals_request(
+            resource_urn=resource_urn,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
 
 class SignalsOperations:
     """
@@ -187291,8 +188149,10 @@ class SignalsOperations:
                               Required. Known values are: "agent" and "inference".
                             "team_id": 0,  # The team ID that owns this consent record.
                               Required.
-                            "updated_at": "2020-02-20 00:00:00"  # A time value given in
+                            "updated_at": "2020-02-20 00:00:00",  # A time value given in
                               ISO8601 combined date and time format. Required.
+                            "environment_id": "str"  # Optional. Same as agent_id when
+                              present. Dual-emitted during the rename; omitted when agent_id is empty.
                         }
                     ],
                     "source": "str"  # Optional. Echoes the ``source`` filter when the request
@@ -187409,14 +188269,14 @@ class SignalsOperations:
 
         To revoke consent, send the same request with ``enabled`` set to ``false``.
         The ``source`` query parameter is required. Per-environment consent for Harness
-        Runtime environments is managed with ``PUT /v1/consent/{agent_id}`` instead.
+        Runtime environments is managed with ``PUT /v1/consent/{environment_id}`` instead.
 
         :param body: Required.
         :type body: JSON
         :keyword source: The consent source to update. Only team-level sources are accepted on this
          endpoint; currently ``inference`` (Serverless Inference chat completions). Per-environment
-         consent (\\ ``agent``\\ ) is managed with ``PUT /v1/consent/{agent_id}`` instead. "inference"
-         Required.
+         consent (\\ ``agent``\\ ) is managed with ``PUT /v1/consent/{environment_id}`` instead.
+         "inference" Required.
         :paramtype source: str
         :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
          Default value is "application/json".
@@ -187450,8 +188310,10 @@ class SignalsOperations:
                           consent for Serverless Inference chat completions. Required. Known values
                           are: "agent" and "inference".
                         "team_id": 0,  # The team ID that owns this consent record. Required.
-                        "updated_at": "2020-02-20 00:00:00"  # A time value given in ISO8601
+                        "updated_at": "2020-02-20 00:00:00",  # A time value given in ISO8601
                           combined date and time format. Required.
+                        "environment_id": "str"  # Optional. Same as agent_id when present.
+                          Dual-emitted during the rename; omitted when agent_id is empty.
                     }
                 }
                 # response body for status code(s): 400
@@ -187487,14 +188349,14 @@ class SignalsOperations:
 
         To revoke consent, send the same request with ``enabled`` set to ``false``.
         The ``source`` query parameter is required. Per-environment consent for Harness
-        Runtime environments is managed with ``PUT /v1/consent/{agent_id}`` instead.
+        Runtime environments is managed with ``PUT /v1/consent/{environment_id}`` instead.
 
         :param body: Required.
         :type body: IO[bytes]
         :keyword source: The consent source to update. Only team-level sources are accepted on this
          endpoint; currently ``inference`` (Serverless Inference chat completions). Per-environment
-         consent (\\ ``agent``\\ ) is managed with ``PUT /v1/consent/{agent_id}`` instead. "inference"
-         Required.
+         consent (\\ ``agent``\\ ) is managed with ``PUT /v1/consent/{environment_id}`` instead.
+         "inference" Required.
         :paramtype source: str
         :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
          Default value is "application/json".
@@ -187522,8 +188384,10 @@ class SignalsOperations:
                           consent for Serverless Inference chat completions. Required. Known values
                           are: "agent" and "inference".
                         "team_id": 0,  # The team ID that owns this consent record. Required.
-                        "updated_at": "2020-02-20 00:00:00"  # A time value given in ISO8601
+                        "updated_at": "2020-02-20 00:00:00",  # A time value given in ISO8601
                           combined date and time format. Required.
+                        "environment_id": "str"  # Optional. Same as agent_id when present.
+                          Dual-emitted during the rename; omitted when agent_id is empty.
                     }
                 }
                 # response body for status code(s): 400
@@ -187554,14 +188418,14 @@ class SignalsOperations:
 
         To revoke consent, send the same request with ``enabled`` set to ``false``.
         The ``source`` query parameter is required. Per-environment consent for Harness
-        Runtime environments is managed with ``PUT /v1/consent/{agent_id}`` instead.
+        Runtime environments is managed with ``PUT /v1/consent/{environment_id}`` instead.
 
         :param body: Is either a JSON type or a IO[bytes] type. Required.
         :type body: JSON or IO[bytes]
         :keyword source: The consent source to update. Only team-level sources are accepted on this
          endpoint; currently ``inference`` (Serverless Inference chat completions). Per-environment
-         consent (\\ ``agent``\\ ) is managed with ``PUT /v1/consent/{agent_id}`` instead. "inference"
-         Required.
+         consent (\\ ``agent``\\ ) is managed with ``PUT /v1/consent/{environment_id}`` instead.
+         "inference" Required.
         :paramtype source: str
         :return: JSON object
         :rtype: JSON
@@ -187592,8 +188456,10 @@ class SignalsOperations:
                           consent for Serverless Inference chat completions. Required. Known values
                           are: "agent" and "inference".
                         "team_id": 0,  # The team ID that owns this consent record. Required.
-                        "updated_at": "2020-02-20 00:00:00"  # A time value given in ISO8601
+                        "updated_at": "2020-02-20 00:00:00",  # A time value given in ISO8601
                           combined date and time format. Required.
+                        "environment_id": "str"  # Optional. Same as agent_id when present.
+                          Dual-emitted during the rename; omitted when agent_id is empty.
                     }
                 }
                 # response body for status code(s): 400
@@ -187701,20 +188567,20 @@ class SignalsOperations:
         return cast(JSON, deserialized)  # type: ignore
 
     @distributed_trace_async
-    async def get_consent(self, agent_id: str, **kwargs: Any) -> JSON:
+    async def get_consent(self, environment_id: str, **kwargs: Any) -> JSON:
         # pylint: disable=line-too-long
         """Retrieve Consent for an Environment.
 
         To retrieve the consent record for a specific environment, send a GET
-        request to ``/v1/consent/{agent_id}``. The response includes an ``enabled``
+        request to ``/v1/consent/{environment_id}``. The response includes an ``enabled``
         field indicating whether signals collection is on for this environment.
 
         This endpoint only serves per-environment (\\ ``source: agent``\\ ) records. Team-level
         inference consent is read from ``GET /v1/consent?source=inference``.
 
-        :param agent_id: A unique identifier for an environment. For Harness Runtime, this is the
-         Environment Config ID. Required.
-        :type agent_id: str
+        :param environment_id: A unique identifier for an environment. For Harness Runtime, this is the
+         Environment Config ID. Formerly named agent_id. Required.
+        :type environment_id: str
         :return: JSON object
         :rtype: JSON
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -187728,6 +188594,8 @@ class SignalsOperations:
                       Runtime, this is the Environment Config ID. Required.
                     "enabled": bool,  # Whether signals collection is enabled for this
                       environment. Required.
+                    "environment_id": "str",  # Same as agent_id. Dual-emitted during the rename.
+                      Required.
                     "source": "str",  # The source this consent applies to. Always ``agent`` for
                       per-environment records returned by this endpoint. Required. "agent"
                     "team_id": 0,  # The team ID that owns this consent record. Required.
@@ -187766,7 +188634,7 @@ class SignalsOperations:
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
         _request = build_signals_get_consent_request(
-            agent_id=agent_id,
+            environment_id=environment_id,
             headers=_headers,
             params=_params,
         )
@@ -187844,7 +188712,7 @@ class SignalsOperations:
     @overload
     async def update_consent(
         self,
-        agent_id: str,
+        environment_id: str,
         body: JSON,
         *,
         content_type: str = "application/json",
@@ -187854,16 +188722,16 @@ class SignalsOperations:
         """Update Consent for an Environment.
 
         To enable or disable signals collection for a specific environment, send a
-        PUT request to ``/v1/consent/{agent_id}`` with an ``enabled`` boolean in the
+        PUT request to ``/v1/consent/{environment_id}`` with an ``enabled`` boolean in the
         request body.
 
         This endpoint only manages per-environment (\\ ``source: agent``\\ ) consent. To manage
         team-level consent for Serverless Inference, use
         ``PUT /v1/consent?source=inference`` instead.
 
-        :param agent_id: A unique identifier for an environment. For Harness Runtime, this is the
-         Environment Config ID. Required.
-        :type agent_id: str
+        :param environment_id: A unique identifier for an environment. For Harness Runtime, this is the
+         Environment Config ID. Formerly named agent_id. Required.
+        :type environment_id: str
         :param body: Required.
         :type body: JSON
         :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
@@ -187898,8 +188766,10 @@ class SignalsOperations:
                           consent for Serverless Inference chat completions. Required. Known values
                           are: "agent" and "inference".
                         "team_id": 0,  # The team ID that owns this consent record. Required.
-                        "updated_at": "2020-02-20 00:00:00"  # A time value given in ISO8601
+                        "updated_at": "2020-02-20 00:00:00",  # A time value given in ISO8601
                           combined date and time format. Required.
+                        "environment_id": "str"  # Optional. Same as agent_id when present.
+                          Dual-emitted during the rename; omitted when agent_id is empty.
                     }
                 }
                 # response body for status code(s): 400, 404
@@ -187918,7 +188788,7 @@ class SignalsOperations:
     @overload
     async def update_consent(
         self,
-        agent_id: str,
+        environment_id: str,
         body: IO[bytes],
         *,
         content_type: str = "application/json",
@@ -187928,16 +188798,16 @@ class SignalsOperations:
         """Update Consent for an Environment.
 
         To enable or disable signals collection for a specific environment, send a
-        PUT request to ``/v1/consent/{agent_id}`` with an ``enabled`` boolean in the
+        PUT request to ``/v1/consent/{environment_id}`` with an ``enabled`` boolean in the
         request body.
 
         This endpoint only manages per-environment (\\ ``source: agent``\\ ) consent. To manage
         team-level consent for Serverless Inference, use
         ``PUT /v1/consent?source=inference`` instead.
 
-        :param agent_id: A unique identifier for an environment. For Harness Runtime, this is the
-         Environment Config ID. Required.
-        :type agent_id: str
+        :param environment_id: A unique identifier for an environment. For Harness Runtime, this is the
+         Environment Config ID. Formerly named agent_id. Required.
+        :type environment_id: str
         :param body: Required.
         :type body: IO[bytes]
         :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
@@ -187966,8 +188836,10 @@ class SignalsOperations:
                           consent for Serverless Inference chat completions. Required. Known values
                           are: "agent" and "inference".
                         "team_id": 0,  # The team ID that owns this consent record. Required.
-                        "updated_at": "2020-02-20 00:00:00"  # A time value given in ISO8601
+                        "updated_at": "2020-02-20 00:00:00",  # A time value given in ISO8601
                           combined date and time format. Required.
+                        "environment_id": "str"  # Optional. Same as agent_id when present.
+                          Dual-emitted during the rename; omitted when agent_id is empty.
                     }
                 }
                 # response body for status code(s): 400, 404
@@ -187985,22 +188857,22 @@ class SignalsOperations:
 
     @distributed_trace_async
     async def update_consent(
-        self, agent_id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+        self, environment_id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
     ) -> JSON:
         # pylint: disable=line-too-long
         """Update Consent for an Environment.
 
         To enable or disable signals collection for a specific environment, send a
-        PUT request to ``/v1/consent/{agent_id}`` with an ``enabled`` boolean in the
+        PUT request to ``/v1/consent/{environment_id}`` with an ``enabled`` boolean in the
         request body.
 
         This endpoint only manages per-environment (\\ ``source: agent``\\ ) consent. To manage
         team-level consent for Serverless Inference, use
         ``PUT /v1/consent?source=inference`` instead.
 
-        :param agent_id: A unique identifier for an environment. For Harness Runtime, this is the
-         Environment Config ID. Required.
-        :type agent_id: str
+        :param environment_id: A unique identifier for an environment. For Harness Runtime, this is the
+         Environment Config ID. Formerly named agent_id. Required.
+        :type environment_id: str
         :param body: Is either a JSON type or a IO[bytes] type. Required.
         :type body: JSON or IO[bytes]
         :return: JSON object
@@ -188032,8 +188904,10 @@ class SignalsOperations:
                           consent for Serverless Inference chat completions. Required. Known values
                           are: "agent" and "inference".
                         "team_id": 0,  # The team ID that owns this consent record. Required.
-                        "updated_at": "2020-02-20 00:00:00"  # A time value given in ISO8601
+                        "updated_at": "2020-02-20 00:00:00",  # A time value given in ISO8601
                           combined date and time format. Required.
+                        "environment_id": "str"  # Optional. Same as agent_id when present.
+                          Dual-emitted during the rename; omitted when agent_id is empty.
                     }
                 }
                 # response body for status code(s): 400, 404
@@ -188078,7 +188952,7 @@ class SignalsOperations:
             _json = body
 
         _request = build_signals_update_consent_request(
-            agent_id=agent_id,
+            environment_id=environment_id,
             content_type=content_type,
             json=_json,
             content=_content,
@@ -188159,7 +189033,7 @@ class SignalsOperations:
     @distributed_trace_async
     async def list_agent_sessions(
         self,
-        agent_id: str,
+        environment_id: str,
         *,
         limit: int = 20,
         after: Optional[str] = None,
@@ -188172,12 +189046,12 @@ class SignalsOperations:
         """List Sessions for an Environment.
 
         To list signals sessions for a specific environment, send a GET request to
-        ``/v1/signals/agents/{agent_id}/sessions``. Results are paginated using cursor-based
+        ``/v1/signals/agents/{environment_id}/sessions``. Results are paginated using cursor-based
         pagination with ``limit`` and ``after`` parameters.
 
-        :param agent_id: A unique identifier for an environment. For Harness Runtime, this is the
-         Environment Config ID. Required.
-        :type agent_id: str
+        :param environment_id: A unique identifier for an environment. For Harness Runtime, this is the
+         Environment Config ID. Formerly named agent_id. Required.
+        :type environment_id: str
         :keyword limit: Maximum number of items to return per page. Default value is 20.
         :paramtype limit: int
         :keyword after: An opaque cursor string returned from a previous page. Pass this value to
@@ -188255,7 +189129,7 @@ class SignalsOperations:
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
         _request = build_signals_list_agent_sessions_request(
-            agent_id=agent_id,
+            environment_id=environment_id,
             limit=limit,
             after=after,
             start_time=start_time,
@@ -188486,7 +189360,13 @@ class SignalsOperations:
 
     @distributed_trace_async
     async def list_exports(
-        self, *, limit: int = 20, after: Optional[str] = None, **kwargs: Any
+        self,
+        *,
+        environment_id: Optional[str] = None,
+        agent_id: Optional[str] = None,
+        limit: int = 20,
+        after: Optional[str] = None,
+        **kwargs: Any
     ) -> JSON:
         # pylint: disable=line-too-long
         """List Export Jobs.
@@ -188495,6 +189375,12 @@ class SignalsOperations:
         ``/v1/signals/exports``. Results are paginated using cursor-based pagination
         with ``limit`` and ``after`` parameters.
 
+        :keyword environment_id: Optional filter by environment ID. Default value is None.
+        :paramtype environment_id: str
+        :keyword agent_id: Deprecated alias for environment_id. Accepted for backward compatibility;
+         must equal environment_id when both are set. Both set and different returns 400. Default value
+         is None.
+        :paramtype agent_id: str
         :keyword limit: Maximum number of items to return per page. Default value is 20.
         :paramtype limit: int
         :keyword after: An opaque cursor string returned from a previous page. Pass this value to
@@ -188514,23 +189400,10 @@ class SignalsOperations:
                             "cursor": "str",  # Optional. An opaque cursor for
                               pagination.
                             "node": {
-                                "agent_id": "str",  # The environment whose data is
-                                  being exported. For Harness Runtime, this is the Environment Config
-                                  ID. Not meaningful for ``inference`` exports; use ``type`` to
-                                  distinguish the export scope. Required.
                                 "created_at": 0,  # Unix timestamp when the export
                                   was created. Required.
                                 "export_id": "str",  # The unique identifier for the
                                   export job. Required.
-                                "status": "str",  # The current status of the export
-                                  job. Required. Known values are: "pending", "processing", "complete",
-                                  and "failed".
-                                "completed_at": 0,  # Optional. Unix timestamp when
-                                  the export completed, or null if still in progress.
-                                "error_message": "str",  # Optional. Error message if
-                                  the export failed, or null on success.
-                                "expires_at": 0,  # Optional. Unix timestamp when the
-                                  export download link expires.
                                 "filters": {
                                     "session_ids": [
                                         "str"  # Optional. Specific session
@@ -188541,6 +189414,21 @@ class SignalsOperations:
                                           included in the export.
                                     ]
                                 },
+                                "status": "str",  # The current status of the export
+                                  job. Required. Known values are: "pending", "processing", "complete",
+                                  and "failed".
+                                "agent_id": "str",  # Optional. The environment whose
+                                  data is being exported. For Harness Runtime, this is the Environment
+                                  Config ID. Not meaningful for ``inference`` exports; use ``type`` to
+                                  distinguish the export scope.
+                                "completed_at": 0,  # Optional. Unix timestamp when
+                                  the export completed, or null if still in progress.
+                                "environment_id": "str",  # Optional. Same as
+                                  agent_id. Dual-emitted during the rename.
+                                "error_message": "str",  # Optional. Error message if
+                                  the export failed, or null on success.
+                                "expires_at": 0,  # Optional. Unix timestamp when the
+                                  export download link expires.
                                 "type": "str"  # Optional. The scope of the export.
                                   ``agent`` covers one Harness Runtime environment; ``inference``
                                   covers the team's Serverless Inference Signals conversations. Known
@@ -188573,6 +189461,8 @@ class SignalsOperations:
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
         _request = build_signals_list_exports_request(
+            environment_id=environment_id,
+            agent_id=agent_id,
             limit=limit,
             after=after,
             headers=_headers,
@@ -188625,9 +189515,10 @@ class SignalsOperations:
 
         To create a new signals data export, send a POST request to
         ``/v1/signals/exports``. To export one Harness Runtime environment, include its
-        ``agent_id`` (\\ ``type`` defaults to ``agent``\\ ). To export the team's Serverless
-        Inference Signals conversations, set ``type`` to ``inference`` and omit
-        ``agent_id``. You may optionally filter the export by ``signal_type``\\ ,
+        ``environment_id`` (\\ ``type`` defaults to ``agent``\\ ). Deprecated ``agent_id`` is still
+        accepted. To export the team's Serverless Inference Signals conversations, set
+        ``type`` to ``inference`` and omit ``environment_id`` and ``agent_id``. You may
+        optionally filter the export by ``signal_type``\\ ,
         ``session_ids``\\ , ``start_time``\\ , and ``end_time``. Use the export options endpoint
         to discover available signal types.
 
@@ -188649,11 +189540,16 @@ class SignalsOperations:
 
                 # JSON input template you can fill out and use as your body input.
                 body = {
-                    "agent_id": "str",  # Optional. The environment whose data should be
-                      exported. For Harness Runtime, this is the Environment Config ID. Required when
-                      ``type`` is ``agent``"" ; must be omitted when ``type`` is ``inference``.
+                    "agent_id": "str",  # Optional. Deprecated alias for ``environment_id``.
+                      Accepted for backward compatibility; must equal ``environment_id`` when both are
+                      set. Both set and different returns 400. Required when ``type`` is ``agent`` if
+                      ``environment_id`` is omitted; must be omitted when ``type`` is ``inference``.
                     "end_time": "2020-02-20 00:00:00",  # Optional. Include only sessions that
                       started at or before this timestamp.
+                    "environment_id": "str",  # Optional. The environment whose data should be
+                      exported. For Harness Runtime, this is the Environment Config ID. Required when
+                      ``type`` is ``agent`` if ``agent_id`` is omitted; must be omitted when ``type``
+                      is ``inference``. Prefer this over ``agent_id``.
                     "session_ids": [
                         "str"  # Optional. Optional list of specific session IDs to include
                           in the export.
@@ -188665,28 +189561,18 @@ class SignalsOperations:
                     "start_time": "2020-02-20 00:00:00",  # Optional. Include only sessions that
                       started at or after this timestamp.
                     "type": "str"  # Optional. The scope of the export. ``agent`` exports Signals
-                      conversations for one Harness Runtime environment and requires ``agent_id``.
-                      ``inference`` exports Serverless Inference Signals conversations for the whole
-                      team (team-wide; omit ``agent_id``"" ). Defaults to ``agent`` when ``agent_id``
-                      is provided and to ``inference`` when it is omitted. Known values are: "agent"
+                      conversations for one Harness Runtime environment and requires ``environment_id``
+                      (or deprecated ``agent_id``"" ). ``inference`` exports Serverless Inference
+                      Signals conversations for the whole team (team-wide; omit ``environment_id`` and
+                      ``agent_id``"" ). Defaults to ``agent`` when ``environment_id`` or ``agent_id``
+                      is provided and to ``inference`` when both are omitted. Known values are: "agent"
                       and "inference".
                 }
 
                 # response body for status code(s): 201
                 response == {
-                    "agent_id": "str",  # The environment whose data is being exported. For
-                      Harness Runtime, this is the Environment Config ID. Not meaningful for
-                      ``inference`` exports; use ``type`` to distinguish the export scope. Required.
                     "created_at": 0,  # Unix timestamp when the export was created. Required.
                     "export_id": "str",  # The unique identifier for the export job. Required.
-                    "status": "str",  # The current status of the export job. Required. Known
-                      values are: "pending", "processing", "complete", and "failed".
-                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
-                      null if still in progress.
-                    "error_message": "str",  # Optional. Error message if the export failed, or
-                      null on success.
-                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
-                      expires.
                     "filters": {
                         "session_ids": [
                             "str"  # Optional. Specific session IDs included in the
@@ -188696,6 +189582,19 @@ class SignalsOperations:
                             "str"  # Optional. Signal types included in the export.
                         ]
                     },
+                    "status": "str",  # The current status of the export job. Required. Known
+                      values are: "pending", "processing", "complete", and "failed".
+                    "agent_id": "str",  # Optional. The environment whose data is being exported.
+                      For Harness Runtime, this is the Environment Config ID. Not meaningful for
+                      ``inference`` exports; use ``type`` to distinguish the export scope.
+                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
+                      null if still in progress.
+                    "environment_id": "str",  # Optional. Same as agent_id. Dual-emitted during
+                      the rename.
+                    "error_message": "str",  # Optional. Error message if the export failed, or
+                      null on success.
+                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
+                      expires.
                     "type": "str"  # Optional. The scope of the export. ``agent`` covers one
                       Harness Runtime environment; ``inference`` covers the team's Serverless Inference
                       Signals conversations. Known values are: "agent" and "inference".
@@ -188722,9 +189621,10 @@ class SignalsOperations:
 
         To create a new signals data export, send a POST request to
         ``/v1/signals/exports``. To export one Harness Runtime environment, include its
-        ``agent_id`` (\\ ``type`` defaults to ``agent``\\ ). To export the team's Serverless
-        Inference Signals conversations, set ``type`` to ``inference`` and omit
-        ``agent_id``. You may optionally filter the export by ``signal_type``\\ ,
+        ``environment_id`` (\\ ``type`` defaults to ``agent``\\ ). Deprecated ``agent_id`` is still
+        accepted. To export the team's Serverless Inference Signals conversations, set
+        ``type`` to ``inference`` and omit ``environment_id`` and ``agent_id``. You may
+        optionally filter the export by ``signal_type``\\ ,
         ``session_ids``\\ , ``start_time``\\ , and ``end_time``. Use the export options endpoint
         to discover available signal types.
 
@@ -188746,19 +189646,8 @@ class SignalsOperations:
 
                 # response body for status code(s): 201
                 response == {
-                    "agent_id": "str",  # The environment whose data is being exported. For
-                      Harness Runtime, this is the Environment Config ID. Not meaningful for
-                      ``inference`` exports; use ``type`` to distinguish the export scope. Required.
                     "created_at": 0,  # Unix timestamp when the export was created. Required.
                     "export_id": "str",  # The unique identifier for the export job. Required.
-                    "status": "str",  # The current status of the export job. Required. Known
-                      values are: "pending", "processing", "complete", and "failed".
-                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
-                      null if still in progress.
-                    "error_message": "str",  # Optional. Error message if the export failed, or
-                      null on success.
-                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
-                      expires.
                     "filters": {
                         "session_ids": [
                             "str"  # Optional. Specific session IDs included in the
@@ -188768,6 +189657,19 @@ class SignalsOperations:
                             "str"  # Optional. Signal types included in the export.
                         ]
                     },
+                    "status": "str",  # The current status of the export job. Required. Known
+                      values are: "pending", "processing", "complete", and "failed".
+                    "agent_id": "str",  # Optional. The environment whose data is being exported.
+                      For Harness Runtime, this is the Environment Config ID. Not meaningful for
+                      ``inference`` exports; use ``type`` to distinguish the export scope.
+                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
+                      null if still in progress.
+                    "environment_id": "str",  # Optional. Same as agent_id. Dual-emitted during
+                      the rename.
+                    "error_message": "str",  # Optional. Error message if the export failed, or
+                      null on success.
+                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
+                      expires.
                     "type": "str"  # Optional. The scope of the export. ``agent`` covers one
                       Harness Runtime environment; ``inference`` covers the team's Serverless Inference
                       Signals conversations. Known values are: "agent" and "inference".
@@ -188792,9 +189694,10 @@ class SignalsOperations:
 
         To create a new signals data export, send a POST request to
         ``/v1/signals/exports``. To export one Harness Runtime environment, include its
-        ``agent_id`` (\\ ``type`` defaults to ``agent``\\ ). To export the team's Serverless
-        Inference Signals conversations, set ``type`` to ``inference`` and omit
-        ``agent_id``. You may optionally filter the export by ``signal_type``\\ ,
+        ``environment_id`` (\\ ``type`` defaults to ``agent``\\ ). Deprecated ``agent_id`` is still
+        accepted. To export the team's Serverless Inference Signals conversations, set
+        ``type`` to ``inference`` and omit ``environment_id`` and ``agent_id``. You may
+        optionally filter the export by ``signal_type``\\ ,
         ``session_ids``\\ , ``start_time``\\ , and ``end_time``. Use the export options endpoint
         to discover available signal types.
 
@@ -188813,11 +189716,16 @@ class SignalsOperations:
 
                 # JSON input template you can fill out and use as your body input.
                 body = {
-                    "agent_id": "str",  # Optional. The environment whose data should be
-                      exported. For Harness Runtime, this is the Environment Config ID. Required when
-                      ``type`` is ``agent``"" ; must be omitted when ``type`` is ``inference``.
+                    "agent_id": "str",  # Optional. Deprecated alias for ``environment_id``.
+                      Accepted for backward compatibility; must equal ``environment_id`` when both are
+                      set. Both set and different returns 400. Required when ``type`` is ``agent`` if
+                      ``environment_id`` is omitted; must be omitted when ``type`` is ``inference``.
                     "end_time": "2020-02-20 00:00:00",  # Optional. Include only sessions that
                       started at or before this timestamp.
+                    "environment_id": "str",  # Optional. The environment whose data should be
+                      exported. For Harness Runtime, this is the Environment Config ID. Required when
+                      ``type`` is ``agent`` if ``agent_id`` is omitted; must be omitted when ``type``
+                      is ``inference``. Prefer this over ``agent_id``.
                     "session_ids": [
                         "str"  # Optional. Optional list of specific session IDs to include
                           in the export.
@@ -188829,28 +189737,18 @@ class SignalsOperations:
                     "start_time": "2020-02-20 00:00:00",  # Optional. Include only sessions that
                       started at or after this timestamp.
                     "type": "str"  # Optional. The scope of the export. ``agent`` exports Signals
-                      conversations for one Harness Runtime environment and requires ``agent_id``.
-                      ``inference`` exports Serverless Inference Signals conversations for the whole
-                      team (team-wide; omit ``agent_id``"" ). Defaults to ``agent`` when ``agent_id``
-                      is provided and to ``inference`` when it is omitted. Known values are: "agent"
+                      conversations for one Harness Runtime environment and requires ``environment_id``
+                      (or deprecated ``agent_id``"" ). ``inference`` exports Serverless Inference
+                      Signals conversations for the whole team (team-wide; omit ``environment_id`` and
+                      ``agent_id``"" ). Defaults to ``agent`` when ``environment_id`` or ``agent_id``
+                      is provided and to ``inference`` when both are omitted. Known values are: "agent"
                       and "inference".
                 }
 
                 # response body for status code(s): 201
                 response == {
-                    "agent_id": "str",  # The environment whose data is being exported. For
-                      Harness Runtime, this is the Environment Config ID. Not meaningful for
-                      ``inference`` exports; use ``type`` to distinguish the export scope. Required.
                     "created_at": 0,  # Unix timestamp when the export was created. Required.
                     "export_id": "str",  # The unique identifier for the export job. Required.
-                    "status": "str",  # The current status of the export job. Required. Known
-                      values are: "pending", "processing", "complete", and "failed".
-                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
-                      null if still in progress.
-                    "error_message": "str",  # Optional. Error message if the export failed, or
-                      null on success.
-                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
-                      expires.
                     "filters": {
                         "session_ids": [
                             "str"  # Optional. Specific session IDs included in the
@@ -188860,6 +189758,19 @@ class SignalsOperations:
                             "str"  # Optional. Signal types included in the export.
                         ]
                     },
+                    "status": "str",  # The current status of the export job. Required. Known
+                      values are: "pending", "processing", "complete", and "failed".
+                    "agent_id": "str",  # Optional. The environment whose data is being exported.
+                      For Harness Runtime, this is the Environment Config ID. Not meaningful for
+                      ``inference`` exports; use ``type`` to distinguish the export scope.
+                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
+                      null if still in progress.
+                    "environment_id": "str",  # Optional. Same as agent_id. Dual-emitted during
+                      the rename.
+                    "error_message": "str",  # Optional. Error message if the export failed, or
+                      null on success.
+                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
+                      expires.
                     "type": "str"  # Optional. The scope of the export. ``agent`` covers one
                       Harness Runtime environment; ``inference`` covers the team's Serverless Inference
                       Signals conversations. Known values are: "agent" and "inference".
@@ -189087,19 +189998,8 @@ class SignalsOperations:
 
                 # response body for status code(s): 200
                 response == {
-                    "agent_id": "str",  # The environment whose data is being exported. For
-                      Harness Runtime, this is the Environment Config ID. Not meaningful for
-                      ``inference`` exports; use ``type`` to distinguish the export scope. Required.
                     "created_at": 0,  # Unix timestamp when the export was created. Required.
                     "export_id": "str",  # The unique identifier for the export job. Required.
-                    "status": "str",  # The current status of the export job. Required. Known
-                      values are: "pending", "processing", "complete", and "failed".
-                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
-                      null if still in progress.
-                    "error_message": "str",  # Optional. Error message if the export failed, or
-                      null on success.
-                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
-                      expires.
                     "filters": {
                         "session_ids": [
                             "str"  # Optional. Specific session IDs included in the
@@ -189109,6 +190009,19 @@ class SignalsOperations:
                             "str"  # Optional. Signal types included in the export.
                         ]
                     },
+                    "status": "str",  # The current status of the export job. Required. Known
+                      values are: "pending", "processing", "complete", and "failed".
+                    "agent_id": "str",  # Optional. The environment whose data is being exported.
+                      For Harness Runtime, this is the Environment Config ID. Not meaningful for
+                      ``inference`` exports; use ``type`` to distinguish the export scope.
+                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
+                      null if still in progress.
+                    "environment_id": "str",  # Optional. Same as agent_id. Dual-emitted during
+                      the rename.
+                    "error_message": "str",  # Optional. Error message if the export failed, or
+                      null on success.
+                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
+                      expires.
                     "type": "str"  # Optional. The scope of the export. ``agent`` covers one
                       Harness Runtime environment; ``inference`` covers the team's Serverless Inference
                       Signals conversations. Known values are: "agent" and "inference".
@@ -189367,6 +190280,9 @@ class SignalsOperations:
                                   deleted. Only present for ``agent`` deletions.
                                 "completed_at": 0,  # Optional. Unix timestamp when
                                   the deletion finished, or null if still in progress.
+                                "environment_id": "str",  # Optional. Same as
+                                  agent_id when present. Dual-emitted during the rename; omitted when
+                                  agent_id is omitted.
                                 "error_message": "str",  # Optional. Error message if
                                   the deletion failed, or null otherwise.
                                 "started_at": 0  # Optional. Unix timestamp when
@@ -189486,15 +190402,16 @@ class SignalsOperations:
 
 
         * ``agent`` — deletes Signals conversations for one Harness Runtime environment and
-          turns off collection for that environment. Requires ``agent_id``\\ , which is the
-          environment's Environment Config ID (the environment's ``agent_id``\\ ). On create, matching
-          conversations are hidden from Signals reads immediately. Wait until the
+          turns off collection for that environment. Requires ``environment_id`` (the
+          environment's Environment Config ID). Deprecated ``agent_id`` is still accepted;
+          both set and equal is accepted, both set and different returns 400. On create,
+          matching conversations are hidden from Signals reads immediately. Wait until the
           job is ``complete`` before enabling Signals for the environment again.
         * ``inference`` — deletes Serverless Inference Signals conversations for your
           whole team (team-wide; not limited to one endpoint or model) that were
           collected at or before the deletion request, and turns off team inference
-          collection (\\ ``source=inference``\\ ). Do not send ``agent_id``. On create,
-          matching conversations are hidden from Signals reads immediately.
+          collection (\\ ``source=inference``\\ ). Do not send ``environment_id`` or ``agent_id``.
+          On create, matching conversations are hidden from Signals reads immediately.
 
         The job runs asynchronously; poll the get endpoint until ``status`` is
         ``complete`` or ``failed``. DigitalOcean may retry transient processing errors
@@ -189530,14 +190447,18 @@ class SignalsOperations:
                     "team_id": 0,  # The team whose data should be deleted. Must match the
                       authenticated team. Required.
                     "type": "str",  # The scope of the deletion. ``agent`` deletes Signals
-                      conversations for one Harness Runtime environment and requires ``agent_id``.
-                      ``inference`` deletes Serverless Inference Signals conversations for the whole
-                      team (team-wide; omit ``agent_id``"" ). Required. Known values are: "agent" and
-                      "inference".
-                    "agent_id": "str"  # Optional. The Harness Runtime Environment Config ID of
-                      the environment whose conversations should be deleted. This is the environment's
-                      ``agent_id``. Required when ``type`` is ``agent``"" ; must be omitted when
-                      ``type`` is ``inference``.
+                      conversations for one Harness Runtime environment and requires ``environment_id``
+                      (or deprecated ``agent_id``"" ). ``inference`` deletes Serverless Inference
+                      Signals conversations for the whole team (team-wide; omit ``environment_id`` and
+                      ``agent_id``"" ). Required. Known values are: "agent" and "inference".
+                    "agent_id": "str",  # Optional. Deprecated alias for ``environment_id``.
+                      Accepted for backward compatibility; must equal ``environment_id`` when both are
+                      set. Both set and different returns 400. Required when ``type`` is ``agent`` if
+                      ``environment_id`` is omitted; must be omitted when ``type`` is ``inference``.
+                    "environment_id": "str"  # Optional. The Harness Runtime Environment Config
+                      ID of the environment whose conversations should be deleted. Required when
+                      ``type`` is ``agent`` if ``agent_id`` is omitted; must be omitted when ``type``
+                      is ``inference``. Prefer this over ``agent_id``.
                 }
 
                 # response body for status code(s): 200, 202
@@ -189558,6 +190479,8 @@ class SignalsOperations:
                       deletions.
                     "completed_at": 0,  # Optional. Unix timestamp when the deletion finished, or
                       null if still in progress.
+                    "environment_id": "str",  # Optional. Same as agent_id when present.
+                      Dual-emitted during the rename; omitted when agent_id is omitted.
                     "error_message": "str",  # Optional. Error message if the deletion failed, or
                       null otherwise.
                     "started_at": 0  # Optional. Unix timestamp when processing started, or null
@@ -189590,15 +190513,16 @@ class SignalsOperations:
 
 
         * ``agent`` — deletes Signals conversations for one Harness Runtime environment and
-          turns off collection for that environment. Requires ``agent_id``\\ , which is the
-          environment's Environment Config ID (the environment's ``agent_id``\\ ). On create, matching
-          conversations are hidden from Signals reads immediately. Wait until the
+          turns off collection for that environment. Requires ``environment_id`` (the
+          environment's Environment Config ID). Deprecated ``agent_id`` is still accepted;
+          both set and equal is accepted, both set and different returns 400. On create,
+          matching conversations are hidden from Signals reads immediately. Wait until the
           job is ``complete`` before enabling Signals for the environment again.
         * ``inference`` — deletes Serverless Inference Signals conversations for your
           whole team (team-wide; not limited to one endpoint or model) that were
           collected at or before the deletion request, and turns off team inference
-          collection (\\ ``source=inference``\\ ). Do not send ``agent_id``. On create,
-          matching conversations are hidden from Signals reads immediately.
+          collection (\\ ``source=inference``\\ ). Do not send ``environment_id`` or ``agent_id``.
+          On create, matching conversations are hidden from Signals reads immediately.
 
         The job runs asynchronously; poll the get endpoint until ``status`` is
         ``complete`` or ``failed``. DigitalOcean may retry transient processing errors
@@ -189647,6 +190571,8 @@ class SignalsOperations:
                       deletions.
                     "completed_at": 0,  # Optional. Unix timestamp when the deletion finished, or
                       null if still in progress.
+                    "environment_id": "str",  # Optional. Same as agent_id when present.
+                      Dual-emitted during the rename; omitted when agent_id is omitted.
                     "error_message": "str",  # Optional. Error message if the deletion failed, or
                       null otherwise.
                     "started_at": 0  # Optional. Unix timestamp when processing started, or null
@@ -189679,15 +190605,16 @@ class SignalsOperations:
 
 
         * ``agent`` — deletes Signals conversations for one Harness Runtime environment and
-          turns off collection for that environment. Requires ``agent_id``\\ , which is the
-          environment's Environment Config ID (the environment's ``agent_id``\\ ). On create, matching
-          conversations are hidden from Signals reads immediately. Wait until the
+          turns off collection for that environment. Requires ``environment_id`` (the
+          environment's Environment Config ID). Deprecated ``agent_id`` is still accepted;
+          both set and equal is accepted, both set and different returns 400. On create,
+          matching conversations are hidden from Signals reads immediately. Wait until the
           job is ``complete`` before enabling Signals for the environment again.
         * ``inference`` — deletes Serverless Inference Signals conversations for your
           whole team (team-wide; not limited to one endpoint or model) that were
           collected at or before the deletion request, and turns off team inference
-          collection (\\ ``source=inference``\\ ). Do not send ``agent_id``. On create,
-          matching conversations are hidden from Signals reads immediately.
+          collection (\\ ``source=inference``\\ ). Do not send ``environment_id`` or ``agent_id``.
+          On create, matching conversations are hidden from Signals reads immediately.
 
         The job runs asynchronously; poll the get endpoint until ``status`` is
         ``complete`` or ``failed``. DigitalOcean may retry transient processing errors
@@ -189720,14 +190647,18 @@ class SignalsOperations:
                     "team_id": 0,  # The team whose data should be deleted. Must match the
                       authenticated team. Required.
                     "type": "str",  # The scope of the deletion. ``agent`` deletes Signals
-                      conversations for one Harness Runtime environment and requires ``agent_id``.
-                      ``inference`` deletes Serverless Inference Signals conversations for the whole
-                      team (team-wide; omit ``agent_id``"" ). Required. Known values are: "agent" and
-                      "inference".
-                    "agent_id": "str"  # Optional. The Harness Runtime Environment Config ID of
-                      the environment whose conversations should be deleted. This is the environment's
-                      ``agent_id``. Required when ``type`` is ``agent``"" ; must be omitted when
-                      ``type`` is ``inference``.
+                      conversations for one Harness Runtime environment and requires ``environment_id``
+                      (or deprecated ``agent_id``"" ). ``inference`` deletes Serverless Inference
+                      Signals conversations for the whole team (team-wide; omit ``environment_id`` and
+                      ``agent_id``"" ). Required. Known values are: "agent" and "inference".
+                    "agent_id": "str",  # Optional. Deprecated alias for ``environment_id``.
+                      Accepted for backward compatibility; must equal ``environment_id`` when both are
+                      set. Both set and different returns 400. Required when ``type`` is ``agent`` if
+                      ``environment_id`` is omitted; must be omitted when ``type`` is ``inference``.
+                    "environment_id": "str"  # Optional. The Harness Runtime Environment Config
+                      ID of the environment whose conversations should be deleted. Required when
+                      ``type`` is ``agent`` if ``agent_id`` is omitted; must be omitted when ``type``
+                      is ``inference``. Prefer this over ``agent_id``.
                 }
 
                 # response body for status code(s): 200, 202
@@ -189748,6 +190679,8 @@ class SignalsOperations:
                       deletions.
                     "completed_at": 0,  # Optional. Unix timestamp when the deletion finished, or
                       null if still in progress.
+                    "environment_id": "str",  # Optional. Same as agent_id when present.
+                      Dual-emitted during the rename; omitted when agent_id is omitted.
                     "error_message": "str",  # Optional. Error message if the deletion failed, or
                       null otherwise.
                     "started_at": 0  # Optional. Unix timestamp when processing started, or null
@@ -189939,6 +190872,8 @@ class SignalsOperations:
                       deletions.
                     "completed_at": 0,  # Optional. Unix timestamp when the deletion finished, or
                       null if still in progress.
+                    "environment_id": "str",  # Optional. Same as agent_id when present.
+                      Dual-emitted during the rename; omitted when agent_id is omitted.
                     "error_message": "str",  # Optional. Error message if the deletion failed, or
                       null otherwise.
                     "started_at": 0  # Optional. Unix timestamp when processing started, or null
@@ -235041,6 +235976,8 @@ class SizesOperations:
                             "gpu_info": {
                                 "count": 0,  # Optional. The number of GPUs allocated
                                   to the Droplet.
+                                "fabric": bool,  # Optional. If GPU fabric networking
+                                  is enabled.
                                 "model": "str",  # Optional. The model of the GPU.
                                 "vram": {
                                     "amount": 0,  # Optional. The amount of VRAM
@@ -304719,18 +305656,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                     "presets": [
                         {
                             "candidate_inference_config": {
-                                "max_tokens": 0,  # Optional. Inference configuration
-                                  for the candidate model during evaluation.
                                 "reasoning_effort": "str",  # Optional. Reasoning
                                   effort for reasoning-capable models (e.g. "low", "medium", "high").
                                   Validated against the candidate model's supported values; a model
                                   that advertises none rejects this field.
                                 "stop_token": "str",  # Optional. Inference
-                                  configuration for the candidate model during evaluation.
+                                  configuration for the candidate model during evaluation. The output
+                                  token limit is set automatically and cannot be configured.
                                 "system_prompt": "str",  # Optional. Inference
-                                  configuration for the candidate model during evaluation.
+                                  configuration for the candidate model during evaluation. The output
+                                  token limit is set automatically and cannot be configured.
                                 "temperature": 0.0  # Optional. Inference
-                                  configuration for the candidate model during evaluation.
+                                  configuration for the candidate model during evaluation. The output
+                                  token limit is set automatically and cannot be configured.
                             },
                             "candidate_model_name": "str",  # Optional. Model slug used
                               to call the candidate model API. Empty when the CANDIDATE section was not
@@ -304986,18 +305924,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                 response == {
                     "preset": {
                         "candidate_inference_config": {
-                            "max_tokens": 0,  # Optional. Inference configuration for the
-                              candidate model during evaluation.
                             "reasoning_effort": "str",  # Optional. Reasoning effort for
                               reasoning-capable models (e.g. "low", "medium", "high"). Validated
                               against the candidate model's supported values; a model that advertises
                               none rejects this field.
                             "stop_token": "str",  # Optional. Inference configuration for
-                              the candidate model during evaluation.
+                              the candidate model during evaluation. The output token limit is set
+                              automatically and cannot be configured.
                             "system_prompt": "str",  # Optional. Inference configuration
-                              for the candidate model during evaluation.
+                              for the candidate model during evaluation. The output token limit is set
+                              automatically and cannot be configured.
                             "temperature": 0.0  # Optional. Inference configuration for
-                              the candidate model during evaluation.
+                              the candidate model during evaluation. The output token limit is set
+                              automatically and cannot be configured.
                         },
                         "candidate_model_name": "str",  # Optional. Model slug used to call
                           the candidate model API. Empty when the CANDIDATE section was not saved.
@@ -305595,18 +306534,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                 # JSON input template you can fill out and use as your body input.
                 body = {
                     "candidate_inference_config": {
-                        "max_tokens": 0,  # Optional. Inference configuration for the
-                          candidate model during evaluation.
                         "reasoning_effort": "str",  # Optional. Reasoning effort for
                           reasoning-capable models (e.g. "low", "medium", "high"). Validated against
                           the candidate model's supported values; a model that advertises none rejects
                           this field.
                         "stop_token": "str",  # Optional. Inference configuration for the
-                          candidate model during evaluation.
+                          candidate model during evaluation. The output token limit is set
+                          automatically and cannot be configured.
                         "system_prompt": "str",  # Optional. Inference configuration for the
-                          candidate model during evaluation.
+                          candidate model during evaluation. The output token limit is set
+                          automatically and cannot be configured.
                         "temperature": 0.0  # Optional. Inference configuration for the
-                          candidate model during evaluation.
+                          candidate model during evaluation. The output token limit is set
+                          automatically and cannot be configured.
                     },
                     "candidate_model_name": "str",  # Optional. Model slug used to call the
                       candidate model API. For dedicated inference, this is the model slug from the
@@ -305740,18 +306680,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                 # JSON input template you can fill out and use as your body input.
                 body = {
                     "candidate_inference_config": {
-                        "max_tokens": 0,  # Optional. Inference configuration for the
-                          candidate model during evaluation.
                         "reasoning_effort": "str",  # Optional. Reasoning effort for
                           reasoning-capable models (e.g. "low", "medium", "high"). Validated against
                           the candidate model's supported values; a model that advertises none rejects
                           this field.
                         "stop_token": "str",  # Optional. Inference configuration for the
-                          candidate model during evaluation.
+                          candidate model during evaluation. The output token limit is set
+                          automatically and cannot be configured.
                         "system_prompt": "str",  # Optional. Inference configuration for the
-                          candidate model during evaluation.
+                          candidate model during evaluation. The output token limit is set
+                          automatically and cannot be configured.
                         "temperature": 0.0  # Optional. Inference configuration for the
-                          candidate model during evaluation.
+                          candidate model during evaluation. The output token limit is set
+                          automatically and cannot be configured.
                     },
                     "candidate_model_name": "str",  # Optional. Model slug used to call the
                       candidate model API. For dedicated inference, this is the model slug from the
@@ -306064,18 +307005,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                     ],
                     "run": {
                         "candidate_inference_config": {
-                            "max_tokens": 0,  # Optional. Inference configuration for the
-                              candidate model during evaluation.
                             "reasoning_effort": "str",  # Optional. Reasoning effort for
                               reasoning-capable models (e.g. "low", "medium", "high"). Validated
                               against the candidate model's supported values; a model that advertises
                               none rejects this field.
                             "stop_token": "str",  # Optional. Inference configuration for
-                              the candidate model during evaluation.
+                              the candidate model during evaluation. The output token limit is set
+                              automatically and cannot be configured.
                             "system_prompt": "str",  # Optional. Inference configuration
-                              for the candidate model during evaluation.
+                              for the candidate model during evaluation. The output token limit is set
+                              automatically and cannot be configured.
                             "temperature": 0.0  # Optional. Inference configuration for
-                              the candidate model during evaluation.
+                              the candidate model during evaluation. The output token limit is set
+                              automatically and cannot be configured.
                         },
                         "candidate_model_name": "str",  # Optional. Model Evaluation Run
                           Detail - full view returned when fetching a specific run.
@@ -340982,7 +341924,7 @@ class InferenceOperations:
         # pylint: disable=line-too-long
         """Generate images from text prompts.
 
-        Creates a high-quality image from a text prompt using GPT-IMAGE-1, the latest image generation
+        Creates a high-quality image from a text prompt using GPT-IMAGE-2, the latest image generation
         model with automatic prompt optimization and enhanced visual capabilities.
 
         :param body: Required.
@@ -341019,7 +341961,7 @@ class InferenceOperations:
                       generated.
                     "quality": "str",  # Optional. The quality of the image that will be
                       generated. Supported values: auto, high, medium, low.
-                    "size": "str",  # Optional. The size of the generated images. GPT-IMAGE-1
+                    "size": "str",  # Optional. The size of the generated images. GPT-IMAGE-2
                       supports: auto (automatically select best size), 1536x1024 (landscape), 1024x1536
                       (portrait). Known values are: "auto", "1536x1024", and "1024x1536".
                     "stream": False,  # Optional. Default value is False. If set to true, partial
@@ -341072,7 +342014,7 @@ class InferenceOperations:
     ) -> JSON:
         """Generate images from text prompts.
 
-        Creates a high-quality image from a text prompt using GPT-IMAGE-1, the latest image generation
+        Creates a high-quality image from a text prompt using GPT-IMAGE-2, the latest image generation
         model with automatic prompt optimization and enhanced visual capabilities.
 
         :param body: Required.
@@ -341128,7 +342070,7 @@ class InferenceOperations:
         # pylint: disable=line-too-long
         """Generate images from text prompts.
 
-        Creates a high-quality image from a text prompt using GPT-IMAGE-1, the latest image generation
+        Creates a high-quality image from a text prompt using GPT-IMAGE-2, the latest image generation
         model with automatic prompt optimization and enhanced visual capabilities.
 
         :param body: Is either a JSON type or a IO[bytes] type. Required.
@@ -341162,7 +342104,7 @@ class InferenceOperations:
                       generated.
                     "quality": "str",  # Optional. The quality of the image that will be
                       generated. Supported values: auto, high, medium, low.
-                    "size": "str",  # Optional. The size of the generated images. GPT-IMAGE-1
+                    "size": "str",  # Optional. The size of the generated images. GPT-IMAGE-2
                       supports: auto (automatically select best size), 1536x1024 (landscape), 1024x1536
                       (portrait). Known values are: "auto", "1536x1024", and "1024x1536".
                     "stream": False,  # Optional. Default value is False. If set to true, partial
@@ -342498,6 +343440,655 @@ class InferenceOperations:
             return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
 
         return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def create_speech(
+        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
+    ) -> Union[JSON, AsyncIterator[bytes]]:
+        # pylint: disable=line-too-long
+        """Generate speech from text.
+
+        Convert text input to speech audio. The response may be raw audio bytes (\\ ``audio/mpeg``\\ ,
+        ``audio/wav``\\ , and similar) or a JSON envelope with base64-encoded audio in
+        ``data[].b64_json``.
+
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object or AsyncIterator[bytes]
+        :rtype: JSON or AsyncIterator[bytes]
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "input": "str",  # The text to convert to speech. Required.
+                    "model": "str",  # The text-to-speech model to use. Required.
+                    "instructions": "str",  # Optional. Optional style or delivery instructions
+                      for the synthesizer.
+                    "response_format": "str",  # Optional. The audio format to return. Supported
+                      values include ``mp3`` and ``wav``. The API may return raw audio bytes or a JSON
+                      envelope with base64-encoded audio.
+                    "voice": "str"  # Optional. The voice to use for synthesis.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "data": [
+                        {
+                            "b64_json": "str"  # Base64-encoded audio bytes. Required.
+                        }
+                    ],
+                    "created": 0  # Optional. Unix timestamp (in seconds) of when the audio was
+                      created.
+                }
+        """
+
+    @overload
+    async def create_speech(
+        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
+    ) -> Union[JSON, AsyncIterator[bytes]]:
+        """Generate speech from text.
+
+        Convert text input to speech audio. The response may be raw audio bytes (\\ ``audio/mpeg``\\ ,
+        ``audio/wav``\\ , and similar) or a JSON envelope with base64-encoded audio in
+        ``data[].b64_json``.
+
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object or AsyncIterator[bytes]
+        :rtype: JSON or AsyncIterator[bytes]
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "data": [
+                        {
+                            "b64_json": "str"  # Base64-encoded audio bytes. Required.
+                        }
+                    ],
+                    "created": 0  # Optional. Unix timestamp (in seconds) of when the audio was
+                      created.
+                }
+        """
+
+    @distributed_trace_async
+    async def create_speech(
+        self, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> Union[JSON, AsyncIterator[bytes]]:
+        # pylint: disable=line-too-long
+        """Generate speech from text.
+
+        Convert text input to speech audio. The response may be raw audio bytes (\\ ``audio/mpeg``\\ ,
+        ``audio/wav``\\ , and similar) or a JSON envelope with base64-encoded audio in
+        ``data[].b64_json``.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object or AsyncIterator[bytes]
+        :rtype: JSON or AsyncIterator[bytes]
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "input": "str",  # The text to convert to speech. Required.
+                    "model": "str",  # The text-to-speech model to use. Required.
+                    "instructions": "str",  # Optional. Optional style or delivery instructions
+                      for the synthesizer.
+                    "response_format": "str",  # Optional. The audio format to return. Supported
+                      values include ``mp3`` and ``wav``. The API may return raw audio bytes or a JSON
+                      envelope with base64-encoded audio.
+                    "voice": "str"  # Optional. The voice to use for synthesis.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "data": [
+                        {
+                            "b64_json": "str"  # Base64-encoded audio bytes. Required.
+                        }
+                    ],
+                    "created": 0  # Optional. Unix timestamp (in seconds) of when the audio was
+                      created.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[Union[JSON, AsyncIterator[bytes]]] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_inference_create_speech_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = True
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 200]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if cls:
+            return cls(pipeline_response, cast(Union[JSON, AsyncIterator[bytes]], deserialized), response_headers)  # type: ignore
+
+        return cast(Union[JSON, AsyncIterator[bytes]], deserialized)  # type: ignore
+
+    @overload
+    async def create_video(
+        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Start a video generation job.
+
+        Start an asynchronous video generation job from a text prompt. Poll ``GET
+        /v1/videos/{video_id}`` until the job reaches a terminal status, then download the MP4 with
+        ``GET /v1/videos/{video_id}/content`` or from ``output.url`` when present.
+
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "model": "str",  # The video generation model to use. Required.
+                    "prompt": "str",  # A text description of the desired video. Required.
+                    "fps": 0,  # Optional. Frames per second for the generated video.
+                    "size": "str"  # Optional. The output resolution, for example ``1280x720``.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "id": "str",  # The video generation job identifier. Required.
+                    "status": "str",  # Job status. Poll until the value is a terminal state such
+                      as ``completed`` or ``failed``. Required.
+                    "created_at": 0,  # Optional. Unix timestamp (in seconds) of when the job was
+                      created.
+                    "error": {
+                        "str": {}  # Optional. Error details when status is ``failed``.
+                    },
+                    "model": "str",  # Optional. The model used for generation.
+                    "object": "str",  # Optional. Object type returned by the API.
+                    "output": {
+                        "url": "str"  # Optional. Presigned URL for the generated MP4.
+                    },
+                    "x_request_id": "str"  # Optional. Request correlation identifier when
+                      provided by the API.
+                }
+        """
+
+    @overload
+    async def create_video(
+        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Start a video generation job.
+
+        Start an asynchronous video generation job from a text prompt. Poll ``GET
+        /v1/videos/{video_id}`` until the job reaches a terminal status, then download the MP4 with
+        ``GET /v1/videos/{video_id}/content`` or from ``output.url`` when present.
+
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "id": "str",  # The video generation job identifier. Required.
+                    "status": "str",  # Job status. Poll until the value is a terminal state such
+                      as ``completed`` or ``failed``. Required.
+                    "created_at": 0,  # Optional. Unix timestamp (in seconds) of when the job was
+                      created.
+                    "error": {
+                        "str": {}  # Optional. Error details when status is ``failed``.
+                    },
+                    "model": "str",  # Optional. The model used for generation.
+                    "object": "str",  # Optional. Object type returned by the API.
+                    "output": {
+                        "url": "str"  # Optional. Presigned URL for the generated MP4.
+                    },
+                    "x_request_id": "str"  # Optional. Request correlation identifier when
+                      provided by the API.
+                }
+        """
+
+    @distributed_trace_async
+    async def create_video(self, body: Union[JSON, IO[bytes]], **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Start a video generation job.
+
+        Start an asynchronous video generation job from a text prompt. Poll ``GET
+        /v1/videos/{video_id}`` until the job reaches a terminal status, then download the MP4 with
+        ``GET /v1/videos/{video_id}/content`` or from ``output.url`` when present.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "model": "str",  # The video generation model to use. Required.
+                    "prompt": "str",  # A text description of the desired video. Required.
+                    "fps": 0,  # Optional. Frames per second for the generated video.
+                    "size": "str"  # Optional. The output resolution, for example ``1280x720``.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "id": "str",  # The video generation job identifier. Required.
+                    "status": "str",  # Job status. Poll until the value is a terminal state such
+                      as ``completed`` or ``failed``. Required.
+                    "created_at": 0,  # Optional. Unix timestamp (in seconds) of when the job was
+                      created.
+                    "error": {
+                        "str": {}  # Optional. Error details when status is ``failed``.
+                    },
+                    "model": "str",  # Optional. The model used for generation.
+                    "object": "str",  # Optional. Object type returned by the API.
+                    "output": {
+                        "url": "str"  # Optional. Presigned URL for the generated MP4.
+                    },
+                    "x_request_id": "str"  # Optional. Request correlation identifier when
+                      provided by the API.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_inference_create_video_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        response_headers["ratelimit-limit"] = self._deserialize(
+            "int", response.headers.get("ratelimit-limit")
+        )
+        response_headers["ratelimit-remaining"] = self._deserialize(
+            "int", response.headers.get("ratelimit-remaining")
+        )
+        response_headers["ratelimit-reset"] = self._deserialize(
+            "int", response.headers.get("ratelimit-reset")
+        )
+
+        if response.content:
+            deserialized = response.json()
+        else:
+            deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_video(self, video_id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve a video generation job.
+
+        Returns the current state of a video generation job. Poll until ``status`` reaches a terminal
+        value such as ``completed`` or ``failed``.
+
+        :param video_id: The video generation job identifier. Required.
+        :type video_id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "id": "str",  # The video generation job identifier. Required.
+                    "status": "str",  # Job status. Poll until the value is a terminal state such
+                      as ``completed`` or ``failed``. Required.
+                    "created_at": 0,  # Optional. Unix timestamp (in seconds) of when the job was
+                      created.
+                    "error": {
+                        "str": {}  # Optional. Error details when status is ``failed``.
+                    },
+                    "model": "str",  # Optional. The model used for generation.
+                    "object": "str",  # Optional. Object type returned by the API.
+                    "output": {
+                        "url": "str"  # Optional. Presigned URL for the generated MP4.
+                    },
+                    "x_request_id": "str"  # Optional. Request correlation identifier when
+                      provided by the API.
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_inference_get_video_request(
+            video_id=video_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_video_content(
+        self, video_id: str, **kwargs: Any
+    ) -> Union[AsyncIterator[bytes], JSON]:
+        # pylint: disable=line-too-long
+        """Download generated video content.
+
+        Downloads the generated MP4 for a completed video generation job.
+
+        :param video_id: The video generation job identifier. Required.
+        :type video_id: str
+        :return: AsyncIterator[bytes] or JSON object
+        :rtype: AsyncIterator[bytes] or JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[Union[AsyncIterator[bytes], JSON]] = kwargs.pop("cls", None)
+
+        _request = build_inference_get_video_content_request(
+            video_id=video_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = True
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if cls:
+            return cls(pipeline_response, cast(Union[AsyncIterator[bytes], JSON], deserialized), response_headers)  # type: ignore
+
+        return cast(Union[AsyncIterator[bytes], JSON], deserialized)  # type: ignore
 
     @overload
     async def create_batch_file(
