@@ -46,6 +46,13 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
 
+      # Pin Python so ubuntu-latest default (currently 3.14) does not break
+      # poetry install of cffi during client generation.
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
       - name: Install Poetry
         uses: snok/install-poetry@v1.3.4
         with:
