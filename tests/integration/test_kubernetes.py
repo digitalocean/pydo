@@ -312,3 +312,63 @@ def test_kubernetes_upgrade_cluster(integration_client: Client, existing_cluster
             cluster_id, {"version": next_version}
         )
         assert resp is None
+
+
+def test_kubernetes_cluster_registry_integration(
+    integration_client: Client, existing_cluster_id
+):
+    """Tests container registry integration with Kubernetes cluster.
+    
+    This test demonstrates the correct approach for enabling container registry
+    integration with a Kubernetes cluster. The registry_enabled field is read-only
+    in the cluster response, so registry integration must be enabled using the
+    add_registry operation after cluster creation.
+    
+    This test covers:
+    1. Creating a cluster (registry_enabled is False by default)
+    2. Enabling registry integration using add_registry
+    3. Verifying registry_enabled is True
+    4. Removing registry integration
+    5. Verifying registry_enabled is False
+    
+    Related to: https://github.com/digitalocean/pydo/issues/433
+    """
+    create_req = {
+        "name": f"{defaults.PREFIX}-registry-test-{uuid.uuid4().hex}",
+        "region": defaults.REGION,
+        "version": defaults.K8S_VERSION,
+        "node_pools": [{"size": defaults.K8S_NODE_SIZE, "count": 2, "name": "workers"}],
+    }
+
+    with shared.with_test_kubernetes_cluster(
+        integration_client,
+        wait=True,
+        existing_cluster_id=existing_cluster_id,
+        **create_req,
+    ) as cluster:
+        cluster_id = cluster["kubernetes_cluster"]["id"]
+        assert cluster_id != ""
+
+        # Verify registry is not enabled by default
+        cluster_details = integration_client.kubernetes.get_cluster(cluster_id)
+        assert (
+            cluster_details["kubernetes_cluster"]["registry_enabled"] is False
+        ), "Registry should not be enabled by default"
+
+        # Enable registry integration
+        integration_client.kubernetes.add_registry({"cluster_uuids": [cluster_id]})
+
+        # Verify registry is now enabled
+        cluster_details = integration_client.kubernetes.get_cluster(cluster_id)
+        assert (
+            cluster_details["kubernetes_cluster"]["registry_enabled"] is True
+        ), "Registry should be enabled after add_registry call"
+
+        # Disable registry integration
+        integration_client.kubernetes.remove_registry({"cluster_uuids": [cluster_id]})
+
+        # Verify registry is now disabled
+        cluster_details = integration_client.kubernetes.get_cluster(cluster_id)
+        assert (
+            cluster_details["kubernetes_cluster"]["registry_enabled"] is False
+        ), "Registry should be disabled after remove_registry call"
