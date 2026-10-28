@@ -373,7 +373,7 @@ def test_destroy_session_docs_api():
     resources.destroy_session(session_id="do-docs-1")
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "DELETE"
-    assert call.request.url.endswith("/v2/agents/sessions/do-docs-1")
+    assert call.request.url.endswith("/v2/harness-runtime/sessions/do-docs-1")
 
 
 def test_start_orchestrates_openai_then_creates_do_session():

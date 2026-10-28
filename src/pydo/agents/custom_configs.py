@@ -2,7 +2,7 @@
 # Copyright (c) DigitalOcean.
 # Licensed under the Apache-2.0 License.
 # ------------------------------------
-"""Sync Hosted Agents config operations (``/v2/agents/configs/...``).
+"""Sync Hosted Agents config operations (``/v2/harness-runtime/configs/...``).
 
 Hand-written against harness-api's public contract
 (``public/harness.swagger.json``). Preserved across ``make generate``.
@@ -19,7 +19,7 @@ from azure.core.rest import HttpRequest
 from pydo.agents.custom_sessions import _OK_STATUS, _raise_agents_http_error
 from pydo.custom_extensions import _wrap
 
-_CONFIGS_PATH = "/v2/agents/configs"
+_CONFIGS_PATH = "/v2/harness-runtime/configs"
 
 
 def _quote(value: str) -> str:
@@ -102,7 +102,7 @@ class ConfigsOperations:
         )
 
     def create(self, body: Dict[str, Any]) -> Any:
-        """Create an Agent Config (``POST /v2/agents/configs``).
+        """Create an Agent Config (``POST /v2/harness-runtime/configs``).
 
         Accepts ``name`` and ``manifest_yaml`` (the full ``agents.yaml`` text,
         including write-only ``spec.secrets[].value`` entries for tenant
@@ -122,7 +122,7 @@ class ConfigsOperations:
         )
 
     def delete(self, config_id: str) -> None:
-        """Soft-delete an Agent Config (``DELETE /v2/agents/configs/{id}``).
+        """Soft-delete an Agent Config (``DELETE /v2/harness-runtime/configs/{id}``).
 
         Returns ``204`` with no body. Returns ``409`` when any session created
         from this config is still active.

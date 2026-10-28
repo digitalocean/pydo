@@ -2,7 +2,7 @@
 # Copyright (c) DigitalOcean.
 # Licensed under the Apache-2.0 License.
 # ------------------------------------
-"""Sync Hosted Agents session operations (``/v2/agents/sessions/...``)."""
+"""Sync Hosted Agents session operations (``/v2/harness-runtime/sessions/...``)."""
 
 from __future__ import annotations
 
@@ -46,7 +46,7 @@ _ERROR_MAP = {
     304: ResourceNotModifiedError,
 }
 
-_BASE_PATH = "/v2/agents/sessions"
+_BASE_PATH = "/v2/harness-runtime/sessions"
 _OK_STATUS = (200, 201, 202, 204)
 
 # Cap on children created by one ``fork`` call (matches godo HostedAgentForkMaxCount).
@@ -336,7 +336,7 @@ def _encode_source_raw(source_raw: Union[bytes, bytearray, memoryview, str]) -> 
 
 
 def _port_forward_ws_url(base_url: str, session_id: str, remote_port: int) -> str:
-    """Build ``ws[s]://…/v2/agents/sessions/{id}/port-forward/{port}``."""
+    """Build ``ws[s]://…/v2/harness-runtime/sessions/{id}/port-forward/{port}``."""
     port = int(remote_port)
     if port < 1024 or port > 65535:
         raise ValueError(f"remote_port must be between 1024 and 65535 (got {port})")
@@ -528,7 +528,7 @@ class SessionsOperations:
     ) -> Any:
         """List sessions, optionally filtered by ``status`` and/or ``name``.
 
-        ``name`` filters server-side (``GET /v2/agents/sessions?name=...``) and
+        ``name`` filters server-side (``GET /v2/harness-runtime/sessions?name=...``) and
         may match more than one session (e.g. a name reused over time).
         """
         return self._parse_json(
@@ -598,7 +598,7 @@ class SessionsOperations:
         config_id: str,
         timeout: Optional[float] = None,
     ) -> Any:
-        """Create a session from a durable Agent Config (``POST /v2/agents/sessions``).
+        """Create a session from a durable Agent Config (``POST /v2/harness-runtime/sessions``).
 
         Sends ``application/json`` with ``name`` and ``config_id``. The server
         loads the config, resolves credentials from Secrets Manager, and
@@ -665,7 +665,7 @@ class SessionsOperations:
     def validate_policy(self, manifest: Union[str, bytes]) -> Any:
         """Validate a manifest's tool-permission policy without creating a session.
 
-        ``POST /v2/agents/sessions/policy/validate`` with ``application/x-yaml``.
+        ``POST /v2/harness-runtime/sessions/policy/validate`` with ``application/x-yaml``.
         """
         data = _manifest_bytes(manifest)
         if not data.strip():
@@ -915,7 +915,7 @@ class SessionsOperations:
         return self._parse_json(
             self._send(
                 "POST",
-                f"/v2/agents/auth/{_quote(provider)}",
+                f"/v2/harness-runtime/auth/{_quote(provider)}",
                 body={},
             ),
         )
@@ -931,7 +931,7 @@ class SessionsOperations:
         return self._parse_json(
             self._send(
                 "GET",
-                f"/v2/agents/auth/{_quote(provider)}/poll",
+                f"/v2/harness-runtime/auth/{_quote(provider)}/poll",
                 params={"poll_url": poll_url},
             ),
         )
@@ -947,7 +947,7 @@ class SessionsOperations:
     ) -> Any:
         """List the team's external-provider connections (actor-scoped auth).
 
-        ``GET /v2/agents/auth/{provider}/connections``. This is the newer
+        ``GET /v2/harness-runtime/auth/{provider}/connections``. This is the newer
         actor-scoped flow, separate from the team-wide
         :meth:`start_provider_auth`. Each connection binds a ``user_id`` (the
         actor a manifest's oauth slot references) to the provider and holds the
@@ -958,7 +958,7 @@ class SessionsOperations:
         return self._parse_json(
             self._send(
                 "GET",
-                f"/v2/agents/auth/{_quote(provider)}/connections",
+                f"/v2/harness-runtime/auth/{_quote(provider)}/connections",
                 params={
                     "user_id": user_id,
                     "status": status,
@@ -977,7 +977,7 @@ class SessionsOperations:
     ) -> Any:
         """Create (or resume) a connection for an actor.
 
-        ``POST /v2/agents/auth/{provider}/connections`` with ``{"user_id":
+        ``POST /v2/harness-runtime/auth/{provider}/connections`` with ``{"user_id":
         ..., "scopes": [...]}``. ``user_id`` is the actor the connection acts
         for (required). Omit ``scopes`` to request the provider's full
         configured scope set. A new connection comes back ``pending`` with an
@@ -993,7 +993,7 @@ class SessionsOperations:
         return self._parse_json(
             self._send(
                 "POST",
-                f"/v2/agents/auth/{_quote(provider)}/connections",
+                f"/v2/harness-runtime/auth/{_quote(provider)}/connections",
                 body=body,
             ),
         )
@@ -1009,7 +1009,7 @@ class SessionsOperations:
         return self._parse_json(
             self._send(
                 "GET",
-                f"/v2/agents/auth/{_quote(provider)}/connections/"
+                f"/v2/harness-runtime/auth/{_quote(provider)}/connections/"
                 f"{_quote(connection_id)}",
             ),
         )
@@ -1025,7 +1025,7 @@ class SessionsOperations:
         return self._parse_json(
             self._send(
                 "DELETE",
-                f"/v2/agents/auth/{_quote(provider)}/connections/"
+                f"/v2/harness-runtime/auth/{_quote(provider)}/connections/"
                 f"{_quote(connection_id)}",
             ),
         )
