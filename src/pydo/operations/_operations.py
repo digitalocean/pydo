@@ -9480,6 +9480,109 @@ def build_insights_post_spans_search_request(region: str, **kwargs: Any) -> Http
     return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
 
 
+def build_insights_list_resources_request(
+    *,
+    filter_product_types: Optional[List[str]] = None,
+    filter_regions: Optional[List[str]] = None,
+    pagination_page: int = 1,
+    pagination_per_page: int = 20,
+    pagination_sort: Optional[str] = None,
+    pagination_sort_direction: Optional[str] = None,
+    **kwargs: Any,
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/insights/resources"
+
+    # Construct parameters
+    if filter_product_types is not None:
+        _params["filter.product_types"] = [
+            _SERIALIZER.query("filter_product_types", q, "str") if q is not None else ""
+            for q in filter_product_types
+        ]
+    if filter_regions is not None:
+        _params["filter.regions"] = [
+            _SERIALIZER.query("filter_regions", q, "str") if q is not None else ""
+            for q in filter_regions
+        ]
+    if pagination_page is not None:
+        _params["pagination.page"] = _SERIALIZER.query(
+            "pagination_page", pagination_page, "int", minimum=1
+        )
+    if pagination_per_page is not None:
+        _params["pagination.per_page"] = _SERIALIZER.query(
+            "pagination_per_page", pagination_per_page, "int", maximum=200, minimum=1
+        )
+    if pagination_sort is not None:
+        _params["pagination.sort"] = _SERIALIZER.query(
+            "pagination_sort", pagination_sort, "str"
+        )
+    if pagination_sort_direction is not None:
+        _params["pagination.sort_direction"] = _SERIALIZER.query(
+            "pagination_sort_direction", pagination_sort_direction, "str"
+        )
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
+
+
+def build_insights_get_resource_request(
+    resource_urn: str, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/insights/resources/{resource_urn}"
+    path_format_arguments = {
+        "resource_urn": _SERIALIZER.url("resource_urn", resource_urn, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
+
+
+def build_insights_update_resource_signals_request(  # pylint: disable=name-too-long
+    resource_urn: str, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/insights/resources/{resource_urn}/signals"
+    path_format_arguments = {
+        "resource_urn": _SERIALIZER.url("resource_urn", resource_urn, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="PUT", url=_url, headers=_headers, **kwargs)
+
+
 def build_signals_list_consents_request(
     *, source: Optional[str] = None, **kwargs: Any
 ) -> HttpRequest:
@@ -21339,6 +21442,90 @@ def build_inference_create_async_invoke_request(
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
 
     return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_inference_create_speech_request(**kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop(
+        "Accept", "application/json, audio/mpeg, audio/wav, audio/mp3"
+    )
+
+    # Construct URL
+    _url = "/v1/audio/speech"
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_inference_create_video_request(**kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v1/videos"
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_inference_get_video_request(video_id: str, **kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v1/videos/{video_id}"
+    path_format_arguments = {
+        "video_id": _SERIALIZER.url("video_id", video_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
+
+
+def build_inference_get_video_content_request(  # pylint: disable=name-too-long
+    video_id: str, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "video/mp4, application/json")
+
+    # Construct URL
+    _url = "/v1/videos/{video_id}/content"
+    path_format_arguments = {
+        "video_id": _SERIALIZER.url("video_id", video_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
 
 
 def build_inference_create_batch_file_request(
@@ -184558,6 +184745,8 @@ class DropletsOperations:
                                 "gpu_info": {
                                     "count": 0,  # Optional. The number of GPUs
                                       allocated to the Droplet.
+                                    "fabric": bool,  # Optional. If GPU fabric
+                                      networking is enabled.
                                     "model": "str",  # Optional. The model of the
                                       GPU.
                                     "vram": {
@@ -184605,6 +184794,8 @@ class DropletsOperations:
                             "gpu_info": {
                                 "count": 0,  # Optional. The number of GPUs allocated
                                   to the Droplet.
+                                "fabric": bool,  # Optional. If GPU fabric networking
+                                  is enabled.
                                 "model": "str",  # Optional. The model of the GPU.
                                 "vram": {
                                     "amount": 0,  # Optional. The amount of VRAM
@@ -185234,6 +185425,8 @@ class DropletsOperations:
                             "gpu_info": {
                                 "count": 0,  # Optional. The number of GPUs allocated
                                   to the Droplet.
+                                "fabric": bool,  # Optional. If GPU fabric networking
+                                  is enabled.
                                 "model": "str",  # Optional. The model of the GPU.
                                 "vram": {
                                     "amount": 0,  # Optional. The amount of VRAM
@@ -185279,6 +185472,8 @@ class DropletsOperations:
                         "gpu_info": {
                             "count": 0,  # Optional. The number of GPUs allocated to the
                               Droplet.
+                            "fabric": bool,  # Optional. If GPU fabric networking is
+                              enabled.
                             "model": "str",  # Optional. The model of the GPU.
                             "vram": {
                                 "amount": 0,  # Optional. The amount of VRAM
@@ -186821,6 +187016,8 @@ class DropletsOperations:
                                 "gpu_info": {
                                     "count": 0,  # Optional. The number of GPUs
                                       allocated to the Droplet.
+                                    "fabric": bool,  # Optional. If GPU fabric
+                                      networking is enabled.
                                     "model": "str",  # Optional. The model of the
                                       GPU.
                                     "vram": {
@@ -186868,6 +187065,8 @@ class DropletsOperations:
                             "gpu_info": {
                                 "count": 0,  # Optional. The number of GPUs allocated
                                   to the Droplet.
+                                "fabric": bool,  # Optional. If GPU fabric networking
+                                  is enabled.
                                 "model": "str",  # Optional. The model of the GPU.
                                 "vram": {
                                     "amount": 0,  # Optional. The amount of VRAM
@@ -206436,9 +206635,9 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
         included when at least one of its spans matches ``filter``. The time range must not exceed 7
         days (\\ ``168h``\\ ). ``pagination.limit`` defaults to 100 (also used when ``limit`` is
         ``0``\\ ) and must be between 0 and 1000. Results are ordered by ``started`` descending unless
-        ``orderBy`` is set.
-        JSON field names are camelCase (\\ ``timeRange``\\ , ``orderBy``\\ , ``hasMore``\\ ,
-        ``traceId``\\ ). Unknown request properties, invalid filters, and out-of-range values are
+        ``order_by`` is set.
+        JSON field names use snake_case (\\ ``time_range``\\ , ``order_by``\\ , ``has_more``\\ ,
+        ``trace_id``\\ ). Unknown request properties, invalid filters, and out-of-range values are
         rejected with ``400``.
         Each request searches a single region; there is no multi-region search. Supported regions are
         ``ams2``\\ , ``ams3``\\ , ``atl1``\\ , ``blr1``\\ , ``fra1``\\ , ``lon1``\\ , ``mem1``\\ ,
@@ -206467,7 +206666,7 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
 
                 # JSON input template you can fill out and use as your body input.
                 body = {
-                    "timeRange": {
+                    "time_range": {
                         "from": {
                             "absolute": "str",  # Optional. An absolute timestamp, either
                               RFC3339 (with optional fractional seconds) or a Unix epoch integer as a
@@ -206492,79 +206691,100 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                         }
                     },
                     "filter": {
-                        "expressions": [
-                            ...
-                        ],
-                        "field": {
-                            "name": "str",  # The field name. Without ``scope``"" , these
-                              names (case-insensitive) resolve to built-in span columns: `traceId`
-                              (`trace.id`, `trace_id`), `spanId` (`span.id`, `span_id`), `parentSpanId`
-                              (`parent.span.id`, `parent_span_id`), `startTime` (`start_time`,
-                              `timestamp`), `endTime` (`end_time`), `durationNs` (`duration`, in
-                              nanoseconds), `name` (`span.name`), `kind` (`span.kind`), `statusCode`
-                              (`status.code`, `status_code`), `statusMessage` (`status.message`,
-                              `status_message`), and `serviceName` (`service.name`, `service_name`).
-                              Any other name is looked up as a span attribute, falling back to a
-                              resource attribute. With `scope` set, `name` is always treated as an
-                              attribute key. Attribute keys may contain only letters, digits, and `.`,
-                              `_`, `-`, `/`, `:`, `@`.  In traces ``orderBy``"" , ``name`` must be a
-                              trace-level sort field instead; see the ``orderBy`` field description.
-                              Required.
-                            "scope": "str"  # Optional. Restricts the lookup to one
-                              attribute map (case-insensitive). ``resource`` (or
-                              ``resource.attributes``"" ) reads resource attributes; ``attribute`` (or
-                              ``attributes``"" , ``span.attributes``"" ) reads span attributes. Omit to
-                              use the built-in column mapping described for ``name``. Ignored in traces
-                              ``orderBy``. Known values are: "resource", "resource.attributes",
-                              "attribute", "attributes", and "span.attributes".
+                        "and": {
+                            "expressions": [
+                                ...
+                            ]
                         },
-                        "operator": "str",  # Optional. The comparison operator for a
-                          ``condition`` node. Matching is case-insensitive, and the symbol forms
-                          ``=``"" , ``!=``"" , ``>``"" , ``>=``"" , ``<``"" , and ``<=`` are accepted
-                          as aliases for ``eq``"" , ``neq``"" , ``gt``"" , ``gte``"" , ``lt``"" , and
-                          ``lte``. ``exists`` matches spans where the field is present and non-empty
-                          and ignores ``value``. ``in`` requires an array ``value`` with 1 to 100
-                          entries. ``neq`` on string fields also matches spans where the field is
-                          absent. Known values are: "eq", "neq", "in", "exists", "gt", "gte", "lt", and
-                          "lte".
-                        "query": "str",  # Optional. The search string for a ``text_search``
-                          node. Leading and trailing whitespace is trimmed; the trimmed string must be
-                          non-empty.
-                        "type": "condition",  # Optional. Default value is "condition". The
-                          node type. Matching is case-insensitive. Known values are: "condition",
-                          "and", "or", "not", and "text_search".
-                        "value": {}
+                        "condition": {
+                            "field": {
+                                "name": "str",  # The field name. Without ``scope``""
+                                  , these names (case-insensitive) resolve to built-in span columns:
+                                  `trace_id`, `span_id`, `parent_span_id`, `start_time`, `end_time`,
+                                  `duration_ns`, `name` (`span.name`), `kind` (`span.kind`),
+                                  `status_code` (`status.code`, `status_code`), `status_message`, and
+                                  `service_name` (`service.name`). Any other name is looked up as a
+                                  span attribute, falling back to a resource attribute. With `scope`
+                                  set, `name` is always treated as an attribute key. Attribute keys may
+                                  contain only letters, digits, and `.`, `_`, `-`, `/`, `:`, `@`.  In
+                                  traces ``order_by``"" , ``name`` must be a trace-level sort field
+                                  instead; see the ``order_by`` field description. Required.
+                                "scope": "str"  # Optional. Restricts the lookup to
+                                  one attribute map and is matched case-insensitively.
+                                  ``FIELD_SCOPE_RESOURCE`` reads resource attributes and accepts
+                                  ``resource`` or ``resource.attributes`` as aliases.
+                                  ``FIELD_SCOPE_ATTRIBUTES`` reads span attributes and accepts
+                                  ``attribute``"" , ``attributes``"" , or ``span.attributes`` as
+                                  aliases. Omit to use the built-in column mapping described for
+                                  ``name``. Ignored in traces ``order_by``. Known values are:
+                                  "FIELD_SCOPE_RESOURCE", "FIELD_SCOPE_ATTRIBUTES", "resource",
+                                  "resource.attributes", "attribute", "attributes", and
+                                  "span.attributes".
+                            },
+                            "operator": "str",  # The comparison operator. Required.
+                              Known values are: "FILTER_OPERATOR_EQ", "FILTER_OPERATOR_NEQ",
+                              "FILTER_OPERATOR_IN", "FILTER_OPERATOR_EXISTS", "FILTER_OPERATOR_GTE",
+                              and "FILTER_OPERATOR_LTE".
+                            "value": {
+                                "number_array_value": {
+                                    "values": [
+                                        0.0  # Required.
+                                    ]
+                                },
+                                "number_value": 0.0,  # Optional. A typed literal or
+                                  list value for a traces filter condition. Exactly one kind is set per
+                                  message.
+                                "string_array_value": {
+                                    "values": [
+                                        "str"  # Required.
+                                    ]
+                                },
+                                "string_value": "str"  # Optional. A typed literal or
+                                  list value for a traces filter condition. Exactly one kind is set per
+                                  message.
+                            }
+                        },
+                        "not": ...,
+                        "or": {
+                            "expressions": [
+                                ...
+                            ]
+                        },
+                        "text_search": {
+                            "query": "str"  # The search string. Leading and trailing
+                              whitespace is trimmed, and the remaining string must not be empty.
+                              Required.
+                        }
                     },
-                    "orderBy": [
+                    "order_by": [
                         {
                             "field": {
                                 "name": "str",  # The field name. Without ``scope``""
                                   , these names (case-insensitive) resolve to built-in span columns:
-                                  `traceId` (`trace.id`, `trace_id`), `spanId` (`span.id`, `span_id`),
-                                  `parentSpanId` (`parent.span.id`, `parent_span_id`), `startTime`
-                                  (`start_time`, `timestamp`), `endTime` (`end_time`), `durationNs`
-                                  (`duration`, in nanoseconds), `name` (`span.name`), `kind`
-                                  (`span.kind`), `statusCode` (`status.code`, `status_code`),
-                                  `statusMessage` (`status.message`, `status_message`), and
-                                  `serviceName` (`service.name`, `service_name`). Any other name is
-                                  looked up as a span attribute, falling back to a resource attribute.
-                                  With `scope` set, `name` is always treated as an attribute key.
-                                  Attribute keys may contain only letters, digits, and `.`, `_`, `-`,
-                                  `/`, `:`, `@`.  In traces ``orderBy``"" , ``name`` must be a
-                                  trace-level sort field instead; see the ``orderBy`` field
-                                  description. Required.
+                                  `trace_id`, `span_id`, `parent_span_id`, `start_time`, `end_time`,
+                                  `duration_ns`, `name` (`span.name`), `kind` (`span.kind`),
+                                  `status_code` (`status.code`, `status_code`), `status_message`, and
+                                  `service_name` (`service.name`). Any other name is looked up as a
+                                  span attribute, falling back to a resource attribute. With `scope`
+                                  set, `name` is always treated as an attribute key. Attribute keys may
+                                  contain only letters, digits, and `.`, `_`, `-`, `/`, `:`, `@`.  In
+                                  traces ``order_by``"" , ``name`` must be a trace-level sort field
+                                  instead; see the ``order_by`` field description. Required.
                                 "scope": "str"  # Optional. Restricts the lookup to
-                                  one attribute map (case-insensitive). ``resource`` (or
-                                  ``resource.attributes``"" ) reads resource attributes; ``attribute``
-                                  (or ``attributes``"" , ``span.attributes``"" ) reads span attributes.
-                                  Omit to use the built-in column mapping described for ``name``.
-                                  Ignored in traces ``orderBy``. Known values are: "resource",
+                                  one attribute map and is matched case-insensitively.
+                                  ``FIELD_SCOPE_RESOURCE`` reads resource attributes and accepts
+                                  ``resource`` or ``resource.attributes`` as aliases.
+                                  ``FIELD_SCOPE_ATTRIBUTES`` reads span attributes and accepts
+                                  ``attribute``"" , ``attributes``"" , or ``span.attributes`` as
+                                  aliases. Omit to use the built-in column mapping described for
+                                  ``name``. Ignored in traces ``order_by``. Known values are:
+                                  "FIELD_SCOPE_RESOURCE", "FIELD_SCOPE_ATTRIBUTES", "resource",
                                   "resource.attributes", "attribute", "attributes", and
                                   "span.attributes".
                             },
-                            "direction": "desc"  # Optional. Default value is "desc". The
-                              sort direction (case-insensitive). Defaults to ``desc``. Known values
-                              are: "asc" and "desc".
+                            "direction": "str"  # Optional. The sort direction, matched
+                              case-insensitively. Omit to use the server default. Known values are:
+                              "asc" and "desc".
                         }
                     ],
                     "pagination": {
@@ -206578,17 +206798,17 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                 response == {
                     "data": [
                         {
-                            "traceId": "str",  # The trace identifier. Required.
-                            "durationNs": 0,  # Optional. Wall-clock duration of the
+                            "trace_id": "str",  # The trace identifier. Required.
+                            "duration_ns": 0,  # Optional. Wall-clock duration of the
                               trace in nanoseconds.
-                            "errorCount": 0,  # Optional. The number of spans in the
+                            "error_count": 0,  # Optional. The number of spans in the
                               trace with an ``Error`` status code. Omitted when zero.
-                            "serviceName": "str",  # Optional. The service that emitted
+                            "service_name": "str",  # Optional. The service that emitted
                               the root span. Omitted when the root span has no service.name resource
                               attribute.
-                            "spanCount": 0,  # Optional. The number of spans in the
+                            "span_count": 0,  # Optional. The number of spans in the
                               trace.
-                            "spanNames": [
+                            "span_names": [
                                 "str"  # Optional. The distinct span names present in
                                   the trace.
                             ],
@@ -206600,7 +206820,7 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                         }
                     ],
                     "pagination": {
-                        "hasMore": bool  # Whether more results matched the query than were
+                        "has_more": bool  # Whether more results matched the query than were
                           returned. Required.
                     }
                 }
@@ -206636,9 +206856,9 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
         included when at least one of its spans matches ``filter``. The time range must not exceed 7
         days (\\ ``168h``\\ ). ``pagination.limit`` defaults to 100 (also used when ``limit`` is
         ``0``\\ ) and must be between 0 and 1000. Results are ordered by ``started`` descending unless
-        ``orderBy`` is set.
-        JSON field names are camelCase (\\ ``timeRange``\\ , ``orderBy``\\ , ``hasMore``\\ ,
-        ``traceId``\\ ). Unknown request properties, invalid filters, and out-of-range values are
+        ``order_by`` is set.
+        JSON field names use snake_case (\\ ``time_range``\\ , ``order_by``\\ , ``has_more``\\ ,
+        ``trace_id``\\ ). Unknown request properties, invalid filters, and out-of-range values are
         rejected with ``400``.
         Each request searches a single region; there is no multi-region search. Supported regions are
         ``ams2``\\ , ``ams3``\\ , ``atl1``\\ , ``blr1``\\ , ``fra1``\\ , ``lon1``\\ , ``mem1``\\ ,
@@ -206669,17 +206889,17 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                 response == {
                     "data": [
                         {
-                            "traceId": "str",  # The trace identifier. Required.
-                            "durationNs": 0,  # Optional. Wall-clock duration of the
+                            "trace_id": "str",  # The trace identifier. Required.
+                            "duration_ns": 0,  # Optional. Wall-clock duration of the
                               trace in nanoseconds.
-                            "errorCount": 0,  # Optional. The number of spans in the
+                            "error_count": 0,  # Optional. The number of spans in the
                               trace with an ``Error`` status code. Omitted when zero.
-                            "serviceName": "str",  # Optional. The service that emitted
+                            "service_name": "str",  # Optional. The service that emitted
                               the root span. Omitted when the root span has no service.name resource
                               attribute.
-                            "spanCount": 0,  # Optional. The number of spans in the
+                            "span_count": 0,  # Optional. The number of spans in the
                               trace.
-                            "spanNames": [
+                            "span_names": [
                                 "str"  # Optional. The distinct span names present in
                                   the trace.
                             ],
@@ -206691,7 +206911,7 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                         }
                     ],
                     "pagination": {
-                        "hasMore": bool  # Whether more results matched the query than were
+                        "has_more": bool  # Whether more results matched the query than were
                           returned. Required.
                     }
                 }
@@ -206722,9 +206942,9 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
         included when at least one of its spans matches ``filter``. The time range must not exceed 7
         days (\\ ``168h``\\ ). ``pagination.limit`` defaults to 100 (also used when ``limit`` is
         ``0``\\ ) and must be between 0 and 1000. Results are ordered by ``started`` descending unless
-        ``orderBy`` is set.
-        JSON field names are camelCase (\\ ``timeRange``\\ , ``orderBy``\\ , ``hasMore``\\ ,
-        ``traceId``\\ ). Unknown request properties, invalid filters, and out-of-range values are
+        ``order_by`` is set.
+        JSON field names use snake_case (\\ ``time_range``\\ , ``order_by``\\ , ``has_more``\\ ,
+        ``trace_id``\\ ). Unknown request properties, invalid filters, and out-of-range values are
         rejected with ``400``.
         Each request searches a single region; there is no multi-region search. Supported regions are
         ``ams2``\\ , ``ams3``\\ , ``atl1``\\ , ``blr1``\\ , ``fra1``\\ , ``lon1``\\ , ``mem1``\\ ,
@@ -206750,7 +206970,7 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
 
                 # JSON input template you can fill out and use as your body input.
                 body = {
-                    "timeRange": {
+                    "time_range": {
                         "from": {
                             "absolute": "str",  # Optional. An absolute timestamp, either
                               RFC3339 (with optional fractional seconds) or a Unix epoch integer as a
@@ -206775,79 +206995,100 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                         }
                     },
                     "filter": {
-                        "expressions": [
-                            ...
-                        ],
-                        "field": {
-                            "name": "str",  # The field name. Without ``scope``"" , these
-                              names (case-insensitive) resolve to built-in span columns: `traceId`
-                              (`trace.id`, `trace_id`), `spanId` (`span.id`, `span_id`), `parentSpanId`
-                              (`parent.span.id`, `parent_span_id`), `startTime` (`start_time`,
-                              `timestamp`), `endTime` (`end_time`), `durationNs` (`duration`, in
-                              nanoseconds), `name` (`span.name`), `kind` (`span.kind`), `statusCode`
-                              (`status.code`, `status_code`), `statusMessage` (`status.message`,
-                              `status_message`), and `serviceName` (`service.name`, `service_name`).
-                              Any other name is looked up as a span attribute, falling back to a
-                              resource attribute. With `scope` set, `name` is always treated as an
-                              attribute key. Attribute keys may contain only letters, digits, and `.`,
-                              `_`, `-`, `/`, `:`, `@`.  In traces ``orderBy``"" , ``name`` must be a
-                              trace-level sort field instead; see the ``orderBy`` field description.
-                              Required.
-                            "scope": "str"  # Optional. Restricts the lookup to one
-                              attribute map (case-insensitive). ``resource`` (or
-                              ``resource.attributes``"" ) reads resource attributes; ``attribute`` (or
-                              ``attributes``"" , ``span.attributes``"" ) reads span attributes. Omit to
-                              use the built-in column mapping described for ``name``. Ignored in traces
-                              ``orderBy``. Known values are: "resource", "resource.attributes",
-                              "attribute", "attributes", and "span.attributes".
+                        "and": {
+                            "expressions": [
+                                ...
+                            ]
                         },
-                        "operator": "str",  # Optional. The comparison operator for a
-                          ``condition`` node. Matching is case-insensitive, and the symbol forms
-                          ``=``"" , ``!=``"" , ``>``"" , ``>=``"" , ``<``"" , and ``<=`` are accepted
-                          as aliases for ``eq``"" , ``neq``"" , ``gt``"" , ``gte``"" , ``lt``"" , and
-                          ``lte``. ``exists`` matches spans where the field is present and non-empty
-                          and ignores ``value``. ``in`` requires an array ``value`` with 1 to 100
-                          entries. ``neq`` on string fields also matches spans where the field is
-                          absent. Known values are: "eq", "neq", "in", "exists", "gt", "gte", "lt", and
-                          "lte".
-                        "query": "str",  # Optional. The search string for a ``text_search``
-                          node. Leading and trailing whitespace is trimmed; the trimmed string must be
-                          non-empty.
-                        "type": "condition",  # Optional. Default value is "condition". The
-                          node type. Matching is case-insensitive. Known values are: "condition",
-                          "and", "or", "not", and "text_search".
-                        "value": {}
+                        "condition": {
+                            "field": {
+                                "name": "str",  # The field name. Without ``scope``""
+                                  , these names (case-insensitive) resolve to built-in span columns:
+                                  `trace_id`, `span_id`, `parent_span_id`, `start_time`, `end_time`,
+                                  `duration_ns`, `name` (`span.name`), `kind` (`span.kind`),
+                                  `status_code` (`status.code`, `status_code`), `status_message`, and
+                                  `service_name` (`service.name`). Any other name is looked up as a
+                                  span attribute, falling back to a resource attribute. With `scope`
+                                  set, `name` is always treated as an attribute key. Attribute keys may
+                                  contain only letters, digits, and `.`, `_`, `-`, `/`, `:`, `@`.  In
+                                  traces ``order_by``"" , ``name`` must be a trace-level sort field
+                                  instead; see the ``order_by`` field description. Required.
+                                "scope": "str"  # Optional. Restricts the lookup to
+                                  one attribute map and is matched case-insensitively.
+                                  ``FIELD_SCOPE_RESOURCE`` reads resource attributes and accepts
+                                  ``resource`` or ``resource.attributes`` as aliases.
+                                  ``FIELD_SCOPE_ATTRIBUTES`` reads span attributes and accepts
+                                  ``attribute``"" , ``attributes``"" , or ``span.attributes`` as
+                                  aliases. Omit to use the built-in column mapping described for
+                                  ``name``. Ignored in traces ``order_by``. Known values are:
+                                  "FIELD_SCOPE_RESOURCE", "FIELD_SCOPE_ATTRIBUTES", "resource",
+                                  "resource.attributes", "attribute", "attributes", and
+                                  "span.attributes".
+                            },
+                            "operator": "str",  # The comparison operator. Required.
+                              Known values are: "FILTER_OPERATOR_EQ", "FILTER_OPERATOR_NEQ",
+                              "FILTER_OPERATOR_IN", "FILTER_OPERATOR_EXISTS", "FILTER_OPERATOR_GTE",
+                              and "FILTER_OPERATOR_LTE".
+                            "value": {
+                                "number_array_value": {
+                                    "values": [
+                                        0.0  # Required.
+                                    ]
+                                },
+                                "number_value": 0.0,  # Optional. A typed literal or
+                                  list value for a traces filter condition. Exactly one kind is set per
+                                  message.
+                                "string_array_value": {
+                                    "values": [
+                                        "str"  # Required.
+                                    ]
+                                },
+                                "string_value": "str"  # Optional. A typed literal or
+                                  list value for a traces filter condition. Exactly one kind is set per
+                                  message.
+                            }
+                        },
+                        "not": ...,
+                        "or": {
+                            "expressions": [
+                                ...
+                            ]
+                        },
+                        "text_search": {
+                            "query": "str"  # The search string. Leading and trailing
+                              whitespace is trimmed, and the remaining string must not be empty.
+                              Required.
+                        }
                     },
-                    "orderBy": [
+                    "order_by": [
                         {
                             "field": {
                                 "name": "str",  # The field name. Without ``scope``""
                                   , these names (case-insensitive) resolve to built-in span columns:
-                                  `traceId` (`trace.id`, `trace_id`), `spanId` (`span.id`, `span_id`),
-                                  `parentSpanId` (`parent.span.id`, `parent_span_id`), `startTime`
-                                  (`start_time`, `timestamp`), `endTime` (`end_time`), `durationNs`
-                                  (`duration`, in nanoseconds), `name` (`span.name`), `kind`
-                                  (`span.kind`), `statusCode` (`status.code`, `status_code`),
-                                  `statusMessage` (`status.message`, `status_message`), and
-                                  `serviceName` (`service.name`, `service_name`). Any other name is
-                                  looked up as a span attribute, falling back to a resource attribute.
-                                  With `scope` set, `name` is always treated as an attribute key.
-                                  Attribute keys may contain only letters, digits, and `.`, `_`, `-`,
-                                  `/`, `:`, `@`.  In traces ``orderBy``"" , ``name`` must be a
-                                  trace-level sort field instead; see the ``orderBy`` field
-                                  description. Required.
+                                  `trace_id`, `span_id`, `parent_span_id`, `start_time`, `end_time`,
+                                  `duration_ns`, `name` (`span.name`), `kind` (`span.kind`),
+                                  `status_code` (`status.code`, `status_code`), `status_message`, and
+                                  `service_name` (`service.name`). Any other name is looked up as a
+                                  span attribute, falling back to a resource attribute. With `scope`
+                                  set, `name` is always treated as an attribute key. Attribute keys may
+                                  contain only letters, digits, and `.`, `_`, `-`, `/`, `:`, `@`.  In
+                                  traces ``order_by``"" , ``name`` must be a trace-level sort field
+                                  instead; see the ``order_by`` field description. Required.
                                 "scope": "str"  # Optional. Restricts the lookup to
-                                  one attribute map (case-insensitive). ``resource`` (or
-                                  ``resource.attributes``"" ) reads resource attributes; ``attribute``
-                                  (or ``attributes``"" , ``span.attributes``"" ) reads span attributes.
-                                  Omit to use the built-in column mapping described for ``name``.
-                                  Ignored in traces ``orderBy``. Known values are: "resource",
+                                  one attribute map and is matched case-insensitively.
+                                  ``FIELD_SCOPE_RESOURCE`` reads resource attributes and accepts
+                                  ``resource`` or ``resource.attributes`` as aliases.
+                                  ``FIELD_SCOPE_ATTRIBUTES`` reads span attributes and accepts
+                                  ``attribute``"" , ``attributes``"" , or ``span.attributes`` as
+                                  aliases. Omit to use the built-in column mapping described for
+                                  ``name``. Ignored in traces ``order_by``. Known values are:
+                                  "FIELD_SCOPE_RESOURCE", "FIELD_SCOPE_ATTRIBUTES", "resource",
                                   "resource.attributes", "attribute", "attributes", and
                                   "span.attributes".
                             },
-                            "direction": "desc"  # Optional. Default value is "desc". The
-                              sort direction (case-insensitive). Defaults to ``desc``. Known values
-                              are: "asc" and "desc".
+                            "direction": "str"  # Optional. The sort direction, matched
+                              case-insensitively. Omit to use the server default. Known values are:
+                              "asc" and "desc".
                         }
                     ],
                     "pagination": {
@@ -206861,17 +207102,17 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                 response == {
                     "data": [
                         {
-                            "traceId": "str",  # The trace identifier. Required.
-                            "durationNs": 0,  # Optional. Wall-clock duration of the
+                            "trace_id": "str",  # The trace identifier. Required.
+                            "duration_ns": 0,  # Optional. Wall-clock duration of the
                               trace in nanoseconds.
-                            "errorCount": 0,  # Optional. The number of spans in the
+                            "error_count": 0,  # Optional. The number of spans in the
                               trace with an ``Error`` status code. Omitted when zero.
-                            "serviceName": "str",  # Optional. The service that emitted
+                            "service_name": "str",  # Optional. The service that emitted
                               the root span. Omitted when the root span has no service.name resource
                               attribute.
-                            "spanCount": 0,  # Optional. The number of spans in the
+                            "span_count": 0,  # Optional. The number of spans in the
                               trace.
-                            "spanNames": [
+                            "span_names": [
                                 "str"  # Optional. The distinct span names present in
                                   the trace.
                             ],
@@ -206883,7 +207124,7 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                         }
                     ],
                     "pagination": {
-                        "hasMore": bool  # Whether more results matched the query than were
+                        "has_more": bool  # Whether more results matched the query than were
                           returned. Required.
                     }
                 }
@@ -207088,8 +207329,9 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
         with ``id`` and ``message``. ``403`` is also returned for accounts that are in a trial or not
         in good standing. If the regional traces backend cannot be reached, the response is ``502``
         with a ``text/plain`` body.
-        JSON field names are camelCase (\\ ``traceId``\\ , ``spanId``\\ , ``startTime``\\ ,
-        ``endTime``\\ , ``durationNs``\\ , ``serviceName``\\ , ``statusCode``\\ , ``parentSpanId``\\ ).
+        JSON field names use snake_case (\\ ``trace_id``\\ , ``span_id``\\ , ``start_time``\\ ,
+        ``end_time``\\ , ``duration_ns``\\ , ``service_name``\\ , ``status_code``\\ ,
+        ``parent_span_id``\\ ).
 
         :param region: The datacenter region slug for the query. Required.
         :type region: str
@@ -207117,37 +207359,37 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                 response == {
                     "spans": [
                         {
-                            "spanId": "str",  # The span identifier. Required.
-                            "traceId": "str",  # The trace this span belongs to.
+                            "span_id": "str",  # The span identifier. Required.
+                            "trace_id": "str",  # The trace this span belongs to.
                               Required.
                             "attributes": {
                                 "str": "str"  # Optional. Span attributes. Omitted
                                   when empty.
                             },
-                            "durationNs": 0,  # Optional. Span duration in nanoseconds.
-                            "endTime": "2020-02-20 00:00:00",  # Optional. The span end
+                            "duration_ns": 0,  # Optional. Span duration in nanoseconds.
+                            "end_time": "2020-02-20 00:00:00",  # Optional. The span end
                               time.
                             "kind": "str",  # Optional. The OpenTelemetry span kind as a
                               string, for example ``Server``"" , ``Client``"" , or ``Internal``.
                             "name": "str",  # Optional. The span name, typically the
                               operation being performed.
-                            "parentSpanId": "str",  # Optional. The parent span
+                            "parent_span_id": "str",  # Optional. The parent span
                               identifier. Omitted for the root span.
                             "resource": {
                                 "str": "str"  # Optional. Resource attributes
                                   associated with the span.
                             },
-                            "serviceName": "str",  # Optional. The service that emitted
+                            "service_name": "str",  # Optional. The service that emitted
                               the span. Omitted when the span has no service.name resource attribute.
-                            "startTime": "2020-02-20 00:00:00",  # Optional. The span
+                            "start_time": "2020-02-20 00:00:00",  # Optional. The span
                               start time.
-                            "statusCode": "str",  # Optional. The OpenTelemetry span
+                            "status_code": "str",  # Optional. The OpenTelemetry span
                               status code as a string: ``Unset``"" , ``Ok``"" , or ``Error``.
-                            "statusMessage": "str"  # Optional. The status description.
+                            "status_message": "str"  # Optional. The status description.
                               Omitted when empty.
                         }
                     ],
-                    "traceId": "str",  # Optional. The trace identifier.
+                    "trace_id": "str",  # Optional. The trace identifier.
                     "truncated": bool  # Optional. True when the trace has more spans than were
                       returned in this response. Omitted when false.
                 }
@@ -207324,9 +207566,9 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
         ``/v2/insights/query/{region}/spans/search`` with a JSON body describing the time range,
         optional filter, ordering, and pagination.
         The time range must not exceed 7 days. ``pagination.limit`` defaults to 100 and must be between
-        1 and 1000. Results are ordered by ``startTime`` descending by default. Cursor-based pagination
-        is not yet supported; ``pagination.hasMore`` indicates whether additional spans matched beyond
-        the returned page.
+        1 and 1000. Results are ordered by ``start_time`` descending by default. Cursor-based
+        pagination is not yet supported; ``pagination.has_more`` indicates whether additional spans
+        matched beyond the returned page.
 
         :param region: The datacenter region slug for the query. Required.
         :type region: str
@@ -207344,7 +207586,7 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
 
                 # JSON input template you can fill out and use as your body input.
                 body = {
-                    "timeRange": {
+                    "time_range": {
                         "from": {
                             "absolute": "str",  # Optional. An absolute timestamp.
                               Accepts an RFC3339/RFC3339Nano string or a Unix timestamp (seconds,
@@ -207365,46 +207607,88 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                         }
                     },
                     "filter": {
-                        "type": "str",  # The node kind. Required. Known values are:
-                          "condition", "and", "or", "not", and "text_search".
-                        "expressions": [
-                            ...
-                        ],
-                        "field": {
-                            "name": "str",  # The field name. Well-known span fields
-                              include ``traceId``"" , ``spanId``"" , ``parentSpanId``"" ,
-                              ``startTime``"" , ``endTime``"" , ``durationNs``"" , ``name``"" ,
-                              ``serviceName``"" , ``kind``"" , ``statusCode``"" , and
-                              ``statusMessage``. Any other value is treated as a span or resource
-                              attribute key. Required.
-                            "scope": "str"  # Optional. Optional attribute scope. Use
-                              ``resource`` to match a resource attribute or ``attributes`` to match a
-                              span attribute. Omit for well-known fields or to search both attribute
-                              maps. Known values are: "resource" and "attributes".
+                        "and": {
+                            "expressions": [
+                                ...
+                            ]
                         },
-                        "operator": "str",  # Optional. The comparison operator for a
-                          ``condition`` node. Known values are: "eq", "neq", "gt", "gte", "lt", "lte",
-                          "in", and "exists".
-                        "query": "str",  # Optional. The substring to match for a
-                          ``text_search`` node.
-                        "value": {}
+                        "condition": {
+                            "field": {
+                                "name": "str",  # The field name. Well-known span
+                                  fields include ``trace_id``"" , ``span_id``"" , ``parent_span_id``""
+                                  , ``start_time``"" , ``end_time``"" , ``duration_ns``"" , ``name``""
+                                  , ``service_name``"" , ``kind``"" , ``status_code``"" , and
+                                  ``status_message``. Any other value is treated as a span or resource
+                                  attribute key. Required.
+                                "scope": "str"  # Optional. Optional attribute scope,
+                                  matched case-insensitively. Use ``FIELD_SCOPE_RESOURCE`` to match a
+                                  resource attribute or ``FIELD_SCOPE_ATTRIBUTES`` to match a span
+                                  attribute. The aliases ``resource`` and ``resource.attributes`` are
+                                  accepted for resource attributes; ``attribute``"" , ``attributes``""
+                                  , and ``span.attributes`` are accepted for span attributes. Omit for
+                                  well-known fields or to search both attribute maps. Known values are:
+                                  "FIELD_SCOPE_RESOURCE", "FIELD_SCOPE_ATTRIBUTES", "resource",
+                                  "resource.attributes", "attribute", "attributes", and
+                                  "span.attributes".
+                            },
+                            "operator": "str",  # The comparison operator. Required.
+                              Known values are: "FILTER_OPERATOR_EQ", "FILTER_OPERATOR_NEQ",
+                              "FILTER_OPERATOR_IN", "FILTER_OPERATOR_EXISTS", "FILTER_OPERATOR_GTE",
+                              and "FILTER_OPERATOR_LTE".
+                            "value": {
+                                "number_array_value": {
+                                    "values": [
+                                        0.0  # Required.
+                                    ]
+                                },
+                                "number_value": 0.0,  # Optional. A typed literal or
+                                  list value for a spans filter condition. Exactly one kind is set per
+                                  message.
+                                "string_array_value": {
+                                    "values": [
+                                        "str"  # Required.
+                                    ]
+                                },
+                                "string_value": "str"  # Optional. A typed literal or
+                                  list value for a spans filter condition. Exactly one kind is set per
+                                  message.
+                            }
+                        },
+                        "not": ...,
+                        "or": {
+                            "expressions": [
+                                ...
+                            ]
+                        },
+                        "text_search": {
+                            "query": "str"  # The search string. Leading and trailing
+                              whitespace is trimmed, and the remaining string must not be empty.
+                              Required.
+                        }
                     },
-                    "orderBy": [
+                    "order_by": [
                         {
                             "field": {
                                 "name": "str",  # The field name. Well-known span
-                                  fields include ``traceId``"" , ``spanId``"" , ``parentSpanId``"" ,
-                                  ``startTime``"" , ``endTime``"" , ``durationNs``"" , ``name``"" ,
-                                  ``serviceName``"" , ``kind``"" , ``statusCode``"" , and
-                                  ``statusMessage``. Any other value is treated as a span or resource
+                                  fields include ``trace_id``"" , ``span_id``"" , ``parent_span_id``""
+                                  , ``start_time``"" , ``end_time``"" , ``duration_ns``"" , ``name``""
+                                  , ``service_name``"" , ``kind``"" , ``status_code``"" , and
+                                  ``status_message``. Any other value is treated as a span or resource
                                   attribute key. Required.
-                                "scope": "str"  # Optional. Optional attribute scope.
-                                  Use ``resource`` to match a resource attribute or ``attributes`` to
-                                  match a span attribute. Omit for well-known fields or to search both
-                                  attribute maps. Known values are: "resource" and "attributes".
+                                "scope": "str"  # Optional. Optional attribute scope,
+                                  matched case-insensitively. Use ``FIELD_SCOPE_RESOURCE`` to match a
+                                  resource attribute or ``FIELD_SCOPE_ATTRIBUTES`` to match a span
+                                  attribute. The aliases ``resource`` and ``resource.attributes`` are
+                                  accepted for resource attributes; ``attribute``"" , ``attributes``""
+                                  , and ``span.attributes`` are accepted for span attributes. Omit for
+                                  well-known fields or to search both attribute maps. Known values are:
+                                  "FIELD_SCOPE_RESOURCE", "FIELD_SCOPE_ATTRIBUTES", "resource",
+                                  "resource.attributes", "attribute", "attributes", and
+                                  "span.attributes".
                             },
-                            "direction": "str"  # Optional. The sort direction. Defaults
-                              to ``desc`` when omitted. Known values are: "asc" and "desc".
+                            "direction": "str"  # Optional. The sort direction, matched
+                              case-insensitively. Omit to use the server default. Known values are:
+                              "asc" and "desc".
                         }
                     ],
                     "pagination": {
@@ -207420,13 +207704,13 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                             "attributes": {
                                 "str": "str"  # Optional. Span attributes.
                             },
-                            "durationNs": 0,  # Optional. The span duration in
+                            "duration_ns": 0,  # Optional. The span duration in
                               nanoseconds.
-                            "endTime": "2020-02-20 00:00:00",  # Optional. The span end
+                            "end_time": "2020-02-20 00:00:00",  # Optional. The span end
                               time.
                             "kind": "str",  # Optional. The span kind.
                             "name": "str",  # Optional. The span name.
-                            "parentSpanId": "str",  # Optional. The parent span
+                            "parent_span_id": "str",  # Optional. The parent span
                               identifier. Omitted for root spans.
                             "region": "str",  # Optional. The datacenter region slug the
                               span was queried from.
@@ -207434,20 +207718,20 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                                 "str": "str"  # Optional. Resource attributes
                                   associated with the span.
                             },
-                            "serviceName": "str",  # Optional. The name of the service
+                            "service_name": "str",  # Optional. The name of the service
                               that emitted the span.
-                            "spanId": "str",  # Optional. The span identifier.
-                            "startTime": "2020-02-20 00:00:00",  # Optional. The span
+                            "span_id": "str",  # Optional. The span identifier.
+                            "start_time": "2020-02-20 00:00:00",  # Optional. The span
                               start time.
-                            "statusCode": "str",  # Optional. The span status code.
-                            "statusMessage": "str",  # Optional. The span status message.
-                              Omitted when empty.
-                            "traceId": "str"  # Optional. The trace identifier the span
+                            "status_code": "str",  # Optional. The span status code.
+                            "status_message": "str",  # Optional. The span status
+                              message. Omitted when empty.
+                            "trace_id": "str"  # Optional. The trace identifier the span
                               belongs to.
                         }
                     ],
                     "pagination": {
-                        "hasMore": bool  # Optional. Whether more spans matched than were
+                        "has_more": bool  # Optional. Whether more spans matched than were
                           returned in this page. Cursor-based continuation is not yet supported.
                     }
                 }
@@ -207480,9 +207764,9 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
         ``/v2/insights/query/{region}/spans/search`` with a JSON body describing the time range,
         optional filter, ordering, and pagination.
         The time range must not exceed 7 days. ``pagination.limit`` defaults to 100 and must be between
-        1 and 1000. Results are ordered by ``startTime`` descending by default. Cursor-based pagination
-        is not yet supported; ``pagination.hasMore`` indicates whether additional spans matched beyond
-        the returned page.
+        1 and 1000. Results are ordered by ``start_time`` descending by default. Cursor-based
+        pagination is not yet supported; ``pagination.has_more`` indicates whether additional spans
+        matched beyond the returned page.
 
         :param region: The datacenter region slug for the query. Required.
         :type region: str
@@ -207505,13 +207789,13 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                             "attributes": {
                                 "str": "str"  # Optional. Span attributes.
                             },
-                            "durationNs": 0,  # Optional. The span duration in
+                            "duration_ns": 0,  # Optional. The span duration in
                               nanoseconds.
-                            "endTime": "2020-02-20 00:00:00",  # Optional. The span end
+                            "end_time": "2020-02-20 00:00:00",  # Optional. The span end
                               time.
                             "kind": "str",  # Optional. The span kind.
                             "name": "str",  # Optional. The span name.
-                            "parentSpanId": "str",  # Optional. The parent span
+                            "parent_span_id": "str",  # Optional. The parent span
                               identifier. Omitted for root spans.
                             "region": "str",  # Optional. The datacenter region slug the
                               span was queried from.
@@ -207519,20 +207803,20 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                                 "str": "str"  # Optional. Resource attributes
                                   associated with the span.
                             },
-                            "serviceName": "str",  # Optional. The name of the service
+                            "service_name": "str",  # Optional. The name of the service
                               that emitted the span.
-                            "spanId": "str",  # Optional. The span identifier.
-                            "startTime": "2020-02-20 00:00:00",  # Optional. The span
+                            "span_id": "str",  # Optional. The span identifier.
+                            "start_time": "2020-02-20 00:00:00",  # Optional. The span
                               start time.
-                            "statusCode": "str",  # Optional. The span status code.
-                            "statusMessage": "str",  # Optional. The span status message.
-                              Omitted when empty.
-                            "traceId": "str"  # Optional. The trace identifier the span
+                            "status_code": "str",  # Optional. The span status code.
+                            "status_message": "str",  # Optional. The span status
+                              message. Omitted when empty.
+                            "trace_id": "str"  # Optional. The trace identifier the span
                               belongs to.
                         }
                     ],
                     "pagination": {
-                        "hasMore": bool  # Optional. Whether more spans matched than were
+                        "has_more": bool  # Optional. Whether more spans matched than were
                           returned in this page. Cursor-based continuation is not yet supported.
                     }
                 }
@@ -207560,9 +207844,9 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
         ``/v2/insights/query/{region}/spans/search`` with a JSON body describing the time range,
         optional filter, ordering, and pagination.
         The time range must not exceed 7 days. ``pagination.limit`` defaults to 100 and must be between
-        1 and 1000. Results are ordered by ``startTime`` descending by default. Cursor-based pagination
-        is not yet supported; ``pagination.hasMore`` indicates whether additional spans matched beyond
-        the returned page.
+        1 and 1000. Results are ordered by ``start_time`` descending by default. Cursor-based
+        pagination is not yet supported; ``pagination.has_more`` indicates whether additional spans
+        matched beyond the returned page.
 
         :param region: The datacenter region slug for the query. Required.
         :type region: str
@@ -207577,7 +207861,7 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
 
                 # JSON input template you can fill out and use as your body input.
                 body = {
-                    "timeRange": {
+                    "time_range": {
                         "from": {
                             "absolute": "str",  # Optional. An absolute timestamp.
                               Accepts an RFC3339/RFC3339Nano string or a Unix timestamp (seconds,
@@ -207598,46 +207882,88 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                         }
                     },
                     "filter": {
-                        "type": "str",  # The node kind. Required. Known values are:
-                          "condition", "and", "or", "not", and "text_search".
-                        "expressions": [
-                            ...
-                        ],
-                        "field": {
-                            "name": "str",  # The field name. Well-known span fields
-                              include ``traceId``"" , ``spanId``"" , ``parentSpanId``"" ,
-                              ``startTime``"" , ``endTime``"" , ``durationNs``"" , ``name``"" ,
-                              ``serviceName``"" , ``kind``"" , ``statusCode``"" , and
-                              ``statusMessage``. Any other value is treated as a span or resource
-                              attribute key. Required.
-                            "scope": "str"  # Optional. Optional attribute scope. Use
-                              ``resource`` to match a resource attribute or ``attributes`` to match a
-                              span attribute. Omit for well-known fields or to search both attribute
-                              maps. Known values are: "resource" and "attributes".
+                        "and": {
+                            "expressions": [
+                                ...
+                            ]
                         },
-                        "operator": "str",  # Optional. The comparison operator for a
-                          ``condition`` node. Known values are: "eq", "neq", "gt", "gte", "lt", "lte",
-                          "in", and "exists".
-                        "query": "str",  # Optional. The substring to match for a
-                          ``text_search`` node.
-                        "value": {}
+                        "condition": {
+                            "field": {
+                                "name": "str",  # The field name. Well-known span
+                                  fields include ``trace_id``"" , ``span_id``"" , ``parent_span_id``""
+                                  , ``start_time``"" , ``end_time``"" , ``duration_ns``"" , ``name``""
+                                  , ``service_name``"" , ``kind``"" , ``status_code``"" , and
+                                  ``status_message``. Any other value is treated as a span or resource
+                                  attribute key. Required.
+                                "scope": "str"  # Optional. Optional attribute scope,
+                                  matched case-insensitively. Use ``FIELD_SCOPE_RESOURCE`` to match a
+                                  resource attribute or ``FIELD_SCOPE_ATTRIBUTES`` to match a span
+                                  attribute. The aliases ``resource`` and ``resource.attributes`` are
+                                  accepted for resource attributes; ``attribute``"" , ``attributes``""
+                                  , and ``span.attributes`` are accepted for span attributes. Omit for
+                                  well-known fields or to search both attribute maps. Known values are:
+                                  "FIELD_SCOPE_RESOURCE", "FIELD_SCOPE_ATTRIBUTES", "resource",
+                                  "resource.attributes", "attribute", "attributes", and
+                                  "span.attributes".
+                            },
+                            "operator": "str",  # The comparison operator. Required.
+                              Known values are: "FILTER_OPERATOR_EQ", "FILTER_OPERATOR_NEQ",
+                              "FILTER_OPERATOR_IN", "FILTER_OPERATOR_EXISTS", "FILTER_OPERATOR_GTE",
+                              and "FILTER_OPERATOR_LTE".
+                            "value": {
+                                "number_array_value": {
+                                    "values": [
+                                        0.0  # Required.
+                                    ]
+                                },
+                                "number_value": 0.0,  # Optional. A typed literal or
+                                  list value for a spans filter condition. Exactly one kind is set per
+                                  message.
+                                "string_array_value": {
+                                    "values": [
+                                        "str"  # Required.
+                                    ]
+                                },
+                                "string_value": "str"  # Optional. A typed literal or
+                                  list value for a spans filter condition. Exactly one kind is set per
+                                  message.
+                            }
+                        },
+                        "not": ...,
+                        "or": {
+                            "expressions": [
+                                ...
+                            ]
+                        },
+                        "text_search": {
+                            "query": "str"  # The search string. Leading and trailing
+                              whitespace is trimmed, and the remaining string must not be empty.
+                              Required.
+                        }
                     },
-                    "orderBy": [
+                    "order_by": [
                         {
                             "field": {
                                 "name": "str",  # The field name. Well-known span
-                                  fields include ``traceId``"" , ``spanId``"" , ``parentSpanId``"" ,
-                                  ``startTime``"" , ``endTime``"" , ``durationNs``"" , ``name``"" ,
-                                  ``serviceName``"" , ``kind``"" , ``statusCode``"" , and
-                                  ``statusMessage``. Any other value is treated as a span or resource
+                                  fields include ``trace_id``"" , ``span_id``"" , ``parent_span_id``""
+                                  , ``start_time``"" , ``end_time``"" , ``duration_ns``"" , ``name``""
+                                  , ``service_name``"" , ``kind``"" , ``status_code``"" , and
+                                  ``status_message``. Any other value is treated as a span or resource
                                   attribute key. Required.
-                                "scope": "str"  # Optional. Optional attribute scope.
-                                  Use ``resource`` to match a resource attribute or ``attributes`` to
-                                  match a span attribute. Omit for well-known fields or to search both
-                                  attribute maps. Known values are: "resource" and "attributes".
+                                "scope": "str"  # Optional. Optional attribute scope,
+                                  matched case-insensitively. Use ``FIELD_SCOPE_RESOURCE`` to match a
+                                  resource attribute or ``FIELD_SCOPE_ATTRIBUTES`` to match a span
+                                  attribute. The aliases ``resource`` and ``resource.attributes`` are
+                                  accepted for resource attributes; ``attribute``"" , ``attributes``""
+                                  , and ``span.attributes`` are accepted for span attributes. Omit for
+                                  well-known fields or to search both attribute maps. Known values are:
+                                  "FIELD_SCOPE_RESOURCE", "FIELD_SCOPE_ATTRIBUTES", "resource",
+                                  "resource.attributes", "attribute", "attributes", and
+                                  "span.attributes".
                             },
-                            "direction": "str"  # Optional. The sort direction. Defaults
-                              to ``desc`` when omitted. Known values are: "asc" and "desc".
+                            "direction": "str"  # Optional. The sort direction, matched
+                              case-insensitively. Omit to use the server default. Known values are:
+                              "asc" and "desc".
                         }
                     ],
                     "pagination": {
@@ -207653,13 +207979,13 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                             "attributes": {
                                 "str": "str"  # Optional. Span attributes.
                             },
-                            "durationNs": 0,  # Optional. The span duration in
+                            "duration_ns": 0,  # Optional. The span duration in
                               nanoseconds.
-                            "endTime": "2020-02-20 00:00:00",  # Optional. The span end
+                            "end_time": "2020-02-20 00:00:00",  # Optional. The span end
                               time.
                             "kind": "str",  # Optional. The span kind.
                             "name": "str",  # Optional. The span name.
-                            "parentSpanId": "str",  # Optional. The parent span
+                            "parent_span_id": "str",  # Optional. The parent span
                               identifier. Omitted for root spans.
                             "region": "str",  # Optional. The datacenter region slug the
                               span was queried from.
@@ -207667,20 +207993,20 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                                 "str": "str"  # Optional. Resource attributes
                                   associated with the span.
                             },
-                            "serviceName": "str",  # Optional. The name of the service
+                            "service_name": "str",  # Optional. The name of the service
                               that emitted the span.
-                            "spanId": "str",  # Optional. The span identifier.
-                            "startTime": "2020-02-20 00:00:00",  # Optional. The span
+                            "span_id": "str",  # Optional. The span identifier.
+                            "start_time": "2020-02-20 00:00:00",  # Optional. The span
                               start time.
-                            "statusCode": "str",  # Optional. The span status code.
-                            "statusMessage": "str",  # Optional. The span status message.
-                              Omitted when empty.
-                            "traceId": "str"  # Optional. The trace identifier the span
+                            "status_code": "str",  # Optional. The span status code.
+                            "status_message": "str",  # Optional. The span status
+                              message. Omitted when empty.
+                            "trace_id": "str"  # Optional. The trace identifier the span
                               belongs to.
                         }
                     ],
                     "pagination": {
-                        "hasMore": bool  # Optional. Whether more spans matched than were
+                        "has_more": bool  # Optional. Whether more spans matched than were
                           returned in this page. Cursor-based continuation is not yet supported.
                     }
                 }
@@ -207784,6 +208110,718 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
                 deserialized = None
 
         if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def list_resources(
+        self,
+        *,
+        filter_product_types: Optional[List[str]] = None,
+        filter_regions: Optional[List[str]] = None,
+        pagination_page: int = 1,
+        pagination_per_page: int = 20,
+        pagination_sort: Optional[str] = None,
+        pagination_sort_direction: Optional[str] = None,
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Resource Signal Enablement.
+
+        To list the resources in your account that have telemetry signal enablement
+        recorded, along with the current state of their metrics, logs, and traces
+        signals, send a GET request to ``/v2/insights/resources``.
+
+        Results are paginated with ``pagination.page`` and ``pagination.per_page``
+        (default ``20``\\ , maximum ``200``\\ ) and can be sorted with ``pagination.sort`` and
+        ``pagination.sort_direction``. Optionally filter by ``filter.product_types`` and
+        ``filter.regions``.
+
+        A signal is omitted from a resource when no explicit enablement has ever been
+        recorded for it.
+
+        :keyword filter_product_types: Optional filter. When set, only resources of these product types
+         are returned. Repeat the parameter for multiple product types. Default value is None.
+        :paramtype filter_product_types: list[str]
+        :keyword filter_regions: Optional filter. When set, only resources in these regions are
+         returned. Repeat the parameter for multiple regions. Default value is None.
+        :paramtype filter_regions: list[str]
+        :keyword pagination_page: Which 'page' of paginated results to return. Default value is 1.
+        :paramtype pagination_page: int
+        :keyword pagination_per_page: Number of items returned per page. Default value is 20.
+        :paramtype pagination_per_page: int
+        :keyword pagination_sort: Field to sort by. Defaults to ``resource_urn``. Known values are:
+         "resource_urn" and "effective_at". Default value is None.
+        :paramtype pagination_sort: str
+        :keyword pagination_sort_direction: Sort direction. Defaults to ``asc``. Known values are:
+         "asc" and "desc". Default value is None.
+        :paramtype pagination_sort_direction: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "pagination": {
+                        "page": 0,  # Optional. The current page number.
+                        "pages": 0,  # Optional. The total number of pages. Omitted when
+                          there are no results.
+                        "per_page": 0,  # Optional. The number of items per page.
+                        "total": 0  # Optional. The total number of resources across all
+                          pages. Omitted when there are no results.
+                    },
+                    "resources": [
+                        {
+                            "product_type": "str",  # The product type of the resource,
+                              for example ``droplet`` or ``kubernetes``. Required.
+                            "resource_urn": "str",  # The uniform resource name (URN) of
+                              the resource. Required.
+                            "logs": {
+                                "effective_at": "2020-02-20 00:00:00",  # Optional.
+                                  When this signal state last changed.
+                                "enabled": bool  # Optional. Whether the signal is
+                                  enabled for the resource.
+                            },
+                            "metrics": {
+                                "effective_at": "2020-02-20 00:00:00",  # Optional.
+                                  When this signal state last changed.
+                                "enabled": bool  # Optional. Whether the signal is
+                                  enabled for the resource.
+                            },
+                            "region": "str",  # Optional. The region slug for
+                              region-specific resources. Omitted when the resource has no region.
+                            "traces": {
+                                "effective_at": "2020-02-20 00:00:00",  # Optional.
+                                  When this signal state last changed.
+                                "enabled": bool  # Optional. Whether the signal is
+                                  enabled for the resource.
+                            }
+                        }
+                    ]
+                }
+                # response body for status code(s): 400
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_insights_list_resources_request(
+            filter_product_types=filter_product_types,
+            filter_regions=filter_regions,
+            pagination_page=pagination_page,
+            pagination_per_page=pagination_per_page,
+            pagination_sort=pagination_sort,
+            pagination_sort_direction=pagination_sort_direction,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def get_resource(self, resource_urn: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve Resource Signal Enablement.
+
+        To retrieve the current metrics, logs, and traces signal enablement for a
+        single resource, send a GET request to
+        ``/v2/insights/resources/{resource_urn}``.
+
+        A ``404`` is returned when no signal enablement has been recorded for the
+        resource.
+
+        :param resource_urn: The uniform resource name (URN) of the resource, for example
+         ``do:droplet:12345``. Required.
+        :type resource_urn: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "resource": {
+                        "product_type": "str",  # The product type of the resource, for
+                          example ``droplet`` or ``kubernetes``. Required.
+                        "resource_urn": "str",  # The uniform resource name (URN) of the
+                          resource. Required.
+                        "logs": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        },
+                        "metrics": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        },
+                        "region": "str",  # Optional. The region slug for region-specific
+                          resources. Omitted when the resource has no region.
+                        "traces": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        }
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_insights_get_resource_request(
+            resource_urn=resource_urn,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    def update_resource_signals(
+        self,
+        resource_urn: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Resource Signal Enablement.
+
+        To enable or disable telemetry signals for a resource, send a PUT request to
+        ``/v2/insights/resources/{resource_urn}/signals``.
+
+        This endpoint uses merge semantics. Set ``metrics``\\ , ``logs``\\ , or ``traces`` to
+        ``true`` or ``false`` to change that signal; omit a signal to leave it unchanged.
+        At least one signal must be set.
+
+        ``region`` is only used when the resource has no existing enablement. On later
+        updates, omit it or send the stored value; changing the region is rejected
+        with a ``400``.
+
+        Requires both the ``insights:update`` and ``insights:create`` scopes.
+
+        :param resource_urn: The uniform resource name (URN) of the resource, for example
+         ``do:droplet:12345``. Required.
+        :type resource_urn: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "logs": bool,  # Optional. Enable or disable the logs signal. Omit to leave
+                      unchanged.
+                    "metrics": bool,  # Optional. Enable or disable the metrics signal. Omit to
+                      leave unchanged.
+                    "region": "str",  # Optional. The region slug for region-specific resources.
+                      Only used when the resource has no existing enablement. On later updates, omit it
+                      or send the stored value; changing the region is rejected.
+                    "traces": bool  # Optional. Enable or disable the traces signal. Omit to
+                      leave unchanged.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "resource": {
+                        "product_type": "str",  # The product type of the resource, for
+                          example ``droplet`` or ``kubernetes``. Required.
+                        "resource_urn": "str",  # The uniform resource name (URN) of the
+                          resource. Required.
+                        "logs": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        },
+                        "metrics": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        },
+                        "region": "str",  # Optional. The region slug for region-specific
+                          resources. Omitted when the resource has no region.
+                        "traces": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        }
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    def update_resource_signals(
+        self,
+        resource_urn: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Resource Signal Enablement.
+
+        To enable or disable telemetry signals for a resource, send a PUT request to
+        ``/v2/insights/resources/{resource_urn}/signals``.
+
+        This endpoint uses merge semantics. Set ``metrics``\\ , ``logs``\\ , or ``traces`` to
+        ``true`` or ``false`` to change that signal; omit a signal to leave it unchanged.
+        At least one signal must be set.
+
+        ``region`` is only used when the resource has no existing enablement. On later
+        updates, omit it or send the stored value; changing the region is rejected
+        with a ``400``.
+
+        Requires both the ``insights:update`` and ``insights:create`` scopes.
+
+        :param resource_urn: The uniform resource name (URN) of the resource, for example
+         ``do:droplet:12345``. Required.
+        :type resource_urn: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "resource": {
+                        "product_type": "str",  # The product type of the resource, for
+                          example ``droplet`` or ``kubernetes``. Required.
+                        "resource_urn": "str",  # The uniform resource name (URN) of the
+                          resource. Required.
+                        "logs": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        },
+                        "metrics": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        },
+                        "region": "str",  # Optional. The region slug for region-specific
+                          resources. Omitted when the resource has no region.
+                        "traces": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        }
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace
+    def update_resource_signals(
+        self, resource_urn: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Resource Signal Enablement.
+
+        To enable or disable telemetry signals for a resource, send a PUT request to
+        ``/v2/insights/resources/{resource_urn}/signals``.
+
+        This endpoint uses merge semantics. Set ``metrics``\\ , ``logs``\\ , or ``traces`` to
+        ``true`` or ``false`` to change that signal; omit a signal to leave it unchanged.
+        At least one signal must be set.
+
+        ``region`` is only used when the resource has no existing enablement. On later
+        updates, omit it or send the stored value; changing the region is rejected
+        with a ``400``.
+
+        Requires both the ``insights:update`` and ``insights:create`` scopes.
+
+        :param resource_urn: The uniform resource name (URN) of the resource, for example
+         ``do:droplet:12345``. Required.
+        :type resource_urn: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "logs": bool,  # Optional. Enable or disable the logs signal. Omit to leave
+                      unchanged.
+                    "metrics": bool,  # Optional. Enable or disable the metrics signal. Omit to
+                      leave unchanged.
+                    "region": "str",  # Optional. The region slug for region-specific resources.
+                      Only used when the resource has no existing enablement. On later updates, omit it
+                      or send the stored value; changing the region is rejected.
+                    "traces": bool  # Optional. Enable or disable the traces signal. Omit to
+                      leave unchanged.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "resource": {
+                        "product_type": "str",  # The product type of the resource, for
+                          example ``droplet`` or ``kubernetes``. Required.
+                        "resource_urn": "str",  # The uniform resource name (URN) of the
+                          resource. Required.
+                        "logs": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        },
+                        "metrics": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        },
+                        "region": "str",  # Optional. The region slug for region-specific
+                          resources. Omitted when the resource has no region.
+                        "traces": {
+                            "effective_at": "2020-02-20 00:00:00",  # Optional. When this
+                              signal state last changed.
+                            "enabled": bool  # Optional. Whether the signal is enabled
+                              for the resource.
+                        }
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_insights_update_resource_signals_request(
+            resource_urn=resource_urn,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
             response_headers["ratelimit-limit"] = self._deserialize(
                 "int", response.headers.get("ratelimit-limit")
             )
@@ -255612,6 +256650,8 @@ class SizesOperations:
                             "gpu_info": {
                                 "count": 0,  # Optional. The number of GPUs allocated
                                   to the Droplet.
+                                "fabric": bool,  # Optional. If GPU fabric networking
+                                  is enabled.
                                 "model": "str",  # Optional. The model of the GPU.
                                 "vram": {
                                     "amount": 0,  # Optional. The amount of VRAM
@@ -325280,18 +326320,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                     "presets": [
                         {
                             "candidate_inference_config": {
-                                "max_tokens": 0,  # Optional. Inference configuration
-                                  for the candidate model during evaluation.
                                 "reasoning_effort": "str",  # Optional. Reasoning
                                   effort for reasoning-capable models (e.g. "low", "medium", "high").
                                   Validated against the candidate model's supported values; a model
                                   that advertises none rejects this field.
                                 "stop_token": "str",  # Optional. Inference
-                                  configuration for the candidate model during evaluation.
+                                  configuration for the candidate model during evaluation. The output
+                                  token limit is set automatically and cannot be configured.
                                 "system_prompt": "str",  # Optional. Inference
-                                  configuration for the candidate model during evaluation.
+                                  configuration for the candidate model during evaluation. The output
+                                  token limit is set automatically and cannot be configured.
                                 "temperature": 0.0  # Optional. Inference
-                                  configuration for the candidate model during evaluation.
+                                  configuration for the candidate model during evaluation. The output
+                                  token limit is set automatically and cannot be configured.
                             },
                             "candidate_model_name": "str",  # Optional. Model slug used
                               to call the candidate model API. Empty when the CANDIDATE section was not
@@ -325545,18 +326586,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                 response == {
                     "preset": {
                         "candidate_inference_config": {
-                            "max_tokens": 0,  # Optional. Inference configuration for the
-                              candidate model during evaluation.
                             "reasoning_effort": "str",  # Optional. Reasoning effort for
                               reasoning-capable models (e.g. "low", "medium", "high"). Validated
                               against the candidate model's supported values; a model that advertises
                               none rejects this field.
                             "stop_token": "str",  # Optional. Inference configuration for
-                              the candidate model during evaluation.
+                              the candidate model during evaluation. The output token limit is set
+                              automatically and cannot be configured.
                             "system_prompt": "str",  # Optional. Inference configuration
-                              for the candidate model during evaluation.
+                              for the candidate model during evaluation. The output token limit is set
+                              automatically and cannot be configured.
                             "temperature": 0.0  # Optional. Inference configuration for
-                              the candidate model during evaluation.
+                              the candidate model during evaluation. The output token limit is set
+                              automatically and cannot be configured.
                         },
                         "candidate_model_name": "str",  # Optional. Model slug used to call
                           the candidate model API. Empty when the CANDIDATE section was not saved.
@@ -326154,18 +327196,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                 # JSON input template you can fill out and use as your body input.
                 body = {
                     "candidate_inference_config": {
-                        "max_tokens": 0,  # Optional. Inference configuration for the
-                          candidate model during evaluation.
                         "reasoning_effort": "str",  # Optional. Reasoning effort for
                           reasoning-capable models (e.g. "low", "medium", "high"). Validated against
                           the candidate model's supported values; a model that advertises none rejects
                           this field.
                         "stop_token": "str",  # Optional. Inference configuration for the
-                          candidate model during evaluation.
+                          candidate model during evaluation. The output token limit is set
+                          automatically and cannot be configured.
                         "system_prompt": "str",  # Optional. Inference configuration for the
-                          candidate model during evaluation.
+                          candidate model during evaluation. The output token limit is set
+                          automatically and cannot be configured.
                         "temperature": 0.0  # Optional. Inference configuration for the
-                          candidate model during evaluation.
+                          candidate model during evaluation. The output token limit is set
+                          automatically and cannot be configured.
                     },
                     "candidate_model_name": "str",  # Optional. Model slug used to call the
                       candidate model API. For dedicated inference, this is the model slug from the
@@ -326299,18 +327342,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                 # JSON input template you can fill out and use as your body input.
                 body = {
                     "candidate_inference_config": {
-                        "max_tokens": 0,  # Optional. Inference configuration for the
-                          candidate model during evaluation.
                         "reasoning_effort": "str",  # Optional. Reasoning effort for
                           reasoning-capable models (e.g. "low", "medium", "high"). Validated against
                           the candidate model's supported values; a model that advertises none rejects
                           this field.
                         "stop_token": "str",  # Optional. Inference configuration for the
-                          candidate model during evaluation.
+                          candidate model during evaluation. The output token limit is set
+                          automatically and cannot be configured.
                         "system_prompt": "str",  # Optional. Inference configuration for the
-                          candidate model during evaluation.
+                          candidate model during evaluation. The output token limit is set
+                          automatically and cannot be configured.
                         "temperature": 0.0  # Optional. Inference configuration for the
-                          candidate model during evaluation.
+                          candidate model during evaluation. The output token limit is set
+                          automatically and cannot be configured.
                     },
                     "candidate_model_name": "str",  # Optional. Model slug used to call the
                       candidate model API. For dedicated inference, this is the model slug from the
@@ -326623,18 +327667,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                     ],
                     "run": {
                         "candidate_inference_config": {
-                            "max_tokens": 0,  # Optional. Inference configuration for the
-                              candidate model during evaluation.
                             "reasoning_effort": "str",  # Optional. Reasoning effort for
                               reasoning-capable models (e.g. "low", "medium", "high"). Validated
                               against the candidate model's supported values; a model that advertises
                               none rejects this field.
                             "stop_token": "str",  # Optional. Inference configuration for
-                              the candidate model during evaluation.
+                              the candidate model during evaluation. The output token limit is set
+                              automatically and cannot be configured.
                             "system_prompt": "str",  # Optional. Inference configuration
-                              for the candidate model during evaluation.
+                              for the candidate model during evaluation. The output token limit is set
+                              automatically and cannot be configured.
                             "temperature": 0.0  # Optional. Inference configuration for
-                              the candidate model during evaluation.
+                              the candidate model during evaluation. The output token limit is set
+                              automatically and cannot be configured.
                         },
                         "candidate_model_name": "str",  # Optional. Model Evaluation Run
                           Detail - full view returned when fetching a specific run.
@@ -361533,7 +362578,7 @@ class InferenceOperations:
         # pylint: disable=line-too-long
         """Generate images from text prompts.
 
-        Creates a high-quality image from a text prompt using GPT-IMAGE-1, the latest image generation
+        Creates a high-quality image from a text prompt using GPT-IMAGE-2, the latest image generation
         model with automatic prompt optimization and enhanced visual capabilities.
 
         :param body: Required.
@@ -361570,7 +362615,7 @@ class InferenceOperations:
                       generated.
                     "quality": "str",  # Optional. The quality of the image that will be
                       generated. Supported values: auto, high, medium, low.
-                    "size": "str",  # Optional. The size of the generated images. GPT-IMAGE-1
+                    "size": "str",  # Optional. The size of the generated images. GPT-IMAGE-2
                       supports: auto (automatically select best size), 1536x1024 (landscape), 1024x1536
                       (portrait). Known values are: "auto", "1536x1024", and "1024x1536".
                     "stream": False,  # Optional. Default value is False. If set to true, partial
@@ -361623,7 +362668,7 @@ class InferenceOperations:
     ) -> JSON:
         """Generate images from text prompts.
 
-        Creates a high-quality image from a text prompt using GPT-IMAGE-1, the latest image generation
+        Creates a high-quality image from a text prompt using GPT-IMAGE-2, the latest image generation
         model with automatic prompt optimization and enhanced visual capabilities.
 
         :param body: Required.
@@ -361679,7 +362724,7 @@ class InferenceOperations:
         # pylint: disable=line-too-long
         """Generate images from text prompts.
 
-        Creates a high-quality image from a text prompt using GPT-IMAGE-1, the latest image generation
+        Creates a high-quality image from a text prompt using GPT-IMAGE-2, the latest image generation
         model with automatic prompt optimization and enhanced visual capabilities.
 
         :param body: Is either a JSON type or a IO[bytes] type. Required.
@@ -361713,7 +362758,7 @@ class InferenceOperations:
                       generated.
                     "quality": "str",  # Optional. The quality of the image that will be
                       generated. Supported values: auto, high, medium, low.
-                    "size": "str",  # Optional. The size of the generated images. GPT-IMAGE-1
+                    "size": "str",  # Optional. The size of the generated images. GPT-IMAGE-2
                       supports: auto (automatically select best size), 1536x1024 (landscape), 1024x1536
                       (portrait). Known values are: "auto", "1536x1024", and "1024x1536".
                     "stream": False,  # Optional. Default value is False. If set to true, partial
@@ -363043,6 +364088,655 @@ class InferenceOperations:
             return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
 
         return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    def create_speech(
+        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
+    ) -> Union[JSON, Iterator[bytes]]:
+        # pylint: disable=line-too-long
+        """Generate speech from text.
+
+        Convert text input to speech audio. The response may be raw audio bytes (\\ ``audio/mpeg``\\ ,
+        ``audio/wav``\\ , and similar) or a JSON envelope with base64-encoded audio in
+        ``data[].b64_json``.
+
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object or Iterator[bytes]
+        :rtype: JSON or Iterator[bytes]
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "input": "str",  # The text to convert to speech. Required.
+                    "model": "str",  # The text-to-speech model to use. Required.
+                    "instructions": "str",  # Optional. Optional style or delivery instructions
+                      for the synthesizer.
+                    "response_format": "str",  # Optional. The audio format to return. Supported
+                      values include ``mp3`` and ``wav``. The API may return raw audio bytes or a JSON
+                      envelope with base64-encoded audio.
+                    "voice": "str"  # Optional. The voice to use for synthesis.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "data": [
+                        {
+                            "b64_json": "str"  # Base64-encoded audio bytes. Required.
+                        }
+                    ],
+                    "created": 0  # Optional. Unix timestamp (in seconds) of when the audio was
+                      created.
+                }
+        """
+
+    @overload
+    def create_speech(
+        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
+    ) -> Union[JSON, Iterator[bytes]]:
+        """Generate speech from text.
+
+        Convert text input to speech audio. The response may be raw audio bytes (\\ ``audio/mpeg``\\ ,
+        ``audio/wav``\\ , and similar) or a JSON envelope with base64-encoded audio in
+        ``data[].b64_json``.
+
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object or Iterator[bytes]
+        :rtype: JSON or Iterator[bytes]
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "data": [
+                        {
+                            "b64_json": "str"  # Base64-encoded audio bytes. Required.
+                        }
+                    ],
+                    "created": 0  # Optional. Unix timestamp (in seconds) of when the audio was
+                      created.
+                }
+        """
+
+    @distributed_trace
+    def create_speech(
+        self, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> Union[JSON, Iterator[bytes]]:
+        # pylint: disable=line-too-long
+        """Generate speech from text.
+
+        Convert text input to speech audio. The response may be raw audio bytes (\\ ``audio/mpeg``\\ ,
+        ``audio/wav``\\ , and similar) or a JSON envelope with base64-encoded audio in
+        ``data[].b64_json``.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object or Iterator[bytes]
+        :rtype: JSON or Iterator[bytes]
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "input": "str",  # The text to convert to speech. Required.
+                    "model": "str",  # The text-to-speech model to use. Required.
+                    "instructions": "str",  # Optional. Optional style or delivery instructions
+                      for the synthesizer.
+                    "response_format": "str",  # Optional. The audio format to return. Supported
+                      values include ``mp3`` and ``wav``. The API may return raw audio bytes or a JSON
+                      envelope with base64-encoded audio.
+                    "voice": "str"  # Optional. The voice to use for synthesis.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "data": [
+                        {
+                            "b64_json": "str"  # Base64-encoded audio bytes. Required.
+                        }
+                    ],
+                    "created": 0  # Optional. Unix timestamp (in seconds) of when the audio was
+                      created.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[Union[JSON, Iterator[bytes]]] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_inference_create_speech_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = True
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 200]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if cls:
+            return cls(pipeline_response, cast(Union[JSON, Iterator[bytes]], deserialized), response_headers)  # type: ignore
+
+        return cast(Union[JSON, Iterator[bytes]], deserialized)  # type: ignore
+
+    @overload
+    def create_video(
+        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Start a video generation job.
+
+        Start an asynchronous video generation job from a text prompt. Poll ``GET
+        /v1/videos/{video_id}`` until the job reaches a terminal status, then download the MP4 with
+        ``GET /v1/videos/{video_id}/content`` or from ``output.url`` when present.
+
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "model": "str",  # The video generation model to use. Required.
+                    "prompt": "str",  # A text description of the desired video. Required.
+                    "fps": 0,  # Optional. Frames per second for the generated video.
+                    "size": "str"  # Optional. The output resolution, for example ``1280x720``.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "id": "str",  # The video generation job identifier. Required.
+                    "status": "str",  # Job status. Poll until the value is a terminal state such
+                      as ``completed`` or ``failed``. Required.
+                    "created_at": 0,  # Optional. Unix timestamp (in seconds) of when the job was
+                      created.
+                    "error": {
+                        "str": {}  # Optional. Error details when status is ``failed``.
+                    },
+                    "model": "str",  # Optional. The model used for generation.
+                    "object": "str",  # Optional. Object type returned by the API.
+                    "output": {
+                        "url": "str"  # Optional. Presigned URL for the generated MP4.
+                    },
+                    "x_request_id": "str"  # Optional. Request correlation identifier when
+                      provided by the API.
+                }
+        """
+
+    @overload
+    def create_video(
+        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Start a video generation job.
+
+        Start an asynchronous video generation job from a text prompt. Poll ``GET
+        /v1/videos/{video_id}`` until the job reaches a terminal status, then download the MP4 with
+        ``GET /v1/videos/{video_id}/content`` or from ``output.url`` when present.
+
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "id": "str",  # The video generation job identifier. Required.
+                    "status": "str",  # Job status. Poll until the value is a terminal state such
+                      as ``completed`` or ``failed``. Required.
+                    "created_at": 0,  # Optional. Unix timestamp (in seconds) of when the job was
+                      created.
+                    "error": {
+                        "str": {}  # Optional. Error details when status is ``failed``.
+                    },
+                    "model": "str",  # Optional. The model used for generation.
+                    "object": "str",  # Optional. Object type returned by the API.
+                    "output": {
+                        "url": "str"  # Optional. Presigned URL for the generated MP4.
+                    },
+                    "x_request_id": "str"  # Optional. Request correlation identifier when
+                      provided by the API.
+                }
+        """
+
+    @distributed_trace
+    def create_video(self, body: Union[JSON, IO[bytes]], **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Start a video generation job.
+
+        Start an asynchronous video generation job from a text prompt. Poll ``GET
+        /v1/videos/{video_id}`` until the job reaches a terminal status, then download the MP4 with
+        ``GET /v1/videos/{video_id}/content`` or from ``output.url`` when present.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "model": "str",  # The video generation model to use. Required.
+                    "prompt": "str",  # A text description of the desired video. Required.
+                    "fps": 0,  # Optional. Frames per second for the generated video.
+                    "size": "str"  # Optional. The output resolution, for example ``1280x720``.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "id": "str",  # The video generation job identifier. Required.
+                    "status": "str",  # Job status. Poll until the value is a terminal state such
+                      as ``completed`` or ``failed``. Required.
+                    "created_at": 0,  # Optional. Unix timestamp (in seconds) of when the job was
+                      created.
+                    "error": {
+                        "str": {}  # Optional. Error details when status is ``failed``.
+                    },
+                    "model": "str",  # Optional. The model used for generation.
+                    "object": "str",  # Optional. Object type returned by the API.
+                    "output": {
+                        "url": "str"  # Optional. Presigned URL for the generated MP4.
+                    },
+                    "x_request_id": "str"  # Optional. Request correlation identifier when
+                      provided by the API.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_inference_create_video_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        response_headers["ratelimit-limit"] = self._deserialize(
+            "int", response.headers.get("ratelimit-limit")
+        )
+        response_headers["ratelimit-remaining"] = self._deserialize(
+            "int", response.headers.get("ratelimit-remaining")
+        )
+        response_headers["ratelimit-reset"] = self._deserialize(
+            "int", response.headers.get("ratelimit-reset")
+        )
+
+        if response.content:
+            deserialized = response.json()
+        else:
+            deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def get_video(self, video_id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve a video generation job.
+
+        Returns the current state of a video generation job. Poll until ``status`` reaches a terminal
+        value such as ``completed`` or ``failed``.
+
+        :param video_id: The video generation job identifier. Required.
+        :type video_id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "id": "str",  # The video generation job identifier. Required.
+                    "status": "str",  # Job status. Poll until the value is a terminal state such
+                      as ``completed`` or ``failed``. Required.
+                    "created_at": 0,  # Optional. Unix timestamp (in seconds) of when the job was
+                      created.
+                    "error": {
+                        "str": {}  # Optional. Error details when status is ``failed``.
+                    },
+                    "model": "str",  # Optional. The model used for generation.
+                    "object": "str",  # Optional. Object type returned by the API.
+                    "output": {
+                        "url": "str"  # Optional. Presigned URL for the generated MP4.
+                    },
+                    "x_request_id": "str"  # Optional. Request correlation identifier when
+                      provided by the API.
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_inference_get_video_request(
+            video_id=video_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def get_video_content(
+        self, video_id: str, **kwargs: Any
+    ) -> Union[Iterator[bytes], JSON]:
+        # pylint: disable=line-too-long
+        """Download generated video content.
+
+        Downloads the generated MP4 for a completed video generation job.
+
+        :param video_id: The video generation job identifier. Required.
+        :type video_id: str
+        :return: Iterator[bytes] or JSON object
+        :rtype: Iterator[bytes] or JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[Union[Iterator[bytes], JSON]] = kwargs.pop("cls", None)
+
+        _request = build_inference_get_video_content_request(
+            video_id=video_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = True
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if cls:
+            return cls(pipeline_response, cast(Union[Iterator[bytes], JSON], deserialized), response_headers)  # type: ignore
+
+        return cast(Union[Iterator[bytes], JSON], deserialized)  # type: ignore
 
     @overload
     def create_batch_file(
