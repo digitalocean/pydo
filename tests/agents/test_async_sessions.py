@@ -514,3 +514,38 @@ async def test_async_delete_connection_requires_id():
     resources = _make_async_resources([])
     with pytest.raises(ValueError):
         await resources.sessions.delete_connection("github", "")
+
+
+@pytest.mark.asyncio
+async def test_async_reconnect_connection_posts_empty_body():
+    body = {
+        "connection": {
+            "id": "conn_1",
+            "provider": "github",
+            "user_id": "alice",
+            "status": "pending",
+        },
+        "authorization": {
+            "status": "pending",
+            "connect_url": "https://x/confirm?token=abc",
+        },
+    }
+    resources = _make_async_resources([_FakeAsyncResponse(200, body)])
+
+    resp = await resources.sessions.reconnect_connection("github", "conn_1")
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "POST"
+    assert call.request.url.endswith(
+        "/v2/agents/auth/github/connections/conn_1/reconnect"
+    )
+    assert json.loads(call.request.content) == {}
+    assert resp.connection.status == "pending"
+    assert resp.authorization.connect_url.endswith("token=abc")
+
+
+@pytest.mark.asyncio
+async def test_async_reconnect_connection_requires_id():
+    resources = _make_async_resources([])
+    with pytest.raises(ValueError):
+        await resources.sessions.reconnect_connection("github", "")

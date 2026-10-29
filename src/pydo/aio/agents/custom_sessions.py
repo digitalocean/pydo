@@ -608,15 +608,19 @@ class AsyncSessionsOperations:
         user_id: str,
         scopes: Optional[Sequence[str]] = None,
     ) -> Any:
-        """Create (or resume) a connection for an actor.
+        """Create a connection for an actor.
 
         ``POST /v2/agents/auth/{provider}/connections`` with ``{"user_id":
         ..., "scopes": [...]}``. ``user_id`` is the actor the connection acts
         for (required). Omit ``scopes`` to request the provider's full
         configured scope set. A new connection comes back ``pending`` with an
         ``authorization`` block (``connect_url`` / ``verification_code``) for
-        the browser step; an already-connected actor comes back ``active`` with
-        no authorization. Returns ``{"connection": {...}, "authorization": {...}?}``.
+        the browser step. Returns ``{"connection": {...}, "authorization": {...}}``.
+
+        Create is strict: if the actor already has an active, pending, or
+        expired connection for the provider, the API answers 409 Conflict
+        rather than resuming it. Use :meth:`reconnect_connection` to resume or
+        restart that connection's authorization.
         """
         if not user_id or not str(user_id).strip():
             raise ValueError("user_id is required")
@@ -660,6 +664,28 @@ class AsyncSessionsOperations:
                 "DELETE",
                 f"/v2/agents/auth/{_quote(provider)}/connections/"
                 f"{_quote(connection_id)}",
+            ),
+        )
+
+    async def reconnect_connection(self, provider: str, connection_id: str) -> Any:
+        """Resume or restart a connection by id.
+
+        ``POST .../connections/{id}/reconnect`` with ``{}``. Resumes a pending
+        connection's authorization, or starts a new one for an expired or
+        revoked connection. The connection keeps its id, actor, and scopes, so
+        agent configs that use it keep working once it is active again. An
+        active connection comes back unchanged. Only the connection's owner can
+        reconnect it. Returns the same envelope as
+        :meth:`create_connection`: ``{"connection": {...}, "authorization": {...}?}``.
+        """
+        if not connection_id:
+            raise ValueError("connection_id is required")
+        return await self._parse_json(
+            await self._send(
+                "POST",
+                f"/v2/agents/auth/{_quote(provider)}/connections/"
+                f"{_quote(connection_id)}/reconnect",
+                body={},
             ),
         )
 
