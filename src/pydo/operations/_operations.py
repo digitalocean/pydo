@@ -9635,15 +9635,17 @@ def build_signals_update_team_consent_request(  # pylint: disable=name-too-long
     )
 
 
-def build_signals_get_consent_request(agent_id: str, **kwargs: Any) -> HttpRequest:
+def build_signals_get_consent_request(
+    environment_id: str, **kwargs: Any
+) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
 
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v1/consent/{agent_id}"
+    _url = "/v1/consent/{environment_id}"
     path_format_arguments = {
-        "agent_id": _SERIALIZER.url("agent_id", agent_id, "str"),
+        "environment_id": _SERIALIZER.url("environment_id", environment_id, "str"),
     }
 
     _url: str = _url.format(**path_format_arguments)  # type: ignore
@@ -9654,7 +9656,9 @@ def build_signals_get_consent_request(agent_id: str, **kwargs: Any) -> HttpReque
     return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
 
 
-def build_signals_update_consent_request(agent_id: str, **kwargs: Any) -> HttpRequest:
+def build_signals_update_consent_request(
+    environment_id: str, **kwargs: Any
+) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
 
     content_type: Optional[str] = kwargs.pop(
@@ -9663,9 +9667,9 @@ def build_signals_update_consent_request(agent_id: str, **kwargs: Any) -> HttpRe
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v1/consent/{agent_id}"
+    _url = "/v1/consent/{environment_id}"
     path_format_arguments = {
-        "agent_id": _SERIALIZER.url("agent_id", agent_id, "str"),
+        "environment_id": _SERIALIZER.url("environment_id", environment_id, "str"),
     }
 
     _url: str = _url.format(**path_format_arguments)  # type: ignore
@@ -9681,7 +9685,7 @@ def build_signals_update_consent_request(agent_id: str, **kwargs: Any) -> HttpRe
 
 
 def build_signals_list_agent_sessions_request(  # pylint: disable=name-too-long
-    agent_id: str,
+    environment_id: str,
     *,
     limit: int = 20,
     after: Optional[str] = None,
@@ -9696,9 +9700,9 @@ def build_signals_list_agent_sessions_request(  # pylint: disable=name-too-long
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v1/signals/agents/{agent_id}/sessions"
+    _url = "/v1/signals/agents/{environment_id}/sessions"
     path_format_arguments = {
-        "agent_id": _SERIALIZER.url("agent_id", agent_id, "str"),
+        "environment_id": _SERIALIZER.url("environment_id", environment_id, "str"),
     }
 
     _url: str = _url.format(**path_format_arguments)  # type: ignore
@@ -9771,7 +9775,12 @@ def build_signals_list_session_dialogues_request(  # pylint: disable=name-too-lo
 
 
 def build_signals_list_exports_request(
-    *, limit: int = 20, after: Optional[str] = None, **kwargs: Any
+    *,
+    environment_id: Optional[str] = None,
+    agent_id: Optional[str] = None,
+    limit: int = 20,
+    after: Optional[str] = None,
+    **kwargs: Any,
 ) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
     _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
@@ -9782,6 +9791,12 @@ def build_signals_list_exports_request(
     _url = "/v1/signals/exports"
 
     # Construct parameters
+    if environment_id is not None:
+        _params["environment_id"] = _SERIALIZER.query(
+            "environment_id", environment_id, "str"
+        )
+    if agent_id is not None:
+        _params["agent_id"] = _SERIALIZER.query("agent_id", agent_id, "str")
     if limit is not None:
         _params["limit"] = _SERIALIZER.query(
             "limit", limit, "int", maximum=100, minimum=1
@@ -27109,6 +27124,9 @@ class SessionsOperations:
         connects to. tools selects the tools and toolbelts the session exposes, and policy decides
         which calls run, need approval, or are refused.
 
+        Set config.cache to opt into result caching for all eligible tools or a specific list. Caching
+        is off by default and must be enabled for the team.
+
         :param body: Required.
         :type body: JSON
         :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
@@ -27128,11 +27146,24 @@ class SessionsOperations:
                       connections the session's tool calls use, matched against connection ``user_id``.
                       When set it must use the same alphabet as a connection's ``user_id``"" ,
                       ``[A-Za-z0-9._-]``"" , at most 64 characters; anything else is rejected with 400.
-                    "config": {},  # Optional. Optional session options. config.preloadTools may
-                      contain concrete tool names (optionally version-pinned) and version-pinned
-                      toolbelt references. config.customInstructions is a string of at most 1000
-                      characters. config.outputViews maps up to 100 tool slugs to the name of an output
-                      view to apply to that tool's results.
+                    "config": {
+                        "cache": {
+                            "allEligible": bool,  # Optional. Enables caching for every
+                              called tool version with a catalog cache policy, including tools that
+                              become eligible after session creation. Do not combine with tools. True
+                            "maxAgeSeconds": 0,  # Optional. Maximum cache lifetime in
+                              seconds for this session. Omit to use each tool's lifetime, up to 300
+                              seconds. A smaller tool lifetime or provider response cache header can
+                              shorten it. Per-call max_age_seconds can require a fresher result but
+                              cannot increase this limit.
+                            "tools": [
+                                "str"  # Optional. Provider-qualified tool slugs to
+                                  cache. Every listed tool must resolve for the team and have a catalog
+                                  cache policy, or session creation fails. Use slugs without version
+                                  suffixes or toolbelt references. An empty array enables no tools.
+                            ]
+                        }
+                    },
                     "insights": {
                         "logs": bool,  # Optional. Whether the session's customer logs are
                           sent to Insights.
@@ -27185,8 +27216,26 @@ class SessionsOperations:
                           session. Empty for sessions created through this API.
                         "agentUrn": "str",  # Optional. URN of the agent that started the
                           session. Empty for sessions created through this API.
-                        "config": {},  # Optional. Session options as supplied at creation.
-                          Omitted when none were supplied.
+                        "config": {
+                            "cache": {
+                                "allEligible": bool,  # Optional. Enables caching for
+                                  every called tool version with a catalog cache policy, including
+                                  tools that become eligible after session creation. Do not combine
+                                  with tools. True
+                                "maxAgeSeconds": 0,  # Optional. Maximum cache
+                                  lifetime in seconds for this session. Omit to use each tool's
+                                  lifetime, up to 300 seconds. A smaller tool lifetime or provider
+                                  response cache header can shorten it. Per-call max_age_seconds can
+                                  require a fresher result but cannot increase this limit.
+                                "tools": [
+                                    "str"  # Optional. Provider-qualified tool
+                                      slugs to cache. Every listed tool must resolve for the team and
+                                      have a catalog cache policy, or session creation fails. Use slugs
+                                      without version suffixes or toolbelt references. An empty array
+                                      enables no tools.
+                                ]
+                            }
+                        },
                         "createdAt": "2020-02-20 00:00:00",  # Optional. When the session was
                           created.
                         "insights": {
@@ -27272,6 +27321,9 @@ class SessionsOperations:
         connects to. tools selects the tools and toolbelts the session exposes, and policy decides
         which calls run, need approval, or are refused.
 
+        Set config.cache to opt into result caching for all eligible tools or a specific list. Caching
+        is off by default and must be enabled for the team.
+
         :param body: Required.
         :type body: IO[bytes]
         :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
@@ -27295,8 +27347,26 @@ class SessionsOperations:
                           session. Empty for sessions created through this API.
                         "agentUrn": "str",  # Optional. URN of the agent that started the
                           session. Empty for sessions created through this API.
-                        "config": {},  # Optional. Session options as supplied at creation.
-                          Omitted when none were supplied.
+                        "config": {
+                            "cache": {
+                                "allEligible": bool,  # Optional. Enables caching for
+                                  every called tool version with a catalog cache policy, including
+                                  tools that become eligible after session creation. Do not combine
+                                  with tools. True
+                                "maxAgeSeconds": 0,  # Optional. Maximum cache
+                                  lifetime in seconds for this session. Omit to use each tool's
+                                  lifetime, up to 300 seconds. A smaller tool lifetime or provider
+                                  response cache header can shorten it. Per-call max_age_seconds can
+                                  require a fresher result but cannot increase this limit.
+                                "tools": [
+                                    "str"  # Optional. Provider-qualified tool
+                                      slugs to cache. Every listed tool must resolve for the team and
+                                      have a catalog cache policy, or session creation fails. Use slugs
+                                      without version suffixes or toolbelt references. An empty array
+                                      enables no tools.
+                                ]
+                            }
+                        },
                         "createdAt": "2020-02-20 00:00:00",  # Optional. When the session was
                           created.
                         "insights": {
@@ -27380,6 +27450,9 @@ class SessionsOperations:
         connects to. tools selects the tools and toolbelts the session exposes, and policy decides
         which calls run, need approval, or are refused.
 
+        Set config.cache to opt into result caching for all eligible tools or a specific list. Caching
+        is off by default and must be enabled for the team.
+
         :param body: Is either a JSON type or a IO[bytes] type. Required.
         :type body: JSON or IO[bytes]
         :return: JSON object
@@ -27396,11 +27469,24 @@ class SessionsOperations:
                       connections the session's tool calls use, matched against connection ``user_id``.
                       When set it must use the same alphabet as a connection's ``user_id``"" ,
                       ``[A-Za-z0-9._-]``"" , at most 64 characters; anything else is rejected with 400.
-                    "config": {},  # Optional. Optional session options. config.preloadTools may
-                      contain concrete tool names (optionally version-pinned) and version-pinned
-                      toolbelt references. config.customInstructions is a string of at most 1000
-                      characters. config.outputViews maps up to 100 tool slugs to the name of an output
-                      view to apply to that tool's results.
+                    "config": {
+                        "cache": {
+                            "allEligible": bool,  # Optional. Enables caching for every
+                              called tool version with a catalog cache policy, including tools that
+                              become eligible after session creation. Do not combine with tools. True
+                            "maxAgeSeconds": 0,  # Optional. Maximum cache lifetime in
+                              seconds for this session. Omit to use each tool's lifetime, up to 300
+                              seconds. A smaller tool lifetime or provider response cache header can
+                              shorten it. Per-call max_age_seconds can require a fresher result but
+                              cannot increase this limit.
+                            "tools": [
+                                "str"  # Optional. Provider-qualified tool slugs to
+                                  cache. Every listed tool must resolve for the team and have a catalog
+                                  cache policy, or session creation fails. Use slugs without version
+                                  suffixes or toolbelt references. An empty array enables no tools.
+                            ]
+                        }
+                    },
                     "insights": {
                         "logs": bool,  # Optional. Whether the session's customer logs are
                           sent to Insights.
@@ -27453,8 +27539,26 @@ class SessionsOperations:
                           session. Empty for sessions created through this API.
                         "agentUrn": "str",  # Optional. URN of the agent that started the
                           session. Empty for sessions created through this API.
-                        "config": {},  # Optional. Session options as supplied at creation.
-                          Omitted when none were supplied.
+                        "config": {
+                            "cache": {
+                                "allEligible": bool,  # Optional. Enables caching for
+                                  every called tool version with a catalog cache policy, including
+                                  tools that become eligible after session creation. Do not combine
+                                  with tools. True
+                                "maxAgeSeconds": 0,  # Optional. Maximum cache
+                                  lifetime in seconds for this session. Omit to use each tool's
+                                  lifetime, up to 300 seconds. A smaller tool lifetime or provider
+                                  response cache header can shorten it. Per-call max_age_seconds can
+                                  require a fresher result but cannot increase this limit.
+                                "tools": [
+                                    "str"  # Optional. Provider-qualified tool
+                                      slugs to cache. Every listed tool must resolve for the team and
+                                      have a catalog cache policy, or session creation fails. Use slugs
+                                      without version suffixes or toolbelt references. An empty array
+                                      enables no tools.
+                                ]
+                            }
+                        },
                         "createdAt": "2020-02-20 00:00:00",  # Optional. When the session was
                           created.
                         "insights": {
@@ -27664,8 +27768,27 @@ class SessionsOperations:
                               started the session. Empty for sessions created through this API.
                             "agentUrn": "str",  # Optional. URN of the agent that started
                               the session. Empty for sessions created through this API.
-                            "config": {},  # Optional. Session options as supplied at
-                              creation. Omitted when none were supplied.
+                            "config": {
+                                "cache": {
+                                    "allEligible": bool,  # Optional. Enables
+                                      caching for every called tool version with a catalog cache
+                                      policy, including tools that become eligible after session
+                                      creation. Do not combine with tools. True
+                                    "maxAgeSeconds": 0,  # Optional. Maximum
+                                      cache lifetime in seconds for this session. Omit to use each
+                                      tool's lifetime, up to 300 seconds. A smaller tool lifetime or
+                                      provider response cache header can shorten it. Per-call
+                                      max_age_seconds can require a fresher result but cannot increase
+                                      this limit.
+                                    "tools": [
+                                        "str"  # Optional. Provider-qualified
+                                          tool slugs to cache. Every listed tool must resolve for the
+                                          team and have a catalog cache policy, or session creation
+                                          fails. Use slugs without version suffixes or toolbelt
+                                          references. An empty array enables no tools.
+                                    ]
+                                }
+                            },
                             "createdAt": "2020-02-20 00:00:00",  # Optional. When the
                               session was created.
                             "insights": {
@@ -27842,8 +27965,27 @@ class SessionsOperations:
                               started the session. Empty for sessions created through this API.
                             "agentUrn": "str",  # Optional. URN of the agent that started
                               the session. Empty for sessions created through this API.
-                            "config": {},  # Optional. Session options as supplied at
-                              creation. Omitted when none were supplied.
+                            "config": {
+                                "cache": {
+                                    "allEligible": bool,  # Optional. Enables
+                                      caching for every called tool version with a catalog cache
+                                      policy, including tools that become eligible after session
+                                      creation. Do not combine with tools. True
+                                    "maxAgeSeconds": 0,  # Optional. Maximum
+                                      cache lifetime in seconds for this session. Omit to use each
+                                      tool's lifetime, up to 300 seconds. A smaller tool lifetime or
+                                      provider response cache header can shorten it. Per-call
+                                      max_age_seconds can require a fresher result but cannot increase
+                                      this limit.
+                                    "tools": [
+                                        "str"  # Optional. Provider-qualified
+                                          tool slugs to cache. Every listed tool must resolve for the
+                                          team and have a catalog cache policy, or session creation
+                                          fails. Use slugs without version suffixes or toolbelt
+                                          references. An empty array enables no tools.
+                                    ]
+                                }
+                            },
                             "createdAt": "2020-02-20 00:00:00",  # Optional. When the
                               session was created.
                             "insights": {
@@ -30256,6 +30398,10 @@ class ToolsOperations:
                                       the tool requests.
                                 ]
                             },
+                            "cache": {
+                                "ttlSeconds": 0  # Maximum cache lifetime in seconds
+                                  for this tool version. Required.
+                            },
                             "description": "str",  # Optional. What the tool does.
                             "inputSchema": {},  # Optional. The JSON Schema the tool's
                               arguments must satisfy.
@@ -32304,16 +32450,14 @@ class GatewayToolsOperations:
                       contacting support. Required.
                     "status": "str",  # Required. Known values are: "succeeded" and "failed".
                     "_meta": {
-                        "str": {}  # Optional. Additional result metadata. Keys include:   *
-                          ``status``"" : ``requires_approval``"" , ``requires_authorization``"" , or
-                          ``requires_connection_configuration`` when the call stopped before   running.
-                          *    ``approval_id``"" , ``tool_name``"" , ``expires_at``"" , and
-                          ``decide``"" : present with   ``requires_approval``. ``decide`` gives the
-                          ``method``"" , ``path``"" , and ``body``   of the approval request to send.
-                          Approve the call, then repeat it   with the same arguments before
-                          ``expires_at``.  *    `retry`: `{"attempt_count": N, "exhausted": bool}` when
-                          the gateway   retried the call.  *    ``output_view``"" : the output view
-                          applied to the result.
+                        "cache": {
+                            "status": "str",  # HIT returned a cached result without
+                              calling the provider. MISS found no usable result and called the
+                              provider. BYPASS skipped caching. Required. Known values are: "HIT",
+                              "MISS", and "BYPASS".
+                            "age_seconds": 0  # Optional. Age of the cached result in
+                              seconds. Present only on a hit.
+                        }
                     },
                     "error": {
                         "class": "str",  # Optional. The failure class. Branch on this value
@@ -32339,6 +32483,13 @@ class GatewayToolsOperations:
                                   query in the request.
                                 "results": [
                                     {
+                                        "cache": {
+                                            "maxAgeSeconds": 0  # Maximum
+                                              result age the session allows, or 300 if the session sets
+                                              no limit. The tool's own cache lifetime can be shorter.
+                                              Invoke controls use max_age_seconds, not this field's
+                                              camelCase spelling. Required.
+                                        },
                                         "description": "str",  # Optional.
                                           One result group per query, in request order.
                                         "inputSchema": {
@@ -32439,16 +32590,14 @@ class GatewayToolsOperations:
                       contacting support. Required.
                     "status": "str",  # Required. Known values are: "succeeded" and "failed".
                     "_meta": {
-                        "str": {}  # Optional. Additional result metadata. Keys include:   *
-                          ``status``"" : ``requires_approval``"" , ``requires_authorization``"" , or
-                          ``requires_connection_configuration`` when the call stopped before   running.
-                          *    ``approval_id``"" , ``tool_name``"" , ``expires_at``"" , and
-                          ``decide``"" : present with   ``requires_approval``. ``decide`` gives the
-                          ``method``"" , ``path``"" , and ``body``   of the approval request to send.
-                          Approve the call, then repeat it   with the same arguments before
-                          ``expires_at``.  *    `retry`: `{"attempt_count": N, "exhausted": bool}` when
-                          the gateway   retried the call.  *    ``output_view``"" : the output view
-                          applied to the result.
+                        "cache": {
+                            "status": "str",  # HIT returned a cached result without
+                              calling the provider. MISS found no usable result and called the
+                              provider. BYPASS skipped caching. Required. Known values are: "HIT",
+                              "MISS", and "BYPASS".
+                            "age_seconds": 0  # Optional. Age of the cached result in
+                              seconds. Present only on a hit.
+                        }
                     },
                     "error": {
                         "class": "str",  # Optional. The failure class. Branch on this value
@@ -32474,6 +32623,13 @@ class GatewayToolsOperations:
                                   query in the request.
                                 "results": [
                                     {
+                                        "cache": {
+                                            "maxAgeSeconds": 0  # Maximum
+                                              result age the session allows, or 300 if the session sets
+                                              no limit. The tool's own cache lifetime can be shorter.
+                                              Invoke controls use max_age_seconds, not this field's
+                                              camelCase spelling. Required.
+                                        },
                                         "description": "str",  # Optional.
                                           One result group per query, in request order.
                                         "inputSchema": {
@@ -32590,16 +32746,14 @@ class GatewayToolsOperations:
                       contacting support. Required.
                     "status": "str",  # Required. Known values are: "succeeded" and "failed".
                     "_meta": {
-                        "str": {}  # Optional. Additional result metadata. Keys include:   *
-                          ``status``"" : ``requires_approval``"" , ``requires_authorization``"" , or
-                          ``requires_connection_configuration`` when the call stopped before   running.
-                          *    ``approval_id``"" , ``tool_name``"" , ``expires_at``"" , and
-                          ``decide``"" : present with   ``requires_approval``. ``decide`` gives the
-                          ``method``"" , ``path``"" , and ``body``   of the approval request to send.
-                          Approve the call, then repeat it   with the same arguments before
-                          ``expires_at``.  *    `retry`: `{"attempt_count": N, "exhausted": bool}` when
-                          the gateway   retried the call.  *    ``output_view``"" : the output view
-                          applied to the result.
+                        "cache": {
+                            "status": "str",  # HIT returned a cached result without
+                              calling the provider. MISS found no usable result and called the
+                              provider. BYPASS skipped caching. Required. Known values are: "HIT",
+                              "MISS", and "BYPASS".
+                            "age_seconds": 0  # Optional. Age of the cached result in
+                              seconds. Present only on a hit.
+                        }
                     },
                     "error": {
                         "class": "str",  # Optional. The failure class. Branch on this value
@@ -32625,6 +32779,13 @@ class GatewayToolsOperations:
                                   query in the request.
                                 "results": [
                                     {
+                                        "cache": {
+                                            "maxAgeSeconds": 0  # Maximum
+                                              result age the session allows, or 300 if the session sets
+                                              no limit. The tool's own cache lifetime can be shorter.
+                                              Invoke controls use max_age_seconds, not this field's
+                                              camelCase spelling. Required.
+                                        },
                                         "description": "str",  # Optional.
                                           One result group per query, in request order.
                                         "inputSchema": {
@@ -32821,6 +32982,11 @@ class GatewayToolsOperations:
         needs the end user to connect a provider fails with ``_meta.status`` set to
         ``requires_authorization`` or ``requires_connection_configuration``.
 
+        Tools opted into result caching use the session's settings automatically. Set cache on an
+        individual tools entry to bypass caching or require a fresher result. The result's _meta.cache
+        reports cache hits. Hits still incur the standard gateway invocation charge but no additional
+        provider charge, because the provider is not called.
+
         :param body: Required.
         :type body: JSON
         :keyword x_session_id: The session to act in: the UUID at the end of the session's
@@ -32847,6 +33013,18 @@ class GatewayToolsOperations:
                                 "str": {}  # Optional. The tool's arguments, matching
                                   its ``inputSchema``.
                             },
+                            "cache": {
+                                "max_age_seconds": 0,  # Optional. Oldest cached
+                                  result this call accepts, in seconds. Zero bypasses caching. Values
+                                  above 300 are clamped to 300; larger values cannot increase the
+                                  session or tool lifetime. This controls accepted result age, not the
+                                  lifetime of a newly stored entry.
+                                "mode": "auto"  # Optional. Default value is "auto".
+                                  auto uses a sufficiently recent cached result or calls the provider
+                                  and can store a successful result. bypass skips lookup and storage
+                                  without clearing or refreshing existing entries. Known values are:
+                                  "auto" and "bypass".
+                            },
                             "version": "str"  # Optional. An immutable tool version. Omit
                               to use the released version.
                         }
@@ -32868,18 +33046,15 @@ class GatewayToolsOperations:
                                 "status": "str",  # Required. Known values are:
                                   "succeeded" and "failed".
                                 "_meta": {
-                                    "str": {}  # Optional. Additional result
-                                      metadata. Keys include:   *    ``status``"" :
-                                      ``requires_approval``"" , ``requires_authorization``"" , or
-                                      ``requires_connection_configuration`` when the call stopped
-                                      before   running.  *    ``approval_id``"" , ``tool_name``"" ,
-                                      ``expires_at``"" , and ``decide``"" : present with
-                                      ``requires_approval``. ``decide`` gives the ``method``"" ,
-                                      ``path``"" , and ``body``   of the approval request to send.
-                                      Approve the call, then repeat it   with the same arguments before
-                                      ``expires_at``.  *    `retry`: `{"attempt_count": N, "exhausted":
-                                      bool}` when the gateway   retried the call.  *
-                                      ``output_view``"" : the output view applied to the result.
+                                    "cache": {
+                                        "status": "str",  # HIT returned a
+                                          cached result without calling the provider. MISS found no
+                                          usable result and called the provider. BYPASS skipped
+                                          caching. Required. Known values are: "HIT", "MISS", and
+                                          "BYPASS".
+                                        "age_seconds": 0  # Optional. Age of
+                                          the cached result in seconds. Present only on a hit.
+                                    }
                                 },
                                 "error": {
                                     "class": "str",  # Optional. The failure
@@ -32972,6 +33147,11 @@ class GatewayToolsOperations:
         needs the end user to connect a provider fails with ``_meta.status`` set to
         ``requires_authorization`` or ``requires_connection_configuration``.
 
+        Tools opted into result caching use the session's settings automatically. Set cache on an
+        individual tools entry to bypass caching or require a fresher result. The result's _meta.cache
+        reports cache hits. Hits still incur the standard gateway invocation charge but no additional
+        provider charge, because the provider is not called.
+
         :param body: Required.
         :type body: IO[bytes]
         :keyword x_session_id: The session to act in: the UUID at the end of the session's
@@ -33001,18 +33181,15 @@ class GatewayToolsOperations:
                                 "status": "str",  # Required. Known values are:
                                   "succeeded" and "failed".
                                 "_meta": {
-                                    "str": {}  # Optional. Additional result
-                                      metadata. Keys include:   *    ``status``"" :
-                                      ``requires_approval``"" , ``requires_authorization``"" , or
-                                      ``requires_connection_configuration`` when the call stopped
-                                      before   running.  *    ``approval_id``"" , ``tool_name``"" ,
-                                      ``expires_at``"" , and ``decide``"" : present with
-                                      ``requires_approval``. ``decide`` gives the ``method``"" ,
-                                      ``path``"" , and ``body``   of the approval request to send.
-                                      Approve the call, then repeat it   with the same arguments before
-                                      ``expires_at``.  *    `retry`: `{"attempt_count": N, "exhausted":
-                                      bool}` when the gateway   retried the call.  *
-                                      ``output_view``"" : the output view applied to the result.
+                                    "cache": {
+                                        "status": "str",  # HIT returned a
+                                          cached result without calling the provider. MISS found no
+                                          usable result and called the provider. BYPASS skipped
+                                          caching. Required. Known values are: "HIT", "MISS", and
+                                          "BYPASS".
+                                        "age_seconds": 0  # Optional. Age of
+                                          the cached result in seconds. Present only on a hit.
+                                    }
                                 },
                                 "error": {
                                     "class": "str",  # Optional. The failure
@@ -33100,6 +33277,11 @@ class GatewayToolsOperations:
         needs the end user to connect a provider fails with ``_meta.status`` set to
         ``requires_authorization`` or ``requires_connection_configuration``.
 
+        Tools opted into result caching use the session's settings automatically. Set cache on an
+        individual tools entry to bypass caching or require a fresher result. The result's _meta.cache
+        reports cache hits. Hits still incur the standard gateway invocation charge but no additional
+        provider charge, because the provider is not called.
+
         :param body: Is either a JSON type or a IO[bytes] type. Required.
         :type body: JSON or IO[bytes]
         :keyword x_session_id: The session to act in: the UUID at the end of the session's
@@ -33123,6 +33305,18 @@ class GatewayToolsOperations:
                                 "str": {}  # Optional. The tool's arguments, matching
                                   its ``inputSchema``.
                             },
+                            "cache": {
+                                "max_age_seconds": 0,  # Optional. Oldest cached
+                                  result this call accepts, in seconds. Zero bypasses caching. Values
+                                  above 300 are clamped to 300; larger values cannot increase the
+                                  session or tool lifetime. This controls accepted result age, not the
+                                  lifetime of a newly stored entry.
+                                "mode": "auto"  # Optional. Default value is "auto".
+                                  auto uses a sufficiently recent cached result or calls the provider
+                                  and can store a successful result. bypass skips lookup and storage
+                                  without clearing or refreshing existing entries. Known values are:
+                                  "auto" and "bypass".
+                            },
                             "version": "str"  # Optional. An immutable tool version. Omit
                               to use the released version.
                         }
@@ -33144,18 +33338,15 @@ class GatewayToolsOperations:
                                 "status": "str",  # Required. Known values are:
                                   "succeeded" and "failed".
                                 "_meta": {
-                                    "str": {}  # Optional. Additional result
-                                      metadata. Keys include:   *    ``status``"" :
-                                      ``requires_approval``"" , ``requires_authorization``"" , or
-                                      ``requires_connection_configuration`` when the call stopped
-                                      before   running.  *    ``approval_id``"" , ``tool_name``"" ,
-                                      ``expires_at``"" , and ``decide``"" : present with
-                                      ``requires_approval``. ``decide`` gives the ``method``"" ,
-                                      ``path``"" , and ``body``   of the approval request to send.
-                                      Approve the call, then repeat it   with the same arguments before
-                                      ``expires_at``.  *    `retry`: `{"attempt_count": N, "exhausted":
-                                      bool}` when the gateway   retried the call.  *
-                                      ``output_view``"" : the output view applied to the result.
+                                    "cache": {
+                                        "status": "str",  # HIT returned a
+                                          cached result without calling the provider. MISS found no
+                                          usable result and called the provider. BYPASS skipped
+                                          caching. Required. Known values are: "HIT", "MISS", and
+                                          "BYPASS".
+                                        "age_seconds": 0  # Optional. Age of
+                                          the cached result in seconds. Present only on a hit.
+                                    }
                                 },
                                 "error": {
                                     "class": "str",  # Optional. The failure
@@ -33428,16 +33619,14 @@ class GatewayCodeOperations:
                       contacting support. Required.
                     "status": "str",  # Required. Known values are: "succeeded" and "failed".
                     "_meta": {
-                        "str": {}  # Optional. Additional result metadata. Keys include:   *
-                          ``status``"" : ``requires_approval``"" , ``requires_authorization``"" , or
-                          ``requires_connection_configuration`` when the call stopped before   running.
-                          *    ``approval_id``"" , ``tool_name``"" , ``expires_at``"" , and
-                          ``decide``"" : present with   ``requires_approval``. ``decide`` gives the
-                          ``method``"" , ``path``"" , and ``body``   of the approval request to send.
-                          Approve the call, then repeat it   with the same arguments before
-                          ``expires_at``.  *    `retry`: `{"attempt_count": N, "exhausted": bool}` when
-                          the gateway   retried the call.  *    ``output_view``"" : the output view
-                          applied to the result.
+                        "cache": {
+                            "status": "str",  # HIT returned a cached result without
+                              calling the provider. MISS found no usable result and called the
+                              provider. BYPASS skipped caching. Required. Known values are: "HIT",
+                              "MISS", and "BYPASS".
+                            "age_seconds": 0  # Optional. Age of the cached result in
+                              seconds. Present only on a hit.
+                        }
                     },
                     "error": {
                         "class": "str",  # Optional. The failure class. Branch on this value
@@ -33542,16 +33731,14 @@ class GatewayCodeOperations:
                       contacting support. Required.
                     "status": "str",  # Required. Known values are: "succeeded" and "failed".
                     "_meta": {
-                        "str": {}  # Optional. Additional result metadata. Keys include:   *
-                          ``status``"" : ``requires_approval``"" , ``requires_authorization``"" , or
-                          ``requires_connection_configuration`` when the call stopped before   running.
-                          *    ``approval_id``"" , ``tool_name``"" , ``expires_at``"" , and
-                          ``decide``"" : present with   ``requires_approval``. ``decide`` gives the
-                          ``method``"" , ``path``"" , and ``body``   of the approval request to send.
-                          Approve the call, then repeat it   with the same arguments before
-                          ``expires_at``.  *    `retry`: `{"attempt_count": N, "exhausted": bool}` when
-                          the gateway   retried the call.  *    ``output_view``"" : the output view
-                          applied to the result.
+                        "cache": {
+                            "status": "str",  # HIT returned a cached result without
+                              calling the provider. MISS found no usable result and called the
+                              provider. BYPASS skipped caching. Required. Known values are: "HIT",
+                              "MISS", and "BYPASS".
+                            "age_seconds": 0  # Optional. Age of the cached result in
+                              seconds. Present only on a hit.
+                        }
                     },
                     "error": {
                         "class": "str",  # Optional. The failure class. Branch on this value
@@ -33655,16 +33842,14 @@ class GatewayCodeOperations:
                       contacting support. Required.
                     "status": "str",  # Required. Known values are: "succeeded" and "failed".
                     "_meta": {
-                        "str": {}  # Optional. Additional result metadata. Keys include:   *
-                          ``status``"" : ``requires_approval``"" , ``requires_authorization``"" , or
-                          ``requires_connection_configuration`` when the call stopped before   running.
-                          *    ``approval_id``"" , ``tool_name``"" , ``expires_at``"" , and
-                          ``decide``"" : present with   ``requires_approval``. ``decide`` gives the
-                          ``method``"" , ``path``"" , and ``body``   of the approval request to send.
-                          Approve the call, then repeat it   with the same arguments before
-                          ``expires_at``.  *    `retry`: `{"attempt_count": N, "exhausted": bool}` when
-                          the gateway   retried the call.  *    ``output_view``"" : the output view
-                          applied to the result.
+                        "cache": {
+                            "status": "str",  # HIT returned a cached result without
+                              calling the provider. MISS found no usable result and called the
+                              provider. BYPASS skipped caching. Required. Known values are: "HIT",
+                              "MISS", and "BYPASS".
+                            "age_seconds": 0  # Optional. Age of the cached result in
+                              seconds. Present only on a hit.
+                        }
                     },
                     "error": {
                         "class": "str",  # Optional. The failure class. Branch on this value
@@ -208922,8 +209107,10 @@ class SignalsOperations:
                               Required. Known values are: "agent" and "inference".
                             "team_id": 0,  # The team ID that owns this consent record.
                               Required.
-                            "updated_at": "2020-02-20 00:00:00"  # A time value given in
+                            "updated_at": "2020-02-20 00:00:00",  # A time value given in
                               ISO8601 combined date and time format. Required.
+                            "environment_id": "str"  # Optional. Same as agent_id when
+                              present. Dual-emitted during the rename; omitted when agent_id is empty.
                         }
                     ],
                     "source": "str"  # Optional. Echoes the ``source`` filter when the request
@@ -209040,14 +209227,14 @@ class SignalsOperations:
 
         To revoke consent, send the same request with ``enabled`` set to ``false``.
         The ``source`` query parameter is required. Per-environment consent for Harness
-        Runtime environments is managed with ``PUT /v1/consent/{agent_id}`` instead.
+        Runtime environments is managed with ``PUT /v1/consent/{environment_id}`` instead.
 
         :param body: Required.
         :type body: JSON
         :keyword source: The consent source to update. Only team-level sources are accepted on this
          endpoint; currently ``inference`` (Serverless Inference chat completions). Per-environment
-         consent (\\ ``agent``\\ ) is managed with ``PUT /v1/consent/{agent_id}`` instead. "inference"
-         Required.
+         consent (\\ ``agent``\\ ) is managed with ``PUT /v1/consent/{environment_id}`` instead.
+         "inference" Required.
         :paramtype source: str
         :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
          Default value is "application/json".
@@ -209081,8 +209268,10 @@ class SignalsOperations:
                           consent for Serverless Inference chat completions. Required. Known values
                           are: "agent" and "inference".
                         "team_id": 0,  # The team ID that owns this consent record. Required.
-                        "updated_at": "2020-02-20 00:00:00"  # A time value given in ISO8601
+                        "updated_at": "2020-02-20 00:00:00",  # A time value given in ISO8601
                           combined date and time format. Required.
+                        "environment_id": "str"  # Optional. Same as agent_id when present.
+                          Dual-emitted during the rename; omitted when agent_id is empty.
                     }
                 }
                 # response body for status code(s): 400
@@ -209118,14 +209307,14 @@ class SignalsOperations:
 
         To revoke consent, send the same request with ``enabled`` set to ``false``.
         The ``source`` query parameter is required. Per-environment consent for Harness
-        Runtime environments is managed with ``PUT /v1/consent/{agent_id}`` instead.
+        Runtime environments is managed with ``PUT /v1/consent/{environment_id}`` instead.
 
         :param body: Required.
         :type body: IO[bytes]
         :keyword source: The consent source to update. Only team-level sources are accepted on this
          endpoint; currently ``inference`` (Serverless Inference chat completions). Per-environment
-         consent (\\ ``agent``\\ ) is managed with ``PUT /v1/consent/{agent_id}`` instead. "inference"
-         Required.
+         consent (\\ ``agent``\\ ) is managed with ``PUT /v1/consent/{environment_id}`` instead.
+         "inference" Required.
         :paramtype source: str
         :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
          Default value is "application/json".
@@ -209153,8 +209342,10 @@ class SignalsOperations:
                           consent for Serverless Inference chat completions. Required. Known values
                           are: "agent" and "inference".
                         "team_id": 0,  # The team ID that owns this consent record. Required.
-                        "updated_at": "2020-02-20 00:00:00"  # A time value given in ISO8601
+                        "updated_at": "2020-02-20 00:00:00",  # A time value given in ISO8601
                           combined date and time format. Required.
+                        "environment_id": "str"  # Optional. Same as agent_id when present.
+                          Dual-emitted during the rename; omitted when agent_id is empty.
                     }
                 }
                 # response body for status code(s): 400
@@ -209185,14 +209376,14 @@ class SignalsOperations:
 
         To revoke consent, send the same request with ``enabled`` set to ``false``.
         The ``source`` query parameter is required. Per-environment consent for Harness
-        Runtime environments is managed with ``PUT /v1/consent/{agent_id}`` instead.
+        Runtime environments is managed with ``PUT /v1/consent/{environment_id}`` instead.
 
         :param body: Is either a JSON type or a IO[bytes] type. Required.
         :type body: JSON or IO[bytes]
         :keyword source: The consent source to update. Only team-level sources are accepted on this
          endpoint; currently ``inference`` (Serverless Inference chat completions). Per-environment
-         consent (\\ ``agent``\\ ) is managed with ``PUT /v1/consent/{agent_id}`` instead. "inference"
-         Required.
+         consent (\\ ``agent``\\ ) is managed with ``PUT /v1/consent/{environment_id}`` instead.
+         "inference" Required.
         :paramtype source: str
         :return: JSON object
         :rtype: JSON
@@ -209223,8 +209414,10 @@ class SignalsOperations:
                           consent for Serverless Inference chat completions. Required. Known values
                           are: "agent" and "inference".
                         "team_id": 0,  # The team ID that owns this consent record. Required.
-                        "updated_at": "2020-02-20 00:00:00"  # A time value given in ISO8601
+                        "updated_at": "2020-02-20 00:00:00",  # A time value given in ISO8601
                           combined date and time format. Required.
+                        "environment_id": "str"  # Optional. Same as agent_id when present.
+                          Dual-emitted during the rename; omitted when agent_id is empty.
                     }
                 }
                 # response body for status code(s): 400
@@ -209332,20 +209525,20 @@ class SignalsOperations:
         return cast(JSON, deserialized)  # type: ignore
 
     @distributed_trace
-    def get_consent(self, agent_id: str, **kwargs: Any) -> JSON:
+    def get_consent(self, environment_id: str, **kwargs: Any) -> JSON:
         # pylint: disable=line-too-long
         """Retrieve Consent for an Environment.
 
         To retrieve the consent record for a specific environment, send a GET
-        request to ``/v1/consent/{agent_id}``. The response includes an ``enabled``
+        request to ``/v1/consent/{environment_id}``. The response includes an ``enabled``
         field indicating whether signals collection is on for this environment.
 
         This endpoint only serves per-environment (\\ ``source: agent``\\ ) records. Team-level
         inference consent is read from ``GET /v1/consent?source=inference``.
 
-        :param agent_id: A unique identifier for an environment. For Harness Runtime, this is the
-         Environment Config ID. Required.
-        :type agent_id: str
+        :param environment_id: A unique identifier for an environment. For Harness Runtime, this is the
+         Environment Config ID. Formerly named agent_id. Required.
+        :type environment_id: str
         :return: JSON object
         :rtype: JSON
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -209359,6 +209552,8 @@ class SignalsOperations:
                       Runtime, this is the Environment Config ID. Required.
                     "enabled": bool,  # Whether signals collection is enabled for this
                       environment. Required.
+                    "environment_id": "str",  # Same as agent_id. Dual-emitted during the rename.
+                      Required.
                     "source": "str",  # The source this consent applies to. Always ``agent`` for
                       per-environment records returned by this endpoint. Required. "agent"
                     "team_id": 0,  # The team ID that owns this consent record. Required.
@@ -209397,7 +209592,7 @@ class SignalsOperations:
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
         _request = build_signals_get_consent_request(
-            agent_id=agent_id,
+            environment_id=environment_id,
             headers=_headers,
             params=_params,
         )
@@ -209475,7 +209670,7 @@ class SignalsOperations:
     @overload
     def update_consent(
         self,
-        agent_id: str,
+        environment_id: str,
         body: JSON,
         *,
         content_type: str = "application/json",
@@ -209485,16 +209680,16 @@ class SignalsOperations:
         """Update Consent for an Environment.
 
         To enable or disable signals collection for a specific environment, send a
-        PUT request to ``/v1/consent/{agent_id}`` with an ``enabled`` boolean in the
+        PUT request to ``/v1/consent/{environment_id}`` with an ``enabled`` boolean in the
         request body.
 
         This endpoint only manages per-environment (\\ ``source: agent``\\ ) consent. To manage
         team-level consent for Serverless Inference, use
         ``PUT /v1/consent?source=inference`` instead.
 
-        :param agent_id: A unique identifier for an environment. For Harness Runtime, this is the
-         Environment Config ID. Required.
-        :type agent_id: str
+        :param environment_id: A unique identifier for an environment. For Harness Runtime, this is the
+         Environment Config ID. Formerly named agent_id. Required.
+        :type environment_id: str
         :param body: Required.
         :type body: JSON
         :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
@@ -209529,8 +209724,10 @@ class SignalsOperations:
                           consent for Serverless Inference chat completions. Required. Known values
                           are: "agent" and "inference".
                         "team_id": 0,  # The team ID that owns this consent record. Required.
-                        "updated_at": "2020-02-20 00:00:00"  # A time value given in ISO8601
+                        "updated_at": "2020-02-20 00:00:00",  # A time value given in ISO8601
                           combined date and time format. Required.
+                        "environment_id": "str"  # Optional. Same as agent_id when present.
+                          Dual-emitted during the rename; omitted when agent_id is empty.
                     }
                 }
                 # response body for status code(s): 400, 404
@@ -209549,7 +209746,7 @@ class SignalsOperations:
     @overload
     def update_consent(
         self,
-        agent_id: str,
+        environment_id: str,
         body: IO[bytes],
         *,
         content_type: str = "application/json",
@@ -209559,16 +209756,16 @@ class SignalsOperations:
         """Update Consent for an Environment.
 
         To enable or disable signals collection for a specific environment, send a
-        PUT request to ``/v1/consent/{agent_id}`` with an ``enabled`` boolean in the
+        PUT request to ``/v1/consent/{environment_id}`` with an ``enabled`` boolean in the
         request body.
 
         This endpoint only manages per-environment (\\ ``source: agent``\\ ) consent. To manage
         team-level consent for Serverless Inference, use
         ``PUT /v1/consent?source=inference`` instead.
 
-        :param agent_id: A unique identifier for an environment. For Harness Runtime, this is the
-         Environment Config ID. Required.
-        :type agent_id: str
+        :param environment_id: A unique identifier for an environment. For Harness Runtime, this is the
+         Environment Config ID. Formerly named agent_id. Required.
+        :type environment_id: str
         :param body: Required.
         :type body: IO[bytes]
         :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
@@ -209597,8 +209794,10 @@ class SignalsOperations:
                           consent for Serverless Inference chat completions. Required. Known values
                           are: "agent" and "inference".
                         "team_id": 0,  # The team ID that owns this consent record. Required.
-                        "updated_at": "2020-02-20 00:00:00"  # A time value given in ISO8601
+                        "updated_at": "2020-02-20 00:00:00",  # A time value given in ISO8601
                           combined date and time format. Required.
+                        "environment_id": "str"  # Optional. Same as agent_id when present.
+                          Dual-emitted during the rename; omitted when agent_id is empty.
                     }
                 }
                 # response body for status code(s): 400, 404
@@ -209616,22 +209815,22 @@ class SignalsOperations:
 
     @distributed_trace
     def update_consent(
-        self, agent_id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+        self, environment_id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
     ) -> JSON:
         # pylint: disable=line-too-long
         """Update Consent for an Environment.
 
         To enable or disable signals collection for a specific environment, send a
-        PUT request to ``/v1/consent/{agent_id}`` with an ``enabled`` boolean in the
+        PUT request to ``/v1/consent/{environment_id}`` with an ``enabled`` boolean in the
         request body.
 
         This endpoint only manages per-environment (\\ ``source: agent``\\ ) consent. To manage
         team-level consent for Serverless Inference, use
         ``PUT /v1/consent?source=inference`` instead.
 
-        :param agent_id: A unique identifier for an environment. For Harness Runtime, this is the
-         Environment Config ID. Required.
-        :type agent_id: str
+        :param environment_id: A unique identifier for an environment. For Harness Runtime, this is the
+         Environment Config ID. Formerly named agent_id. Required.
+        :type environment_id: str
         :param body: Is either a JSON type or a IO[bytes] type. Required.
         :type body: JSON or IO[bytes]
         :return: JSON object
@@ -209663,8 +209862,10 @@ class SignalsOperations:
                           consent for Serverless Inference chat completions. Required. Known values
                           are: "agent" and "inference".
                         "team_id": 0,  # The team ID that owns this consent record. Required.
-                        "updated_at": "2020-02-20 00:00:00"  # A time value given in ISO8601
+                        "updated_at": "2020-02-20 00:00:00",  # A time value given in ISO8601
                           combined date and time format. Required.
+                        "environment_id": "str"  # Optional. Same as agent_id when present.
+                          Dual-emitted during the rename; omitted when agent_id is empty.
                     }
                 }
                 # response body for status code(s): 400, 404
@@ -209709,7 +209910,7 @@ class SignalsOperations:
             _json = body
 
         _request = build_signals_update_consent_request(
-            agent_id=agent_id,
+            environment_id=environment_id,
             content_type=content_type,
             json=_json,
             content=_content,
@@ -209790,7 +209991,7 @@ class SignalsOperations:
     @distributed_trace
     def list_agent_sessions(
         self,
-        agent_id: str,
+        environment_id: str,
         *,
         limit: int = 20,
         after: Optional[str] = None,
@@ -209803,12 +210004,12 @@ class SignalsOperations:
         """List Sessions for an Environment.
 
         To list signals sessions for a specific environment, send a GET request to
-        ``/v1/signals/agents/{agent_id}/sessions``. Results are paginated using cursor-based
+        ``/v1/signals/agents/{environment_id}/sessions``. Results are paginated using cursor-based
         pagination with ``limit`` and ``after`` parameters.
 
-        :param agent_id: A unique identifier for an environment. For Harness Runtime, this is the
-         Environment Config ID. Required.
-        :type agent_id: str
+        :param environment_id: A unique identifier for an environment. For Harness Runtime, this is the
+         Environment Config ID. Formerly named agent_id. Required.
+        :type environment_id: str
         :keyword limit: Maximum number of items to return per page. Default value is 20.
         :paramtype limit: int
         :keyword after: An opaque cursor string returned from a previous page. Pass this value to
@@ -209886,7 +210087,7 @@ class SignalsOperations:
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
         _request = build_signals_list_agent_sessions_request(
-            agent_id=agent_id,
+            environment_id=environment_id,
             limit=limit,
             after=after,
             start_time=start_time,
@@ -210117,7 +210318,13 @@ class SignalsOperations:
 
     @distributed_trace
     def list_exports(
-        self, *, limit: int = 20, after: Optional[str] = None, **kwargs: Any
+        self,
+        *,
+        environment_id: Optional[str] = None,
+        agent_id: Optional[str] = None,
+        limit: int = 20,
+        after: Optional[str] = None,
+        **kwargs: Any,
     ) -> JSON:
         # pylint: disable=line-too-long
         """List Export Jobs.
@@ -210126,6 +210333,12 @@ class SignalsOperations:
         ``/v1/signals/exports``. Results are paginated using cursor-based pagination
         with ``limit`` and ``after`` parameters.
 
+        :keyword environment_id: Optional filter by environment ID. Default value is None.
+        :paramtype environment_id: str
+        :keyword agent_id: Deprecated alias for environment_id. Accepted for backward compatibility;
+         must equal environment_id when both are set. Both set and different returns 400. Default value
+         is None.
+        :paramtype agent_id: str
         :keyword limit: Maximum number of items to return per page. Default value is 20.
         :paramtype limit: int
         :keyword after: An opaque cursor string returned from a previous page. Pass this value to
@@ -210145,23 +210358,10 @@ class SignalsOperations:
                             "cursor": "str",  # Optional. An opaque cursor for
                               pagination.
                             "node": {
-                                "agent_id": "str",  # The environment whose data is
-                                  being exported. For Harness Runtime, this is the Environment Config
-                                  ID. Not meaningful for ``inference`` exports; use ``type`` to
-                                  distinguish the export scope. Required.
                                 "created_at": 0,  # Unix timestamp when the export
                                   was created. Required.
                                 "export_id": "str",  # The unique identifier for the
                                   export job. Required.
-                                "status": "str",  # The current status of the export
-                                  job. Required. Known values are: "pending", "processing", "complete",
-                                  and "failed".
-                                "completed_at": 0,  # Optional. Unix timestamp when
-                                  the export completed, or null if still in progress.
-                                "error_message": "str",  # Optional. Error message if
-                                  the export failed, or null on success.
-                                "expires_at": 0,  # Optional. Unix timestamp when the
-                                  export download link expires.
                                 "filters": {
                                     "session_ids": [
                                         "str"  # Optional. Specific session
@@ -210172,6 +210372,21 @@ class SignalsOperations:
                                           included in the export.
                                     ]
                                 },
+                                "status": "str",  # The current status of the export
+                                  job. Required. Known values are: "pending", "processing", "complete",
+                                  and "failed".
+                                "agent_id": "str",  # Optional. The environment whose
+                                  data is being exported. For Harness Runtime, this is the Environment
+                                  Config ID. Not meaningful for ``inference`` exports; use ``type`` to
+                                  distinguish the export scope.
+                                "completed_at": 0,  # Optional. Unix timestamp when
+                                  the export completed, or null if still in progress.
+                                "environment_id": "str",  # Optional. Same as
+                                  agent_id. Dual-emitted during the rename.
+                                "error_message": "str",  # Optional. Error message if
+                                  the export failed, or null on success.
+                                "expires_at": 0,  # Optional. Unix timestamp when the
+                                  export download link expires.
                                 "type": "str"  # Optional. The scope of the export.
                                   ``agent`` covers one Harness Runtime environment; ``inference``
                                   covers the team's Serverless Inference Signals conversations. Known
@@ -210204,6 +210419,8 @@ class SignalsOperations:
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
         _request = build_signals_list_exports_request(
+            environment_id=environment_id,
+            agent_id=agent_id,
             limit=limit,
             after=after,
             headers=_headers,
@@ -210256,9 +210473,10 @@ class SignalsOperations:
 
         To create a new signals data export, send a POST request to
         ``/v1/signals/exports``. To export one Harness Runtime environment, include its
-        ``agent_id`` (\\ ``type`` defaults to ``agent``\\ ). To export the team's Serverless
-        Inference Signals conversations, set ``type`` to ``inference`` and omit
-        ``agent_id``. You may optionally filter the export by ``signal_type``\\ ,
+        ``environment_id`` (\\ ``type`` defaults to ``agent``\\ ). Deprecated ``agent_id`` is still
+        accepted. To export the team's Serverless Inference Signals conversations, set
+        ``type`` to ``inference`` and omit ``environment_id`` and ``agent_id``. You may
+        optionally filter the export by ``signal_type``\\ ,
         ``session_ids``\\ , ``start_time``\\ , and ``end_time``. Use the export options endpoint
         to discover available signal types.
 
@@ -210280,11 +210498,16 @@ class SignalsOperations:
 
                 # JSON input template you can fill out and use as your body input.
                 body = {
-                    "agent_id": "str",  # Optional. The environment whose data should be
-                      exported. For Harness Runtime, this is the Environment Config ID. Required when
-                      ``type`` is ``agent``"" ; must be omitted when ``type`` is ``inference``.
+                    "agent_id": "str",  # Optional. Deprecated alias for ``environment_id``.
+                      Accepted for backward compatibility; must equal ``environment_id`` when both are
+                      set. Both set and different returns 400. Required when ``type`` is ``agent`` if
+                      ``environment_id`` is omitted; must be omitted when ``type`` is ``inference``.
                     "end_time": "2020-02-20 00:00:00",  # Optional. Include only sessions that
                       started at or before this timestamp.
+                    "environment_id": "str",  # Optional. The environment whose data should be
+                      exported. For Harness Runtime, this is the Environment Config ID. Required when
+                      ``type`` is ``agent`` if ``agent_id`` is omitted; must be omitted when ``type``
+                      is ``inference``. Prefer this over ``agent_id``.
                     "session_ids": [
                         "str"  # Optional. Optional list of specific session IDs to include
                           in the export.
@@ -210296,28 +210519,18 @@ class SignalsOperations:
                     "start_time": "2020-02-20 00:00:00",  # Optional. Include only sessions that
                       started at or after this timestamp.
                     "type": "str"  # Optional. The scope of the export. ``agent`` exports Signals
-                      conversations for one Harness Runtime environment and requires ``agent_id``.
-                      ``inference`` exports Serverless Inference Signals conversations for the whole
-                      team (team-wide; omit ``agent_id``"" ). Defaults to ``agent`` when ``agent_id``
-                      is provided and to ``inference`` when it is omitted. Known values are: "agent"
+                      conversations for one Harness Runtime environment and requires ``environment_id``
+                      (or deprecated ``agent_id``"" ). ``inference`` exports Serverless Inference
+                      Signals conversations for the whole team (team-wide; omit ``environment_id`` and
+                      ``agent_id``"" ). Defaults to ``agent`` when ``environment_id`` or ``agent_id``
+                      is provided and to ``inference`` when both are omitted. Known values are: "agent"
                       and "inference".
                 }
 
                 # response body for status code(s): 201
                 response == {
-                    "agent_id": "str",  # The environment whose data is being exported. For
-                      Harness Runtime, this is the Environment Config ID. Not meaningful for
-                      ``inference`` exports; use ``type`` to distinguish the export scope. Required.
                     "created_at": 0,  # Unix timestamp when the export was created. Required.
                     "export_id": "str",  # The unique identifier for the export job. Required.
-                    "status": "str",  # The current status of the export job. Required. Known
-                      values are: "pending", "processing", "complete", and "failed".
-                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
-                      null if still in progress.
-                    "error_message": "str",  # Optional. Error message if the export failed, or
-                      null on success.
-                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
-                      expires.
                     "filters": {
                         "session_ids": [
                             "str"  # Optional. Specific session IDs included in the
@@ -210327,6 +210540,19 @@ class SignalsOperations:
                             "str"  # Optional. Signal types included in the export.
                         ]
                     },
+                    "status": "str",  # The current status of the export job. Required. Known
+                      values are: "pending", "processing", "complete", and "failed".
+                    "agent_id": "str",  # Optional. The environment whose data is being exported.
+                      For Harness Runtime, this is the Environment Config ID. Not meaningful for
+                      ``inference`` exports; use ``type`` to distinguish the export scope.
+                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
+                      null if still in progress.
+                    "environment_id": "str",  # Optional. Same as agent_id. Dual-emitted during
+                      the rename.
+                    "error_message": "str",  # Optional. Error message if the export failed, or
+                      null on success.
+                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
+                      expires.
                     "type": "str"  # Optional. The scope of the export. ``agent`` covers one
                       Harness Runtime environment; ``inference`` covers the team's Serverless Inference
                       Signals conversations. Known values are: "agent" and "inference".
@@ -210353,9 +210579,10 @@ class SignalsOperations:
 
         To create a new signals data export, send a POST request to
         ``/v1/signals/exports``. To export one Harness Runtime environment, include its
-        ``agent_id`` (\\ ``type`` defaults to ``agent``\\ ). To export the team's Serverless
-        Inference Signals conversations, set ``type`` to ``inference`` and omit
-        ``agent_id``. You may optionally filter the export by ``signal_type``\\ ,
+        ``environment_id`` (\\ ``type`` defaults to ``agent``\\ ). Deprecated ``agent_id`` is still
+        accepted. To export the team's Serverless Inference Signals conversations, set
+        ``type`` to ``inference`` and omit ``environment_id`` and ``agent_id``. You may
+        optionally filter the export by ``signal_type``\\ ,
         ``session_ids``\\ , ``start_time``\\ , and ``end_time``. Use the export options endpoint
         to discover available signal types.
 
@@ -210377,19 +210604,8 @@ class SignalsOperations:
 
                 # response body for status code(s): 201
                 response == {
-                    "agent_id": "str",  # The environment whose data is being exported. For
-                      Harness Runtime, this is the Environment Config ID. Not meaningful for
-                      ``inference`` exports; use ``type`` to distinguish the export scope. Required.
                     "created_at": 0,  # Unix timestamp when the export was created. Required.
                     "export_id": "str",  # The unique identifier for the export job. Required.
-                    "status": "str",  # The current status of the export job. Required. Known
-                      values are: "pending", "processing", "complete", and "failed".
-                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
-                      null if still in progress.
-                    "error_message": "str",  # Optional. Error message if the export failed, or
-                      null on success.
-                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
-                      expires.
                     "filters": {
                         "session_ids": [
                             "str"  # Optional. Specific session IDs included in the
@@ -210399,6 +210615,19 @@ class SignalsOperations:
                             "str"  # Optional. Signal types included in the export.
                         ]
                     },
+                    "status": "str",  # The current status of the export job. Required. Known
+                      values are: "pending", "processing", "complete", and "failed".
+                    "agent_id": "str",  # Optional. The environment whose data is being exported.
+                      For Harness Runtime, this is the Environment Config ID. Not meaningful for
+                      ``inference`` exports; use ``type`` to distinguish the export scope.
+                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
+                      null if still in progress.
+                    "environment_id": "str",  # Optional. Same as agent_id. Dual-emitted during
+                      the rename.
+                    "error_message": "str",  # Optional. Error message if the export failed, or
+                      null on success.
+                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
+                      expires.
                     "type": "str"  # Optional. The scope of the export. ``agent`` covers one
                       Harness Runtime environment; ``inference`` covers the team's Serverless Inference
                       Signals conversations. Known values are: "agent" and "inference".
@@ -210423,9 +210652,10 @@ class SignalsOperations:
 
         To create a new signals data export, send a POST request to
         ``/v1/signals/exports``. To export one Harness Runtime environment, include its
-        ``agent_id`` (\\ ``type`` defaults to ``agent``\\ ). To export the team's Serverless
-        Inference Signals conversations, set ``type`` to ``inference`` and omit
-        ``agent_id``. You may optionally filter the export by ``signal_type``\\ ,
+        ``environment_id`` (\\ ``type`` defaults to ``agent``\\ ). Deprecated ``agent_id`` is still
+        accepted. To export the team's Serverless Inference Signals conversations, set
+        ``type`` to ``inference`` and omit ``environment_id`` and ``agent_id``. You may
+        optionally filter the export by ``signal_type``\\ ,
         ``session_ids``\\ , ``start_time``\\ , and ``end_time``. Use the export options endpoint
         to discover available signal types.
 
@@ -210444,11 +210674,16 @@ class SignalsOperations:
 
                 # JSON input template you can fill out and use as your body input.
                 body = {
-                    "agent_id": "str",  # Optional. The environment whose data should be
-                      exported. For Harness Runtime, this is the Environment Config ID. Required when
-                      ``type`` is ``agent``"" ; must be omitted when ``type`` is ``inference``.
+                    "agent_id": "str",  # Optional. Deprecated alias for ``environment_id``.
+                      Accepted for backward compatibility; must equal ``environment_id`` when both are
+                      set. Both set and different returns 400. Required when ``type`` is ``agent`` if
+                      ``environment_id`` is omitted; must be omitted when ``type`` is ``inference``.
                     "end_time": "2020-02-20 00:00:00",  # Optional. Include only sessions that
                       started at or before this timestamp.
+                    "environment_id": "str",  # Optional. The environment whose data should be
+                      exported. For Harness Runtime, this is the Environment Config ID. Required when
+                      ``type`` is ``agent`` if ``agent_id`` is omitted; must be omitted when ``type``
+                      is ``inference``. Prefer this over ``agent_id``.
                     "session_ids": [
                         "str"  # Optional. Optional list of specific session IDs to include
                           in the export.
@@ -210460,28 +210695,18 @@ class SignalsOperations:
                     "start_time": "2020-02-20 00:00:00",  # Optional. Include only sessions that
                       started at or after this timestamp.
                     "type": "str"  # Optional. The scope of the export. ``agent`` exports Signals
-                      conversations for one Harness Runtime environment and requires ``agent_id``.
-                      ``inference`` exports Serverless Inference Signals conversations for the whole
-                      team (team-wide; omit ``agent_id``"" ). Defaults to ``agent`` when ``agent_id``
-                      is provided and to ``inference`` when it is omitted. Known values are: "agent"
+                      conversations for one Harness Runtime environment and requires ``environment_id``
+                      (or deprecated ``agent_id``"" ). ``inference`` exports Serverless Inference
+                      Signals conversations for the whole team (team-wide; omit ``environment_id`` and
+                      ``agent_id``"" ). Defaults to ``agent`` when ``environment_id`` or ``agent_id``
+                      is provided and to ``inference`` when both are omitted. Known values are: "agent"
                       and "inference".
                 }
 
                 # response body for status code(s): 201
                 response == {
-                    "agent_id": "str",  # The environment whose data is being exported. For
-                      Harness Runtime, this is the Environment Config ID. Not meaningful for
-                      ``inference`` exports; use ``type`` to distinguish the export scope. Required.
                     "created_at": 0,  # Unix timestamp when the export was created. Required.
                     "export_id": "str",  # The unique identifier for the export job. Required.
-                    "status": "str",  # The current status of the export job. Required. Known
-                      values are: "pending", "processing", "complete", and "failed".
-                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
-                      null if still in progress.
-                    "error_message": "str",  # Optional. Error message if the export failed, or
-                      null on success.
-                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
-                      expires.
                     "filters": {
                         "session_ids": [
                             "str"  # Optional. Specific session IDs included in the
@@ -210491,6 +210716,19 @@ class SignalsOperations:
                             "str"  # Optional. Signal types included in the export.
                         ]
                     },
+                    "status": "str",  # The current status of the export job. Required. Known
+                      values are: "pending", "processing", "complete", and "failed".
+                    "agent_id": "str",  # Optional. The environment whose data is being exported.
+                      For Harness Runtime, this is the Environment Config ID. Not meaningful for
+                      ``inference`` exports; use ``type`` to distinguish the export scope.
+                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
+                      null if still in progress.
+                    "environment_id": "str",  # Optional. Same as agent_id. Dual-emitted during
+                      the rename.
+                    "error_message": "str",  # Optional. Error message if the export failed, or
+                      null on success.
+                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
+                      expires.
                     "type": "str"  # Optional. The scope of the export. ``agent`` covers one
                       Harness Runtime environment; ``inference`` covers the team's Serverless Inference
                       Signals conversations. Known values are: "agent" and "inference".
@@ -210718,19 +210956,8 @@ class SignalsOperations:
 
                 # response body for status code(s): 200
                 response == {
-                    "agent_id": "str",  # The environment whose data is being exported. For
-                      Harness Runtime, this is the Environment Config ID. Not meaningful for
-                      ``inference`` exports; use ``type`` to distinguish the export scope. Required.
                     "created_at": 0,  # Unix timestamp when the export was created. Required.
                     "export_id": "str",  # The unique identifier for the export job. Required.
-                    "status": "str",  # The current status of the export job. Required. Known
-                      values are: "pending", "processing", "complete", and "failed".
-                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
-                      null if still in progress.
-                    "error_message": "str",  # Optional. Error message if the export failed, or
-                      null on success.
-                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
-                      expires.
                     "filters": {
                         "session_ids": [
                             "str"  # Optional. Specific session IDs included in the
@@ -210740,6 +210967,19 @@ class SignalsOperations:
                             "str"  # Optional. Signal types included in the export.
                         ]
                     },
+                    "status": "str",  # The current status of the export job. Required. Known
+                      values are: "pending", "processing", "complete", and "failed".
+                    "agent_id": "str",  # Optional. The environment whose data is being exported.
+                      For Harness Runtime, this is the Environment Config ID. Not meaningful for
+                      ``inference`` exports; use ``type`` to distinguish the export scope.
+                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
+                      null if still in progress.
+                    "environment_id": "str",  # Optional. Same as agent_id. Dual-emitted during
+                      the rename.
+                    "error_message": "str",  # Optional. Error message if the export failed, or
+                      null on success.
+                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
+                      expires.
                     "type": "str"  # Optional. The scope of the export. ``agent`` covers one
                       Harness Runtime environment; ``inference`` covers the team's Serverless Inference
                       Signals conversations. Known values are: "agent" and "inference".
@@ -210998,6 +211238,9 @@ class SignalsOperations:
                                   deleted. Only present for ``agent`` deletions.
                                 "completed_at": 0,  # Optional. Unix timestamp when
                                   the deletion finished, or null if still in progress.
+                                "environment_id": "str",  # Optional. Same as
+                                  agent_id when present. Dual-emitted during the rename; omitted when
+                                  agent_id is omitted.
                                 "error_message": "str",  # Optional. Error message if
                                   the deletion failed, or null otherwise.
                                 "started_at": 0  # Optional. Unix timestamp when
@@ -211117,15 +211360,16 @@ class SignalsOperations:
 
 
         * ``agent`` — deletes Signals conversations for one Harness Runtime environment and
-          turns off collection for that environment. Requires ``agent_id``\\ , which is the
-          environment's Environment Config ID (the environment's ``agent_id``\\ ). On create, matching
-          conversations are hidden from Signals reads immediately. Wait until the
+          turns off collection for that environment. Requires ``environment_id`` (the
+          environment's Environment Config ID). Deprecated ``agent_id`` is still accepted;
+          both set and equal is accepted, both set and different returns 400. On create,
+          matching conversations are hidden from Signals reads immediately. Wait until the
           job is ``complete`` before enabling Signals for the environment again.
         * ``inference`` — deletes Serverless Inference Signals conversations for your
           whole team (team-wide; not limited to one endpoint or model) that were
           collected at or before the deletion request, and turns off team inference
-          collection (\\ ``source=inference``\\ ). Do not send ``agent_id``. On create,
-          matching conversations are hidden from Signals reads immediately.
+          collection (\\ ``source=inference``\\ ). Do not send ``environment_id`` or ``agent_id``.
+          On create, matching conversations are hidden from Signals reads immediately.
 
         The job runs asynchronously; poll the get endpoint until ``status`` is
         ``complete`` or ``failed``. DigitalOcean may retry transient processing errors
@@ -211161,14 +211405,18 @@ class SignalsOperations:
                     "team_id": 0,  # The team whose data should be deleted. Must match the
                       authenticated team. Required.
                     "type": "str",  # The scope of the deletion. ``agent`` deletes Signals
-                      conversations for one Harness Runtime environment and requires ``agent_id``.
-                      ``inference`` deletes Serverless Inference Signals conversations for the whole
-                      team (team-wide; omit ``agent_id``"" ). Required. Known values are: "agent" and
-                      "inference".
-                    "agent_id": "str"  # Optional. The Harness Runtime Environment Config ID of
-                      the environment whose conversations should be deleted. This is the environment's
-                      ``agent_id``. Required when ``type`` is ``agent``"" ; must be omitted when
-                      ``type`` is ``inference``.
+                      conversations for one Harness Runtime environment and requires ``environment_id``
+                      (or deprecated ``agent_id``"" ). ``inference`` deletes Serverless Inference
+                      Signals conversations for the whole team (team-wide; omit ``environment_id`` and
+                      ``agent_id``"" ). Required. Known values are: "agent" and "inference".
+                    "agent_id": "str",  # Optional. Deprecated alias for ``environment_id``.
+                      Accepted for backward compatibility; must equal ``environment_id`` when both are
+                      set. Both set and different returns 400. Required when ``type`` is ``agent`` if
+                      ``environment_id`` is omitted; must be omitted when ``type`` is ``inference``.
+                    "environment_id": "str"  # Optional. The Harness Runtime Environment Config
+                      ID of the environment whose conversations should be deleted. Required when
+                      ``type`` is ``agent`` if ``agent_id`` is omitted; must be omitted when ``type``
+                      is ``inference``. Prefer this over ``agent_id``.
                 }
 
                 # response body for status code(s): 200, 202
@@ -211189,6 +211437,8 @@ class SignalsOperations:
                       deletions.
                     "completed_at": 0,  # Optional. Unix timestamp when the deletion finished, or
                       null if still in progress.
+                    "environment_id": "str",  # Optional. Same as agent_id when present.
+                      Dual-emitted during the rename; omitted when agent_id is omitted.
                     "error_message": "str",  # Optional. Error message if the deletion failed, or
                       null otherwise.
                     "started_at": 0  # Optional. Unix timestamp when processing started, or null
@@ -211221,15 +211471,16 @@ class SignalsOperations:
 
 
         * ``agent`` — deletes Signals conversations for one Harness Runtime environment and
-          turns off collection for that environment. Requires ``agent_id``\\ , which is the
-          environment's Environment Config ID (the environment's ``agent_id``\\ ). On create, matching
-          conversations are hidden from Signals reads immediately. Wait until the
+          turns off collection for that environment. Requires ``environment_id`` (the
+          environment's Environment Config ID). Deprecated ``agent_id`` is still accepted;
+          both set and equal is accepted, both set and different returns 400. On create,
+          matching conversations are hidden from Signals reads immediately. Wait until the
           job is ``complete`` before enabling Signals for the environment again.
         * ``inference`` — deletes Serverless Inference Signals conversations for your
           whole team (team-wide; not limited to one endpoint or model) that were
           collected at or before the deletion request, and turns off team inference
-          collection (\\ ``source=inference``\\ ). Do not send ``agent_id``. On create,
-          matching conversations are hidden from Signals reads immediately.
+          collection (\\ ``source=inference``\\ ). Do not send ``environment_id`` or ``agent_id``.
+          On create, matching conversations are hidden from Signals reads immediately.
 
         The job runs asynchronously; poll the get endpoint until ``status`` is
         ``complete`` or ``failed``. DigitalOcean may retry transient processing errors
@@ -211278,6 +211529,8 @@ class SignalsOperations:
                       deletions.
                     "completed_at": 0,  # Optional. Unix timestamp when the deletion finished, or
                       null if still in progress.
+                    "environment_id": "str",  # Optional. Same as agent_id when present.
+                      Dual-emitted during the rename; omitted when agent_id is omitted.
                     "error_message": "str",  # Optional. Error message if the deletion failed, or
                       null otherwise.
                     "started_at": 0  # Optional. Unix timestamp when processing started, or null
@@ -211308,15 +211561,16 @@ class SignalsOperations:
 
 
         * ``agent`` — deletes Signals conversations for one Harness Runtime environment and
-          turns off collection for that environment. Requires ``agent_id``\\ , which is the
-          environment's Environment Config ID (the environment's ``agent_id``\\ ). On create, matching
-          conversations are hidden from Signals reads immediately. Wait until the
+          turns off collection for that environment. Requires ``environment_id`` (the
+          environment's Environment Config ID). Deprecated ``agent_id`` is still accepted;
+          both set and equal is accepted, both set and different returns 400. On create,
+          matching conversations are hidden from Signals reads immediately. Wait until the
           job is ``complete`` before enabling Signals for the environment again.
         * ``inference`` — deletes Serverless Inference Signals conversations for your
           whole team (team-wide; not limited to one endpoint or model) that were
           collected at or before the deletion request, and turns off team inference
-          collection (\\ ``source=inference``\\ ). Do not send ``agent_id``. On create,
-          matching conversations are hidden from Signals reads immediately.
+          collection (\\ ``source=inference``\\ ). Do not send ``environment_id`` or ``agent_id``.
+          On create, matching conversations are hidden from Signals reads immediately.
 
         The job runs asynchronously; poll the get endpoint until ``status`` is
         ``complete`` or ``failed``. DigitalOcean may retry transient processing errors
@@ -211349,14 +211603,18 @@ class SignalsOperations:
                     "team_id": 0,  # The team whose data should be deleted. Must match the
                       authenticated team. Required.
                     "type": "str",  # The scope of the deletion. ``agent`` deletes Signals
-                      conversations for one Harness Runtime environment and requires ``agent_id``.
-                      ``inference`` deletes Serverless Inference Signals conversations for the whole
-                      team (team-wide; omit ``agent_id``"" ). Required. Known values are: "agent" and
-                      "inference".
-                    "agent_id": "str"  # Optional. The Harness Runtime Environment Config ID of
-                      the environment whose conversations should be deleted. This is the environment's
-                      ``agent_id``. Required when ``type`` is ``agent``"" ; must be omitted when
-                      ``type`` is ``inference``.
+                      conversations for one Harness Runtime environment and requires ``environment_id``
+                      (or deprecated ``agent_id``"" ). ``inference`` deletes Serverless Inference
+                      Signals conversations for the whole team (team-wide; omit ``environment_id`` and
+                      ``agent_id``"" ). Required. Known values are: "agent" and "inference".
+                    "agent_id": "str",  # Optional. Deprecated alias for ``environment_id``.
+                      Accepted for backward compatibility; must equal ``environment_id`` when both are
+                      set. Both set and different returns 400. Required when ``type`` is ``agent`` if
+                      ``environment_id`` is omitted; must be omitted when ``type`` is ``inference``.
+                    "environment_id": "str"  # Optional. The Harness Runtime Environment Config
+                      ID of the environment whose conversations should be deleted. Required when
+                      ``type`` is ``agent`` if ``agent_id`` is omitted; must be omitted when ``type``
+                      is ``inference``. Prefer this over ``agent_id``.
                 }
 
                 # response body for status code(s): 200, 202
@@ -211377,6 +211635,8 @@ class SignalsOperations:
                       deletions.
                     "completed_at": 0,  # Optional. Unix timestamp when the deletion finished, or
                       null if still in progress.
+                    "environment_id": "str",  # Optional. Same as agent_id when present.
+                      Dual-emitted during the rename; omitted when agent_id is omitted.
                     "error_message": "str",  # Optional. Error message if the deletion failed, or
                       null otherwise.
                     "started_at": 0  # Optional. Unix timestamp when processing started, or null
@@ -211568,6 +211828,8 @@ class SignalsOperations:
                       deletions.
                     "completed_at": 0,  # Optional. Unix timestamp when the deletion finished, or
                       null if still in progress.
+                    "environment_id": "str",  # Optional. Same as agent_id when present.
+                      Dual-emitted during the rename; omitted when agent_id is omitted.
                     "error_message": "str",  # Optional. Error message if the deletion failed, or
                       null otherwise.
                     "started_at": 0  # Optional. Unix timestamp when processing started, or null
@@ -327223,11 +327485,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                       evaluate.
                     "dataset_uuid": "str",  # Optional. UUID of the dataset to use for
                       evaluation.
-                    "epochs": 0,  # Optional. Number of times to evaluate each dataset row
-                      (n-pass/epochs), so the result reports avg@k/pass@k/cons@k instead of a single
-                      score. Defaults to 1 when unset. Capped at 3 until throughput/sharding work
-                      lands, since each extra epoch roughly multiplies wall-clock run time. Not
-                      persisted on presets.
+                    "epochs": 0,  # Optional. How many times each dataset row is evaluated.
+                      Defaults to 1, maximum 10. When more than 1, the results show how consistent the
+                      model is across attempts (avg@k, pass@k, cons@k). Each extra attempt makes the
+                      run take longer. Not saved in presets.
                     "eval_preset_uuid": "str",  # Optional.
                     "judge_model_uuid": "str",  # Optional. UUID of the judge model used to score
                       responses.
@@ -327369,11 +327630,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                       evaluate.
                     "dataset_uuid": "str",  # Optional. UUID of the dataset to use for
                       evaluation.
-                    "epochs": 0,  # Optional. Number of times to evaluate each dataset row
-                      (n-pass/epochs), so the result reports avg@k/pass@k/cons@k instead of a single
-                      score. Defaults to 1 when unset. Capped at 3 until throughput/sharding work
-                      lands, since each extra epoch roughly multiplies wall-clock run time. Not
-                      persisted on presets.
+                    "epochs": 0,  # Optional. How many times each dataset row is evaluated.
+                      Defaults to 1, maximum 10. When more than 1, the results show how consistent the
+                      model is across attempts (avg@k, pass@k, cons@k). Each extra attempt makes the
+                      run take longer. Not saved in presets.
                     "eval_preset_uuid": "str",  # Optional.
                     "judge_model_uuid": "str",  # Optional. UUID of the judge model used to score
                       responses.
