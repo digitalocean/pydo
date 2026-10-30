@@ -630,6 +630,58 @@ def test_delete_connection_requires_id():
         resources.sessions.delete_connection(OAuthProvider.GITHUB, "")
 
 
+def test_reconnect_connection_posts_empty_body():
+    body = {
+        "connection": {
+            "id": "conn_1",
+            "provider": "github",
+            "user_id": "alice",
+            "status": "pending",
+        },
+        "authorization": {
+            "status": "pending",
+            "connect_url": "https://cloud.digitalocean.com/security/connectlinks/confirm?token=abc",
+            "verification_code": "k5r2cprq",
+        },
+    }
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    resp = resources.sessions.reconnect_connection(OAuthProvider.GITHUB, "conn_1")
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "POST"
+    assert call.request.url.endswith(
+        "/v2/agents/auth/github/connections/conn_1/reconnect"
+    )
+    # The API takes an empty JSON object, not an empty body.
+    assert json.loads(call.request.content) == {}
+    assert resp.connection.status == "pending"
+    assert resp.authorization.verification_code == "k5r2cprq"
+
+
+def test_reconnect_connection_active_has_no_authorization():
+    body = {
+        "connection": {
+            "id": "conn_1",
+            "provider": "github",
+            "user_id": "alice",
+            "status": "active",
+        }
+    }
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    resp = resources.sessions.reconnect_connection(OAuthProvider.GITHUB, "conn_1")
+
+    assert resp.connection.status == "active"
+    assert getattr(resp, "authorization", None) is None
+
+
+def test_reconnect_connection_requires_id():
+    resources = _make_resources([])
+    with pytest.raises(ValueError):
+        resources.sessions.reconnect_connection(OAuthProvider.GITHUB, "")
+
+
 # ---------------------------------------------------------------------------
 # Streaming
 # ---------------------------------------------------------------------------
