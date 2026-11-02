@@ -578,12 +578,14 @@ from ...operations._operations import (
     build_microvms_create_request,
     build_microvms_delete_request,
     build_microvms_get_console_request,
+    build_microvms_get_file_request,
     build_microvms_get_options_request,
     build_microvms_get_request,
     build_microvms_list_request,
     build_microvms_post_pause_request,
     build_microvms_post_resume_request,
     build_microvms_run_command_request,
+    build_microvms_upload_file_request,
     build_monitoring_create_alert_policy_request,
     build_monitoring_create_destination_request,
     build_monitoring_create_sink_request,
@@ -701,6 +703,11 @@ from ...operations._operations import (
     build_projects_patch_request,
     build_projects_update_default_request,
     build_projects_update_request,
+    build_provider_credentials_create_request,
+    build_provider_credentials_delete_request,
+    build_provider_credentials_get_request,
+    build_provider_credentials_list_request,
+    build_provider_credentials_update_request,
     build_regions_list_request,
     build_registries_create_request,
     build_registries_delete_repository_manifest_request,
@@ -753,13 +760,21 @@ from ...operations._operations import (
     build_reserved_ipv6_list_request,
     build_security_create_scan_request,
     build_security_create_scan_rule_request,
+    build_security_create_secret_request,
     build_security_create_suppression_request,
+    build_security_delete_secret_request,
     build_security_delete_suppression_request,
     build_security_get_latest_scan_request,
     build_security_get_scan_request,
+    build_security_get_secret_request,
     build_security_list_scan_finding_affected_resources_request,
     build_security_list_scans_request,
+    build_security_list_secret_versions_request,
+    build_security_list_secrets_request,
     build_security_list_settings_request,
+    build_security_post_restore_secret_request,
+    build_security_revert_secret_request,
+    build_security_update_secret_request,
     build_security_update_settings_plan_request,
     build_sessions_create_request,
     build_sessions_delete_request,
@@ -1574,6 +1589,1535 @@ class ActorLimitsOperations:
         return cast(JSON, deserialized)  # type: ignore
 
 
+class ProviderCredentialsOperations:
+    """
+    .. warning::
+        **DO NOT** instantiate this class directly.
+
+        Instead, you should access the following operations through
+        :class:`~pydo.aio.GeneratedClient`'s
+        :attr:`provider_credentials` attribute.
+    """
+
+    def __init__(self, *args, **kwargs) -> None:
+        input_args = list(args)
+        self._client = input_args.pop(0) if input_args else kwargs.pop("client")
+        self._config = input_args.pop(0) if input_args else kwargs.pop("config")
+        self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
+        self._deserialize = (
+            input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        )
+
+    @overload
+    async def create(
+        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Provider Credential.
+
+        Stores an API key or OAuth client for a catalog provider that supports that
+        credential type. Secret material is write-only. Only you can see and use the
+        credential unless you share it with your team using ``reusable_by_team``.
+
+        To use an API key, first create this credential, then create a connection for
+        the same provider with ``credential.team_credential.credential_id`` set to the
+        returned ``credential.id``. That connection becomes active without OAuth consent.
+        Its ``user_id`` must match the session's ``actor_id``.
+
+        Creating a credential does not replace existing credentials or connections.
+        A duplicate display name for the same provider returns 409.
+
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "display_name": "str",  # Required label, unique among the team's credentials
+                      for this provider, ignoring case. A duplicate returns 409. Required.
+                    "kind": "str",  # Credential type. NONE is available only for eligible MCP
+                      providers when team-scoped provider credentials are enabled; it accepts no
+                      credential fields. Required. Known values are:
+                      "PROVIDER_CREDENTIAL_KIND_OAUTH_CLIENT", "PROVIDER_CREDENTIAL_KIND_API_KEY", and
+                      "PROVIDER_CREDENTIAL_KIND_NONE".
+                    "provider": "str",  # Required provider slug from the provider catalog.
+                      Required.
+                    "api_key": "str",  # Optional. Required for API-key credentials. Rejected for
+                      other kinds. Never returned.
+                    "base_url": "str",  # Optional. Provider API HTTPS origin. Accepted only when
+                      the provider allows one, restricted to its allowed hosts, and required when the
+                      provider requires it. Do not send this alongside credential_parameters.
+                    "client_id": "str",  # Optional. Required for OAuth client credentials.
+                      Rejected for other kinds.
+                    "client_secret": "str",  # Optional. Required for OAuth client credentials.
+                      Rejected for other kinds. Never returned.
+                    "credential_parameters": {
+                        "str": {}  # Optional. Non-secret configuration for API-key providers
+                          that declare credential parameters. Validated against the provider's
+                          parameter definitions and used to derive base_url. Rejected for other
+                          credential kinds.
+                    },
+                    "redirect_url": "str",  # Optional. OAuth clients only. Optional absolute
+                      HTTPS redirect URI registered at the provider, with no user information or
+                      fragment. Requires custom OAuth redirects to be enabled for the account. Omit to
+                      use DigitalOcean's callback. Cannot be changed after registration.
+                    "reusable_by_team": False  # Optional. Default value is False. Share the
+                      credential with the team. Defaults to false, so only its creator can see and use
+                      it. Requires the team owner role when team-scoped provider credentials are
+                      enabled for the account.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "credential": {
+                        "base_url": "str",  # Optional. Normalized HTTPS origin for this
+                          credential's provider API, when configured.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. When the credential
+                          was created.
+                        "discovery": {
+                            "authorization_url": "str",  # Optional. Where a team owner
+                              authorizes discovery. Set only while status is pending.
+                            "consented_at": "2020-02-20 00:00:00",  # Optional. When
+                              discovery was authorized, if consent has been given.
+                            "consented_by_user_id": "str",  # Optional. DigitalOcean user
+                              ID of the team owner who authorized discovery, or empty before consent.
+                            "status": "str"  # Optional. Whether discovery needs
+                              authorization, is waiting for it, is active, or has expired. Known values
+                              are: "not_required", "pending", "active", and "expired".
+                        },
+                        "display_name": "str",  # Optional. Label, unique among the team's
+                          credentials for this provider, ignoring case.
+                        "id": "str",  # Optional. Opaque ID used to select, retrieve, update,
+                          or delete the credential.
+                        "kind": "str",  # Optional. Credential type. NONE, NO_AUTH, and
+                          USER_API_KEY describe MCP server credentials; NO_AUTH and USER_API_KEY are
+                          output-only values. Known values are: "PROVIDER_CREDENTIAL_KIND_UNSPECIFIED",
+                          "PROVIDER_CREDENTIAL_KIND_OAUTH_CLIENT", "PROVIDER_CREDENTIAL_KIND_API_KEY",
+                          "PROVIDER_CREDENTIAL_KIND_NONE", "PROVIDER_CREDENTIAL_KIND_NO_AUTH", and
+                          "PROVIDER_CREDENTIAL_KIND_USER_API_KEY".
+                        "owning_user_id": "str",  # Optional. DigitalOcean user ID of the
+                          creator. Absent for a credential shared with the team.
+                        "provider": "str",  # Optional. Provider slug.
+                        "redirect_url": "str",  # Optional. OAuth redirect URI supplied at
+                          registration. Empty when using DigitalOcean's callback or when the credential
+                          is not an OAuth client.
+                        "reusable_by_team": bool,  # Optional. Whether everyone on the team
+                          can see and use the credential instead of only its creator.
+                        "scope": "str",  # Optional. Who can use the credential, either its
+                          creator (user) or the whole team (team). Known values are: "user" and "team".
+                        "status": "str",  # Optional. Credential lifecycle state. Disabled
+                          credentials cannot be used by existing or new connections and cannot be
+                          re-enabled through this API. DELETED is returned only by deletion. Known
+                          values are: "PROVIDER_CREDENTIAL_STATUS_UNSPECIFIED",
+                          "PROVIDER_CREDENTIAL_STATUS_ACTIVE", "PROVIDER_CREDENTIAL_STATUS_DISABLED",
+                          and "PROVIDER_CREDENTIAL_STATUS_DELETED".
+                        "updated_at": "2020-02-20 00:00:00"  # Optional. When the credential
+                          was last modified.
+                    },
+                    "revoked_connections": 0  # Optional. Number of connections deleted with the
+                      credential. Always zero for create, get, and update operations.
+                }
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def create(
+        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Provider Credential.
+
+        Stores an API key or OAuth client for a catalog provider that supports that
+        credential type. Secret material is write-only. Only you can see and use the
+        credential unless you share it with your team using ``reusable_by_team``.
+
+        To use an API key, first create this credential, then create a connection for
+        the same provider with ``credential.team_credential.credential_id`` set to the
+        returned ``credential.id``. That connection becomes active without OAuth consent.
+        Its ``user_id`` must match the session's ``actor_id``.
+
+        Creating a credential does not replace existing credentials or connections.
+        A duplicate display name for the same provider returns 409.
+
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "credential": {
+                        "base_url": "str",  # Optional. Normalized HTTPS origin for this
+                          credential's provider API, when configured.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. When the credential
+                          was created.
+                        "discovery": {
+                            "authorization_url": "str",  # Optional. Where a team owner
+                              authorizes discovery. Set only while status is pending.
+                            "consented_at": "2020-02-20 00:00:00",  # Optional. When
+                              discovery was authorized, if consent has been given.
+                            "consented_by_user_id": "str",  # Optional. DigitalOcean user
+                              ID of the team owner who authorized discovery, or empty before consent.
+                            "status": "str"  # Optional. Whether discovery needs
+                              authorization, is waiting for it, is active, or has expired. Known values
+                              are: "not_required", "pending", "active", and "expired".
+                        },
+                        "display_name": "str",  # Optional. Label, unique among the team's
+                          credentials for this provider, ignoring case.
+                        "id": "str",  # Optional. Opaque ID used to select, retrieve, update,
+                          or delete the credential.
+                        "kind": "str",  # Optional. Credential type. NONE, NO_AUTH, and
+                          USER_API_KEY describe MCP server credentials; NO_AUTH and USER_API_KEY are
+                          output-only values. Known values are: "PROVIDER_CREDENTIAL_KIND_UNSPECIFIED",
+                          "PROVIDER_CREDENTIAL_KIND_OAUTH_CLIENT", "PROVIDER_CREDENTIAL_KIND_API_KEY",
+                          "PROVIDER_CREDENTIAL_KIND_NONE", "PROVIDER_CREDENTIAL_KIND_NO_AUTH", and
+                          "PROVIDER_CREDENTIAL_KIND_USER_API_KEY".
+                        "owning_user_id": "str",  # Optional. DigitalOcean user ID of the
+                          creator. Absent for a credential shared with the team.
+                        "provider": "str",  # Optional. Provider slug.
+                        "redirect_url": "str",  # Optional. OAuth redirect URI supplied at
+                          registration. Empty when using DigitalOcean's callback or when the credential
+                          is not an OAuth client.
+                        "reusable_by_team": bool,  # Optional. Whether everyone on the team
+                          can see and use the credential instead of only its creator.
+                        "scope": "str",  # Optional. Who can use the credential, either its
+                          creator (user) or the whole team (team). Known values are: "user" and "team".
+                        "status": "str",  # Optional. Credential lifecycle state. Disabled
+                          credentials cannot be used by existing or new connections and cannot be
+                          re-enabled through this API. DELETED is returned only by deletion. Known
+                          values are: "PROVIDER_CREDENTIAL_STATUS_UNSPECIFIED",
+                          "PROVIDER_CREDENTIAL_STATUS_ACTIVE", "PROVIDER_CREDENTIAL_STATUS_DISABLED",
+                          and "PROVIDER_CREDENTIAL_STATUS_DELETED".
+                        "updated_at": "2020-02-20 00:00:00"  # Optional. When the credential
+                          was last modified.
+                    },
+                    "revoked_connections": 0  # Optional. Number of connections deleted with the
+                      credential. Always zero for create, get, and update operations.
+                }
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def create(self, body: Union[JSON, IO[bytes]], **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Provider Credential.
+
+        Stores an API key or OAuth client for a catalog provider that supports that
+        credential type. Secret material is write-only. Only you can see and use the
+        credential unless you share it with your team using ``reusable_by_team``.
+
+        To use an API key, first create this credential, then create a connection for
+        the same provider with ``credential.team_credential.credential_id`` set to the
+        returned ``credential.id``. That connection becomes active without OAuth consent.
+        Its ``user_id`` must match the session's ``actor_id``.
+
+        Creating a credential does not replace existing credentials or connections.
+        A duplicate display name for the same provider returns 409.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "display_name": "str",  # Required label, unique among the team's credentials
+                      for this provider, ignoring case. A duplicate returns 409. Required.
+                    "kind": "str",  # Credential type. NONE is available only for eligible MCP
+                      providers when team-scoped provider credentials are enabled; it accepts no
+                      credential fields. Required. Known values are:
+                      "PROVIDER_CREDENTIAL_KIND_OAUTH_CLIENT", "PROVIDER_CREDENTIAL_KIND_API_KEY", and
+                      "PROVIDER_CREDENTIAL_KIND_NONE".
+                    "provider": "str",  # Required provider slug from the provider catalog.
+                      Required.
+                    "api_key": "str",  # Optional. Required for API-key credentials. Rejected for
+                      other kinds. Never returned.
+                    "base_url": "str",  # Optional. Provider API HTTPS origin. Accepted only when
+                      the provider allows one, restricted to its allowed hosts, and required when the
+                      provider requires it. Do not send this alongside credential_parameters.
+                    "client_id": "str",  # Optional. Required for OAuth client credentials.
+                      Rejected for other kinds.
+                    "client_secret": "str",  # Optional. Required for OAuth client credentials.
+                      Rejected for other kinds. Never returned.
+                    "credential_parameters": {
+                        "str": {}  # Optional. Non-secret configuration for API-key providers
+                          that declare credential parameters. Validated against the provider's
+                          parameter definitions and used to derive base_url. Rejected for other
+                          credential kinds.
+                    },
+                    "redirect_url": "str",  # Optional. OAuth clients only. Optional absolute
+                      HTTPS redirect URI registered at the provider, with no user information or
+                      fragment. Requires custom OAuth redirects to be enabled for the account. Omit to
+                      use DigitalOcean's callback. Cannot be changed after registration.
+                    "reusable_by_team": False  # Optional. Default value is False. Share the
+                      credential with the team. Defaults to false, so only its creator can see and use
+                      it. Requires the team owner role when team-scoped provider credentials are
+                      enabled for the account.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "credential": {
+                        "base_url": "str",  # Optional. Normalized HTTPS origin for this
+                          credential's provider API, when configured.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. When the credential
+                          was created.
+                        "discovery": {
+                            "authorization_url": "str",  # Optional. Where a team owner
+                              authorizes discovery. Set only while status is pending.
+                            "consented_at": "2020-02-20 00:00:00",  # Optional. When
+                              discovery was authorized, if consent has been given.
+                            "consented_by_user_id": "str",  # Optional. DigitalOcean user
+                              ID of the team owner who authorized discovery, or empty before consent.
+                            "status": "str"  # Optional. Whether discovery needs
+                              authorization, is waiting for it, is active, or has expired. Known values
+                              are: "not_required", "pending", "active", and "expired".
+                        },
+                        "display_name": "str",  # Optional. Label, unique among the team's
+                          credentials for this provider, ignoring case.
+                        "id": "str",  # Optional. Opaque ID used to select, retrieve, update,
+                          or delete the credential.
+                        "kind": "str",  # Optional. Credential type. NONE, NO_AUTH, and
+                          USER_API_KEY describe MCP server credentials; NO_AUTH and USER_API_KEY are
+                          output-only values. Known values are: "PROVIDER_CREDENTIAL_KIND_UNSPECIFIED",
+                          "PROVIDER_CREDENTIAL_KIND_OAUTH_CLIENT", "PROVIDER_CREDENTIAL_KIND_API_KEY",
+                          "PROVIDER_CREDENTIAL_KIND_NONE", "PROVIDER_CREDENTIAL_KIND_NO_AUTH", and
+                          "PROVIDER_CREDENTIAL_KIND_USER_API_KEY".
+                        "owning_user_id": "str",  # Optional. DigitalOcean user ID of the
+                          creator. Absent for a credential shared with the team.
+                        "provider": "str",  # Optional. Provider slug.
+                        "redirect_url": "str",  # Optional. OAuth redirect URI supplied at
+                          registration. Empty when using DigitalOcean's callback or when the credential
+                          is not an OAuth client.
+                        "reusable_by_team": bool,  # Optional. Whether everyone on the team
+                          can see and use the credential instead of only its creator.
+                        "scope": "str",  # Optional. Who can use the credential, either its
+                          creator (user) or the whole team (team). Known values are: "user" and "team".
+                        "status": "str",  # Optional. Credential lifecycle state. Disabled
+                          credentials cannot be used by existing or new connections and cannot be
+                          re-enabled through this API. DELETED is returned only by deletion. Known
+                          values are: "PROVIDER_CREDENTIAL_STATUS_UNSPECIFIED",
+                          "PROVIDER_CREDENTIAL_STATUS_ACTIVE", "PROVIDER_CREDENTIAL_STATUS_DISABLED",
+                          and "PROVIDER_CREDENTIAL_STATUS_DELETED".
+                        "updated_at": "2020-02-20 00:00:00"  # Optional. When the credential
+                          was last modified.
+                    },
+                    "revoked_connections": 0  # Optional. Number of connections deleted with the
+                      credential. Always zero for create, get, and update operations.
+                }
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_provider_credentials_create_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404, 409]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def list(self, *, provider: Optional[str] = None, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """List Provider Credentials.
+
+        Lists registered credentials visible to you, ordered by provider and display name. Optionally
+        filter by provider slug, ignoring case. An unknown provider returns an empty list. Results are
+        not paginated and exclude DigitalOcean-owned OAuth applications and credentials managed by MCP
+        server registrations.
+
+        :keyword provider: Optional provider slug, matched case-insensitively. Omit to list credentials
+         for all providers. Default value is None.
+        :paramtype provider: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "credentials": [
+                        {
+                            "base_url": "str",  # Optional. Normalized HTTPS origin for
+                              this credential's provider API, when configured.
+                            "created_at": "2020-02-20 00:00:00",  # Optional. When the
+                              credential was created.
+                            "discovery": {
+                                "authorization_url": "str",  # Optional. Where a team
+                                  owner authorizes discovery. Set only while status is pending.
+                                "consented_at": "2020-02-20 00:00:00",  # Optional.
+                                  When discovery was authorized, if consent has been given.
+                                "consented_by_user_id": "str",  # Optional.
+                                  DigitalOcean user ID of the team owner who authorized discovery, or
+                                  empty before consent.
+                                "status": "str"  # Optional. Whether discovery needs
+                                  authorization, is waiting for it, is active, or has expired. Known
+                                  values are: "not_required", "pending", "active", and "expired".
+                            },
+                            "display_name": "str",  # Optional. Label, unique among the
+                              team's credentials for this provider, ignoring case.
+                            "id": "str",  # Optional. Opaque ID used to select, retrieve,
+                              update, or delete the credential.
+                            "kind": "str",  # Optional. Credential type. NONE, NO_AUTH,
+                              and USER_API_KEY describe MCP server credentials; NO_AUTH and
+                              USER_API_KEY are output-only values. Known values are:
+                              "PROVIDER_CREDENTIAL_KIND_UNSPECIFIED",
+                              "PROVIDER_CREDENTIAL_KIND_OAUTH_CLIENT",
+                              "PROVIDER_CREDENTIAL_KIND_API_KEY", "PROVIDER_CREDENTIAL_KIND_NONE",
+                              "PROVIDER_CREDENTIAL_KIND_NO_AUTH", and
+                              "PROVIDER_CREDENTIAL_KIND_USER_API_KEY".
+                            "owning_user_id": "str",  # Optional. DigitalOcean user ID of
+                              the creator. Absent for a credential shared with the team.
+                            "provider": "str",  # Optional. Provider slug.
+                            "redirect_url": "str",  # Optional. OAuth redirect URI
+                              supplied at registration. Empty when using DigitalOcean's callback or
+                              when the credential is not an OAuth client.
+                            "reusable_by_team": bool,  # Optional. Whether everyone on
+                              the team can see and use the credential instead of only its creator.
+                            "scope": "str",  # Optional. Who can use the credential,
+                              either its creator (user) or the whole team (team). Known values are:
+                              "user" and "team".
+                            "status": "str",  # Optional. Credential lifecycle state.
+                              Disabled credentials cannot be used by existing or new connections and
+                              cannot be re-enabled through this API. DELETED is returned only by
+                              deletion. Known values are: "PROVIDER_CREDENTIAL_STATUS_UNSPECIFIED",
+                              "PROVIDER_CREDENTIAL_STATUS_ACTIVE",
+                              "PROVIDER_CREDENTIAL_STATUS_DISABLED", and
+                              "PROVIDER_CREDENTIAL_STATUS_DELETED".
+                            "updated_at": "2020-02-20 00:00:00"  # Optional. When the
+                              credential was last modified.
+                        }
+                    ]
+                }
+                # response body for status code(s): 403
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_provider_credentials_list_request(
+            provider=provider,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 403]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get(self, id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Get a Provider Credential.
+
+        Returns metadata for a provider credential, never its secret material. Returns 404 if the
+        credential is unknown, deleted, or not visible to you.
+
+        :param id: Provider credential ID returned when the credential was created. Required.
+        :type id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "credential": {
+                        "base_url": "str",  # Optional. Normalized HTTPS origin for this
+                          credential's provider API, when configured.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. When the credential
+                          was created.
+                        "discovery": {
+                            "authorization_url": "str",  # Optional. Where a team owner
+                              authorizes discovery. Set only while status is pending.
+                            "consented_at": "2020-02-20 00:00:00",  # Optional. When
+                              discovery was authorized, if consent has been given.
+                            "consented_by_user_id": "str",  # Optional. DigitalOcean user
+                              ID of the team owner who authorized discovery, or empty before consent.
+                            "status": "str"  # Optional. Whether discovery needs
+                              authorization, is waiting for it, is active, or has expired. Known values
+                              are: "not_required", "pending", "active", and "expired".
+                        },
+                        "display_name": "str",  # Optional. Label, unique among the team's
+                          credentials for this provider, ignoring case.
+                        "id": "str",  # Optional. Opaque ID used to select, retrieve, update,
+                          or delete the credential.
+                        "kind": "str",  # Optional. Credential type. NONE, NO_AUTH, and
+                          USER_API_KEY describe MCP server credentials; NO_AUTH and USER_API_KEY are
+                          output-only values. Known values are: "PROVIDER_CREDENTIAL_KIND_UNSPECIFIED",
+                          "PROVIDER_CREDENTIAL_KIND_OAUTH_CLIENT", "PROVIDER_CREDENTIAL_KIND_API_KEY",
+                          "PROVIDER_CREDENTIAL_KIND_NONE", "PROVIDER_CREDENTIAL_KIND_NO_AUTH", and
+                          "PROVIDER_CREDENTIAL_KIND_USER_API_KEY".
+                        "owning_user_id": "str",  # Optional. DigitalOcean user ID of the
+                          creator. Absent for a credential shared with the team.
+                        "provider": "str",  # Optional. Provider slug.
+                        "redirect_url": "str",  # Optional. OAuth redirect URI supplied at
+                          registration. Empty when using DigitalOcean's callback or when the credential
+                          is not an OAuth client.
+                        "reusable_by_team": bool,  # Optional. Whether everyone on the team
+                          can see and use the credential instead of only its creator.
+                        "scope": "str",  # Optional. Who can use the credential, either its
+                          creator (user) or the whole team (team). Known values are: "user" and "team".
+                        "status": "str",  # Optional. Credential lifecycle state. Disabled
+                          credentials cannot be used by existing or new connections and cannot be
+                          re-enabled through this API. DELETED is returned only by deletion. Known
+                          values are: "PROVIDER_CREDENTIAL_STATUS_UNSPECIFIED",
+                          "PROVIDER_CREDENTIAL_STATUS_ACTIVE", "PROVIDER_CREDENTIAL_STATUS_DISABLED",
+                          and "PROVIDER_CREDENTIAL_STATUS_DELETED".
+                        "updated_at": "2020-02-20 00:00:00"  # Optional. When the credential
+                          was last modified.
+                    },
+                    "revoked_connections": 0  # Optional. Number of connections deleted with the
+                      credential. Always zero for create, get, and update operations.
+                }
+                # response body for status code(s): 403, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_provider_credentials_get_request(
+            id=id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 403, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def update(
+        self,
+        id: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update a Provider Credential.
+
+        Rotates an API key or OAuth client secret, or updates credential metadata, in
+        place. Send only the fields to change; omitted fields are preserved. No update
+        mask is required. The provider, kind, and redirect URL cannot be changed.
+
+        The credential keeps its ID and its connections. Those connections use the new
+        material on subsequent calls; ``revoked_connections`` remains zero. For an OAuth
+        client, changing secret material or the base URL requires the original ``client_id``.
+
+        Credentials managed by MCP server registrations accept only secret rotation,
+        not display name or base URL changes. Sharing with the team requires the
+        appropriate account feature and permissions and cannot be undone.
+
+        :param id: Provider credential ID returned when the credential was created. Required.
+        :type id: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "api_key": "str",  # Optional. New API key. Only valid for API-key
+                      credentials. Never returned.
+                    "base_url": "str",  # Optional. New HTTPS origin, validated as on creation.
+                      An empty string clears it unless the provider requires an origin. OAuth client
+                      updates also require client_id.
+                    "client_id": "str",  # Optional. OAuth clients only. Required when changing
+                      client_id, client_secret, or base_url. Must match the originally registered
+                      client ID; a different ID is rejected. Register another credential to use a
+                      different OAuth client.
+                    "client_secret": "str",  # Optional. New OAuth client secret. Requires
+                      client_id. Never returned.
+                    "credential_parameters": {
+                        "str": {}  # Optional. Non-secret configuration for API-key providers
+                          that declare credential parameters. Validated against the provider's
+                          parameter definitions and used to derive base_url. Rejected for other
+                          credential kinds.
+                    },
+                    "display_name": "str",  # Optional. New label, unique among the team's
+                      credentials for this provider, ignoring case.
+                    "reusable_by_team": bool  # Optional. Set to true to share a credential with
+                      the team. Requires team-scoped provider credentials to be enabled and the team
+                      owner role to share a private credential. Sharing cannot be undone; false is
+                      rejected. True
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "credential": {
+                        "base_url": "str",  # Optional. Normalized HTTPS origin for this
+                          credential's provider API, when configured.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. When the credential
+                          was created.
+                        "discovery": {
+                            "authorization_url": "str",  # Optional. Where a team owner
+                              authorizes discovery. Set only while status is pending.
+                            "consented_at": "2020-02-20 00:00:00",  # Optional. When
+                              discovery was authorized, if consent has been given.
+                            "consented_by_user_id": "str",  # Optional. DigitalOcean user
+                              ID of the team owner who authorized discovery, or empty before consent.
+                            "status": "str"  # Optional. Whether discovery needs
+                              authorization, is waiting for it, is active, or has expired. Known values
+                              are: "not_required", "pending", "active", and "expired".
+                        },
+                        "display_name": "str",  # Optional. Label, unique among the team's
+                          credentials for this provider, ignoring case.
+                        "id": "str",  # Optional. Opaque ID used to select, retrieve, update,
+                          or delete the credential.
+                        "kind": "str",  # Optional. Credential type. NONE, NO_AUTH, and
+                          USER_API_KEY describe MCP server credentials; NO_AUTH and USER_API_KEY are
+                          output-only values. Known values are: "PROVIDER_CREDENTIAL_KIND_UNSPECIFIED",
+                          "PROVIDER_CREDENTIAL_KIND_OAUTH_CLIENT", "PROVIDER_CREDENTIAL_KIND_API_KEY",
+                          "PROVIDER_CREDENTIAL_KIND_NONE", "PROVIDER_CREDENTIAL_KIND_NO_AUTH", and
+                          "PROVIDER_CREDENTIAL_KIND_USER_API_KEY".
+                        "owning_user_id": "str",  # Optional. DigitalOcean user ID of the
+                          creator. Absent for a credential shared with the team.
+                        "provider": "str",  # Optional. Provider slug.
+                        "redirect_url": "str",  # Optional. OAuth redirect URI supplied at
+                          registration. Empty when using DigitalOcean's callback or when the credential
+                          is not an OAuth client.
+                        "reusable_by_team": bool,  # Optional. Whether everyone on the team
+                          can see and use the credential instead of only its creator.
+                        "scope": "str",  # Optional. Who can use the credential, either its
+                          creator (user) or the whole team (team). Known values are: "user" and "team".
+                        "status": "str",  # Optional. Credential lifecycle state. Disabled
+                          credentials cannot be used by existing or new connections and cannot be
+                          re-enabled through this API. DELETED is returned only by deletion. Known
+                          values are: "PROVIDER_CREDENTIAL_STATUS_UNSPECIFIED",
+                          "PROVIDER_CREDENTIAL_STATUS_ACTIVE", "PROVIDER_CREDENTIAL_STATUS_DISABLED",
+                          and "PROVIDER_CREDENTIAL_STATUS_DELETED".
+                        "updated_at": "2020-02-20 00:00:00"  # Optional. When the credential
+                          was last modified.
+                    },
+                    "revoked_connections": 0  # Optional. Number of connections deleted with the
+                      credential. Always zero for create, get, and update operations.
+                }
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def update(
+        self,
+        id: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update a Provider Credential.
+
+        Rotates an API key or OAuth client secret, or updates credential metadata, in
+        place. Send only the fields to change; omitted fields are preserved. No update
+        mask is required. The provider, kind, and redirect URL cannot be changed.
+
+        The credential keeps its ID and its connections. Those connections use the new
+        material on subsequent calls; ``revoked_connections`` remains zero. For an OAuth
+        client, changing secret material or the base URL requires the original ``client_id``.
+
+        Credentials managed by MCP server registrations accept only secret rotation,
+        not display name or base URL changes. Sharing with the team requires the
+        appropriate account feature and permissions and cannot be undone.
+
+        :param id: Provider credential ID returned when the credential was created. Required.
+        :type id: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "credential": {
+                        "base_url": "str",  # Optional. Normalized HTTPS origin for this
+                          credential's provider API, when configured.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. When the credential
+                          was created.
+                        "discovery": {
+                            "authorization_url": "str",  # Optional. Where a team owner
+                              authorizes discovery. Set only while status is pending.
+                            "consented_at": "2020-02-20 00:00:00",  # Optional. When
+                              discovery was authorized, if consent has been given.
+                            "consented_by_user_id": "str",  # Optional. DigitalOcean user
+                              ID of the team owner who authorized discovery, or empty before consent.
+                            "status": "str"  # Optional. Whether discovery needs
+                              authorization, is waiting for it, is active, or has expired. Known values
+                              are: "not_required", "pending", "active", and "expired".
+                        },
+                        "display_name": "str",  # Optional. Label, unique among the team's
+                          credentials for this provider, ignoring case.
+                        "id": "str",  # Optional. Opaque ID used to select, retrieve, update,
+                          or delete the credential.
+                        "kind": "str",  # Optional. Credential type. NONE, NO_AUTH, and
+                          USER_API_KEY describe MCP server credentials; NO_AUTH and USER_API_KEY are
+                          output-only values. Known values are: "PROVIDER_CREDENTIAL_KIND_UNSPECIFIED",
+                          "PROVIDER_CREDENTIAL_KIND_OAUTH_CLIENT", "PROVIDER_CREDENTIAL_KIND_API_KEY",
+                          "PROVIDER_CREDENTIAL_KIND_NONE", "PROVIDER_CREDENTIAL_KIND_NO_AUTH", and
+                          "PROVIDER_CREDENTIAL_KIND_USER_API_KEY".
+                        "owning_user_id": "str",  # Optional. DigitalOcean user ID of the
+                          creator. Absent for a credential shared with the team.
+                        "provider": "str",  # Optional. Provider slug.
+                        "redirect_url": "str",  # Optional. OAuth redirect URI supplied at
+                          registration. Empty when using DigitalOcean's callback or when the credential
+                          is not an OAuth client.
+                        "reusable_by_team": bool,  # Optional. Whether everyone on the team
+                          can see and use the credential instead of only its creator.
+                        "scope": "str",  # Optional. Who can use the credential, either its
+                          creator (user) or the whole team (team). Known values are: "user" and "team".
+                        "status": "str",  # Optional. Credential lifecycle state. Disabled
+                          credentials cannot be used by existing or new connections and cannot be
+                          re-enabled through this API. DELETED is returned only by deletion. Known
+                          values are: "PROVIDER_CREDENTIAL_STATUS_UNSPECIFIED",
+                          "PROVIDER_CREDENTIAL_STATUS_ACTIVE", "PROVIDER_CREDENTIAL_STATUS_DISABLED",
+                          and "PROVIDER_CREDENTIAL_STATUS_DELETED".
+                        "updated_at": "2020-02-20 00:00:00"  # Optional. When the credential
+                          was last modified.
+                    },
+                    "revoked_connections": 0  # Optional. Number of connections deleted with the
+                      credential. Always zero for create, get, and update operations.
+                }
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def update(
+        self, id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update a Provider Credential.
+
+        Rotates an API key or OAuth client secret, or updates credential metadata, in
+        place. Send only the fields to change; omitted fields are preserved. No update
+        mask is required. The provider, kind, and redirect URL cannot be changed.
+
+        The credential keeps its ID and its connections. Those connections use the new
+        material on subsequent calls; ``revoked_connections`` remains zero. For an OAuth
+        client, changing secret material or the base URL requires the original ``client_id``.
+
+        Credentials managed by MCP server registrations accept only secret rotation,
+        not display name or base URL changes. Sharing with the team requires the
+        appropriate account feature and permissions and cannot be undone.
+
+        :param id: Provider credential ID returned when the credential was created. Required.
+        :type id: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "api_key": "str",  # Optional. New API key. Only valid for API-key
+                      credentials. Never returned.
+                    "base_url": "str",  # Optional. New HTTPS origin, validated as on creation.
+                      An empty string clears it unless the provider requires an origin. OAuth client
+                      updates also require client_id.
+                    "client_id": "str",  # Optional. OAuth clients only. Required when changing
+                      client_id, client_secret, or base_url. Must match the originally registered
+                      client ID; a different ID is rejected. Register another credential to use a
+                      different OAuth client.
+                    "client_secret": "str",  # Optional. New OAuth client secret. Requires
+                      client_id. Never returned.
+                    "credential_parameters": {
+                        "str": {}  # Optional. Non-secret configuration for API-key providers
+                          that declare credential parameters. Validated against the provider's
+                          parameter definitions and used to derive base_url. Rejected for other
+                          credential kinds.
+                    },
+                    "display_name": "str",  # Optional. New label, unique among the team's
+                      credentials for this provider, ignoring case.
+                    "reusable_by_team": bool  # Optional. Set to true to share a credential with
+                      the team. Requires team-scoped provider credentials to be enabled and the team
+                      owner role to share a private credential. Sharing cannot be undone; false is
+                      rejected. True
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "credential": {
+                        "base_url": "str",  # Optional. Normalized HTTPS origin for this
+                          credential's provider API, when configured.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. When the credential
+                          was created.
+                        "discovery": {
+                            "authorization_url": "str",  # Optional. Where a team owner
+                              authorizes discovery. Set only while status is pending.
+                            "consented_at": "2020-02-20 00:00:00",  # Optional. When
+                              discovery was authorized, if consent has been given.
+                            "consented_by_user_id": "str",  # Optional. DigitalOcean user
+                              ID of the team owner who authorized discovery, or empty before consent.
+                            "status": "str"  # Optional. Whether discovery needs
+                              authorization, is waiting for it, is active, or has expired. Known values
+                              are: "not_required", "pending", "active", and "expired".
+                        },
+                        "display_name": "str",  # Optional. Label, unique among the team's
+                          credentials for this provider, ignoring case.
+                        "id": "str",  # Optional. Opaque ID used to select, retrieve, update,
+                          or delete the credential.
+                        "kind": "str",  # Optional. Credential type. NONE, NO_AUTH, and
+                          USER_API_KEY describe MCP server credentials; NO_AUTH and USER_API_KEY are
+                          output-only values. Known values are: "PROVIDER_CREDENTIAL_KIND_UNSPECIFIED",
+                          "PROVIDER_CREDENTIAL_KIND_OAUTH_CLIENT", "PROVIDER_CREDENTIAL_KIND_API_KEY",
+                          "PROVIDER_CREDENTIAL_KIND_NONE", "PROVIDER_CREDENTIAL_KIND_NO_AUTH", and
+                          "PROVIDER_CREDENTIAL_KIND_USER_API_KEY".
+                        "owning_user_id": "str",  # Optional. DigitalOcean user ID of the
+                          creator. Absent for a credential shared with the team.
+                        "provider": "str",  # Optional. Provider slug.
+                        "redirect_url": "str",  # Optional. OAuth redirect URI supplied at
+                          registration. Empty when using DigitalOcean's callback or when the credential
+                          is not an OAuth client.
+                        "reusable_by_team": bool,  # Optional. Whether everyone on the team
+                          can see and use the credential instead of only its creator.
+                        "scope": "str",  # Optional. Who can use the credential, either its
+                          creator (user) or the whole team (team). Known values are: "user" and "team".
+                        "status": "str",  # Optional. Credential lifecycle state. Disabled
+                          credentials cannot be used by existing or new connections and cannot be
+                          re-enabled through this API. DELETED is returned only by deletion. Known
+                          values are: "PROVIDER_CREDENTIAL_STATUS_UNSPECIFIED",
+                          "PROVIDER_CREDENTIAL_STATUS_ACTIVE", "PROVIDER_CREDENTIAL_STATUS_DISABLED",
+                          and "PROVIDER_CREDENTIAL_STATUS_DELETED".
+                        "updated_at": "2020-02-20 00:00:00"  # Optional. When the credential
+                          was last modified.
+                    },
+                    "revoked_connections": 0  # Optional. Number of connections deleted with the
+                      credential. Always zero for create, get, and update operations.
+                }
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_provider_credentials_update_request(
+            id=id,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404, 409]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def delete(self, id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Delete a Provider Credential.
+
+        Deletes a provider credential and every connection that uses it. There is no
+        confirmation step. Warn affected users before deleting; sessions relying on
+        those connections lose provider access. To rotate a key without removing
+        connections, update the credential instead.
+
+        Returns the deleted credential with status ``PROVIDER_CREDENTIAL_STATUS_DELETED``
+        and the number of removed connections in ``revoked_connections``. Returns 404 for
+        an unknown or already-deleted credential. A credential still bound to an MCP
+        server cannot be deleted separately; delete the server first.
+
+        :param id: Provider credential ID returned when the credential was created. Required.
+        :type id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "credential": {
+                        "base_url": "str",  # Optional. Normalized HTTPS origin for this
+                          credential's provider API, when configured.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. When the credential
+                          was created.
+                        "discovery": {
+                            "authorization_url": "str",  # Optional. Where a team owner
+                              authorizes discovery. Set only while status is pending.
+                            "consented_at": "2020-02-20 00:00:00",  # Optional. When
+                              discovery was authorized, if consent has been given.
+                            "consented_by_user_id": "str",  # Optional. DigitalOcean user
+                              ID of the team owner who authorized discovery, or empty before consent.
+                            "status": "str"  # Optional. Whether discovery needs
+                              authorization, is waiting for it, is active, or has expired. Known values
+                              are: "not_required", "pending", "active", and "expired".
+                        },
+                        "display_name": "str",  # Optional. Label, unique among the team's
+                          credentials for this provider, ignoring case.
+                        "id": "str",  # Optional. Opaque ID used to select, retrieve, update,
+                          or delete the credential.
+                        "kind": "str",  # Optional. Credential type. NONE, NO_AUTH, and
+                          USER_API_KEY describe MCP server credentials; NO_AUTH and USER_API_KEY are
+                          output-only values. Known values are: "PROVIDER_CREDENTIAL_KIND_UNSPECIFIED",
+                          "PROVIDER_CREDENTIAL_KIND_OAUTH_CLIENT", "PROVIDER_CREDENTIAL_KIND_API_KEY",
+                          "PROVIDER_CREDENTIAL_KIND_NONE", "PROVIDER_CREDENTIAL_KIND_NO_AUTH", and
+                          "PROVIDER_CREDENTIAL_KIND_USER_API_KEY".
+                        "owning_user_id": "str",  # Optional. DigitalOcean user ID of the
+                          creator. Absent for a credential shared with the team.
+                        "provider": "str",  # Optional. Provider slug.
+                        "redirect_url": "str",  # Optional. OAuth redirect URI supplied at
+                          registration. Empty when using DigitalOcean's callback or when the credential
+                          is not an OAuth client.
+                        "reusable_by_team": bool,  # Optional. Whether everyone on the team
+                          can see and use the credential instead of only its creator.
+                        "scope": "str",  # Optional. Who can use the credential, either its
+                          creator (user) or the whole team (team). Known values are: "user" and "team".
+                        "status": "str",  # Optional. Credential lifecycle state. Disabled
+                          credentials cannot be used by existing or new connections and cannot be
+                          re-enabled through this API. DELETED is returned only by deletion. Known
+                          values are: "PROVIDER_CREDENTIAL_STATUS_UNSPECIFIED",
+                          "PROVIDER_CREDENTIAL_STATUS_ACTIVE", "PROVIDER_CREDENTIAL_STATUS_DISABLED",
+                          and "PROVIDER_CREDENTIAL_STATUS_DELETED".
+                        "updated_at": "2020-02-20 00:00:00"  # Optional. When the credential
+                          was last modified.
+                    },
+                    "revoked_connections": 0  # Optional. Number of connections deleted with the
+                      credential. Always zero for create, get, and update operations.
+                }
+                # response body for status code(s): 400, 403, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_provider_credentials_delete_request(
+            id=id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+
 class ConnectionsOperations:
     """
     .. warning::
@@ -1606,7 +3150,8 @@ class ConnectionsOperations:
         to;
         read the connection until it is active or expired. A connection through a team API-key
         credential is
-        active immediately.
+        active immediately. Register the API key with ``POST /v2/action-gateway/provider-credentials``
+        first, then set ``credential.team_credential.credential_id`` to the returned ``credential.id``.
 
         There is one connection per provider and ``user_id`` for each DigitalOcean user who creates
         connections. Repeating the request returns the existing connection when its scopes cover the
@@ -1773,7 +3318,8 @@ class ConnectionsOperations:
         to;
         read the connection until it is active or expired. A connection through a team API-key
         credential is
-        active immediately.
+        active immediately. Register the API key with ``POST /v2/action-gateway/provider-credentials``
+        first, then set ``credential.team_credential.credential_id`` to the returned ``credential.id``.
 
         There is one connection per provider and ``user_id`` for each DigitalOcean user who creates
         connections. Repeating the request returns the existing connection when its scopes cover the
@@ -1896,7 +3442,8 @@ class ConnectionsOperations:
         to;
         read the connection until it is active or expired. A connection through a team API-key
         credential is
-        active immediately.
+        active immediately. Register the API key with ``POST /v2/action-gateway/provider-credentials``
+        first, then set ``credential.team_credential.credential_id`` to the returned ``credential.id``.
 
         There is one connection per provider and ``user_id`` for each DigitalOcean user who creates
         connections. Repeating the request returns the existing connection when its scopes cover the
@@ -6290,6 +7837,9 @@ class SessionsOperations:
         connects to. tools selects the tools and toolbelts the session exposes, and policy decides
         which calls run, need approval, or are refused.
 
+        Set config.cache to opt into result caching for all eligible tools or a specific list. Caching
+        is off by default and must be enabled for the team.
+
         :param body: Required.
         :type body: JSON
         :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
@@ -6309,11 +7859,24 @@ class SessionsOperations:
                       connections the session's tool calls use, matched against connection ``user_id``.
                       When set it must use the same alphabet as a connection's ``user_id``"" ,
                       ``[A-Za-z0-9._-]``"" , at most 64 characters; anything else is rejected with 400.
-                    "config": {},  # Optional. Optional session options. config.preloadTools may
-                      contain concrete tool names (optionally version-pinned) and version-pinned
-                      toolbelt references. config.customInstructions is a string of at most 1000
-                      characters. config.outputViews maps up to 100 tool slugs to the name of an output
-                      view to apply to that tool's results.
+                    "config": {
+                        "cache": {
+                            "allEligible": bool,  # Optional. Enables caching for every
+                              called tool version with a catalog cache policy, including tools that
+                              become eligible after session creation. Do not combine with tools. True
+                            "maxAgeSeconds": 0,  # Optional. Maximum cache lifetime in
+                              seconds for this session. Omit to use each tool's lifetime, up to 300
+                              seconds. A smaller tool lifetime or provider response cache header can
+                              shorten it. Per-call max_age_seconds can require a fresher result but
+                              cannot increase this limit.
+                            "tools": [
+                                "str"  # Optional. Provider-qualified tool slugs to
+                                  cache. Every listed tool must resolve for the team and have a catalog
+                                  cache policy, or session creation fails. Use slugs without version
+                                  suffixes or toolbelt references. An empty array enables no tools.
+                            ]
+                        }
+                    },
                     "insights": {
                         "logs": bool,  # Optional. Whether the session's customer logs are
                           sent to Insights.
@@ -6366,8 +7929,26 @@ class SessionsOperations:
                           session. Empty for sessions created through this API.
                         "agentUrn": "str",  # Optional. URN of the agent that started the
                           session. Empty for sessions created through this API.
-                        "config": {},  # Optional. Session options as supplied at creation.
-                          Omitted when none were supplied.
+                        "config": {
+                            "cache": {
+                                "allEligible": bool,  # Optional. Enables caching for
+                                  every called tool version with a catalog cache policy, including
+                                  tools that become eligible after session creation. Do not combine
+                                  with tools. True
+                                "maxAgeSeconds": 0,  # Optional. Maximum cache
+                                  lifetime in seconds for this session. Omit to use each tool's
+                                  lifetime, up to 300 seconds. A smaller tool lifetime or provider
+                                  response cache header can shorten it. Per-call max_age_seconds can
+                                  require a fresher result but cannot increase this limit.
+                                "tools": [
+                                    "str"  # Optional. Provider-qualified tool
+                                      slugs to cache. Every listed tool must resolve for the team and
+                                      have a catalog cache policy, or session creation fails. Use slugs
+                                      without version suffixes or toolbelt references. An empty array
+                                      enables no tools.
+                                ]
+                            }
+                        },
                         "createdAt": "2020-02-20 00:00:00",  # Optional. When the session was
                           created.
                         "insights": {
@@ -6453,6 +8034,9 @@ class SessionsOperations:
         connects to. tools selects the tools and toolbelts the session exposes, and policy decides
         which calls run, need approval, or are refused.
 
+        Set config.cache to opt into result caching for all eligible tools or a specific list. Caching
+        is off by default and must be enabled for the team.
+
         :param body: Required.
         :type body: IO[bytes]
         :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
@@ -6476,8 +8060,26 @@ class SessionsOperations:
                           session. Empty for sessions created through this API.
                         "agentUrn": "str",  # Optional. URN of the agent that started the
                           session. Empty for sessions created through this API.
-                        "config": {},  # Optional. Session options as supplied at creation.
-                          Omitted when none were supplied.
+                        "config": {
+                            "cache": {
+                                "allEligible": bool,  # Optional. Enables caching for
+                                  every called tool version with a catalog cache policy, including
+                                  tools that become eligible after session creation. Do not combine
+                                  with tools. True
+                                "maxAgeSeconds": 0,  # Optional. Maximum cache
+                                  lifetime in seconds for this session. Omit to use each tool's
+                                  lifetime, up to 300 seconds. A smaller tool lifetime or provider
+                                  response cache header can shorten it. Per-call max_age_seconds can
+                                  require a fresher result but cannot increase this limit.
+                                "tools": [
+                                    "str"  # Optional. Provider-qualified tool
+                                      slugs to cache. Every listed tool must resolve for the team and
+                                      have a catalog cache policy, or session creation fails. Use slugs
+                                      without version suffixes or toolbelt references. An empty array
+                                      enables no tools.
+                                ]
+                            }
+                        },
                         "createdAt": "2020-02-20 00:00:00",  # Optional. When the session was
                           created.
                         "insights": {
@@ -6561,6 +8163,9 @@ class SessionsOperations:
         connects to. tools selects the tools and toolbelts the session exposes, and policy decides
         which calls run, need approval, or are refused.
 
+        Set config.cache to opt into result caching for all eligible tools or a specific list. Caching
+        is off by default and must be enabled for the team.
+
         :param body: Is either a JSON type or a IO[bytes] type. Required.
         :type body: JSON or IO[bytes]
         :return: JSON object
@@ -6577,11 +8182,24 @@ class SessionsOperations:
                       connections the session's tool calls use, matched against connection ``user_id``.
                       When set it must use the same alphabet as a connection's ``user_id``"" ,
                       ``[A-Za-z0-9._-]``"" , at most 64 characters; anything else is rejected with 400.
-                    "config": {},  # Optional. Optional session options. config.preloadTools may
-                      contain concrete tool names (optionally version-pinned) and version-pinned
-                      toolbelt references. config.customInstructions is a string of at most 1000
-                      characters. config.outputViews maps up to 100 tool slugs to the name of an output
-                      view to apply to that tool's results.
+                    "config": {
+                        "cache": {
+                            "allEligible": bool,  # Optional. Enables caching for every
+                              called tool version with a catalog cache policy, including tools that
+                              become eligible after session creation. Do not combine with tools. True
+                            "maxAgeSeconds": 0,  # Optional. Maximum cache lifetime in
+                              seconds for this session. Omit to use each tool's lifetime, up to 300
+                              seconds. A smaller tool lifetime or provider response cache header can
+                              shorten it. Per-call max_age_seconds can require a fresher result but
+                              cannot increase this limit.
+                            "tools": [
+                                "str"  # Optional. Provider-qualified tool slugs to
+                                  cache. Every listed tool must resolve for the team and have a catalog
+                                  cache policy, or session creation fails. Use slugs without version
+                                  suffixes or toolbelt references. An empty array enables no tools.
+                            ]
+                        }
+                    },
                     "insights": {
                         "logs": bool,  # Optional. Whether the session's customer logs are
                           sent to Insights.
@@ -6634,8 +8252,26 @@ class SessionsOperations:
                           session. Empty for sessions created through this API.
                         "agentUrn": "str",  # Optional. URN of the agent that started the
                           session. Empty for sessions created through this API.
-                        "config": {},  # Optional. Session options as supplied at creation.
-                          Omitted when none were supplied.
+                        "config": {
+                            "cache": {
+                                "allEligible": bool,  # Optional. Enables caching for
+                                  every called tool version with a catalog cache policy, including
+                                  tools that become eligible after session creation. Do not combine
+                                  with tools. True
+                                "maxAgeSeconds": 0,  # Optional. Maximum cache
+                                  lifetime in seconds for this session. Omit to use each tool's
+                                  lifetime, up to 300 seconds. A smaller tool lifetime or provider
+                                  response cache header can shorten it. Per-call max_age_seconds can
+                                  require a fresher result but cannot increase this limit.
+                                "tools": [
+                                    "str"  # Optional. Provider-qualified tool
+                                      slugs to cache. Every listed tool must resolve for the team and
+                                      have a catalog cache policy, or session creation fails. Use slugs
+                                      without version suffixes or toolbelt references. An empty array
+                                      enables no tools.
+                                ]
+                            }
+                        },
                         "createdAt": "2020-02-20 00:00:00",  # Optional. When the session was
                           created.
                         "insights": {
@@ -6845,8 +8481,27 @@ class SessionsOperations:
                               started the session. Empty for sessions created through this API.
                             "agentUrn": "str",  # Optional. URN of the agent that started
                               the session. Empty for sessions created through this API.
-                            "config": {},  # Optional. Session options as supplied at
-                              creation. Omitted when none were supplied.
+                            "config": {
+                                "cache": {
+                                    "allEligible": bool,  # Optional. Enables
+                                      caching for every called tool version with a catalog cache
+                                      policy, including tools that become eligible after session
+                                      creation. Do not combine with tools. True
+                                    "maxAgeSeconds": 0,  # Optional. Maximum
+                                      cache lifetime in seconds for this session. Omit to use each
+                                      tool's lifetime, up to 300 seconds. A smaller tool lifetime or
+                                      provider response cache header can shorten it. Per-call
+                                      max_age_seconds can require a fresher result but cannot increase
+                                      this limit.
+                                    "tools": [
+                                        "str"  # Optional. Provider-qualified
+                                          tool slugs to cache. Every listed tool must resolve for the
+                                          team and have a catalog cache policy, or session creation
+                                          fails. Use slugs without version suffixes or toolbelt
+                                          references. An empty array enables no tools.
+                                    ]
+                                }
+                            },
                             "createdAt": "2020-02-20 00:00:00",  # Optional. When the
                               session was created.
                             "insights": {
@@ -7023,8 +8678,27 @@ class SessionsOperations:
                               started the session. Empty for sessions created through this API.
                             "agentUrn": "str",  # Optional. URN of the agent that started
                               the session. Empty for sessions created through this API.
-                            "config": {},  # Optional. Session options as supplied at
-                              creation. Omitted when none were supplied.
+                            "config": {
+                                "cache": {
+                                    "allEligible": bool,  # Optional. Enables
+                                      caching for every called tool version with a catalog cache
+                                      policy, including tools that become eligible after session
+                                      creation. Do not combine with tools. True
+                                    "maxAgeSeconds": 0,  # Optional. Maximum
+                                      cache lifetime in seconds for this session. Omit to use each
+                                      tool's lifetime, up to 300 seconds. A smaller tool lifetime or
+                                      provider response cache header can shorten it. Per-call
+                                      max_age_seconds can require a fresher result but cannot increase
+                                      this limit.
+                                    "tools": [
+                                        "str"  # Optional. Provider-qualified
+                                          tool slugs to cache. Every listed tool must resolve for the
+                                          team and have a catalog cache policy, or session creation
+                                          fails. Use slugs without version suffixes or toolbelt
+                                          references. An empty array enables no tools.
+                                    ]
+                                }
+                            },
                             "createdAt": "2020-02-20 00:00:00",  # Optional. When the
                               session was created.
                             "insights": {
@@ -9439,6 +11113,10 @@ class ToolsOperations:
                                       the tool requests.
                                 ]
                             },
+                            "cache": {
+                                "ttlSeconds": 0  # Maximum cache lifetime in seconds
+                                  for this tool version. Required.
+                            },
                             "description": "str",  # Optional. What the tool does.
                             "inputSchema": {},  # Optional. The JSON Schema the tool's
                               arguments must satisfy.
@@ -11487,16 +13165,14 @@ class GatewayToolsOperations:
                       contacting support. Required.
                     "status": "str",  # Required. Known values are: "succeeded" and "failed".
                     "_meta": {
-                        "str": {}  # Optional. Additional result metadata. Keys include:   *
-                          ``status``"" : ``requires_approval``"" , ``requires_authorization``"" , or
-                          ``requires_connection_configuration`` when the call stopped before   running.
-                          *    ``approval_id``"" , ``tool_name``"" , ``expires_at``"" , and
-                          ``decide``"" : present with   ``requires_approval``. ``decide`` gives the
-                          ``method``"" , ``path``"" , and ``body``   of the approval request to send.
-                          Approve the call, then repeat it   with the same arguments before
-                          ``expires_at``.  *    `retry`: `{"attempt_count": N, "exhausted": bool}` when
-                          the gateway   retried the call.  *    ``output_view``"" : the output view
-                          applied to the result.
+                        "cache": {
+                            "status": "str",  # HIT returned a cached result without
+                              calling the provider. MISS found no usable result and called the
+                              provider. BYPASS skipped caching. Required. Known values are: "HIT",
+                              "MISS", and "BYPASS".
+                            "age_seconds": 0  # Optional. Age of the cached result in
+                              seconds. Present only on a hit.
+                        }
                     },
                     "error": {
                         "class": "str",  # Optional. The failure class. Branch on this value
@@ -11522,6 +13198,13 @@ class GatewayToolsOperations:
                                   query in the request.
                                 "results": [
                                     {
+                                        "cache": {
+                                            "maxAgeSeconds": 0  # Maximum
+                                              result age the session allows, or 300 if the session sets
+                                              no limit. The tool's own cache lifetime can be shorter.
+                                              Invoke controls use max_age_seconds, not this field's
+                                              camelCase spelling. Required.
+                                        },
                                         "description": "str",  # Optional.
                                           One result group per query, in request order.
                                         "inputSchema": {
@@ -11622,16 +13305,14 @@ class GatewayToolsOperations:
                       contacting support. Required.
                     "status": "str",  # Required. Known values are: "succeeded" and "failed".
                     "_meta": {
-                        "str": {}  # Optional. Additional result metadata. Keys include:   *
-                          ``status``"" : ``requires_approval``"" , ``requires_authorization``"" , or
-                          ``requires_connection_configuration`` when the call stopped before   running.
-                          *    ``approval_id``"" , ``tool_name``"" , ``expires_at``"" , and
-                          ``decide``"" : present with   ``requires_approval``. ``decide`` gives the
-                          ``method``"" , ``path``"" , and ``body``   of the approval request to send.
-                          Approve the call, then repeat it   with the same arguments before
-                          ``expires_at``.  *    `retry`: `{"attempt_count": N, "exhausted": bool}` when
-                          the gateway   retried the call.  *    ``output_view``"" : the output view
-                          applied to the result.
+                        "cache": {
+                            "status": "str",  # HIT returned a cached result without
+                              calling the provider. MISS found no usable result and called the
+                              provider. BYPASS skipped caching. Required. Known values are: "HIT",
+                              "MISS", and "BYPASS".
+                            "age_seconds": 0  # Optional. Age of the cached result in
+                              seconds. Present only on a hit.
+                        }
                     },
                     "error": {
                         "class": "str",  # Optional. The failure class. Branch on this value
@@ -11657,6 +13338,13 @@ class GatewayToolsOperations:
                                   query in the request.
                                 "results": [
                                     {
+                                        "cache": {
+                                            "maxAgeSeconds": 0  # Maximum
+                                              result age the session allows, or 300 if the session sets
+                                              no limit. The tool's own cache lifetime can be shorter.
+                                              Invoke controls use max_age_seconds, not this field's
+                                              camelCase spelling. Required.
+                                        },
                                         "description": "str",  # Optional.
                                           One result group per query, in request order.
                                         "inputSchema": {
@@ -11773,16 +13461,14 @@ class GatewayToolsOperations:
                       contacting support. Required.
                     "status": "str",  # Required. Known values are: "succeeded" and "failed".
                     "_meta": {
-                        "str": {}  # Optional. Additional result metadata. Keys include:   *
-                          ``status``"" : ``requires_approval``"" , ``requires_authorization``"" , or
-                          ``requires_connection_configuration`` when the call stopped before   running.
-                          *    ``approval_id``"" , ``tool_name``"" , ``expires_at``"" , and
-                          ``decide``"" : present with   ``requires_approval``. ``decide`` gives the
-                          ``method``"" , ``path``"" , and ``body``   of the approval request to send.
-                          Approve the call, then repeat it   with the same arguments before
-                          ``expires_at``.  *    `retry`: `{"attempt_count": N, "exhausted": bool}` when
-                          the gateway   retried the call.  *    ``output_view``"" : the output view
-                          applied to the result.
+                        "cache": {
+                            "status": "str",  # HIT returned a cached result without
+                              calling the provider. MISS found no usable result and called the
+                              provider. BYPASS skipped caching. Required. Known values are: "HIT",
+                              "MISS", and "BYPASS".
+                            "age_seconds": 0  # Optional. Age of the cached result in
+                              seconds. Present only on a hit.
+                        }
                     },
                     "error": {
                         "class": "str",  # Optional. The failure class. Branch on this value
@@ -11808,6 +13494,13 @@ class GatewayToolsOperations:
                                   query in the request.
                                 "results": [
                                     {
+                                        "cache": {
+                                            "maxAgeSeconds": 0  # Maximum
+                                              result age the session allows, or 300 if the session sets
+                                              no limit. The tool's own cache lifetime can be shorter.
+                                              Invoke controls use max_age_seconds, not this field's
+                                              camelCase spelling. Required.
+                                        },
                                         "description": "str",  # Optional.
                                           One result group per query, in request order.
                                         "inputSchema": {
@@ -12004,6 +13697,11 @@ class GatewayToolsOperations:
         needs the end user to connect a provider fails with ``_meta.status`` set to
         ``requires_authorization`` or ``requires_connection_configuration``.
 
+        Tools opted into result caching use the session's settings automatically. Set cache on an
+        individual tools entry to bypass caching or require a fresher result. The result's _meta.cache
+        reports cache hits. Hits still incur the standard gateway invocation charge but no additional
+        provider charge, because the provider is not called.
+
         :param body: Required.
         :type body: JSON
         :keyword x_session_id: The session to act in: the UUID at the end of the session's
@@ -12030,6 +13728,18 @@ class GatewayToolsOperations:
                                 "str": {}  # Optional. The tool's arguments, matching
                                   its ``inputSchema``.
                             },
+                            "cache": {
+                                "max_age_seconds": 0,  # Optional. Oldest cached
+                                  result this call accepts, in seconds. Zero bypasses caching. Values
+                                  above 300 are clamped to 300; larger values cannot increase the
+                                  session or tool lifetime. This controls accepted result age, not the
+                                  lifetime of a newly stored entry.
+                                "mode": "auto"  # Optional. Default value is "auto".
+                                  auto uses a sufficiently recent cached result or calls the provider
+                                  and can store a successful result. bypass skips lookup and storage
+                                  without clearing or refreshing existing entries. Known values are:
+                                  "auto" and "bypass".
+                            },
                             "version": "str"  # Optional. An immutable tool version. Omit
                               to use the released version.
                         }
@@ -12051,18 +13761,15 @@ class GatewayToolsOperations:
                                 "status": "str",  # Required. Known values are:
                                   "succeeded" and "failed".
                                 "_meta": {
-                                    "str": {}  # Optional. Additional result
-                                      metadata. Keys include:   *    ``status``"" :
-                                      ``requires_approval``"" , ``requires_authorization``"" , or
-                                      ``requires_connection_configuration`` when the call stopped
-                                      before   running.  *    ``approval_id``"" , ``tool_name``"" ,
-                                      ``expires_at``"" , and ``decide``"" : present with
-                                      ``requires_approval``. ``decide`` gives the ``method``"" ,
-                                      ``path``"" , and ``body``   of the approval request to send.
-                                      Approve the call, then repeat it   with the same arguments before
-                                      ``expires_at``.  *    `retry`: `{"attempt_count": N, "exhausted":
-                                      bool}` when the gateway   retried the call.  *
-                                      ``output_view``"" : the output view applied to the result.
+                                    "cache": {
+                                        "status": "str",  # HIT returned a
+                                          cached result without calling the provider. MISS found no
+                                          usable result and called the provider. BYPASS skipped
+                                          caching. Required. Known values are: "HIT", "MISS", and
+                                          "BYPASS".
+                                        "age_seconds": 0  # Optional. Age of
+                                          the cached result in seconds. Present only on a hit.
+                                    }
                                 },
                                 "error": {
                                     "class": "str",  # Optional. The failure
@@ -12155,6 +13862,11 @@ class GatewayToolsOperations:
         needs the end user to connect a provider fails with ``_meta.status`` set to
         ``requires_authorization`` or ``requires_connection_configuration``.
 
+        Tools opted into result caching use the session's settings automatically. Set cache on an
+        individual tools entry to bypass caching or require a fresher result. The result's _meta.cache
+        reports cache hits. Hits still incur the standard gateway invocation charge but no additional
+        provider charge, because the provider is not called.
+
         :param body: Required.
         :type body: IO[bytes]
         :keyword x_session_id: The session to act in: the UUID at the end of the session's
@@ -12184,18 +13896,15 @@ class GatewayToolsOperations:
                                 "status": "str",  # Required. Known values are:
                                   "succeeded" and "failed".
                                 "_meta": {
-                                    "str": {}  # Optional. Additional result
-                                      metadata. Keys include:   *    ``status``"" :
-                                      ``requires_approval``"" , ``requires_authorization``"" , or
-                                      ``requires_connection_configuration`` when the call stopped
-                                      before   running.  *    ``approval_id``"" , ``tool_name``"" ,
-                                      ``expires_at``"" , and ``decide``"" : present with
-                                      ``requires_approval``. ``decide`` gives the ``method``"" ,
-                                      ``path``"" , and ``body``   of the approval request to send.
-                                      Approve the call, then repeat it   with the same arguments before
-                                      ``expires_at``.  *    `retry`: `{"attempt_count": N, "exhausted":
-                                      bool}` when the gateway   retried the call.  *
-                                      ``output_view``"" : the output view applied to the result.
+                                    "cache": {
+                                        "status": "str",  # HIT returned a
+                                          cached result without calling the provider. MISS found no
+                                          usable result and called the provider. BYPASS skipped
+                                          caching. Required. Known values are: "HIT", "MISS", and
+                                          "BYPASS".
+                                        "age_seconds": 0  # Optional. Age of
+                                          the cached result in seconds. Present only on a hit.
+                                    }
                                 },
                                 "error": {
                                     "class": "str",  # Optional. The failure
@@ -12283,6 +13992,11 @@ class GatewayToolsOperations:
         needs the end user to connect a provider fails with ``_meta.status`` set to
         ``requires_authorization`` or ``requires_connection_configuration``.
 
+        Tools opted into result caching use the session's settings automatically. Set cache on an
+        individual tools entry to bypass caching or require a fresher result. The result's _meta.cache
+        reports cache hits. Hits still incur the standard gateway invocation charge but no additional
+        provider charge, because the provider is not called.
+
         :param body: Is either a JSON type or a IO[bytes] type. Required.
         :type body: JSON or IO[bytes]
         :keyword x_session_id: The session to act in: the UUID at the end of the session's
@@ -12306,6 +14020,18 @@ class GatewayToolsOperations:
                                 "str": {}  # Optional. The tool's arguments, matching
                                   its ``inputSchema``.
                             },
+                            "cache": {
+                                "max_age_seconds": 0,  # Optional. Oldest cached
+                                  result this call accepts, in seconds. Zero bypasses caching. Values
+                                  above 300 are clamped to 300; larger values cannot increase the
+                                  session or tool lifetime. This controls accepted result age, not the
+                                  lifetime of a newly stored entry.
+                                "mode": "auto"  # Optional. Default value is "auto".
+                                  auto uses a sufficiently recent cached result or calls the provider
+                                  and can store a successful result. bypass skips lookup and storage
+                                  without clearing or refreshing existing entries. Known values are:
+                                  "auto" and "bypass".
+                            },
                             "version": "str"  # Optional. An immutable tool version. Omit
                               to use the released version.
                         }
@@ -12327,18 +14053,15 @@ class GatewayToolsOperations:
                                 "status": "str",  # Required. Known values are:
                                   "succeeded" and "failed".
                                 "_meta": {
-                                    "str": {}  # Optional. Additional result
-                                      metadata. Keys include:   *    ``status``"" :
-                                      ``requires_approval``"" , ``requires_authorization``"" , or
-                                      ``requires_connection_configuration`` when the call stopped
-                                      before   running.  *    ``approval_id``"" , ``tool_name``"" ,
-                                      ``expires_at``"" , and ``decide``"" : present with
-                                      ``requires_approval``. ``decide`` gives the ``method``"" ,
-                                      ``path``"" , and ``body``   of the approval request to send.
-                                      Approve the call, then repeat it   with the same arguments before
-                                      ``expires_at``.  *    `retry`: `{"attempt_count": N, "exhausted":
-                                      bool}` when the gateway   retried the call.  *
-                                      ``output_view``"" : the output view applied to the result.
+                                    "cache": {
+                                        "status": "str",  # HIT returned a
+                                          cached result without calling the provider. MISS found no
+                                          usable result and called the provider. BYPASS skipped
+                                          caching. Required. Known values are: "HIT", "MISS", and
+                                          "BYPASS".
+                                        "age_seconds": 0  # Optional. Age of
+                                          the cached result in seconds. Present only on a hit.
+                                    }
                                 },
                                 "error": {
                                     "class": "str",  # Optional. The failure
@@ -12611,16 +14334,14 @@ class GatewayCodeOperations:
                       contacting support. Required.
                     "status": "str",  # Required. Known values are: "succeeded" and "failed".
                     "_meta": {
-                        "str": {}  # Optional. Additional result metadata. Keys include:   *
-                          ``status``"" : ``requires_approval``"" , ``requires_authorization``"" , or
-                          ``requires_connection_configuration`` when the call stopped before   running.
-                          *    ``approval_id``"" , ``tool_name``"" , ``expires_at``"" , and
-                          ``decide``"" : present with   ``requires_approval``. ``decide`` gives the
-                          ``method``"" , ``path``"" , and ``body``   of the approval request to send.
-                          Approve the call, then repeat it   with the same arguments before
-                          ``expires_at``.  *    `retry`: `{"attempt_count": N, "exhausted": bool}` when
-                          the gateway   retried the call.  *    ``output_view``"" : the output view
-                          applied to the result.
+                        "cache": {
+                            "status": "str",  # HIT returned a cached result without
+                              calling the provider. MISS found no usable result and called the
+                              provider. BYPASS skipped caching. Required. Known values are: "HIT",
+                              "MISS", and "BYPASS".
+                            "age_seconds": 0  # Optional. Age of the cached result in
+                              seconds. Present only on a hit.
+                        }
                     },
                     "error": {
                         "class": "str",  # Optional. The failure class. Branch on this value
@@ -12725,16 +14446,14 @@ class GatewayCodeOperations:
                       contacting support. Required.
                     "status": "str",  # Required. Known values are: "succeeded" and "failed".
                     "_meta": {
-                        "str": {}  # Optional. Additional result metadata. Keys include:   *
-                          ``status``"" : ``requires_approval``"" , ``requires_authorization``"" , or
-                          ``requires_connection_configuration`` when the call stopped before   running.
-                          *    ``approval_id``"" , ``tool_name``"" , ``expires_at``"" , and
-                          ``decide``"" : present with   ``requires_approval``. ``decide`` gives the
-                          ``method``"" , ``path``"" , and ``body``   of the approval request to send.
-                          Approve the call, then repeat it   with the same arguments before
-                          ``expires_at``.  *    `retry`: `{"attempt_count": N, "exhausted": bool}` when
-                          the gateway   retried the call.  *    ``output_view``"" : the output view
-                          applied to the result.
+                        "cache": {
+                            "status": "str",  # HIT returned a cached result without
+                              calling the provider. MISS found no usable result and called the
+                              provider. BYPASS skipped caching. Required. Known values are: "HIT",
+                              "MISS", and "BYPASS".
+                            "age_seconds": 0  # Optional. Age of the cached result in
+                              seconds. Present only on a hit.
+                        }
                     },
                     "error": {
                         "class": "str",  # Optional. The failure class. Branch on this value
@@ -12838,16 +14557,14 @@ class GatewayCodeOperations:
                       contacting support. Required.
                     "status": "str",  # Required. Known values are: "succeeded" and "failed".
                     "_meta": {
-                        "str": {}  # Optional. Additional result metadata. Keys include:   *
-                          ``status``"" : ``requires_approval``"" , ``requires_authorization``"" , or
-                          ``requires_connection_configuration`` when the call stopped before   running.
-                          *    ``approval_id``"" , ``tool_name``"" , ``expires_at``"" , and
-                          ``decide``"" : present with   ``requires_approval``. ``decide`` gives the
-                          ``method``"" , ``path``"" , and ``body``   of the approval request to send.
-                          Approve the call, then repeat it   with the same arguments before
-                          ``expires_at``.  *    `retry`: `{"attempt_count": N, "exhausted": bool}` when
-                          the gateway   retried the call.  *    ``output_view``"" : the output view
-                          applied to the result.
+                        "cache": {
+                            "status": "str",  # HIT returned a cached result without
+                              calling the provider. MISS found no usable result and called the
+                              provider. BYPASS skipped caching. Required. Known values are: "HIT",
+                              "MISS", and "BYPASS".
+                            "age_seconds": 0  # Optional. Age of the cached result in
+                              seconds. Present only on a hit.
+                        }
                     },
                     "error": {
                         "class": "str",  # Optional. The failure class. Branch on this value
@@ -17105,7 +18822,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               created the config. Required.
                             "id": "str",  # Required.
                             "name": "str",  # Required.
-                            "updated_at": "2020-02-20 00:00:00"  # Required.
+                            "updated_at": "2020-02-20 00:00:00",  # Required.
+                            "region": "str"  # Optional. DO region slug the config lives
+                              in, e.g. ric1. Stamped once at create from the region whose API host
+                              served the request, and never changed. Returned only for teams on the
+                              regional routing rollout; omitted otherwise.
                         }
                     ],
                     "next_page_token": "str"  # Optional.
@@ -17621,7 +19342,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               metrics are dropped at ingest rather than opted out of here.
                             "traces": bool  # Optional. Whether the agent's traces are
                               sent to Insights.
-                        }
+                        },
+                        "region": "str"  # Optional. DO region slug the config lives in, e.g.
+                          ric1. Stamped once at create from the region whose API host served the
+                          request, and never changed. Returned only for teams on the regional routing
+                          rollout; omitted otherwise.
                     }
                 }
                 # response body for status code(s): 400, 409, 413, 415
@@ -18039,7 +19764,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               metrics are dropped at ingest rather than opted out of here.
                             "traces": bool  # Optional. Whether the agent's traces are
                               sent to Insights.
-                        }
+                        },
+                        "region": "str"  # Optional. DO region slug the config lives in, e.g.
+                          ric1. Stamped once at create from the region whose API host served the
+                          request, and never changed. Returned only for teams on the regional routing
+                          rollout; omitted otherwise.
                     }
                 }
                 # response body for status code(s): 400, 409, 413, 415
@@ -18469,7 +20198,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               metrics are dropped at ingest rather than opted out of here.
                             "traces": bool  # Optional. Whether the agent's traces are
                               sent to Insights.
-                        }
+                        },
+                        "region": "str"  # Optional. DO region slug the config lives in, e.g.
+                          ric1. Stamped once at create from the region whose API host served the
+                          request, and never changed. Returned only for teams on the regional routing
+                          rollout; omitted otherwise.
                     }
                 }
                 # response body for status code(s): 400, 409, 413, 415
@@ -19017,7 +20750,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               metrics are dropped at ingest rather than opted out of here.
                             "traces": bool  # Optional. Whether the agent's traces are
                               sent to Insights.
-                        }
+                        },
+                        "region": "str"  # Optional. DO region slug the config lives in, e.g.
+                          ric1. Stamped once at create from the region whose API host served the
+                          request, and never changed. Returned only for teams on the regional routing
+                          rollout; omitted otherwise.
                     }
                 }
                 # response body for status code(s): 400, 404
@@ -19686,7 +21423,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               metrics are dropped at ingest rather than opted out of here.
                             "traces": bool  # Optional. Whether the agent's traces are
                               sent to Insights.
-                        }
+                        },
+                        "region": "str"  # Optional. DO region slug the config lives in, e.g.
+                          ric1. Stamped once at create from the region whose API host served the
+                          request, and never changed. Returned only for teams on the regional routing
+                          rollout; omitted otherwise.
                     }
                 }
                 # response body for status code(s): 400, 404, 409, 413, 415
@@ -20111,7 +21852,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               metrics are dropped at ingest rather than opted out of here.
                             "traces": bool  # Optional. Whether the agent's traces are
                               sent to Insights.
-                        }
+                        },
+                        "region": "str"  # Optional. DO region slug the config lives in, e.g.
+                          ric1. Stamped once at create from the region whose API host served the
+                          request, and never changed. Returned only for teams on the regional routing
+                          rollout; omitted otherwise.
                     }
                 }
                 # response body for status code(s): 400, 404, 409, 413, 415
@@ -20544,7 +22289,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               metrics are dropped at ingest rather than opted out of here.
                             "traces": bool  # Optional. Whether the agent's traces are
                               sent to Insights.
-                        }
+                        },
+                        "region": "str"  # Optional. DO region slug the config lives in, e.g.
+                          ric1. Stamped once at create from the region whose API host served the
+                          request, and never changed. Returned only for teams on the regional routing
+                          rollout; omitted otherwise.
                     }
                 }
                 # response body for status code(s): 400, 404, 409, 413, 415
@@ -20795,11 +22544,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               the deployment-wide default.
                             "keep_warm": bool,  # Optional. Session is exempt from idle
                               auto-pause (manifest keep_warm, or the agent-kind default: hermes
-                              sessions keep warm). Pause requests against such a session are rejected
-                              with 409. Omitted when false.
+                              sessions keep warm). It still accepts a manual pause. Omitted when false.
                             "last_event_at": "2020-02-20 00:00:00",  # Optional.
                               Timestamp of the most recent event in this session's canonical stream.
-                              Drives the inactivity policy that destroys idle sessions.
+                              Drives the inactivity policy that pauses idle sessions.
                             "name": "str",  # Optional. User-assignable display name,
                               unique per team among non-terminal sessions. Usable in place of
                               session_id by clients (doctl / Console resolve it to the id via the
@@ -20823,6 +22571,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               otherwise. Known values: manual (PauseSession RPC), idle (inactivity
                               auto-pause), low_balance (prepay gate). Clients should treat an
                               unrecognized value as an opaque reason string.
+                            "region": "str",  # Optional. DO region slug the session
+                              lives in, e.g. ric1. Stamped once at create from the region whose API
+                              host served the request, and never changed. Returned only for teams on
+                              the regional routing rollout; omitted otherwise.
                             "repo_hint": "str",  # Optional. Optional repository hint
                               supplied at session creation (first spec.workspace.repos entry of the
                               manifest). Not authoritative; the agent may change repos in-session.
@@ -21067,11 +22819,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               the deployment-wide default.
                             "keep_warm": bool,  # Optional. Session is exempt from idle
                               auto-pause (manifest keep_warm, or the agent-kind default: hermes
-                              sessions keep warm). Pause requests against such a session are rejected
-                              with 409. Omitted when false.
+                              sessions keep warm). It still accepts a manual pause. Omitted when false.
                             "last_event_at": "2020-02-20 00:00:00",  # Optional.
                               Timestamp of the most recent event in this session's canonical stream.
-                              Drives the inactivity policy that destroys idle sessions.
+                              Drives the inactivity policy that pauses idle sessions.
                             "name": "str",  # Optional. User-assignable display name,
                               unique per team among non-terminal sessions. Usable in place of
                               session_id by clients (doctl / Console resolve it to the id via the
@@ -21095,6 +22846,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               otherwise. Known values: manual (PauseSession RPC), idle (inactivity
                               auto-pause), low_balance (prepay gate). Clients should treat an
                               unrecognized value as an opaque reason string.
+                            "region": "str",  # Optional. DO region slug the session
+                              lives in, e.g. ric1. Stamped once at create from the region whose API
+                              host served the request, and never changed. Returned only for teams on
+                              the regional routing rollout; omitted otherwise.
                             "repo_hint": "str",  # Optional. Optional repository hint
                               supplied at session creation (first spec.workspace.repos entry of the
                               manifest). Not authoritative; the agent may change repos in-session.
@@ -21321,6 +23076,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                     "name": "str",  # Session name, independent of the config name. Must satisfy
                       the existing environment-spec metadata.name rules and must not be UUID-shaped.
                       Required.
+                    "region": "str",  # Optional. Optional placement check, not a placement
+                      choice: the session is always created in the region whose API host served the
+                      request. If set, it must equal that region, or the request fails with 400 and a
+                      region_mismatch message. Honored only for teams on the regional routing rollout;
+                      ignored otherwise.
                     "resume_on_topoff": bool  # Optional. Opt the new session in to automatic
                       resumption when the team's prepayment balance is restored. Defaults to false.
                       Session-scoped, not config-scoped: the referenced config never confers this, so
@@ -21365,11 +23125,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           deployment-wide default.
                         "keep_warm": bool,  # Optional. Session is exempt from idle
                           auto-pause (manifest keep_warm, or the agent-kind default: hermes sessions
-                          keep warm). Pause requests against such a session are rejected with 409.
-                          Omitted when false.
+                          keep warm). It still accepts a manual pause. Omitted when false.
                         "last_event_at": "2020-02-20 00:00:00",  # Optional. Timestamp of the
                           most recent event in this session's canonical stream. Drives the inactivity
-                          policy that destroys idle sessions.
+                          policy that pauses idle sessions.
                         "name": "str",  # Optional. User-assignable display name, unique per
                           team among non-terminal sessions. Usable in place of session_id by clients
                           (doctl / Console resolve it to the id via the ListSessions ?name= filter; the
@@ -21392,6 +23151,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
                           (prepay gate). Clients should treat an unrecognized value as an opaque reason
                           string.
+                        "region": "str",  # Optional. DO region slug the session lives in,
+                          e.g. ric1. Stamped once at create from the region whose API host served the
+                          request, and never changed. Returned only for teams on the regional routing
+                          rollout; omitted otherwise.
                         "repo_hint": "str",  # Optional. Optional repository hint supplied at
                           session creation (first spec.workspace.repos entry of the manifest). Not
                           authoritative; the agent may change repos in-session.
@@ -21550,11 +23313,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           deployment-wide default.
                         "keep_warm": bool,  # Optional. Session is exempt from idle
                           auto-pause (manifest keep_warm, or the agent-kind default: hermes sessions
-                          keep warm). Pause requests against such a session are rejected with 409.
-                          Omitted when false.
+                          keep warm). It still accepts a manual pause. Omitted when false.
                         "last_event_at": "2020-02-20 00:00:00",  # Optional. Timestamp of the
                           most recent event in this session's canonical stream. Drives the inactivity
-                          policy that destroys idle sessions.
+                          policy that pauses idle sessions.
                         "name": "str",  # Optional. User-assignable display name, unique per
                           team among non-terminal sessions. Usable in place of session_id by clients
                           (doctl / Console resolve it to the id via the ListSessions ?name= filter; the
@@ -21577,6 +23339,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
                           (prepay gate). Clients should treat an unrecognized value as an opaque reason
                           string.
+                        "region": "str",  # Optional. DO region slug the session lives in,
+                          e.g. ric1. Stamped once at create from the region whose API host served the
+                          request, and never changed. Returned only for teams on the regional routing
+                          rollout; omitted otherwise.
                         "repo_hint": "str",  # Optional. Optional repository hint supplied at
                           session creation (first spec.workspace.repos entry of the manifest). Not
                           authoritative; the agent may change repos in-session.
@@ -21701,6 +23467,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                     "name": "str",  # Session name, independent of the config name. Must satisfy
                       the existing environment-spec metadata.name rules and must not be UUID-shaped.
                       Required.
+                    "region": "str",  # Optional. Optional placement check, not a placement
+                      choice: the session is always created in the region whose API host served the
+                      request. If set, it must equal that region, or the request fails with 400 and a
+                      region_mismatch message. Honored only for teams on the regional routing rollout;
+                      ignored otherwise.
                     "resume_on_topoff": bool  # Optional. Opt the new session in to automatic
                       resumption when the team's prepayment balance is restored. Defaults to false.
                       Session-scoped, not config-scoped: the referenced config never confers this, so
@@ -21745,11 +23516,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           deployment-wide default.
                         "keep_warm": bool,  # Optional. Session is exempt from idle
                           auto-pause (manifest keep_warm, or the agent-kind default: hermes sessions
-                          keep warm). Pause requests against such a session are rejected with 409.
-                          Omitted when false.
+                          keep warm). It still accepts a manual pause. Omitted when false.
                         "last_event_at": "2020-02-20 00:00:00",  # Optional. Timestamp of the
                           most recent event in this session's canonical stream. Drives the inactivity
-                          policy that destroys idle sessions.
+                          policy that pauses idle sessions.
                         "name": "str",  # Optional. User-assignable display name, unique per
                           team among non-terminal sessions. Usable in place of session_id by clients
                           (doctl / Console resolve it to the id via the ListSessions ?name= filter; the
@@ -21772,6 +23542,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
                           (prepay gate). Clients should treat an unrecognized value as an opaque reason
                           string.
+                        "region": "str",  # Optional. DO region slug the session lives in,
+                          e.g. ric1. Stamped once at create from the region whose API host served the
+                          request, and never changed. Returned only for teams on the regional routing
+                          rollout; omitted otherwise.
                         "repo_hint": "str",  # Optional. Optional repository hint supplied at
                           session creation (first spec.workspace.repos entry of the manifest). Not
                           authoritative; the agent may change repos in-session.
@@ -22575,11 +24349,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           deployment-wide default.
                         "keep_warm": bool,  # Optional. Session is exempt from idle
                           auto-pause (manifest keep_warm, or the agent-kind default: hermes sessions
-                          keep warm). Pause requests against such a session are rejected with 409.
-                          Omitted when false.
+                          keep warm). It still accepts a manual pause. Omitted when false.
                         "last_event_at": "2020-02-20 00:00:00",  # Optional. Timestamp of the
                           most recent event in this session's canonical stream. Drives the inactivity
-                          policy that destroys idle sessions.
+                          policy that pauses idle sessions.
                         "name": "str",  # Optional. User-assignable display name, unique per
                           team among non-terminal sessions. Usable in place of session_id by clients
                           (doctl / Console resolve it to the id via the ListSessions ?name= filter; the
@@ -22602,6 +24375,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
                           (prepay gate). Clients should treat an unrecognized value as an opaque reason
                           string.
+                        "region": "str",  # Optional. DO region slug the session lives in,
+                          e.g. ric1. Stamped once at create from the region whose API host served the
+                          request, and never changed. Returned only for teams on the regional routing
+                          rollout; omitted otherwise.
                         "repo_hint": "str",  # Optional. Optional repository hint supplied at
                           session creation (first spec.workspace.repos entry of the manifest). Not
                           authoritative; the agent may change repos in-session.
@@ -22840,11 +24617,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           deployment-wide default.
                         "keep_warm": bool,  # Optional. Session is exempt from idle
                           auto-pause (manifest keep_warm, or the agent-kind default: hermes sessions
-                          keep warm). Pause requests against such a session are rejected with 409.
-                          Omitted when false.
+                          keep warm). It still accepts a manual pause. Omitted when false.
                         "last_event_at": "2020-02-20 00:00:00",  # Optional. Timestamp of the
                           most recent event in this session's canonical stream. Drives the inactivity
-                          policy that destroys idle sessions.
+                          policy that pauses idle sessions.
                         "name": "str",  # Optional. User-assignable display name, unique per
                           team among non-terminal sessions. Usable in place of session_id by clients
                           (doctl / Console resolve it to the id via the ListSessions ?name= filter; the
@@ -22867,6 +24643,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
                           (prepay gate). Clients should treat an unrecognized value as an opaque reason
                           string.
+                        "region": "str",  # Optional. DO region slug the session lives in,
+                          e.g. ric1. Stamped once at create from the region whose API host served the
+                          request, and never changed. Returned only for teams on the regional routing
+                          rollout; omitted otherwise.
                         "repo_hint": "str",  # Optional. Optional repository hint supplied at
                           session creation (first spec.workspace.repos entry of the manifest). Not
                           authoritative; the agent may change repos in-session.
@@ -22988,11 +24768,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           deployment-wide default.
                         "keep_warm": bool,  # Optional. Session is exempt from idle
                           auto-pause (manifest keep_warm, or the agent-kind default: hermes sessions
-                          keep warm). Pause requests against such a session are rejected with 409.
-                          Omitted when false.
+                          keep warm). It still accepts a manual pause. Omitted when false.
                         "last_event_at": "2020-02-20 00:00:00",  # Optional. Timestamp of the
                           most recent event in this session's canonical stream. Drives the inactivity
-                          policy that destroys idle sessions.
+                          policy that pauses idle sessions.
                         "name": "str",  # Optional. User-assignable display name, unique per
                           team among non-terminal sessions. Usable in place of session_id by clients
                           (doctl / Console resolve it to the id via the ListSessions ?name= filter; the
@@ -23015,6 +24794,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
                           (prepay gate). Clients should treat an unrecognized value as an opaque reason
                           string.
+                        "region": "str",  # Optional. DO region slug the session lives in,
+                          e.g. ric1. Stamped once at create from the region whose API host served the
+                          request, and never changed. Returned only for teams on the regional routing
+                          rollout; omitted otherwise.
                         "repo_hint": "str",  # Optional. Optional repository hint supplied at
                           session creation (first spec.workspace.repos entry of the manifest). Not
                           authoritative; the agent may change repos in-session.
@@ -23136,11 +24919,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           deployment-wide default.
                         "keep_warm": bool,  # Optional. Session is exempt from idle
                           auto-pause (manifest keep_warm, or the agent-kind default: hermes sessions
-                          keep warm). Pause requests against such a session are rejected with 409.
-                          Omitted when false.
+                          keep warm). It still accepts a manual pause. Omitted when false.
                         "last_event_at": "2020-02-20 00:00:00",  # Optional. Timestamp of the
                           most recent event in this session's canonical stream. Drives the inactivity
-                          policy that destroys idle sessions.
+                          policy that pauses idle sessions.
                         "name": "str",  # Optional. User-assignable display name, unique per
                           team among non-terminal sessions. Usable in place of session_id by clients
                           (doctl / Console resolve it to the id via the ListSessions ?name= filter; the
@@ -23163,6 +24945,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
                           (prepay gate). Clients should treat an unrecognized value as an opaque reason
                           string.
+                        "region": "str",  # Optional. DO region slug the session lives in,
+                          e.g. ric1. Stamped once at create from the region whose API host served the
+                          request, and never changed. Returned only for teams on the regional routing
+                          rollout; omitted otherwise.
                         "repo_hint": "str",  # Optional. Optional repository hint supplied at
                           session creation (first spec.workspace.repos entry of the manifest). Not
                           authoritative; the agent may change repos in-session.
@@ -24355,11 +26141,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           deployment-wide default.
                         "keep_warm": bool,  # Optional. Session is exempt from idle
                           auto-pause (manifest keep_warm, or the agent-kind default: hermes sessions
-                          keep warm). Pause requests against such a session are rejected with 409.
-                          Omitted when false.
+                          keep warm). It still accepts a manual pause. Omitted when false.
                         "last_event_at": "2020-02-20 00:00:00",  # Optional. Timestamp of the
                           most recent event in this session's canonical stream. Drives the inactivity
-                          policy that destroys idle sessions.
+                          policy that pauses idle sessions.
                         "name": "str",  # Optional. User-assignable display name, unique per
                           team among non-terminal sessions. Usable in place of session_id by clients
                           (doctl / Console resolve it to the id via the ListSessions ?name= filter; the
@@ -24382,6 +26167,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
                           (prepay gate). Clients should treat an unrecognized value as an opaque reason
                           string.
+                        "region": "str",  # Optional. DO region slug the session lives in,
+                          e.g. ric1. Stamped once at create from the region whose API host served the
+                          request, and never changed. Returned only for teams on the regional routing
+                          rollout; omitted otherwise.
                         "repo_hint": "str",  # Optional. Optional repository hint supplied at
                           session creation (first spec.workspace.repos entry of the manifest). Not
                           authoritative; the agent may change repos in-session.
@@ -24674,11 +26463,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               the deployment-wide default.
                             "keep_warm": bool,  # Optional. Session is exempt from idle
                               auto-pause (manifest keep_warm, or the agent-kind default: hermes
-                              sessions keep warm). Pause requests against such a session are rejected
-                              with 409. Omitted when false.
+                              sessions keep warm). It still accepts a manual pause. Omitted when false.
                             "last_event_at": "2020-02-20 00:00:00",  # Optional.
                               Timestamp of the most recent event in this session's canonical stream.
-                              Drives the inactivity policy that destroys idle sessions.
+                              Drives the inactivity policy that pauses idle sessions.
                             "name": "str",  # Optional. User-assignable display name,
                               unique per team among non-terminal sessions. Usable in place of
                               session_id by clients (doctl / Console resolve it to the id via the
@@ -24702,6 +26490,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               otherwise. Known values: manual (PauseSession RPC), idle (inactivity
                               auto-pause), low_balance (prepay gate). Clients should treat an
                               unrecognized value as an opaque reason string.
+                            "region": "str",  # Optional. DO region slug the session
+                              lives in, e.g. ric1. Stamped once at create from the region whose API
+                              host served the request, and never changed. Returned only for teams on
+                              the regional routing rollout; omitted otherwise.
                             "repo_hint": "str",  # Optional. Optional repository hint
                               supplied at session creation (first spec.workspace.repos entry of the
                               manifest). Not authoritative; the agent may change repos in-session.
@@ -24830,11 +26622,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               the deployment-wide default.
                             "keep_warm": bool,  # Optional. Session is exempt from idle
                               auto-pause (manifest keep_warm, or the agent-kind default: hermes
-                              sessions keep warm). Pause requests against such a session are rejected
-                              with 409. Omitted when false.
+                              sessions keep warm). It still accepts a manual pause. Omitted when false.
                             "last_event_at": "2020-02-20 00:00:00",  # Optional.
                               Timestamp of the most recent event in this session's canonical stream.
-                              Drives the inactivity policy that destroys idle sessions.
+                              Drives the inactivity policy that pauses idle sessions.
                             "name": "str",  # Optional. User-assignable display name,
                               unique per team among non-terminal sessions. Usable in place of
                               session_id by clients (doctl / Console resolve it to the id via the
@@ -24858,6 +26649,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               otherwise. Known values: manual (PauseSession RPC), idle (inactivity
                               auto-pause), low_balance (prepay gate). Clients should treat an
                               unrecognized value as an opaque reason string.
+                            "region": "str",  # Optional. DO region slug the session
+                              lives in, e.g. ric1. Stamped once at create from the region whose API
+                              host served the request, and never changed. Returned only for teams on
+                              the regional routing rollout; omitted otherwise.
                             "repo_hint": "str",  # Optional. Optional repository hint
                               supplied at session creation (first spec.workspace.repos entry of the
                               manifest). Not authoritative; the agent may change repos in-session.
@@ -24991,11 +26786,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               the deployment-wide default.
                             "keep_warm": bool,  # Optional. Session is exempt from idle
                               auto-pause (manifest keep_warm, or the agent-kind default: hermes
-                              sessions keep warm). Pause requests against such a session are rejected
-                              with 409. Omitted when false.
+                              sessions keep warm). It still accepts a manual pause. Omitted when false.
                             "last_event_at": "2020-02-20 00:00:00",  # Optional.
                               Timestamp of the most recent event in this session's canonical stream.
-                              Drives the inactivity policy that destroys idle sessions.
+                              Drives the inactivity policy that pauses idle sessions.
                             "name": "str",  # Optional. User-assignable display name,
                               unique per team among non-terminal sessions. Usable in place of
                               session_id by clients (doctl / Console resolve it to the id via the
@@ -25019,6 +26813,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               otherwise. Known values: manual (PauseSession RPC), idle (inactivity
                               auto-pause), low_balance (prepay gate). Clients should treat an
                               unrecognized value as an opaque reason string.
+                            "region": "str",  # Optional. DO region slug the session
+                              lives in, e.g. ric1. Stamped once at create from the region whose API
+                              host served the request, and never changed. Returned only for teams on
+                              the regional routing rollout; omitted otherwise.
                             "repo_hint": "str",  # Optional. Optional repository hint
                               supplied at session creation (first spec.workspace.repos entry of the
                               manifest). Not authoritative; the agent may change repos in-session.
@@ -163944,6 +165742,8 @@ class DropletsOperations:
                                   Droplets of this size. Required.
                                 "disk_info": [
                                     {
+                                        "ephemeral": bool,  # Optional.
+                                          Indicates an ephemeral (non-persistent) disk.
                                         "size": {
                                             "amount": 0,  # Optional. The
                                               amount of space allocated to the disk.
@@ -163994,6 +165794,8 @@ class DropletsOperations:
                             ],
                             "disk_info": [
                                 {
+                                    "ephemeral": bool,  # Optional. Indicates an
+                                      ephemeral (non-persistent) disk.
                                     "size": {
                                         "amount": 0,  # Optional. The amount
                                           of space allocated to the disk.
@@ -164625,6 +166427,8 @@ class DropletsOperations:
                               this size. Required.
                             "disk_info": [
                                 {
+                                    "ephemeral": bool,  # Optional. Indicates an
+                                      ephemeral (non-persistent) disk.
                                     "size": {
                                         "amount": 0,  # Optional. The amount
                                           of space allocated to the disk.
@@ -164672,6 +166476,8 @@ class DropletsOperations:
                         ],
                         "disk_info": [
                             {
+                                "ephemeral": bool,  # Optional. Indicates an
+                                  ephemeral (non-persistent) disk.
                                 "size": {
                                     "amount": 0,  # Optional. The amount of space
                                       allocated to the disk.
@@ -166215,6 +168021,8 @@ class DropletsOperations:
                                   Droplets of this size. Required.
                                 "disk_info": [
                                     {
+                                        "ephemeral": bool,  # Optional.
+                                          Indicates an ephemeral (non-persistent) disk.
                                         "size": {
                                             "amount": 0,  # Optional. The
                                               amount of space allocated to the disk.
@@ -166265,6 +168073,8 @@ class DropletsOperations:
                             ],
                             "disk_info": [
                                 {
+                                    "ephemeral": bool,  # Optional. Indicates an
+                                      ephemeral (non-persistent) disk.
                                     "size": {
                                         "amount": 0,  # Optional. The amount
                                           of space allocated to the disk.
@@ -188149,8 +189959,10 @@ class SignalsOperations:
                               Required. Known values are: "agent" and "inference".
                             "team_id": 0,  # The team ID that owns this consent record.
                               Required.
-                            "updated_at": "2020-02-20 00:00:00"  # A time value given in
+                            "updated_at": "2020-02-20 00:00:00",  # A time value given in
                               ISO8601 combined date and time format. Required.
+                            "environment_id": "str"  # Optional. Same as agent_id when
+                              present. Dual-emitted during the rename; omitted when agent_id is empty.
                         }
                     ],
                     "source": "str"  # Optional. Echoes the ``source`` filter when the request
@@ -188267,14 +190079,14 @@ class SignalsOperations:
 
         To revoke consent, send the same request with ``enabled`` set to ``false``.
         The ``source`` query parameter is required. Per-environment consent for Harness
-        Runtime environments is managed with ``PUT /v1/consent/{agent_id}`` instead.
+        Runtime environments is managed with ``PUT /v1/consent/{environment_id}`` instead.
 
         :param body: Required.
         :type body: JSON
         :keyword source: The consent source to update. Only team-level sources are accepted on this
          endpoint; currently ``inference`` (Serverless Inference chat completions). Per-environment
-         consent (\\ ``agent``\\ ) is managed with ``PUT /v1/consent/{agent_id}`` instead. "inference"
-         Required.
+         consent (\\ ``agent``\\ ) is managed with ``PUT /v1/consent/{environment_id}`` instead.
+         "inference" Required.
         :paramtype source: str
         :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
          Default value is "application/json".
@@ -188308,8 +190120,10 @@ class SignalsOperations:
                           consent for Serverless Inference chat completions. Required. Known values
                           are: "agent" and "inference".
                         "team_id": 0,  # The team ID that owns this consent record. Required.
-                        "updated_at": "2020-02-20 00:00:00"  # A time value given in ISO8601
+                        "updated_at": "2020-02-20 00:00:00",  # A time value given in ISO8601
                           combined date and time format. Required.
+                        "environment_id": "str"  # Optional. Same as agent_id when present.
+                          Dual-emitted during the rename; omitted when agent_id is empty.
                     }
                 }
                 # response body for status code(s): 400
@@ -188345,14 +190159,14 @@ class SignalsOperations:
 
         To revoke consent, send the same request with ``enabled`` set to ``false``.
         The ``source`` query parameter is required. Per-environment consent for Harness
-        Runtime environments is managed with ``PUT /v1/consent/{agent_id}`` instead.
+        Runtime environments is managed with ``PUT /v1/consent/{environment_id}`` instead.
 
         :param body: Required.
         :type body: IO[bytes]
         :keyword source: The consent source to update. Only team-level sources are accepted on this
          endpoint; currently ``inference`` (Serverless Inference chat completions). Per-environment
-         consent (\\ ``agent``\\ ) is managed with ``PUT /v1/consent/{agent_id}`` instead. "inference"
-         Required.
+         consent (\\ ``agent``\\ ) is managed with ``PUT /v1/consent/{environment_id}`` instead.
+         "inference" Required.
         :paramtype source: str
         :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
          Default value is "application/json".
@@ -188380,8 +190194,10 @@ class SignalsOperations:
                           consent for Serverless Inference chat completions. Required. Known values
                           are: "agent" and "inference".
                         "team_id": 0,  # The team ID that owns this consent record. Required.
-                        "updated_at": "2020-02-20 00:00:00"  # A time value given in ISO8601
+                        "updated_at": "2020-02-20 00:00:00",  # A time value given in ISO8601
                           combined date and time format. Required.
+                        "environment_id": "str"  # Optional. Same as agent_id when present.
+                          Dual-emitted during the rename; omitted when agent_id is empty.
                     }
                 }
                 # response body for status code(s): 400
@@ -188412,14 +190228,14 @@ class SignalsOperations:
 
         To revoke consent, send the same request with ``enabled`` set to ``false``.
         The ``source`` query parameter is required. Per-environment consent for Harness
-        Runtime environments is managed with ``PUT /v1/consent/{agent_id}`` instead.
+        Runtime environments is managed with ``PUT /v1/consent/{environment_id}`` instead.
 
         :param body: Is either a JSON type or a IO[bytes] type. Required.
         :type body: JSON or IO[bytes]
         :keyword source: The consent source to update. Only team-level sources are accepted on this
          endpoint; currently ``inference`` (Serverless Inference chat completions). Per-environment
-         consent (\\ ``agent``\\ ) is managed with ``PUT /v1/consent/{agent_id}`` instead. "inference"
-         Required.
+         consent (\\ ``agent``\\ ) is managed with ``PUT /v1/consent/{environment_id}`` instead.
+         "inference" Required.
         :paramtype source: str
         :return: JSON object
         :rtype: JSON
@@ -188450,8 +190266,10 @@ class SignalsOperations:
                           consent for Serverless Inference chat completions. Required. Known values
                           are: "agent" and "inference".
                         "team_id": 0,  # The team ID that owns this consent record. Required.
-                        "updated_at": "2020-02-20 00:00:00"  # A time value given in ISO8601
+                        "updated_at": "2020-02-20 00:00:00",  # A time value given in ISO8601
                           combined date and time format. Required.
+                        "environment_id": "str"  # Optional. Same as agent_id when present.
+                          Dual-emitted during the rename; omitted when agent_id is empty.
                     }
                 }
                 # response body for status code(s): 400
@@ -188559,20 +190377,20 @@ class SignalsOperations:
         return cast(JSON, deserialized)  # type: ignore
 
     @distributed_trace_async
-    async def get_consent(self, agent_id: str, **kwargs: Any) -> JSON:
+    async def get_consent(self, environment_id: str, **kwargs: Any) -> JSON:
         # pylint: disable=line-too-long
         """Retrieve Consent for an Environment.
 
         To retrieve the consent record for a specific environment, send a GET
-        request to ``/v1/consent/{agent_id}``. The response includes an ``enabled``
+        request to ``/v1/consent/{environment_id}``. The response includes an ``enabled``
         field indicating whether signals collection is on for this environment.
 
         This endpoint only serves per-environment (\\ ``source: agent``\\ ) records. Team-level
         inference consent is read from ``GET /v1/consent?source=inference``.
 
-        :param agent_id: A unique identifier for an environment. For Harness Runtime, this is the
-         Environment Config ID. Required.
-        :type agent_id: str
+        :param environment_id: A unique identifier for an environment. For Harness Runtime, this is the
+         Environment Config ID. Formerly named agent_id. Required.
+        :type environment_id: str
         :return: JSON object
         :rtype: JSON
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -188586,6 +190404,8 @@ class SignalsOperations:
                       Runtime, this is the Environment Config ID. Required.
                     "enabled": bool,  # Whether signals collection is enabled for this
                       environment. Required.
+                    "environment_id": "str",  # Same as agent_id. Dual-emitted during the rename.
+                      Required.
                     "source": "str",  # The source this consent applies to. Always ``agent`` for
                       per-environment records returned by this endpoint. Required. "agent"
                     "team_id": 0,  # The team ID that owns this consent record. Required.
@@ -188624,7 +190444,7 @@ class SignalsOperations:
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
         _request = build_signals_get_consent_request(
-            agent_id=agent_id,
+            environment_id=environment_id,
             headers=_headers,
             params=_params,
         )
@@ -188702,7 +190522,7 @@ class SignalsOperations:
     @overload
     async def update_consent(
         self,
-        agent_id: str,
+        environment_id: str,
         body: JSON,
         *,
         content_type: str = "application/json",
@@ -188712,16 +190532,16 @@ class SignalsOperations:
         """Update Consent for an Environment.
 
         To enable or disable signals collection for a specific environment, send a
-        PUT request to ``/v1/consent/{agent_id}`` with an ``enabled`` boolean in the
+        PUT request to ``/v1/consent/{environment_id}`` with an ``enabled`` boolean in the
         request body.
 
         This endpoint only manages per-environment (\\ ``source: agent``\\ ) consent. To manage
         team-level consent for Serverless Inference, use
         ``PUT /v1/consent?source=inference`` instead.
 
-        :param agent_id: A unique identifier for an environment. For Harness Runtime, this is the
-         Environment Config ID. Required.
-        :type agent_id: str
+        :param environment_id: A unique identifier for an environment. For Harness Runtime, this is the
+         Environment Config ID. Formerly named agent_id. Required.
+        :type environment_id: str
         :param body: Required.
         :type body: JSON
         :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
@@ -188756,8 +190576,10 @@ class SignalsOperations:
                           consent for Serverless Inference chat completions. Required. Known values
                           are: "agent" and "inference".
                         "team_id": 0,  # The team ID that owns this consent record. Required.
-                        "updated_at": "2020-02-20 00:00:00"  # A time value given in ISO8601
+                        "updated_at": "2020-02-20 00:00:00",  # A time value given in ISO8601
                           combined date and time format. Required.
+                        "environment_id": "str"  # Optional. Same as agent_id when present.
+                          Dual-emitted during the rename; omitted when agent_id is empty.
                     }
                 }
                 # response body for status code(s): 400, 404
@@ -188776,7 +190598,7 @@ class SignalsOperations:
     @overload
     async def update_consent(
         self,
-        agent_id: str,
+        environment_id: str,
         body: IO[bytes],
         *,
         content_type: str = "application/json",
@@ -188786,16 +190608,16 @@ class SignalsOperations:
         """Update Consent for an Environment.
 
         To enable or disable signals collection for a specific environment, send a
-        PUT request to ``/v1/consent/{agent_id}`` with an ``enabled`` boolean in the
+        PUT request to ``/v1/consent/{environment_id}`` with an ``enabled`` boolean in the
         request body.
 
         This endpoint only manages per-environment (\\ ``source: agent``\\ ) consent. To manage
         team-level consent for Serverless Inference, use
         ``PUT /v1/consent?source=inference`` instead.
 
-        :param agent_id: A unique identifier for an environment. For Harness Runtime, this is the
-         Environment Config ID. Required.
-        :type agent_id: str
+        :param environment_id: A unique identifier for an environment. For Harness Runtime, this is the
+         Environment Config ID. Formerly named agent_id. Required.
+        :type environment_id: str
         :param body: Required.
         :type body: IO[bytes]
         :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
@@ -188824,8 +190646,10 @@ class SignalsOperations:
                           consent for Serverless Inference chat completions. Required. Known values
                           are: "agent" and "inference".
                         "team_id": 0,  # The team ID that owns this consent record. Required.
-                        "updated_at": "2020-02-20 00:00:00"  # A time value given in ISO8601
+                        "updated_at": "2020-02-20 00:00:00",  # A time value given in ISO8601
                           combined date and time format. Required.
+                        "environment_id": "str"  # Optional. Same as agent_id when present.
+                          Dual-emitted during the rename; omitted when agent_id is empty.
                     }
                 }
                 # response body for status code(s): 400, 404
@@ -188843,22 +190667,22 @@ class SignalsOperations:
 
     @distributed_trace_async
     async def update_consent(
-        self, agent_id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+        self, environment_id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
     ) -> JSON:
         # pylint: disable=line-too-long
         """Update Consent for an Environment.
 
         To enable or disable signals collection for a specific environment, send a
-        PUT request to ``/v1/consent/{agent_id}`` with an ``enabled`` boolean in the
+        PUT request to ``/v1/consent/{environment_id}`` with an ``enabled`` boolean in the
         request body.
 
         This endpoint only manages per-environment (\\ ``source: agent``\\ ) consent. To manage
         team-level consent for Serverless Inference, use
         ``PUT /v1/consent?source=inference`` instead.
 
-        :param agent_id: A unique identifier for an environment. For Harness Runtime, this is the
-         Environment Config ID. Required.
-        :type agent_id: str
+        :param environment_id: A unique identifier for an environment. For Harness Runtime, this is the
+         Environment Config ID. Formerly named agent_id. Required.
+        :type environment_id: str
         :param body: Is either a JSON type or a IO[bytes] type. Required.
         :type body: JSON or IO[bytes]
         :return: JSON object
@@ -188890,8 +190714,10 @@ class SignalsOperations:
                           consent for Serverless Inference chat completions. Required. Known values
                           are: "agent" and "inference".
                         "team_id": 0,  # The team ID that owns this consent record. Required.
-                        "updated_at": "2020-02-20 00:00:00"  # A time value given in ISO8601
+                        "updated_at": "2020-02-20 00:00:00",  # A time value given in ISO8601
                           combined date and time format. Required.
+                        "environment_id": "str"  # Optional. Same as agent_id when present.
+                          Dual-emitted during the rename; omitted when agent_id is empty.
                     }
                 }
                 # response body for status code(s): 400, 404
@@ -188936,7 +190762,7 @@ class SignalsOperations:
             _json = body
 
         _request = build_signals_update_consent_request(
-            agent_id=agent_id,
+            environment_id=environment_id,
             content_type=content_type,
             json=_json,
             content=_content,
@@ -189017,7 +190843,7 @@ class SignalsOperations:
     @distributed_trace_async
     async def list_agent_sessions(
         self,
-        agent_id: str,
+        environment_id: str,
         *,
         limit: int = 20,
         after: Optional[str] = None,
@@ -189030,12 +190856,12 @@ class SignalsOperations:
         """List Sessions for an Environment.
 
         To list signals sessions for a specific environment, send a GET request to
-        ``/v1/signals/agents/{agent_id}/sessions``. Results are paginated using cursor-based
+        ``/v1/signals/agents/{environment_id}/sessions``. Results are paginated using cursor-based
         pagination with ``limit`` and ``after`` parameters.
 
-        :param agent_id: A unique identifier for an environment. For Harness Runtime, this is the
-         Environment Config ID. Required.
-        :type agent_id: str
+        :param environment_id: A unique identifier for an environment. For Harness Runtime, this is the
+         Environment Config ID. Formerly named agent_id. Required.
+        :type environment_id: str
         :keyword limit: Maximum number of items to return per page. Default value is 20.
         :paramtype limit: int
         :keyword after: An opaque cursor string returned from a previous page. Pass this value to
@@ -189113,7 +190939,7 @@ class SignalsOperations:
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
         _request = build_signals_list_agent_sessions_request(
-            agent_id=agent_id,
+            environment_id=environment_id,
             limit=limit,
             after=after,
             start_time=start_time,
@@ -189344,7 +191170,13 @@ class SignalsOperations:
 
     @distributed_trace_async
     async def list_exports(
-        self, *, limit: int = 20, after: Optional[str] = None, **kwargs: Any
+        self,
+        *,
+        environment_id: Optional[str] = None,
+        agent_id: Optional[str] = None,
+        limit: int = 20,
+        after: Optional[str] = None,
+        **kwargs: Any
     ) -> JSON:
         # pylint: disable=line-too-long
         """List Export Jobs.
@@ -189353,6 +191185,12 @@ class SignalsOperations:
         ``/v1/signals/exports``. Results are paginated using cursor-based pagination
         with ``limit`` and ``after`` parameters.
 
+        :keyword environment_id: Optional filter by environment ID. Default value is None.
+        :paramtype environment_id: str
+        :keyword agent_id: Deprecated alias for environment_id. Accepted for backward compatibility;
+         must equal environment_id when both are set. Both set and different returns 400. Default value
+         is None.
+        :paramtype agent_id: str
         :keyword limit: Maximum number of items to return per page. Default value is 20.
         :paramtype limit: int
         :keyword after: An opaque cursor string returned from a previous page. Pass this value to
@@ -189372,23 +191210,10 @@ class SignalsOperations:
                             "cursor": "str",  # Optional. An opaque cursor for
                               pagination.
                             "node": {
-                                "agent_id": "str",  # The environment whose data is
-                                  being exported. For Harness Runtime, this is the Environment Config
-                                  ID. Not meaningful for ``inference`` exports; use ``type`` to
-                                  distinguish the export scope. Required.
                                 "created_at": 0,  # Unix timestamp when the export
                                   was created. Required.
                                 "export_id": "str",  # The unique identifier for the
                                   export job. Required.
-                                "status": "str",  # The current status of the export
-                                  job. Required. Known values are: "pending", "processing", "complete",
-                                  and "failed".
-                                "completed_at": 0,  # Optional. Unix timestamp when
-                                  the export completed, or null if still in progress.
-                                "error_message": "str",  # Optional. Error message if
-                                  the export failed, or null on success.
-                                "expires_at": 0,  # Optional. Unix timestamp when the
-                                  export download link expires.
                                 "filters": {
                                     "session_ids": [
                                         "str"  # Optional. Specific session
@@ -189399,6 +191224,21 @@ class SignalsOperations:
                                           included in the export.
                                     ]
                                 },
+                                "status": "str",  # The current status of the export
+                                  job. Required. Known values are: "pending", "processing", "complete",
+                                  and "failed".
+                                "agent_id": "str",  # Optional. The environment whose
+                                  data is being exported. For Harness Runtime, this is the Environment
+                                  Config ID. Not meaningful for ``inference`` exports; use ``type`` to
+                                  distinguish the export scope.
+                                "completed_at": 0,  # Optional. Unix timestamp when
+                                  the export completed, or null if still in progress.
+                                "environment_id": "str",  # Optional. Same as
+                                  agent_id. Dual-emitted during the rename.
+                                "error_message": "str",  # Optional. Error message if
+                                  the export failed, or null on success.
+                                "expires_at": 0,  # Optional. Unix timestamp when the
+                                  export download link expires.
                                 "type": "str"  # Optional. The scope of the export.
                                   ``agent`` covers one Harness Runtime environment; ``inference``
                                   covers the team's Serverless Inference Signals conversations. Known
@@ -189431,6 +191271,8 @@ class SignalsOperations:
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
         _request = build_signals_list_exports_request(
+            environment_id=environment_id,
+            agent_id=agent_id,
             limit=limit,
             after=after,
             headers=_headers,
@@ -189483,9 +191325,10 @@ class SignalsOperations:
 
         To create a new signals data export, send a POST request to
         ``/v1/signals/exports``. To export one Harness Runtime environment, include its
-        ``agent_id`` (\\ ``type`` defaults to ``agent``\\ ). To export the team's Serverless
-        Inference Signals conversations, set ``type`` to ``inference`` and omit
-        ``agent_id``. You may optionally filter the export by ``signal_type``\\ ,
+        ``environment_id`` (\\ ``type`` defaults to ``agent``\\ ). Deprecated ``agent_id`` is still
+        accepted. To export the team's Serverless Inference Signals conversations, set
+        ``type`` to ``inference`` and omit ``environment_id`` and ``agent_id``. You may
+        optionally filter the export by ``signal_type``\\ ,
         ``session_ids``\\ , ``start_time``\\ , and ``end_time``. Use the export options endpoint
         to discover available signal types.
 
@@ -189507,11 +191350,16 @@ class SignalsOperations:
 
                 # JSON input template you can fill out and use as your body input.
                 body = {
-                    "agent_id": "str",  # Optional. The environment whose data should be
-                      exported. For Harness Runtime, this is the Environment Config ID. Required when
-                      ``type`` is ``agent``"" ; must be omitted when ``type`` is ``inference``.
+                    "agent_id": "str",  # Optional. Deprecated alias for ``environment_id``.
+                      Accepted for backward compatibility; must equal ``environment_id`` when both are
+                      set. Both set and different returns 400. Required when ``type`` is ``agent`` if
+                      ``environment_id`` is omitted; must be omitted when ``type`` is ``inference``.
                     "end_time": "2020-02-20 00:00:00",  # Optional. Include only sessions that
                       started at or before this timestamp.
+                    "environment_id": "str",  # Optional. The environment whose data should be
+                      exported. For Harness Runtime, this is the Environment Config ID. Required when
+                      ``type`` is ``agent`` if ``agent_id`` is omitted; must be omitted when ``type``
+                      is ``inference``. Prefer this over ``agent_id``.
                     "session_ids": [
                         "str"  # Optional. Optional list of specific session IDs to include
                           in the export.
@@ -189523,28 +191371,18 @@ class SignalsOperations:
                     "start_time": "2020-02-20 00:00:00",  # Optional. Include only sessions that
                       started at or after this timestamp.
                     "type": "str"  # Optional. The scope of the export. ``agent`` exports Signals
-                      conversations for one Harness Runtime environment and requires ``agent_id``.
-                      ``inference`` exports Serverless Inference Signals conversations for the whole
-                      team (team-wide; omit ``agent_id``"" ). Defaults to ``agent`` when ``agent_id``
-                      is provided and to ``inference`` when it is omitted. Known values are: "agent"
+                      conversations for one Harness Runtime environment and requires ``environment_id``
+                      (or deprecated ``agent_id``"" ). ``inference`` exports Serverless Inference
+                      Signals conversations for the whole team (team-wide; omit ``environment_id`` and
+                      ``agent_id``"" ). Defaults to ``agent`` when ``environment_id`` or ``agent_id``
+                      is provided and to ``inference`` when both are omitted. Known values are: "agent"
                       and "inference".
                 }
 
                 # response body for status code(s): 201
                 response == {
-                    "agent_id": "str",  # The environment whose data is being exported. For
-                      Harness Runtime, this is the Environment Config ID. Not meaningful for
-                      ``inference`` exports; use ``type`` to distinguish the export scope. Required.
                     "created_at": 0,  # Unix timestamp when the export was created. Required.
                     "export_id": "str",  # The unique identifier for the export job. Required.
-                    "status": "str",  # The current status of the export job. Required. Known
-                      values are: "pending", "processing", "complete", and "failed".
-                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
-                      null if still in progress.
-                    "error_message": "str",  # Optional. Error message if the export failed, or
-                      null on success.
-                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
-                      expires.
                     "filters": {
                         "session_ids": [
                             "str"  # Optional. Specific session IDs included in the
@@ -189554,6 +191392,19 @@ class SignalsOperations:
                             "str"  # Optional. Signal types included in the export.
                         ]
                     },
+                    "status": "str",  # The current status of the export job. Required. Known
+                      values are: "pending", "processing", "complete", and "failed".
+                    "agent_id": "str",  # Optional. The environment whose data is being exported.
+                      For Harness Runtime, this is the Environment Config ID. Not meaningful for
+                      ``inference`` exports; use ``type`` to distinguish the export scope.
+                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
+                      null if still in progress.
+                    "environment_id": "str",  # Optional. Same as agent_id. Dual-emitted during
+                      the rename.
+                    "error_message": "str",  # Optional. Error message if the export failed, or
+                      null on success.
+                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
+                      expires.
                     "type": "str"  # Optional. The scope of the export. ``agent`` covers one
                       Harness Runtime environment; ``inference`` covers the team's Serverless Inference
                       Signals conversations. Known values are: "agent" and "inference".
@@ -189580,9 +191431,10 @@ class SignalsOperations:
 
         To create a new signals data export, send a POST request to
         ``/v1/signals/exports``. To export one Harness Runtime environment, include its
-        ``agent_id`` (\\ ``type`` defaults to ``agent``\\ ). To export the team's Serverless
-        Inference Signals conversations, set ``type`` to ``inference`` and omit
-        ``agent_id``. You may optionally filter the export by ``signal_type``\\ ,
+        ``environment_id`` (\\ ``type`` defaults to ``agent``\\ ). Deprecated ``agent_id`` is still
+        accepted. To export the team's Serverless Inference Signals conversations, set
+        ``type`` to ``inference`` and omit ``environment_id`` and ``agent_id``. You may
+        optionally filter the export by ``signal_type``\\ ,
         ``session_ids``\\ , ``start_time``\\ , and ``end_time``. Use the export options endpoint
         to discover available signal types.
 
@@ -189604,19 +191456,8 @@ class SignalsOperations:
 
                 # response body for status code(s): 201
                 response == {
-                    "agent_id": "str",  # The environment whose data is being exported. For
-                      Harness Runtime, this is the Environment Config ID. Not meaningful for
-                      ``inference`` exports; use ``type`` to distinguish the export scope. Required.
                     "created_at": 0,  # Unix timestamp when the export was created. Required.
                     "export_id": "str",  # The unique identifier for the export job. Required.
-                    "status": "str",  # The current status of the export job. Required. Known
-                      values are: "pending", "processing", "complete", and "failed".
-                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
-                      null if still in progress.
-                    "error_message": "str",  # Optional. Error message if the export failed, or
-                      null on success.
-                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
-                      expires.
                     "filters": {
                         "session_ids": [
                             "str"  # Optional. Specific session IDs included in the
@@ -189626,6 +191467,19 @@ class SignalsOperations:
                             "str"  # Optional. Signal types included in the export.
                         ]
                     },
+                    "status": "str",  # The current status of the export job. Required. Known
+                      values are: "pending", "processing", "complete", and "failed".
+                    "agent_id": "str",  # Optional. The environment whose data is being exported.
+                      For Harness Runtime, this is the Environment Config ID. Not meaningful for
+                      ``inference`` exports; use ``type`` to distinguish the export scope.
+                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
+                      null if still in progress.
+                    "environment_id": "str",  # Optional. Same as agent_id. Dual-emitted during
+                      the rename.
+                    "error_message": "str",  # Optional. Error message if the export failed, or
+                      null on success.
+                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
+                      expires.
                     "type": "str"  # Optional. The scope of the export. ``agent`` covers one
                       Harness Runtime environment; ``inference`` covers the team's Serverless Inference
                       Signals conversations. Known values are: "agent" and "inference".
@@ -189650,9 +191504,10 @@ class SignalsOperations:
 
         To create a new signals data export, send a POST request to
         ``/v1/signals/exports``. To export one Harness Runtime environment, include its
-        ``agent_id`` (\\ ``type`` defaults to ``agent``\\ ). To export the team's Serverless
-        Inference Signals conversations, set ``type`` to ``inference`` and omit
-        ``agent_id``. You may optionally filter the export by ``signal_type``\\ ,
+        ``environment_id`` (\\ ``type`` defaults to ``agent``\\ ). Deprecated ``agent_id`` is still
+        accepted. To export the team's Serverless Inference Signals conversations, set
+        ``type`` to ``inference`` and omit ``environment_id`` and ``agent_id``. You may
+        optionally filter the export by ``signal_type``\\ ,
         ``session_ids``\\ , ``start_time``\\ , and ``end_time``. Use the export options endpoint
         to discover available signal types.
 
@@ -189671,11 +191526,16 @@ class SignalsOperations:
 
                 # JSON input template you can fill out and use as your body input.
                 body = {
-                    "agent_id": "str",  # Optional. The environment whose data should be
-                      exported. For Harness Runtime, this is the Environment Config ID. Required when
-                      ``type`` is ``agent``"" ; must be omitted when ``type`` is ``inference``.
+                    "agent_id": "str",  # Optional. Deprecated alias for ``environment_id``.
+                      Accepted for backward compatibility; must equal ``environment_id`` when both are
+                      set. Both set and different returns 400. Required when ``type`` is ``agent`` if
+                      ``environment_id`` is omitted; must be omitted when ``type`` is ``inference``.
                     "end_time": "2020-02-20 00:00:00",  # Optional. Include only sessions that
                       started at or before this timestamp.
+                    "environment_id": "str",  # Optional. The environment whose data should be
+                      exported. For Harness Runtime, this is the Environment Config ID. Required when
+                      ``type`` is ``agent`` if ``agent_id`` is omitted; must be omitted when ``type``
+                      is ``inference``. Prefer this over ``agent_id``.
                     "session_ids": [
                         "str"  # Optional. Optional list of specific session IDs to include
                           in the export.
@@ -189687,28 +191547,18 @@ class SignalsOperations:
                     "start_time": "2020-02-20 00:00:00",  # Optional. Include only sessions that
                       started at or after this timestamp.
                     "type": "str"  # Optional. The scope of the export. ``agent`` exports Signals
-                      conversations for one Harness Runtime environment and requires ``agent_id``.
-                      ``inference`` exports Serverless Inference Signals conversations for the whole
-                      team (team-wide; omit ``agent_id``"" ). Defaults to ``agent`` when ``agent_id``
-                      is provided and to ``inference`` when it is omitted. Known values are: "agent"
+                      conversations for one Harness Runtime environment and requires ``environment_id``
+                      (or deprecated ``agent_id``"" ). ``inference`` exports Serverless Inference
+                      Signals conversations for the whole team (team-wide; omit ``environment_id`` and
+                      ``agent_id``"" ). Defaults to ``agent`` when ``environment_id`` or ``agent_id``
+                      is provided and to ``inference`` when both are omitted. Known values are: "agent"
                       and "inference".
                 }
 
                 # response body for status code(s): 201
                 response == {
-                    "agent_id": "str",  # The environment whose data is being exported. For
-                      Harness Runtime, this is the Environment Config ID. Not meaningful for
-                      ``inference`` exports; use ``type`` to distinguish the export scope. Required.
                     "created_at": 0,  # Unix timestamp when the export was created. Required.
                     "export_id": "str",  # The unique identifier for the export job. Required.
-                    "status": "str",  # The current status of the export job. Required. Known
-                      values are: "pending", "processing", "complete", and "failed".
-                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
-                      null if still in progress.
-                    "error_message": "str",  # Optional. Error message if the export failed, or
-                      null on success.
-                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
-                      expires.
                     "filters": {
                         "session_ids": [
                             "str"  # Optional. Specific session IDs included in the
@@ -189718,6 +191568,19 @@ class SignalsOperations:
                             "str"  # Optional. Signal types included in the export.
                         ]
                     },
+                    "status": "str",  # The current status of the export job. Required. Known
+                      values are: "pending", "processing", "complete", and "failed".
+                    "agent_id": "str",  # Optional. The environment whose data is being exported.
+                      For Harness Runtime, this is the Environment Config ID. Not meaningful for
+                      ``inference`` exports; use ``type`` to distinguish the export scope.
+                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
+                      null if still in progress.
+                    "environment_id": "str",  # Optional. Same as agent_id. Dual-emitted during
+                      the rename.
+                    "error_message": "str",  # Optional. Error message if the export failed, or
+                      null on success.
+                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
+                      expires.
                     "type": "str"  # Optional. The scope of the export. ``agent`` covers one
                       Harness Runtime environment; ``inference`` covers the team's Serverless Inference
                       Signals conversations. Known values are: "agent" and "inference".
@@ -189945,19 +191808,8 @@ class SignalsOperations:
 
                 # response body for status code(s): 200
                 response == {
-                    "agent_id": "str",  # The environment whose data is being exported. For
-                      Harness Runtime, this is the Environment Config ID. Not meaningful for
-                      ``inference`` exports; use ``type`` to distinguish the export scope. Required.
                     "created_at": 0,  # Unix timestamp when the export was created. Required.
                     "export_id": "str",  # The unique identifier for the export job. Required.
-                    "status": "str",  # The current status of the export job. Required. Known
-                      values are: "pending", "processing", "complete", and "failed".
-                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
-                      null if still in progress.
-                    "error_message": "str",  # Optional. Error message if the export failed, or
-                      null on success.
-                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
-                      expires.
                     "filters": {
                         "session_ids": [
                             "str"  # Optional. Specific session IDs included in the
@@ -189967,6 +191819,19 @@ class SignalsOperations:
                             "str"  # Optional. Signal types included in the export.
                         ]
                     },
+                    "status": "str",  # The current status of the export job. Required. Known
+                      values are: "pending", "processing", "complete", and "failed".
+                    "agent_id": "str",  # Optional. The environment whose data is being exported.
+                      For Harness Runtime, this is the Environment Config ID. Not meaningful for
+                      ``inference`` exports; use ``type`` to distinguish the export scope.
+                    "completed_at": 0,  # Optional. Unix timestamp when the export completed, or
+                      null if still in progress.
+                    "environment_id": "str",  # Optional. Same as agent_id. Dual-emitted during
+                      the rename.
+                    "error_message": "str",  # Optional. Error message if the export failed, or
+                      null on success.
+                    "expires_at": 0,  # Optional. Unix timestamp when the export download link
+                      expires.
                     "type": "str"  # Optional. The scope of the export. ``agent`` covers one
                       Harness Runtime environment; ``inference`` covers the team's Serverless Inference
                       Signals conversations. Known values are: "agent" and "inference".
@@ -190225,6 +192090,9 @@ class SignalsOperations:
                                   deleted. Only present for ``agent`` deletions.
                                 "completed_at": 0,  # Optional. Unix timestamp when
                                   the deletion finished, or null if still in progress.
+                                "environment_id": "str",  # Optional. Same as
+                                  agent_id when present. Dual-emitted during the rename; omitted when
+                                  agent_id is omitted.
                                 "error_message": "str",  # Optional. Error message if
                                   the deletion failed, or null otherwise.
                                 "started_at": 0  # Optional. Unix timestamp when
@@ -190344,15 +192212,16 @@ class SignalsOperations:
 
 
         * ``agent`` — deletes Signals conversations for one Harness Runtime environment and
-          turns off collection for that environment. Requires ``agent_id``\\ , which is the
-          environment's Environment Config ID (the environment's ``agent_id``\\ ). On create, matching
-          conversations are hidden from Signals reads immediately. Wait until the
+          turns off collection for that environment. Requires ``environment_id`` (the
+          environment's Environment Config ID). Deprecated ``agent_id`` is still accepted;
+          both set and equal is accepted, both set and different returns 400. On create,
+          matching conversations are hidden from Signals reads immediately. Wait until the
           job is ``complete`` before enabling Signals for the environment again.
         * ``inference`` — deletes Serverless Inference Signals conversations for your
           whole team (team-wide; not limited to one endpoint or model) that were
           collected at or before the deletion request, and turns off team inference
-          collection (\\ ``source=inference``\\ ). Do not send ``agent_id``. On create,
-          matching conversations are hidden from Signals reads immediately.
+          collection (\\ ``source=inference``\\ ). Do not send ``environment_id`` or ``agent_id``.
+          On create, matching conversations are hidden from Signals reads immediately.
 
         The job runs asynchronously; poll the get endpoint until ``status`` is
         ``complete`` or ``failed``. DigitalOcean may retry transient processing errors
@@ -190388,14 +192257,18 @@ class SignalsOperations:
                     "team_id": 0,  # The team whose data should be deleted. Must match the
                       authenticated team. Required.
                     "type": "str",  # The scope of the deletion. ``agent`` deletes Signals
-                      conversations for one Harness Runtime environment and requires ``agent_id``.
-                      ``inference`` deletes Serverless Inference Signals conversations for the whole
-                      team (team-wide; omit ``agent_id``"" ). Required. Known values are: "agent" and
-                      "inference".
-                    "agent_id": "str"  # Optional. The Harness Runtime Environment Config ID of
-                      the environment whose conversations should be deleted. This is the environment's
-                      ``agent_id``. Required when ``type`` is ``agent``"" ; must be omitted when
-                      ``type`` is ``inference``.
+                      conversations for one Harness Runtime environment and requires ``environment_id``
+                      (or deprecated ``agent_id``"" ). ``inference`` deletes Serverless Inference
+                      Signals conversations for the whole team (team-wide; omit ``environment_id`` and
+                      ``agent_id``"" ). Required. Known values are: "agent" and "inference".
+                    "agent_id": "str",  # Optional. Deprecated alias for ``environment_id``.
+                      Accepted for backward compatibility; must equal ``environment_id`` when both are
+                      set. Both set and different returns 400. Required when ``type`` is ``agent`` if
+                      ``environment_id`` is omitted; must be omitted when ``type`` is ``inference``.
+                    "environment_id": "str"  # Optional. The Harness Runtime Environment Config
+                      ID of the environment whose conversations should be deleted. Required when
+                      ``type`` is ``agent`` if ``agent_id`` is omitted; must be omitted when ``type``
+                      is ``inference``. Prefer this over ``agent_id``.
                 }
 
                 # response body for status code(s): 200, 202
@@ -190416,6 +192289,8 @@ class SignalsOperations:
                       deletions.
                     "completed_at": 0,  # Optional. Unix timestamp when the deletion finished, or
                       null if still in progress.
+                    "environment_id": "str",  # Optional. Same as agent_id when present.
+                      Dual-emitted during the rename; omitted when agent_id is omitted.
                     "error_message": "str",  # Optional. Error message if the deletion failed, or
                       null otherwise.
                     "started_at": 0  # Optional. Unix timestamp when processing started, or null
@@ -190448,15 +192323,16 @@ class SignalsOperations:
 
 
         * ``agent`` — deletes Signals conversations for one Harness Runtime environment and
-          turns off collection for that environment. Requires ``agent_id``\\ , which is the
-          environment's Environment Config ID (the environment's ``agent_id``\\ ). On create, matching
-          conversations are hidden from Signals reads immediately. Wait until the
+          turns off collection for that environment. Requires ``environment_id`` (the
+          environment's Environment Config ID). Deprecated ``agent_id`` is still accepted;
+          both set and equal is accepted, both set and different returns 400. On create,
+          matching conversations are hidden from Signals reads immediately. Wait until the
           job is ``complete`` before enabling Signals for the environment again.
         * ``inference`` — deletes Serverless Inference Signals conversations for your
           whole team (team-wide; not limited to one endpoint or model) that were
           collected at or before the deletion request, and turns off team inference
-          collection (\\ ``source=inference``\\ ). Do not send ``agent_id``. On create,
-          matching conversations are hidden from Signals reads immediately.
+          collection (\\ ``source=inference``\\ ). Do not send ``environment_id`` or ``agent_id``.
+          On create, matching conversations are hidden from Signals reads immediately.
 
         The job runs asynchronously; poll the get endpoint until ``status`` is
         ``complete`` or ``failed``. DigitalOcean may retry transient processing errors
@@ -190505,6 +192381,8 @@ class SignalsOperations:
                       deletions.
                     "completed_at": 0,  # Optional. Unix timestamp when the deletion finished, or
                       null if still in progress.
+                    "environment_id": "str",  # Optional. Same as agent_id when present.
+                      Dual-emitted during the rename; omitted when agent_id is omitted.
                     "error_message": "str",  # Optional. Error message if the deletion failed, or
                       null otherwise.
                     "started_at": 0  # Optional. Unix timestamp when processing started, or null
@@ -190537,15 +192415,16 @@ class SignalsOperations:
 
 
         * ``agent`` — deletes Signals conversations for one Harness Runtime environment and
-          turns off collection for that environment. Requires ``agent_id``\\ , which is the
-          environment's Environment Config ID (the environment's ``agent_id``\\ ). On create, matching
-          conversations are hidden from Signals reads immediately. Wait until the
+          turns off collection for that environment. Requires ``environment_id`` (the
+          environment's Environment Config ID). Deprecated ``agent_id`` is still accepted;
+          both set and equal is accepted, both set and different returns 400. On create,
+          matching conversations are hidden from Signals reads immediately. Wait until the
           job is ``complete`` before enabling Signals for the environment again.
         * ``inference`` — deletes Serverless Inference Signals conversations for your
           whole team (team-wide; not limited to one endpoint or model) that were
           collected at or before the deletion request, and turns off team inference
-          collection (\\ ``source=inference``\\ ). Do not send ``agent_id``. On create,
-          matching conversations are hidden from Signals reads immediately.
+          collection (\\ ``source=inference``\\ ). Do not send ``environment_id`` or ``agent_id``.
+          On create, matching conversations are hidden from Signals reads immediately.
 
         The job runs asynchronously; poll the get endpoint until ``status`` is
         ``complete`` or ``failed``. DigitalOcean may retry transient processing errors
@@ -190578,14 +192457,18 @@ class SignalsOperations:
                     "team_id": 0,  # The team whose data should be deleted. Must match the
                       authenticated team. Required.
                     "type": "str",  # The scope of the deletion. ``agent`` deletes Signals
-                      conversations for one Harness Runtime environment and requires ``agent_id``.
-                      ``inference`` deletes Serverless Inference Signals conversations for the whole
-                      team (team-wide; omit ``agent_id``"" ). Required. Known values are: "agent" and
-                      "inference".
-                    "agent_id": "str"  # Optional. The Harness Runtime Environment Config ID of
-                      the environment whose conversations should be deleted. This is the environment's
-                      ``agent_id``. Required when ``type`` is ``agent``"" ; must be omitted when
-                      ``type`` is ``inference``.
+                      conversations for one Harness Runtime environment and requires ``environment_id``
+                      (or deprecated ``agent_id``"" ). ``inference`` deletes Serverless Inference
+                      Signals conversations for the whole team (team-wide; omit ``environment_id`` and
+                      ``agent_id``"" ). Required. Known values are: "agent" and "inference".
+                    "agent_id": "str",  # Optional. Deprecated alias for ``environment_id``.
+                      Accepted for backward compatibility; must equal ``environment_id`` when both are
+                      set. Both set and different returns 400. Required when ``type`` is ``agent`` if
+                      ``environment_id`` is omitted; must be omitted when ``type`` is ``inference``.
+                    "environment_id": "str"  # Optional. The Harness Runtime Environment Config
+                      ID of the environment whose conversations should be deleted. Required when
+                      ``type`` is ``agent`` if ``agent_id`` is omitted; must be omitted when ``type``
+                      is ``inference``. Prefer this over ``agent_id``.
                 }
 
                 # response body for status code(s): 200, 202
@@ -190606,6 +192489,8 @@ class SignalsOperations:
                       deletions.
                     "completed_at": 0,  # Optional. Unix timestamp when the deletion finished, or
                       null if still in progress.
+                    "environment_id": "str",  # Optional. Same as agent_id when present.
+                      Dual-emitted during the rename; omitted when agent_id is omitted.
                     "error_message": "str",  # Optional. Error message if the deletion failed, or
                       null otherwise.
                     "started_at": 0  # Optional. Unix timestamp when processing started, or null
@@ -190797,6 +192682,8 @@ class SignalsOperations:
                       deletions.
                     "completed_at": 0,  # Optional. Unix timestamp when the deletion finished, or
                       null if still in progress.
+                    "environment_id": "str",  # Optional. Same as agent_id when present.
+                      Dual-emitted during the rename; omitted when agent_id is omitted.
                     "error_message": "str",  # Optional. Error message if the deletion failed, or
                       null otherwise.
                     "started_at": 0  # Optional. Unix timestamp when processing started, or null
@@ -204650,6 +206537,497 @@ class MicrovmsOperations:
             return cls(pipeline_response, deserialized, response_headers)  # type: ignore
 
         return deserialized  # type: ignore
+
+    @distributed_trace_async
+    async def upload_file(
+        self,
+        microvm_id: str,
+        data: IO[bytes],
+        *,
+        path: str,
+        mode: Optional[str] = None,
+        uid: Optional[int] = None,
+        gid: Optional[int] = None,
+        sha256: Optional[str] = None,
+        **kwargs: Any
+    ) -> JSON:
+        """Upload a file to a MicroVM.
+
+        To write a file into a MicroVM's workload container, send a PUT request to
+        ``/v2/microvms/{microvm_id}/files?path=<absolute path>`` with the raw file content as the
+        request body and a ``Content-Type`` of ``application/octet-stream``.
+
+        The file replaces any existing regular file at ``path`` atomically. The parent directory
+        must already exist. The request must carry a ``Content-Length`` header; chunked bodies are
+        rejected. A body of up to 64 MiB is accepted, and a ``Content-Length`` of ``0`` writes an empty
+        file. Pass ``sha256`` to have the API verify the content before it replaces the target.
+
+        Your team needs the ``file_transfer`` feature. Check ``GET /v2/microvms/options``. If the
+        MicroVM
+        is paused and auto-resume is on, the request resumes it.
+
+        :param microvm_id: The unique ID of the MicroVM. Required.
+        :type microvm_id: str
+        :param data: The raw file content. Required.
+        :type data: IO[bytes]
+        :keyword path: The absolute path of the file inside the workload container. Required.
+        :paramtype path: str
+        :keyword mode: The octal permission bits for the file, from ``0001`` to ``0777``. Defaults to
+         ``0644``. Setuid, setgid, sticky bits, and ``0000`` are rejected. Default value is None.
+        :paramtype mode: str
+        :keyword uid: The owner user ID. Set it together with ``gid``. Defaults to the workload
+         container's user. Default value is None.
+        :paramtype uid: int
+        :keyword gid: The owner group ID. Set it together with ``uid``. Defaults to the workload
+         container's group. Default value is None.
+        :paramtype gid: int
+        :keyword sha256: The lowercase hex SHA-256 of the request body. When set, the API verifies the
+         content before it replaces the target. A mismatch returns 422 and leaves the existing file
+         unchanged. Default value is None.
+        :paramtype sha256: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "path": "str",  # The absolute path inside the workload container. Required.
+                    "sha256": "str",  # The lowercase hex SHA-256 of the content. Required.
+                    "size_bytes": 0,  # The file size in bytes. Required.
+                    "gid": 0,  # Optional. The owner group ID.
+                    "mode": "str",  # Optional. The octal permission bits as written.
+                    "uid": 0  # Optional. The owner user ID.
+                }
+                # response body for status code(s): 400, 403, 404, 409, 411, 413, 422, 502, 504
+                response == {
+                    "code": "str",  # A service-defined error code. Required.
+                    "message": "str"  # A human-readable description of the error. Required.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: str = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", "application/octet-stream")
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _content = data
+
+        _request = build_microvms_upload_file_request(
+            microvm_id=microvm_id,
+            path=path,
+            mode=mode,
+            uid=uid,
+            gid=gid,
+            sha256=sha256,
+            content_type=content_type,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [
+            200,
+            400,
+            403,
+            404,
+            409,
+            411,
+            413,
+            422,
+            502,
+            504,
+        ]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+            response_headers["X-Checksum-Sha256"] = self._deserialize(
+                "str", response.headers.get("X-Checksum-Sha256")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 411:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 413:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 422:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 502:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 504:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_file(
+        self, microvm_id: str, *, path: str, **kwargs: Any
+    ) -> Union[AsyncIterator[bytes], JSON]:
+        """Download a file from a MicroVM.
+
+        To read a file from a MicroVM's workload container, send a GET request to
+        ``/v2/microvms/{microvm_id}/files?path=<absolute path>``.
+
+        The response body is the raw file content with a ``Content-Type`` of
+        ``application/octet-stream``. The ``Content-Length`` and ``X-Checksum-Sha256`` headers describe
+        the
+        file as it was when the transfer began. Only regular files of up to 64 MiB can be downloaded.
+        A MicroVM serves up to 4 downloads at a time.
+
+        Your team needs the ``file_transfer`` feature. Check ``GET /v2/microvms/options``. If the
+        MicroVM
+        is paused and auto-resume is on, the request resumes it.
+
+        :param microvm_id: The unique ID of the MicroVM. Required.
+        :type microvm_id: str
+        :keyword path: The absolute path of the file inside the workload container. Required.
+        :paramtype path: str
+        :return: AsyncIterator[bytes] or JSON object
+        :rtype: AsyncIterator[bytes] or JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 400, 403, 404, 409, 413, 502, 504
+                response == {
+                    "code": "str",  # A service-defined error code. Required.
+                    "message": "str"  # A human-readable description of the error. Required.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[Union[AsyncIterator[bytes], JSON]] = kwargs.pop("cls", None)
+
+        _request = build_microvms_get_file_request(
+            microvm_id=microvm_id,
+            path=path,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = True
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404, 409, 413, 502, 504]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+            response_headers["X-Checksum-Sha256"] = self._deserialize(
+                "str", response.headers.get("X-Checksum-Sha256")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if response.status_code == 413:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if response.status_code == 502:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if response.status_code == 504:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if cls:
+            return cls(pipeline_response, cast(Union[AsyncIterator[bytes], JSON], deserialized), response_headers)  # type: ignore
+
+        return cast(Union[AsyncIterator[bytes], JSON], deserialized)  # type: ignore
 
 
 class MicrovmCheckpointsOperations:
@@ -235808,6 +238186,1706 @@ class SecurityOperations:
 
         return deserialized  # type: ignore
 
+    @distributed_trace_async
+    async def list_secrets(
+        self,
+        *,
+        per_page: int = 20,
+        page: int = 1,
+        include_deleted: bool = False,
+        name: Optional[str] = None,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Secrets.
+
+        To list secrets across all configured regions, send a GET request to ``/v2/security/secrets``.
+
+        The response includes secret metadata only. Secret values are not returned.
+        Use ``name`` to return secrets whose names start with that prefix, and
+        ``include_deleted`` to include secrets that are pending deletion.
+
+        :keyword per_page: Number of items returned per page. Default value is 20.
+        :paramtype per_page: int
+        :keyword page: Which 'page' of paginated results to return. Default value is 1.
+        :paramtype page: int
+        :keyword include_deleted: Whether to include secrets that are pending deletion. Default value
+         is False.
+        :paramtype include_deleted: bool
+        :keyword name: Only return secrets whose names start with this value. Default value is None.
+        :paramtype name: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "links": {
+                        "pages": {
+                            "first": "str",  # Optional. URL for the first page of
+                              results.
+                            "last": "str",  # Optional. URL for the last page of results.
+                            "next": "str",  # Optional. URL for the next page of results.
+                            "prev": "str"  # Optional. URL for the previous page of
+                              results.
+                        }
+                    },
+                    "meta": {
+                        "page": 0,  # Optional. The current page number.
+                        "pages": 0,  # Optional. The total number of pages.
+                        "total": 0  # Optional. The total number of secrets across all
+                          regions.
+                    },
+                    "secrets": [
+                        {
+                            "created_at": "2020-02-20 00:00:00",  # Optional. When the
+                              secret was created.
+                            "delete_requested_at": "2020-02-20 00:00:00",  # Optional.
+                              When deletion was requested for the secret.
+                            "region": "str",  # Optional. The region where the secret is
+                              stored.
+                            "secret": "str",  # Optional. The name of the secret.
+                            "updated_at": "2020-02-20 00:00:00",  # Optional. When the
+                              secret was last updated.
+                            "version": 0  # Optional. The current version of the secret.
+                        }
+                    ],
+                    "unavailable_regions": [
+                        "str"  # Optional. Regions that could not be queried while building
+                          the list response.
+                    ]
+                }
+                # response body for status code(s): 403
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_security_list_secrets_request(
+            per_page=per_page,
+            page=page,
+            include_deleted=include_deleted,
+            name=name,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 403]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def create_secret(
+        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create Secret.
+
+        To create a secret, send a POST request to ``/v2/security/secrets``.
+
+        Creating a secret that already exists in the same region returns a ``409`` response.
+
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "name": "str",  # The name of the secret to create. Required.
+                    "region": "str",  # The region where the secret will be stored. Required.
+                    "values": {
+                        "str": "str"  # Key-value pairs to store in the secret. Required.
+                    }
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "name": "str",  # Optional. The name of the secret.
+                    "region": "str",  # Optional. The region where the secret is stored.
+                    "version": 0  # Optional. The version of the secret after the operation.
+                }
+                # response body for status code(s): 400, 403, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def create_secret(
+        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create Secret.
+
+        To create a secret, send a POST request to ``/v2/security/secrets``.
+
+        Creating a secret that already exists in the same region returns a ``409`` response.
+
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "name": "str",  # Optional. The name of the secret.
+                    "region": "str",  # Optional. The region where the secret is stored.
+                    "version": 0  # Optional. The version of the secret after the operation.
+                }
+                # response body for status code(s): 400, 403, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def create_secret(self, body: Union[JSON, IO[bytes]], **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Create Secret.
+
+        To create a secret, send a POST request to ``/v2/security/secrets``.
+
+        Creating a secret that already exists in the same region returns a ``409`` response.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "name": "str",  # The name of the secret to create. Required.
+                    "region": "str",  # The region where the secret will be stored. Required.
+                    "values": {
+                        "str": "str"  # Key-value pairs to store in the secret. Required.
+                    }
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "name": "str",  # Optional. The name of the secret.
+                    "region": "str",  # Optional. The region where the secret is stored.
+                    "version": 0  # Optional. The version of the secret after the operation.
+                }
+                # response body for status code(s): 400, 403, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_security_create_secret_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 409]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_secret(self, secret: str, *, region: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Get Secret.
+
+        To retrieve a secret and its values, send a GET request to ``/v2/security/secrets/{secret}``.
+
+        ``region`` is required.
+
+        :param secret: The name of the secret. Required.
+        :type secret: str
+        :keyword region: The region where the secret is stored. Required.
+        :paramtype region: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "created_at": "2020-02-20 00:00:00",  # Optional. When the secret was
+                      created.
+                    "delete_requested_at": "2020-02-20 00:00:00",  # Optional. When deletion was
+                      requested for the secret.
+                    "region": "str",  # Optional. The region where the secret is stored.
+                    "secret": "str",  # Optional. The name of the secret.
+                    "updated_at": "2020-02-20 00:00:00",  # Optional. When the secret was last
+                      updated.
+                    "values": {
+                        "str": "str"  # Optional. Key-value pairs stored in the secret.
+                    },
+                    "version": 0  # Optional. The current version of the secret.
+                }
+                # response body for status code(s): 400, 403, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_security_get_secret_request(
+            secret=secret,
+            region=region,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def update_secret(
+        self,
+        secret: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Secret.
+
+        To update a secret, send a PUT request to ``/v2/security/secrets/{secret}``.
+
+        ``version`` is the secret's current version. If it does not match, the request
+        returns a ``409`` response and the secret is not changed.
+
+        :param secret: The name of the secret. Required.
+        :type secret: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "region": "str",  # The region where the secret is stored. Required.
+                    "values": {
+                        "str": "str"  # Updated key-value pairs for the secret. Required.
+                    },
+                    "version": 0  # The current version of the secret to update. Required.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "name": "str",  # Optional. The name of the secret.
+                    "region": "str",  # Optional. The region where the secret is stored.
+                    "version": 0  # Optional. The version of the secret after the operation.
+                }
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def update_secret(
+        self,
+        secret: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Secret.
+
+        To update a secret, send a PUT request to ``/v2/security/secrets/{secret}``.
+
+        ``version`` is the secret's current version. If it does not match, the request
+        returns a ``409`` response and the secret is not changed.
+
+        :param secret: The name of the secret. Required.
+        :type secret: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "name": "str",  # Optional. The name of the secret.
+                    "region": "str",  # Optional. The region where the secret is stored.
+                    "version": 0  # Optional. The version of the secret after the operation.
+                }
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def update_secret(
+        self, secret: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update Secret.
+
+        To update a secret, send a PUT request to ``/v2/security/secrets/{secret}``.
+
+        ``version`` is the secret's current version. If it does not match, the request
+        returns a ``409`` response and the secret is not changed.
+
+        :param secret: The name of the secret. Required.
+        :type secret: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "region": "str",  # The region where the secret is stored. Required.
+                    "values": {
+                        "str": "str"  # Updated key-value pairs for the secret. Required.
+                    },
+                    "version": 0  # The current version of the secret to update. Required.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "name": "str",  # Optional. The name of the secret.
+                    "region": "str",  # Optional. The region where the secret is stored.
+                    "version": 0  # Optional. The version of the secret after the operation.
+                }
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_security_update_secret_request(
+            secret=secret,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404, 409]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def delete_secret(
+        self, secret: str, *, region: str, **kwargs: Any
+    ) -> Optional[JSON]:
+        # pylint: disable=line-too-long
+        """Delete Secret.
+
+        To schedule a secret for deletion, send a DELETE request to ``/v2/security/secrets/{secret}``.
+
+        ``region`` is required. The secret is pending deletion and can be restored
+        until it is permanently removed.
+
+        :param secret: The name of the secret. Required.
+        :type secret: str
+        :keyword region: The region where the secret is stored. Required.
+        :paramtype region: str
+        :return: JSON object or None
+        :rtype: JSON or None
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[Optional[JSON]] = kwargs.pop("cls", None)
+
+        _request = build_security_delete_secret_request(
+            secret=secret,
+            region=region,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [204, 400, 403, 404, 409]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        deserialized = None
+        response_headers = {}
+        if response.status_code == 204:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, deserialized, response_headers)  # type: ignore
+
+        return deserialized  # type: ignore
+
+    @distributed_trace_async
+    async def list_secret_versions(
+        self, secret: str, *, region: str, **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Secret Versions.
+
+        To list all versions of a secret, send a GET request to
+        ``/v2/security/secrets/{secret}/versions``.
+
+        ``region`` is required. Version entries do not include secret values.
+
+        :param secret: The name of the secret. Required.
+        :type secret: str
+        :keyword region: The region where the secret is stored. Required.
+        :paramtype region: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "versions": [
+                        {
+                            "created_at": "2020-02-20 00:00:00",  # Optional. When this
+                              version was created.
+                            "updated_at": "2020-02-20 00:00:00",  # Optional. When this
+                              version was last updated.
+                            "version": 0  # Optional. The version number.
+                        }
+                    ]
+                }
+                # response body for status code(s): 400, 403, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_security_list_secret_versions_request(
+            secret=secret,
+            region=region,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def revert_secret(
+        self,
+        secret: str,
+        version: int,
+        body: JSON,
+        *,
+        region: str,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Revert Secret.
+
+        To revert a secret to a prior version, send a POST request to
+        ``/v2/security/secrets/{secret}/versions/{version}/revert``.
+
+        ``region`` is required. ``current_version`` must be the secret's current version.
+        If it does not match, the request returns a ``409`` response. A successful
+        revert creates a new version with the contents of the target version.
+
+        :param secret: The name of the secret. Required.
+        :type secret: str
+        :param version: The target version to revert to. Reverting creates a new version with the
+         contents of this version. Required.
+        :type version: int
+        :param body: Required.
+        :type body: JSON
+        :keyword region: The region where the secret is stored. Required.
+        :paramtype region: str
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "current_version": 0  # The current version of the secret. Used to reject the
+                      request if the secret changed. Required.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "name": "str",  # Optional. The name of the secret.
+                    "region": "str",  # Optional. The region where the secret is stored.
+                    "version": 0  # Optional. The version of the secret after the operation.
+                }
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def revert_secret(
+        self,
+        secret: str,
+        version: int,
+        body: IO[bytes],
+        *,
+        region: str,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Revert Secret.
+
+        To revert a secret to a prior version, send a POST request to
+        ``/v2/security/secrets/{secret}/versions/{version}/revert``.
+
+        ``region`` is required. ``current_version`` must be the secret's current version.
+        If it does not match, the request returns a ``409`` response. A successful
+        revert creates a new version with the contents of the target version.
+
+        :param secret: The name of the secret. Required.
+        :type secret: str
+        :param version: The target version to revert to. Reverting creates a new version with the
+         contents of this version. Required.
+        :type version: int
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword region: The region where the secret is stored. Required.
+        :paramtype region: str
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "name": "str",  # Optional. The name of the secret.
+                    "region": "str",  # Optional. The region where the secret is stored.
+                    "version": 0  # Optional. The version of the secret after the operation.
+                }
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def revert_secret(
+        self,
+        secret: str,
+        version: int,
+        body: Union[JSON, IO[bytes]],
+        *,
+        region: str,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Revert Secret.
+
+        To revert a secret to a prior version, send a POST request to
+        ``/v2/security/secrets/{secret}/versions/{version}/revert``.
+
+        ``region`` is required. ``current_version`` must be the secret's current version.
+        If it does not match, the request returns a ``409`` response. A successful
+        revert creates a new version with the contents of the target version.
+
+        :param secret: The name of the secret. Required.
+        :type secret: str
+        :param version: The target version to revert to. Reverting creates a new version with the
+         contents of this version. Required.
+        :type version: int
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :keyword region: The region where the secret is stored. Required.
+        :paramtype region: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "current_version": 0  # The current version of the secret. Used to reject the
+                      request if the secret changed. Required.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "name": "str",  # Optional. The name of the secret.
+                    "region": "str",  # Optional. The region where the secret is stored.
+                    "version": 0  # Optional. The version of the secret after the operation.
+                }
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_security_revert_secret_request(
+            secret=secret,
+            version=version,
+            region=region,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404, 409]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def post_restore_secret(
+        self, secret: str, *, region: str, **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Restore Secret.
+
+        To restore a secret that is pending deletion, send a POST request to
+        ``/v2/security/secrets/{secret}/restore``.
+
+        ``region`` is required. The response contains the secret metadata and does not
+        include secret values.
+
+        :param secret: The name of the secret. Required.
+        :type secret: str
+        :keyword region: The region where the secret is stored. Required.
+        :paramtype region: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "created_at": "2020-02-20 00:00:00",  # Optional. When the secret was
+                      created.
+                    "delete_requested_at": "2020-02-20 00:00:00",  # Optional. When deletion was
+                      requested for the secret.
+                    "region": "str",  # Optional. The region where the secret is stored.
+                    "secret": "str",  # Optional. The name of the secret.
+                    "updated_at": "2020-02-20 00:00:00",  # Optional. When the secret was last
+                      updated.
+                    "version": 0  # Optional. The current version of the secret.
+                }
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_security_post_restore_secret_request(
+            secret=secret,
+            region=region,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404, 409]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
 
 class SizesOperations:
     """
@@ -235829,7 +239907,24 @@ class SizesOperations:
         )
 
     @distributed_trace_async
-    async def list(self, *, per_page: int = 20, page: int = 1, **kwargs: Any) -> JSON:
+    async def list(
+        self,
+        *,
+        per_page: int = 20,
+        page: int = 1,
+        cpu_minimum: Optional[int] = None,
+        cpu_maximum: Optional[int] = None,
+        gpu_minimum: Optional[int] = None,
+        gpu_maximum: Optional[int] = None,
+        gpu_fabric: Optional[bool] = None,
+        memory_minimum: Optional[int] = None,
+        memory_maximum: Optional[int] = None,
+        price_hourly_minimum: Optional[str] = None,
+        price_hourly_maximum: Optional[str] = None,
+        price_monthly_minimum: Optional[str] = None,
+        price_monthly_maximum: Optional[str] = None,
+        **kwargs: Any
+    ) -> JSON:
         # pylint: disable=line-too-long
         """List All Droplet Sizes.
 
@@ -235841,6 +239936,36 @@ class SizesOperations:
         :paramtype per_page: int
         :keyword page: Which 'page' of paginated results to return. Default value is 1.
         :paramtype page: int
+        :keyword cpu_minimum: Filter sizes with an inclusive minimum CPU count. Default value is None.
+        :paramtype cpu_minimum: int
+        :keyword cpu_maximum: Filter sizes with an inclusive maximum CPU count. Default value is None.
+        :paramtype cpu_maximum: int
+        :keyword gpu_minimum: Filter sizes with an inclusive minimum GPU count. Default value is None.
+        :paramtype gpu_minimum: int
+        :keyword gpu_maximum: Filter sizes with an inclusive maximum GPU count. Zero is allowed to
+         filter to sizes without GPUs. Default value is None.
+        :paramtype gpu_maximum: int
+        :keyword gpu_fabric: Filter sizes to those with a given GPU fabric setting. Default value is
+         None.
+        :paramtype gpu_fabric: bool
+        :keyword memory_minimum: Filter sizes with an inclusive minimum memory amount (in megabytes).
+         Default value is None.
+        :paramtype memory_minimum: int
+        :keyword memory_maximum: Filter sizes with an inclusive maximum memory amount (in megabytes).
+         Default value is None.
+        :paramtype memory_maximum: int
+        :keyword price_hourly_minimum: Filter sizes with an inclusive minimum hourly price (in USD).
+         Default value is None.
+        :paramtype price_hourly_minimum: str
+        :keyword price_hourly_maximum: Filter sizes with an inclusive maximum hourly price (in USD).
+         Default value is None.
+        :paramtype price_hourly_maximum: str
+        :keyword price_monthly_minimum: Filter sizes with an inclusive minimum monthly price (in USD).
+         Default value is None.
+        :paramtype price_monthly_minimum: str
+        :keyword price_monthly_maximum: Filter sizes with an inclusive maximum monthly price (in USD).
+         Default value is None.
+        :paramtype price_monthly_maximum: str
         :return: JSON object
         :rtype: JSON
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -235884,6 +240009,8 @@ class SizesOperations:
                               this size. Required.
                             "disk_info": [
                                 {
+                                    "ephemeral": bool,  # Optional. Indicates an
+                                      ephemeral (non-persistent) disk.
                                     "size": {
                                         "amount": 0,  # Optional. The amount
                                           of space allocated to the disk.
@@ -235937,6 +240064,17 @@ class SizesOperations:
         _request = build_sizes_list_request(
             per_page=per_page,
             page=page,
+            cpu_minimum=cpu_minimum,
+            cpu_maximum=cpu_maximum,
+            gpu_minimum=gpu_minimum,
+            gpu_maximum=gpu_maximum,
+            gpu_fabric=gpu_fabric,
+            memory_minimum=memory_minimum,
+            memory_maximum=memory_maximum,
+            price_hourly_minimum=price_hourly_minimum,
+            price_hourly_maximum=price_hourly_maximum,
+            price_monthly_minimum=price_monthly_minimum,
+            price_monthly_maximum=price_monthly_maximum,
             headers=_headers,
             params=_params,
         )
@@ -306484,11 +310622,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                       evaluate.
                     "dataset_uuid": "str",  # Optional. UUID of the dataset to use for
                       evaluation.
-                    "epochs": 0,  # Optional. Number of times to evaluate each dataset row
-                      (n-pass/epochs), so the result reports avg@k/pass@k/cons@k instead of a single
-                      score. Defaults to 1 when unset. Capped at 3 until throughput/sharding work
-                      lands, since each extra epoch roughly multiplies wall-clock run time. Not
-                      persisted on presets.
+                    "epochs": 0,  # Optional. How many times each dataset row is evaluated.
+                      Defaults to 1, maximum 10. When more than 1, the results show how consistent the
+                      model is across attempts (avg@k, pass@k, cons@k). Each extra attempt makes the
+                      run take longer. Not saved in presets.
                     "eval_preset_uuid": "str",  # Optional.
                     "judge_model_uuid": "str",  # Optional. UUID of the judge model used to score
                       responses.
@@ -306630,11 +310767,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                       evaluate.
                     "dataset_uuid": "str",  # Optional. UUID of the dataset to use for
                       evaluation.
-                    "epochs": 0,  # Optional. Number of times to evaluate each dataset row
-                      (n-pass/epochs), so the result reports avg@k/pass@k/cons@k instead of a single
-                      score. Defaults to 1 when unset. Capped at 3 until throughput/sharding work
-                      lands, since each extra epoch roughly multiplies wall-clock run time. Not
-                      persisted on presets.
+                    "epochs": 0,  # Optional. How many times each dataset row is evaluated.
+                      Defaults to 1, maximum 10. When more than 1, the results show how consistent the
+                      model is across attempts (avg@k, pass@k, cons@k). Each extra attempt makes the
+                      run take longer. Not saved in presets.
                     "eval_preset_uuid": "str",  # Optional.
                     "judge_model_uuid": "str",  # Optional. UUID of the judge model used to score
                       responses.
