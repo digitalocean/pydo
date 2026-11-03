@@ -61,6 +61,7 @@ from .operations import (
     PrepaymentConfigOperations,
     PrepaymentStatusOperations,
     ProjectsOperations,
+    ProviderCredentialsOperations,
     RegionsOperations,
     RegistriesOperations,
     RegistryOperations,
@@ -102,6 +103,8 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
 
     :ivar actor_limits: ActorLimitsOperations operations
     :vartype actor_limits: pydo.operations.ActorLimitsOperations
+    :ivar provider_credentials: ProviderCredentialsOperations operations
+    :vartype provider_credentials: pydo.operations.ProviderCredentialsOperations
     :ivar connections: ConnectionsOperations operations
     :vartype connections: pydo.operations.ConnectionsOperations
     :ivar mcp_servers: McpServersOperations operations
@@ -295,6 +298,9 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
         self._deserialize = Deserializer()
         self._serialize.client_side_validation = False
         self.actor_limits = ActorLimitsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.provider_credentials = ProviderCredentialsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.connections = ConnectionsOperations(
