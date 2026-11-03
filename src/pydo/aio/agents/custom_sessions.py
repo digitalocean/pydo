@@ -683,7 +683,7 @@ class AsyncSessionsOperations:
         return await self._parse_json(
             await self._send(
                 "POST",
-                f"/v2/agents/auth/{_quote(provider)}/connections/"
+                f"/v2/harness-runtime/auth/{_quote(provider)}/connections/"
                 f"{_quote(connection_id)}/reconnect",
                 body={},
             ),

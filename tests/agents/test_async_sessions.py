@@ -541,7 +541,7 @@ async def test_async_reconnect_connection_posts_empty_body():
     call = resources._proxy._original._pipeline.calls[0]
     assert call.request.method == "POST"
     assert call.request.url.endswith(
-        "/v2/agents/auth/github/connections/conn_1/reconnect"
+        "/v2/harness-runtime/auth/github/connections/conn_1/reconnect"
     )
     assert json.loads(call.request.content) == {}
     assert resp.connection.status == "pending"
