@@ -166,6 +166,7 @@ class EndpointFields:
         self.id: str = raw.get("id") or ""
         self.name: str = raw.get("name") or ""
         self.actor_id: Optional[str] = raw.get("actor_id") or None
+        self.is_default: bool = bool(raw.get("is_default", False))
         self.insights: Optional[Dict[str, Any]] = raw.get("insights")
         self.created_at: Optional[str] = raw.get("created_at")
         self.updated_at: Optional[str] = raw.get("updated_at")

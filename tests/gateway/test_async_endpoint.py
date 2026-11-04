@@ -204,6 +204,23 @@ def test_endpoint_lifecycle_delegates_to_generated_operations():
     endpoints.delete.assert_awaited_once_with(TEST_ENDPOINT_ID)
 
 
+def test_list_reports_default_endpoint():
+    parent = _mock_parent()
+    parent.endpoints.list = AsyncMock(
+        return_value={
+            "endpoints": [
+                endpoint_payload(name="default", is_default=True),
+                endpoint_payload(),
+            ],
+            "next_page_token": "",
+        }
+    )
+
+    page = _run(_ops(parent).list())
+
+    assert [endpoint.is_default for endpoint in page.endpoints] == [True, False]
+
+
 def test_missing_generated_operations_raise_clear_error():
     ops = AsyncEndpointsOperations(
         SimpleNamespace(_client=MagicMock()), gateway_endpoint=TEST_GATEWAY_URL

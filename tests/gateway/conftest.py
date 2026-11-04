@@ -235,6 +235,7 @@ def endpoint_payload(
     name: str = "support-agent",
     actor_id: str = "actor-123",
     head_version: Optional[dict] = None,
+    is_default: Optional[bool] = None,
 ) -> dict:
     endpoint: dict = {
         "id": TEST_ENDPOINT_ID,
@@ -247,6 +248,8 @@ def endpoint_payload(
     }
     if head_version is not None:
         endpoint["head_version"] = head_version
+    if is_default is not None:
+        endpoint["is_default"] = is_default
     return endpoint
 
 

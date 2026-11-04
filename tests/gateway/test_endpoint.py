@@ -195,6 +195,19 @@ def test_get_without_live_version():
     assert endpoint.url == TEST_ENDPOINT_MCP_URL
 
 
+@pytest.mark.parametrize(
+    "payload, expected",
+    [({"is_default": True}, True), ({"is_default": False}, False), ({}, False)],
+)
+def test_get_reports_default_endpoint(payload, expected):
+    parent = _mock_parent()
+    parent.endpoints.get.return_value = {"endpoint": endpoint_payload(**payload)}
+
+    endpoint = _ops(parent).get(TEST_ENDPOINT_ID)
+
+    assert endpoint.is_default is expected
+
+
 def test_list_passes_only_supplied_filters():
     parent = _mock_parent()
     parent.endpoints.list.return_value = {
