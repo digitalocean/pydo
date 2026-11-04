@@ -15262,7 +15262,7 @@ def build_registry_get_options_request(**kwargs: Any) -> HttpRequest:
 
 
 def build_reserved_ips_list_request(
-    *, per_page: int = 20, page: int = 1, **kwargs: Any
+    *, per_page: int = 20, page: int = 1, sort: Optional[str] = None, sort_direction: Optional[str] = None,**kwargs: Any
 ) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
     _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
@@ -15279,6 +15279,14 @@ def build_reserved_ips_list_request(
         )
     if page is not None:
         _params["page"] = _SERIALIZER.query("page", page, "int", minimum=1)
+
+    if sort is not None:
+        _params["sort"] = _SERIALIZER.query("sort", sort, "str")
+
+    if sort_direction is not None:
+        _params["sort_direction"] = _SERIALIZER.query(
+            "sort_direction", sort_direction, "str"
+        )
 
     # Construct headers
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
@@ -256890,7 +256898,7 @@ class ReservedIPsOperations:
         )
 
     @distributed_trace
-    def list(self, *, per_page: int = 20, page: int = 1, **kwargs: Any) -> JSON:
+    def list(self, *, per_page: int = 20, page: int = 1, sort: Optional[str] = None, sort_direction: Optional[str] = None, **kwargs: Any) -> JSON:
         # pylint: disable=line-too-long
         """List All Reserved IPs.
 
@@ -256971,6 +256979,8 @@ class ReservedIPsOperations:
         _request = build_reserved_ips_list_request(
             per_page=per_page,
             page=page,
+            sort=sort,
+            sort_direction=sort_direction,
             headers=_headers,
             params=_params,
         )

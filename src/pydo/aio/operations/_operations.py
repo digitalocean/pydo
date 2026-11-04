@@ -235353,7 +235353,7 @@ class ReservedIPsOperations:
         )
 
     @distributed_trace_async
-    async def list(self, *, per_page: int = 20, page: int = 1, **kwargs: Any) -> JSON:
+    async def list(self, *, per_page: int = 20, page: int = 1, sort: Optional[str] = None, sort_direction: Optional[str] = None, **kwargs: Any) -> JSON:
         # pylint: disable=line-too-long
         """List All Reserved IPs.
 
@@ -235364,6 +235364,11 @@ class ReservedIPsOperations:
         :paramtype per_page: int
         :keyword page: Which 'page' of paginated results to return. Default value is 1.
         :paramtype page: int
+        :keyword sort: Field to sort the results by. Default value is None.
+        :paramtype sort: str
+        :keyword sort_direction: Direction to sort the results. Known values are: "asc" and "desc".
+         Default value is None.
+        :paramtype sort_direction: str
         :return: JSON object
         :rtype: JSON
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -235434,6 +235439,8 @@ class ReservedIPsOperations:
         _request = build_reserved_ips_list_request(
             per_page=per_page,
             page=page,
+            sort=sort,
+            sort_direction=sort_direction,
             headers=_headers,
             params=_params,
         )
