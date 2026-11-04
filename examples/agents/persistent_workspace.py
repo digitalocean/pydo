@@ -15,7 +15,7 @@ Required env:
 Optional env:
   PYDO_AGENTS_ENDPOINT   default: https://api.digitalocean.com
 
-A 501 from the API means workspaces are not enabled for the team. Attaching a
+A 403 from the API means workspaces are not enabled for the team. Attaching a
 workspace that is not AVAILABLE (for example one that is still releasing)
 returns 409.
 """

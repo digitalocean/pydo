@@ -112,7 +112,7 @@ class WorkspacesOperations:
             for an idempotent replay. Raises ``ResourceExistsError`` (``409``)
             when the team's workspace limit is reached, or when the key belongs
             to a workspace that is being deleted (retry in a moment and the key
-            then creates a new workspace), and ``HttpResponseError`` for ``501``
+            then creates a new workspace), and ``HttpResponseError`` for ``403``
             when workspaces are not enabled for the team.
         """
         headers = {_IDEMPOTENCY_HEADER: idempotency_key} if idempotency_key else None

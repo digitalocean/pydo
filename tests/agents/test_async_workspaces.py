@@ -165,7 +165,7 @@ async def test_async_workspace_errors():
             _FakeAsyncResponse(404, _error(404, "not found")),
             _FakeAsyncResponse(409, _error(409, "not AVAILABLE or FAILED")),
             _FakeAsyncResponse(422, _error(422, "idempotency key reused")),
-            _FakeAsyncResponse(501, _error(501, "workspaces are not enabled")),
+            _FakeAsyncResponse(403, _error(403, "workspaces are not enabled")),
         ]
     )
 
@@ -178,7 +178,7 @@ async def test_async_workspace_errors():
     assert excinfo.value.status_code == 422
     with pytest.raises(HttpResponseError) as excinfo:
         await resources.workspaces.create(10)
-    assert excinfo.value.status_code == 501
+    assert excinfo.value.status_code == 403
     assert "workspaces are not enabled" in str(excinfo.value)
 
 

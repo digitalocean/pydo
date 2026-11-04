@@ -280,13 +280,13 @@ def test_create_workspace_422_idempotency_conflict():
     assert "idempotency key" in str(excinfo.value)
 
 
-def test_create_workspace_501_not_enabled():
+def test_create_workspace_403_not_enabled():
     resources = _make_resources(
-        [_FakeResponse(501, _error(501, "workspaces are not enabled"))]
+        [_FakeResponse(403, _error(403, "workspaces are not enabled"))]
     )
     with pytest.raises(HttpResponseError) as excinfo:
         resources.workspaces.create(10)
-    assert excinfo.value.status_code == 501
+    assert excinfo.value.status_code == 403
     assert "workspaces are not enabled" in str(excinfo.value)
 
 
@@ -357,7 +357,7 @@ def test_start_has_no_workspace_id():
     assert "workspace_id" not in _last_call(resources).request.url
 
 
-@pytest.mark.parametrize("status", [409, 501])
+@pytest.mark.parametrize("status", [409, 403, 501])
 def test_create_session_workspace_errors(status):
     resources = _make_resources([_FakeResponse(status, _error(status, "nope"))])
     expected = ResourceExistsError if status == 409 else HttpResponseError
