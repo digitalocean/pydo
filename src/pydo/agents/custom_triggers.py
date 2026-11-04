@@ -234,9 +234,8 @@ class TriggersOperations:
 
         Fails the execution and frees the trigger's in-flight slot. A
         fresh-mode session is destroyed outright; a reuse-mode session is
-        only paused, since the API has no run-interrupt call -- the agent's
-        turn may still be in flight server-side. Cancelling a non-running
-        execution is a no-op that still succeeds.
+        paused and the turn it was running is stopped. Cancelling a
+        non-running execution is a no-op that still succeeds.
 
         A freshly-claimed execution briefly has no run yet while the worker
         dispatches it; cancelling in that window is guarded against a race
