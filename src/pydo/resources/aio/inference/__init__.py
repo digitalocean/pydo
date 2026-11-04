@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from pydo.aio import Client
 from .async_invoke import AsyncInvoke
+from .audio import Audio
 from .batches import Batches
 from .chat import Chat
 from .embeddings import Embeddings
@@ -17,6 +18,7 @@ from .messages import Messages
 from .models import Models
 from .responses import Responses
 from .systemone import Systemone
+from .videos import Videos
 
 
 class InferenceResources:
@@ -24,6 +26,7 @@ class InferenceResources:
 
     def __init__(self, client: Client) -> None:
         self.async_invoke = AsyncInvoke(client)
+        self.audio = Audio(client)
         self.batches = Batches(client)
         self.chat = Chat(client)
         self.embeddings = Embeddings(client)
@@ -33,6 +36,7 @@ class InferenceResources:
         self.models = Models(client)
         self.responses = Responses(client)
         self.systemone = Systemone(client)
+        self.videos = Videos(client)
 
 
 __all__ = ["InferenceResources"]

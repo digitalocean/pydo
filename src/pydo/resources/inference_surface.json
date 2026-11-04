@@ -84,6 +84,54 @@
       ]
     },
     {
+      "op_method": "create_speech",
+      "path_segments": [
+        "audio",
+        "speech"
+      ],
+      "path_params": [],
+      "facade_methods": [
+        "create"
+      ]
+    },
+    {
+      "op_method": "create_video",
+      "path_segments": [
+        "videos"
+      ],
+      "path_params": [],
+      "facade_methods": [
+        "create"
+      ]
+    },
+    {
+      "op_method": "get_video",
+      "path_segments": [
+        "videos"
+      ],
+      "path_params": [
+        "video_id"
+      ],
+      "facade_methods": [
+        "get",
+        "retrieve"
+      ]
+    },
+    {
+      "op_method": "get_video_content",
+      "path_segments": [
+        "videos",
+        "content"
+      ],
+      "path_params": [
+        "video_id"
+      ],
+      "facade_methods": [
+        "get",
+        "retrieve"
+      ]
+    },
+    {
       "op_method": "create_batch_file",
       "path_segments": [
         "batches",
