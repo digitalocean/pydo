@@ -203,6 +203,70 @@ def session_create_response(
     }
 
 
+TEST_ENDPOINT_ID = "1b4d4e0f-9a7c-4d5b-8f3c-2a6e6e8f0a13"
+TEST_BACKING_SESSION_ID = "9a7c2d5b-6e8f-4a13-8f3c-2a6e1b4d4e0f"
+TEST_ENDPOINT_MCP_URL = f"{TEST_GATEWAY_URL}/mcp/endpoint/{TEST_ENDPOINT_ID}"
+TEST_VERSION_MCP_URL = f"{TEST_ENDPOINT_MCP_URL}/version/{TEST_BACKING_SESSION_ID}"
+
+
+def endpoint_version_payload(
+    *,
+    number: int = 1,
+    actor_id: str = "actor-123",
+    promoted_from: Optional[int] = None,
+) -> dict:
+    version: dict = {
+        "id": f"{TEST_ENDPOINT_ID}.v{number}",
+        "endpoint_id": TEST_ENDPOINT_ID,
+        "version_number": number,
+        "actor_id": actor_id,
+        "policy": {"defaultAction": "ask", "rules": []},
+        "tools": {"references": []},
+        "mcp_url": TEST_VERSION_MCP_URL,
+        "created_at": "2026-10-15T14:00:00Z",
+    }
+    if promoted_from is not None:
+        version["promoted_from_version_number"] = promoted_from
+    return version
+
+
+def endpoint_payload(
+    *,
+    name: str = "support-agent",
+    actor_id: str = "actor-123",
+    head_version: Optional[dict] = None,
+) -> dict:
+    endpoint: dict = {
+        "id": TEST_ENDPOINT_ID,
+        "name": name,
+        "actor_id": actor_id,
+        "insights": {"logs": True},
+        "mcp_url": TEST_ENDPOINT_MCP_URL,
+        "created_at": "2026-10-15T14:00:00Z",
+        "updated_at": "2026-10-15T14:00:00Z",
+    }
+    if head_version is not None:
+        endpoint["head_version"] = head_version
+    return endpoint
+
+
+def endpoint_publish_response(
+    *,
+    number: int = 1,
+    actor_id: str = "actor-123",
+    promoted_from: Optional[int] = None,
+) -> dict:
+    version = endpoint_version_payload(
+        number=number, actor_id=actor_id, promoted_from=promoted_from
+    )
+    return {
+        "endpoint": endpoint_payload(actor_id=actor_id, head_version=version),
+        "version": version,
+        "mcp_url": TEST_ENDPOINT_MCP_URL,
+        "version_mcp_url": TEST_VERSION_MCP_URL,
+    }
+
+
 def make_parent(responses: List[FakeResponse]) -> MagicMock:
     parent = MagicMock()
     parent._client = MagicMock()

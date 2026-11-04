@@ -45,6 +45,7 @@ from pydo.gateway.transport import (
     _REST_INVOKE_PATH,
     _REST_SEARCH_PATH,
     _REST_TOOLS_PATH,
+    _endpoint_approval_url,
     _external_session_id,
     _parse_json_body,
     _parse_jsonrpc,
@@ -145,17 +146,19 @@ class AsyncMCPTransport(AsyncGatewayTransport):
         )
         return _unwrap_call_result(result)
 
+    def _approval_url(self, approval_id: str) -> str:
+        endpoint = urlsplit(self.endpoint_url or self._client._base_url)
+        approval_id = quote(approval_id, safe="")
+        return f"{endpoint.scheme}://{endpoint.netloc}/approvals/{approval_id}"
+
     async def decide_approval(self, approval_id: str, decision: str) -> Any:
         if not approval_id or not str(approval_id).strip():
             raise ValueError("approval_id is required")
         if decision not in ("approve", "deny"):
             raise ValueError("decision must be 'approve' or 'deny'")
-        endpoint = urlsplit(self.endpoint_url or self._client._base_url)
-        approval_id = quote(str(approval_id).strip(), safe="")
-        url = f"{endpoint.scheme}://{endpoint.netloc}/approvals/{approval_id}"
         request = HttpRequest(
             "POST",
-            url,
+            self._approval_url(str(approval_id).strip()),
             headers={**self._headers(), "Accept": "application/json"},
             json={"decision": decision},
         )
@@ -165,6 +168,35 @@ class AsyncMCPTransport(AsyncGatewayTransport):
         if response.status_code not in (200, 201, 202, 204):
             _raise_gateway_http_error(response)
         return _wrap(_parse_json_body(body)) if body else None
+
+
+class AsyncEndpointMCPTransport(AsyncMCPTransport):
+    """Async counterpart of :class:`pydo.gateway.transport.EndpointMCPTransport`."""
+
+    # pylint: disable-next=super-init-not-called
+    def __init__(
+        self,
+        base_url_proxy: Any,
+        *,
+        mcp_url: str,
+        actor_id: Optional[str] = None,
+    ):
+        if not mcp_url:
+            raise ValueError("mcp_url is required for AsyncEndpointMCPTransport")
+        self._client = base_url_proxy
+        self._ids = itertools.count(1)
+        self.session_id = None
+        self.actor_id = str(actor_id).strip() if actor_id else ""
+        self.endpoint_url = mcp_url
+
+    def _headers(self) -> Dict[str, str]:
+        headers = dict(_MCP_HEADERS)
+        if self.actor_id:
+            headers[ACTOR_ID_HEADER] = self.actor_id
+        return headers
+
+    def _approval_url(self, approval_id: str) -> str:
+        return _endpoint_approval_url(self.endpoint_url, approval_id)
 
 
 class AsyncRESTTransport(AsyncGatewayTransport):
@@ -423,6 +455,7 @@ async def async_execute_tool_calls(
 __all__ = [
     "AsyncGatewayTransport",
     "AsyncMCPTransport",
+    "AsyncEndpointMCPTransport",
     "AsyncRESTTransport",
     "AsyncToolsOperations",
     "AsyncCodeOperations",

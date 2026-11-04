@@ -1,5 +1,8 @@
 """Control Action Gateway discovery, direct tools, and invocation policy.
 
+Uses a session, which is deprecated. Endpoint versions take the same
+tools, config, and permissions options; see create_endpoint.py.
+
 The three session controls have separate roles:
   tools                         catalog available to action_search/action_invoke
   config.preloadTools           concrete tools also exposed directly over MCP
