@@ -83,7 +83,7 @@ def test_list_configs_pagination():
 
     call = _last_call(resources)
     assert call.request.method == "GET"
-    assert _path(call.request.url).endswith("/v2/agents/configs")
+    assert _path(call.request.url).endswith("/v2/harness-runtime/configs")
     assert "page_size=25" in call.request.url
     assert "page_token=tok" in call.request.url
     assert resp.configs[0].id == "cfg-1"
@@ -105,7 +105,7 @@ def test_create_config():
 
     call = _last_call(resources)
     assert call.request.method == "POST"
-    assert _path(call.request.url).endswith("/v2/agents/configs")
+    assert _path(call.request.url).endswith("/v2/harness-runtime/configs")
     assert call.request.headers.get("Content-Type") == "application/json"
     assert resp.config.id == "cfg-new"
 
@@ -124,7 +124,7 @@ def test_get_config():
 
     call = _last_call(resources)
     assert call.request.method == "GET"
-    assert _path(call.request.url).endswith("/v2/agents/configs/cfg-1")
+    assert _path(call.request.url).endswith("/v2/harness-runtime/configs/cfg-1")
     assert resp.config.name == "demo"
 
 
@@ -135,7 +135,7 @@ def test_delete_config():
 
     call = _last_call(resources)
     assert call.request.method == "DELETE"
-    assert _path(call.request.url).endswith("/v2/agents/configs/cfg-1")
+    assert _path(call.request.url).endswith("/v2/harness-runtime/configs/cfg-1")
 
 
 def test_list_config_sessions_with_status_filter():
@@ -151,7 +151,9 @@ def test_list_config_sessions_with_status_filter():
 
     call = _last_call(resources)
     assert call.request.method == "GET"
-    assert _path(call.request.url).endswith("/v2/agents/configs/cfg-1/sessions")
+    assert _path(call.request.url).endswith(
+        "/v2/harness-runtime/configs/cfg-1/sessions"
+    )
     assert "status=SESSION_STATUS_ALL" in call.request.url
     assert resp.sessions[0].session_id == "sess-1"
 
@@ -167,7 +169,7 @@ def test_create_session_from_config():
 
     call = _last_call(resources)
     assert call.request.method == "POST"
-    assert _path(call.request.url).endswith("/v2/agents/sessions")
+    assert _path(call.request.url).endswith("/v2/harness-runtime/sessions")
     assert call.request.headers.get("Content-Type") == "application/json"
     assert resp.session.session_id == "sess-new"
 

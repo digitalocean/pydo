@@ -205,7 +205,7 @@ class AgentsResources:
     ) -> AgentSession:
         """Resolve a session by ``name`` and return an :class:`AgentSession`.
 
-        Looks up ``GET /v2/agents/sessions?name=<name>``. If several sessions
+        Looks up ``GET /v2/harness-runtime/sessions?name=<name>``. If several sessions
         share the name (e.g. reused over time), the most recently created one
         is chosen. Raises :class:`LookupError` when there is no match.
         """

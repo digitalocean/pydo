@@ -94,7 +94,7 @@ class OAuthProvider:
     """External identity provider a team can connect for its sessions.
 
     The value is the provider path segment used by
-    ``/v2/agents/auth/{provider}`` (e.g. ``github``).
+    ``/v2/harness-runtime/auth/{provider}`` (e.g. ``github``).
     """
 
     GITHUB = "github"

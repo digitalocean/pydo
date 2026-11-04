@@ -84,7 +84,7 @@ class AsyncConfigsOperations:
         )
 
     async def create(self, body: Dict[str, Any]) -> Any:
-        """Create an Agent Config (``POST /v2/agents/configs``)."""
+        """Create an Agent Config (``POST /v2/harness-runtime/configs``)."""
         if not isinstance(body, dict) or not body:
             raise ValueError("body must be a non-empty dict")
         return await self._parse_json(

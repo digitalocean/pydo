@@ -2,7 +2,7 @@
 # Copyright (c) DigitalOcean.
 # Licensed under the Apache-2.0 License.
 # ------------------------------------
-"""Sync Hosted Agents sandbox template operations (``/v2/agents/templates/...``).
+"""Sync Hosted Agents sandbox template operations (``/v2/harness-runtime/templates/...``).
 
 Hand-written against harness-api's public contract
 (``public/harness.swagger.json`` / OHS). Preserved across ``make generate``.
@@ -19,7 +19,7 @@ from azure.core.rest import HttpRequest
 from pydo.agents.custom_sessions import _OK_STATUS, _raise_agents_http_error
 from pydo.custom_extensions import _wrap
 
-_TEMPLATES_PATH = "/v2/agents/templates"
+_TEMPLATES_PATH = "/v2/harness-runtime/templates"
 
 
 def _quote(value: str) -> str:
@@ -87,7 +87,7 @@ class TemplatesOperations:
     ) -> Any:
         """List the caller's team custom sandbox templates (keyset-paginated).
 
-        ``GET /v2/agents/templates``
+        ``GET /v2/harness-runtime/templates``
         """
         return self._parse_json(
             self._send(
@@ -103,7 +103,7 @@ class TemplatesOperations:
     def get(self, template_id: str) -> Any:
         """Get one team sandbox template.
 
-        ``GET /v2/agents/templates/{template_id}``
+        ``GET /v2/harness-runtime/templates/{template_id}``
         """
         return self._parse_json(
             self._send("GET", f"{_TEMPLATES_PATH}/{_quote(template_id)}"),
@@ -112,7 +112,7 @@ class TemplatesOperations:
     def create(self, body: Dict[str, Any]) -> Any:
         """Create a team custom template and kick a build.
 
-        ``POST /v2/agents/templates``
+        ``POST /v2/harness-runtime/templates``
 
         Required body fields: ``name``, ``base_template``, ``source_oci_ref``.
         ``base_template`` is a catalog key such as ``coding-base``,
@@ -127,7 +127,7 @@ class TemplatesOperations:
     def update(self, template_id: str, body: Dict[str, Any]) -> Any:
         """Update a team template (kicks a new build).
 
-        ``PUT /v2/agents/templates/{template_id}``
+        ``PUT /v2/harness-runtime/templates/{template_id}``
 
         Optional body fields: ``source_oci_ref``, ``base_template``.
         """
@@ -144,7 +144,7 @@ class TemplatesOperations:
     def delete(self, template_id: str) -> Any:
         """Delete a team custom template.
 
-        ``DELETE /v2/agents/templates/{template_id}``
+        ``DELETE /v2/harness-runtime/templates/{template_id}``
 
         Returns ``{template_id, deleted}``. Global catalog templates cannot be
         deleted via this API.
@@ -166,7 +166,7 @@ class TemplatesOperations:
     ) -> Any:
         """List build history for a template (keyset-paginated).
 
-        ``GET /v2/agents/templates/{template_id}/builds``
+        ``GET /v2/harness-runtime/templates/{template_id}/builds``
         """
         return self._parse_json(
             self._send(
@@ -182,7 +182,7 @@ class TemplatesOperations:
     def get_build(self, template_id: str, build_id: str) -> Any:
         """Get one template build.
 
-        ``GET /v2/agents/templates/{template_id}/builds/{build_id}``
+        ``GET /v2/harness-runtime/templates/{template_id}/builds/{build_id}``
         """
         return self._parse_json(
             self._send(
@@ -194,7 +194,7 @@ class TemplatesOperations:
     def get_build_logs(self, template_id: str, build_id: str) -> Any:
         """Return a short-lived signed URL for archived build logs.
 
-        ``GET /v2/agents/templates/{template_id}/builds/{build_id}/logs``
+        ``GET /v2/harness-runtime/templates/{template_id}/builds/{build_id}/logs``
 
         Response shape is ``{"signed_url": "..."}`` (≈15-minute Spaces GET URL).
         """

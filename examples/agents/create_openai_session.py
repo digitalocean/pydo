@@ -5,7 +5,7 @@ Flow (same as doctl agents start):
   1. Read the manifest config file
   2. POST OpenAI create-session body → api.openai.com
   3. Resolve ${ENV_ID} / ${REMOTE_URL} / ${OPENAI_API_KEY} into the manifest
-  4. POST resolved YAML → DO /v2/agents/sessions?openai_session_id=...
+  4. POST resolved YAML → DO /v2/harness-runtime/sessions?openai_session_id=...
 
 Required env:
   DIGITALOCEAN_TOKEN

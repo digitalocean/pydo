@@ -76,7 +76,7 @@ class AsyncTriggersOperations:
         kind: Optional[str] = None,
         status: Optional[str] = None,
     ) -> Any:
-        """List the calling team's triggers (``GET /v2/agents/triggers``)."""
+        """List the calling team's triggers (``GET /v2/harness-runtime/triggers``)."""
         return await self._parse_json(
             await self._send(
                 "GET",
@@ -91,7 +91,7 @@ class AsyncTriggersOperations:
         )
 
     async def create(self, body: Dict[str, Any]) -> Any:
-        """Create a webhook or cron trigger (``POST /v2/agents/triggers``)."""
+        """Create a webhook or cron trigger (``POST /v2/harness-runtime/triggers``)."""
         if not isinstance(body, dict) or not body:
             raise ValueError("body must be a non-empty dict")
         return await self._parse_json(
@@ -105,7 +105,7 @@ class AsyncTriggersOperations:
         )
 
     async def update(self, trigger_id: str, body: Dict[str, Any]) -> Any:
-        """Partial-update a trigger (``PATCH /v2/agents/triggers/{id}``)."""
+        """Partial-update a trigger (``PATCH /v2/harness-runtime/triggers/{id}``)."""
         if not isinstance(body, dict) or not body:
             raise ValueError("body must be a non-empty dict")
         return await self._parse_json(
@@ -117,7 +117,7 @@ class AsyncTriggersOperations:
         )
 
     async def delete(self, trigger_id: str) -> None:
-        """Soft-delete a trigger (``DELETE /v2/agents/triggers/{id}``)."""
+        """Soft-delete a trigger (``DELETE /v2/harness-runtime/triggers/{id}``)."""
         await self._send("DELETE", f"{_TRIGGERS_PATH}/{_quote(trigger_id)}")
 
     async def rotate_secret(
