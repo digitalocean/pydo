@@ -20,6 +20,14 @@ pydo.gateway.custom\_operations module
    :undoc-members:
    :show-inheritance:
 
+pydo.gateway.endpoint module
+----------------------------
+
+.. automodule:: pydo.gateway.endpoint
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pydo.gateway.providers module
 -----------------------------
 

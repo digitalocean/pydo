@@ -3,7 +3,11 @@
 # Licensed under the Apache-2.0 License.
 # ------------------------------------
 # pylint: disable=duplicate-code
-"""Async Action Gateway sessions."""
+"""Async Action Gateway sessions.
+
+Deprecated: use :mod:`pydo.aio.gateway.endpoint`. Existing sessions and their
+MCP URLs keep working.
+"""
 
 from __future__ import annotations
 
@@ -34,7 +38,11 @@ def _pick(data: Dict[str, Any], *keys: str) -> Any:
 
 
 class AsyncSession:
-    """Async twin of :class:`pydo.gateway.session.Session`."""
+    """Async twin of :class:`pydo.gateway.session.Session`.
+
+    Deprecated: use :class:`~pydo.aio.gateway.endpoint.AsyncEndpoint` or
+    :class:`~pydo.aio.gateway.endpoint.AsyncEndpointVersion`.
+    """
 
     def __init__(
         self,
@@ -100,7 +108,11 @@ class AsyncSession:
 
 
 class AsyncSessionsOperations:
-    """Create sessions through the generated async Action Gateway operation."""
+    """Create sessions through the generated async Action Gateway operation.
+
+    Deprecated: use :class:`~pydo.aio.gateway.endpoint.AsyncEndpointsOperations`
+    (``client.gateway.endpoints``).
+    """
 
     def __init__(
         self,

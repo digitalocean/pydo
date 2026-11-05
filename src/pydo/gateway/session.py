@@ -3,7 +3,12 @@
 # Licensed under the Apache-2.0 License.
 # ------------------------------------
 # pylint: disable=duplicate-code
-"""Action Gateway sessions — create on the DO API, execute on the gateway."""
+"""Action Gateway sessions — create on the DO API, execute on the gateway.
+
+Deprecated: sessions are superseded by endpoints (:mod:`pydo.gateway.endpoint`).
+A session is equivalent to a single endpoint version. Existing sessions and
+their MCP URLs keep working.
+"""
 
 from __future__ import annotations
 
@@ -67,6 +72,10 @@ def normalize_permissions(permissions: Optional[Dict[str, Any]]) -> Dict[str, An
 
 class Session:
     """A gateway session bound to an ``actor_id`` and tool policy.
+
+    Deprecated: use :class:`~pydo.gateway.endpoint.Endpoint`, whose MCP URL
+    follows its latest version, or :class:`~pydo.gateway.endpoint.EndpointVersion`
+    for a pinned URL.
 
     Create via :meth:`SessionsOperations.create`. Use ``url`` for external
     MCP clients, ``tools()`` for inference ``tools=``, and
@@ -140,7 +149,11 @@ class Session:
 
 
 class SessionsOperations:
-    """Create sessions through the generated Action Gateway operation."""
+    """Create sessions through the generated Action Gateway operation.
+
+    Deprecated: use :class:`~pydo.gateway.endpoint.EndpointsOperations`
+    (``client.gateway.endpoints``).
+    """
 
     def __init__(
         self,
@@ -164,6 +177,10 @@ class SessionsOperations:
         config: Optional[Dict[str, Any]] = None,
     ) -> Session:
         """Create a session.
+
+        Deprecated: use :meth:`EndpointsOperations.create
+        <pydo.gateway.endpoint.EndpointsOperations.create>`, which takes the
+        same tool, permission, and config options plus an endpoint name.
 
         :param actor_id: Required actor identifier used to evaluate the policy.
         :param name: Optional display name (auto-generated when omitted).

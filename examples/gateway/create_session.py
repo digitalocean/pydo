@@ -1,5 +1,8 @@
 """Create an Action Gateway session and print its MCP URL.
 
+Deprecated: sessions are superseded by endpoints; see create_endpoint.py.
+Existing sessions and their MCP URLs keep working.
+
 Required env:
   DIGITALOCEAN_TOKEN
 
