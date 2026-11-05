@@ -639,6 +639,304 @@ def build_output_views_delete_request(view_id: str, **kwargs: Any) -> HttpReques
     return HttpRequest(method="DELETE", url=_url, headers=_headers, **kwargs)
 
 
+def build_endpoints_create_request(**kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/endpoints"
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_endpoints_list_request(
+    *,
+    page_size: int = 20,
+    page_token: Optional[str] = None,
+    name: Optional[str] = None,
+    actor_id: Optional[str] = None,
+    **kwargs: Any,
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/endpoints"
+
+    # Construct parameters
+    if page_size is not None:
+        _params["page_size"] = _SERIALIZER.query(
+            "page_size", page_size, "int", maximum=100, minimum=1
+        )
+    if page_token is not None:
+        _params["page_token"] = _SERIALIZER.query("page_token", page_token, "str")
+    if name is not None:
+        _params["name"] = _SERIALIZER.query("name", name, "str")
+    if actor_id is not None:
+        _params["actor_id"] = _SERIALIZER.query("actor_id", actor_id, "str")
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
+
+
+def build_endpoints_list_search_request(
+    *,
+    query: str,
+    actor_id: Optional[str] = None,
+    page_size: int = 20,
+    page_token: Optional[str] = None,
+    **kwargs: Any,
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/endpoints/search"
+
+    # Construct parameters
+    _params["query"] = _SERIALIZER.query("query", query, "str", min_length=1)
+    if actor_id is not None:
+        _params["actor_id"] = _SERIALIZER.query("actor_id", actor_id, "str")
+    if page_size is not None:
+        _params["page_size"] = _SERIALIZER.query(
+            "page_size", page_size, "int", maximum=100, minimum=1
+        )
+    if page_token is not None:
+        _params["page_token"] = _SERIALIZER.query("page_token", page_token, "str")
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
+
+
+def build_endpoints_get_request(endpoint_id: str, **kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/endpoints/{endpoint_id}"
+    path_format_arguments = {
+        "endpoint_id": _SERIALIZER.url("endpoint_id", endpoint_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
+
+
+def build_endpoints_patch_request(endpoint_id: str, **kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/endpoints/{endpoint_id}"
+    path_format_arguments = {
+        "endpoint_id": _SERIALIZER.url("endpoint_id", endpoint_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="PATCH", url=_url, headers=_headers, **kwargs)
+
+
+def build_endpoints_delete_request(endpoint_id: str, **kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/endpoints/{endpoint_id}"
+    path_format_arguments = {
+        "endpoint_id": _SERIALIZER.url("endpoint_id", endpoint_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="DELETE", url=_url, headers=_headers, **kwargs)
+
+
+def build_endpoint_versions_create_request(
+    endpoint_id: str, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/endpoints/{endpoint_id}/versions"
+    path_format_arguments = {
+        "endpoint_id": _SERIALIZER.url("endpoint_id", endpoint_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_endpoint_versions_list_request(
+    endpoint_id: str,
+    *,
+    page_size: int = 20,
+    page_token: Optional[str] = None,
+    **kwargs: Any,
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/endpoints/{endpoint_id}/versions"
+    path_format_arguments = {
+        "endpoint_id": _SERIALIZER.url("endpoint_id", endpoint_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct parameters
+    if page_size is not None:
+        _params["page_size"] = _SERIALIZER.query(
+            "page_size", page_size, "int", maximum=100, minimum=1
+        )
+    if page_token is not None:
+        _params["page_token"] = _SERIALIZER.query("page_token", page_token, "str")
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
+
+
+def build_endpoint_versions_create_promotion_request(  # pylint: disable=name-too-long
+    endpoint_id: str, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/endpoints/{endpoint_id}/versions:promote"
+    path_format_arguments = {
+        "endpoint_id": _SERIALIZER.url("endpoint_id", endpoint_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_endpoint_versions_get_request(version_id: str, **kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/endpoint-versions/{version_id}"
+    path_format_arguments = {
+        "version_id": _SERIALIZER.url(
+            "version_id",
+            version_id,
+            "str",
+            pattern=r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.v([1-9][0-9]{0,8}|[1-3][0-9]{9}|4[01][0-9]{8}|42[0-8][0-9]{7}|429[0-3][0-9]{6}|4294[0-8][0-9]{5}|42949[0-5][0-9]{4}|429496[0-6][0-9]{3}|4294967[01][0-9]{2}|42949672[0-8][0-9]|429496729[0-5])$",
+        ),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
+
+
+def build_endpoint_versions_delete_request(
+    version_id: str, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/action-gateway/endpoint-versions/{version_id}"
+    path_format_arguments = {
+        "version_id": _SERIALIZER.url(
+            "version_id",
+            version_id,
+            "str",
+            pattern=r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.v([1-9][0-9]{0,8}|[1-3][0-9]{9}|4[01][0-9]{8}|42[0-8][0-9]{7}|429[0-3][0-9]{6}|4294[0-8][0-9]{5}|42949[0-5][0-9]{4}|429496[0-6][0-9]{3}|4294967[01][0-9]{2}|42949672[0-8][0-9]|429496729[0-5])$",
+        ),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="DELETE", url=_url, headers=_headers, **kwargs)
+
+
 def build_sessions_create_request(**kwargs: Any) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
 
@@ -1357,7 +1655,9 @@ def build_users_get_request(user_id: str, **kwargs: Any) -> HttpRequest:
 
 def build_gateway_tools_list_request(
     *,
-    x_session_id: str,
+    x_session_id: Optional[str] = None,
+    x_endpoint_id: Optional[str] = None,
+    x_actor_id: Optional[str] = None,
     page_size: int = 20,
     page_token: Optional[str] = None,
     etag: Optional[str] = None,
@@ -1381,7 +1681,16 @@ def build_gateway_tools_list_request(
         _params["page_token"] = _SERIALIZER.query("page_token", page_token, "str")
 
     # Construct headers
-    _headers["X-Session-Id"] = _SERIALIZER.header("x_session_id", x_session_id, "str")
+    if x_session_id is not None:
+        _headers["X-Session-Id"] = _SERIALIZER.header(
+            "x_session_id", x_session_id, "str"
+        )
+    if x_endpoint_id is not None:
+        _headers["X-Endpoint-Id"] = _SERIALIZER.header(
+            "x_endpoint_id", x_endpoint_id, "str"
+        )
+    if x_actor_id is not None:
+        _headers["X-Actor-Id"] = _SERIALIZER.header("x_actor_id", x_actor_id, "str")
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
     if_match = prep_if_match(etag, match_condition)
     if if_match is not None:
@@ -1398,7 +1707,11 @@ def build_gateway_tools_list_request(
 
 
 def build_gateway_tools_list_search_request(
-    *, x_session_id: str, **kwargs: Any
+    *,
+    x_session_id: Optional[str] = None,
+    x_endpoint_id: Optional[str] = None,
+    x_actor_id: Optional[str] = None,
+    **kwargs: Any,
 ) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
 
@@ -1411,7 +1724,16 @@ def build_gateway_tools_list_search_request(
     _url = "/tools/search"
 
     # Construct headers
-    _headers["X-Session-Id"] = _SERIALIZER.header("x_session_id", x_session_id, "str")
+    if x_session_id is not None:
+        _headers["X-Session-Id"] = _SERIALIZER.header(
+            "x_session_id", x_session_id, "str"
+        )
+    if x_endpoint_id is not None:
+        _headers["X-Endpoint-Id"] = _SERIALIZER.header(
+            "x_endpoint_id", x_endpoint_id, "str"
+        )
+    if x_actor_id is not None:
+        _headers["X-Actor-Id"] = _SERIALIZER.header("x_actor_id", x_actor_id, "str")
     if content_type is not None:
         _headers["Content-Type"] = _SERIALIZER.header(
             "content_type", content_type, "str"
@@ -1421,7 +1743,13 @@ def build_gateway_tools_list_search_request(
     return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
 
 
-def build_gateway_tools_run_request(*, x_session_id: str, **kwargs: Any) -> HttpRequest:
+def build_gateway_tools_run_request(
+    *,
+    x_session_id: Optional[str] = None,
+    x_endpoint_id: Optional[str] = None,
+    x_actor_id: Optional[str] = None,
+    **kwargs: Any,
+) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
 
     content_type: Optional[str] = kwargs.pop(
@@ -1433,7 +1761,16 @@ def build_gateway_tools_run_request(*, x_session_id: str, **kwargs: Any) -> Http
     _url = "/tools/invoke"
 
     # Construct headers
-    _headers["X-Session-Id"] = _SERIALIZER.header("x_session_id", x_session_id, "str")
+    if x_session_id is not None:
+        _headers["X-Session-Id"] = _SERIALIZER.header(
+            "x_session_id", x_session_id, "str"
+        )
+    if x_endpoint_id is not None:
+        _headers["X-Endpoint-Id"] = _SERIALIZER.header(
+            "x_endpoint_id", x_endpoint_id, "str"
+        )
+    if x_actor_id is not None:
+        _headers["X-Actor-Id"] = _SERIALIZER.header("x_actor_id", x_actor_id, "str")
     if content_type is not None:
         _headers["Content-Type"] = _SERIALIZER.header(
             "content_type", content_type, "str"
@@ -1443,7 +1780,13 @@ def build_gateway_tools_run_request(*, x_session_id: str, **kwargs: Any) -> Http
     return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
 
 
-def build_gateway_code_run_request(*, x_session_id: str, **kwargs: Any) -> HttpRequest:
+def build_gateway_code_run_request(
+    *,
+    x_session_id: Optional[str] = None,
+    x_endpoint_id: Optional[str] = None,
+    x_actor_id: Optional[str] = None,
+    **kwargs: Any,
+) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
 
     content_type: Optional[str] = kwargs.pop(
@@ -1455,7 +1798,16 @@ def build_gateway_code_run_request(*, x_session_id: str, **kwargs: Any) -> HttpR
     _url = "/code/execute"
 
     # Construct headers
-    _headers["X-Session-Id"] = _SERIALIZER.header("x_session_id", x_session_id, "str")
+    if x_session_id is not None:
+        _headers["X-Session-Id"] = _SERIALIZER.header(
+            "x_session_id", x_session_id, "str"
+        )
+    if x_endpoint_id is not None:
+        _headers["X-Endpoint-Id"] = _SERIALIZER.header(
+            "x_endpoint_id", x_endpoint_id, "str"
+        )
+    if x_actor_id is not None:
+        _headers["X-Actor-Id"] = _SERIALIZER.header("x_actor_id", x_actor_id, "str")
     if content_type is not None:
         _headers["Content-Type"] = _SERIALIZER.header(
             "content_type", content_type, "str"
@@ -1466,7 +1818,11 @@ def build_gateway_code_run_request(*, x_session_id: str, **kwargs: Any) -> HttpR
 
 
 def build_gateway_session_approvals_update_request(  # pylint: disable=name-too-long
-    session_id: str, approval_id: str, **kwargs: Any
+    session_id: str,
+    approval_id: str,
+    *,
+    x_actor_id: Optional[str] = None,
+    **kwargs: Any,
 ) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
 
@@ -1485,6 +1841,8 @@ def build_gateway_session_approvals_update_request(  # pylint: disable=name-too-
     _url: str = _url.format(**path_format_arguments)  # type: ignore
 
     # Construct headers
+    if x_actor_id is not None:
+        _headers["X-Actor-Id"] = _SERIALIZER.header("x_actor_id", x_actor_id, "str")
     if content_type is not None:
         _headers["Content-Type"] = _SERIALIZER.header(
             "content_type", content_type, "str"
@@ -1495,7 +1853,12 @@ def build_gateway_session_approvals_update_request(  # pylint: disable=name-too-
 
 
 def build_gateway_approvals_update_request(
-    approval_id: str, *, x_session_id: str, **kwargs: Any
+    approval_id: str,
+    *,
+    x_session_id: Optional[str] = None,
+    x_endpoint_id: Optional[str] = None,
+    x_actor_id: Optional[str] = None,
+    **kwargs: Any,
 ) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
 
@@ -1513,7 +1876,16 @@ def build_gateway_approvals_update_request(
     _url: str = _url.format(**path_format_arguments)  # type: ignore
 
     # Construct headers
-    _headers["X-Session-Id"] = _SERIALIZER.header("x_session_id", x_session_id, "str")
+    if x_session_id is not None:
+        _headers["X-Session-Id"] = _SERIALIZER.header(
+            "x_session_id", x_session_id, "str"
+        )
+    if x_endpoint_id is not None:
+        _headers["X-Endpoint-Id"] = _SERIALIZER.header(
+            "x_endpoint_id", x_endpoint_id, "str"
+        )
+    if x_actor_id is not None:
+        _headers["X-Actor-Id"] = _SERIALIZER.header("x_actor_id", x_actor_id, "str")
     if content_type is not None:
         _headers["Content-Type"] = _SERIALIZER.header(
             "content_type", content_type, "str"
@@ -3684,6 +4056,108 @@ def build_harness_list_webhook_providers_request(
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
 
     return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
+
+
+def build_harness_list_workspaces_request(
+    *,
+    page_size: Optional[int] = None,
+    page_token: Optional[str] = None,
+    state: Optional[str] = None,
+    **kwargs: Any,
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/agents/workspaces"
+
+    # Construct parameters
+    if page_size is not None:
+        _params["page_size"] = _SERIALIZER.query(
+            "page_size", page_size, "int", minimum=1
+        )
+    if page_token is not None:
+        _params["page_token"] = _SERIALIZER.query("page_token", page_token, "str")
+    if state is not None:
+        _params["state"] = _SERIALIZER.query("state", state, "str")
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
+
+
+def build_harness_create_workspace_request(
+    *, idempotency_key: Optional[str] = None, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/agents/workspaces"
+
+    # Construct headers
+    if idempotency_key is not None:
+        _headers["Idempotency-Key"] = _SERIALIZER.header(
+            "idempotency_key", idempotency_key, "str", max_length=255
+        )
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_harness_get_workspace_request(
+    workspace_id: str, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/agents/workspaces/{workspace_id}"
+    path_format_arguments = {
+        "workspace_id": _SERIALIZER.url("workspace_id", workspace_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
+
+
+def build_harness_delete_workspace_request(
+    workspace_id: str, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/agents/workspaces/{workspace_id}"
+    path_format_arguments = {
+        "workspace_id": _SERIALIZER.url("workspace_id", workspace_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="DELETE", url=_url, headers=_headers, **kwargs)
 
 
 def build_apps_list_request(
@@ -9468,6 +9942,149 @@ def build_insights_delete_alert_rule_request(id: str, **kwargs: Any) -> HttpRequ
     _url = "/v2/insights/alert-rules/{id}"
     path_format_arguments = {
         "id": _SERIALIZER.url("id", id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="DELETE", url=_url, headers=_headers, **kwargs)
+
+
+def build_insights_list_dashboards_request(
+    *,
+    pagination_page: int = 1,
+    pagination_per_page: int = 20,
+    pagination_sort: Optional[str] = None,
+    pagination_sort_direction: Optional[str] = None,
+    **kwargs: Any,
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/insights/dashboards"
+
+    # Construct parameters
+    if pagination_page is not None:
+        _params["pagination.page"] = _SERIALIZER.query(
+            "pagination_page", pagination_page, "int", minimum=1
+        )
+    if pagination_per_page is not None:
+        _params["pagination.per_page"] = _SERIALIZER.query(
+            "pagination_per_page", pagination_per_page, "int", maximum=200, minimum=1
+        )
+    if pagination_sort is not None:
+        _params["pagination.sort"] = _SERIALIZER.query(
+            "pagination_sort", pagination_sort, "str"
+        )
+    if pagination_sort_direction is not None:
+        _params["pagination.sort_direction"] = _SERIALIZER.query(
+            "pagination_sort_direction", pagination_sort_direction, "str"
+        )
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
+
+
+def build_insights_create_dashboard_request(**kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/insights/dashboards"
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_insights_get_dashboard_schema_request(
+    **kwargs: Any,
+) -> HttpRequest:  # pylint: disable=name-too-long
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/insights/dashboards/schema"
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
+
+
+def build_insights_get_dashboard_request(uuid: str, **kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/insights/dashboards/{uuid}"
+    path_format_arguments = {
+        "uuid": _SERIALIZER.url("uuid", uuid, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
+
+
+def build_insights_update_dashboard_request(uuid: str, **kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/insights/dashboards/{uuid}"
+    path_format_arguments = {
+        "uuid": _SERIALIZER.url("uuid", uuid, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="PUT", url=_url, headers=_headers, **kwargs)
+
+
+def build_insights_delete_dashboard_request(uuid: str, **kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/insights/dashboards/{uuid}"
+    path_format_arguments = {
+        "uuid": _SERIALIZER.url("uuid", uuid, "str"),
     }
 
     _url: str = _url.format(**path_format_arguments)  # type: ignore
@@ -16335,6 +16952,28 @@ def build_snapshots_delete_request(snapshot_id: JSON, **kwargs: Any) -> HttpRequ
     _url = "/v2/snapshots/{snapshot_id}"
     path_format_arguments = {
         "snapshot_id": _SERIALIZER.url("snapshot_id", snapshot_id, "object"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="DELETE", url=_url, headers=_headers, **kwargs)
+
+
+def build_snapshots_delete_region_request(
+    snapshot_id: JSON, region: str, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/snapshots/{snapshot_id}/regions/{region}"
+    path_format_arguments = {
+        "snapshot_id": _SERIALIZER.url("snapshot_id", snapshot_id, "object"),
+        "region": _SERIALIZER.url("region", region, "str"),
     }
 
     _url: str = _url.format(**path_format_arguments)  # type: ignore
@@ -29417,6 +30056,5679 @@ class OutputViewsOperations:
         return cast(JSON, deserialized)  # type: ignore
 
 
+class EndpointsOperations:
+    """
+    .. warning::
+        **DO NOT** instantiate this class directly.
+
+        Instead, you should access the following operations through
+        :class:`~pydo.GeneratedClient`'s
+        :attr:`endpoints` attribute.
+    """
+
+    def __init__(self, *args, **kwargs):
+        input_args = list(args)
+        self._client = input_args.pop(0) if input_args else kwargs.pop("client")
+        self._config = input_args.pop(0) if input_args else kwargs.pop("config")
+        self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
+        self._deserialize = (
+            input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        )
+
+    @overload
+    def create(
+        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create an Endpoint.
+
+        Creates a named endpoint and its first immutable version atomically. The MCP URL follows the
+        highest-numbered live version; version_mcp_url stays pinned. The top-level insights field sets
+        the endpoint's Insights consent; version.insights is deprecated and ignored. An invalid name
+        returns 400 invalid_endpoint_name; a duplicate team name returns 409 endpoint_name_taken.
+
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "name": "str",  # Endpoint name, unique within your team. Required.
+                    "version": {
+                        "actor_id": "str",  # Optional. Actor whose provider connections are
+                          used. Omitted or empty means no actor.
+                        "config": {
+                            "cache": {
+                                "allEligible": bool,  # Optional. Enables caching for
+                                  every called tool version with a catalog cache policy, including
+                                  tools that become eligible after session creation. Do not combine
+                                  with tools. True
+                                "maxAgeSeconds": 0,  # Optional. Maximum cache
+                                  lifetime in seconds for this session. Omit to use each tool's
+                                  lifetime, up to 300 seconds. A smaller tool lifetime or provider
+                                  response cache header can shorten it. Per-call max_age_seconds can
+                                  require a fresher result but cannot increase this limit.
+                                "tools": [
+                                    "str"  # Optional. Provider-qualified tool
+                                      slugs to cache. Every listed tool must resolve for the team and
+                                      have a catalog cache policy, or session creation fails. Use slugs
+                                      without version suffixes or toolbelt references. An empty array
+                                      enables no tools.
+                                ]
+                            },
+                            "customInstructions": "str",  # Optional. Instructions for
+                              tools in this version.
+                            "outputViews": {
+                                "str": "str"  # Optional. Maps up to 100 tool slugs
+                                  to output-view names.
+                            },
+                            "preloadTools": [
+                                "str"  # Optional. Tool names, optionally
+                                  version-pinned, or version-pinned toolbelt references.
+                            ]
+                        },
+                        "insights": {
+                            "logs": bool,  # Optional. Explicit true enables customer
+                              logs and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                            "metrics": bool,  # Optional. Accepted and stored for parity
+                              with the Insights schema.
+                            "traces": bool  # Optional. Explicit true enables customer
+                              traces and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                        },
+                        "network": {
+                            "vpcUuid": "str"  # Optional. UUID of a VPC owned by your
+                              team in a supported region.
+                        },
+                        "policy": {
+                            "defaultAction": "str",  # Optional. Action for calls no rule
+                              matches. Omission means ask; responses then return
+                              SESSION_POLICY_ACTION_UNSPECIFIED. Known values are: "allow", "ask",
+                              "deny", and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                            "rules": [
+                                {
+                                    "action": "str",  # Action when the rule
+                                      matches. Required. Known values are: "allow", "ask", and "deny".
+                                    "tool": "str",  # Selected tool slug or
+                                      version-pinned toolbelt reference. Required.
+                                    "match": {
+                                        "str": "str"  # Optional. Argument
+                                          conditions; an empty object matches every call to the tool.
+                                    }
+                                }
+                            ]
+                        },
+                        "tools": [
+                            "str"  # Optional. Omitted enables every tool; an explicit
+                              empty array enables no tools. Direct tools use provider-qualified slugs,
+                              optionally pinned as tool@version. Toolbelts must be pinned as
+                              toolbelt:name@version. Floating pins are rejected.
+                        ]
+                    },
+                    "insights": {
+                        "logs": bool,  # Optional. Explicit true enables customer logs and
+                          false disables them. Omission preserves the existing choice without an
+                          implicit reset.
+                        "metrics": bool,  # Optional. Accepted and stored for parity with the
+                          Insights schema.
+                        "traces": bool  # Optional. Explicit true enables customer traces and
+                          false disables them. Omission preserves the existing choice without an
+                          implicit reset.
+                    }
+                }
+
+                # response body for status code(s): 201
+                response == {
+                    "endpoint": {
+                        "actor_id": "str",  # Immutable actor binding; empty means no actor.
+                          Required.
+                        "created_at": "2020-02-20 00:00:00",  # When the endpoint was
+                          created. Required.
+                        "id": "str",  # Lowercase, hyphenated endpoint UUID, without a URN
+                          prefix. Required.
+                        "name": "str",  # Endpoint name, unique within your team. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # When the endpoint was last
+                          changed. Required.
+                        "head_version": {
+                            "actor_id": "str",  # Actor binding shared by every version
+                              of the endpoint; empty means no actor. Required.
+                            "created_at": "2020-02-20 00:00:00",  # When the version was
+                              created. Required.
+                            "endpoint_id": "str",  # Lowercase, hyphenated endpoint UUID,
+                              without a URN prefix. Required.
+                            "id": "str",  # The endpoint UUID followed by .v and its
+                              version number, without a URN prefix. The UUID is lowercase and
+                              hyphenated. The number is from 1 through 4294967295, in decimal without
+                              signs or leading zeros. A bare UUID is not a version ID. Required.
+                            "name": "str",  # The endpoint's name when this version was
+                              created. Renaming the endpoint does not change it. Required.
+                            "policy": {
+                                "defaultAction": "str",  # Optional. Action for calls
+                                  no rule matches. Omission means ask; responses then return
+                                  SESSION_POLICY_ACTION_UNSPECIFIED. Known values are: "allow", "ask",
+                                  "deny", and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                                "rules": [
+                                    {
+                                        "action": "str",  # Action when the
+                                          rule matches. Required. Known values are: "allow", "ask", and
+                                          "deny".
+                                        "tool": "str",  # Selected tool slug
+                                          or version-pinned toolbelt reference. Required.
+                                        "match": {
+                                            "str": "str"  # Optional.
+                                              Argument conditions; an empty object matches every call
+                                              to the tool.
+                                        }
+                                    }
+                                ]
+                            },
+                            "updated_at": "2020-02-20 00:00:00",  # When the version was
+                              last updated. Required.
+                            "version_number": 0,  # Positive unsigned 32-bit version
+                              number, never reused after deletion. Required.
+                            "config": {
+                                "cache": {
+                                    "allEligible": bool,  # Optional. Enables
+                                      caching for every called tool version with a catalog cache
+                                      policy, including tools that become eligible after session
+                                      creation. Do not combine with tools. True
+                                    "maxAgeSeconds": 0,  # Optional. Maximum
+                                      cache lifetime in seconds for this session. Omit to use each
+                                      tool's lifetime, up to 300 seconds. A smaller tool lifetime or
+                                      provider response cache header can shorten it. Per-call
+                                      max_age_seconds can require a fresher result but cannot increase
+                                      this limit.
+                                    "tools": [
+                                        "str"  # Optional. Provider-qualified
+                                          tool slugs to cache. Every listed tool must resolve for the
+                                          team and have a catalog cache policy, or session creation
+                                          fails. Use slugs without version suffixes or toolbelt
+                                          references. An empty array enables no tools.
+                                    ]
+                                },
+                                "customInstructions": "str",  # Optional.
+                                  Instructions for tools in this version.
+                                "outputViews": {
+                                    "str": "str"  # Optional. Maps up to 100 tool
+                                      slugs to output-view names.
+                                },
+                                "preloadTools": [
+                                    "str"  # Optional. Tool names, optionally
+                                      version-pinned, or version-pinned toolbelt references.
+                                ]
+                            },
+                            "insights": {
+                                "logs": bool,  # Optional. Whether the session's
+                                  customer logs are sent to Insights.
+                                "metrics": bool,  # Optional. Accepted and stored for
+                                  parity with the Insights schema.
+                                "traces": bool  # Optional. Whether the session's
+                                  customer traces are sent to Insights.
+                            },
+                            "mcp_url": "str",  # Optional. Pinned MCP URL for this
+                              version, valid for the version's lifetime. It is the same value the
+                              create response returns as version_mcp_url. Its final segment is the
+                              backing session UUID, not the composite version ID. VPC-bound versions
+                              may use a regional host. Returned in responses only.
+                            "network": {
+                                "region": "str",  # The VPC's region, recorded when
+                                  the version was created. A tool call through a connection whose VPC
+                                  is in a different region is refused. This field is returned in
+                                  responses only and is rejected in requests. Required.
+                                "vpcUuid": "str"  # UUID of a VPC owned by your team
+                                  in a supported region. Required.
+                            },
+                            "promoted_from_version_number": 0,  # Optional. Positive
+                              unsigned 32-bit version number, never reused after deletion.
+                            "tools": {
+                                "references": [
+                                    {
+                                        "kind": "str",  # Optional. Whether
+                                          name is a tool or a toolbelt. Known values are:
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                        "name": "str",  # Optional. Tool slug
+                                          or toolbelt name.
+                                        "version": "str"  # Optional. Pinned
+                                          version.
+                                    }
+                                ]
+                            }
+                        },
+                        "insights": {
+                            "logs": bool,  # Optional. Explicit true enables customer
+                              logs and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                            "metrics": bool,  # Optional. Accepted and stored for parity
+                              with the Insights schema.
+                            "traces": bool  # Optional. Explicit true enables customer
+                              traces and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                        },
+                        "is_default": bool,  # Optional. True only for your own default
+                          endpoint in the team: the one the generic MCP URL and data-plane requests
+                          without ``X-Session-Id`` or ``X-Endpoint-Id`` resolve to for you, which
+                          Action Gateway creates on first use. False for every other endpoint,
+                          including other team members' default endpoints that a team owner can see, so
+                          a response marks at most one endpoint. A default endpoint does not count
+                          toward your team's endpoint limit or reserve its name. After it is deleted,
+                          the next such request creates a new default. Returned in responses only.
+                        "mcp_url": "str"  # Optional. MCP URL that resolves the
+                          highest-numbered live version on every request. Its host follows the head
+                          version's VPC region, or the default host when no version is live. It is the
+                          same value the create response returns as mcp_url. Returned in responses
+                          only.
+                    },
+                    "mcp_url": "str",  # MCP URL that resolves the highest-numbered live version
+                      on every request. Its host follows the head version's VPC region, or the default
+                      host when no version is live. Required.
+                    "version": {
+                        "actor_id": "str",  # Actor binding shared by every version of the
+                          endpoint; empty means no actor. Required.
+                        "created_at": "2020-02-20 00:00:00",  # When the version was created.
+                          Required.
+                        "endpoint_id": "str",  # Lowercase, hyphenated endpoint UUID, without
+                          a URN prefix. Required.
+                        "id": "str",  # The endpoint UUID followed by .v and its version
+                          number, without a URN prefix. The UUID is lowercase and hyphenated. The
+                          number is from 1 through 4294967295, in decimal without signs or leading
+                          zeros. A bare UUID is not a version ID. Required.
+                        "name": "str",  # The endpoint's name when this version was created.
+                          Renaming the endpoint does not change it. Required.
+                        "policy": {
+                            "defaultAction": "str",  # Optional. Action for calls no rule
+                              matches. Omission means ask; responses then return
+                              SESSION_POLICY_ACTION_UNSPECIFIED. Known values are: "allow", "ask",
+                              "deny", and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                            "rules": [
+                                {
+                                    "action": "str",  # Action when the rule
+                                      matches. Required. Known values are: "allow", "ask", and "deny".
+                                    "tool": "str",  # Selected tool slug or
+                                      version-pinned toolbelt reference. Required.
+                                    "match": {
+                                        "str": "str"  # Optional. Argument
+                                          conditions; an empty object matches every call to the tool.
+                                    }
+                                }
+                            ]
+                        },
+                        "updated_at": "2020-02-20 00:00:00",  # When the version was last
+                          updated. Required.
+                        "version_number": 0,  # Positive unsigned 32-bit version number,
+                          never reused after deletion. Required.
+                        "config": {
+                            "cache": {
+                                "allEligible": bool,  # Optional. Enables caching for
+                                  every called tool version with a catalog cache policy, including
+                                  tools that become eligible after session creation. Do not combine
+                                  with tools. True
+                                "maxAgeSeconds": 0,  # Optional. Maximum cache
+                                  lifetime in seconds for this session. Omit to use each tool's
+                                  lifetime, up to 300 seconds. A smaller tool lifetime or provider
+                                  response cache header can shorten it. Per-call max_age_seconds can
+                                  require a fresher result but cannot increase this limit.
+                                "tools": [
+                                    "str"  # Optional. Provider-qualified tool
+                                      slugs to cache. Every listed tool must resolve for the team and
+                                      have a catalog cache policy, or session creation fails. Use slugs
+                                      without version suffixes or toolbelt references. An empty array
+                                      enables no tools.
+                                ]
+                            },
+                            "customInstructions": "str",  # Optional. Instructions for
+                              tools in this version.
+                            "outputViews": {
+                                "str": "str"  # Optional. Maps up to 100 tool slugs
+                                  to output-view names.
+                            },
+                            "preloadTools": [
+                                "str"  # Optional. Tool names, optionally
+                                  version-pinned, or version-pinned toolbelt references.
+                            ]
+                        },
+                        "insights": {
+                            "logs": bool,  # Optional. Whether the session's customer
+                              logs are sent to Insights.
+                            "metrics": bool,  # Optional. Accepted and stored for parity
+                              with the Insights schema.
+                            "traces": bool  # Optional. Whether the session's customer
+                              traces are sent to Insights.
+                        },
+                        "mcp_url": "str",  # Optional. Pinned MCP URL for this version, valid
+                          for the version's lifetime. It is the same value the create response returns
+                          as version_mcp_url. Its final segment is the backing session UUID, not the
+                          composite version ID. VPC-bound versions may use a regional host. Returned in
+                          responses only.
+                        "network": {
+                            "region": "str",  # The VPC's region, recorded when the
+                              version was created. A tool call through a connection whose VPC is in a
+                              different region is refused. This field is returned in responses only and
+                              is rejected in requests. Required.
+                            "vpcUuid": "str"  # UUID of a VPC owned by your team in a
+                              supported region. Required.
+                        },
+                        "promoted_from_version_number": 0,  # Optional. Positive unsigned
+                          32-bit version number, never reused after deletion.
+                        "tools": {
+                            "references": [
+                                {
+                                    "kind": "str",  # Optional. Whether name is a
+                                      tool or a toolbelt. Known values are:
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                    "name": "str",  # Optional. Tool slug or
+                                      toolbelt name.
+                                    "version": "str"  # Optional. Pinned version.
+                                }
+                            ]
+                        }
+                    },
+                    "version_mcp_url": "str"  # Pinned MCP URL, valid for this version's
+                      lifetime. Its final segment is the backing session UUID, not the public composite
+                      version ID. VPC-bound versions may use a regional host. Existing /mcp/session/
+                      URLs keep working. Required.
+                }
+                # response body for status code(s): 400, 409, 429
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    def create(
+        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create an Endpoint.
+
+        Creates a named endpoint and its first immutable version atomically. The MCP URL follows the
+        highest-numbered live version; version_mcp_url stays pinned. The top-level insights field sets
+        the endpoint's Insights consent; version.insights is deprecated and ignored. An invalid name
+        returns 400 invalid_endpoint_name; a duplicate team name returns 409 endpoint_name_taken.
+
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 201
+                response == {
+                    "endpoint": {
+                        "actor_id": "str",  # Immutable actor binding; empty means no actor.
+                          Required.
+                        "created_at": "2020-02-20 00:00:00",  # When the endpoint was
+                          created. Required.
+                        "id": "str",  # Lowercase, hyphenated endpoint UUID, without a URN
+                          prefix. Required.
+                        "name": "str",  # Endpoint name, unique within your team. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # When the endpoint was last
+                          changed. Required.
+                        "head_version": {
+                            "actor_id": "str",  # Actor binding shared by every version
+                              of the endpoint; empty means no actor. Required.
+                            "created_at": "2020-02-20 00:00:00",  # When the version was
+                              created. Required.
+                            "endpoint_id": "str",  # Lowercase, hyphenated endpoint UUID,
+                              without a URN prefix. Required.
+                            "id": "str",  # The endpoint UUID followed by .v and its
+                              version number, without a URN prefix. The UUID is lowercase and
+                              hyphenated. The number is from 1 through 4294967295, in decimal without
+                              signs or leading zeros. A bare UUID is not a version ID. Required.
+                            "name": "str",  # The endpoint's name when this version was
+                              created. Renaming the endpoint does not change it. Required.
+                            "policy": {
+                                "defaultAction": "str",  # Optional. Action for calls
+                                  no rule matches. Omission means ask; responses then return
+                                  SESSION_POLICY_ACTION_UNSPECIFIED. Known values are: "allow", "ask",
+                                  "deny", and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                                "rules": [
+                                    {
+                                        "action": "str",  # Action when the
+                                          rule matches. Required. Known values are: "allow", "ask", and
+                                          "deny".
+                                        "tool": "str",  # Selected tool slug
+                                          or version-pinned toolbelt reference. Required.
+                                        "match": {
+                                            "str": "str"  # Optional.
+                                              Argument conditions; an empty object matches every call
+                                              to the tool.
+                                        }
+                                    }
+                                ]
+                            },
+                            "updated_at": "2020-02-20 00:00:00",  # When the version was
+                              last updated. Required.
+                            "version_number": 0,  # Positive unsigned 32-bit version
+                              number, never reused after deletion. Required.
+                            "config": {
+                                "cache": {
+                                    "allEligible": bool,  # Optional. Enables
+                                      caching for every called tool version with a catalog cache
+                                      policy, including tools that become eligible after session
+                                      creation. Do not combine with tools. True
+                                    "maxAgeSeconds": 0,  # Optional. Maximum
+                                      cache lifetime in seconds for this session. Omit to use each
+                                      tool's lifetime, up to 300 seconds. A smaller tool lifetime or
+                                      provider response cache header can shorten it. Per-call
+                                      max_age_seconds can require a fresher result but cannot increase
+                                      this limit.
+                                    "tools": [
+                                        "str"  # Optional. Provider-qualified
+                                          tool slugs to cache. Every listed tool must resolve for the
+                                          team and have a catalog cache policy, or session creation
+                                          fails. Use slugs without version suffixes or toolbelt
+                                          references. An empty array enables no tools.
+                                    ]
+                                },
+                                "customInstructions": "str",  # Optional.
+                                  Instructions for tools in this version.
+                                "outputViews": {
+                                    "str": "str"  # Optional. Maps up to 100 tool
+                                      slugs to output-view names.
+                                },
+                                "preloadTools": [
+                                    "str"  # Optional. Tool names, optionally
+                                      version-pinned, or version-pinned toolbelt references.
+                                ]
+                            },
+                            "insights": {
+                                "logs": bool,  # Optional. Whether the session's
+                                  customer logs are sent to Insights.
+                                "metrics": bool,  # Optional. Accepted and stored for
+                                  parity with the Insights schema.
+                                "traces": bool  # Optional. Whether the session's
+                                  customer traces are sent to Insights.
+                            },
+                            "mcp_url": "str",  # Optional. Pinned MCP URL for this
+                              version, valid for the version's lifetime. It is the same value the
+                              create response returns as version_mcp_url. Its final segment is the
+                              backing session UUID, not the composite version ID. VPC-bound versions
+                              may use a regional host. Returned in responses only.
+                            "network": {
+                                "region": "str",  # The VPC's region, recorded when
+                                  the version was created. A tool call through a connection whose VPC
+                                  is in a different region is refused. This field is returned in
+                                  responses only and is rejected in requests. Required.
+                                "vpcUuid": "str"  # UUID of a VPC owned by your team
+                                  in a supported region. Required.
+                            },
+                            "promoted_from_version_number": 0,  # Optional. Positive
+                              unsigned 32-bit version number, never reused after deletion.
+                            "tools": {
+                                "references": [
+                                    {
+                                        "kind": "str",  # Optional. Whether
+                                          name is a tool or a toolbelt. Known values are:
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                        "name": "str",  # Optional. Tool slug
+                                          or toolbelt name.
+                                        "version": "str"  # Optional. Pinned
+                                          version.
+                                    }
+                                ]
+                            }
+                        },
+                        "insights": {
+                            "logs": bool,  # Optional. Explicit true enables customer
+                              logs and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                            "metrics": bool,  # Optional. Accepted and stored for parity
+                              with the Insights schema.
+                            "traces": bool  # Optional. Explicit true enables customer
+                              traces and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                        },
+                        "is_default": bool,  # Optional. True only for your own default
+                          endpoint in the team: the one the generic MCP URL and data-plane requests
+                          without ``X-Session-Id`` or ``X-Endpoint-Id`` resolve to for you, which
+                          Action Gateway creates on first use. False for every other endpoint,
+                          including other team members' default endpoints that a team owner can see, so
+                          a response marks at most one endpoint. A default endpoint does not count
+                          toward your team's endpoint limit or reserve its name. After it is deleted,
+                          the next such request creates a new default. Returned in responses only.
+                        "mcp_url": "str"  # Optional. MCP URL that resolves the
+                          highest-numbered live version on every request. Its host follows the head
+                          version's VPC region, or the default host when no version is live. It is the
+                          same value the create response returns as mcp_url. Returned in responses
+                          only.
+                    },
+                    "mcp_url": "str",  # MCP URL that resolves the highest-numbered live version
+                      on every request. Its host follows the head version's VPC region, or the default
+                      host when no version is live. Required.
+                    "version": {
+                        "actor_id": "str",  # Actor binding shared by every version of the
+                          endpoint; empty means no actor. Required.
+                        "created_at": "2020-02-20 00:00:00",  # When the version was created.
+                          Required.
+                        "endpoint_id": "str",  # Lowercase, hyphenated endpoint UUID, without
+                          a URN prefix. Required.
+                        "id": "str",  # The endpoint UUID followed by .v and its version
+                          number, without a URN prefix. The UUID is lowercase and hyphenated. The
+                          number is from 1 through 4294967295, in decimal without signs or leading
+                          zeros. A bare UUID is not a version ID. Required.
+                        "name": "str",  # The endpoint's name when this version was created.
+                          Renaming the endpoint does not change it. Required.
+                        "policy": {
+                            "defaultAction": "str",  # Optional. Action for calls no rule
+                              matches. Omission means ask; responses then return
+                              SESSION_POLICY_ACTION_UNSPECIFIED. Known values are: "allow", "ask",
+                              "deny", and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                            "rules": [
+                                {
+                                    "action": "str",  # Action when the rule
+                                      matches. Required. Known values are: "allow", "ask", and "deny".
+                                    "tool": "str",  # Selected tool slug or
+                                      version-pinned toolbelt reference. Required.
+                                    "match": {
+                                        "str": "str"  # Optional. Argument
+                                          conditions; an empty object matches every call to the tool.
+                                    }
+                                }
+                            ]
+                        },
+                        "updated_at": "2020-02-20 00:00:00",  # When the version was last
+                          updated. Required.
+                        "version_number": 0,  # Positive unsigned 32-bit version number,
+                          never reused after deletion. Required.
+                        "config": {
+                            "cache": {
+                                "allEligible": bool,  # Optional. Enables caching for
+                                  every called tool version with a catalog cache policy, including
+                                  tools that become eligible after session creation. Do not combine
+                                  with tools. True
+                                "maxAgeSeconds": 0,  # Optional. Maximum cache
+                                  lifetime in seconds for this session. Omit to use each tool's
+                                  lifetime, up to 300 seconds. A smaller tool lifetime or provider
+                                  response cache header can shorten it. Per-call max_age_seconds can
+                                  require a fresher result but cannot increase this limit.
+                                "tools": [
+                                    "str"  # Optional. Provider-qualified tool
+                                      slugs to cache. Every listed tool must resolve for the team and
+                                      have a catalog cache policy, or session creation fails. Use slugs
+                                      without version suffixes or toolbelt references. An empty array
+                                      enables no tools.
+                                ]
+                            },
+                            "customInstructions": "str",  # Optional. Instructions for
+                              tools in this version.
+                            "outputViews": {
+                                "str": "str"  # Optional. Maps up to 100 tool slugs
+                                  to output-view names.
+                            },
+                            "preloadTools": [
+                                "str"  # Optional. Tool names, optionally
+                                  version-pinned, or version-pinned toolbelt references.
+                            ]
+                        },
+                        "insights": {
+                            "logs": bool,  # Optional. Whether the session's customer
+                              logs are sent to Insights.
+                            "metrics": bool,  # Optional. Accepted and stored for parity
+                              with the Insights schema.
+                            "traces": bool  # Optional. Whether the session's customer
+                              traces are sent to Insights.
+                        },
+                        "mcp_url": "str",  # Optional. Pinned MCP URL for this version, valid
+                          for the version's lifetime. It is the same value the create response returns
+                          as version_mcp_url. Its final segment is the backing session UUID, not the
+                          composite version ID. VPC-bound versions may use a regional host. Returned in
+                          responses only.
+                        "network": {
+                            "region": "str",  # The VPC's region, recorded when the
+                              version was created. A tool call through a connection whose VPC is in a
+                              different region is refused. This field is returned in responses only and
+                              is rejected in requests. Required.
+                            "vpcUuid": "str"  # UUID of a VPC owned by your team in a
+                              supported region. Required.
+                        },
+                        "promoted_from_version_number": 0,  # Optional. Positive unsigned
+                          32-bit version number, never reused after deletion.
+                        "tools": {
+                            "references": [
+                                {
+                                    "kind": "str",  # Optional. Whether name is a
+                                      tool or a toolbelt. Known values are:
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                    "name": "str",  # Optional. Tool slug or
+                                      toolbelt name.
+                                    "version": "str"  # Optional. Pinned version.
+                                }
+                            ]
+                        }
+                    },
+                    "version_mcp_url": "str"  # Pinned MCP URL, valid for this version's
+                      lifetime. Its final segment is the backing session UUID, not the public composite
+                      version ID. VPC-bound versions may use a regional host. Existing /mcp/session/
+                      URLs keep working. Required.
+                }
+                # response body for status code(s): 400, 409, 429
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace
+    def create(self, body: Union[JSON, IO[bytes]], **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Create an Endpoint.
+
+        Creates a named endpoint and its first immutable version atomically. The MCP URL follows the
+        highest-numbered live version; version_mcp_url stays pinned. The top-level insights field sets
+        the endpoint's Insights consent; version.insights is deprecated and ignored. An invalid name
+        returns 400 invalid_endpoint_name; a duplicate team name returns 409 endpoint_name_taken.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "name": "str",  # Endpoint name, unique within your team. Required.
+                    "version": {
+                        "actor_id": "str",  # Optional. Actor whose provider connections are
+                          used. Omitted or empty means no actor.
+                        "config": {
+                            "cache": {
+                                "allEligible": bool,  # Optional. Enables caching for
+                                  every called tool version with a catalog cache policy, including
+                                  tools that become eligible after session creation. Do not combine
+                                  with tools. True
+                                "maxAgeSeconds": 0,  # Optional. Maximum cache
+                                  lifetime in seconds for this session. Omit to use each tool's
+                                  lifetime, up to 300 seconds. A smaller tool lifetime or provider
+                                  response cache header can shorten it. Per-call max_age_seconds can
+                                  require a fresher result but cannot increase this limit.
+                                "tools": [
+                                    "str"  # Optional. Provider-qualified tool
+                                      slugs to cache. Every listed tool must resolve for the team and
+                                      have a catalog cache policy, or session creation fails. Use slugs
+                                      without version suffixes or toolbelt references. An empty array
+                                      enables no tools.
+                                ]
+                            },
+                            "customInstructions": "str",  # Optional. Instructions for
+                              tools in this version.
+                            "outputViews": {
+                                "str": "str"  # Optional. Maps up to 100 tool slugs
+                                  to output-view names.
+                            },
+                            "preloadTools": [
+                                "str"  # Optional. Tool names, optionally
+                                  version-pinned, or version-pinned toolbelt references.
+                            ]
+                        },
+                        "insights": {
+                            "logs": bool,  # Optional. Explicit true enables customer
+                              logs and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                            "metrics": bool,  # Optional. Accepted and stored for parity
+                              with the Insights schema.
+                            "traces": bool  # Optional. Explicit true enables customer
+                              traces and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                        },
+                        "network": {
+                            "vpcUuid": "str"  # Optional. UUID of a VPC owned by your
+                              team in a supported region.
+                        },
+                        "policy": {
+                            "defaultAction": "str",  # Optional. Action for calls no rule
+                              matches. Omission means ask; responses then return
+                              SESSION_POLICY_ACTION_UNSPECIFIED. Known values are: "allow", "ask",
+                              "deny", and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                            "rules": [
+                                {
+                                    "action": "str",  # Action when the rule
+                                      matches. Required. Known values are: "allow", "ask", and "deny".
+                                    "tool": "str",  # Selected tool slug or
+                                      version-pinned toolbelt reference. Required.
+                                    "match": {
+                                        "str": "str"  # Optional. Argument
+                                          conditions; an empty object matches every call to the tool.
+                                    }
+                                }
+                            ]
+                        },
+                        "tools": [
+                            "str"  # Optional. Omitted enables every tool; an explicit
+                              empty array enables no tools. Direct tools use provider-qualified slugs,
+                              optionally pinned as tool@version. Toolbelts must be pinned as
+                              toolbelt:name@version. Floating pins are rejected.
+                        ]
+                    },
+                    "insights": {
+                        "logs": bool,  # Optional. Explicit true enables customer logs and
+                          false disables them. Omission preserves the existing choice without an
+                          implicit reset.
+                        "metrics": bool,  # Optional. Accepted and stored for parity with the
+                          Insights schema.
+                        "traces": bool  # Optional. Explicit true enables customer traces and
+                          false disables them. Omission preserves the existing choice without an
+                          implicit reset.
+                    }
+                }
+
+                # response body for status code(s): 201
+                response == {
+                    "endpoint": {
+                        "actor_id": "str",  # Immutable actor binding; empty means no actor.
+                          Required.
+                        "created_at": "2020-02-20 00:00:00",  # When the endpoint was
+                          created. Required.
+                        "id": "str",  # Lowercase, hyphenated endpoint UUID, without a URN
+                          prefix. Required.
+                        "name": "str",  # Endpoint name, unique within your team. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # When the endpoint was last
+                          changed. Required.
+                        "head_version": {
+                            "actor_id": "str",  # Actor binding shared by every version
+                              of the endpoint; empty means no actor. Required.
+                            "created_at": "2020-02-20 00:00:00",  # When the version was
+                              created. Required.
+                            "endpoint_id": "str",  # Lowercase, hyphenated endpoint UUID,
+                              without a URN prefix. Required.
+                            "id": "str",  # The endpoint UUID followed by .v and its
+                              version number, without a URN prefix. The UUID is lowercase and
+                              hyphenated. The number is from 1 through 4294967295, in decimal without
+                              signs or leading zeros. A bare UUID is not a version ID. Required.
+                            "name": "str",  # The endpoint's name when this version was
+                              created. Renaming the endpoint does not change it. Required.
+                            "policy": {
+                                "defaultAction": "str",  # Optional. Action for calls
+                                  no rule matches. Omission means ask; responses then return
+                                  SESSION_POLICY_ACTION_UNSPECIFIED. Known values are: "allow", "ask",
+                                  "deny", and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                                "rules": [
+                                    {
+                                        "action": "str",  # Action when the
+                                          rule matches. Required. Known values are: "allow", "ask", and
+                                          "deny".
+                                        "tool": "str",  # Selected tool slug
+                                          or version-pinned toolbelt reference. Required.
+                                        "match": {
+                                            "str": "str"  # Optional.
+                                              Argument conditions; an empty object matches every call
+                                              to the tool.
+                                        }
+                                    }
+                                ]
+                            },
+                            "updated_at": "2020-02-20 00:00:00",  # When the version was
+                              last updated. Required.
+                            "version_number": 0,  # Positive unsigned 32-bit version
+                              number, never reused after deletion. Required.
+                            "config": {
+                                "cache": {
+                                    "allEligible": bool,  # Optional. Enables
+                                      caching for every called tool version with a catalog cache
+                                      policy, including tools that become eligible after session
+                                      creation. Do not combine with tools. True
+                                    "maxAgeSeconds": 0,  # Optional. Maximum
+                                      cache lifetime in seconds for this session. Omit to use each
+                                      tool's lifetime, up to 300 seconds. A smaller tool lifetime or
+                                      provider response cache header can shorten it. Per-call
+                                      max_age_seconds can require a fresher result but cannot increase
+                                      this limit.
+                                    "tools": [
+                                        "str"  # Optional. Provider-qualified
+                                          tool slugs to cache. Every listed tool must resolve for the
+                                          team and have a catalog cache policy, or session creation
+                                          fails. Use slugs without version suffixes or toolbelt
+                                          references. An empty array enables no tools.
+                                    ]
+                                },
+                                "customInstructions": "str",  # Optional.
+                                  Instructions for tools in this version.
+                                "outputViews": {
+                                    "str": "str"  # Optional. Maps up to 100 tool
+                                      slugs to output-view names.
+                                },
+                                "preloadTools": [
+                                    "str"  # Optional. Tool names, optionally
+                                      version-pinned, or version-pinned toolbelt references.
+                                ]
+                            },
+                            "insights": {
+                                "logs": bool,  # Optional. Whether the session's
+                                  customer logs are sent to Insights.
+                                "metrics": bool,  # Optional. Accepted and stored for
+                                  parity with the Insights schema.
+                                "traces": bool  # Optional. Whether the session's
+                                  customer traces are sent to Insights.
+                            },
+                            "mcp_url": "str",  # Optional. Pinned MCP URL for this
+                              version, valid for the version's lifetime. It is the same value the
+                              create response returns as version_mcp_url. Its final segment is the
+                              backing session UUID, not the composite version ID. VPC-bound versions
+                              may use a regional host. Returned in responses only.
+                            "network": {
+                                "region": "str",  # The VPC's region, recorded when
+                                  the version was created. A tool call through a connection whose VPC
+                                  is in a different region is refused. This field is returned in
+                                  responses only and is rejected in requests. Required.
+                                "vpcUuid": "str"  # UUID of a VPC owned by your team
+                                  in a supported region. Required.
+                            },
+                            "promoted_from_version_number": 0,  # Optional. Positive
+                              unsigned 32-bit version number, never reused after deletion.
+                            "tools": {
+                                "references": [
+                                    {
+                                        "kind": "str",  # Optional. Whether
+                                          name is a tool or a toolbelt. Known values are:
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                        "name": "str",  # Optional. Tool slug
+                                          or toolbelt name.
+                                        "version": "str"  # Optional. Pinned
+                                          version.
+                                    }
+                                ]
+                            }
+                        },
+                        "insights": {
+                            "logs": bool,  # Optional. Explicit true enables customer
+                              logs and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                            "metrics": bool,  # Optional. Accepted and stored for parity
+                              with the Insights schema.
+                            "traces": bool  # Optional. Explicit true enables customer
+                              traces and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                        },
+                        "is_default": bool,  # Optional. True only for your own default
+                          endpoint in the team: the one the generic MCP URL and data-plane requests
+                          without ``X-Session-Id`` or ``X-Endpoint-Id`` resolve to for you, which
+                          Action Gateway creates on first use. False for every other endpoint,
+                          including other team members' default endpoints that a team owner can see, so
+                          a response marks at most one endpoint. A default endpoint does not count
+                          toward your team's endpoint limit or reserve its name. After it is deleted,
+                          the next such request creates a new default. Returned in responses only.
+                        "mcp_url": "str"  # Optional. MCP URL that resolves the
+                          highest-numbered live version on every request. Its host follows the head
+                          version's VPC region, or the default host when no version is live. It is the
+                          same value the create response returns as mcp_url. Returned in responses
+                          only.
+                    },
+                    "mcp_url": "str",  # MCP URL that resolves the highest-numbered live version
+                      on every request. Its host follows the head version's VPC region, or the default
+                      host when no version is live. Required.
+                    "version": {
+                        "actor_id": "str",  # Actor binding shared by every version of the
+                          endpoint; empty means no actor. Required.
+                        "created_at": "2020-02-20 00:00:00",  # When the version was created.
+                          Required.
+                        "endpoint_id": "str",  # Lowercase, hyphenated endpoint UUID, without
+                          a URN prefix. Required.
+                        "id": "str",  # The endpoint UUID followed by .v and its version
+                          number, without a URN prefix. The UUID is lowercase and hyphenated. The
+                          number is from 1 through 4294967295, in decimal without signs or leading
+                          zeros. A bare UUID is not a version ID. Required.
+                        "name": "str",  # The endpoint's name when this version was created.
+                          Renaming the endpoint does not change it. Required.
+                        "policy": {
+                            "defaultAction": "str",  # Optional. Action for calls no rule
+                              matches. Omission means ask; responses then return
+                              SESSION_POLICY_ACTION_UNSPECIFIED. Known values are: "allow", "ask",
+                              "deny", and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                            "rules": [
+                                {
+                                    "action": "str",  # Action when the rule
+                                      matches. Required. Known values are: "allow", "ask", and "deny".
+                                    "tool": "str",  # Selected tool slug or
+                                      version-pinned toolbelt reference. Required.
+                                    "match": {
+                                        "str": "str"  # Optional. Argument
+                                          conditions; an empty object matches every call to the tool.
+                                    }
+                                }
+                            ]
+                        },
+                        "updated_at": "2020-02-20 00:00:00",  # When the version was last
+                          updated. Required.
+                        "version_number": 0,  # Positive unsigned 32-bit version number,
+                          never reused after deletion. Required.
+                        "config": {
+                            "cache": {
+                                "allEligible": bool,  # Optional. Enables caching for
+                                  every called tool version with a catalog cache policy, including
+                                  tools that become eligible after session creation. Do not combine
+                                  with tools. True
+                                "maxAgeSeconds": 0,  # Optional. Maximum cache
+                                  lifetime in seconds for this session. Omit to use each tool's
+                                  lifetime, up to 300 seconds. A smaller tool lifetime or provider
+                                  response cache header can shorten it. Per-call max_age_seconds can
+                                  require a fresher result but cannot increase this limit.
+                                "tools": [
+                                    "str"  # Optional. Provider-qualified tool
+                                      slugs to cache. Every listed tool must resolve for the team and
+                                      have a catalog cache policy, or session creation fails. Use slugs
+                                      without version suffixes or toolbelt references. An empty array
+                                      enables no tools.
+                                ]
+                            },
+                            "customInstructions": "str",  # Optional. Instructions for
+                              tools in this version.
+                            "outputViews": {
+                                "str": "str"  # Optional. Maps up to 100 tool slugs
+                                  to output-view names.
+                            },
+                            "preloadTools": [
+                                "str"  # Optional. Tool names, optionally
+                                  version-pinned, or version-pinned toolbelt references.
+                            ]
+                        },
+                        "insights": {
+                            "logs": bool,  # Optional. Whether the session's customer
+                              logs are sent to Insights.
+                            "metrics": bool,  # Optional. Accepted and stored for parity
+                              with the Insights schema.
+                            "traces": bool  # Optional. Whether the session's customer
+                              traces are sent to Insights.
+                        },
+                        "mcp_url": "str",  # Optional. Pinned MCP URL for this version, valid
+                          for the version's lifetime. It is the same value the create response returns
+                          as version_mcp_url. Its final segment is the backing session UUID, not the
+                          composite version ID. VPC-bound versions may use a regional host. Returned in
+                          responses only.
+                        "network": {
+                            "region": "str",  # The VPC's region, recorded when the
+                              version was created. A tool call through a connection whose VPC is in a
+                              different region is refused. This field is returned in responses only and
+                              is rejected in requests. Required.
+                            "vpcUuid": "str"  # UUID of a VPC owned by your team in a
+                              supported region. Required.
+                        },
+                        "promoted_from_version_number": 0,  # Optional. Positive unsigned
+                          32-bit version number, never reused after deletion.
+                        "tools": {
+                            "references": [
+                                {
+                                    "kind": "str",  # Optional. Whether name is a
+                                      tool or a toolbelt. Known values are:
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                    "name": "str",  # Optional. Tool slug or
+                                      toolbelt name.
+                                    "version": "str"  # Optional. Pinned version.
+                                }
+                            ]
+                        }
+                    },
+                    "version_mcp_url": "str"  # Pinned MCP URL, valid for this version's
+                      lifetime. Its final segment is the backing session UUID, not the public composite
+                      version ID. VPC-bound versions may use a regional host. Existing /mcp/session/
+                      URLs keep working. Required.
+                }
+                # response body for status code(s): 400, 409, 429
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_endpoints_create_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [201, 400, 409, 429]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 201:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 429:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def list(
+        self,
+        *,
+        page_size: int = 20,
+        page_token: Optional[str] = None,
+        name: Optional[str] = None,
+        actor_id: Optional[str] = None,
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Endpoints.
+
+        Lists visible endpoints, newest creation time first, with endpoint UUID descending as the
+        tie-breaker. Keyset pagination remains stable across tied timestamps, deletions, and concurrent
+        inserts. There are no offsets or totals. Team owners may list all endpoints in their team.
+
+        :keyword page_size: Page size; defaults to 20 when omitted. Supplied values outside 1 through
+         100 return 400. Sizes are not clamped. Default value is 20.
+        :paramtype page_size: int
+        :keyword page_token: Opaque next_page_token from the previous response. Omit for the first
+         page. Malformed tokens or replay with a different team, caller visibility, normalized filters,
+         resource kind, or parent endpoint return 400. Tokens contain no full URNs or database row IDs.
+         Default value is None.
+        :paramtype page_token: str
+        :keyword name: Filter by endpoint name. Default value is None.
+        :paramtype name: str
+        :keyword actor_id: Filter by the endpoint's actor binding. Default value is None.
+        :paramtype actor_id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "endpoints": [
+                        {
+                            "actor_id": "str",  # Immutable actor binding; empty means no
+                              actor. Required.
+                            "created_at": "2020-02-20 00:00:00",  # When the endpoint was
+                              created. Required.
+                            "id": "str",  # Lowercase, hyphenated endpoint UUID, without
+                              a URN prefix. Required.
+                            "name": "str",  # Endpoint name, unique within your team.
+                              Required.
+                            "updated_at": "2020-02-20 00:00:00",  # When the endpoint was
+                              last changed. Required.
+                            "head_version": {
+                                "actor_id": "str",  # Actor binding shared by every
+                                  version of the endpoint; empty means no actor. Required.
+                                "created_at": "2020-02-20 00:00:00",  # When the
+                                  version was created. Required.
+                                "endpoint_id": "str",  # Lowercase, hyphenated
+                                  endpoint UUID, without a URN prefix. Required.
+                                "id": "str",  # The endpoint UUID followed by .v and
+                                  its version number, without a URN prefix. The UUID is lowercase and
+                                  hyphenated. The number is from 1 through 4294967295, in decimal
+                                  without signs or leading zeros. A bare UUID is not a version ID.
+                                  Required.
+                                "name": "str",  # The endpoint's name when this
+                                  version was created. Renaming the endpoint does not change it.
+                                  Required.
+                                "policy": {
+                                    "defaultAction": "str",  # Optional. Action
+                                      for calls no rule matches. Omission means ask; responses then
+                                      return SESSION_POLICY_ACTION_UNSPECIFIED. Known values are:
+                                      "allow", "ask", "deny", and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                                    "rules": [
+                                        {
+                                            "action": "str",  # Action
+                                              when the rule matches. Required. Known values are:
+                                              "allow", "ask", and "deny".
+                                            "tool": "str",  # Selected
+                                              tool slug or version-pinned toolbelt reference. Required.
+                                            "match": {
+                                                "str": "str"  #
+                                                  Optional. Argument conditions; an empty object
+                                                  matches every call to the tool.
+                                            }
+                                        }
+                                    ]
+                                },
+                                "updated_at": "2020-02-20 00:00:00",  # When the
+                                  version was last updated. Required.
+                                "version_number": 0,  # Positive unsigned 32-bit
+                                  version number, never reused after deletion. Required.
+                                "config": {
+                                    "cache": {
+                                        "allEligible": bool,  # Optional.
+                                          Enables caching for every called tool version with a catalog
+                                          cache policy, including tools that become eligible after
+                                          session creation. Do not combine with tools. True
+                                        "maxAgeSeconds": 0,  # Optional.
+                                          Maximum cache lifetime in seconds for this session. Omit to
+                                          use each tool's lifetime, up to 300 seconds. A smaller tool
+                                          lifetime or provider response cache header can shorten it.
+                                          Per-call max_age_seconds can require a fresher result but
+                                          cannot increase this limit.
+                                        "tools": [
+                                            "str"  # Optional.
+                                              Provider-qualified tool slugs to cache. Every listed tool
+                                              must resolve for the team and have a catalog cache
+                                              policy, or session creation fails. Use slugs without
+                                              version suffixes or toolbelt references. An empty array
+                                              enables no tools.
+                                        ]
+                                    },
+                                    "customInstructions": "str",  # Optional.
+                                      Instructions for tools in this version.
+                                    "outputViews": {
+                                        "str": "str"  # Optional. Maps up to
+                                          100 tool slugs to output-view names.
+                                    },
+                                    "preloadTools": [
+                                        "str"  # Optional. Tool names,
+                                          optionally version-pinned, or version-pinned toolbelt
+                                          references.
+                                    ]
+                                },
+                                "insights": {
+                                    "logs": bool,  # Optional. Whether the
+                                      session's customer logs are sent to Insights.
+                                    "metrics": bool,  # Optional. Accepted and
+                                      stored for parity with the Insights schema.
+                                    "traces": bool  # Optional. Whether the
+                                      session's customer traces are sent to Insights.
+                                },
+                                "mcp_url": "str",  # Optional. Pinned MCP URL for
+                                  this version, valid for the version's lifetime. It is the same value
+                                  the create response returns as version_mcp_url. Its final segment is
+                                  the backing session UUID, not the composite version ID. VPC-bound
+                                  versions may use a regional host. Returned in responses only.
+                                "network": {
+                                    "region": "str",  # The VPC's region,
+                                      recorded when the version was created. A tool call through a
+                                      connection whose VPC is in a different region is refused. This
+                                      field is returned in responses only and is rejected in requests.
+                                      Required.
+                                    "vpcUuid": "str"  # UUID of a VPC owned by
+                                      your team in a supported region. Required.
+                                },
+                                "promoted_from_version_number": 0,  # Optional.
+                                  Positive unsigned 32-bit version number, never reused after deletion.
+                                "tools": {
+                                    "references": [
+                                        {
+                                            "kind": "str",  # Optional.
+                                              Whether name is a tool or a toolbelt. Known values are:
+                                              "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                              "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                            "name": "str",  # Optional.
+                                              Tool slug or toolbelt name.
+                                            "version": "str"  # Optional.
+                                              Pinned version.
+                                        }
+                                    ]
+                                }
+                            },
+                            "insights": {
+                                "logs": bool,  # Optional. Explicit true enables
+                                  customer logs and false disables them. Omission preserves the
+                                  existing choice without an implicit reset.
+                                "metrics": bool,  # Optional. Accepted and stored for
+                                  parity with the Insights schema.
+                                "traces": bool  # Optional. Explicit true enables
+                                  customer traces and false disables them. Omission preserves the
+                                  existing choice without an implicit reset.
+                            },
+                            "is_default": bool,  # Optional. True only for your own
+                              default endpoint in the team: the one the generic MCP URL and data-plane
+                              requests without ``X-Session-Id`` or ``X-Endpoint-Id`` resolve to for
+                              you, which Action Gateway creates on first use. False for every other
+                              endpoint, including other team members' default endpoints that a team
+                              owner can see, so a response marks at most one endpoint. A default
+                              endpoint does not count toward your team's endpoint limit or reserve its
+                              name. After it is deleted, the next such request creates a new default.
+                              Returned in responses only.
+                            "mcp_url": "str"  # Optional. MCP URL that resolves the
+                              highest-numbered live version on every request. Its host follows the head
+                              version's VPC region, or the default host when no version is live. It is
+                              the same value the create response returns as mcp_url. Returned in
+                              responses only.
+                        }
+                    ],
+                    "next_page_token": "str"  # Opaque keyset cursor for the next page; an empty
+                      string marks the last page. Bound to the team, caller visibility, normalized
+                      filters, resource kind, and parent endpoint for version lists. Contains no full
+                      URNs or database row IDs. Pass it unchanged as page_token with the same criteria.
+                      Required.
+                }
+                # response body for status code(s): 400
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_endpoints_list_request(
+            page_size=page_size,
+            page_token=page_token,
+            name=name,
+            actor_id=actor_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def list_search(
+        self,
+        *,
+        query: str,
+        actor_id: Optional[str] = None,
+        page_size: int = 20,
+        page_token: Optional[str] = None,
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Search Endpoints.
+
+        Returns the endpoints you can see whose name, endpoint ID, actor_id, or agent name contains
+        query, case-insensitively. Results are ranked across the whole result set: exact matches first,
+        then prefix matches, then substring matches, then by name. Each endpoint has the list shape,
+        including its embedded head_version. Keyset pagination uses page_size and page_token; a page
+        token is valid only with the same query and actor_id. There are no offsets or totals.
+        Service-managed endpoints are never returned.
+
+        :keyword query: Text matched case-insensitively as a substring of the endpoint name, endpoint
+         ID, actor_id, or agent name. Leading and trailing whitespace is trimmed; an empty query returns
+         400 invalid_search_query. Required.
+        :paramtype query: str
+        :keyword actor_id: Exact actor_id filter, combined with query. Omitted or empty means all
+         actors. Default value is None.
+        :paramtype actor_id: str
+        :keyword page_size: Page size; defaults to 20 when omitted. Supplied values outside 1 through
+         100 return 400. Sizes are not clamped. Default value is 20.
+        :paramtype page_size: int
+        :keyword page_token: Opaque next_page_token from the previous response. Omit for the first
+         page. Malformed tokens or replay with a different team, caller visibility, normalized filters,
+         resource kind, or parent endpoint return 400. Tokens contain no full URNs or database row IDs.
+         Default value is None.
+        :paramtype page_token: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "endpoints": [
+                        {
+                            "actor_id": "str",  # Immutable actor binding; empty means no
+                              actor. Required.
+                            "created_at": "2020-02-20 00:00:00",  # When the endpoint was
+                              created. Required.
+                            "id": "str",  # Lowercase, hyphenated endpoint UUID, without
+                              a URN prefix. Required.
+                            "name": "str",  # Endpoint name, unique within your team.
+                              Required.
+                            "updated_at": "2020-02-20 00:00:00",  # When the endpoint was
+                              last changed. Required.
+                            "head_version": {
+                                "actor_id": "str",  # Actor binding shared by every
+                                  version of the endpoint; empty means no actor. Required.
+                                "created_at": "2020-02-20 00:00:00",  # When the
+                                  version was created. Required.
+                                "endpoint_id": "str",  # Lowercase, hyphenated
+                                  endpoint UUID, without a URN prefix. Required.
+                                "id": "str",  # The endpoint UUID followed by .v and
+                                  its version number, without a URN prefix. The UUID is lowercase and
+                                  hyphenated. The number is from 1 through 4294967295, in decimal
+                                  without signs or leading zeros. A bare UUID is not a version ID.
+                                  Required.
+                                "name": "str",  # The endpoint's name when this
+                                  version was created. Renaming the endpoint does not change it.
+                                  Required.
+                                "policy": {
+                                    "defaultAction": "str",  # Optional. Action
+                                      for calls no rule matches. Omission means ask; responses then
+                                      return SESSION_POLICY_ACTION_UNSPECIFIED. Known values are:
+                                      "allow", "ask", "deny", and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                                    "rules": [
+                                        {
+                                            "action": "str",  # Action
+                                              when the rule matches. Required. Known values are:
+                                              "allow", "ask", and "deny".
+                                            "tool": "str",  # Selected
+                                              tool slug or version-pinned toolbelt reference. Required.
+                                            "match": {
+                                                "str": "str"  #
+                                                  Optional. Argument conditions; an empty object
+                                                  matches every call to the tool.
+                                            }
+                                        }
+                                    ]
+                                },
+                                "updated_at": "2020-02-20 00:00:00",  # When the
+                                  version was last updated. Required.
+                                "version_number": 0,  # Positive unsigned 32-bit
+                                  version number, never reused after deletion. Required.
+                                "config": {
+                                    "cache": {
+                                        "allEligible": bool,  # Optional.
+                                          Enables caching for every called tool version with a catalog
+                                          cache policy, including tools that become eligible after
+                                          session creation. Do not combine with tools. True
+                                        "maxAgeSeconds": 0,  # Optional.
+                                          Maximum cache lifetime in seconds for this session. Omit to
+                                          use each tool's lifetime, up to 300 seconds. A smaller tool
+                                          lifetime or provider response cache header can shorten it.
+                                          Per-call max_age_seconds can require a fresher result but
+                                          cannot increase this limit.
+                                        "tools": [
+                                            "str"  # Optional.
+                                              Provider-qualified tool slugs to cache. Every listed tool
+                                              must resolve for the team and have a catalog cache
+                                              policy, or session creation fails. Use slugs without
+                                              version suffixes or toolbelt references. An empty array
+                                              enables no tools.
+                                        ]
+                                    },
+                                    "customInstructions": "str",  # Optional.
+                                      Instructions for tools in this version.
+                                    "outputViews": {
+                                        "str": "str"  # Optional. Maps up to
+                                          100 tool slugs to output-view names.
+                                    },
+                                    "preloadTools": [
+                                        "str"  # Optional. Tool names,
+                                          optionally version-pinned, or version-pinned toolbelt
+                                          references.
+                                    ]
+                                },
+                                "insights": {
+                                    "logs": bool,  # Optional. Whether the
+                                      session's customer logs are sent to Insights.
+                                    "metrics": bool,  # Optional. Accepted and
+                                      stored for parity with the Insights schema.
+                                    "traces": bool  # Optional. Whether the
+                                      session's customer traces are sent to Insights.
+                                },
+                                "mcp_url": "str",  # Optional. Pinned MCP URL for
+                                  this version, valid for the version's lifetime. It is the same value
+                                  the create response returns as version_mcp_url. Its final segment is
+                                  the backing session UUID, not the composite version ID. VPC-bound
+                                  versions may use a regional host. Returned in responses only.
+                                "network": {
+                                    "region": "str",  # The VPC's region,
+                                      recorded when the version was created. A tool call through a
+                                      connection whose VPC is in a different region is refused. This
+                                      field is returned in responses only and is rejected in requests.
+                                      Required.
+                                    "vpcUuid": "str"  # UUID of a VPC owned by
+                                      your team in a supported region. Required.
+                                },
+                                "promoted_from_version_number": 0,  # Optional.
+                                  Positive unsigned 32-bit version number, never reused after deletion.
+                                "tools": {
+                                    "references": [
+                                        {
+                                            "kind": "str",  # Optional.
+                                              Whether name is a tool or a toolbelt. Known values are:
+                                              "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                              "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                            "name": "str",  # Optional.
+                                              Tool slug or toolbelt name.
+                                            "version": "str"  # Optional.
+                                              Pinned version.
+                                        }
+                                    ]
+                                }
+                            },
+                            "insights": {
+                                "logs": bool,  # Optional. Explicit true enables
+                                  customer logs and false disables them. Omission preserves the
+                                  existing choice without an implicit reset.
+                                "metrics": bool,  # Optional. Accepted and stored for
+                                  parity with the Insights schema.
+                                "traces": bool  # Optional. Explicit true enables
+                                  customer traces and false disables them. Omission preserves the
+                                  existing choice without an implicit reset.
+                            },
+                            "is_default": bool,  # Optional. True only for your own
+                              default endpoint in the team: the one the generic MCP URL and data-plane
+                              requests without ``X-Session-Id`` or ``X-Endpoint-Id`` resolve to for
+                              you, which Action Gateway creates on first use. False for every other
+                              endpoint, including other team members' default endpoints that a team
+                              owner can see, so a response marks at most one endpoint. A default
+                              endpoint does not count toward your team's endpoint limit or reserve its
+                              name. After it is deleted, the next such request creates a new default.
+                              Returned in responses only.
+                            "mcp_url": "str"  # Optional. MCP URL that resolves the
+                              highest-numbered live version on every request. Its host follows the head
+                              version's VPC region, or the default host when no version is live. It is
+                              the same value the create response returns as mcp_url. Returned in
+                              responses only.
+                        }
+                    ],
+                    "next_page_token": "str"  # Opaque keyset cursor for the next page; an empty
+                      string marks the last page. Bound to the team, caller visibility, normalized
+                      filters, resource kind, and parent endpoint for version lists. Contains no full
+                      URNs or database row IDs. Pass it unchanged as page_token with the same criteria.
+                      Required.
+                }
+                # response body for status code(s): 400
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_endpoints_list_search_request(
+            query=query,
+            actor_id=actor_id,
+            page_size=page_size,
+            page_token=page_token,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def get(self, endpoint_id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve an Endpoint.
+
+        Returns an endpoint with its live head and Insights consent. When no live versions remain,
+        head_version is null and the endpoint MCP URL fails closed until a version is published. An
+        inaccessible endpoint returns 404 endpoint_not_found.
+
+        :param endpoint_id: Endpoint UUID only. Malformed IDs or full URNs return 400
+         invalid_endpoint_id. Required.
+        :type endpoint_id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "endpoint": {
+                        "actor_id": "str",  # Immutable actor binding; empty means no actor.
+                          Required.
+                        "created_at": "2020-02-20 00:00:00",  # When the endpoint was
+                          created. Required.
+                        "id": "str",  # Lowercase, hyphenated endpoint UUID, without a URN
+                          prefix. Required.
+                        "name": "str",  # Endpoint name, unique within your team. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # When the endpoint was last
+                          changed. Required.
+                        "head_version": {
+                            "actor_id": "str",  # Actor binding shared by every version
+                              of the endpoint; empty means no actor. Required.
+                            "created_at": "2020-02-20 00:00:00",  # When the version was
+                              created. Required.
+                            "endpoint_id": "str",  # Lowercase, hyphenated endpoint UUID,
+                              without a URN prefix. Required.
+                            "id": "str",  # The endpoint UUID followed by .v and its
+                              version number, without a URN prefix. The UUID is lowercase and
+                              hyphenated. The number is from 1 through 4294967295, in decimal without
+                              signs or leading zeros. A bare UUID is not a version ID. Required.
+                            "name": "str",  # The endpoint's name when this version was
+                              created. Renaming the endpoint does not change it. Required.
+                            "policy": {
+                                "defaultAction": "str",  # Optional. Action for calls
+                                  no rule matches. Omission means ask; responses then return
+                                  SESSION_POLICY_ACTION_UNSPECIFIED. Known values are: "allow", "ask",
+                                  "deny", and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                                "rules": [
+                                    {
+                                        "action": "str",  # Action when the
+                                          rule matches. Required. Known values are: "allow", "ask", and
+                                          "deny".
+                                        "tool": "str",  # Selected tool slug
+                                          or version-pinned toolbelt reference. Required.
+                                        "match": {
+                                            "str": "str"  # Optional.
+                                              Argument conditions; an empty object matches every call
+                                              to the tool.
+                                        }
+                                    }
+                                ]
+                            },
+                            "updated_at": "2020-02-20 00:00:00",  # When the version was
+                              last updated. Required.
+                            "version_number": 0,  # Positive unsigned 32-bit version
+                              number, never reused after deletion. Required.
+                            "config": {
+                                "cache": {
+                                    "allEligible": bool,  # Optional. Enables
+                                      caching for every called tool version with a catalog cache
+                                      policy, including tools that become eligible after session
+                                      creation. Do not combine with tools. True
+                                    "maxAgeSeconds": 0,  # Optional. Maximum
+                                      cache lifetime in seconds for this session. Omit to use each
+                                      tool's lifetime, up to 300 seconds. A smaller tool lifetime or
+                                      provider response cache header can shorten it. Per-call
+                                      max_age_seconds can require a fresher result but cannot increase
+                                      this limit.
+                                    "tools": [
+                                        "str"  # Optional. Provider-qualified
+                                          tool slugs to cache. Every listed tool must resolve for the
+                                          team and have a catalog cache policy, or session creation
+                                          fails. Use slugs without version suffixes or toolbelt
+                                          references. An empty array enables no tools.
+                                    ]
+                                },
+                                "customInstructions": "str",  # Optional.
+                                  Instructions for tools in this version.
+                                "outputViews": {
+                                    "str": "str"  # Optional. Maps up to 100 tool
+                                      slugs to output-view names.
+                                },
+                                "preloadTools": [
+                                    "str"  # Optional. Tool names, optionally
+                                      version-pinned, or version-pinned toolbelt references.
+                                ]
+                            },
+                            "insights": {
+                                "logs": bool,  # Optional. Whether the session's
+                                  customer logs are sent to Insights.
+                                "metrics": bool,  # Optional. Accepted and stored for
+                                  parity with the Insights schema.
+                                "traces": bool  # Optional. Whether the session's
+                                  customer traces are sent to Insights.
+                            },
+                            "mcp_url": "str",  # Optional. Pinned MCP URL for this
+                              version, valid for the version's lifetime. It is the same value the
+                              create response returns as version_mcp_url. Its final segment is the
+                              backing session UUID, not the composite version ID. VPC-bound versions
+                              may use a regional host. Returned in responses only.
+                            "network": {
+                                "region": "str",  # The VPC's region, recorded when
+                                  the version was created. A tool call through a connection whose VPC
+                                  is in a different region is refused. This field is returned in
+                                  responses only and is rejected in requests. Required.
+                                "vpcUuid": "str"  # UUID of a VPC owned by your team
+                                  in a supported region. Required.
+                            },
+                            "promoted_from_version_number": 0,  # Optional. Positive
+                              unsigned 32-bit version number, never reused after deletion.
+                            "tools": {
+                                "references": [
+                                    {
+                                        "kind": "str",  # Optional. Whether
+                                          name is a tool or a toolbelt. Known values are:
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                        "name": "str",  # Optional. Tool slug
+                                          or toolbelt name.
+                                        "version": "str"  # Optional. Pinned
+                                          version.
+                                    }
+                                ]
+                            }
+                        },
+                        "insights": {
+                            "logs": bool,  # Optional. Explicit true enables customer
+                              logs and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                            "metrics": bool,  # Optional. Accepted and stored for parity
+                              with the Insights schema.
+                            "traces": bool  # Optional. Explicit true enables customer
+                              traces and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                        },
+                        "is_default": bool,  # Optional. True only for your own default
+                          endpoint in the team: the one the generic MCP URL and data-plane requests
+                          without ``X-Session-Id`` or ``X-Endpoint-Id`` resolve to for you, which
+                          Action Gateway creates on first use. False for every other endpoint,
+                          including other team members' default endpoints that a team owner can see, so
+                          a response marks at most one endpoint. A default endpoint does not count
+                          toward your team's endpoint limit or reserve its name. After it is deleted,
+                          the next such request creates a new default. Returned in responses only.
+                        "mcp_url": "str"  # Optional. MCP URL that resolves the
+                          highest-numbered live version on every request. Its host follows the head
+                          version's VPC region, or the default host when no version is live. It is the
+                          same value the create response returns as mcp_url. Returned in responses
+                          only.
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_endpoints_get_request(
+            endpoint_id=endpoint_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    def patch(
+        self,
+        endpoint_id: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update an Endpoint.
+
+        Renames an endpoint, changes its Insights consent, or both, without changing its owner, actor,
+        or versions. Send name, insights, or both. Insights merges per signal: a metrics, logs, or
+        traces value of true or false replaces that signal, and an omitted signal keeps its stored
+        value. The consent applies to every version, including pinned and older versions. A body with
+        no name and no insights signal returns 400 endpoint_update_empty. Only the endpoint owner may
+        update it. An invalid name returns 400 invalid_endpoint_name; a duplicate team name returns 409
+        endpoint_name_taken. Inaccessible endpoints return 404 endpoint_not_found.
+
+        :param endpoint_id: Endpoint UUID only. Malformed IDs or full URNs return 400
+         invalid_endpoint_id. Required.
+        :type endpoint_id: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "insights": {
+                        "logs": bool,  # Optional. Explicit true enables customer logs and
+                          false disables them. Omission preserves the existing choice without an
+                          implicit reset.
+                        "metrics": bool,  # Optional. Accepted and stored for parity with the
+                          Insights schema.
+                        "traces": bool  # Optional. Explicit true enables customer traces and
+                          false disables them. Omission preserves the existing choice without an
+                          implicit reset.
+                    },
+                    "name": "str"  # Optional. Endpoint name, unique within your team.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "endpoint": {
+                        "actor_id": "str",  # Immutable actor binding; empty means no actor.
+                          Required.
+                        "created_at": "2020-02-20 00:00:00",  # When the endpoint was
+                          created. Required.
+                        "id": "str",  # Lowercase, hyphenated endpoint UUID, without a URN
+                          prefix. Required.
+                        "name": "str",  # Endpoint name, unique within your team. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # When the endpoint was last
+                          changed. Required.
+                        "head_version": {
+                            "actor_id": "str",  # Actor binding shared by every version
+                              of the endpoint; empty means no actor. Required.
+                            "created_at": "2020-02-20 00:00:00",  # When the version was
+                              created. Required.
+                            "endpoint_id": "str",  # Lowercase, hyphenated endpoint UUID,
+                              without a URN prefix. Required.
+                            "id": "str",  # The endpoint UUID followed by .v and its
+                              version number, without a URN prefix. The UUID is lowercase and
+                              hyphenated. The number is from 1 through 4294967295, in decimal without
+                              signs or leading zeros. A bare UUID is not a version ID. Required.
+                            "name": "str",  # The endpoint's name when this version was
+                              created. Renaming the endpoint does not change it. Required.
+                            "policy": {
+                                "defaultAction": "str",  # Optional. Action for calls
+                                  no rule matches. Omission means ask; responses then return
+                                  SESSION_POLICY_ACTION_UNSPECIFIED. Known values are: "allow", "ask",
+                                  "deny", and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                                "rules": [
+                                    {
+                                        "action": "str",  # Action when the
+                                          rule matches. Required. Known values are: "allow", "ask", and
+                                          "deny".
+                                        "tool": "str",  # Selected tool slug
+                                          or version-pinned toolbelt reference. Required.
+                                        "match": {
+                                            "str": "str"  # Optional.
+                                              Argument conditions; an empty object matches every call
+                                              to the tool.
+                                        }
+                                    }
+                                ]
+                            },
+                            "updated_at": "2020-02-20 00:00:00",  # When the version was
+                              last updated. Required.
+                            "version_number": 0,  # Positive unsigned 32-bit version
+                              number, never reused after deletion. Required.
+                            "config": {
+                                "cache": {
+                                    "allEligible": bool,  # Optional. Enables
+                                      caching for every called tool version with a catalog cache
+                                      policy, including tools that become eligible after session
+                                      creation. Do not combine with tools. True
+                                    "maxAgeSeconds": 0,  # Optional. Maximum
+                                      cache lifetime in seconds for this session. Omit to use each
+                                      tool's lifetime, up to 300 seconds. A smaller tool lifetime or
+                                      provider response cache header can shorten it. Per-call
+                                      max_age_seconds can require a fresher result but cannot increase
+                                      this limit.
+                                    "tools": [
+                                        "str"  # Optional. Provider-qualified
+                                          tool slugs to cache. Every listed tool must resolve for the
+                                          team and have a catalog cache policy, or session creation
+                                          fails. Use slugs without version suffixes or toolbelt
+                                          references. An empty array enables no tools.
+                                    ]
+                                },
+                                "customInstructions": "str",  # Optional.
+                                  Instructions for tools in this version.
+                                "outputViews": {
+                                    "str": "str"  # Optional. Maps up to 100 tool
+                                      slugs to output-view names.
+                                },
+                                "preloadTools": [
+                                    "str"  # Optional. Tool names, optionally
+                                      version-pinned, or version-pinned toolbelt references.
+                                ]
+                            },
+                            "insights": {
+                                "logs": bool,  # Optional. Whether the session's
+                                  customer logs are sent to Insights.
+                                "metrics": bool,  # Optional. Accepted and stored for
+                                  parity with the Insights schema.
+                                "traces": bool  # Optional. Whether the session's
+                                  customer traces are sent to Insights.
+                            },
+                            "mcp_url": "str",  # Optional. Pinned MCP URL for this
+                              version, valid for the version's lifetime. It is the same value the
+                              create response returns as version_mcp_url. Its final segment is the
+                              backing session UUID, not the composite version ID. VPC-bound versions
+                              may use a regional host. Returned in responses only.
+                            "network": {
+                                "region": "str",  # The VPC's region, recorded when
+                                  the version was created. A tool call through a connection whose VPC
+                                  is in a different region is refused. This field is returned in
+                                  responses only and is rejected in requests. Required.
+                                "vpcUuid": "str"  # UUID of a VPC owned by your team
+                                  in a supported region. Required.
+                            },
+                            "promoted_from_version_number": 0,  # Optional. Positive
+                              unsigned 32-bit version number, never reused after deletion.
+                            "tools": {
+                                "references": [
+                                    {
+                                        "kind": "str",  # Optional. Whether
+                                          name is a tool or a toolbelt. Known values are:
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                        "name": "str",  # Optional. Tool slug
+                                          or toolbelt name.
+                                        "version": "str"  # Optional. Pinned
+                                          version.
+                                    }
+                                ]
+                            }
+                        },
+                        "insights": {
+                            "logs": bool,  # Optional. Explicit true enables customer
+                              logs and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                            "metrics": bool,  # Optional. Accepted and stored for parity
+                              with the Insights schema.
+                            "traces": bool  # Optional. Explicit true enables customer
+                              traces and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                        },
+                        "is_default": bool,  # Optional. True only for your own default
+                          endpoint in the team: the one the generic MCP URL and data-plane requests
+                          without ``X-Session-Id`` or ``X-Endpoint-Id`` resolve to for you, which
+                          Action Gateway creates on first use. False for every other endpoint,
+                          including other team members' default endpoints that a team owner can see, so
+                          a response marks at most one endpoint. A default endpoint does not count
+                          toward your team's endpoint limit or reserve its name. After it is deleted,
+                          the next such request creates a new default. Returned in responses only.
+                        "mcp_url": "str"  # Optional. MCP URL that resolves the
+                          highest-numbered live version on every request. Its host follows the head
+                          version's VPC region, or the default host when no version is live. It is the
+                          same value the create response returns as mcp_url. Returned in responses
+                          only.
+                    }
+                }
+                # response body for status code(s): 400, 404, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    def patch(
+        self,
+        endpoint_id: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update an Endpoint.
+
+        Renames an endpoint, changes its Insights consent, or both, without changing its owner, actor,
+        or versions. Send name, insights, or both. Insights merges per signal: a metrics, logs, or
+        traces value of true or false replaces that signal, and an omitted signal keeps its stored
+        value. The consent applies to every version, including pinned and older versions. A body with
+        no name and no insights signal returns 400 endpoint_update_empty. Only the endpoint owner may
+        update it. An invalid name returns 400 invalid_endpoint_name; a duplicate team name returns 409
+        endpoint_name_taken. Inaccessible endpoints return 404 endpoint_not_found.
+
+        :param endpoint_id: Endpoint UUID only. Malformed IDs or full URNs return 400
+         invalid_endpoint_id. Required.
+        :type endpoint_id: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "endpoint": {
+                        "actor_id": "str",  # Immutable actor binding; empty means no actor.
+                          Required.
+                        "created_at": "2020-02-20 00:00:00",  # When the endpoint was
+                          created. Required.
+                        "id": "str",  # Lowercase, hyphenated endpoint UUID, without a URN
+                          prefix. Required.
+                        "name": "str",  # Endpoint name, unique within your team. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # When the endpoint was last
+                          changed. Required.
+                        "head_version": {
+                            "actor_id": "str",  # Actor binding shared by every version
+                              of the endpoint; empty means no actor. Required.
+                            "created_at": "2020-02-20 00:00:00",  # When the version was
+                              created. Required.
+                            "endpoint_id": "str",  # Lowercase, hyphenated endpoint UUID,
+                              without a URN prefix. Required.
+                            "id": "str",  # The endpoint UUID followed by .v and its
+                              version number, without a URN prefix. The UUID is lowercase and
+                              hyphenated. The number is from 1 through 4294967295, in decimal without
+                              signs or leading zeros. A bare UUID is not a version ID. Required.
+                            "name": "str",  # The endpoint's name when this version was
+                              created. Renaming the endpoint does not change it. Required.
+                            "policy": {
+                                "defaultAction": "str",  # Optional. Action for calls
+                                  no rule matches. Omission means ask; responses then return
+                                  SESSION_POLICY_ACTION_UNSPECIFIED. Known values are: "allow", "ask",
+                                  "deny", and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                                "rules": [
+                                    {
+                                        "action": "str",  # Action when the
+                                          rule matches. Required. Known values are: "allow", "ask", and
+                                          "deny".
+                                        "tool": "str",  # Selected tool slug
+                                          or version-pinned toolbelt reference. Required.
+                                        "match": {
+                                            "str": "str"  # Optional.
+                                              Argument conditions; an empty object matches every call
+                                              to the tool.
+                                        }
+                                    }
+                                ]
+                            },
+                            "updated_at": "2020-02-20 00:00:00",  # When the version was
+                              last updated. Required.
+                            "version_number": 0,  # Positive unsigned 32-bit version
+                              number, never reused after deletion. Required.
+                            "config": {
+                                "cache": {
+                                    "allEligible": bool,  # Optional. Enables
+                                      caching for every called tool version with a catalog cache
+                                      policy, including tools that become eligible after session
+                                      creation. Do not combine with tools. True
+                                    "maxAgeSeconds": 0,  # Optional. Maximum
+                                      cache lifetime in seconds for this session. Omit to use each
+                                      tool's lifetime, up to 300 seconds. A smaller tool lifetime or
+                                      provider response cache header can shorten it. Per-call
+                                      max_age_seconds can require a fresher result but cannot increase
+                                      this limit.
+                                    "tools": [
+                                        "str"  # Optional. Provider-qualified
+                                          tool slugs to cache. Every listed tool must resolve for the
+                                          team and have a catalog cache policy, or session creation
+                                          fails. Use slugs without version suffixes or toolbelt
+                                          references. An empty array enables no tools.
+                                    ]
+                                },
+                                "customInstructions": "str",  # Optional.
+                                  Instructions for tools in this version.
+                                "outputViews": {
+                                    "str": "str"  # Optional. Maps up to 100 tool
+                                      slugs to output-view names.
+                                },
+                                "preloadTools": [
+                                    "str"  # Optional. Tool names, optionally
+                                      version-pinned, or version-pinned toolbelt references.
+                                ]
+                            },
+                            "insights": {
+                                "logs": bool,  # Optional. Whether the session's
+                                  customer logs are sent to Insights.
+                                "metrics": bool,  # Optional. Accepted and stored for
+                                  parity with the Insights schema.
+                                "traces": bool  # Optional. Whether the session's
+                                  customer traces are sent to Insights.
+                            },
+                            "mcp_url": "str",  # Optional. Pinned MCP URL for this
+                              version, valid for the version's lifetime. It is the same value the
+                              create response returns as version_mcp_url. Its final segment is the
+                              backing session UUID, not the composite version ID. VPC-bound versions
+                              may use a regional host. Returned in responses only.
+                            "network": {
+                                "region": "str",  # The VPC's region, recorded when
+                                  the version was created. A tool call through a connection whose VPC
+                                  is in a different region is refused. This field is returned in
+                                  responses only and is rejected in requests. Required.
+                                "vpcUuid": "str"  # UUID of a VPC owned by your team
+                                  in a supported region. Required.
+                            },
+                            "promoted_from_version_number": 0,  # Optional. Positive
+                              unsigned 32-bit version number, never reused after deletion.
+                            "tools": {
+                                "references": [
+                                    {
+                                        "kind": "str",  # Optional. Whether
+                                          name is a tool or a toolbelt. Known values are:
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                        "name": "str",  # Optional. Tool slug
+                                          or toolbelt name.
+                                        "version": "str"  # Optional. Pinned
+                                          version.
+                                    }
+                                ]
+                            }
+                        },
+                        "insights": {
+                            "logs": bool,  # Optional. Explicit true enables customer
+                              logs and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                            "metrics": bool,  # Optional. Accepted and stored for parity
+                              with the Insights schema.
+                            "traces": bool  # Optional. Explicit true enables customer
+                              traces and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                        },
+                        "is_default": bool,  # Optional. True only for your own default
+                          endpoint in the team: the one the generic MCP URL and data-plane requests
+                          without ``X-Session-Id`` or ``X-Endpoint-Id`` resolve to for you, which
+                          Action Gateway creates on first use. False for every other endpoint,
+                          including other team members' default endpoints that a team owner can see, so
+                          a response marks at most one endpoint. A default endpoint does not count
+                          toward your team's endpoint limit or reserve its name. After it is deleted,
+                          the next such request creates a new default. Returned in responses only.
+                        "mcp_url": "str"  # Optional. MCP URL that resolves the
+                          highest-numbered live version on every request. Its host follows the head
+                          version's VPC region, or the default host when no version is live. It is the
+                          same value the create response returns as mcp_url. Returned in responses
+                          only.
+                    }
+                }
+                # response body for status code(s): 400, 404, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace
+    def patch(
+        self, endpoint_id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update an Endpoint.
+
+        Renames an endpoint, changes its Insights consent, or both, without changing its owner, actor,
+        or versions. Send name, insights, or both. Insights merges per signal: a metrics, logs, or
+        traces value of true or false replaces that signal, and an omitted signal keeps its stored
+        value. The consent applies to every version, including pinned and older versions. A body with
+        no name and no insights signal returns 400 endpoint_update_empty. Only the endpoint owner may
+        update it. An invalid name returns 400 invalid_endpoint_name; a duplicate team name returns 409
+        endpoint_name_taken. Inaccessible endpoints return 404 endpoint_not_found.
+
+        :param endpoint_id: Endpoint UUID only. Malformed IDs or full URNs return 400
+         invalid_endpoint_id. Required.
+        :type endpoint_id: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "insights": {
+                        "logs": bool,  # Optional. Explicit true enables customer logs and
+                          false disables them. Omission preserves the existing choice without an
+                          implicit reset.
+                        "metrics": bool,  # Optional. Accepted and stored for parity with the
+                          Insights schema.
+                        "traces": bool  # Optional. Explicit true enables customer traces and
+                          false disables them. Omission preserves the existing choice without an
+                          implicit reset.
+                    },
+                    "name": "str"  # Optional. Endpoint name, unique within your team.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "endpoint": {
+                        "actor_id": "str",  # Immutable actor binding; empty means no actor.
+                          Required.
+                        "created_at": "2020-02-20 00:00:00",  # When the endpoint was
+                          created. Required.
+                        "id": "str",  # Lowercase, hyphenated endpoint UUID, without a URN
+                          prefix. Required.
+                        "name": "str",  # Endpoint name, unique within your team. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # When the endpoint was last
+                          changed. Required.
+                        "head_version": {
+                            "actor_id": "str",  # Actor binding shared by every version
+                              of the endpoint; empty means no actor. Required.
+                            "created_at": "2020-02-20 00:00:00",  # When the version was
+                              created. Required.
+                            "endpoint_id": "str",  # Lowercase, hyphenated endpoint UUID,
+                              without a URN prefix. Required.
+                            "id": "str",  # The endpoint UUID followed by .v and its
+                              version number, without a URN prefix. The UUID is lowercase and
+                              hyphenated. The number is from 1 through 4294967295, in decimal without
+                              signs or leading zeros. A bare UUID is not a version ID. Required.
+                            "name": "str",  # The endpoint's name when this version was
+                              created. Renaming the endpoint does not change it. Required.
+                            "policy": {
+                                "defaultAction": "str",  # Optional. Action for calls
+                                  no rule matches. Omission means ask; responses then return
+                                  SESSION_POLICY_ACTION_UNSPECIFIED. Known values are: "allow", "ask",
+                                  "deny", and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                                "rules": [
+                                    {
+                                        "action": "str",  # Action when the
+                                          rule matches. Required. Known values are: "allow", "ask", and
+                                          "deny".
+                                        "tool": "str",  # Selected tool slug
+                                          or version-pinned toolbelt reference. Required.
+                                        "match": {
+                                            "str": "str"  # Optional.
+                                              Argument conditions; an empty object matches every call
+                                              to the tool.
+                                        }
+                                    }
+                                ]
+                            },
+                            "updated_at": "2020-02-20 00:00:00",  # When the version was
+                              last updated. Required.
+                            "version_number": 0,  # Positive unsigned 32-bit version
+                              number, never reused after deletion. Required.
+                            "config": {
+                                "cache": {
+                                    "allEligible": bool,  # Optional. Enables
+                                      caching for every called tool version with a catalog cache
+                                      policy, including tools that become eligible after session
+                                      creation. Do not combine with tools. True
+                                    "maxAgeSeconds": 0,  # Optional. Maximum
+                                      cache lifetime in seconds for this session. Omit to use each
+                                      tool's lifetime, up to 300 seconds. A smaller tool lifetime or
+                                      provider response cache header can shorten it. Per-call
+                                      max_age_seconds can require a fresher result but cannot increase
+                                      this limit.
+                                    "tools": [
+                                        "str"  # Optional. Provider-qualified
+                                          tool slugs to cache. Every listed tool must resolve for the
+                                          team and have a catalog cache policy, or session creation
+                                          fails. Use slugs without version suffixes or toolbelt
+                                          references. An empty array enables no tools.
+                                    ]
+                                },
+                                "customInstructions": "str",  # Optional.
+                                  Instructions for tools in this version.
+                                "outputViews": {
+                                    "str": "str"  # Optional. Maps up to 100 tool
+                                      slugs to output-view names.
+                                },
+                                "preloadTools": [
+                                    "str"  # Optional. Tool names, optionally
+                                      version-pinned, or version-pinned toolbelt references.
+                                ]
+                            },
+                            "insights": {
+                                "logs": bool,  # Optional. Whether the session's
+                                  customer logs are sent to Insights.
+                                "metrics": bool,  # Optional. Accepted and stored for
+                                  parity with the Insights schema.
+                                "traces": bool  # Optional. Whether the session's
+                                  customer traces are sent to Insights.
+                            },
+                            "mcp_url": "str",  # Optional. Pinned MCP URL for this
+                              version, valid for the version's lifetime. It is the same value the
+                              create response returns as version_mcp_url. Its final segment is the
+                              backing session UUID, not the composite version ID. VPC-bound versions
+                              may use a regional host. Returned in responses only.
+                            "network": {
+                                "region": "str",  # The VPC's region, recorded when
+                                  the version was created. A tool call through a connection whose VPC
+                                  is in a different region is refused. This field is returned in
+                                  responses only and is rejected in requests. Required.
+                                "vpcUuid": "str"  # UUID of a VPC owned by your team
+                                  in a supported region. Required.
+                            },
+                            "promoted_from_version_number": 0,  # Optional. Positive
+                              unsigned 32-bit version number, never reused after deletion.
+                            "tools": {
+                                "references": [
+                                    {
+                                        "kind": "str",  # Optional. Whether
+                                          name is a tool or a toolbelt. Known values are:
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                        "name": "str",  # Optional. Tool slug
+                                          or toolbelt name.
+                                        "version": "str"  # Optional. Pinned
+                                          version.
+                                    }
+                                ]
+                            }
+                        },
+                        "insights": {
+                            "logs": bool,  # Optional. Explicit true enables customer
+                              logs and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                            "metrics": bool,  # Optional. Accepted and stored for parity
+                              with the Insights schema.
+                            "traces": bool  # Optional. Explicit true enables customer
+                              traces and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                        },
+                        "is_default": bool,  # Optional. True only for your own default
+                          endpoint in the team: the one the generic MCP URL and data-plane requests
+                          without ``X-Session-Id`` or ``X-Endpoint-Id`` resolve to for you, which
+                          Action Gateway creates on first use. False for every other endpoint,
+                          including other team members' default endpoints that a team owner can see, so
+                          a response marks at most one endpoint. A default endpoint does not count
+                          toward your team's endpoint limit or reserve its name. After it is deleted,
+                          the next such request creates a new default. Returned in responses only.
+                        "mcp_url": "str"  # Optional. MCP URL that resolves the
+                          highest-numbered live version on every request. Its host follows the head
+                          version's VPC region, or the default host when no version is live. It is the
+                          same value the create response returns as mcp_url. Returned in responses
+                          only.
+                    }
+                }
+                # response body for status code(s): 400, 404, 409
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_endpoints_patch_request(
+            endpoint_id=endpoint_id,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404, 409]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def delete(self, endpoint_id: str, **kwargs: Any) -> Optional[JSON]:
+        # pylint: disable=line-too-long
+        """Delete an Endpoint.
+
+        Deletes an endpoint and all its versions. The owner or a team owner may delete it. Missing
+        endpoints, endpoints outside your team, and otherwise invisible endpoints all return the same
+        empty 204 response as a successful deletion. A service-managed endpoint is invisible: deleting
+        its ID returns the same 204 as an unknown ID and does not change it. Repeating a delete returns
+        204. Deletion is final for the endpoint identity and all cascaded version identities; retries,
+        replays, and later writes cannot resurrect them. Reusing the same contents requires a new
+        endpoint identity and a new version identity and number.
+
+        :param endpoint_id: Endpoint UUID only. Malformed IDs or full URNs return 400
+         invalid_endpoint_id. Required.
+        :type endpoint_id: str
+        :return: JSON object or None
+        :rtype: JSON or None
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 400
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[Optional[JSON]] = kwargs.pop("cls", None)
+
+        _request = build_endpoints_delete_request(
+            endpoint_id=endpoint_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [204, 400]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        deserialized = None
+        response_headers = {}
+        if response.status_code == 204:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, deserialized, response_headers)  # type: ignore
+
+        return deserialized  # type: ignore
+
+
+class EndpointVersionsOperations:
+    """
+    .. warning::
+        **DO NOT** instantiate this class directly.
+
+        Instead, you should access the following operations through
+        :class:`~pydo.GeneratedClient`'s
+        :attr:`endpoint_versions` attribute.
+    """
+
+    def __init__(self, *args, **kwargs):
+        input_args = list(args)
+        self._client = input_args.pop(0) if input_args else kwargs.pop("client")
+        self._config = input_args.pop(0) if input_args else kwargs.pop("config")
+        self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
+        self._deserialize = (
+            input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        )
+
+    @overload
+    def create(
+        self,
+        endpoint_id: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create an Endpoint Version.
+
+        Publishes a new immutable version as the endpoint's head. Only the endpoint owner may create
+        versions, and the actor binding must match the endpoint. An identity mismatch returns 404
+        endpoint_identity_mismatch. Inaccessible endpoints return 404 endpoint_not_found. Publishing
+        identical contents still creates a new version identity and number; it never resurrects a
+        deleted version. Versions carry no Insights consent: a request's insights field is deprecated
+        and ignored, and the endpoint's consent applies to the new version. Neither new-version
+        creation nor head replacement changes that consent; change it with PATCH
+        /v2/action-gateway/endpoints/{endpoint_id}.
+
+        :param endpoint_id: Endpoint UUID only. Malformed IDs or full URNs return 400
+         invalid_endpoint_id. Required.
+        :type endpoint_id: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "actor_id": "str",  # Optional. Actor whose provider connections are used.
+                      Omitted or empty means no actor.
+                    "config": {
+                        "cache": {
+                            "allEligible": bool,  # Optional. Enables caching for every
+                              called tool version with a catalog cache policy, including tools that
+                              become eligible after session creation. Do not combine with tools. True
+                            "maxAgeSeconds": 0,  # Optional. Maximum cache lifetime in
+                              seconds for this session. Omit to use each tool's lifetime, up to 300
+                              seconds. A smaller tool lifetime or provider response cache header can
+                              shorten it. Per-call max_age_seconds can require a fresher result but
+                              cannot increase this limit.
+                            "tools": [
+                                "str"  # Optional. Provider-qualified tool slugs to
+                                  cache. Every listed tool must resolve for the team and have a catalog
+                                  cache policy, or session creation fails. Use slugs without version
+                                  suffixes or toolbelt references. An empty array enables no tools.
+                            ]
+                        },
+                        "customInstructions": "str",  # Optional. Instructions for tools in
+                          this version.
+                        "outputViews": {
+                            "str": "str"  # Optional. Maps up to 100 tool slugs to
+                              output-view names.
+                        },
+                        "preloadTools": [
+                            "str"  # Optional. Tool names, optionally version-pinned, or
+                              version-pinned toolbelt references.
+                        ]
+                    },
+                    "insights": {
+                        "logs": bool,  # Optional. Explicit true enables customer logs and
+                          false disables them. Omission preserves the existing choice without an
+                          implicit reset.
+                        "metrics": bool,  # Optional. Accepted and stored for parity with the
+                          Insights schema.
+                        "traces": bool  # Optional. Explicit true enables customer traces and
+                          false disables them. Omission preserves the existing choice without an
+                          implicit reset.
+                    },
+                    "network": {
+                        "vpcUuid": "str"  # Optional. UUID of a VPC owned by your team in a
+                          supported region.
+                    },
+                    "policy": {
+                        "defaultAction": "str",  # Optional. Action for calls no rule
+                          matches. Omission means ask; responses then return
+                          SESSION_POLICY_ACTION_UNSPECIFIED. Known values are: "allow", "ask", "deny",
+                          and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                        "rules": [
+                            {
+                                "action": "str",  # Action when the rule matches.
+                                  Required. Known values are: "allow", "ask", and "deny".
+                                "tool": "str",  # Selected tool slug or
+                                  version-pinned toolbelt reference. Required.
+                                "match": {
+                                    "str": "str"  # Optional. Argument
+                                      conditions; an empty object matches every call to the tool.
+                                }
+                            }
+                        ]
+                    },
+                    "tools": [
+                        "str"  # Optional. Omitted enables every tool; an explicit empty
+                          array enables no tools. Direct tools use provider-qualified slugs, optionally
+                          pinned as tool@version. Toolbelts must be pinned as toolbelt:name@version.
+                          Floating pins are rejected.
+                    ]
+                }
+
+                # response body for status code(s): 201
+                response == {
+                    "endpoint": {
+                        "actor_id": "str",  # Immutable actor binding; empty means no actor.
+                          Required.
+                        "created_at": "2020-02-20 00:00:00",  # When the endpoint was
+                          created. Required.
+                        "id": "str",  # Lowercase, hyphenated endpoint UUID, without a URN
+                          prefix. Required.
+                        "name": "str",  # Endpoint name, unique within your team. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # When the endpoint was last
+                          changed. Required.
+                        "head_version": {
+                            "actor_id": "str",  # Actor binding shared by every version
+                              of the endpoint; empty means no actor. Required.
+                            "created_at": "2020-02-20 00:00:00",  # When the version was
+                              created. Required.
+                            "endpoint_id": "str",  # Lowercase, hyphenated endpoint UUID,
+                              without a URN prefix. Required.
+                            "id": "str",  # The endpoint UUID followed by .v and its
+                              version number, without a URN prefix. The UUID is lowercase and
+                              hyphenated. The number is from 1 through 4294967295, in decimal without
+                              signs or leading zeros. A bare UUID is not a version ID. Required.
+                            "name": "str",  # The endpoint's name when this version was
+                              created. Renaming the endpoint does not change it. Required.
+                            "policy": {
+                                "defaultAction": "str",  # Optional. Action for calls
+                                  no rule matches. Omission means ask; responses then return
+                                  SESSION_POLICY_ACTION_UNSPECIFIED. Known values are: "allow", "ask",
+                                  "deny", and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                                "rules": [
+                                    {
+                                        "action": "str",  # Action when the
+                                          rule matches. Required. Known values are: "allow", "ask", and
+                                          "deny".
+                                        "tool": "str",  # Selected tool slug
+                                          or version-pinned toolbelt reference. Required.
+                                        "match": {
+                                            "str": "str"  # Optional.
+                                              Argument conditions; an empty object matches every call
+                                              to the tool.
+                                        }
+                                    }
+                                ]
+                            },
+                            "updated_at": "2020-02-20 00:00:00",  # When the version was
+                              last updated. Required.
+                            "version_number": 0,  # Positive unsigned 32-bit version
+                              number, never reused after deletion. Required.
+                            "config": {
+                                "cache": {
+                                    "allEligible": bool,  # Optional. Enables
+                                      caching for every called tool version with a catalog cache
+                                      policy, including tools that become eligible after session
+                                      creation. Do not combine with tools. True
+                                    "maxAgeSeconds": 0,  # Optional. Maximum
+                                      cache lifetime in seconds for this session. Omit to use each
+                                      tool's lifetime, up to 300 seconds. A smaller tool lifetime or
+                                      provider response cache header can shorten it. Per-call
+                                      max_age_seconds can require a fresher result but cannot increase
+                                      this limit.
+                                    "tools": [
+                                        "str"  # Optional. Provider-qualified
+                                          tool slugs to cache. Every listed tool must resolve for the
+                                          team and have a catalog cache policy, or session creation
+                                          fails. Use slugs without version suffixes or toolbelt
+                                          references. An empty array enables no tools.
+                                    ]
+                                },
+                                "customInstructions": "str",  # Optional.
+                                  Instructions for tools in this version.
+                                "outputViews": {
+                                    "str": "str"  # Optional. Maps up to 100 tool
+                                      slugs to output-view names.
+                                },
+                                "preloadTools": [
+                                    "str"  # Optional. Tool names, optionally
+                                      version-pinned, or version-pinned toolbelt references.
+                                ]
+                            },
+                            "insights": {
+                                "logs": bool,  # Optional. Whether the session's
+                                  customer logs are sent to Insights.
+                                "metrics": bool,  # Optional. Accepted and stored for
+                                  parity with the Insights schema.
+                                "traces": bool  # Optional. Whether the session's
+                                  customer traces are sent to Insights.
+                            },
+                            "mcp_url": "str",  # Optional. Pinned MCP URL for this
+                              version, valid for the version's lifetime. It is the same value the
+                              create response returns as version_mcp_url. Its final segment is the
+                              backing session UUID, not the composite version ID. VPC-bound versions
+                              may use a regional host. Returned in responses only.
+                            "network": {
+                                "region": "str",  # The VPC's region, recorded when
+                                  the version was created. A tool call through a connection whose VPC
+                                  is in a different region is refused. This field is returned in
+                                  responses only and is rejected in requests. Required.
+                                "vpcUuid": "str"  # UUID of a VPC owned by your team
+                                  in a supported region. Required.
+                            },
+                            "promoted_from_version_number": 0,  # Optional. Positive
+                              unsigned 32-bit version number, never reused after deletion.
+                            "tools": {
+                                "references": [
+                                    {
+                                        "kind": "str",  # Optional. Whether
+                                          name is a tool or a toolbelt. Known values are:
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                        "name": "str",  # Optional. Tool slug
+                                          or toolbelt name.
+                                        "version": "str"  # Optional. Pinned
+                                          version.
+                                    }
+                                ]
+                            }
+                        },
+                        "insights": {
+                            "logs": bool,  # Optional. Explicit true enables customer
+                              logs and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                            "metrics": bool,  # Optional. Accepted and stored for parity
+                              with the Insights schema.
+                            "traces": bool  # Optional. Explicit true enables customer
+                              traces and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                        },
+                        "is_default": bool,  # Optional. True only for your own default
+                          endpoint in the team: the one the generic MCP URL and data-plane requests
+                          without ``X-Session-Id`` or ``X-Endpoint-Id`` resolve to for you, which
+                          Action Gateway creates on first use. False for every other endpoint,
+                          including other team members' default endpoints that a team owner can see, so
+                          a response marks at most one endpoint. A default endpoint does not count
+                          toward your team's endpoint limit or reserve its name. After it is deleted,
+                          the next such request creates a new default. Returned in responses only.
+                        "mcp_url": "str"  # Optional. MCP URL that resolves the
+                          highest-numbered live version on every request. Its host follows the head
+                          version's VPC region, or the default host when no version is live. It is the
+                          same value the create response returns as mcp_url. Returned in responses
+                          only.
+                    },
+                    "mcp_url": "str",  # MCP URL that resolves the highest-numbered live version
+                      on every request. Its host follows the head version's VPC region, or the default
+                      host when no version is live. Required.
+                    "version": {
+                        "actor_id": "str",  # Actor binding shared by every version of the
+                          endpoint; empty means no actor. Required.
+                        "created_at": "2020-02-20 00:00:00",  # When the version was created.
+                          Required.
+                        "endpoint_id": "str",  # Lowercase, hyphenated endpoint UUID, without
+                          a URN prefix. Required.
+                        "id": "str",  # The endpoint UUID followed by .v and its version
+                          number, without a URN prefix. The UUID is lowercase and hyphenated. The
+                          number is from 1 through 4294967295, in decimal without signs or leading
+                          zeros. A bare UUID is not a version ID. Required.
+                        "name": "str",  # The endpoint's name when this version was created.
+                          Renaming the endpoint does not change it. Required.
+                        "policy": {
+                            "defaultAction": "str",  # Optional. Action for calls no rule
+                              matches. Omission means ask; responses then return
+                              SESSION_POLICY_ACTION_UNSPECIFIED. Known values are: "allow", "ask",
+                              "deny", and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                            "rules": [
+                                {
+                                    "action": "str",  # Action when the rule
+                                      matches. Required. Known values are: "allow", "ask", and "deny".
+                                    "tool": "str",  # Selected tool slug or
+                                      version-pinned toolbelt reference. Required.
+                                    "match": {
+                                        "str": "str"  # Optional. Argument
+                                          conditions; an empty object matches every call to the tool.
+                                    }
+                                }
+                            ]
+                        },
+                        "updated_at": "2020-02-20 00:00:00",  # When the version was last
+                          updated. Required.
+                        "version_number": 0,  # Positive unsigned 32-bit version number,
+                          never reused after deletion. Required.
+                        "config": {
+                            "cache": {
+                                "allEligible": bool,  # Optional. Enables caching for
+                                  every called tool version with a catalog cache policy, including
+                                  tools that become eligible after session creation. Do not combine
+                                  with tools. True
+                                "maxAgeSeconds": 0,  # Optional. Maximum cache
+                                  lifetime in seconds for this session. Omit to use each tool's
+                                  lifetime, up to 300 seconds. A smaller tool lifetime or provider
+                                  response cache header can shorten it. Per-call max_age_seconds can
+                                  require a fresher result but cannot increase this limit.
+                                "tools": [
+                                    "str"  # Optional. Provider-qualified tool
+                                      slugs to cache. Every listed tool must resolve for the team and
+                                      have a catalog cache policy, or session creation fails. Use slugs
+                                      without version suffixes or toolbelt references. An empty array
+                                      enables no tools.
+                                ]
+                            },
+                            "customInstructions": "str",  # Optional. Instructions for
+                              tools in this version.
+                            "outputViews": {
+                                "str": "str"  # Optional. Maps up to 100 tool slugs
+                                  to output-view names.
+                            },
+                            "preloadTools": [
+                                "str"  # Optional. Tool names, optionally
+                                  version-pinned, or version-pinned toolbelt references.
+                            ]
+                        },
+                        "insights": {
+                            "logs": bool,  # Optional. Whether the session's customer
+                              logs are sent to Insights.
+                            "metrics": bool,  # Optional. Accepted and stored for parity
+                              with the Insights schema.
+                            "traces": bool  # Optional. Whether the session's customer
+                              traces are sent to Insights.
+                        },
+                        "mcp_url": "str",  # Optional. Pinned MCP URL for this version, valid
+                          for the version's lifetime. It is the same value the create response returns
+                          as version_mcp_url. Its final segment is the backing session UUID, not the
+                          composite version ID. VPC-bound versions may use a regional host. Returned in
+                          responses only.
+                        "network": {
+                            "region": "str",  # The VPC's region, recorded when the
+                              version was created. A tool call through a connection whose VPC is in a
+                              different region is refused. This field is returned in responses only and
+                              is rejected in requests. Required.
+                            "vpcUuid": "str"  # UUID of a VPC owned by your team in a
+                              supported region. Required.
+                        },
+                        "promoted_from_version_number": 0,  # Optional. Positive unsigned
+                          32-bit version number, never reused after deletion.
+                        "tools": {
+                            "references": [
+                                {
+                                    "kind": "str",  # Optional. Whether name is a
+                                      tool or a toolbelt. Known values are:
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                    "name": "str",  # Optional. Tool slug or
+                                      toolbelt name.
+                                    "version": "str"  # Optional. Pinned version.
+                                }
+                            ]
+                        }
+                    },
+                    "version_mcp_url": "str"  # Pinned MCP URL, valid for this version's
+                      lifetime. Its final segment is the backing session UUID, not the public composite
+                      version ID. VPC-bound versions may use a regional host. Existing /mcp/session/
+                      URLs keep working. Required.
+                }
+                # response body for status code(s): 400, 404, 429
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    def create(
+        self,
+        endpoint_id: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create an Endpoint Version.
+
+        Publishes a new immutable version as the endpoint's head. Only the endpoint owner may create
+        versions, and the actor binding must match the endpoint. An identity mismatch returns 404
+        endpoint_identity_mismatch. Inaccessible endpoints return 404 endpoint_not_found. Publishing
+        identical contents still creates a new version identity and number; it never resurrects a
+        deleted version. Versions carry no Insights consent: a request's insights field is deprecated
+        and ignored, and the endpoint's consent applies to the new version. Neither new-version
+        creation nor head replacement changes that consent; change it with PATCH
+        /v2/action-gateway/endpoints/{endpoint_id}.
+
+        :param endpoint_id: Endpoint UUID only. Malformed IDs or full URNs return 400
+         invalid_endpoint_id. Required.
+        :type endpoint_id: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 201
+                response == {
+                    "endpoint": {
+                        "actor_id": "str",  # Immutable actor binding; empty means no actor.
+                          Required.
+                        "created_at": "2020-02-20 00:00:00",  # When the endpoint was
+                          created. Required.
+                        "id": "str",  # Lowercase, hyphenated endpoint UUID, without a URN
+                          prefix. Required.
+                        "name": "str",  # Endpoint name, unique within your team. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # When the endpoint was last
+                          changed. Required.
+                        "head_version": {
+                            "actor_id": "str",  # Actor binding shared by every version
+                              of the endpoint; empty means no actor. Required.
+                            "created_at": "2020-02-20 00:00:00",  # When the version was
+                              created. Required.
+                            "endpoint_id": "str",  # Lowercase, hyphenated endpoint UUID,
+                              without a URN prefix. Required.
+                            "id": "str",  # The endpoint UUID followed by .v and its
+                              version number, without a URN prefix. The UUID is lowercase and
+                              hyphenated. The number is from 1 through 4294967295, in decimal without
+                              signs or leading zeros. A bare UUID is not a version ID. Required.
+                            "name": "str",  # The endpoint's name when this version was
+                              created. Renaming the endpoint does not change it. Required.
+                            "policy": {
+                                "defaultAction": "str",  # Optional. Action for calls
+                                  no rule matches. Omission means ask; responses then return
+                                  SESSION_POLICY_ACTION_UNSPECIFIED. Known values are: "allow", "ask",
+                                  "deny", and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                                "rules": [
+                                    {
+                                        "action": "str",  # Action when the
+                                          rule matches. Required. Known values are: "allow", "ask", and
+                                          "deny".
+                                        "tool": "str",  # Selected tool slug
+                                          or version-pinned toolbelt reference. Required.
+                                        "match": {
+                                            "str": "str"  # Optional.
+                                              Argument conditions; an empty object matches every call
+                                              to the tool.
+                                        }
+                                    }
+                                ]
+                            },
+                            "updated_at": "2020-02-20 00:00:00",  # When the version was
+                              last updated. Required.
+                            "version_number": 0,  # Positive unsigned 32-bit version
+                              number, never reused after deletion. Required.
+                            "config": {
+                                "cache": {
+                                    "allEligible": bool,  # Optional. Enables
+                                      caching for every called tool version with a catalog cache
+                                      policy, including tools that become eligible after session
+                                      creation. Do not combine with tools. True
+                                    "maxAgeSeconds": 0,  # Optional. Maximum
+                                      cache lifetime in seconds for this session. Omit to use each
+                                      tool's lifetime, up to 300 seconds. A smaller tool lifetime or
+                                      provider response cache header can shorten it. Per-call
+                                      max_age_seconds can require a fresher result but cannot increase
+                                      this limit.
+                                    "tools": [
+                                        "str"  # Optional. Provider-qualified
+                                          tool slugs to cache. Every listed tool must resolve for the
+                                          team and have a catalog cache policy, or session creation
+                                          fails. Use slugs without version suffixes or toolbelt
+                                          references. An empty array enables no tools.
+                                    ]
+                                },
+                                "customInstructions": "str",  # Optional.
+                                  Instructions for tools in this version.
+                                "outputViews": {
+                                    "str": "str"  # Optional. Maps up to 100 tool
+                                      slugs to output-view names.
+                                },
+                                "preloadTools": [
+                                    "str"  # Optional. Tool names, optionally
+                                      version-pinned, or version-pinned toolbelt references.
+                                ]
+                            },
+                            "insights": {
+                                "logs": bool,  # Optional. Whether the session's
+                                  customer logs are sent to Insights.
+                                "metrics": bool,  # Optional. Accepted and stored for
+                                  parity with the Insights schema.
+                                "traces": bool  # Optional. Whether the session's
+                                  customer traces are sent to Insights.
+                            },
+                            "mcp_url": "str",  # Optional. Pinned MCP URL for this
+                              version, valid for the version's lifetime. It is the same value the
+                              create response returns as version_mcp_url. Its final segment is the
+                              backing session UUID, not the composite version ID. VPC-bound versions
+                              may use a regional host. Returned in responses only.
+                            "network": {
+                                "region": "str",  # The VPC's region, recorded when
+                                  the version was created. A tool call through a connection whose VPC
+                                  is in a different region is refused. This field is returned in
+                                  responses only and is rejected in requests. Required.
+                                "vpcUuid": "str"  # UUID of a VPC owned by your team
+                                  in a supported region. Required.
+                            },
+                            "promoted_from_version_number": 0,  # Optional. Positive
+                              unsigned 32-bit version number, never reused after deletion.
+                            "tools": {
+                                "references": [
+                                    {
+                                        "kind": "str",  # Optional. Whether
+                                          name is a tool or a toolbelt. Known values are:
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                        "name": "str",  # Optional. Tool slug
+                                          or toolbelt name.
+                                        "version": "str"  # Optional. Pinned
+                                          version.
+                                    }
+                                ]
+                            }
+                        },
+                        "insights": {
+                            "logs": bool,  # Optional. Explicit true enables customer
+                              logs and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                            "metrics": bool,  # Optional. Accepted and stored for parity
+                              with the Insights schema.
+                            "traces": bool  # Optional. Explicit true enables customer
+                              traces and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                        },
+                        "is_default": bool,  # Optional. True only for your own default
+                          endpoint in the team: the one the generic MCP URL and data-plane requests
+                          without ``X-Session-Id`` or ``X-Endpoint-Id`` resolve to for you, which
+                          Action Gateway creates on first use. False for every other endpoint,
+                          including other team members' default endpoints that a team owner can see, so
+                          a response marks at most one endpoint. A default endpoint does not count
+                          toward your team's endpoint limit or reserve its name. After it is deleted,
+                          the next such request creates a new default. Returned in responses only.
+                        "mcp_url": "str"  # Optional. MCP URL that resolves the
+                          highest-numbered live version on every request. Its host follows the head
+                          version's VPC region, or the default host when no version is live. It is the
+                          same value the create response returns as mcp_url. Returned in responses
+                          only.
+                    },
+                    "mcp_url": "str",  # MCP URL that resolves the highest-numbered live version
+                      on every request. Its host follows the head version's VPC region, or the default
+                      host when no version is live. Required.
+                    "version": {
+                        "actor_id": "str",  # Actor binding shared by every version of the
+                          endpoint; empty means no actor. Required.
+                        "created_at": "2020-02-20 00:00:00",  # When the version was created.
+                          Required.
+                        "endpoint_id": "str",  # Lowercase, hyphenated endpoint UUID, without
+                          a URN prefix. Required.
+                        "id": "str",  # The endpoint UUID followed by .v and its version
+                          number, without a URN prefix. The UUID is lowercase and hyphenated. The
+                          number is from 1 through 4294967295, in decimal without signs or leading
+                          zeros. A bare UUID is not a version ID. Required.
+                        "name": "str",  # The endpoint's name when this version was created.
+                          Renaming the endpoint does not change it. Required.
+                        "policy": {
+                            "defaultAction": "str",  # Optional. Action for calls no rule
+                              matches. Omission means ask; responses then return
+                              SESSION_POLICY_ACTION_UNSPECIFIED. Known values are: "allow", "ask",
+                              "deny", and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                            "rules": [
+                                {
+                                    "action": "str",  # Action when the rule
+                                      matches. Required. Known values are: "allow", "ask", and "deny".
+                                    "tool": "str",  # Selected tool slug or
+                                      version-pinned toolbelt reference. Required.
+                                    "match": {
+                                        "str": "str"  # Optional. Argument
+                                          conditions; an empty object matches every call to the tool.
+                                    }
+                                }
+                            ]
+                        },
+                        "updated_at": "2020-02-20 00:00:00",  # When the version was last
+                          updated. Required.
+                        "version_number": 0,  # Positive unsigned 32-bit version number,
+                          never reused after deletion. Required.
+                        "config": {
+                            "cache": {
+                                "allEligible": bool,  # Optional. Enables caching for
+                                  every called tool version with a catalog cache policy, including
+                                  tools that become eligible after session creation. Do not combine
+                                  with tools. True
+                                "maxAgeSeconds": 0,  # Optional. Maximum cache
+                                  lifetime in seconds for this session. Omit to use each tool's
+                                  lifetime, up to 300 seconds. A smaller tool lifetime or provider
+                                  response cache header can shorten it. Per-call max_age_seconds can
+                                  require a fresher result but cannot increase this limit.
+                                "tools": [
+                                    "str"  # Optional. Provider-qualified tool
+                                      slugs to cache. Every listed tool must resolve for the team and
+                                      have a catalog cache policy, or session creation fails. Use slugs
+                                      without version suffixes or toolbelt references. An empty array
+                                      enables no tools.
+                                ]
+                            },
+                            "customInstructions": "str",  # Optional. Instructions for
+                              tools in this version.
+                            "outputViews": {
+                                "str": "str"  # Optional. Maps up to 100 tool slugs
+                                  to output-view names.
+                            },
+                            "preloadTools": [
+                                "str"  # Optional. Tool names, optionally
+                                  version-pinned, or version-pinned toolbelt references.
+                            ]
+                        },
+                        "insights": {
+                            "logs": bool,  # Optional. Whether the session's customer
+                              logs are sent to Insights.
+                            "metrics": bool,  # Optional. Accepted and stored for parity
+                              with the Insights schema.
+                            "traces": bool  # Optional. Whether the session's customer
+                              traces are sent to Insights.
+                        },
+                        "mcp_url": "str",  # Optional. Pinned MCP URL for this version, valid
+                          for the version's lifetime. It is the same value the create response returns
+                          as version_mcp_url. Its final segment is the backing session UUID, not the
+                          composite version ID. VPC-bound versions may use a regional host. Returned in
+                          responses only.
+                        "network": {
+                            "region": "str",  # The VPC's region, recorded when the
+                              version was created. A tool call through a connection whose VPC is in a
+                              different region is refused. This field is returned in responses only and
+                              is rejected in requests. Required.
+                            "vpcUuid": "str"  # UUID of a VPC owned by your team in a
+                              supported region. Required.
+                        },
+                        "promoted_from_version_number": 0,  # Optional. Positive unsigned
+                          32-bit version number, never reused after deletion.
+                        "tools": {
+                            "references": [
+                                {
+                                    "kind": "str",  # Optional. Whether name is a
+                                      tool or a toolbelt. Known values are:
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                    "name": "str",  # Optional. Tool slug or
+                                      toolbelt name.
+                                    "version": "str"  # Optional. Pinned version.
+                                }
+                            ]
+                        }
+                    },
+                    "version_mcp_url": "str"  # Pinned MCP URL, valid for this version's
+                      lifetime. Its final segment is the backing session UUID, not the public composite
+                      version ID. VPC-bound versions may use a regional host. Existing /mcp/session/
+                      URLs keep working. Required.
+                }
+                # response body for status code(s): 400, 404, 429
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace
+    def create(
+        self, endpoint_id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create an Endpoint Version.
+
+        Publishes a new immutable version as the endpoint's head. Only the endpoint owner may create
+        versions, and the actor binding must match the endpoint. An identity mismatch returns 404
+        endpoint_identity_mismatch. Inaccessible endpoints return 404 endpoint_not_found. Publishing
+        identical contents still creates a new version identity and number; it never resurrects a
+        deleted version. Versions carry no Insights consent: a request's insights field is deprecated
+        and ignored, and the endpoint's consent applies to the new version. Neither new-version
+        creation nor head replacement changes that consent; change it with PATCH
+        /v2/action-gateway/endpoints/{endpoint_id}.
+
+        :param endpoint_id: Endpoint UUID only. Malformed IDs or full URNs return 400
+         invalid_endpoint_id. Required.
+        :type endpoint_id: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "actor_id": "str",  # Optional. Actor whose provider connections are used.
+                      Omitted or empty means no actor.
+                    "config": {
+                        "cache": {
+                            "allEligible": bool,  # Optional. Enables caching for every
+                              called tool version with a catalog cache policy, including tools that
+                              become eligible after session creation. Do not combine with tools. True
+                            "maxAgeSeconds": 0,  # Optional. Maximum cache lifetime in
+                              seconds for this session. Omit to use each tool's lifetime, up to 300
+                              seconds. A smaller tool lifetime or provider response cache header can
+                              shorten it. Per-call max_age_seconds can require a fresher result but
+                              cannot increase this limit.
+                            "tools": [
+                                "str"  # Optional. Provider-qualified tool slugs to
+                                  cache. Every listed tool must resolve for the team and have a catalog
+                                  cache policy, or session creation fails. Use slugs without version
+                                  suffixes or toolbelt references. An empty array enables no tools.
+                            ]
+                        },
+                        "customInstructions": "str",  # Optional. Instructions for tools in
+                          this version.
+                        "outputViews": {
+                            "str": "str"  # Optional. Maps up to 100 tool slugs to
+                              output-view names.
+                        },
+                        "preloadTools": [
+                            "str"  # Optional. Tool names, optionally version-pinned, or
+                              version-pinned toolbelt references.
+                        ]
+                    },
+                    "insights": {
+                        "logs": bool,  # Optional. Explicit true enables customer logs and
+                          false disables them. Omission preserves the existing choice without an
+                          implicit reset.
+                        "metrics": bool,  # Optional. Accepted and stored for parity with the
+                          Insights schema.
+                        "traces": bool  # Optional. Explicit true enables customer traces and
+                          false disables them. Omission preserves the existing choice without an
+                          implicit reset.
+                    },
+                    "network": {
+                        "vpcUuid": "str"  # Optional. UUID of a VPC owned by your team in a
+                          supported region.
+                    },
+                    "policy": {
+                        "defaultAction": "str",  # Optional. Action for calls no rule
+                          matches. Omission means ask; responses then return
+                          SESSION_POLICY_ACTION_UNSPECIFIED. Known values are: "allow", "ask", "deny",
+                          and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                        "rules": [
+                            {
+                                "action": "str",  # Action when the rule matches.
+                                  Required. Known values are: "allow", "ask", and "deny".
+                                "tool": "str",  # Selected tool slug or
+                                  version-pinned toolbelt reference. Required.
+                                "match": {
+                                    "str": "str"  # Optional. Argument
+                                      conditions; an empty object matches every call to the tool.
+                                }
+                            }
+                        ]
+                    },
+                    "tools": [
+                        "str"  # Optional. Omitted enables every tool; an explicit empty
+                          array enables no tools. Direct tools use provider-qualified slugs, optionally
+                          pinned as tool@version. Toolbelts must be pinned as toolbelt:name@version.
+                          Floating pins are rejected.
+                    ]
+                }
+
+                # response body for status code(s): 201
+                response == {
+                    "endpoint": {
+                        "actor_id": "str",  # Immutable actor binding; empty means no actor.
+                          Required.
+                        "created_at": "2020-02-20 00:00:00",  # When the endpoint was
+                          created. Required.
+                        "id": "str",  # Lowercase, hyphenated endpoint UUID, without a URN
+                          prefix. Required.
+                        "name": "str",  # Endpoint name, unique within your team. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # When the endpoint was last
+                          changed. Required.
+                        "head_version": {
+                            "actor_id": "str",  # Actor binding shared by every version
+                              of the endpoint; empty means no actor. Required.
+                            "created_at": "2020-02-20 00:00:00",  # When the version was
+                              created. Required.
+                            "endpoint_id": "str",  # Lowercase, hyphenated endpoint UUID,
+                              without a URN prefix. Required.
+                            "id": "str",  # The endpoint UUID followed by .v and its
+                              version number, without a URN prefix. The UUID is lowercase and
+                              hyphenated. The number is from 1 through 4294967295, in decimal without
+                              signs or leading zeros. A bare UUID is not a version ID. Required.
+                            "name": "str",  # The endpoint's name when this version was
+                              created. Renaming the endpoint does not change it. Required.
+                            "policy": {
+                                "defaultAction": "str",  # Optional. Action for calls
+                                  no rule matches. Omission means ask; responses then return
+                                  SESSION_POLICY_ACTION_UNSPECIFIED. Known values are: "allow", "ask",
+                                  "deny", and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                                "rules": [
+                                    {
+                                        "action": "str",  # Action when the
+                                          rule matches. Required. Known values are: "allow", "ask", and
+                                          "deny".
+                                        "tool": "str",  # Selected tool slug
+                                          or version-pinned toolbelt reference. Required.
+                                        "match": {
+                                            "str": "str"  # Optional.
+                                              Argument conditions; an empty object matches every call
+                                              to the tool.
+                                        }
+                                    }
+                                ]
+                            },
+                            "updated_at": "2020-02-20 00:00:00",  # When the version was
+                              last updated. Required.
+                            "version_number": 0,  # Positive unsigned 32-bit version
+                              number, never reused after deletion. Required.
+                            "config": {
+                                "cache": {
+                                    "allEligible": bool,  # Optional. Enables
+                                      caching for every called tool version with a catalog cache
+                                      policy, including tools that become eligible after session
+                                      creation. Do not combine with tools. True
+                                    "maxAgeSeconds": 0,  # Optional. Maximum
+                                      cache lifetime in seconds for this session. Omit to use each
+                                      tool's lifetime, up to 300 seconds. A smaller tool lifetime or
+                                      provider response cache header can shorten it. Per-call
+                                      max_age_seconds can require a fresher result but cannot increase
+                                      this limit.
+                                    "tools": [
+                                        "str"  # Optional. Provider-qualified
+                                          tool slugs to cache. Every listed tool must resolve for the
+                                          team and have a catalog cache policy, or session creation
+                                          fails. Use slugs without version suffixes or toolbelt
+                                          references. An empty array enables no tools.
+                                    ]
+                                },
+                                "customInstructions": "str",  # Optional.
+                                  Instructions for tools in this version.
+                                "outputViews": {
+                                    "str": "str"  # Optional. Maps up to 100 tool
+                                      slugs to output-view names.
+                                },
+                                "preloadTools": [
+                                    "str"  # Optional. Tool names, optionally
+                                      version-pinned, or version-pinned toolbelt references.
+                                ]
+                            },
+                            "insights": {
+                                "logs": bool,  # Optional. Whether the session's
+                                  customer logs are sent to Insights.
+                                "metrics": bool,  # Optional. Accepted and stored for
+                                  parity with the Insights schema.
+                                "traces": bool  # Optional. Whether the session's
+                                  customer traces are sent to Insights.
+                            },
+                            "mcp_url": "str",  # Optional. Pinned MCP URL for this
+                              version, valid for the version's lifetime. It is the same value the
+                              create response returns as version_mcp_url. Its final segment is the
+                              backing session UUID, not the composite version ID. VPC-bound versions
+                              may use a regional host. Returned in responses only.
+                            "network": {
+                                "region": "str",  # The VPC's region, recorded when
+                                  the version was created. A tool call through a connection whose VPC
+                                  is in a different region is refused. This field is returned in
+                                  responses only and is rejected in requests. Required.
+                                "vpcUuid": "str"  # UUID of a VPC owned by your team
+                                  in a supported region. Required.
+                            },
+                            "promoted_from_version_number": 0,  # Optional. Positive
+                              unsigned 32-bit version number, never reused after deletion.
+                            "tools": {
+                                "references": [
+                                    {
+                                        "kind": "str",  # Optional. Whether
+                                          name is a tool or a toolbelt. Known values are:
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                        "name": "str",  # Optional. Tool slug
+                                          or toolbelt name.
+                                        "version": "str"  # Optional. Pinned
+                                          version.
+                                    }
+                                ]
+                            }
+                        },
+                        "insights": {
+                            "logs": bool,  # Optional. Explicit true enables customer
+                              logs and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                            "metrics": bool,  # Optional. Accepted and stored for parity
+                              with the Insights schema.
+                            "traces": bool  # Optional. Explicit true enables customer
+                              traces and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                        },
+                        "is_default": bool,  # Optional. True only for your own default
+                          endpoint in the team: the one the generic MCP URL and data-plane requests
+                          without ``X-Session-Id`` or ``X-Endpoint-Id`` resolve to for you, which
+                          Action Gateway creates on first use. False for every other endpoint,
+                          including other team members' default endpoints that a team owner can see, so
+                          a response marks at most one endpoint. A default endpoint does not count
+                          toward your team's endpoint limit or reserve its name. After it is deleted,
+                          the next such request creates a new default. Returned in responses only.
+                        "mcp_url": "str"  # Optional. MCP URL that resolves the
+                          highest-numbered live version on every request. Its host follows the head
+                          version's VPC region, or the default host when no version is live. It is the
+                          same value the create response returns as mcp_url. Returned in responses
+                          only.
+                    },
+                    "mcp_url": "str",  # MCP URL that resolves the highest-numbered live version
+                      on every request. Its host follows the head version's VPC region, or the default
+                      host when no version is live. Required.
+                    "version": {
+                        "actor_id": "str",  # Actor binding shared by every version of the
+                          endpoint; empty means no actor. Required.
+                        "created_at": "2020-02-20 00:00:00",  # When the version was created.
+                          Required.
+                        "endpoint_id": "str",  # Lowercase, hyphenated endpoint UUID, without
+                          a URN prefix. Required.
+                        "id": "str",  # The endpoint UUID followed by .v and its version
+                          number, without a URN prefix. The UUID is lowercase and hyphenated. The
+                          number is from 1 through 4294967295, in decimal without signs or leading
+                          zeros. A bare UUID is not a version ID. Required.
+                        "name": "str",  # The endpoint's name when this version was created.
+                          Renaming the endpoint does not change it. Required.
+                        "policy": {
+                            "defaultAction": "str",  # Optional. Action for calls no rule
+                              matches. Omission means ask; responses then return
+                              SESSION_POLICY_ACTION_UNSPECIFIED. Known values are: "allow", "ask",
+                              "deny", and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                            "rules": [
+                                {
+                                    "action": "str",  # Action when the rule
+                                      matches. Required. Known values are: "allow", "ask", and "deny".
+                                    "tool": "str",  # Selected tool slug or
+                                      version-pinned toolbelt reference. Required.
+                                    "match": {
+                                        "str": "str"  # Optional. Argument
+                                          conditions; an empty object matches every call to the tool.
+                                    }
+                                }
+                            ]
+                        },
+                        "updated_at": "2020-02-20 00:00:00",  # When the version was last
+                          updated. Required.
+                        "version_number": 0,  # Positive unsigned 32-bit version number,
+                          never reused after deletion. Required.
+                        "config": {
+                            "cache": {
+                                "allEligible": bool,  # Optional. Enables caching for
+                                  every called tool version with a catalog cache policy, including
+                                  tools that become eligible after session creation. Do not combine
+                                  with tools. True
+                                "maxAgeSeconds": 0,  # Optional. Maximum cache
+                                  lifetime in seconds for this session. Omit to use each tool's
+                                  lifetime, up to 300 seconds. A smaller tool lifetime or provider
+                                  response cache header can shorten it. Per-call max_age_seconds can
+                                  require a fresher result but cannot increase this limit.
+                                "tools": [
+                                    "str"  # Optional. Provider-qualified tool
+                                      slugs to cache. Every listed tool must resolve for the team and
+                                      have a catalog cache policy, or session creation fails. Use slugs
+                                      without version suffixes or toolbelt references. An empty array
+                                      enables no tools.
+                                ]
+                            },
+                            "customInstructions": "str",  # Optional. Instructions for
+                              tools in this version.
+                            "outputViews": {
+                                "str": "str"  # Optional. Maps up to 100 tool slugs
+                                  to output-view names.
+                            },
+                            "preloadTools": [
+                                "str"  # Optional. Tool names, optionally
+                                  version-pinned, or version-pinned toolbelt references.
+                            ]
+                        },
+                        "insights": {
+                            "logs": bool,  # Optional. Whether the session's customer
+                              logs are sent to Insights.
+                            "metrics": bool,  # Optional. Accepted and stored for parity
+                              with the Insights schema.
+                            "traces": bool  # Optional. Whether the session's customer
+                              traces are sent to Insights.
+                        },
+                        "mcp_url": "str",  # Optional. Pinned MCP URL for this version, valid
+                          for the version's lifetime. It is the same value the create response returns
+                          as version_mcp_url. Its final segment is the backing session UUID, not the
+                          composite version ID. VPC-bound versions may use a regional host. Returned in
+                          responses only.
+                        "network": {
+                            "region": "str",  # The VPC's region, recorded when the
+                              version was created. A tool call through a connection whose VPC is in a
+                              different region is refused. This field is returned in responses only and
+                              is rejected in requests. Required.
+                            "vpcUuid": "str"  # UUID of a VPC owned by your team in a
+                              supported region. Required.
+                        },
+                        "promoted_from_version_number": 0,  # Optional. Positive unsigned
+                          32-bit version number, never reused after deletion.
+                        "tools": {
+                            "references": [
+                                {
+                                    "kind": "str",  # Optional. Whether name is a
+                                      tool or a toolbelt. Known values are:
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                    "name": "str",  # Optional. Tool slug or
+                                      toolbelt name.
+                                    "version": "str"  # Optional. Pinned version.
+                                }
+                            ]
+                        }
+                    },
+                    "version_mcp_url": "str"  # Pinned MCP URL, valid for this version's
+                      lifetime. Its final segment is the backing session UUID, not the public composite
+                      version ID. VPC-bound versions may use a regional host. Existing /mcp/session/
+                      URLs keep working. Required.
+                }
+                # response body for status code(s): 400, 404, 429
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_endpoint_versions_create_request(
+            endpoint_id=endpoint_id,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [201, 400, 404, 429]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 201:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 429:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def list(
+        self,
+        endpoint_id: str,
+        *,
+        page_size: int = 20,
+        page_token: Optional[str] = None,
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Endpoint Versions.
+
+        Lists live versions of an accessible endpoint by version_number descending, using keyset
+        pagination without offsets or totals. The cursor is bound to this parent endpoint as well as
+        the caller and team. Inaccessible endpoints return 404 endpoint_not_found.
+
+        :param endpoint_id: Endpoint UUID only. Malformed IDs or full URNs return 400
+         invalid_endpoint_id. Required.
+        :type endpoint_id: str
+        :keyword page_size: Page size; defaults to 20 when omitted. Supplied values outside 1 through
+         100 return 400. Sizes are not clamped. Default value is 20.
+        :paramtype page_size: int
+        :keyword page_token: Opaque next_page_token from the previous response. Omit for the first
+         page. Malformed tokens or replay with a different team, caller visibility, normalized filters,
+         resource kind, or parent endpoint return 400. Tokens contain no full URNs or database row IDs.
+         Default value is None.
+        :paramtype page_token: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "next_page_token": "str",  # Opaque keyset cursor for the next page; an empty
+                      string marks the last page. Bound to the team, caller visibility, normalized
+                      filters, resource kind, and parent endpoint for version lists. Contains no full
+                      URNs or database row IDs. Pass it unchanged as page_token with the same criteria.
+                      Required.
+                    "versions": [
+                        {
+                            "actor_id": "str",  # Actor binding shared by every version
+                              of the endpoint; empty means no actor. Required.
+                            "created_at": "2020-02-20 00:00:00",  # When the version was
+                              created. Required.
+                            "endpoint_id": "str",  # Lowercase, hyphenated endpoint UUID,
+                              without a URN prefix. Required.
+                            "id": "str",  # The endpoint UUID followed by .v and its
+                              version number, without a URN prefix. The UUID is lowercase and
+                              hyphenated. The number is from 1 through 4294967295, in decimal without
+                              signs or leading zeros. A bare UUID is not a version ID. Required.
+                            "name": "str",  # The endpoint's name when this version was
+                              created. Renaming the endpoint does not change it. Required.
+                            "policy": {
+                                "defaultAction": "str",  # Optional. Action for calls
+                                  no rule matches. Omission means ask; responses then return
+                                  SESSION_POLICY_ACTION_UNSPECIFIED. Known values are: "allow", "ask",
+                                  "deny", and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                                "rules": [
+                                    {
+                                        "action": "str",  # Action when the
+                                          rule matches. Required. Known values are: "allow", "ask", and
+                                          "deny".
+                                        "tool": "str",  # Selected tool slug
+                                          or version-pinned toolbelt reference. Required.
+                                        "match": {
+                                            "str": "str"  # Optional.
+                                              Argument conditions; an empty object matches every call
+                                              to the tool.
+                                        }
+                                    }
+                                ]
+                            },
+                            "updated_at": "2020-02-20 00:00:00",  # When the version was
+                              last updated. Required.
+                            "version_number": 0,  # Positive unsigned 32-bit version
+                              number, never reused after deletion. Required.
+                            "config": {
+                                "cache": {
+                                    "allEligible": bool,  # Optional. Enables
+                                      caching for every called tool version with a catalog cache
+                                      policy, including tools that become eligible after session
+                                      creation. Do not combine with tools. True
+                                    "maxAgeSeconds": 0,  # Optional. Maximum
+                                      cache lifetime in seconds for this session. Omit to use each
+                                      tool's lifetime, up to 300 seconds. A smaller tool lifetime or
+                                      provider response cache header can shorten it. Per-call
+                                      max_age_seconds can require a fresher result but cannot increase
+                                      this limit.
+                                    "tools": [
+                                        "str"  # Optional. Provider-qualified
+                                          tool slugs to cache. Every listed tool must resolve for the
+                                          team and have a catalog cache policy, or session creation
+                                          fails. Use slugs without version suffixes or toolbelt
+                                          references. An empty array enables no tools.
+                                    ]
+                                },
+                                "customInstructions": "str",  # Optional.
+                                  Instructions for tools in this version.
+                                "outputViews": {
+                                    "str": "str"  # Optional. Maps up to 100 tool
+                                      slugs to output-view names.
+                                },
+                                "preloadTools": [
+                                    "str"  # Optional. Tool names, optionally
+                                      version-pinned, or version-pinned toolbelt references.
+                                ]
+                            },
+                            "insights": {
+                                "logs": bool,  # Optional. Whether the session's
+                                  customer logs are sent to Insights.
+                                "metrics": bool,  # Optional. Accepted and stored for
+                                  parity with the Insights schema.
+                                "traces": bool  # Optional. Whether the session's
+                                  customer traces are sent to Insights.
+                            },
+                            "mcp_url": "str",  # Optional. Pinned MCP URL for this
+                              version, valid for the version's lifetime. It is the same value the
+                              create response returns as version_mcp_url. Its final segment is the
+                              backing session UUID, not the composite version ID. VPC-bound versions
+                              may use a regional host. Returned in responses only.
+                            "network": {
+                                "region": "str",  # The VPC's region, recorded when
+                                  the version was created. A tool call through a connection whose VPC
+                                  is in a different region is refused. This field is returned in
+                                  responses only and is rejected in requests. Required.
+                                "vpcUuid": "str"  # UUID of a VPC owned by your team
+                                  in a supported region. Required.
+                            },
+                            "promoted_from_version_number": 0,  # Optional. Positive
+                              unsigned 32-bit version number, never reused after deletion.
+                            "tools": {
+                                "references": [
+                                    {
+                                        "kind": "str",  # Optional. Whether
+                                          name is a tool or a toolbelt. Known values are:
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                        "name": "str",  # Optional. Tool slug
+                                          or toolbelt name.
+                                        "version": "str"  # Optional. Pinned
+                                          version.
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_endpoint_versions_list_request(
+            endpoint_id=endpoint_id,
+            page_size=page_size,
+            page_token=page_token,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    def create_promotion(
+        self,
+        endpoint_id: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Promote an Endpoint Version.
+
+        Copies a live version's configuration into a new, higher-numbered head version and sets
+        promoted_from_version_number. Existing versions never change. Only the endpoint owner may
+        promote. An inaccessible endpoint returns 404 endpoint_not_found, and a deleted, unknown, or
+        different endpoint's version returns 404 endpoint_version_not_found. The new version always has
+        a new identity and number, even for identical contents; deleted identities are never
+        resurrected. Head replacement does not change the endpoint's Insights consent, which applies to
+        every version.
+
+        :param endpoint_id: Endpoint UUID only. Malformed IDs or full URNs return 400
+         invalid_endpoint_id. Required.
+        :type endpoint_id: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "version_id": "str"  # The endpoint UUID followed by .v and its version
+                      number, without a URN prefix. The UUID is lowercase and hyphenated. The number is
+                      from 1 through 4294967295, in decimal without signs or leading zeros. A bare UUID
+                      is not a version ID. Required.
+                }
+
+                # response body for status code(s): 201
+                response == {
+                    "endpoint": {
+                        "actor_id": "str",  # Immutable actor binding; empty means no actor.
+                          Required.
+                        "created_at": "2020-02-20 00:00:00",  # When the endpoint was
+                          created. Required.
+                        "id": "str",  # Lowercase, hyphenated endpoint UUID, without a URN
+                          prefix. Required.
+                        "name": "str",  # Endpoint name, unique within your team. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # When the endpoint was last
+                          changed. Required.
+                        "head_version": {
+                            "actor_id": "str",  # Actor binding shared by every version
+                              of the endpoint; empty means no actor. Required.
+                            "created_at": "2020-02-20 00:00:00",  # When the version was
+                              created. Required.
+                            "endpoint_id": "str",  # Lowercase, hyphenated endpoint UUID,
+                              without a URN prefix. Required.
+                            "id": "str",  # The endpoint UUID followed by .v and its
+                              version number, without a URN prefix. The UUID is lowercase and
+                              hyphenated. The number is from 1 through 4294967295, in decimal without
+                              signs or leading zeros. A bare UUID is not a version ID. Required.
+                            "name": "str",  # The endpoint's name when this version was
+                              created. Renaming the endpoint does not change it. Required.
+                            "policy": {
+                                "defaultAction": "str",  # Optional. Action for calls
+                                  no rule matches. Omission means ask; responses then return
+                                  SESSION_POLICY_ACTION_UNSPECIFIED. Known values are: "allow", "ask",
+                                  "deny", and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                                "rules": [
+                                    {
+                                        "action": "str",  # Action when the
+                                          rule matches. Required. Known values are: "allow", "ask", and
+                                          "deny".
+                                        "tool": "str",  # Selected tool slug
+                                          or version-pinned toolbelt reference. Required.
+                                        "match": {
+                                            "str": "str"  # Optional.
+                                              Argument conditions; an empty object matches every call
+                                              to the tool.
+                                        }
+                                    }
+                                ]
+                            },
+                            "updated_at": "2020-02-20 00:00:00",  # When the version was
+                              last updated. Required.
+                            "version_number": 0,  # Positive unsigned 32-bit version
+                              number, never reused after deletion. Required.
+                            "config": {
+                                "cache": {
+                                    "allEligible": bool,  # Optional. Enables
+                                      caching for every called tool version with a catalog cache
+                                      policy, including tools that become eligible after session
+                                      creation. Do not combine with tools. True
+                                    "maxAgeSeconds": 0,  # Optional. Maximum
+                                      cache lifetime in seconds for this session. Omit to use each
+                                      tool's lifetime, up to 300 seconds. A smaller tool lifetime or
+                                      provider response cache header can shorten it. Per-call
+                                      max_age_seconds can require a fresher result but cannot increase
+                                      this limit.
+                                    "tools": [
+                                        "str"  # Optional. Provider-qualified
+                                          tool slugs to cache. Every listed tool must resolve for the
+                                          team and have a catalog cache policy, or session creation
+                                          fails. Use slugs without version suffixes or toolbelt
+                                          references. An empty array enables no tools.
+                                    ]
+                                },
+                                "customInstructions": "str",  # Optional.
+                                  Instructions for tools in this version.
+                                "outputViews": {
+                                    "str": "str"  # Optional. Maps up to 100 tool
+                                      slugs to output-view names.
+                                },
+                                "preloadTools": [
+                                    "str"  # Optional. Tool names, optionally
+                                      version-pinned, or version-pinned toolbelt references.
+                                ]
+                            },
+                            "insights": {
+                                "logs": bool,  # Optional. Whether the session's
+                                  customer logs are sent to Insights.
+                                "metrics": bool,  # Optional. Accepted and stored for
+                                  parity with the Insights schema.
+                                "traces": bool  # Optional. Whether the session's
+                                  customer traces are sent to Insights.
+                            },
+                            "mcp_url": "str",  # Optional. Pinned MCP URL for this
+                              version, valid for the version's lifetime. It is the same value the
+                              create response returns as version_mcp_url. Its final segment is the
+                              backing session UUID, not the composite version ID. VPC-bound versions
+                              may use a regional host. Returned in responses only.
+                            "network": {
+                                "region": "str",  # The VPC's region, recorded when
+                                  the version was created. A tool call through a connection whose VPC
+                                  is in a different region is refused. This field is returned in
+                                  responses only and is rejected in requests. Required.
+                                "vpcUuid": "str"  # UUID of a VPC owned by your team
+                                  in a supported region. Required.
+                            },
+                            "promoted_from_version_number": 0,  # Optional. Positive
+                              unsigned 32-bit version number, never reused after deletion.
+                            "tools": {
+                                "references": [
+                                    {
+                                        "kind": "str",  # Optional. Whether
+                                          name is a tool or a toolbelt. Known values are:
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                        "name": "str",  # Optional. Tool slug
+                                          or toolbelt name.
+                                        "version": "str"  # Optional. Pinned
+                                          version.
+                                    }
+                                ]
+                            }
+                        },
+                        "insights": {
+                            "logs": bool,  # Optional. Explicit true enables customer
+                              logs and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                            "metrics": bool,  # Optional. Accepted and stored for parity
+                              with the Insights schema.
+                            "traces": bool  # Optional. Explicit true enables customer
+                              traces and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                        },
+                        "is_default": bool,  # Optional. True only for your own default
+                          endpoint in the team: the one the generic MCP URL and data-plane requests
+                          without ``X-Session-Id`` or ``X-Endpoint-Id`` resolve to for you, which
+                          Action Gateway creates on first use. False for every other endpoint,
+                          including other team members' default endpoints that a team owner can see, so
+                          a response marks at most one endpoint. A default endpoint does not count
+                          toward your team's endpoint limit or reserve its name. After it is deleted,
+                          the next such request creates a new default. Returned in responses only.
+                        "mcp_url": "str"  # Optional. MCP URL that resolves the
+                          highest-numbered live version on every request. Its host follows the head
+                          version's VPC region, or the default host when no version is live. It is the
+                          same value the create response returns as mcp_url. Returned in responses
+                          only.
+                    },
+                    "mcp_url": "str",  # MCP URL that resolves the highest-numbered live version
+                      on every request. Its host follows the head version's VPC region, or the default
+                      host when no version is live. Required.
+                    "version": {
+                        "actor_id": "str",  # Actor binding shared by every version of the
+                          endpoint; empty means no actor. Required.
+                        "created_at": "2020-02-20 00:00:00",  # When the version was created.
+                          Required.
+                        "endpoint_id": "str",  # Lowercase, hyphenated endpoint UUID, without
+                          a URN prefix. Required.
+                        "id": "str",  # The endpoint UUID followed by .v and its version
+                          number, without a URN prefix. The UUID is lowercase and hyphenated. The
+                          number is from 1 through 4294967295, in decimal without signs or leading
+                          zeros. A bare UUID is not a version ID. Required.
+                        "name": "str",  # The endpoint's name when this version was created.
+                          Renaming the endpoint does not change it. Required.
+                        "policy": {
+                            "defaultAction": "str",  # Optional. Action for calls no rule
+                              matches. Omission means ask; responses then return
+                              SESSION_POLICY_ACTION_UNSPECIFIED. Known values are: "allow", "ask",
+                              "deny", and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                            "rules": [
+                                {
+                                    "action": "str",  # Action when the rule
+                                      matches. Required. Known values are: "allow", "ask", and "deny".
+                                    "tool": "str",  # Selected tool slug or
+                                      version-pinned toolbelt reference. Required.
+                                    "match": {
+                                        "str": "str"  # Optional. Argument
+                                          conditions; an empty object matches every call to the tool.
+                                    }
+                                }
+                            ]
+                        },
+                        "updated_at": "2020-02-20 00:00:00",  # When the version was last
+                          updated. Required.
+                        "version_number": 0,  # Positive unsigned 32-bit version number,
+                          never reused after deletion. Required.
+                        "config": {
+                            "cache": {
+                                "allEligible": bool,  # Optional. Enables caching for
+                                  every called tool version with a catalog cache policy, including
+                                  tools that become eligible after session creation. Do not combine
+                                  with tools. True
+                                "maxAgeSeconds": 0,  # Optional. Maximum cache
+                                  lifetime in seconds for this session. Omit to use each tool's
+                                  lifetime, up to 300 seconds. A smaller tool lifetime or provider
+                                  response cache header can shorten it. Per-call max_age_seconds can
+                                  require a fresher result but cannot increase this limit.
+                                "tools": [
+                                    "str"  # Optional. Provider-qualified tool
+                                      slugs to cache. Every listed tool must resolve for the team and
+                                      have a catalog cache policy, or session creation fails. Use slugs
+                                      without version suffixes or toolbelt references. An empty array
+                                      enables no tools.
+                                ]
+                            },
+                            "customInstructions": "str",  # Optional. Instructions for
+                              tools in this version.
+                            "outputViews": {
+                                "str": "str"  # Optional. Maps up to 100 tool slugs
+                                  to output-view names.
+                            },
+                            "preloadTools": [
+                                "str"  # Optional. Tool names, optionally
+                                  version-pinned, or version-pinned toolbelt references.
+                            ]
+                        },
+                        "insights": {
+                            "logs": bool,  # Optional. Whether the session's customer
+                              logs are sent to Insights.
+                            "metrics": bool,  # Optional. Accepted and stored for parity
+                              with the Insights schema.
+                            "traces": bool  # Optional. Whether the session's customer
+                              traces are sent to Insights.
+                        },
+                        "mcp_url": "str",  # Optional. Pinned MCP URL for this version, valid
+                          for the version's lifetime. It is the same value the create response returns
+                          as version_mcp_url. Its final segment is the backing session UUID, not the
+                          composite version ID. VPC-bound versions may use a regional host. Returned in
+                          responses only.
+                        "network": {
+                            "region": "str",  # The VPC's region, recorded when the
+                              version was created. A tool call through a connection whose VPC is in a
+                              different region is refused. This field is returned in responses only and
+                              is rejected in requests. Required.
+                            "vpcUuid": "str"  # UUID of a VPC owned by your team in a
+                              supported region. Required.
+                        },
+                        "promoted_from_version_number": 0,  # Optional. Positive unsigned
+                          32-bit version number, never reused after deletion.
+                        "tools": {
+                            "references": [
+                                {
+                                    "kind": "str",  # Optional. Whether name is a
+                                      tool or a toolbelt. Known values are:
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                    "name": "str",  # Optional. Tool slug or
+                                      toolbelt name.
+                                    "version": "str"  # Optional. Pinned version.
+                                }
+                            ]
+                        }
+                    },
+                    "version_mcp_url": "str"  # Pinned MCP URL, valid for this version's
+                      lifetime. Its final segment is the backing session UUID, not the public composite
+                      version ID. VPC-bound versions may use a regional host. Existing /mcp/session/
+                      URLs keep working. Required.
+                }
+                # response body for status code(s): 400, 404, 429
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    def create_promotion(
+        self,
+        endpoint_id: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Promote an Endpoint Version.
+
+        Copies a live version's configuration into a new, higher-numbered head version and sets
+        promoted_from_version_number. Existing versions never change. Only the endpoint owner may
+        promote. An inaccessible endpoint returns 404 endpoint_not_found, and a deleted, unknown, or
+        different endpoint's version returns 404 endpoint_version_not_found. The new version always has
+        a new identity and number, even for identical contents; deleted identities are never
+        resurrected. Head replacement does not change the endpoint's Insights consent, which applies to
+        every version.
+
+        :param endpoint_id: Endpoint UUID only. Malformed IDs or full URNs return 400
+         invalid_endpoint_id. Required.
+        :type endpoint_id: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 201
+                response == {
+                    "endpoint": {
+                        "actor_id": "str",  # Immutable actor binding; empty means no actor.
+                          Required.
+                        "created_at": "2020-02-20 00:00:00",  # When the endpoint was
+                          created. Required.
+                        "id": "str",  # Lowercase, hyphenated endpoint UUID, without a URN
+                          prefix. Required.
+                        "name": "str",  # Endpoint name, unique within your team. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # When the endpoint was last
+                          changed. Required.
+                        "head_version": {
+                            "actor_id": "str",  # Actor binding shared by every version
+                              of the endpoint; empty means no actor. Required.
+                            "created_at": "2020-02-20 00:00:00",  # When the version was
+                              created. Required.
+                            "endpoint_id": "str",  # Lowercase, hyphenated endpoint UUID,
+                              without a URN prefix. Required.
+                            "id": "str",  # The endpoint UUID followed by .v and its
+                              version number, without a URN prefix. The UUID is lowercase and
+                              hyphenated. The number is from 1 through 4294967295, in decimal without
+                              signs or leading zeros. A bare UUID is not a version ID. Required.
+                            "name": "str",  # The endpoint's name when this version was
+                              created. Renaming the endpoint does not change it. Required.
+                            "policy": {
+                                "defaultAction": "str",  # Optional. Action for calls
+                                  no rule matches. Omission means ask; responses then return
+                                  SESSION_POLICY_ACTION_UNSPECIFIED. Known values are: "allow", "ask",
+                                  "deny", and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                                "rules": [
+                                    {
+                                        "action": "str",  # Action when the
+                                          rule matches. Required. Known values are: "allow", "ask", and
+                                          "deny".
+                                        "tool": "str",  # Selected tool slug
+                                          or version-pinned toolbelt reference. Required.
+                                        "match": {
+                                            "str": "str"  # Optional.
+                                              Argument conditions; an empty object matches every call
+                                              to the tool.
+                                        }
+                                    }
+                                ]
+                            },
+                            "updated_at": "2020-02-20 00:00:00",  # When the version was
+                              last updated. Required.
+                            "version_number": 0,  # Positive unsigned 32-bit version
+                              number, never reused after deletion. Required.
+                            "config": {
+                                "cache": {
+                                    "allEligible": bool,  # Optional. Enables
+                                      caching for every called tool version with a catalog cache
+                                      policy, including tools that become eligible after session
+                                      creation. Do not combine with tools. True
+                                    "maxAgeSeconds": 0,  # Optional. Maximum
+                                      cache lifetime in seconds for this session. Omit to use each
+                                      tool's lifetime, up to 300 seconds. A smaller tool lifetime or
+                                      provider response cache header can shorten it. Per-call
+                                      max_age_seconds can require a fresher result but cannot increase
+                                      this limit.
+                                    "tools": [
+                                        "str"  # Optional. Provider-qualified
+                                          tool slugs to cache. Every listed tool must resolve for the
+                                          team and have a catalog cache policy, or session creation
+                                          fails. Use slugs without version suffixes or toolbelt
+                                          references. An empty array enables no tools.
+                                    ]
+                                },
+                                "customInstructions": "str",  # Optional.
+                                  Instructions for tools in this version.
+                                "outputViews": {
+                                    "str": "str"  # Optional. Maps up to 100 tool
+                                      slugs to output-view names.
+                                },
+                                "preloadTools": [
+                                    "str"  # Optional. Tool names, optionally
+                                      version-pinned, or version-pinned toolbelt references.
+                                ]
+                            },
+                            "insights": {
+                                "logs": bool,  # Optional. Whether the session's
+                                  customer logs are sent to Insights.
+                                "metrics": bool,  # Optional. Accepted and stored for
+                                  parity with the Insights schema.
+                                "traces": bool  # Optional. Whether the session's
+                                  customer traces are sent to Insights.
+                            },
+                            "mcp_url": "str",  # Optional. Pinned MCP URL for this
+                              version, valid for the version's lifetime. It is the same value the
+                              create response returns as version_mcp_url. Its final segment is the
+                              backing session UUID, not the composite version ID. VPC-bound versions
+                              may use a regional host. Returned in responses only.
+                            "network": {
+                                "region": "str",  # The VPC's region, recorded when
+                                  the version was created. A tool call through a connection whose VPC
+                                  is in a different region is refused. This field is returned in
+                                  responses only and is rejected in requests. Required.
+                                "vpcUuid": "str"  # UUID of a VPC owned by your team
+                                  in a supported region. Required.
+                            },
+                            "promoted_from_version_number": 0,  # Optional. Positive
+                              unsigned 32-bit version number, never reused after deletion.
+                            "tools": {
+                                "references": [
+                                    {
+                                        "kind": "str",  # Optional. Whether
+                                          name is a tool or a toolbelt. Known values are:
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                        "name": "str",  # Optional. Tool slug
+                                          or toolbelt name.
+                                        "version": "str"  # Optional. Pinned
+                                          version.
+                                    }
+                                ]
+                            }
+                        },
+                        "insights": {
+                            "logs": bool,  # Optional. Explicit true enables customer
+                              logs and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                            "metrics": bool,  # Optional. Accepted and stored for parity
+                              with the Insights schema.
+                            "traces": bool  # Optional. Explicit true enables customer
+                              traces and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                        },
+                        "is_default": bool,  # Optional. True only for your own default
+                          endpoint in the team: the one the generic MCP URL and data-plane requests
+                          without ``X-Session-Id`` or ``X-Endpoint-Id`` resolve to for you, which
+                          Action Gateway creates on first use. False for every other endpoint,
+                          including other team members' default endpoints that a team owner can see, so
+                          a response marks at most one endpoint. A default endpoint does not count
+                          toward your team's endpoint limit or reserve its name. After it is deleted,
+                          the next such request creates a new default. Returned in responses only.
+                        "mcp_url": "str"  # Optional. MCP URL that resolves the
+                          highest-numbered live version on every request. Its host follows the head
+                          version's VPC region, or the default host when no version is live. It is the
+                          same value the create response returns as mcp_url. Returned in responses
+                          only.
+                    },
+                    "mcp_url": "str",  # MCP URL that resolves the highest-numbered live version
+                      on every request. Its host follows the head version's VPC region, or the default
+                      host when no version is live. Required.
+                    "version": {
+                        "actor_id": "str",  # Actor binding shared by every version of the
+                          endpoint; empty means no actor. Required.
+                        "created_at": "2020-02-20 00:00:00",  # When the version was created.
+                          Required.
+                        "endpoint_id": "str",  # Lowercase, hyphenated endpoint UUID, without
+                          a URN prefix. Required.
+                        "id": "str",  # The endpoint UUID followed by .v and its version
+                          number, without a URN prefix. The UUID is lowercase and hyphenated. The
+                          number is from 1 through 4294967295, in decimal without signs or leading
+                          zeros. A bare UUID is not a version ID. Required.
+                        "name": "str",  # The endpoint's name when this version was created.
+                          Renaming the endpoint does not change it. Required.
+                        "policy": {
+                            "defaultAction": "str",  # Optional. Action for calls no rule
+                              matches. Omission means ask; responses then return
+                              SESSION_POLICY_ACTION_UNSPECIFIED. Known values are: "allow", "ask",
+                              "deny", and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                            "rules": [
+                                {
+                                    "action": "str",  # Action when the rule
+                                      matches. Required. Known values are: "allow", "ask", and "deny".
+                                    "tool": "str",  # Selected tool slug or
+                                      version-pinned toolbelt reference. Required.
+                                    "match": {
+                                        "str": "str"  # Optional. Argument
+                                          conditions; an empty object matches every call to the tool.
+                                    }
+                                }
+                            ]
+                        },
+                        "updated_at": "2020-02-20 00:00:00",  # When the version was last
+                          updated. Required.
+                        "version_number": 0,  # Positive unsigned 32-bit version number,
+                          never reused after deletion. Required.
+                        "config": {
+                            "cache": {
+                                "allEligible": bool,  # Optional. Enables caching for
+                                  every called tool version with a catalog cache policy, including
+                                  tools that become eligible after session creation. Do not combine
+                                  with tools. True
+                                "maxAgeSeconds": 0,  # Optional. Maximum cache
+                                  lifetime in seconds for this session. Omit to use each tool's
+                                  lifetime, up to 300 seconds. A smaller tool lifetime or provider
+                                  response cache header can shorten it. Per-call max_age_seconds can
+                                  require a fresher result but cannot increase this limit.
+                                "tools": [
+                                    "str"  # Optional. Provider-qualified tool
+                                      slugs to cache. Every listed tool must resolve for the team and
+                                      have a catalog cache policy, or session creation fails. Use slugs
+                                      without version suffixes or toolbelt references. An empty array
+                                      enables no tools.
+                                ]
+                            },
+                            "customInstructions": "str",  # Optional. Instructions for
+                              tools in this version.
+                            "outputViews": {
+                                "str": "str"  # Optional. Maps up to 100 tool slugs
+                                  to output-view names.
+                            },
+                            "preloadTools": [
+                                "str"  # Optional. Tool names, optionally
+                                  version-pinned, or version-pinned toolbelt references.
+                            ]
+                        },
+                        "insights": {
+                            "logs": bool,  # Optional. Whether the session's customer
+                              logs are sent to Insights.
+                            "metrics": bool,  # Optional. Accepted and stored for parity
+                              with the Insights schema.
+                            "traces": bool  # Optional. Whether the session's customer
+                              traces are sent to Insights.
+                        },
+                        "mcp_url": "str",  # Optional. Pinned MCP URL for this version, valid
+                          for the version's lifetime. It is the same value the create response returns
+                          as version_mcp_url. Its final segment is the backing session UUID, not the
+                          composite version ID. VPC-bound versions may use a regional host. Returned in
+                          responses only.
+                        "network": {
+                            "region": "str",  # The VPC's region, recorded when the
+                              version was created. A tool call through a connection whose VPC is in a
+                              different region is refused. This field is returned in responses only and
+                              is rejected in requests. Required.
+                            "vpcUuid": "str"  # UUID of a VPC owned by your team in a
+                              supported region. Required.
+                        },
+                        "promoted_from_version_number": 0,  # Optional. Positive unsigned
+                          32-bit version number, never reused after deletion.
+                        "tools": {
+                            "references": [
+                                {
+                                    "kind": "str",  # Optional. Whether name is a
+                                      tool or a toolbelt. Known values are:
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                    "name": "str",  # Optional. Tool slug or
+                                      toolbelt name.
+                                    "version": "str"  # Optional. Pinned version.
+                                }
+                            ]
+                        }
+                    },
+                    "version_mcp_url": "str"  # Pinned MCP URL, valid for this version's
+                      lifetime. Its final segment is the backing session UUID, not the public composite
+                      version ID. VPC-bound versions may use a regional host. Existing /mcp/session/
+                      URLs keep working. Required.
+                }
+                # response body for status code(s): 400, 404, 429
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace
+    def create_promotion(
+        self, endpoint_id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Promote an Endpoint Version.
+
+        Copies a live version's configuration into a new, higher-numbered head version and sets
+        promoted_from_version_number. Existing versions never change. Only the endpoint owner may
+        promote. An inaccessible endpoint returns 404 endpoint_not_found, and a deleted, unknown, or
+        different endpoint's version returns 404 endpoint_version_not_found. The new version always has
+        a new identity and number, even for identical contents; deleted identities are never
+        resurrected. Head replacement does not change the endpoint's Insights consent, which applies to
+        every version.
+
+        :param endpoint_id: Endpoint UUID only. Malformed IDs or full URNs return 400
+         invalid_endpoint_id. Required.
+        :type endpoint_id: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "version_id": "str"  # The endpoint UUID followed by .v and its version
+                      number, without a URN prefix. The UUID is lowercase and hyphenated. The number is
+                      from 1 through 4294967295, in decimal without signs or leading zeros. A bare UUID
+                      is not a version ID. Required.
+                }
+
+                # response body for status code(s): 201
+                response == {
+                    "endpoint": {
+                        "actor_id": "str",  # Immutable actor binding; empty means no actor.
+                          Required.
+                        "created_at": "2020-02-20 00:00:00",  # When the endpoint was
+                          created. Required.
+                        "id": "str",  # Lowercase, hyphenated endpoint UUID, without a URN
+                          prefix. Required.
+                        "name": "str",  # Endpoint name, unique within your team. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # When the endpoint was last
+                          changed. Required.
+                        "head_version": {
+                            "actor_id": "str",  # Actor binding shared by every version
+                              of the endpoint; empty means no actor. Required.
+                            "created_at": "2020-02-20 00:00:00",  # When the version was
+                              created. Required.
+                            "endpoint_id": "str",  # Lowercase, hyphenated endpoint UUID,
+                              without a URN prefix. Required.
+                            "id": "str",  # The endpoint UUID followed by .v and its
+                              version number, without a URN prefix. The UUID is lowercase and
+                              hyphenated. The number is from 1 through 4294967295, in decimal without
+                              signs or leading zeros. A bare UUID is not a version ID. Required.
+                            "name": "str",  # The endpoint's name when this version was
+                              created. Renaming the endpoint does not change it. Required.
+                            "policy": {
+                                "defaultAction": "str",  # Optional. Action for calls
+                                  no rule matches. Omission means ask; responses then return
+                                  SESSION_POLICY_ACTION_UNSPECIFIED. Known values are: "allow", "ask",
+                                  "deny", and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                                "rules": [
+                                    {
+                                        "action": "str",  # Action when the
+                                          rule matches. Required. Known values are: "allow", "ask", and
+                                          "deny".
+                                        "tool": "str",  # Selected tool slug
+                                          or version-pinned toolbelt reference. Required.
+                                        "match": {
+                                            "str": "str"  # Optional.
+                                              Argument conditions; an empty object matches every call
+                                              to the tool.
+                                        }
+                                    }
+                                ]
+                            },
+                            "updated_at": "2020-02-20 00:00:00",  # When the version was
+                              last updated. Required.
+                            "version_number": 0,  # Positive unsigned 32-bit version
+                              number, never reused after deletion. Required.
+                            "config": {
+                                "cache": {
+                                    "allEligible": bool,  # Optional. Enables
+                                      caching for every called tool version with a catalog cache
+                                      policy, including tools that become eligible after session
+                                      creation. Do not combine with tools. True
+                                    "maxAgeSeconds": 0,  # Optional. Maximum
+                                      cache lifetime in seconds for this session. Omit to use each
+                                      tool's lifetime, up to 300 seconds. A smaller tool lifetime or
+                                      provider response cache header can shorten it. Per-call
+                                      max_age_seconds can require a fresher result but cannot increase
+                                      this limit.
+                                    "tools": [
+                                        "str"  # Optional. Provider-qualified
+                                          tool slugs to cache. Every listed tool must resolve for the
+                                          team and have a catalog cache policy, or session creation
+                                          fails. Use slugs without version suffixes or toolbelt
+                                          references. An empty array enables no tools.
+                                    ]
+                                },
+                                "customInstructions": "str",  # Optional.
+                                  Instructions for tools in this version.
+                                "outputViews": {
+                                    "str": "str"  # Optional. Maps up to 100 tool
+                                      slugs to output-view names.
+                                },
+                                "preloadTools": [
+                                    "str"  # Optional. Tool names, optionally
+                                      version-pinned, or version-pinned toolbelt references.
+                                ]
+                            },
+                            "insights": {
+                                "logs": bool,  # Optional. Whether the session's
+                                  customer logs are sent to Insights.
+                                "metrics": bool,  # Optional. Accepted and stored for
+                                  parity with the Insights schema.
+                                "traces": bool  # Optional. Whether the session's
+                                  customer traces are sent to Insights.
+                            },
+                            "mcp_url": "str",  # Optional. Pinned MCP URL for this
+                              version, valid for the version's lifetime. It is the same value the
+                              create response returns as version_mcp_url. Its final segment is the
+                              backing session UUID, not the composite version ID. VPC-bound versions
+                              may use a regional host. Returned in responses only.
+                            "network": {
+                                "region": "str",  # The VPC's region, recorded when
+                                  the version was created. A tool call through a connection whose VPC
+                                  is in a different region is refused. This field is returned in
+                                  responses only and is rejected in requests. Required.
+                                "vpcUuid": "str"  # UUID of a VPC owned by your team
+                                  in a supported region. Required.
+                            },
+                            "promoted_from_version_number": 0,  # Optional. Positive
+                              unsigned 32-bit version number, never reused after deletion.
+                            "tools": {
+                                "references": [
+                                    {
+                                        "kind": "str",  # Optional. Whether
+                                          name is a tool or a toolbelt. Known values are:
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                          "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                        "name": "str",  # Optional. Tool slug
+                                          or toolbelt name.
+                                        "version": "str"  # Optional. Pinned
+                                          version.
+                                    }
+                                ]
+                            }
+                        },
+                        "insights": {
+                            "logs": bool,  # Optional. Explicit true enables customer
+                              logs and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                            "metrics": bool,  # Optional. Accepted and stored for parity
+                              with the Insights schema.
+                            "traces": bool  # Optional. Explicit true enables customer
+                              traces and false disables them. Omission preserves the existing choice
+                              without an implicit reset.
+                        },
+                        "is_default": bool,  # Optional. True only for your own default
+                          endpoint in the team: the one the generic MCP URL and data-plane requests
+                          without ``X-Session-Id`` or ``X-Endpoint-Id`` resolve to for you, which
+                          Action Gateway creates on first use. False for every other endpoint,
+                          including other team members' default endpoints that a team owner can see, so
+                          a response marks at most one endpoint. A default endpoint does not count
+                          toward your team's endpoint limit or reserve its name. After it is deleted,
+                          the next such request creates a new default. Returned in responses only.
+                        "mcp_url": "str"  # Optional. MCP URL that resolves the
+                          highest-numbered live version on every request. Its host follows the head
+                          version's VPC region, or the default host when no version is live. It is the
+                          same value the create response returns as mcp_url. Returned in responses
+                          only.
+                    },
+                    "mcp_url": "str",  # MCP URL that resolves the highest-numbered live version
+                      on every request. Its host follows the head version's VPC region, or the default
+                      host when no version is live. Required.
+                    "version": {
+                        "actor_id": "str",  # Actor binding shared by every version of the
+                          endpoint; empty means no actor. Required.
+                        "created_at": "2020-02-20 00:00:00",  # When the version was created.
+                          Required.
+                        "endpoint_id": "str",  # Lowercase, hyphenated endpoint UUID, without
+                          a URN prefix. Required.
+                        "id": "str",  # The endpoint UUID followed by .v and its version
+                          number, without a URN prefix. The UUID is lowercase and hyphenated. The
+                          number is from 1 through 4294967295, in decimal without signs or leading
+                          zeros. A bare UUID is not a version ID. Required.
+                        "name": "str",  # The endpoint's name when this version was created.
+                          Renaming the endpoint does not change it. Required.
+                        "policy": {
+                            "defaultAction": "str",  # Optional. Action for calls no rule
+                              matches. Omission means ask; responses then return
+                              SESSION_POLICY_ACTION_UNSPECIFIED. Known values are: "allow", "ask",
+                              "deny", and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                            "rules": [
+                                {
+                                    "action": "str",  # Action when the rule
+                                      matches. Required. Known values are: "allow", "ask", and "deny".
+                                    "tool": "str",  # Selected tool slug or
+                                      version-pinned toolbelt reference. Required.
+                                    "match": {
+                                        "str": "str"  # Optional. Argument
+                                          conditions; an empty object matches every call to the tool.
+                                    }
+                                }
+                            ]
+                        },
+                        "updated_at": "2020-02-20 00:00:00",  # When the version was last
+                          updated. Required.
+                        "version_number": 0,  # Positive unsigned 32-bit version number,
+                          never reused after deletion. Required.
+                        "config": {
+                            "cache": {
+                                "allEligible": bool,  # Optional. Enables caching for
+                                  every called tool version with a catalog cache policy, including
+                                  tools that become eligible after session creation. Do not combine
+                                  with tools. True
+                                "maxAgeSeconds": 0,  # Optional. Maximum cache
+                                  lifetime in seconds for this session. Omit to use each tool's
+                                  lifetime, up to 300 seconds. A smaller tool lifetime or provider
+                                  response cache header can shorten it. Per-call max_age_seconds can
+                                  require a fresher result but cannot increase this limit.
+                                "tools": [
+                                    "str"  # Optional. Provider-qualified tool
+                                      slugs to cache. Every listed tool must resolve for the team and
+                                      have a catalog cache policy, or session creation fails. Use slugs
+                                      without version suffixes or toolbelt references. An empty array
+                                      enables no tools.
+                                ]
+                            },
+                            "customInstructions": "str",  # Optional. Instructions for
+                              tools in this version.
+                            "outputViews": {
+                                "str": "str"  # Optional. Maps up to 100 tool slugs
+                                  to output-view names.
+                            },
+                            "preloadTools": [
+                                "str"  # Optional. Tool names, optionally
+                                  version-pinned, or version-pinned toolbelt references.
+                            ]
+                        },
+                        "insights": {
+                            "logs": bool,  # Optional. Whether the session's customer
+                              logs are sent to Insights.
+                            "metrics": bool,  # Optional. Accepted and stored for parity
+                              with the Insights schema.
+                            "traces": bool  # Optional. Whether the session's customer
+                              traces are sent to Insights.
+                        },
+                        "mcp_url": "str",  # Optional. Pinned MCP URL for this version, valid
+                          for the version's lifetime. It is the same value the create response returns
+                          as version_mcp_url. Its final segment is the backing session UUID, not the
+                          composite version ID. VPC-bound versions may use a regional host. Returned in
+                          responses only.
+                        "network": {
+                            "region": "str",  # The VPC's region, recorded when the
+                              version was created. A tool call through a connection whose VPC is in a
+                              different region is refused. This field is returned in responses only and
+                              is rejected in requests. Required.
+                            "vpcUuid": "str"  # UUID of a VPC owned by your team in a
+                              supported region. Required.
+                        },
+                        "promoted_from_version_number": 0,  # Optional. Positive unsigned
+                          32-bit version number, never reused after deletion.
+                        "tools": {
+                            "references": [
+                                {
+                                    "kind": "str",  # Optional. Whether name is a
+                                      tool or a toolbelt. Known values are:
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                    "name": "str",  # Optional. Tool slug or
+                                      toolbelt name.
+                                    "version": "str"  # Optional. Pinned version.
+                                }
+                            ]
+                        }
+                    },
+                    "version_mcp_url": "str"  # Pinned MCP URL, valid for this version's
+                      lifetime. Its final segment is the backing session UUID, not the public composite
+                      version ID. VPC-bound versions may use a regional host. Existing /mcp/session/
+                      URLs keep working. Required.
+                }
+                # response body for status code(s): 400, 404, 429
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_endpoint_versions_create_promotion_request(
+            endpoint_id=endpoint_id,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [201, 400, 404, 429]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 201:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 429:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def get(self, version_id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve an Endpoint Version.
+
+        Returns the exact live version named by its composite public ID. An inaccessible or deleted
+        version returns 404 endpoint_version_not_found. A bare session UUID is not a version ID.
+
+        :param version_id: Composite version ID only. Invalid IDs return 400
+         invalid_endpoint_version_id. Required.
+        :type version_id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "version": {
+                        "actor_id": "str",  # Actor binding shared by every version of the
+                          endpoint; empty means no actor. Required.
+                        "created_at": "2020-02-20 00:00:00",  # When the version was created.
+                          Required.
+                        "endpoint_id": "str",  # Lowercase, hyphenated endpoint UUID, without
+                          a URN prefix. Required.
+                        "id": "str",  # The endpoint UUID followed by .v and its version
+                          number, without a URN prefix. The UUID is lowercase and hyphenated. The
+                          number is from 1 through 4294967295, in decimal without signs or leading
+                          zeros. A bare UUID is not a version ID. Required.
+                        "name": "str",  # The endpoint's name when this version was created.
+                          Renaming the endpoint does not change it. Required.
+                        "policy": {
+                            "defaultAction": "str",  # Optional. Action for calls no rule
+                              matches. Omission means ask; responses then return
+                              SESSION_POLICY_ACTION_UNSPECIFIED. Known values are: "allow", "ask",
+                              "deny", and "SESSION_POLICY_ACTION_UNSPECIFIED".
+                            "rules": [
+                                {
+                                    "action": "str",  # Action when the rule
+                                      matches. Required. Known values are: "allow", "ask", and "deny".
+                                    "tool": "str",  # Selected tool slug or
+                                      version-pinned toolbelt reference. Required.
+                                    "match": {
+                                        "str": "str"  # Optional. Argument
+                                          conditions; an empty object matches every call to the tool.
+                                    }
+                                }
+                            ]
+                        },
+                        "updated_at": "2020-02-20 00:00:00",  # When the version was last
+                          updated. Required.
+                        "version_number": 0,  # Positive unsigned 32-bit version number,
+                          never reused after deletion. Required.
+                        "config": {
+                            "cache": {
+                                "allEligible": bool,  # Optional. Enables caching for
+                                  every called tool version with a catalog cache policy, including
+                                  tools that become eligible after session creation. Do not combine
+                                  with tools. True
+                                "maxAgeSeconds": 0,  # Optional. Maximum cache
+                                  lifetime in seconds for this session. Omit to use each tool's
+                                  lifetime, up to 300 seconds. A smaller tool lifetime or provider
+                                  response cache header can shorten it. Per-call max_age_seconds can
+                                  require a fresher result but cannot increase this limit.
+                                "tools": [
+                                    "str"  # Optional. Provider-qualified tool
+                                      slugs to cache. Every listed tool must resolve for the team and
+                                      have a catalog cache policy, or session creation fails. Use slugs
+                                      without version suffixes or toolbelt references. An empty array
+                                      enables no tools.
+                                ]
+                            },
+                            "customInstructions": "str",  # Optional. Instructions for
+                              tools in this version.
+                            "outputViews": {
+                                "str": "str"  # Optional. Maps up to 100 tool slugs
+                                  to output-view names.
+                            },
+                            "preloadTools": [
+                                "str"  # Optional. Tool names, optionally
+                                  version-pinned, or version-pinned toolbelt references.
+                            ]
+                        },
+                        "insights": {
+                            "logs": bool,  # Optional. Whether the session's customer
+                              logs are sent to Insights.
+                            "metrics": bool,  # Optional. Accepted and stored for parity
+                              with the Insights schema.
+                            "traces": bool  # Optional. Whether the session's customer
+                              traces are sent to Insights.
+                        },
+                        "mcp_url": "str",  # Optional. Pinned MCP URL for this version, valid
+                          for the version's lifetime. It is the same value the create response returns
+                          as version_mcp_url. Its final segment is the backing session UUID, not the
+                          composite version ID. VPC-bound versions may use a regional host. Returned in
+                          responses only.
+                        "network": {
+                            "region": "str",  # The VPC's region, recorded when the
+                              version was created. A tool call through a connection whose VPC is in a
+                              different region is refused. This field is returned in responses only and
+                              is rejected in requests. Required.
+                            "vpcUuid": "str"  # UUID of a VPC owned by your team in a
+                              supported region. Required.
+                        },
+                        "promoted_from_version_number": 0,  # Optional. Positive unsigned
+                          32-bit version number, never reused after deletion.
+                        "tools": {
+                            "references": [
+                                {
+                                    "kind": "str",  # Optional. Whether name is a
+                                      tool or a toolbelt. Known values are:
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOL" and
+                                      "SESSION_TOOL_REFERENCE_KIND_TOOLBELT".
+                                    "name": "str",  # Optional. Tool slug or
+                                      toolbelt name.
+                                    "version": "str"  # Optional. Pinned version.
+                                }
+                            ]
+                        }
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_endpoint_versions_get_request(
+            version_id=version_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def delete(self, version_id: str, **kwargs: Any) -> Optional[JSON]:
+        # pylint: disable=line-too-long
+        """Delete an Endpoint Version.
+
+        Deletes a live version. Only the endpoint owner may delete versions. Deleting the head makes
+        the highest-numbered remaining live version the head. With no live versions, the endpoint MCP
+        URL fails closed until another version is published. Inaccessible or deleted versions return
+        404 endpoint_version_not_found, and so does a version of a service-managed endpoint, exactly as
+        for an unknown ID. Deletion is final for the version identity. Retries, replays, and later
+        writes cannot resurrect it. Reusing identical contents requires a new version identity and
+        version number.
+
+        :param version_id: Composite version ID only. Invalid IDs return 400
+         invalid_endpoint_version_id. Required.
+        :type version_id: str
+        :return: JSON object or None
+        :rtype: JSON or None
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[Optional[JSON]] = kwargs.pop("cls", None)
+
+        _request = build_endpoint_versions_delete_request(
+            version_id=version_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [204, 400, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        deserialized = None
+        response_headers = {}
+        if response.status_code == 204:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, deserialized, response_headers)  # type: ignore
+
+        return deserialized  # type: ignore
+
+
 class SessionsOperations:
     """
     .. warning::
@@ -29443,9 +35755,15 @@ class SessionsOperations:
         # pylint: disable=line-too-long
         """Create a Session.
 
-        Creates a session owned by your team, with a new session URN, and returns the MCP URL an agent
-        connects to. tools selects the tools and toolbelts the session exposes, and policy decides
-        which calls run, need approval, or are refused.
+        Deprecated: use POST /v2/action-gateway/endpoints. Existing sessions and their MCP URLs keep
+        working. A new session may be created as version 1 of a new endpoint whose name is derived from
+        the session name, with part of the session ID appended when that name is taken. The response
+        then includes endpoint_id, endpoint_version_id, and version_number. Such a session counts
+        against your team's endpoint limit (429 endpoint_limit_exceeded). If every derived name is
+        already used by an endpoint in your team, the request returns 409 endpoint_name_taken. Creates
+        a session owned by your team, with a new session URN, and returns the MCP URL an agent connects
+        to. tools selects the tools and toolbelts the session exposes, and policy decides which calls
+        run, need approval, or are refused.
 
         Set config.cache to opt into result caching for all eligible tools or a specific list. Caching
         is off by default and must be enabled for the team.
@@ -29561,6 +35879,10 @@ class SessionsOperations:
                         },
                         "createdAt": "2020-02-20 00:00:00",  # Optional. When the session was
                           created.
+                        "endpoint_id": "str",  # Optional. Public parent endpoint UUID.
+                          Absent for legacy sessions without a parent.
+                        "endpoint_version_id": "str",  # Optional. Public composite version
+                          ID. Absent for legacy sessions without a parent.
                         "insights": {
                             "logs": bool,  # Optional. Whether the session's customer
                               logs are sent to Insights.
@@ -29612,15 +35934,17 @@ class SessionsOperations:
                                 }
                             ]
                         },
-                        "updatedAt": "2020-02-20 00:00:00"  # Optional. When the session was
+                        "updatedAt": "2020-02-20 00:00:00",  # Optional. When the session was
                           last modified.
+                        "version_number": 0  # Optional. Version number within the parent
+                          endpoint. Absent for legacy sessions without a parent.
                     },
                     "tools": [
                         "str"  # Optional. Canonical, version-pinned selected tool
                           references. Empty when the session exposes every tool.
                     ]
                 }
-                # response body for status code(s): 400
+                # response body for status code(s): 400, 409, 429
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -29640,9 +35964,15 @@ class SessionsOperations:
         # pylint: disable=line-too-long
         """Create a Session.
 
-        Creates a session owned by your team, with a new session URN, and returns the MCP URL an agent
-        connects to. tools selects the tools and toolbelts the session exposes, and policy decides
-        which calls run, need approval, or are refused.
+        Deprecated: use POST /v2/action-gateway/endpoints. Existing sessions and their MCP URLs keep
+        working. A new session may be created as version 1 of a new endpoint whose name is derived from
+        the session name, with part of the session ID appended when that name is taken. The response
+        then includes endpoint_id, endpoint_version_id, and version_number. Such a session counts
+        against your team's endpoint limit (429 endpoint_limit_exceeded). If every derived name is
+        already used by an endpoint in your team, the request returns 409 endpoint_name_taken. Creates
+        a session owned by your team, with a new session URN, and returns the MCP URL an agent connects
+        to. tools selects the tools and toolbelts the session exposes, and policy decides which calls
+        run, need approval, or are refused.
 
         Set config.cache to opt into result caching for all eligible tools or a specific list. Caching
         is off by default and must be enabled for the team.
@@ -29692,6 +36022,10 @@ class SessionsOperations:
                         },
                         "createdAt": "2020-02-20 00:00:00",  # Optional. When the session was
                           created.
+                        "endpoint_id": "str",  # Optional. Public parent endpoint UUID.
+                          Absent for legacy sessions without a parent.
+                        "endpoint_version_id": "str",  # Optional. Public composite version
+                          ID. Absent for legacy sessions without a parent.
                         "insights": {
                             "logs": bool,  # Optional. Whether the session's customer
                               logs are sent to Insights.
@@ -29743,15 +36077,17 @@ class SessionsOperations:
                                 }
                             ]
                         },
-                        "updatedAt": "2020-02-20 00:00:00"  # Optional. When the session was
+                        "updatedAt": "2020-02-20 00:00:00",  # Optional. When the session was
                           last modified.
+                        "version_number": 0  # Optional. Version number within the parent
+                          endpoint. Absent for legacy sessions without a parent.
                     },
                     "tools": [
                         "str"  # Optional. Canonical, version-pinned selected tool
                           references. Empty when the session exposes every tool.
                     ]
                 }
-                # response body for status code(s): 400
+                # response body for status code(s): 400, 409, 429
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -29769,9 +36105,15 @@ class SessionsOperations:
         # pylint: disable=line-too-long
         """Create a Session.
 
-        Creates a session owned by your team, with a new session URN, and returns the MCP URL an agent
-        connects to. tools selects the tools and toolbelts the session exposes, and policy decides
-        which calls run, need approval, or are refused.
+        Deprecated: use POST /v2/action-gateway/endpoints. Existing sessions and their MCP URLs keep
+        working. A new session may be created as version 1 of a new endpoint whose name is derived from
+        the session name, with part of the session ID appended when that name is taken. The response
+        then includes endpoint_id, endpoint_version_id, and version_number. Such a session counts
+        against your team's endpoint limit (429 endpoint_limit_exceeded). If every derived name is
+        already used by an endpoint in your team, the request returns 409 endpoint_name_taken. Creates
+        a session owned by your team, with a new session URN, and returns the MCP URL an agent connects
+        to. tools selects the tools and toolbelts the session exposes, and policy decides which calls
+        run, need approval, or are refused.
 
         Set config.cache to opt into result caching for all eligible tools or a specific list. Caching
         is off by default and must be enabled for the team.
@@ -29884,6 +36226,10 @@ class SessionsOperations:
                         },
                         "createdAt": "2020-02-20 00:00:00",  # Optional. When the session was
                           created.
+                        "endpoint_id": "str",  # Optional. Public parent endpoint UUID.
+                          Absent for legacy sessions without a parent.
+                        "endpoint_version_id": "str",  # Optional. Public composite version
+                          ID. Absent for legacy sessions without a parent.
                         "insights": {
                             "logs": bool,  # Optional. Whether the session's customer
                               logs are sent to Insights.
@@ -29935,15 +36281,17 @@ class SessionsOperations:
                                 }
                             ]
                         },
-                        "updatedAt": "2020-02-20 00:00:00"  # Optional. When the session was
+                        "updatedAt": "2020-02-20 00:00:00",  # Optional. When the session was
                           last modified.
+                        "version_number": 0  # Optional. Version number within the parent
+                          endpoint. Absent for legacy sessions without a parent.
                     },
                     "tools": [
                         "str"  # Optional. Canonical, version-pinned selected tool
                           references. Empty when the session exposes every tool.
                     ]
                 }
-                # response body for status code(s): 400
+                # response body for status code(s): 400, 409, 429
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -29963,7 +36311,6 @@ class SessionsOperations:
                 Type[HttpResponseError],
                 lambda response: ClientAuthenticationError(response=response),
             ),
-            429: HttpResponseError,
             500: HttpResponseError,
         }
         error_map.update(kwargs.pop("error_map", {}) or {})
@@ -30002,7 +36349,7 @@ class SessionsOperations:
 
         response = pipeline_response.http_response
 
-        if response.status_code not in [200, 400]:
+        if response.status_code not in [200, 400, 409, 429]:
             if _stream:
                 response.read()  # Load the body in memory and close the socket
             map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
@@ -30041,6 +36388,38 @@ class SessionsOperations:
             else:
                 deserialized = None
 
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 429:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
         if cls:
             return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
 
@@ -30058,8 +36437,9 @@ class SessionsOperations:
         # pylint: disable=line-too-long
         """List Sessions.
 
-        Returns the sessions you can see, newest first. Offset-paged with page and ``per_page``\\ ;
-        ``end_user_id`` filters to one actor.
+        Deprecated: use GET /v2/action-gateway/endpoints for endpoints. This route continues to list
+        legacy sessions with its existing fields and pagination. Returns the sessions you can see,
+        newest first. Offset-paged with page and ``per_page``\\ ; ``end_user_id`` filters to one actor.
 
         :keyword end_user_id: Optional ``actor_id``\\ , matched exactly. Default value is None.
         :paramtype end_user_id: str
@@ -30114,6 +36494,10 @@ class SessionsOperations:
                             },
                             "createdAt": "2020-02-20 00:00:00",  # Optional. When the
                               session was created.
+                            "endpoint_id": "str",  # Optional. Public parent endpoint
+                              UUID. Absent for legacy sessions without a parent.
+                            "endpoint_version_id": "str",  # Optional. Public composite
+                              version ID. Absent for legacy sessions without a parent.
                             "insights": {
                                 "logs": bool,  # Optional. Whether the session's
                                   customer logs are sent to Insights.
@@ -30167,8 +36551,10 @@ class SessionsOperations:
                                     }
                                 ]
                             },
-                            "updatedAt": "2020-02-20 00:00:00"  # Optional. When the
+                            "updatedAt": "2020-02-20 00:00:00",  # Optional. When the
                               session was last modified.
+                            "version_number": 0  # Optional. Version number within the
+                              parent endpoint. Absent for legacy sessions without a parent.
                         }
                     ]
                 }
@@ -30249,9 +36635,11 @@ class SessionsOperations:
         # pylint: disable=line-too-long
         """Search Sessions.
 
-        Returns the sessions you can see whose name, ``actor_id``\\ , ``session_urn``\\ , or
-        ``agentName`` contains query, case-insensitively, ranked across the whole result set.
-        Cursor-paged with ``page_size`` and ``page_token``\\ ; no total is reported.
+        Deprecated: use GET /v2/action-gateway/endpoints/search for endpoints. This route continues to
+        search legacy sessions with its existing fields and pagination. Returns the sessions you can
+        see whose name, ``actor_id``\\ , ``session_urn``\\ , or ``agentName`` contains query,
+        case-insensitively, ranked across the whole result set. Cursor-paged with ``page_size`` and
+        ``page_token``\\ ; no total is reported.
 
         :keyword query: Matched case-insensitively as a substring of name, ``actor_id``\\ ,
          ``session_urn``\\ , or ``agentName``. Empty matches every session you can see. Results are
@@ -30311,6 +36699,10 @@ class SessionsOperations:
                             },
                             "createdAt": "2020-02-20 00:00:00",  # Optional. When the
                               session was created.
+                            "endpoint_id": "str",  # Optional. Public parent endpoint
+                              UUID. Absent for legacy sessions without a parent.
+                            "endpoint_version_id": "str",  # Optional. Public composite
+                              version ID. Absent for legacy sessions without a parent.
                             "insights": {
                                 "logs": bool,  # Optional. Whether the session's
                                   customer logs are sent to Insights.
@@ -30364,8 +36756,10 @@ class SessionsOperations:
                                     }
                                 ]
                             },
-                            "updatedAt": "2020-02-20 00:00:00"  # Optional. When the
+                            "updatedAt": "2020-02-20 00:00:00",  # Optional. When the
                               session was last modified.
+                            "version_number": 0  # Optional. Version number within the
+                              parent endpoint. Absent for legacy sessions without a parent.
                         }
                     ]
                 }
@@ -30467,9 +36861,14 @@ class SessionsOperations:
         # pylint: disable=line-too-long
         """Delete a Session.
 
-        Deletes the session and its policy. Succeeds without deleting anything when the session does
-        not exist or you cannot delete it, so repeating a delete also succeeds. A malformed
-        ``session_urn`` is rejected with 400.
+        Deprecated: use DELETE /v2/action-gateway/endpoints/{endpoint_id} for endpoints. This route
+        continues to accept legacy session URNs and delete legacy sessions. Deletes the session and its
+        policy. Succeeds without deleting anything when the session does not exist or you cannot delete
+        it, so repeating a delete also succeeds. A malformed ``session_urn`` is rejected with 400. When
+        the session is a version of an endpoint, this deletes that version, and deleting the endpoint's
+        last live version also deletes the endpoint. Deleting the last live version with DELETE
+        /v2/action-gateway/endpoint-versions/{version_id} instead keeps the endpoint, with no live
+        version.
 
         :param session_urn: URN of the session, for example ``do:managed_agent_session:<uuid>``.
          Required.
@@ -34484,7 +40883,9 @@ class GatewayToolsOperations:
     def list(
         self,
         *,
-        x_session_id: str,
+        x_session_id: Optional[str] = None,
+        x_endpoint_id: Optional[str] = None,
+        x_actor_id: Optional[str] = None,
         page_size: int = 20,
         page_token: Optional[str] = None,
         etag: Optional[str] = None,
@@ -34501,9 +40902,25 @@ class GatewayToolsOperations:
         Modified`` while the page is unchanged.
 
         :keyword x_session_id: The session to act in: the UUID at the end of the session's
-         ``sessionUrn`` and ``mcpUrl``. The session must belong to the authenticated user and team.
-         Required.
+         ``sessionUrn`` and ``mcpUrl``. For a pinned endpoint version, use the session UUID at the end
+         of its ``mcp_url``\\ , not the composite version ID. The session must belong to the
+         authenticated user and team. Send either this header or ``X-Endpoint-Id``\\ , not both; both
+         returns 400. With neither, the request uses your default endpoint when default endpoints are
+         enabled for your team, and otherwise returns 403. Default value is None.
         :paramtype x_session_id: str
+        :keyword x_endpoint_id: The endpoint to act in, as a lowercase endpoint UUID. The request uses
+         the endpoint's current head version, which the response reports in
+         ``X-Action-Gateway-Endpoint-Version``. The endpoint must belong to the authenticated user and
+         team; an unknown or inaccessible endpoint returns 404. Send either this header or
+         ``X-Session-Id``\\ , not both. A malformed value or more than one value returns 400. Default
+         value is None.
+        :paramtype x_endpoint_id: str
+        :keyword x_actor_id: The actor you expect the session or endpoint to be bound to. It does not
+         select an actor or connections; those come from the session's or endpoint's ``actor_id``. When
+         sent, it must equal that binding. A different value, including any value for a target with no
+         actor, returns 403 with the message "The session is not bound to the request's actor.". Default
+         value is None.
+        :paramtype x_actor_id: str
         :keyword page_size: The number of tools returned per page, from 1 to 100. Defaults to 20 when
          omitted. Other values are rejected with 400. Default value is 20.
         :paramtype page_size: int
@@ -34563,7 +40980,7 @@ class GatewayToolsOperations:
                     ],
                     "version": "str"  # Optional. The catalog version.
                 }
-                # response body for status code(s): 400, 412, 429, 500, 503
+                # response body for status code(s): 400, 404, 412, 429, 500, 503
                 response == {
                     "call_id": "str",  # A unique identifier for this request, when one was
                       assigned. Required.
@@ -34617,6 +41034,8 @@ class GatewayToolsOperations:
 
         _request = build_gateway_tools_list_request(
             x_session_id=x_session_id,
+            x_endpoint_id=x_endpoint_id,
+            x_actor_id=x_actor_id,
             page_size=page_size,
             page_token=page_token,
             etag=etag,
@@ -34635,7 +41054,18 @@ class GatewayToolsOperations:
 
         response = pipeline_response.http_response
 
-        if response.status_code not in [200, 304, 400, 401, 403, 412, 429, 500, 503]:
+        if response.status_code not in [
+            200,
+            304,
+            400,
+            401,
+            403,
+            404,
+            412,
+            429,
+            500,
+            503,
+        ]:
             if _stream:
                 response.read()  # Load the body in memory and close the socket
             map_error(
@@ -34649,11 +41079,25 @@ class GatewayToolsOperations:
             response_headers["ETag"] = self._deserialize(
                 "str", response.headers.get("ETag")
             )
+            response_headers["X-Endpoint-Id"] = self._deserialize(
+                "str", response.headers.get("X-Endpoint-Id")
+            )
+            response_headers["X-Action-Gateway-Endpoint-Version"] = self._deserialize(
+                "str", response.headers.get("X-Action-Gateway-Endpoint-Version")
+            )
 
             if response.content:
                 deserialized = response.json()
             else:
                 deserialized = None
+
+        if response.status_code == 304:
+            response_headers["X-Endpoint-Id"] = self._deserialize(
+                "str", response.headers.get("X-Endpoint-Id")
+            )
+            response_headers["X-Action-Gateway-Endpoint-Version"] = self._deserialize(
+                "str", response.headers.get("X-Action-Gateway-Endpoint-Version")
+            )
 
         if response.status_code == 400:
             if response.content:
@@ -34668,6 +41112,12 @@ class GatewayToolsOperations:
                 deserialized = None
 
         if response.status_code == 403:
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
             if response.content:
                 deserialized = response.json()
             else:
@@ -34711,7 +41161,9 @@ class GatewayToolsOperations:
         self,
         body: JSON,
         *,
-        x_session_id: str,
+        x_session_id: Optional[str] = None,
+        x_endpoint_id: Optional[str] = None,
+        x_actor_id: Optional[str] = None,
         content_type: str = "application/json",
         **kwargs: Any,
     ) -> JSON:
@@ -34730,9 +41182,25 @@ class GatewayToolsOperations:
         :param body: Required.
         :type body: JSON
         :keyword x_session_id: The session to act in: the UUID at the end of the session's
-         ``sessionUrn`` and ``mcpUrl``. The session must belong to the authenticated user and team.
-         Required.
+         ``sessionUrn`` and ``mcpUrl``. For a pinned endpoint version, use the session UUID at the end
+         of its ``mcp_url``\\ , not the composite version ID. The session must belong to the
+         authenticated user and team. Send either this header or ``X-Endpoint-Id``\\ , not both; both
+         returns 400. With neither, the request uses your default endpoint when default endpoints are
+         enabled for your team, and otherwise returns 403. Default value is None.
         :paramtype x_session_id: str
+        :keyword x_endpoint_id: The endpoint to act in, as a lowercase endpoint UUID. The request uses
+         the endpoint's current head version, which the response reports in
+         ``X-Action-Gateway-Endpoint-Version``. The endpoint must belong to the authenticated user and
+         team; an unknown or inaccessible endpoint returns 404. Send either this header or
+         ``X-Session-Id``\\ , not both. A malformed value or more than one value returns 400. Default
+         value is None.
+        :paramtype x_endpoint_id: str
+        :keyword x_actor_id: The actor you expect the session or endpoint to be bound to. It does not
+         select an actor or connections; those come from the session's or endpoint's ``actor_id``. When
+         sent, it must equal that binding. A different value, including any value for a target with no
+         actor, returns 403 with the message "The session is not bound to the request's actor.". Default
+         value is None.
+        :paramtype x_actor_id: str
         :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
          Default value is "application/json".
         :paramtype content_type: str
@@ -34836,7 +41304,7 @@ class GatewayToolsOperations:
                         ]
                     }
                 }
-                # response body for status code(s): 400, 412, 413, 429, 500, 503
+                # response body for status code(s): 400, 404, 412, 413, 429, 500, 503
                 response == {
                     "call_id": "str",  # A unique identifier for this request, when one was
                       assigned. Required.
@@ -34875,7 +41343,9 @@ class GatewayToolsOperations:
         self,
         body: IO[bytes],
         *,
-        x_session_id: str,
+        x_session_id: Optional[str] = None,
+        x_endpoint_id: Optional[str] = None,
+        x_actor_id: Optional[str] = None,
         content_type: str = "application/json",
         **kwargs: Any,
     ) -> JSON:
@@ -34894,9 +41364,25 @@ class GatewayToolsOperations:
         :param body: Required.
         :type body: IO[bytes]
         :keyword x_session_id: The session to act in: the UUID at the end of the session's
-         ``sessionUrn`` and ``mcpUrl``. The session must belong to the authenticated user and team.
-         Required.
+         ``sessionUrn`` and ``mcpUrl``. For a pinned endpoint version, use the session UUID at the end
+         of its ``mcp_url``\\ , not the composite version ID. The session must belong to the
+         authenticated user and team. Send either this header or ``X-Endpoint-Id``\\ , not both; both
+         returns 400. With neither, the request uses your default endpoint when default endpoints are
+         enabled for your team, and otherwise returns 403. Default value is None.
         :paramtype x_session_id: str
+        :keyword x_endpoint_id: The endpoint to act in, as a lowercase endpoint UUID. The request uses
+         the endpoint's current head version, which the response reports in
+         ``X-Action-Gateway-Endpoint-Version``. The endpoint must belong to the authenticated user and
+         team; an unknown or inaccessible endpoint returns 404. Send either this header or
+         ``X-Session-Id``\\ , not both. A malformed value or more than one value returns 400. Default
+         value is None.
+        :paramtype x_endpoint_id: str
+        :keyword x_actor_id: The actor you expect the session or endpoint to be bound to. It does not
+         select an actor or connections; those come from the session's or endpoint's ``actor_id``. When
+         sent, it must equal that binding. A different value, including any value for a target with no
+         actor, returns 403 with the message "The session is not bound to the request's actor.". Default
+         value is None.
+        :paramtype x_actor_id: str
         :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
          Default value is "application/json".
         :paramtype content_type: str
@@ -34976,7 +41462,7 @@ class GatewayToolsOperations:
                         ]
                     }
                 }
-                # response body for status code(s): 400, 412, 413, 429, 500, 503
+                # response body for status code(s): 400, 404, 412, 413, 429, 500, 503
                 response == {
                     "call_id": "str",  # A unique identifier for this request, when one was
                       assigned. Required.
@@ -35012,7 +41498,13 @@ class GatewayToolsOperations:
 
     @distributed_trace
     def list_search(
-        self, body: Union[JSON, IO[bytes]], *, x_session_id: str, **kwargs: Any
+        self,
+        body: Union[JSON, IO[bytes]],
+        *,
+        x_session_id: Optional[str] = None,
+        x_endpoint_id: Optional[str] = None,
+        x_actor_id: Optional[str] = None,
+        **kwargs: Any,
     ) -> JSON:
         # pylint: disable=line-too-long
         """Search Session Tools.
@@ -35029,9 +41521,25 @@ class GatewayToolsOperations:
         :param body: Is either a JSON type or a IO[bytes] type. Required.
         :type body: JSON or IO[bytes]
         :keyword x_session_id: The session to act in: the UUID at the end of the session's
-         ``sessionUrn`` and ``mcpUrl``. The session must belong to the authenticated user and team.
-         Required.
+         ``sessionUrn`` and ``mcpUrl``. For a pinned endpoint version, use the session UUID at the end
+         of its ``mcp_url``\\ , not the composite version ID. The session must belong to the
+         authenticated user and team. Send either this header or ``X-Endpoint-Id``\\ , not both; both
+         returns 400. With neither, the request uses your default endpoint when default endpoints are
+         enabled for your team, and otherwise returns 403. Default value is None.
         :paramtype x_session_id: str
+        :keyword x_endpoint_id: The endpoint to act in, as a lowercase endpoint UUID. The request uses
+         the endpoint's current head version, which the response reports in
+         ``X-Action-Gateway-Endpoint-Version``. The endpoint must belong to the authenticated user and
+         team; an unknown or inaccessible endpoint returns 404. Send either this header or
+         ``X-Session-Id``\\ , not both. A malformed value or more than one value returns 400. Default
+         value is None.
+        :paramtype x_endpoint_id: str
+        :keyword x_actor_id: The actor you expect the session or endpoint to be bound to. It does not
+         select an actor or connections; those come from the session's or endpoint's ``actor_id``. When
+         sent, it must equal that binding. A different value, including any value for a target with no
+         actor, returns 403 with the message "The session is not bound to the request's actor.". Default
+         value is None.
+        :paramtype x_actor_id: str
         :return: JSON object
         :rtype: JSON
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -35132,7 +41640,7 @@ class GatewayToolsOperations:
                         ]
                     }
                 }
-                # response body for status code(s): 400, 412, 413, 429, 500, 503
+                # response body for status code(s): 400, 404, 412, 413, 429, 500, 503
                 response == {
                     "call_id": "str",  # A unique identifier for this request, when one was
                       assigned. Required.
@@ -35191,6 +41699,8 @@ class GatewayToolsOperations:
 
         _request = build_gateway_tools_list_search_request(
             x_session_id=x_session_id,
+            x_endpoint_id=x_endpoint_id,
+            x_actor_id=x_actor_id,
             content_type=content_type,
             json=_json,
             content=_content,
@@ -35208,7 +41718,18 @@ class GatewayToolsOperations:
 
         response = pipeline_response.http_response
 
-        if response.status_code not in [200, 400, 401, 403, 412, 413, 429, 500, 503]:
+        if response.status_code not in [
+            200,
+            400,
+            401,
+            403,
+            404,
+            412,
+            413,
+            429,
+            500,
+            503,
+        ]:
             if _stream:
                 response.read()  # Load the body in memory and close the socket
             map_error(
@@ -35218,6 +41739,13 @@ class GatewayToolsOperations:
 
         response_headers = {}
         if response.status_code == 200:
+            response_headers["X-Endpoint-Id"] = self._deserialize(
+                "str", response.headers.get("X-Endpoint-Id")
+            )
+            response_headers["X-Action-Gateway-Endpoint-Version"] = self._deserialize(
+                "str", response.headers.get("X-Action-Gateway-Endpoint-Version")
+            )
+
             if response.content:
                 deserialized = response.json()
             else:
@@ -35236,6 +41764,12 @@ class GatewayToolsOperations:
                 deserialized = None
 
         if response.status_code == 403:
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
             if response.content:
                 deserialized = response.json()
             else:
@@ -35285,7 +41819,9 @@ class GatewayToolsOperations:
         self,
         body: JSON,
         *,
-        x_session_id: str,
+        x_session_id: Optional[str] = None,
+        x_endpoint_id: Optional[str] = None,
+        x_actor_id: Optional[str] = None,
         content_type: str = "application/json",
         **kwargs: Any,
     ) -> JSON:
@@ -35313,9 +41849,25 @@ class GatewayToolsOperations:
         :param body: Required.
         :type body: JSON
         :keyword x_session_id: The session to act in: the UUID at the end of the session's
-         ``sessionUrn`` and ``mcpUrl``. The session must belong to the authenticated user and team.
-         Required.
+         ``sessionUrn`` and ``mcpUrl``. For a pinned endpoint version, use the session UUID at the end
+         of its ``mcp_url``\\ , not the composite version ID. The session must belong to the
+         authenticated user and team. Send either this header or ``X-Endpoint-Id``\\ , not both; both
+         returns 400. With neither, the request uses your default endpoint when default endpoints are
+         enabled for your team, and otherwise returns 403. Default value is None.
         :paramtype x_session_id: str
+        :keyword x_endpoint_id: The endpoint to act in, as a lowercase endpoint UUID. The request uses
+         the endpoint's current head version, which the response reports in
+         ``X-Action-Gateway-Endpoint-Version``. The endpoint must belong to the authenticated user and
+         team; an unknown or inaccessible endpoint returns 404. Send either this header or
+         ``X-Session-Id``\\ , not both. A malformed value or more than one value returns 400. Default
+         value is None.
+        :paramtype x_endpoint_id: str
+        :keyword x_actor_id: The actor you expect the session or endpoint to be bound to. It does not
+         select an actor or connections; those come from the session's or endpoint's ``actor_id``. When
+         sent, it must equal that binding. A different value, including any value for a target with no
+         actor, returns 403 with the message "The session is not bound to the request's actor.". Default
+         value is None.
+        :paramtype x_actor_id: str
         :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
          Default value is "application/json".
         :paramtype content_type: str
@@ -35411,7 +41963,7 @@ class GatewayToolsOperations:
                     "success_count": 0,  # Optional.
                     "total_count": 0  # Optional.
                 }
-                # response body for status code(s): 400, 402, 412, 413, 429, 500, 503
+                # response body for status code(s): 400, 402, 404, 412, 413, 429, 500, 503
                 response == {
                     "call_id": "str",  # A unique identifier for this request, when one was
                       assigned. Required.
@@ -35450,7 +42002,9 @@ class GatewayToolsOperations:
         self,
         body: IO[bytes],
         *,
-        x_session_id: str,
+        x_session_id: Optional[str] = None,
+        x_endpoint_id: Optional[str] = None,
+        x_actor_id: Optional[str] = None,
         content_type: str = "application/json",
         **kwargs: Any,
     ) -> JSON:
@@ -35478,9 +42032,25 @@ class GatewayToolsOperations:
         :param body: Required.
         :type body: IO[bytes]
         :keyword x_session_id: The session to act in: the UUID at the end of the session's
-         ``sessionUrn`` and ``mcpUrl``. The session must belong to the authenticated user and team.
-         Required.
+         ``sessionUrn`` and ``mcpUrl``. For a pinned endpoint version, use the session UUID at the end
+         of its ``mcp_url``\\ , not the composite version ID. The session must belong to the
+         authenticated user and team. Send either this header or ``X-Endpoint-Id``\\ , not both; both
+         returns 400. With neither, the request uses your default endpoint when default endpoints are
+         enabled for your team, and otherwise returns 403. Default value is None.
         :paramtype x_session_id: str
+        :keyword x_endpoint_id: The endpoint to act in, as a lowercase endpoint UUID. The request uses
+         the endpoint's current head version, which the response reports in
+         ``X-Action-Gateway-Endpoint-Version``. The endpoint must belong to the authenticated user and
+         team; an unknown or inaccessible endpoint returns 404. Send either this header or
+         ``X-Session-Id``\\ , not both. A malformed value or more than one value returns 400. Default
+         value is None.
+        :paramtype x_endpoint_id: str
+        :keyword x_actor_id: The actor you expect the session or endpoint to be bound to. It does not
+         select an actor or connections; those come from the session's or endpoint's ``actor_id``. When
+         sent, it must equal that binding. A different value, including any value for a target with no
+         actor, returns 403 with the message "The session is not bound to the request's actor.". Default
+         value is None.
+        :paramtype x_actor_id: str
         :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
          Default value is "application/json".
         :paramtype content_type: str
@@ -35546,7 +42116,7 @@ class GatewayToolsOperations:
                     "success_count": 0,  # Optional.
                     "total_count": 0  # Optional.
                 }
-                # response body for status code(s): 400, 402, 412, 413, 429, 500, 503
+                # response body for status code(s): 400, 402, 404, 412, 413, 429, 500, 503
                 response == {
                     "call_id": "str",  # A unique identifier for this request, when one was
                       assigned. Required.
@@ -35582,7 +42152,13 @@ class GatewayToolsOperations:
 
     @distributed_trace
     def run(
-        self, body: Union[JSON, IO[bytes]], *, x_session_id: str, **kwargs: Any
+        self,
+        body: Union[JSON, IO[bytes]],
+        *,
+        x_session_id: Optional[str] = None,
+        x_endpoint_id: Optional[str] = None,
+        x_actor_id: Optional[str] = None,
+        **kwargs: Any,
     ) -> JSON:
         # pylint: disable=line-too-long
         """Invoke Session Tools.
@@ -35608,9 +42184,25 @@ class GatewayToolsOperations:
         :param body: Is either a JSON type or a IO[bytes] type. Required.
         :type body: JSON or IO[bytes]
         :keyword x_session_id: The session to act in: the UUID at the end of the session's
-         ``sessionUrn`` and ``mcpUrl``. The session must belong to the authenticated user and team.
-         Required.
+         ``sessionUrn`` and ``mcpUrl``. For a pinned endpoint version, use the session UUID at the end
+         of its ``mcp_url``\\ , not the composite version ID. The session must belong to the
+         authenticated user and team. Send either this header or ``X-Endpoint-Id``\\ , not both; both
+         returns 400. With neither, the request uses your default endpoint when default endpoints are
+         enabled for your team, and otherwise returns 403. Default value is None.
         :paramtype x_session_id: str
+        :keyword x_endpoint_id: The endpoint to act in, as a lowercase endpoint UUID. The request uses
+         the endpoint's current head version, which the response reports in
+         ``X-Action-Gateway-Endpoint-Version``. The endpoint must belong to the authenticated user and
+         team; an unknown or inaccessible endpoint returns 404. Send either this header or
+         ``X-Session-Id``\\ , not both. A malformed value or more than one value returns 400. Default
+         value is None.
+        :paramtype x_endpoint_id: str
+        :keyword x_actor_id: The actor you expect the session or endpoint to be bound to. It does not
+         select an actor or connections; those come from the session's or endpoint's ``actor_id``. When
+         sent, it must equal that binding. A different value, including any value for a target with no
+         actor, returns 403 with the message "The session is not bound to the request's actor.". Default
+         value is None.
+        :paramtype x_actor_id: str
         :return: JSON object
         :rtype: JSON
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -35703,7 +42295,7 @@ class GatewayToolsOperations:
                     "success_count": 0,  # Optional.
                     "total_count": 0  # Optional.
                 }
-                # response body for status code(s): 400, 402, 412, 413, 429, 500, 503
+                # response body for status code(s): 400, 402, 404, 412, 413, 429, 500, 503
                 response == {
                     "call_id": "str",  # A unique identifier for this request, when one was
                       assigned. Required.
@@ -35762,6 +42354,8 @@ class GatewayToolsOperations:
 
         _request = build_gateway_tools_run_request(
             x_session_id=x_session_id,
+            x_endpoint_id=x_endpoint_id,
+            x_actor_id=x_actor_id,
             content_type=content_type,
             json=_json,
             content=_content,
@@ -35785,6 +42379,7 @@ class GatewayToolsOperations:
             401,
             402,
             403,
+            404,
             412,
             413,
             429,
@@ -35800,6 +42395,13 @@ class GatewayToolsOperations:
 
         response_headers = {}
         if response.status_code == 200:
+            response_headers["X-Endpoint-Id"] = self._deserialize(
+                "str", response.headers.get("X-Endpoint-Id")
+            )
+            response_headers["X-Action-Gateway-Endpoint-Version"] = self._deserialize(
+                "str", response.headers.get("X-Action-Gateway-Endpoint-Version")
+            )
+
             if response.content:
                 deserialized = response.json()
             else:
@@ -35824,6 +42426,12 @@ class GatewayToolsOperations:
                 deserialized = None
 
         if response.status_code == 403:
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
             if response.content:
                 deserialized = response.json()
             else:
@@ -35893,7 +42501,9 @@ class GatewayCodeOperations:
         self,
         body: JSON,
         *,
-        x_session_id: str,
+        x_session_id: Optional[str] = None,
+        x_endpoint_id: Optional[str] = None,
+        x_actor_id: Optional[str] = None,
         content_type: str = "application/json",
         **kwargs: Any,
     ) -> JSON:
@@ -35916,9 +42526,25 @@ class GatewayCodeOperations:
         :param body: Required.
         :type body: JSON
         :keyword x_session_id: The session to act in: the UUID at the end of the session's
-         ``sessionUrn`` and ``mcpUrl``. The session must belong to the authenticated user and team.
-         Required.
+         ``sessionUrn`` and ``mcpUrl``. For a pinned endpoint version, use the session UUID at the end
+         of its ``mcp_url``\\ , not the composite version ID. The session must belong to the
+         authenticated user and team. Send either this header or ``X-Endpoint-Id``\\ , not both; both
+         returns 400. With neither, the request uses your default endpoint when default endpoints are
+         enabled for your team, and otherwise returns 403. Default value is None.
         :paramtype x_session_id: str
+        :keyword x_endpoint_id: The endpoint to act in, as a lowercase endpoint UUID. The request uses
+         the endpoint's current head version, which the response reports in
+         ``X-Action-Gateway-Endpoint-Version``. The endpoint must belong to the authenticated user and
+         team; an unknown or inaccessible endpoint returns 404. Send either this header or
+         ``X-Session-Id``\\ , not both. A malformed value or more than one value returns 400. Default
+         value is None.
+        :paramtype x_endpoint_id: str
+        :keyword x_actor_id: The actor you expect the session or endpoint to be bound to. It does not
+         select an actor or connections; those come from the session's or endpoint's ``actor_id``. When
+         sent, it must equal that binding. A different value, including any value for a target with no
+         actor, returns 403 with the message "The session is not bound to the request's actor.". Default
+         value is None.
+        :paramtype x_actor_id: str
         :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
          Default value is "application/json".
         :paramtype content_type: str
@@ -35973,7 +42599,7 @@ class GatewayCodeOperations:
                         "stdout": "str"  # Optional.
                     }
                 }
-                # response body for status code(s): 400, 412, 413, 429, 500, 503, 504
+                # response body for status code(s): 400, 404, 412, 413, 429, 500, 503, 504
                 response == {
                     "call_id": "str",  # A unique identifier for this request, when one was
                       assigned. Required.
@@ -36012,7 +42638,9 @@ class GatewayCodeOperations:
         self,
         body: IO[bytes],
         *,
-        x_session_id: str,
+        x_session_id: Optional[str] = None,
+        x_endpoint_id: Optional[str] = None,
+        x_actor_id: Optional[str] = None,
         content_type: str = "application/json",
         **kwargs: Any,
     ) -> JSON:
@@ -36035,9 +42663,25 @@ class GatewayCodeOperations:
         :param body: Required.
         :type body: IO[bytes]
         :keyword x_session_id: The session to act in: the UUID at the end of the session's
-         ``sessionUrn`` and ``mcpUrl``. The session must belong to the authenticated user and team.
-         Required.
+         ``sessionUrn`` and ``mcpUrl``. For a pinned endpoint version, use the session UUID at the end
+         of its ``mcp_url``\\ , not the composite version ID. The session must belong to the
+         authenticated user and team. Send either this header or ``X-Endpoint-Id``\\ , not both; both
+         returns 400. With neither, the request uses your default endpoint when default endpoints are
+         enabled for your team, and otherwise returns 403. Default value is None.
         :paramtype x_session_id: str
+        :keyword x_endpoint_id: The endpoint to act in, as a lowercase endpoint UUID. The request uses
+         the endpoint's current head version, which the response reports in
+         ``X-Action-Gateway-Endpoint-Version``. The endpoint must belong to the authenticated user and
+         team; an unknown or inaccessible endpoint returns 404. Send either this header or
+         ``X-Session-Id``\\ , not both. A malformed value or more than one value returns 400. Default
+         value is None.
+        :paramtype x_endpoint_id: str
+        :keyword x_actor_id: The actor you expect the session or endpoint to be bound to. It does not
+         select an actor or connections; those come from the session's or endpoint's ``actor_id``. When
+         sent, it must equal that binding. A different value, including any value for a target with no
+         actor, returns 403 with the message "The session is not bound to the request's actor.". Default
+         value is None.
+        :paramtype x_actor_id: str
         :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
          Default value is "application/json".
         :paramtype content_type: str
@@ -36085,7 +42729,7 @@ class GatewayCodeOperations:
                         "stdout": "str"  # Optional.
                     }
                 }
-                # response body for status code(s): 400, 412, 413, 429, 500, 503, 504
+                # response body for status code(s): 400, 404, 412, 413, 429, 500, 503, 504
                 response == {
                     "call_id": "str",  # A unique identifier for this request, when one was
                       assigned. Required.
@@ -36121,7 +42765,13 @@ class GatewayCodeOperations:
 
     @distributed_trace
     def run(
-        self, body: Union[JSON, IO[bytes]], *, x_session_id: str, **kwargs: Any
+        self,
+        body: Union[JSON, IO[bytes]],
+        *,
+        x_session_id: Optional[str] = None,
+        x_endpoint_id: Optional[str] = None,
+        x_actor_id: Optional[str] = None,
+        **kwargs: Any,
     ) -> JSON:
         # pylint: disable=line-too-long
         """Execute Code.
@@ -36142,9 +42792,25 @@ class GatewayCodeOperations:
         :param body: Is either a JSON type or a IO[bytes] type. Required.
         :type body: JSON or IO[bytes]
         :keyword x_session_id: The session to act in: the UUID at the end of the session's
-         ``sessionUrn`` and ``mcpUrl``. The session must belong to the authenticated user and team.
-         Required.
+         ``sessionUrn`` and ``mcpUrl``. For a pinned endpoint version, use the session UUID at the end
+         of its ``mcp_url``\\ , not the composite version ID. The session must belong to the
+         authenticated user and team. Send either this header or ``X-Endpoint-Id``\\ , not both; both
+         returns 400. With neither, the request uses your default endpoint when default endpoints are
+         enabled for your team, and otherwise returns 403. Default value is None.
         :paramtype x_session_id: str
+        :keyword x_endpoint_id: The endpoint to act in, as a lowercase endpoint UUID. The request uses
+         the endpoint's current head version, which the response reports in
+         ``X-Action-Gateway-Endpoint-Version``. The endpoint must belong to the authenticated user and
+         team; an unknown or inaccessible endpoint returns 404. Send either this header or
+         ``X-Session-Id``\\ , not both. A malformed value or more than one value returns 400. Default
+         value is None.
+        :paramtype x_endpoint_id: str
+        :keyword x_actor_id: The actor you expect the session or endpoint to be bound to. It does not
+         select an actor or connections; those come from the session's or endpoint's ``actor_id``. When
+         sent, it must equal that binding. A different value, including any value for a target with no
+         actor, returns 403 with the message "The session is not bound to the request's actor.". Default
+         value is None.
+        :paramtype x_actor_id: str
         :return: JSON object
         :rtype: JSON
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -36196,7 +42862,7 @@ class GatewayCodeOperations:
                         "stdout": "str"  # Optional.
                     }
                 }
-                # response body for status code(s): 400, 412, 413, 429, 500, 503, 504
+                # response body for status code(s): 400, 404, 412, 413, 429, 500, 503, 504
                 response == {
                     "call_id": "str",  # A unique identifier for this request, when one was
                       assigned. Required.
@@ -36255,6 +42921,8 @@ class GatewayCodeOperations:
 
         _request = build_gateway_code_run_request(
             x_session_id=x_session_id,
+            x_endpoint_id=x_endpoint_id,
+            x_actor_id=x_actor_id,
             content_type=content_type,
             json=_json,
             content=_content,
@@ -36277,6 +42945,7 @@ class GatewayCodeOperations:
             400,
             401,
             403,
+            404,
             412,
             413,
             429,
@@ -36293,6 +42962,13 @@ class GatewayCodeOperations:
 
         response_headers = {}
         if response.status_code == 200:
+            response_headers["X-Endpoint-Id"] = self._deserialize(
+                "str", response.headers.get("X-Endpoint-Id")
+            )
+            response_headers["X-Action-Gateway-Endpoint-Version"] = self._deserialize(
+                "str", response.headers.get("X-Action-Gateway-Endpoint-Version")
+            )
+
             if response.content:
                 deserialized = response.json()
             else:
@@ -36311,6 +42987,12 @@ class GatewayCodeOperations:
                 deserialized = None
 
         if response.status_code == 403:
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
             if response.content:
                 deserialized = response.json()
             else:
@@ -36388,6 +43070,7 @@ class GatewaySessionApprovalsOperations:
         approval_id: str,
         body: JSON,
         *,
+        x_actor_id: Optional[str] = None,
         content_type: str = "application/json",
         **kwargs: Any,
     ) -> JSON:
@@ -36412,6 +43095,12 @@ class GatewaySessionApprovalsOperations:
         :type approval_id: str
         :param body: Required.
         :type body: JSON
+        :keyword x_actor_id: The actor you expect the session or endpoint to be bound to. It does not
+         select an actor or connections; those come from the session's or endpoint's ``actor_id``. When
+         sent, it must equal that binding. A different value, including any value for a target with no
+         actor, returns 403 with the message "The session is not bound to the request's actor.". Default
+         value is None.
+        :paramtype x_actor_id: str
         :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
          Default value is "application/json".
         :paramtype content_type: str
@@ -36476,6 +43165,7 @@ class GatewaySessionApprovalsOperations:
         approval_id: str,
         body: IO[bytes],
         *,
+        x_actor_id: Optional[str] = None,
         content_type: str = "application/json",
         **kwargs: Any,
     ) -> JSON:
@@ -36500,6 +43190,12 @@ class GatewaySessionApprovalsOperations:
         :type approval_id: str
         :param body: Required.
         :type body: IO[bytes]
+        :keyword x_actor_id: The actor you expect the session or endpoint to be bound to. It does not
+         select an actor or connections; those come from the session's or endpoint's ``actor_id``. When
+         sent, it must equal that binding. A different value, including any value for a target with no
+         actor, returns 403 with the message "The session is not bound to the request's actor.". Default
+         value is None.
+        :paramtype x_actor_id: str
         :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
          Default value is "application/json".
         :paramtype content_type: str
@@ -36557,6 +43253,8 @@ class GatewaySessionApprovalsOperations:
         session_id: str,
         approval_id: str,
         body: Union[JSON, IO[bytes]],
+        *,
+        x_actor_id: Optional[str] = None,
         **kwargs: Any,
     ) -> JSON:
         # pylint: disable=line-too-long
@@ -36580,6 +43278,12 @@ class GatewaySessionApprovalsOperations:
         :type approval_id: str
         :param body: Is either a JSON type or a IO[bytes] type. Required.
         :type body: JSON or IO[bytes]
+        :keyword x_actor_id: The actor you expect the session or endpoint to be bound to. It does not
+         select an actor or connections; those come from the session's or endpoint's ``actor_id``. When
+         sent, it must equal that binding. A different value, including any value for a target with no
+         actor, returns 403 with the message "The session is not bound to the request's actor.". Default
+         value is None.
+        :paramtype x_actor_id: str
         :return: JSON object
         :rtype: JSON
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -36660,6 +43364,7 @@ class GatewaySessionApprovalsOperations:
         _request = build_gateway_session_approvals_update_request(
             session_id=session_id,
             approval_id=approval_id,
+            x_actor_id=x_actor_id,
             content_type=content_type,
             json=_json,
             content=_content,
@@ -36792,7 +43497,9 @@ class GatewayApprovalsOperations:
         approval_id: str,
         body: JSON,
         *,
-        x_session_id: str,
+        x_session_id: Optional[str] = None,
+        x_endpoint_id: Optional[str] = None,
+        x_actor_id: Optional[str] = None,
         content_type: str = "application/json",
         **kwargs: Any,
     ) -> JSON:
@@ -36800,9 +43507,10 @@ class GatewayApprovalsOperations:
         """Decide a Pending Approval by Session Header.
 
         Approves or denies a tool call that is waiting for approval, identifying the session with the
-        ``X-Session-Id`` header. It behaves the same as ``POST
+        ``X-Session-Id`` header or the endpoint with the ``X-Endpoint-Id`` header. With
+        ``X-Session-Id``\\ , it behaves the same as ``POST
         /approvals/session/{session_id}/{approval_id}``\\ , which is the path returned in a result's
-        ``_meta.decide``.
+        ``_meta.decide``. An unknown ``X-Endpoint-Id`` returns 404.
 
         :param approval_id: The ``approval_id`` from a tool result whose ``_meta.status`` is
          ``requires_approval``. Required.
@@ -36810,9 +43518,25 @@ class GatewayApprovalsOperations:
         :param body: Required.
         :type body: JSON
         :keyword x_session_id: The session to act in: the UUID at the end of the session's
-         ``sessionUrn`` and ``mcpUrl``. The session must belong to the authenticated user and team.
-         Required.
+         ``sessionUrn`` and ``mcpUrl``. For a pinned endpoint version, use the session UUID at the end
+         of its ``mcp_url``\\ , not the composite version ID. The session must belong to the
+         authenticated user and team. Send either this header or ``X-Endpoint-Id``\\ , not both; both
+         returns 400. With neither, the request uses your default endpoint when default endpoints are
+         enabled for your team, and otherwise returns 403. Default value is None.
         :paramtype x_session_id: str
+        :keyword x_endpoint_id: The endpoint to act in, as a lowercase endpoint UUID. The request uses
+         the endpoint's current head version, which the response reports in
+         ``X-Action-Gateway-Endpoint-Version``. The endpoint must belong to the authenticated user and
+         team; an unknown or inaccessible endpoint returns 404. Send either this header or
+         ``X-Session-Id``\\ , not both. A malformed value or more than one value returns 400. Default
+         value is None.
+        :paramtype x_endpoint_id: str
+        :keyword x_actor_id: The actor you expect the session or endpoint to be bound to. It does not
+         select an actor or connections; those come from the session's or endpoint's ``actor_id``. When
+         sent, it must equal that binding. A different value, including any value for a target with no
+         actor, returns 403 with the message "The session is not bound to the request's actor.". Default
+         value is None.
+        :paramtype x_actor_id: str
         :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
          Default value is "application/json".
         :paramtype content_type: str
@@ -36876,7 +43600,9 @@ class GatewayApprovalsOperations:
         approval_id: str,
         body: IO[bytes],
         *,
-        x_session_id: str,
+        x_session_id: Optional[str] = None,
+        x_endpoint_id: Optional[str] = None,
+        x_actor_id: Optional[str] = None,
         content_type: str = "application/json",
         **kwargs: Any,
     ) -> JSON:
@@ -36884,9 +43610,10 @@ class GatewayApprovalsOperations:
         """Decide a Pending Approval by Session Header.
 
         Approves or denies a tool call that is waiting for approval, identifying the session with the
-        ``X-Session-Id`` header. It behaves the same as ``POST
+        ``X-Session-Id`` header or the endpoint with the ``X-Endpoint-Id`` header. With
+        ``X-Session-Id``\\ , it behaves the same as ``POST
         /approvals/session/{session_id}/{approval_id}``\\ , which is the path returned in a result's
-        ``_meta.decide``.
+        ``_meta.decide``. An unknown ``X-Endpoint-Id`` returns 404.
 
         :param approval_id: The ``approval_id`` from a tool result whose ``_meta.status`` is
          ``requires_approval``. Required.
@@ -36894,9 +43621,25 @@ class GatewayApprovalsOperations:
         :param body: Required.
         :type body: IO[bytes]
         :keyword x_session_id: The session to act in: the UUID at the end of the session's
-         ``sessionUrn`` and ``mcpUrl``. The session must belong to the authenticated user and team.
-         Required.
+         ``sessionUrn`` and ``mcpUrl``. For a pinned endpoint version, use the session UUID at the end
+         of its ``mcp_url``\\ , not the composite version ID. The session must belong to the
+         authenticated user and team. Send either this header or ``X-Endpoint-Id``\\ , not both; both
+         returns 400. With neither, the request uses your default endpoint when default endpoints are
+         enabled for your team, and otherwise returns 403. Default value is None.
         :paramtype x_session_id: str
+        :keyword x_endpoint_id: The endpoint to act in, as a lowercase endpoint UUID. The request uses
+         the endpoint's current head version, which the response reports in
+         ``X-Action-Gateway-Endpoint-Version``. The endpoint must belong to the authenticated user and
+         team; an unknown or inaccessible endpoint returns 404. Send either this header or
+         ``X-Session-Id``\\ , not both. A malformed value or more than one value returns 400. Default
+         value is None.
+        :paramtype x_endpoint_id: str
+        :keyword x_actor_id: The actor you expect the session or endpoint to be bound to. It does not
+         select an actor or connections; those come from the session's or endpoint's ``actor_id``. When
+         sent, it must equal that binding. A different value, including any value for a target with no
+         actor, returns 403 with the message "The session is not bound to the request's actor.". Default
+         value is None.
+        :paramtype x_actor_id: str
         :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
          Default value is "application/json".
         :paramtype content_type: str
@@ -36954,16 +43697,19 @@ class GatewayApprovalsOperations:
         approval_id: str,
         body: Union[JSON, IO[bytes]],
         *,
-        x_session_id: str,
+        x_session_id: Optional[str] = None,
+        x_endpoint_id: Optional[str] = None,
+        x_actor_id: Optional[str] = None,
         **kwargs: Any,
     ) -> JSON:
         # pylint: disable=line-too-long
         """Decide a Pending Approval by Session Header.
 
         Approves or denies a tool call that is waiting for approval, identifying the session with the
-        ``X-Session-Id`` header. It behaves the same as ``POST
+        ``X-Session-Id`` header or the endpoint with the ``X-Endpoint-Id`` header. With
+        ``X-Session-Id``\\ , it behaves the same as ``POST
         /approvals/session/{session_id}/{approval_id}``\\ , which is the path returned in a result's
-        ``_meta.decide``.
+        ``_meta.decide``. An unknown ``X-Endpoint-Id`` returns 404.
 
         :param approval_id: The ``approval_id`` from a tool result whose ``_meta.status`` is
          ``requires_approval``. Required.
@@ -36971,9 +43717,25 @@ class GatewayApprovalsOperations:
         :param body: Is either a JSON type or a IO[bytes] type. Required.
         :type body: JSON or IO[bytes]
         :keyword x_session_id: The session to act in: the UUID at the end of the session's
-         ``sessionUrn`` and ``mcpUrl``. The session must belong to the authenticated user and team.
-         Required.
+         ``sessionUrn`` and ``mcpUrl``. For a pinned endpoint version, use the session UUID at the end
+         of its ``mcp_url``\\ , not the composite version ID. The session must belong to the
+         authenticated user and team. Send either this header or ``X-Endpoint-Id``\\ , not both; both
+         returns 400. With neither, the request uses your default endpoint when default endpoints are
+         enabled for your team, and otherwise returns 403. Default value is None.
         :paramtype x_session_id: str
+        :keyword x_endpoint_id: The endpoint to act in, as a lowercase endpoint UUID. The request uses
+         the endpoint's current head version, which the response reports in
+         ``X-Action-Gateway-Endpoint-Version``. The endpoint must belong to the authenticated user and
+         team; an unknown or inaccessible endpoint returns 404. Send either this header or
+         ``X-Session-Id``\\ , not both. A malformed value or more than one value returns 400. Default
+         value is None.
+        :paramtype x_endpoint_id: str
+        :keyword x_actor_id: The actor you expect the session or endpoint to be bound to. It does not
+         select an actor or connections; those come from the session's or endpoint's ``actor_id``. When
+         sent, it must equal that binding. A different value, including any value for a target with no
+         actor, returns 403 with the message "The session is not bound to the request's actor.". Default
+         value is None.
+        :paramtype x_actor_id: str
         :return: JSON object
         :rtype: JSON
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -37054,6 +43816,8 @@ class GatewayApprovalsOperations:
         _request = build_gateway_approvals_update_request(
             approval_id=approval_id,
             x_session_id=x_session_id,
+            x_endpoint_id=x_endpoint_id,
+            x_actor_id=x_actor_id,
             content_type=content_type,
             json=_json,
             content=_content,
@@ -37092,6 +43856,13 @@ class GatewayApprovalsOperations:
 
         response_headers = {}
         if response.status_code == 200:
+            response_headers["X-Endpoint-Id"] = self._deserialize(
+                "str", response.headers.get("X-Endpoint-Id")
+            )
+            response_headers["X-Action-Gateway-Endpoint-Version"] = self._deserialize(
+                "str", response.headers.get("X-Action-Gateway-Endpoint-Version")
+            )
+
             if response.content:
                 deserialized = response.json()
             else:
@@ -45992,7 +52763,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                   legacy-envelope manifest or an adapter alias (codex-cli, cursor-cli)
                                   is used, and a heuristic entry per credential-looking spec.env value.
                                   Populated on the CreateSession response only.
-                            ]
+                            ],
+                            "workspace_id": "str"  # Optional. The persistent workspace
+                              attached to the session, mounted at ``/workspace``. Empty when the
+                              session has none. Fork and rollback return 409 for a session that has a
+                              workspace.
                         }
                     ]
                 }
@@ -46267,7 +53042,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                   legacy-envelope manifest or an adapter alias (codex-cli, cursor-cli)
                                   is used, and a heuristic entry per credential-looking spec.env value.
                                   Populated on the CreateSession response only.
-                            ]
+                            ],
+                            "workspace_id": "str"  # Optional. The persistent workspace
+                              attached to the session, mounted at ``/workspace``. Empty when the
+                              session has none. Fork and rollback return 409 for a session that has a
+                              workspace.
                         }
                     ]
                 }
@@ -46463,11 +53242,16 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                       request. If set, it must equal that region, or the request fails with 400 and a
                       region_mismatch message. Honored only for teams on the regional routing rollout;
                       ignored otherwise.
-                    "resume_on_topoff": bool  # Optional. Opt the new session in to automatic
+                    "resume_on_topoff": bool,  # Optional. Opt the new session in to automatic
                       resumption when the team's prepayment balance is restored. Defaults to false.
                       Session-scoped, not config-scoped: the referenced config never confers this, so
                       one shared config cannot enrol every session created from it. Omit to leave the
                       default (or to let the ?resume_on_topoff= query parameter supply it).
+                    "workspace_id": "str"  # Optional. Optional persistent workspace to attach at
+                      create; its files are mounted at ``/workspace``. The workspace must be
+                      ``AVAILABLE``"" , otherwise the request returns 409. Accepted only in this JSON
+                      form; an environment spec that contains workspace_id is rejected with 400.
+                      Returns 403 when persistent workspaces are not enabled for the team.
                 }
 
                 # response body for status code(s): 200
@@ -46571,7 +53355,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               manifest or an adapter alias (codex-cli, cursor-cli) is used, and a
                               heuristic entry per credential-looking spec.env value. Populated on the
                               CreateSession response only.
-                        ]
+                        ],
+                        "workspace_id": "str"  # Optional. The persistent workspace attached
+                          to the session, mounted at ``/workspace``. Empty when the session has none.
+                          Fork and rollback return 409 for a session that has a workspace.
                     }
                 }
                 # response body for status code(s): 400, 402, 403, 404, 409, 413, 415, 501, 503
@@ -46759,7 +53546,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               manifest or an adapter alias (codex-cli, cursor-cli) is used, and a
                               heuristic entry per credential-looking spec.env value. Populated on the
                               CreateSession response only.
-                        ]
+                        ],
+                        "workspace_id": "str"  # Optional. The persistent workspace attached
+                          to the session, mounted at ``/workspace``. Empty when the session has none.
+                          Fork and rollback return 409 for a session that has a workspace.
                     }
                 }
                 # response body for status code(s): 400, 402, 403, 404, 409, 413, 415, 501, 503
@@ -46854,11 +53644,16 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                       request. If set, it must equal that region, or the request fails with 400 and a
                       region_mismatch message. Honored only for teams on the regional routing rollout;
                       ignored otherwise.
-                    "resume_on_topoff": bool  # Optional. Opt the new session in to automatic
+                    "resume_on_topoff": bool,  # Optional. Opt the new session in to automatic
                       resumption when the team's prepayment balance is restored. Defaults to false.
                       Session-scoped, not config-scoped: the referenced config never confers this, so
                       one shared config cannot enrol every session created from it. Omit to leave the
                       default (or to let the ?resume_on_topoff= query parameter supply it).
+                    "workspace_id": "str"  # Optional. Optional persistent workspace to attach at
+                      create; its files are mounted at ``/workspace``. The workspace must be
+                      ``AVAILABLE``"" , otherwise the request returns 409. Accepted only in this JSON
+                      form; an environment spec that contains workspace_id is rejected with 400.
+                      Returns 403 when persistent workspaces are not enabled for the team.
                 }
 
                 # response body for status code(s): 200
@@ -46962,7 +53757,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               manifest or an adapter alias (codex-cli, cursor-cli) is used, and a
                               heuristic entry per credential-looking spec.env value. Populated on the
                               CreateSession response only.
-                        ]
+                        ],
+                        "workspace_id": "str"  # Optional. The persistent workspace attached
+                          to the session, mounted at ``/workspace``. Empty when the session has none.
+                          Fork and rollback return 409 for a session that has a workspace.
                     }
                 }
                 # response body for status code(s): 400, 402, 403, 404, 409, 413, 415, 501, 503
@@ -47544,8 +54342,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         # pylint: disable=line-too-long
         """DestroySession tears down the sandbox and marks the session DESTROYED.
 
-        Persistent workspace contents are retained per tenant policy. Returns 204 No Content on
-        success.
+        Persistent workspace contents are retained per tenant policy. A persistent workspace the
+        session holds is saved and kept: it goes to ``RELEASING`` while the files are saved and then
+        back to ``AVAILABLE``. Creating a session on that workspace returns ``409`` until it is
+        ``AVAILABLE`` again. Returns 204 No Content on success.
 
         :param session_id: The session UUID. Required.
         :type session_id: str
@@ -47795,7 +54595,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               manifest or an adapter alias (codex-cli, cursor-cli) is used, and a
                               heuristic entry per credential-looking spec.env value. Populated on the
                               CreateSession response only.
-                        ]
+                        ],
+                        "workspace_id": "str"  # Optional. The persistent workspace attached
+                          to the session, mounted at ``/workspace``. Empty when the session has none.
+                          Fork and rollback return 409 for a session that has a workspace.
                     }
                 }
                 # response body for status code(s): 403, 404, 423
@@ -48063,7 +54866,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               manifest or an adapter alias (codex-cli, cursor-cli) is used, and a
                               heuristic entry per credential-looking spec.env value. Populated on the
                               CreateSession response only.
-                        ]
+                        ],
+                        "workspace_id": "str"  # Optional. The persistent workspace attached
+                          to the session, mounted at ``/workspace``. Empty when the session has none.
+                          Fork and rollback return 409 for a session that has a workspace.
                     }
                 }
                 # response body for status code(s): 400, 403, 404, 409, 423
@@ -48214,7 +55020,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               manifest or an adapter alias (codex-cli, cursor-cli) is used, and a
                               heuristic entry per credential-looking spec.env value. Populated on the
                               CreateSession response only.
-                        ]
+                        ],
+                        "workspace_id": "str"  # Optional. The persistent workspace attached
+                          to the session, mounted at ``/workspace``. Empty when the session has none.
+                          Fork and rollback return 409 for a session that has a workspace.
                     }
                 }
                 # response body for status code(s): 400, 403, 404, 409, 423
@@ -48365,7 +55174,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               manifest or an adapter alias (codex-cli, cursor-cli) is used, and a
                               heuristic entry per credential-looking spec.env value. Populated on the
                               CreateSession response only.
-                        ]
+                        ],
+                        "workspace_id": "str"  # Optional. The persistent workspace attached
+                          to the session, mounted at ``/workspace``. Empty when the session has none.
+                          Fork and rollback return 409 for a session that has a workspace.
                     }
                 }
                 # response body for status code(s): 400, 403, 404, 409, 423
@@ -48753,7 +55565,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         clients never see PENDING on this endpoint and need no poll loop. The checkpoint binds the
         machine-state capture to the event-log cursor at the cut, so it can later seed forks (POST
         .../fork) and rollback. Checkpoints are taken between turns; a session with an active turn in
-        flight returns 409.
+        flight returns 409. A checkpoint captures machine state only: the files of a persistent
+        workspace the session has are not in it, and are saved by the workspace itself.
 
         :param session_id: The session UUID. Required.
         :type session_id: str
@@ -48834,7 +55647,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         clients never see PENDING on this endpoint and need no poll loop. The checkpoint binds the
         machine-state capture to the event-log cursor at the cut, so it can later seed forks (POST
         .../fork) and rollback. Checkpoints are taken between turns; a session with an active turn in
-        flight returns 409.
+        flight returns 409. A checkpoint captures machine state only: the files of a persistent
+        workspace the session has are not in it, and are saved by the workspace itself.
 
         :param session_id: The session UUID. Required.
         :type session_id: str
@@ -48907,7 +55721,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         clients never see PENDING on this endpoint and need no poll loop. The checkpoint binds the
         machine-state capture to the event-log cursor at the cut, so it can later seed forks (POST
         .../fork) and rollback. Checkpoints are taken between turns; a session with an active turn in
-        flight returns 409.
+        flight returns 409. A checkpoint captures machine state only: the files of a persistent
+        workspace the session has are not in it, and are saved by the workspace itself.
 
         :param session_id: The session UUID. Required.
         :type session_id: str
@@ -49800,7 +56615,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               manifest or an adapter alias (codex-cli, cursor-cli) is used, and a
                               heuristic entry per credential-looking spec.env value. Populated on the
                               CreateSession response only.
-                        ]
+                        ],
+                        "workspace_id": "str"  # Optional. The persistent workspace attached
+                          to the session, mounted at ``/workspace``. Empty when the session has none.
+                          Fork and rollback return 409 for a session that has a workspace.
                     }
                 }
                 # response body for status code(s): 402, 403, 404, 409, 423, 501
@@ -50126,7 +56944,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                   legacy-envelope manifest or an adapter alias (codex-cli, cursor-cli)
                                   is used, and a heuristic entry per credential-looking spec.env value.
                                   Populated on the CreateSession response only.
-                            ]
+                            ],
+                            "workspace_id": "str"  # Optional. The persistent workspace
+                              attached to the session, mounted at ``/workspace``. Empty when the
+                              session has none. Fork and rollback return 409 for a session that has a
+                              workspace.
                         }
                     ]
                 }
@@ -50285,7 +57107,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                   legacy-envelope manifest or an adapter alias (codex-cli, cursor-cli)
                                   is used, and a heuristic entry per credential-looking spec.env value.
                                   Populated on the CreateSession response only.
-                            ]
+                            ],
+                            "workspace_id": "str"  # Optional. The persistent workspace
+                              attached to the session, mounted at ``/workspace``. Empty when the
+                              session has none. Fork and rollback return 409 for a session that has a
+                              workspace.
                         }
                     ]
                 }
@@ -50449,7 +57275,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                   legacy-envelope manifest or an adapter alias (codex-cli, cursor-cli)
                                   is used, and a heuristic entry per credential-looking spec.env value.
                                   Populated on the CreateSession response only.
-                            ]
+                            ],
+                            "workspace_id": "str"  # Optional. The persistent workspace
+                              attached to the session, mounted at ``/workspace``. Empty when the
+                              session has none. Fork and rollback return 409 for a session that has a
+                              workspace.
                         }
                     ]
                 }
@@ -56892,6 +63722,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         session) and forbids ``session_template``. ``output.mode`` selects the destination block
         (email/slack),
         which is stored encrypted. ``name`` must be unique per team among non-deleted triggers.
+        Triggers do
+        not support persistent workspaces: a ``session_template`` that names ``workspace_id``\\ , and a
+        ``bound_session_id`` whose session has a workspace, are both refused.
 
         For webhook triggers the response includes ``webhook_secret`` exactly ONCE - it is never
         returned
@@ -57071,6 +63904,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         session) and forbids ``session_template``. ``output.mode`` selects the destination block
         (email/slack),
         which is stored encrypted. ``name`` must be unique per team among non-deleted triggers.
+        Triggers do
+        not support persistent workspaces: a ``session_template`` that names ``workspace_id``\\ , and a
+        ``bound_session_id`` whose session has a workspace, are both refused.
 
         For webhook triggers the response includes ``webhook_secret`` exactly ONCE - it is never
         returned
@@ -57205,6 +64041,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         session) and forbids ``session_template``. ``output.mode`` selects the destination block
         (email/slack),
         which is stored encrypted. ``name`` must be unique per team among non-deleted triggers.
+        Triggers do
+        not support persistent workspaces: a ``session_template`` that names ``workspace_id``\\ , and a
+        ``bound_session_id`` whose session has a workspace, are both refused.
 
         For webhook triggers the response includes ``webhook_secret`` exactly ONCE - it is never
         returned
@@ -59711,6 +66550,1030 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
             return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
 
         return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def list_workspaces(
+        self,
+        *,
+        page_size: Optional[int] = None,
+        page_token: Optional[str] = None,
+        state: Optional[str] = None,
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List the team's persistent workspaces.
+
+        Lists the calling team's persistent workspaces, optionally only those in one state. A page can
+        hold fewer results than page_size, so keep paging until next_page_token is empty.
+
+        :keyword page_size: Page size. The server applies a default when omitted and clamps large
+         values. Default value is None.
+        :paramtype page_size: int
+        :keyword page_token: Opaque cursor returned by the previous page. Empty starts from the
+         beginning. Default value is None.
+        :paramtype page_token: str
+        :keyword state: Only list workspaces in this state. Known values are: "AVAILABLE", "ATTACHING",
+         "ATTACHED", "RELEASING", "FAILED", and "DELETING". Default value is None.
+        :paramtype state: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "next_page_token": "str",  # Optional. Opaque cursor for the next page. Empty
+                      when there are no further pages. A page can hold fewer results than page_size, so
+                      keep paging until this is empty.
+                    "workspaces": [
+                        {
+                            "bytes_used": 0,  # Estimated used space in bytes as of the
+                              last save. It can differ from the usage seen inside the session.
+                              Required.
+                            "created_at": "2020-02-20 00:00:00",  # When the workspace
+                              was created. Required.
+                            "created_by": "str",  # UUID of the user that created the
+                              workspace. Required.
+                            "size_limit_gib": 0,  # Size limit in GiB, fixed at create.
+                              It is a quota, so the filesystem total inside the session is slightly
+                              lower. Required.
+                            "state": "str",  # Lifecycle state of a persistent workspace.
+                              `AVAILABLE`: ready to attach to a new session. `ATTACHING`: a session is
+                              being created with it. `ATTACHED`: a session is using it. `RELEASING`:
+                              the session was removed and the files are being saved. `FAILED`: the
+                              workspace could not be saved or created; it keeps its last successful
+                              save. `DELETING`: a delete is in progress. States may be added; treat an
+                              unknown value as unavailable. Required. Known values are: "AVAILABLE",
+                              "ATTACHING", "ATTACHED", "RELEASING", "FAILED", and "DELETING".
+                            "updated_at": "2020-02-20 00:00:00",  # When a user request
+                              last changed the workspace. Equal to created_at until then. Saves made by
+                              the platform do not change it. Required.
+                            "updated_by": "str",  # UUID of the user whose request last
+                              changed the workspace. Equal to created_by until then. Required.
+                            "workspace_id": "str",  # Assigned at create and never
+                              reused. Treat it as an opaque string. Required.
+                            "attached_session_id": "str",  # Optional. The session that
+                              holds the workspace. Absent when no session does.
+                            "last_saved_at": "2020-02-20 00:00:00",  # Optional. Time of
+                              the newest complete save. Absent until the first save.
+                            "name": "str"  # Optional. Optional label. Not unique, and
+                              never accepted in place of workspace_id.
+                        }
+                    ]
+                }
+                # response body for status code(s): 400, 403, 501, 503
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_harness_list_workspaces_request(
+            page_size=page_size,
+            page_token=page_token,
+            state=state,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 501, 503]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 501:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 503:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    def create_workspace(
+        self,
+        body: JSON,
+        *,
+        idempotency_key: Optional[str] = None,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a persistent workspace.
+
+        Creates a persistent workspace with a fixed size limit. A workspace is a set of files with its
+        own ID that is mounted at ``/workspace`` in the session it is attached to, and is kept when
+        that session is removed. Attach it to a session by passing ``workspace_id`` when you create the
+        session from an Environment Config. A new workspace returns ``201``. A retry with the same
+        ``Idempotency-Key`` and body within 24 hours returns the existing workspace with ``200``.
+        Persistent workspaces are in public preview, free during public preview, and enabled per team;
+        for a team without access this returns ``403``.
+
+        :param body: Required.
+        :type body: JSON
+        :keyword idempotency_key: Optional key that makes retries safe. Within 24 hours, the same key
+         and body return the workspace the first request created, and the same key with a different body
+         returns ``422``. Default value is None.
+        :paramtype idempotency_key: str
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "size_limit_gib": 0,  # Size limit of the workspace in GiB, from 1 to 100. A
+                      team limit can lower the maximum. The size cannot be changed after create.
+                      Required.
+                    "name": "str"  # Optional. Optional label of at most 255 characters. It does
+                      not need to be unique.
+                }
+
+                # response body for status code(s): 200, 201
+                response == {
+                    "workspace": {
+                        "bytes_used": 0,  # Estimated used space in bytes as of the last
+                          save. It can differ from the usage seen inside the session. Required.
+                        "created_at": "2020-02-20 00:00:00",  # When the workspace was
+                          created. Required.
+                        "created_by": "str",  # UUID of the user that created the workspace.
+                          Required.
+                        "size_limit_gib": 0,  # Size limit in GiB, fixed at create. It is a
+                          quota, so the filesystem total inside the session is slightly lower.
+                          Required.
+                        "state": "str",  # Lifecycle state of a persistent workspace.
+                          `AVAILABLE`: ready to attach to a new session. `ATTACHING`: a session is
+                          being created with it. `ATTACHED`: a session is using it. `RELEASING`: the
+                          session was removed and the files are being saved. `FAILED`: the workspace
+                          could not be saved or created; it keeps its last successful save. `DELETING`:
+                          a delete is in progress. States may be added; treat an unknown value as
+                          unavailable. Required. Known values are: "AVAILABLE", "ATTACHING",
+                          "ATTACHED", "RELEASING", "FAILED", and "DELETING".
+                        "updated_at": "2020-02-20 00:00:00",  # When a user request last
+                          changed the workspace. Equal to created_at until then. Saves made by the
+                          platform do not change it. Required.
+                        "updated_by": "str",  # UUID of the user whose request last changed
+                          the workspace. Equal to created_by until then. Required.
+                        "workspace_id": "str",  # Assigned at create and never reused. Treat
+                          it as an opaque string. Required.
+                        "attached_session_id": "str",  # Optional. The session that holds the
+                          workspace. Absent when no session does.
+                        "last_saved_at": "2020-02-20 00:00:00",  # Optional. Time of the
+                          newest complete save. Absent until the first save.
+                        "name": "str"  # Optional. Optional label. Not unique, and never
+                          accepted in place of workspace_id.
+                    }
+                }
+                # response body for status code(s): 400, 403, 409, 422, 501, 503
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    def create_workspace(
+        self,
+        body: IO[bytes],
+        *,
+        idempotency_key: Optional[str] = None,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a persistent workspace.
+
+        Creates a persistent workspace with a fixed size limit. A workspace is a set of files with its
+        own ID that is mounted at ``/workspace`` in the session it is attached to, and is kept when
+        that session is removed. Attach it to a session by passing ``workspace_id`` when you create the
+        session from an Environment Config. A new workspace returns ``201``. A retry with the same
+        ``Idempotency-Key`` and body within 24 hours returns the existing workspace with ``200``.
+        Persistent workspaces are in public preview, free during public preview, and enabled per team;
+        for a team without access this returns ``403``.
+
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword idempotency_key: Optional key that makes retries safe. Within 24 hours, the same key
+         and body return the workspace the first request created, and the same key with a different body
+         returns ``422``. Default value is None.
+        :paramtype idempotency_key: str
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200, 201
+                response == {
+                    "workspace": {
+                        "bytes_used": 0,  # Estimated used space in bytes as of the last
+                          save. It can differ from the usage seen inside the session. Required.
+                        "created_at": "2020-02-20 00:00:00",  # When the workspace was
+                          created. Required.
+                        "created_by": "str",  # UUID of the user that created the workspace.
+                          Required.
+                        "size_limit_gib": 0,  # Size limit in GiB, fixed at create. It is a
+                          quota, so the filesystem total inside the session is slightly lower.
+                          Required.
+                        "state": "str",  # Lifecycle state of a persistent workspace.
+                          `AVAILABLE`: ready to attach to a new session. `ATTACHING`: a session is
+                          being created with it. `ATTACHED`: a session is using it. `RELEASING`: the
+                          session was removed and the files are being saved. `FAILED`: the workspace
+                          could not be saved or created; it keeps its last successful save. `DELETING`:
+                          a delete is in progress. States may be added; treat an unknown value as
+                          unavailable. Required. Known values are: "AVAILABLE", "ATTACHING",
+                          "ATTACHED", "RELEASING", "FAILED", and "DELETING".
+                        "updated_at": "2020-02-20 00:00:00",  # When a user request last
+                          changed the workspace. Equal to created_at until then. Saves made by the
+                          platform do not change it. Required.
+                        "updated_by": "str",  # UUID of the user whose request last changed
+                          the workspace. Equal to created_by until then. Required.
+                        "workspace_id": "str",  # Assigned at create and never reused. Treat
+                          it as an opaque string. Required.
+                        "attached_session_id": "str",  # Optional. The session that holds the
+                          workspace. Absent when no session does.
+                        "last_saved_at": "2020-02-20 00:00:00",  # Optional. Time of the
+                          newest complete save. Absent until the first save.
+                        "name": "str"  # Optional. Optional label. Not unique, and never
+                          accepted in place of workspace_id.
+                    }
+                }
+                # response body for status code(s): 400, 403, 409, 422, 501, 503
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace
+    def create_workspace(
+        self,
+        body: Union[JSON, IO[bytes]],
+        *,
+        idempotency_key: Optional[str] = None,
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a persistent workspace.
+
+        Creates a persistent workspace with a fixed size limit. A workspace is a set of files with its
+        own ID that is mounted at ``/workspace`` in the session it is attached to, and is kept when
+        that session is removed. Attach it to a session by passing ``workspace_id`` when you create the
+        session from an Environment Config. A new workspace returns ``201``. A retry with the same
+        ``Idempotency-Key`` and body within 24 hours returns the existing workspace with ``200``.
+        Persistent workspaces are in public preview, free during public preview, and enabled per team;
+        for a team without access this returns ``403``.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :keyword idempotency_key: Optional key that makes retries safe. Within 24 hours, the same key
+         and body return the workspace the first request created, and the same key with a different body
+         returns ``422``. Default value is None.
+        :paramtype idempotency_key: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "size_limit_gib": 0,  # Size limit of the workspace in GiB, from 1 to 100. A
+                      team limit can lower the maximum. The size cannot be changed after create.
+                      Required.
+                    "name": "str"  # Optional. Optional label of at most 255 characters. It does
+                      not need to be unique.
+                }
+
+                # response body for status code(s): 200, 201
+                response == {
+                    "workspace": {
+                        "bytes_used": 0,  # Estimated used space in bytes as of the last
+                          save. It can differ from the usage seen inside the session. Required.
+                        "created_at": "2020-02-20 00:00:00",  # When the workspace was
+                          created. Required.
+                        "created_by": "str",  # UUID of the user that created the workspace.
+                          Required.
+                        "size_limit_gib": 0,  # Size limit in GiB, fixed at create. It is a
+                          quota, so the filesystem total inside the session is slightly lower.
+                          Required.
+                        "state": "str",  # Lifecycle state of a persistent workspace.
+                          `AVAILABLE`: ready to attach to a new session. `ATTACHING`: a session is
+                          being created with it. `ATTACHED`: a session is using it. `RELEASING`: the
+                          session was removed and the files are being saved. `FAILED`: the workspace
+                          could not be saved or created; it keeps its last successful save. `DELETING`:
+                          a delete is in progress. States may be added; treat an unknown value as
+                          unavailable. Required. Known values are: "AVAILABLE", "ATTACHING",
+                          "ATTACHED", "RELEASING", "FAILED", and "DELETING".
+                        "updated_at": "2020-02-20 00:00:00",  # When a user request last
+                          changed the workspace. Equal to created_at until then. Saves made by the
+                          platform do not change it. Required.
+                        "updated_by": "str",  # UUID of the user whose request last changed
+                          the workspace. Equal to created_by until then. Required.
+                        "workspace_id": "str",  # Assigned at create and never reused. Treat
+                          it as an opaque string. Required.
+                        "attached_session_id": "str",  # Optional. The session that holds the
+                          workspace. Absent when no session does.
+                        "last_saved_at": "2020-02-20 00:00:00",  # Optional. Time of the
+                          newest complete save. Absent until the first save.
+                        "name": "str"  # Optional. Optional label. Not unique, and never
+                          accepted in place of workspace_id.
+                    }
+                }
+                # response body for status code(s): 400, 403, 409, 422, 501, 503
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_harness_create_workspace_request(
+            idempotency_key=idempotency_key,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 201, 400, 403, 409, 422, 501, 503]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 201:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 422:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 501:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 503:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def get_workspace(self, workspace_id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Get a persistent workspace.
+
+        Returns one persistent workspace by its ID, including its state and when its files were last
+        saved. Use it to wait for a workspace to return to ``AVAILABLE`` after the session that held it
+        was removed.
+
+        :param workspace_id: The workspace ID. Workspace names are not accepted. Required.
+        :type workspace_id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "workspace": {
+                        "bytes_used": 0,  # Estimated used space in bytes as of the last
+                          save. It can differ from the usage seen inside the session. Required.
+                        "created_at": "2020-02-20 00:00:00",  # When the workspace was
+                          created. Required.
+                        "created_by": "str",  # UUID of the user that created the workspace.
+                          Required.
+                        "size_limit_gib": 0,  # Size limit in GiB, fixed at create. It is a
+                          quota, so the filesystem total inside the session is slightly lower.
+                          Required.
+                        "state": "str",  # Lifecycle state of a persistent workspace.
+                          `AVAILABLE`: ready to attach to a new session. `ATTACHING`: a session is
+                          being created with it. `ATTACHED`: a session is using it. `RELEASING`: the
+                          session was removed and the files are being saved. `FAILED`: the workspace
+                          could not be saved or created; it keeps its last successful save. `DELETING`:
+                          a delete is in progress. States may be added; treat an unknown value as
+                          unavailable. Required. Known values are: "AVAILABLE", "ATTACHING",
+                          "ATTACHED", "RELEASING", "FAILED", and "DELETING".
+                        "updated_at": "2020-02-20 00:00:00",  # When a user request last
+                          changed the workspace. Equal to created_at until then. Saves made by the
+                          platform do not change it. Required.
+                        "updated_by": "str",  # UUID of the user whose request last changed
+                          the workspace. Equal to created_by until then. Required.
+                        "workspace_id": "str",  # Assigned at create and never reused. Treat
+                          it as an opaque string. Required.
+                        "attached_session_id": "str",  # Optional. The session that holds the
+                          workspace. Absent when no session does.
+                        "last_saved_at": "2020-02-20 00:00:00",  # Optional. Time of the
+                          newest complete save. Absent until the first save.
+                        "name": "str"  # Optional. Optional label. Not unique, and never
+                          accepted in place of workspace_id.
+                    }
+                }
+                # response body for status code(s): 403, 404, 501, 503
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_harness_get_workspace_request(
+            workspace_id=workspace_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 403, 404, 501, 503]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 501:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 503:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def delete_workspace(self, workspace_id: str, **kwargs: Any) -> Optional[JSON]:
+        # pylint: disable=line-too-long
+        """Delete a persistent workspace.
+
+        Permanently deletes a persistent workspace and its files. Only a workspace that is
+        ``AVAILABLE`` or ``FAILED`` can be deleted; remove the session that holds it first. Workspaces
+        are never deleted automatically.
+
+        :param workspace_id: The workspace ID. Workspace names are not accepted. Required.
+        :type workspace_id: str
+        :return: JSON object or None
+        :rtype: JSON or None
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 403, 404, 409, 501, 503
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[Optional[JSON]] = kwargs.pop("cls", None)
+
+        _request = build_harness_delete_workspace_request(
+            workspace_id=workspace_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [204, 403, 404, 409, 501, 503]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        deserialized = None
+        response_headers = {}
+        if response.status_code == 204:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 501:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 503:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, deserialized, response_headers)  # type: ignore
+
+        return deserialized  # type: ignore
 
 
 class AppsOperations:  # pylint: disable=too-many-public-methods
@@ -208622,6 +216485,1426 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
         return deserialized  # type: ignore
 
     @distributed_trace
+    def list_dashboards(
+        self,
+        *,
+        pagination_page: int = 1,
+        pagination_per_page: int = 20,
+        pagination_sort: Optional[str] = None,
+        pagination_sort_direction: Optional[str] = None,
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Dashboards.
+
+        To list the dashboards in your team, send a GET request to
+        ``/v2/insights/dashboards``.
+
+        Results are paginated with ``pagination.page`` and ``pagination.per_page``
+        (default ``20``\\ , maximum ``200``\\ ) and can be sorted with ``pagination.sort``
+        (\\ ``name``\\ , ``created_at``\\ , or ``updated_at``\\ ) and ``pagination.sort_direction``.
+        When ``pagination.sort`` is omitted, dashboards are ordered by ``created_at``
+        descending. When it is set, the direction defaults to ``asc`` unless
+        ``pagination.sort_direction`` is also given.
+
+        :keyword pagination_page: Which 'page' of paginated results to return. Default value is 1.
+        :paramtype pagination_page: int
+        :keyword pagination_per_page: Number of items returned per page. Values above ``200`` are
+         rejected with ``400``. Default value is 20.
+        :paramtype pagination_per_page: int
+        :keyword pagination_sort: Field to sort by. Matched case-insensitively. When omitted, results
+         are ordered by ``created_at`` descending. Any other value is rejected with ``400``. Known
+         values are: "name", "created_at", and "updated_at". Default value is None.
+        :paramtype pagination_sort: str
+        :keyword pagination_sort_direction: Sort direction. Only applied when ``pagination.sort`` is
+         set, in which case it defaults to ``asc``. When ``pagination.sort`` is omitted, results are
+         ordered by ``created_at`` descending regardless of this parameter. Known values are: "asc" and
+         "desc". Default value is None.
+        :paramtype pagination_sort_direction: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "pagination": {
+                        "page": 0,  # The current page number. Required.
+                        "per_page": 0,  # The number of items per page. Required.
+                        "pages": 0,  # Optional. The total number of pages. Omitted when
+                          there are no results.
+                        "total": 0  # Optional. The total number of dashboards across all
+                          pages. Omitted when there are no results.
+                    },
+                    "dashboards": [
+                        {
+                            "created_at": "2020-02-20 00:00:00",  # Time the dashboard
+                              was created. Required.
+                            "spec": "str",  # The dashboard definition as a JSON document
+                              serialized to a string. The document must have ``kind`` set to
+                              ``Dashboard`` and a ``spec.display.name`` between 1 and 255 characters,
+                              which is projected to ``name``. An optional ``spec.display.description``
+                              of up to 1000 characters is projected to ``description``. Retrieve the
+                              full JSON Schema from ``GET /v2/insights/dashboards/schema``. The
+                              document is returned in a normalized form: content is unchanged, but
+                              object keys may be reordered and whitespace may differ from the submitted
+                              string. Required.
+                            "updated_at": "2020-02-20 00:00:00",  # Time the dashboard
+                              was last updated. Required.
+                            "uuid": "str",  # A unique identifier for the dashboard.
+                              Required.
+                            "description": "str",  # Optional. The dashboard's display
+                              description. Populated by the server from ``spec.display.description``""
+                              ; it cannot be set directly. Omitted when the spec has no description.
+                            "name": "str"  # Optional. The dashboard's display name.
+                              Populated by the server from ``spec.display.name``"" ; it cannot be set
+                              directly. Omitted when ``spec.display.name`` is an empty string.
+                        }
+                    ]
+                }
+                # response body for status code(s): 400, 500
+                response == {
+                    "code": 0,  # The gRPC status code for the error. ``3`` = invalid argument,
+                      ``5`` = not found, ``6`` = already exists, ``8`` = resource exhausted, ``13`` =
+                      internal. Required.
+                    "error": "str",  # A human-readable description of the error. Identical to
+                      ``message``. Required.
+                    "message": "str",  # A human-readable description of the error. Identical to
+                      ``error``. Required.
+                    "details": [
+                        {
+                            "str": {}  # Optional. Additional machine-readable error
+                              details. Omitted when there are none. Each entry carries an ``@type``
+                              identifying its schema.
+                        }
+                    ]
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_insights_list_dashboards_request(
+            pagination_page=pagination_page,
+            pagination_per_page=pagination_per_page,
+            pagination_sort=pagination_sort,
+            pagination_sort_direction=pagination_sort_direction,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 429, 500]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 429:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 500:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    def create_dashboard(
+        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Dashboard.
+
+        To create a dashboard, send a POST request to ``/v2/insights/dashboards``
+        with a ``spec`` containing the dashboard definition as a JSON document
+        serialized to a string.
+
+        The server derives the dashboard's ``name`` and ``description`` from
+        ``spec.display.name`` and ``spec.display.description``. Dashboard names are
+        unique within a team; reusing a name returns ``409``.
+
+        The response status is ``200`` and the body contains the created dashboard.
+
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "spec": "str"  # The dashboard definition as a JSON document serialized to a
+                      string. The document must have ``kind`` set to ``Dashboard`` and a
+                      ``spec.display.name`` between 1 and 255 characters. An empty value or a value
+                      that is not valid JSON is rejected with ``400``. Retrieve the full JSON Schema
+                      from ``GET /v2/insights/dashboards/schema``. Required.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "dashboard": {
+                        "created_at": "2020-02-20 00:00:00",  # Time the dashboard was
+                          created. Required.
+                        "spec": "str",  # The dashboard definition as a JSON document
+                          serialized to a string. The document must have ``kind`` set to ``Dashboard``
+                          and a ``spec.display.name`` between 1 and 255 characters, which is projected
+                          to ``name``. An optional ``spec.display.description`` of up to 1000
+                          characters is projected to ``description``. Retrieve the full JSON Schema
+                          from ``GET /v2/insights/dashboards/schema``. The document is returned in a
+                          normalized form: content is unchanged, but object keys may be reordered and
+                          whitespace may differ from the submitted string. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # Time the dashboard was last
+                          updated. Required.
+                        "uuid": "str",  # A unique identifier for the dashboard. Required.
+                        "description": "str",  # Optional. The dashboard's display
+                          description. Populated by the server from ``spec.display.description``"" ; it
+                          cannot be set directly. Omitted when the spec has no description.
+                        "name": "str"  # Optional. The dashboard's display name. Populated by
+                          the server from ``spec.display.name``"" ; it cannot be set directly. Omitted
+                          when ``spec.display.name`` is an empty string.
+                    }
+                }
+                # response body for status code(s): 400, 409, 500
+                response == {
+                    "code": 0,  # The gRPC status code for the error. ``3`` = invalid argument,
+                      ``5`` = not found, ``6`` = already exists, ``8`` = resource exhausted, ``13`` =
+                      internal. Required.
+                    "error": "str",  # A human-readable description of the error. Identical to
+                      ``message``. Required.
+                    "message": "str",  # A human-readable description of the error. Identical to
+                      ``error``. Required.
+                    "details": [
+                        {
+                            "str": {}  # Optional. Additional machine-readable error
+                              details. Omitted when there are none. Each entry carries an ``@type``
+                              identifying its schema.
+                        }
+                    ]
+                }
+        """
+
+    @overload
+    def create_dashboard(
+        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Dashboard.
+
+        To create a dashboard, send a POST request to ``/v2/insights/dashboards``
+        with a ``spec`` containing the dashboard definition as a JSON document
+        serialized to a string.
+
+        The server derives the dashboard's ``name`` and ``description`` from
+        ``spec.display.name`` and ``spec.display.description``. Dashboard names are
+        unique within a team; reusing a name returns ``409``.
+
+        The response status is ``200`` and the body contains the created dashboard.
+
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "dashboard": {
+                        "created_at": "2020-02-20 00:00:00",  # Time the dashboard was
+                          created. Required.
+                        "spec": "str",  # The dashboard definition as a JSON document
+                          serialized to a string. The document must have ``kind`` set to ``Dashboard``
+                          and a ``spec.display.name`` between 1 and 255 characters, which is projected
+                          to ``name``. An optional ``spec.display.description`` of up to 1000
+                          characters is projected to ``description``. Retrieve the full JSON Schema
+                          from ``GET /v2/insights/dashboards/schema``. The document is returned in a
+                          normalized form: content is unchanged, but object keys may be reordered and
+                          whitespace may differ from the submitted string. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # Time the dashboard was last
+                          updated. Required.
+                        "uuid": "str",  # A unique identifier for the dashboard. Required.
+                        "description": "str",  # Optional. The dashboard's display
+                          description. Populated by the server from ``spec.display.description``"" ; it
+                          cannot be set directly. Omitted when the spec has no description.
+                        "name": "str"  # Optional. The dashboard's display name. Populated by
+                          the server from ``spec.display.name``"" ; it cannot be set directly. Omitted
+                          when ``spec.display.name`` is an empty string.
+                    }
+                }
+                # response body for status code(s): 400, 409, 500
+                response == {
+                    "code": 0,  # The gRPC status code for the error. ``3`` = invalid argument,
+                      ``5`` = not found, ``6`` = already exists, ``8`` = resource exhausted, ``13`` =
+                      internal. Required.
+                    "error": "str",  # A human-readable description of the error. Identical to
+                      ``message``. Required.
+                    "message": "str",  # A human-readable description of the error. Identical to
+                      ``error``. Required.
+                    "details": [
+                        {
+                            "str": {}  # Optional. Additional machine-readable error
+                              details. Omitted when there are none. Each entry carries an ``@type``
+                              identifying its schema.
+                        }
+                    ]
+                }
+        """
+
+    @distributed_trace
+    def create_dashboard(self, body: Union[JSON, IO[bytes]], **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Dashboard.
+
+        To create a dashboard, send a POST request to ``/v2/insights/dashboards``
+        with a ``spec`` containing the dashboard definition as a JSON document
+        serialized to a string.
+
+        The server derives the dashboard's ``name`` and ``description`` from
+        ``spec.display.name`` and ``spec.display.description``. Dashboard names are
+        unique within a team; reusing a name returns ``409``.
+
+        The response status is ``200`` and the body contains the created dashboard.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "spec": "str"  # The dashboard definition as a JSON document serialized to a
+                      string. The document must have ``kind`` set to ``Dashboard`` and a
+                      ``spec.display.name`` between 1 and 255 characters. An empty value or a value
+                      that is not valid JSON is rejected with ``400``. Retrieve the full JSON Schema
+                      from ``GET /v2/insights/dashboards/schema``. Required.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "dashboard": {
+                        "created_at": "2020-02-20 00:00:00",  # Time the dashboard was
+                          created. Required.
+                        "spec": "str",  # The dashboard definition as a JSON document
+                          serialized to a string. The document must have ``kind`` set to ``Dashboard``
+                          and a ``spec.display.name`` between 1 and 255 characters, which is projected
+                          to ``name``. An optional ``spec.display.description`` of up to 1000
+                          characters is projected to ``description``. Retrieve the full JSON Schema
+                          from ``GET /v2/insights/dashboards/schema``. The document is returned in a
+                          normalized form: content is unchanged, but object keys may be reordered and
+                          whitespace may differ from the submitted string. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # Time the dashboard was last
+                          updated. Required.
+                        "uuid": "str",  # A unique identifier for the dashboard. Required.
+                        "description": "str",  # Optional. The dashboard's display
+                          description. Populated by the server from ``spec.display.description``"" ; it
+                          cannot be set directly. Omitted when the spec has no description.
+                        "name": "str"  # Optional. The dashboard's display name. Populated by
+                          the server from ``spec.display.name``"" ; it cannot be set directly. Omitted
+                          when ``spec.display.name`` is an empty string.
+                    }
+                }
+                # response body for status code(s): 400, 409, 500
+                response == {
+                    "code": 0,  # The gRPC status code for the error. ``3`` = invalid argument,
+                      ``5`` = not found, ``6`` = already exists, ``8`` = resource exhausted, ``13`` =
+                      internal. Required.
+                    "error": "str",  # A human-readable description of the error. Identical to
+                      ``message``. Required.
+                    "message": "str",  # A human-readable description of the error. Identical to
+                      ``error``. Required.
+                    "details": [
+                        {
+                            "str": {}  # Optional. Additional machine-readable error
+                              details. Omitted when there are none. Each entry carries an ``@type``
+                              identifying its schema.
+                        }
+                    ]
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_insights_create_dashboard_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 409, 429, 500]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 429:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 500:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def get_dashboard_schema(self, **kwargs: Any) -> Union[Dict[str, Any], JSON]:
+        # pylint: disable=line-too-long
+        """Retrieve the Dashboard Schema.
+
+        To retrieve the JSON Schema that dashboard ``spec`` documents must satisfy,
+        send a GET request to ``/v2/insights/dashboards/schema``.
+
+        The response body is the JSON Schema document itself (draft 2020-12). Use
+        it to validate a dashboard definition before sending it to the create or
+        update endpoints.
+
+        :return: dict mapping str to any or JSON object
+        :rtype: dict[str, any] or JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "str": {}  # Optional.
+                }
+                # response body for status code(s): 500
+                response == {
+                    "code": 0,  # The gRPC status code for the error. ``3`` = invalid argument,
+                      ``5`` = not found, ``6`` = already exists, ``8`` = resource exhausted, ``13`` =
+                      internal. Required.
+                    "error": "str",  # A human-readable description of the error. Identical to
+                      ``message``. Required.
+                    "message": "str",  # A human-readable description of the error. Identical to
+                      ``error``. Required.
+                    "details": [
+                        {
+                            "str": {}  # Optional. Additional machine-readable error
+                              details. Omitted when there are none. Each entry carries an ``@type``
+                              identifying its schema.
+                        }
+                    ]
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[Union[Dict[str, Any], JSON]] = kwargs.pop("cls", None)
+
+        _request = build_insights_get_dashboard_schema_request(
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 429, 500]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 429:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 500:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(Union[Dict[str, Any], JSON], deserialized), response_headers)  # type: ignore
+
+        return cast(Union[Dict[str, Any], JSON], deserialized)  # type: ignore
+
+    @distributed_trace
+    def get_dashboard(self, uuid: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve a Dashboard.
+
+        To retrieve a dashboard, send a GET request to
+        ``/v2/insights/dashboards/{uuid}``.
+
+        :param uuid: The unique identifier of the dashboard. Unknown, deleted, or malformed identifiers
+         return ``404``. Required.
+        :type uuid: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "dashboard": {
+                        "created_at": "2020-02-20 00:00:00",  # Time the dashboard was
+                          created. Required.
+                        "spec": "str",  # The dashboard definition as a JSON document
+                          serialized to a string. The document must have ``kind`` set to ``Dashboard``
+                          and a ``spec.display.name`` between 1 and 255 characters, which is projected
+                          to ``name``. An optional ``spec.display.description`` of up to 1000
+                          characters is projected to ``description``. Retrieve the full JSON Schema
+                          from ``GET /v2/insights/dashboards/schema``. The document is returned in a
+                          normalized form: content is unchanged, but object keys may be reordered and
+                          whitespace may differ from the submitted string. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # Time the dashboard was last
+                          updated. Required.
+                        "uuid": "str",  # A unique identifier for the dashboard. Required.
+                        "description": "str",  # Optional. The dashboard's display
+                          description. Populated by the server from ``spec.display.description``"" ; it
+                          cannot be set directly. Omitted when the spec has no description.
+                        "name": "str"  # Optional. The dashboard's display name. Populated by
+                          the server from ``spec.display.name``"" ; it cannot be set directly. Omitted
+                          when ``spec.display.name`` is an empty string.
+                    }
+                }
+                # response body for status code(s): 404, 500
+                response == {
+                    "code": 0,  # The gRPC status code for the error. ``3`` = invalid argument,
+                      ``5`` = not found, ``6`` = already exists, ``8`` = resource exhausted, ``13`` =
+                      internal. Required.
+                    "error": "str",  # A human-readable description of the error. Identical to
+                      ``message``. Required.
+                    "message": "str",  # A human-readable description of the error. Identical to
+                      ``error``. Required.
+                    "details": [
+                        {
+                            "str": {}  # Optional. Additional machine-readable error
+                              details. Omitted when there are none. Each entry carries an ``@type``
+                              identifying its schema.
+                        }
+                    ]
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_insights_get_dashboard_request(
+            uuid=uuid,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404, 429, 500]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 429:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 500:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    def update_dashboard(
+        self,
+        uuid: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update a Dashboard.
+
+        To update a dashboard, send a PUT request to
+        ``/v2/insights/dashboards/{uuid}`` with a ``spec`` containing the full
+        dashboard definition as a JSON document serialized to a string.
+
+        This endpoint uses replace semantics: the stored ``spec`` is overwritten in
+        full and ``name`` and ``description`` are recomputed from the new
+        ``spec.display``. Changing the name to one already used by another dashboard
+        in your team returns ``409``.
+
+        :param uuid: The unique identifier of the dashboard. Unknown, deleted, or malformed identifiers
+         return ``404``. Required.
+        :type uuid: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "spec": "str"  # The dashboard definition as a JSON document serialized to a
+                      string. The document must have ``kind`` set to ``Dashboard`` and a
+                      ``spec.display.name`` between 1 and 255 characters. An empty value or a value
+                      that is not valid JSON is rejected with ``400``. Retrieve the full JSON Schema
+                      from ``GET /v2/insights/dashboards/schema``. Required.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "dashboard": {
+                        "created_at": "2020-02-20 00:00:00",  # Time the dashboard was
+                          created. Required.
+                        "spec": "str",  # The dashboard definition as a JSON document
+                          serialized to a string. The document must have ``kind`` set to ``Dashboard``
+                          and a ``spec.display.name`` between 1 and 255 characters, which is projected
+                          to ``name``. An optional ``spec.display.description`` of up to 1000
+                          characters is projected to ``description``. Retrieve the full JSON Schema
+                          from ``GET /v2/insights/dashboards/schema``. The document is returned in a
+                          normalized form: content is unchanged, but object keys may be reordered and
+                          whitespace may differ from the submitted string. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # Time the dashboard was last
+                          updated. Required.
+                        "uuid": "str",  # A unique identifier for the dashboard. Required.
+                        "description": "str",  # Optional. The dashboard's display
+                          description. Populated by the server from ``spec.display.description``"" ; it
+                          cannot be set directly. Omitted when the spec has no description.
+                        "name": "str"  # Optional. The dashboard's display name. Populated by
+                          the server from ``spec.display.name``"" ; it cannot be set directly. Omitted
+                          when ``spec.display.name`` is an empty string.
+                    }
+                }
+                # response body for status code(s): 400, 404, 409, 500
+                response == {
+                    "code": 0,  # The gRPC status code for the error. ``3`` = invalid argument,
+                      ``5`` = not found, ``6`` = already exists, ``8`` = resource exhausted, ``13`` =
+                      internal. Required.
+                    "error": "str",  # A human-readable description of the error. Identical to
+                      ``message``. Required.
+                    "message": "str",  # A human-readable description of the error. Identical to
+                      ``error``. Required.
+                    "details": [
+                        {
+                            "str": {}  # Optional. Additional machine-readable error
+                              details. Omitted when there are none. Each entry carries an ``@type``
+                              identifying its schema.
+                        }
+                    ]
+                }
+        """
+
+    @overload
+    def update_dashboard(
+        self,
+        uuid: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update a Dashboard.
+
+        To update a dashboard, send a PUT request to
+        ``/v2/insights/dashboards/{uuid}`` with a ``spec`` containing the full
+        dashboard definition as a JSON document serialized to a string.
+
+        This endpoint uses replace semantics: the stored ``spec`` is overwritten in
+        full and ``name`` and ``description`` are recomputed from the new
+        ``spec.display``. Changing the name to one already used by another dashboard
+        in your team returns ``409``.
+
+        :param uuid: The unique identifier of the dashboard. Unknown, deleted, or malformed identifiers
+         return ``404``. Required.
+        :type uuid: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "dashboard": {
+                        "created_at": "2020-02-20 00:00:00",  # Time the dashboard was
+                          created. Required.
+                        "spec": "str",  # The dashboard definition as a JSON document
+                          serialized to a string. The document must have ``kind`` set to ``Dashboard``
+                          and a ``spec.display.name`` between 1 and 255 characters, which is projected
+                          to ``name``. An optional ``spec.display.description`` of up to 1000
+                          characters is projected to ``description``. Retrieve the full JSON Schema
+                          from ``GET /v2/insights/dashboards/schema``. The document is returned in a
+                          normalized form: content is unchanged, but object keys may be reordered and
+                          whitespace may differ from the submitted string. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # Time the dashboard was last
+                          updated. Required.
+                        "uuid": "str",  # A unique identifier for the dashboard. Required.
+                        "description": "str",  # Optional. The dashboard's display
+                          description. Populated by the server from ``spec.display.description``"" ; it
+                          cannot be set directly. Omitted when the spec has no description.
+                        "name": "str"  # Optional. The dashboard's display name. Populated by
+                          the server from ``spec.display.name``"" ; it cannot be set directly. Omitted
+                          when ``spec.display.name`` is an empty string.
+                    }
+                }
+                # response body for status code(s): 400, 404, 409, 500
+                response == {
+                    "code": 0,  # The gRPC status code for the error. ``3`` = invalid argument,
+                      ``5`` = not found, ``6`` = already exists, ``8`` = resource exhausted, ``13`` =
+                      internal. Required.
+                    "error": "str",  # A human-readable description of the error. Identical to
+                      ``message``. Required.
+                    "message": "str",  # A human-readable description of the error. Identical to
+                      ``error``. Required.
+                    "details": [
+                        {
+                            "str": {}  # Optional. Additional machine-readable error
+                              details. Omitted when there are none. Each entry carries an ``@type``
+                              identifying its schema.
+                        }
+                    ]
+                }
+        """
+
+    @distributed_trace
+    def update_dashboard(
+        self, uuid: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update a Dashboard.
+
+        To update a dashboard, send a PUT request to
+        ``/v2/insights/dashboards/{uuid}`` with a ``spec`` containing the full
+        dashboard definition as a JSON document serialized to a string.
+
+        This endpoint uses replace semantics: the stored ``spec`` is overwritten in
+        full and ``name`` and ``description`` are recomputed from the new
+        ``spec.display``. Changing the name to one already used by another dashboard
+        in your team returns ``409``.
+
+        :param uuid: The unique identifier of the dashboard. Unknown, deleted, or malformed identifiers
+         return ``404``. Required.
+        :type uuid: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "spec": "str"  # The dashboard definition as a JSON document serialized to a
+                      string. The document must have ``kind`` set to ``Dashboard`` and a
+                      ``spec.display.name`` between 1 and 255 characters. An empty value or a value
+                      that is not valid JSON is rejected with ``400``. Retrieve the full JSON Schema
+                      from ``GET /v2/insights/dashboards/schema``. Required.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "dashboard": {
+                        "created_at": "2020-02-20 00:00:00",  # Time the dashboard was
+                          created. Required.
+                        "spec": "str",  # The dashboard definition as a JSON document
+                          serialized to a string. The document must have ``kind`` set to ``Dashboard``
+                          and a ``spec.display.name`` between 1 and 255 characters, which is projected
+                          to ``name``. An optional ``spec.display.description`` of up to 1000
+                          characters is projected to ``description``. Retrieve the full JSON Schema
+                          from ``GET /v2/insights/dashboards/schema``. The document is returned in a
+                          normalized form: content is unchanged, but object keys may be reordered and
+                          whitespace may differ from the submitted string. Required.
+                        "updated_at": "2020-02-20 00:00:00",  # Time the dashboard was last
+                          updated. Required.
+                        "uuid": "str",  # A unique identifier for the dashboard. Required.
+                        "description": "str",  # Optional. The dashboard's display
+                          description. Populated by the server from ``spec.display.description``"" ; it
+                          cannot be set directly. Omitted when the spec has no description.
+                        "name": "str"  # Optional. The dashboard's display name. Populated by
+                          the server from ``spec.display.name``"" ; it cannot be set directly. Omitted
+                          when ``spec.display.name`` is an empty string.
+                    }
+                }
+                # response body for status code(s): 400, 404, 409, 500
+                response == {
+                    "code": 0,  # The gRPC status code for the error. ``3`` = invalid argument,
+                      ``5`` = not found, ``6`` = already exists, ``8`` = resource exhausted, ``13`` =
+                      internal. Required.
+                    "error": "str",  # A human-readable description of the error. Identical to
+                      ``message``. Required.
+                    "message": "str",  # A human-readable description of the error. Identical to
+                      ``error``. Required.
+                    "details": [
+                        {
+                            "str": {}  # Optional. Additional machine-readable error
+                              details. Omitted when there are none. Each entry carries an ``@type``
+                              identifying its schema.
+                        }
+                    ]
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_insights_update_dashboard_request(
+            uuid=uuid,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404, 409, 429, 500]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 429:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 500:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def delete_dashboard(self, uuid: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Delete a Dashboard.
+
+        To delete a dashboard, send a DELETE request to
+        ``/v2/insights/dashboards/{uuid}``.
+
+        A successful request returns ``200`` with an empty JSON object as the body.
+
+        :param uuid: The unique identifier of the dashboard. Unknown, deleted, or malformed identifiers
+         return ``404``. Required.
+        :type uuid: str
+        :return: JSON or JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 404, 500
+                response == {
+                    "code": 0,  # The gRPC status code for the error. ``3`` = invalid argument,
+                      ``5`` = not found, ``6`` = already exists, ``8`` = resource exhausted, ``13`` =
+                      internal. Required.
+                    "error": "str",  # A human-readable description of the error. Identical to
+                      ``message``. Required.
+                    "message": "str",  # A human-readable description of the error. Identical to
+                      ``error``. Required.
+                    "details": [
+                        {
+                            "str": {}  # Optional. Additional machine-readable error
+                              details. Omitted when there are none. Each entry carries an ``@type``
+                              identifying its schema.
+                        }
+                    ]
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_insights_delete_dashboard_request(
+            uuid=uuid,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404, 429, 500]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 429:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 500:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
     def list_notification_channels(
         self, *, page: int = 1, per_page: int = 20, **kwargs: Any
     ) -> JSON:
@@ -217452,6 +226735,11 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                       default is true; for earlier versions, the default is false.
                     "id": "str",  # Optional. A unique ID that can be used to identify and
                       reference a Kubernetes cluster.
+                    "insights": {
+                        "logs": bool  # Optional. A boolean value indicating whether the
+                          cluster's logs are sent to Insights. Setting this to ``false`` records an
+                          explicit opt-out. When omitted, no choice is recorded.
+                    },
                     "ipv4": "str",  # Optional. The public IPv4 address of the Kubernetes master
                       node. This will not be set if high availability is configured on the cluster
                       (v1.21+).
@@ -217707,6 +226995,11 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                           false.
                         "id": "str",  # Optional. A unique ID that can be used to identify
                           and reference a Kubernetes cluster.
+                        "insights": {
+                            "logs": bool  # Optional. A boolean value indicating whether
+                              the cluster's logs are sent to Insights. Setting this to ``false``
+                              records an explicit opt-out. When omitted, no choice is recorded.
+                        },
                         "ipv4": "str",  # Optional. The public IPv4 address of the Kubernetes
                           master node. This will not be set if high availability is configured on the
                           cluster (v1.21+).
@@ -217995,6 +227288,11 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                           false.
                         "id": "str",  # Optional. A unique ID that can be used to identify
                           and reference a Kubernetes cluster.
+                        "insights": {
+                            "logs": bool  # Optional. A boolean value indicating whether
+                              the cluster's logs are sent to Insights. Setting this to ``false``
+                              records an explicit opt-out. When omitted, no choice is recorded.
+                        },
                         "ipv4": "str",  # Optional. The public IPv4 address of the Kubernetes
                           master node. This will not be set if high availability is configured on the
                           cluster (v1.21+).
@@ -218268,6 +227566,11 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                       default is true; for earlier versions, the default is false.
                     "id": "str",  # Optional. A unique ID that can be used to identify and
                       reference a Kubernetes cluster.
+                    "insights": {
+                        "logs": bool  # Optional. A boolean value indicating whether the
+                          cluster's logs are sent to Insights. Setting this to ``false`` records an
+                          explicit opt-out. When omitted, no choice is recorded.
+                    },
                     "ipv4": "str",  # Optional. The public IPv4 address of the Kubernetes master
                       node. This will not be set if high availability is configured on the cluster
                       (v1.21+).
@@ -218523,6 +227826,11 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                           false.
                         "id": "str",  # Optional. A unique ID that can be used to identify
                           and reference a Kubernetes cluster.
+                        "insights": {
+                            "logs": bool  # Optional. A boolean value indicating whether
+                              the cluster's logs are sent to Insights. Setting this to ``false``
+                              records an explicit opt-out. When omitted, no choice is recorded.
+                        },
                         "ipv4": "str",  # Optional. The public IPv4 address of the Kubernetes
                           master node. This will not be set if high availability is configured on the
                           cluster (v1.21+).
@@ -219369,6 +228677,11 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                           false.
                         "id": "str",  # Optional. A unique ID that can be used to identify
                           and reference a Kubernetes cluster.
+                        "insights": {
+                            "logs": bool  # Optional. A boolean value indicating whether
+                              the cluster's logs are sent to Insights. Setting this to ``false``
+                              records an explicit opt-out. When omitted, no choice is recorded.
+                        },
                         "ipv4": "str",  # Optional. The public IPv4 address of the Kubernetes
                           master node. This will not be set if high availability is configured on the
                           cluster (v1.21+).
@@ -219669,6 +228982,11 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                           false.
                         "id": "str",  # Optional. A unique ID that can be used to identify
                           and reference a Kubernetes cluster.
+                        "insights": {
+                            "logs": bool  # Optional. A boolean value indicating whether
+                              the cluster's logs are sent to Insights. Setting this to ``false``
+                              records an explicit opt-out. When omitted, no choice is recorded.
+                        },
                         "ipv4": "str",  # Optional. The public IPv4 address of the Kubernetes
                           master node. This will not be set if high availability is configured on the
                           cluster (v1.21+).
@@ -220080,6 +229398,11 @@ class KubernetesOperations:  # pylint: disable=too-many-public-methods
                           false.
                         "id": "str",  # Optional. A unique ID that can be used to identify
                           and reference a Kubernetes cluster.
+                        "insights": {
+                            "logs": bool  # Optional. A boolean value indicating whether
+                              the cluster's logs are sent to Insights. Setting this to ``false``
+                              records an explicit opt-out. When omitted, no choice is recorded.
+                        },
                         "ipv4": "str",  # Optional. The public IPv4 address of the Kubernetes
                           master node. This will not be set if high availability is configured on the
                           cluster (v1.21+).
@@ -264626,6 +273949,158 @@ class SnapshotsOperations:
                 deserialized = None
 
         if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, deserialized, response_headers)  # type: ignore
+
+        return deserialized  # type: ignore
+
+    @distributed_trace
+    def delete_region(
+        self, snapshot_id: JSON, region: str, **kwargs: Any
+    ) -> Optional[JSON]:
+        # pylint: disable=line-too-long
+        """Delete a Snapshot Copy from a Region.
+
+        A Droplet snapshot that has been transferred to additional regions holds an
+        independent copy in each one. To delete the copy in a single region without
+        affecting the snapshot or its copies in other regions, send a DELETE request
+        to ``/v2/snapshots/$SNAPSHOT_ID/regions/$REGION``.
+
+        The regions a snapshot holds copies in are listed in the ``regions`` attribute
+        of the snapshot. The copy in the snapshot's original region cannot be
+        deleted individually; to delete the snapshot entirely, use
+        ``DELETE /v2/snapshots/$SNAPSHOT_ID``. This endpoint is only available for
+        Droplet snapshots.
+
+        A status of 204 will be given. This indicates that the request was processed
+        successfully, but that no response body is needed.
+
+        :param snapshot_id: Either the ID of an existing snapshot. This will be an integer for a
+         Droplet snapshot or a string for a volume snapshot. Required.
+        :type snapshot_id: JSON
+        :param region: The slug of the region from which to delete the snapshot's copy. Required.
+        :type region: str
+        :return: JSON object or None
+        :rtype: JSON or None
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 400, 404, 422
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[Optional[JSON]] = kwargs.pop("cls", None)
+
+        _request = build_snapshots_delete_region_request(
+            snapshot_id=snapshot_id,
+            region=region,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [204, 400, 404, 422]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        deserialized = None
+        response_headers = {}
+        if response.status_code == 204:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 422:
             response_headers["ratelimit-limit"] = self._deserialize(
                 "int", response.headers.get("ratelimit-limit")
             )
