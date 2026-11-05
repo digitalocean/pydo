@@ -16,6 +16,9 @@ from typing import List, Optional
 from pydo.aio import Client as _DigitalOceanClient
 from pydo.aio._patch import TokenCredentials
 from pydo.aio.gateway import (
+    AsyncEndpoint,
+    AsyncEndpointsOperations,
+    AsyncEndpointVersion,
     AsyncSession,
     AsyncSessionsOperations,
 )
@@ -41,6 +44,9 @@ _GATEWAY_SURFACE: tuple = (
     "base_url",
     "chat",
     "create_toolbelt",
+    "endpoint_versions",
+    "endpoints",
+    "endpoints_api",
     "messages",
     "provider",
     "responses",
@@ -58,9 +64,10 @@ class Client(_DigitalOceanClient):
     """Action Gateway–focused DigitalOcean async client.
 
     Asynchronous counterpart to :class:`pydo.action_gateway.Client`.
-    Create a session with ``await client.session.create(actor_id=...)``,
-    then use ``session.tools`` / ``session.code`` /
-    ``await session.handle_tool_calls(...)``.
+    Create an endpoint with ``await client.endpoints.create(name, ...)``,
+    then use ``endpoint.tools`` / ``endpoint.code`` /
+    ``await endpoint.handle_tool_calls(...)``. ``client.session`` is
+    deprecated in favour of endpoints.
     """
 
     def __init__(
@@ -87,6 +94,8 @@ class Client(_DigitalOceanClient):
                 "Action Gateway package is unavailable; "
                 "ensure pydo.aio.gateway is installed"
             )
+        self.endpoints_api = getattr(self, "endpoints", None)
+        self.endpoints = gateway.endpoints
         self.sessions_api = self.sessions
         self.sessions = gateway.sessions
         self.session = self.sessions
@@ -123,6 +132,9 @@ __all__ = [
     "Client",
     "ActionGatewayClient",
     "TokenCredentials",
+    "AsyncEndpoint",
+    "AsyncEndpointsOperations",
+    "AsyncEndpointVersion",
     "AsyncSession",
     "AsyncSessionsOperations",
     "Toolbelt",
