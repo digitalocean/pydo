@@ -347,6 +347,7 @@ from ...operations._operations import (
     build_genai_get_indexing_job_request,
     build_genai_get_knowledge_base_request,
     build_genai_get_model_catalog_card_request,
+    build_genai_get_model_catalog_card_v2_request,
     build_genai_get_model_evaluation_preset_request,
     build_genai_get_model_evaluation_run_request,
     build_genai_get_model_evaluation_run_results_download_url_request,
@@ -383,6 +384,7 @@ from ...operations._operations import (
     build_genai_list_knowledge_bases_request,
     build_genai_list_model_api_keys_request,
     build_genai_list_model_catalog_request,
+    build_genai_list_model_catalog_v2_request,
     build_genai_list_model_evaluation_metrics_request,
     build_genai_list_model_evaluation_presets_request,
     build_genai_list_model_evaluation_runs_request,
@@ -469,6 +471,7 @@ from ...operations._operations import (
     build_harness_list_configs_request,
     build_harness_list_image_messages_request,
     build_harness_list_provider_connections_request,
+    build_harness_list_regions_request,
     build_harness_list_reusable_sessions_request,
     build_harness_list_session_checkpoints_request,
     build_harness_list_session_sandbox_sizes_request,
@@ -30632,6 +30635,134 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                 deserialized = None
 
         if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def list_regions(self, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """ListRegions returns the regions the caller's team may create sessions and agent configs in.
+
+        Per-team catalog the UI (and other clients) render as the region picker, instead of hardcoding
+        the list. A region is chosen by the API host you call, not by a field in the request body, so a
+        returned ``slug`` tells you which regional host to target — ``ric1`` means
+        ``https://api-ric1.digitalocean.com``. The default region is always listed and is marked
+        ``is_default``\\ ; its resources are also reachable on the region-less host,
+        ``https://api.digitalocean.com``. Every other open region is listed only when the team holds
+        its placement grant, so a create on a listed region's host is admitted and a region missing
+        from this list is refused. Teams not yet on the regional routing rollout see only the default
+        region, and their responses carry no ``region`` field. Legacy regions are never listed. Sorted
+        by slug; no pagination.
+
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "regions": [
+                        {
+                            "is_default": bool,  # Optional. True for the region the
+                              region-less host, https://api.digitalocean.com, serves. Exactly one
+                              listed region is the default and every team sees it. Preselect it in a
+                              picker instead of hardcoding a slug.
+                            "slug": "str"  # Optional. DO datacenter slug. Names the
+                              regional API host to call to work in this region "u2014 "ric1" means
+                              https://api-ric1.digitalocean.com. A request is placed in the region of
+                              the host that served it; the optional ``region`` field on a create is a
+                              check against that host, not a choice of region.
+                        }
+                    ]
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_harness_list_regions_request(
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
             response_headers["ratelimit-limit"] = self._deserialize(
                 "int", response.headers.get("ratelimit-limit")
             )
@@ -195901,7 +196032,8 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
         ``/v2/insights/notification-channels`` with a ``name`` and exactly one of
         ``email``\\ , ``slack``\\ , or ``webhook``.
 
-        Email recipients must be verified team member addresses. Webhook URLs must
+        Email recipients must be team contact emails added and verified by a team
+        owner. Webhook URLs must
         use HTTPS. Secret fields (\\ ``slack.webhook_url``\\ , webhook credentials) are
         write-only. Subsequent reads never return secret values; they include
         optional ``*_status`` objects when a secret is configured.
@@ -196047,7 +196179,8 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
         ``/v2/insights/notification-channels`` with a ``name`` and exactly one of
         ``email``\\ , ``slack``\\ , or ``webhook``.
 
-        Email recipients must be verified team member addresses. Webhook URLs must
+        Email recipients must be team contact emails added and verified by a team
+        owner. Webhook URLs must
         use HTTPS. Secret fields (\\ ``slack.webhook_url``\\ , webhook credentials) are
         write-only. Subsequent reads never return secret values; they include
         optional ``*_status`` objects when a secret is configured.
@@ -196149,7 +196282,8 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
         ``/v2/insights/notification-channels`` with a ``name`` and exactly one of
         ``email``\\ , ``slack``\\ , or ``webhook``.
 
-        Email recipients must be verified team member addresses. Webhook URLs must
+        Email recipients must be team contact emails added and verified by a team
+        owner. Webhook URLs must
         use HTTPS. Secret fields (\\ ``slack.webhook_url``\\ , webhook credentials) are
         write-only. Subsequent reads never return secret values; they include
         optional ``*_status`` objects when a secret is configured.
@@ -271152,6 +271286,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -271197,13 +271340,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -272409,6 +272561,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -272454,13 +272615,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -273713,6 +273883,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -273758,13 +273937,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -276003,6 +276191,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -276048,13 +276245,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -277263,6 +277469,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -277308,13 +277523,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -278533,6 +278757,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -278578,13 +278811,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -279906,6 +280148,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -279951,13 +280202,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -281169,6 +281429,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -281214,13 +281483,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -282443,6 +282721,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -282488,13 +282775,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -283791,6 +284087,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -283836,13 +284141,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -285140,6 +285454,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -285185,13 +285508,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -286400,6 +286732,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -286445,13 +286786,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -287666,6 +288016,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -287711,13 +288070,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -289012,6 +289380,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -289057,13 +289434,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -290338,6 +290724,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -290383,13 +290778,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -291667,6 +292071,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -291712,13 +292125,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -292997,6 +293419,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -293042,13 +293473,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -294972,6 +295412,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -295017,13 +295466,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -296389,6 +296847,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -296434,13 +296901,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -297649,6 +298125,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -297694,13 +298179,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -298981,6 +299475,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -299026,13 +299529,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -300322,6 +300834,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -300367,13 +300888,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -301712,6 +302242,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                       the judge.
                 "scoring_prompt": "str",  # Optional.
                                                       Instructions for the judge model (multi-line).
+                                                    "turn_type":
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                      Optional. Default value is
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                                      Whether the metric is for single-turn or
+                                                      multi-turn evaluations. Known values are:
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                     "updated_at":
                                                       "2020-02-20 00:00:00"  # Optional. Configuration
                                                       for a custom model-evaluation metric scored by an
@@ -301761,7 +302300,7 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "range_min": 0.0,  #
                                                   Optional. The minimum value for the metric.
                                                 "source":
-                                                  "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                                  "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                                   Default value is
                                                   "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
                                                   platform catalog metrics from user-defined
@@ -301769,6 +302308,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                                   "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                                   "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             }
                                         ],
                                         "name": "str",  # Optional.
@@ -303072,6 +303620,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -303117,13 +303674,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -304332,6 +304898,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -304377,13 +304952,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -305598,6 +306182,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -305643,13 +306236,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -308568,6 +309170,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                       the judge.
                 "scoring_prompt": "str",  # Optional.
                                                       Instructions for the judge model (multi-line).
+                                                    "turn_type":
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                      Optional. Default value is
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                                      Whether the metric is for single-turn or
+                                                      multi-turn evaluations. Known values are:
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                     "updated_at":
                                                       "2020-02-20 00:00:00"  # Optional. Configuration
                                                       for a custom model-evaluation metric scored by an
@@ -308617,7 +309228,7 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "range_min": 0.0,  #
                                                   Optional. The minimum value for the metric.
                                                 "source":
-                                                  "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                                  "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                                   Default value is
                                                   "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
                                                   platform catalog metrics from user-defined
@@ -308625,6 +309236,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                                   "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                                   "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             }
                                         ],
                                         "name": "str",  # Optional.
@@ -311435,6 +312055,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   sent to the judge.
                                 "scoring_prompt": "str",  # Optional. Instructions
                                   for the judge model (multi-line).
+                                "turn_type":
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional. Default value
+                                  is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the metric is
+                                  for single-turn or multi-turn evaluations. Known values are:
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                 "updated_at": "2020-02-20 00:00:00"  # Optional.
                                   Configuration for a custom model-evaluation metric scored by an LLM
                                   judge. Prompt and model response are always included in the judge
@@ -311467,12 +312094,18 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               metric.
                             "range_min": 0.0,  # Optional. The minimum value for the
                               metric.
-                            "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
-                              Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
-                              platform catalog metrics from user-defined LLM-as-judge metrics. Known
-                              values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                            "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  #
+                              Optional. Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
+                              Distinguishes platform catalog metrics from user-defined LLM-as-judge
+                              metrics. Known values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                            "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  #
+                              Optional. Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                              Whether the metric is for single-turn or multi-turn evaluations. Known
+                              values are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                         }
                     ]
                 }
@@ -311604,6 +312237,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           ground truth is not required and is not sent to the judge.
                         "scoring_prompt": "str",  # Optional. Instructions for the judge
                           model (multi-line).
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                         "updated_at": "2020-02-20 00:00:00"  # Optional. Configuration for a
                           custom model-evaluation metric scored by an LLM judge. Prompt and model
                           response are always included in the judge context.
@@ -311642,6 +312281,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               When false, ground truth is not required and is not sent to the judge.
                             "scoring_prompt": "str",  # Optional. Instructions for the
                               judge model (multi-line).
+                            "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                              Optional. Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                              Whether the metric is for single-turn or multi-turn evaluations. Known
+                              values are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                             "updated_at": "2020-02-20 00:00:00"  # Optional.
                               Configuration for a custom model-evaluation metric scored by an LLM
                               judge. Prompt and model response are always included in the judge
@@ -311670,11 +312315,17 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                         "range_max": 0.0,  # Optional. The maximum value for the metric.
                         "range_min": 0.0,  # Optional. The minimum value for the metric.
-                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
-                          value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes platform
-                          catalog metrics from user-defined LLM-as-judge metrics. Known values are:
-                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED", "EVALUATION_METRIC_SOURCE_BUILTIN",
-                          and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
+                          platform catalog metrics from user-defined LLM-as-judge metrics. Known values
+                          are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                          "EVALUATION_METRIC_SOURCE_BUILTIN", and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                     }
                 }
                 # response body for status code(s): 404
@@ -311746,6 +312397,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               When false, ground truth is not required and is not sent to the judge.
                             "scoring_prompt": "str",  # Optional. Instructions for the
                               judge model (multi-line).
+                            "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                              Optional. Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                              Whether the metric is for single-turn or multi-turn evaluations. Known
+                              values are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                             "updated_at": "2020-02-20 00:00:00"  # Optional.
                               Configuration for a custom model-evaluation metric scored by an LLM
                               judge. Prompt and model response are always included in the judge
@@ -311774,11 +312431,17 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                         "range_max": 0.0,  # Optional. The maximum value for the metric.
                         "range_min": 0.0,  # Optional. The minimum value for the metric.
-                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
-                          value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes platform
-                          catalog metrics from user-defined LLM-as-judge metrics. Known values are:
-                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED", "EVALUATION_METRIC_SOURCE_BUILTIN",
-                          and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
+                          platform catalog metrics from user-defined LLM-as-judge metrics. Known values
+                          are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                          "EVALUATION_METRIC_SOURCE_BUILTIN", and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                     }
                 }
                 # response body for status code(s): 404
@@ -311826,6 +312489,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           ground truth is not required and is not sent to the judge.
                         "scoring_prompt": "str",  # Optional. Instructions for the judge
                           model (multi-line).
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                         "updated_at": "2020-02-20 00:00:00"  # Optional. Configuration for a
                           custom model-evaluation metric scored by an LLM judge. Prompt and model
                           response are always included in the judge context.
@@ -311864,6 +312533,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               When false, ground truth is not required and is not sent to the judge.
                             "scoring_prompt": "str",  # Optional. Instructions for the
                               judge model (multi-line).
+                            "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                              Optional. Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                              Whether the metric is for single-turn or multi-turn evaluations. Known
+                              values are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                             "updated_at": "2020-02-20 00:00:00"  # Optional.
                               Configuration for a custom model-evaluation metric scored by an LLM
                               judge. Prompt and model response are always included in the judge
@@ -311892,11 +312567,17 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                         "range_max": 0.0,  # Optional. The maximum value for the metric.
                         "range_min": 0.0,  # Optional. The minimum value for the metric.
-                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
-                          value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes platform
-                          catalog metrics from user-defined LLM-as-judge metrics. Known values are:
-                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED", "EVALUATION_METRIC_SOURCE_BUILTIN",
-                          and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
+                          platform catalog metrics from user-defined LLM-as-judge metrics. Known values
+                          are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                          "EVALUATION_METRIC_SOURCE_BUILTIN", and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                     }
                 }
                 # response body for status code(s): 404
@@ -312047,6 +312728,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           ground truth is not required and is not sent to the judge.
                         "scoring_prompt": "str",  # Optional. Instructions for the judge
                           model (multi-line).
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                         "updated_at": "2020-02-20 00:00:00"  # Optional. Configuration for a
                           custom model-evaluation metric scored by an LLM judge. Prompt and model
                           response are always included in the judge context.
@@ -312086,6 +312773,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               When false, ground truth is not required and is not sent to the judge.
                             "scoring_prompt": "str",  # Optional. Instructions for the
                               judge model (multi-line).
+                            "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                              Optional. Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                              Whether the metric is for single-turn or multi-turn evaluations. Known
+                              values are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                             "updated_at": "2020-02-20 00:00:00"  # Optional.
                               Configuration for a custom model-evaluation metric scored by an LLM
                               judge. Prompt and model response are always included in the judge
@@ -312114,11 +312807,17 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                         "range_max": 0.0,  # Optional. The maximum value for the metric.
                         "range_min": 0.0,  # Optional. The minimum value for the metric.
-                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
-                          value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes platform
-                          catalog metrics from user-defined LLM-as-judge metrics. Known values are:
-                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED", "EVALUATION_METRIC_SOURCE_BUILTIN",
-                          and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
+                          platform catalog metrics from user-defined LLM-as-judge metrics. Known values
+                          are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                          "EVALUATION_METRIC_SOURCE_BUILTIN", and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                     }
                 }
                 # response body for status code(s): 404
@@ -312193,6 +312892,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               When false, ground truth is not required and is not sent to the judge.
                             "scoring_prompt": "str",  # Optional. Instructions for the
                               judge model (multi-line).
+                            "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                              Optional. Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                              Whether the metric is for single-turn or multi-turn evaluations. Known
+                              values are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                             "updated_at": "2020-02-20 00:00:00"  # Optional.
                               Configuration for a custom model-evaluation metric scored by an LLM
                               judge. Prompt and model response are always included in the judge
@@ -312221,11 +312926,17 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                         "range_max": 0.0,  # Optional. The maximum value for the metric.
                         "range_min": 0.0,  # Optional. The minimum value for the metric.
-                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
-                          value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes platform
-                          catalog metrics from user-defined LLM-as-judge metrics. Known values are:
-                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED", "EVALUATION_METRIC_SOURCE_BUILTIN",
-                          and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
+                          platform catalog metrics from user-defined LLM-as-judge metrics. Known values
+                          are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                          "EVALUATION_METRIC_SOURCE_BUILTIN", and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                     }
                 }
                 # response body for status code(s): 404
@@ -312278,6 +312989,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           ground truth is not required and is not sent to the judge.
                         "scoring_prompt": "str",  # Optional. Instructions for the judge
                           model (multi-line).
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                         "updated_at": "2020-02-20 00:00:00"  # Optional. Configuration for a
                           custom model-evaluation metric scored by an LLM judge. Prompt and model
                           response are always included in the judge context.
@@ -312317,6 +313034,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               When false, ground truth is not required and is not sent to the judge.
                             "scoring_prompt": "str",  # Optional. Instructions for the
                               judge model (multi-line).
+                            "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                              Optional. Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                              Whether the metric is for single-turn or multi-turn evaluations. Known
+                              values are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                             "updated_at": "2020-02-20 00:00:00"  # Optional.
                               Configuration for a custom model-evaluation metric scored by an LLM
                               judge. Prompt and model response are always included in the judge
@@ -312345,11 +313068,17 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                         "range_max": 0.0,  # Optional. The maximum value for the metric.
                         "range_min": 0.0,  # Optional. The minimum value for the metric.
-                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
-                          value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes platform
-                          catalog metrics from user-defined LLM-as-judge metrics. Known values are:
-                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED", "EVALUATION_METRIC_SOURCE_BUILTIN",
-                          and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
+                          platform catalog metrics from user-defined LLM-as-judge metrics. Known values
+                          are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                          "EVALUATION_METRIC_SOURCE_BUILTIN", and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                     }
                 }
                 # response body for status code(s): 404
@@ -314014,6 +314743,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           is not required and is not sent to the judge.
                                         "scoring_prompt": "str",  # Optional.
                                           Instructions for the judge model (multi-line).
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         "updated_at": "2020-02-20 00:00:00"
                                           # Optional. Configuration for a custom model-evaluation
                                           metric scored by an LLM judge. Prompt and model response are
@@ -314059,12 +314796,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                     "range_min": 0.0,  # Optional. The minimum
                                       value for the metric.
                                     "source":
-                                      "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default value
-                                      is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes platform
-                                      catalog metrics from user-defined LLM-as-judge metrics. Known
-                                      values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                                      "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
+                                      value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
+                                      platform catalog metrics from user-defined LLM-as-judge metrics.
+                                      Known values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                       "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                       "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                    "turn_type":
+                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional. Default
+                                      value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                      metric is for single-turn or multi-turn evaluations. Known values
+                                      are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                 }
                             ],
                             "name": "str",  # Optional. Alternative way of authentication
@@ -314758,6 +315502,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       and is not sent to the judge.
                                     "scoring_prompt": "str",  # Optional.
                                       Instructions for the judge model (multi-line).
+                                    "turn_type":
+                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional. Default
+                                      value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                      metric is for single-turn or multi-turn evaluations. Known values
+                                      are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     "updated_at": "2020-02-20 00:00:00"  #
                                       Optional. Configuration for a custom model-evaluation metric
                                       scored by an LLM judge. Prompt and model response are always
@@ -314791,12 +315542,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   the metric.
                                 "range_min": 0.0,  # Optional. The minimum value for
                                   the metric.
-                                "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  #
+                                "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  #
                                   Optional. Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                   Distinguishes platform catalog metrics from user-defined LLM-as-judge
                                   metrics. Known values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                   "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                   "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                "turn_type":
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional. Default value
+                                  is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the metric is
+                                  for single-turn or multi-turn evaluations. Known values are:
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                             }
                         ],
                         "name": "str",  # Optional.
@@ -320932,13 +321690,23 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
         return cast(JSON, deserialized)  # type: ignore
 
     @distributed_trace_async
-    async def list_model_evaluation_metrics(self, **kwargs: Any) -> JSON:
+    async def list_model_evaluation_metrics(
+        self,
+        *,
+        turn_type: str = "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+        **kwargs: Any
+    ) -> JSON:
         # pylint: disable=line-too-long
         """List Model Evaluation Metrics.
 
         To list all available metrics for model evaluation, send a GET request to
         ``/v2/genai/model_evaluation_metrics``.
 
+        :keyword turn_type: When set, only return metrics compatible with this turn type. Known values
+         are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED", "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+         "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN". Default value is
+         "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+        :paramtype turn_type: str
         :return: JSON object
         :rtype: JSON
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -320979,6 +321747,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   sent to the judge.
                                 "scoring_prompt": "str",  # Optional. Instructions
                                   for the judge model (multi-line).
+                                "turn_type":
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional. Default value
+                                  is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the metric is
+                                  for single-turn or multi-turn evaluations. Known values are:
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                 "updated_at": "2020-02-20 00:00:00"  # Optional.
                                   Configuration for a custom model-evaluation metric scored by an LLM
                                   judge. Prompt and model response are always included in the judge
@@ -321016,12 +321791,18 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               metric.
                             "range_min": 0.0,  # Optional. The minimum value for the
                               metric.
-                            "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
-                              Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
-                              platform catalog metrics from user-defined LLM-as-judge metrics. Known
-                              values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                            "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  #
+                              Optional. Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
+                              Distinguishes platform catalog metrics from user-defined LLM-as-judge
+                              metrics. Known values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                            "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  #
+                              Optional. Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                              Whether the metric is for single-turn or multi-turn evaluations. Known
+                              values are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                         }
                     ]
                 }
@@ -321056,6 +321837,7 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
         _request = build_genai_list_model_evaluation_metrics_request(
+            turn_type=turn_type,
             headers=_headers,
             params=_params,
         )
@@ -321213,6 +321995,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           is not required and is not sent to the judge.
                                         "scoring_prompt": "str",  # Optional.
                                           Instructions for the judge model (multi-line).
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         "updated_at": "2020-02-20 00:00:00"
                                           # Optional. Configuration for a custom model-evaluation
                                           metric scored by an LLM judge. Prompt and model response are
@@ -321258,12 +322048,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                     "range_min": 0.0,  # Optional. The minimum
                                       value for the metric.
                                     "source":
-                                      "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default value
-                                      is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes platform
-                                      catalog metrics from user-defined LLM-as-judge metrics. Known
-                                      values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                                      "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
+                                      value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
+                                      platform catalog metrics from user-defined LLM-as-judge metrics.
+                                      Known values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                       "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                       "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                    "turn_type":
+                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional. Default
+                                      value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                      metric is for single-turn or multi-turn evaluations. Known values
+                                      are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                 }
                             ],
                             "name": "str",  # Optional. Name of the evaluation preset.
@@ -321478,6 +322275,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       and is not sent to the judge.
                                     "scoring_prompt": "str",  # Optional.
                                       Instructions for the judge model (multi-line).
+                                    "turn_type":
+                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional. Default
+                                      value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                      metric is for single-turn or multi-turn evaluations. Known values
+                                      are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     "updated_at": "2020-02-20 00:00:00"  #
                                       Optional. Configuration for a custom model-evaluation metric
                                       scored by an LLM judge. Prompt and model response are always
@@ -321516,12 +322320,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   the metric.
                                 "range_min": 0.0,  # Optional. The minimum value for
                                   the metric.
-                                "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  #
+                                "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  #
                                   Optional. Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                   Distinguishes platform catalog metrics from user-defined LLM-as-judge
                                   metrics. Known values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                   "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                   "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                "turn_type":
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional. Default value
+                                  is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the metric is
+                                  for single-turn or multi-turn evaluations. Known values are:
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                             }
                         ],
                         "name": "str",  # Optional. Name of the evaluation preset.
@@ -322558,6 +323369,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       and is not sent to the judge.
                                     "scoring_prompt": "str",  # Optional.
                                       Instructions for the judge model (multi-line).
+                                    "turn_type":
+                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional. Default
+                                      value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                      metric is for single-turn or multi-turn evaluations. Known values
+                                      are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     "updated_at": "2020-02-20 00:00:00"  #
                                       Optional. Configuration for a custom model-evaluation metric
                                       scored by an LLM judge. Prompt and model response are always
@@ -322596,12 +323414,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   the metric.
                                 "range_min": 0.0,  # Optional. The minimum value for
                                   the metric.
-                                "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  #
+                                "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  #
                                   Optional. Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                   Distinguishes platform catalog metrics from user-defined LLM-as-judge
                                   metrics. Known values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                   "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                   "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                "turn_type":
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional. Default value
+                                  is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the metric is
+                                  for single-turn or multi-turn evaluations. Known values are:
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                             }
                         ],
                         "name": "str",  # Optional. Name of the evaluation run.
@@ -326037,6 +326862,1632 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
         _request = build_genai_get_model_catalog_card_request(
+            id=id,
+            model_id=model_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def list_model_catalog_v2(
+        self,
+        *,
+        page: Optional[int] = None,
+        per_page: Optional[int] = None,
+        search: Optional[str] = None,
+        serving: Optional[List[str]] = None,
+        badges: Optional[List[str]] = None,
+        input_modality: Optional[List[str]] = None,
+        output_modality: Optional[List[str]] = None,
+        product: Optional[List[str]] = None,
+        capabilities: Optional[List[str]] = None,
+        item_type: Optional[List[str]] = None,
+        sort_by: str = "MODEL_CATALOG_SORT_BY_CREATED_AT",
+        sort_direction: str = "SORT_DIRECTION_UNSPECIFIED",
+        creator: Optional[List[str]] = None,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Model Catalog V2.
+
+        Returns the model catalog using the V2 card shape (typed serving, badges, and modalities).
+        Requires authentication.
+
+        :keyword page: Page number for pagination. Default value is None.
+        :paramtype page: int
+        :keyword per_page: Number of items per page. Default value is None.
+        :paramtype per_page: int
+        :keyword search: Optional partial, case-insensitive match on the display name or model ID.
+         Omit this when filtering only by modality, serving, or product. Default value is None.
+        :paramtype search: str
+        :keyword serving: Filter by where the model is served. Multiple values use OR semantics.
+
+
+         * MODEL_SERVING_SERVERLESS: Serverless inference.
+         * MODEL_SERVING_DEDICATED: Dedicated inference. Default value is None.
+        :paramtype serving: list[str]
+        :keyword badges: Filter by badge. Multiple values use OR semantics.
+
+
+         * MODEL_CATALOG_BADGE_FEATURED: Featured in the catalog.
+         * MODEL_CATALOG_BADGE_NEW: Newly added.
+         * MODEL_CATALOG_BADGE_PREVIEW: Preview.
+         * MODEL_CATALOG_BADGE_DEPRECATING: Scheduled for deprecation.
+         * MODEL_CATALOG_BADGE_INFERENCE_ROUTER: Inference Router preset. Default value is None.
+        :paramtype badges: list[str]
+        :keyword input_modality: Require every listed modality as a model input. Multiple values use
+         AND semantics.
+
+
+         * MODEL_MODALITY_TEXT: plain text
+         * MODEL_MODALITY_IMAGE: still images
+         * MODEL_MODALITY_AUDIO: audio
+         * MODEL_MODALITY_VIDEO: video
+         * MODEL_MODALITY_EMBEDDING: embedding vectors
+         * MODEL_MODALITY_RANKING: document ranking scores produced by reranking models
+         * MODEL_MODALITY_DECISIONS: structured decisions produced by classification models. Default
+         value is None.
+        :paramtype input_modality: list[str]
+        :keyword output_modality: Require every listed modality as a model output. Multiple values use
+         AND semantics.
+
+
+         * MODEL_MODALITY_TEXT: plain text
+         * MODEL_MODALITY_IMAGE: still images
+         * MODEL_MODALITY_AUDIO: audio
+         * MODEL_MODALITY_VIDEO: video
+         * MODEL_MODALITY_EMBEDDING: embedding vectors
+         * MODEL_MODALITY_RANKING: document ranking scores produced by reranking models
+         * MODEL_MODALITY_DECISIONS: structured decisions produced by classification models. Default
+         value is None.
+        :paramtype output_modality: list[str]
+        :keyword product: Filter by product enrollment.
+
+
+         * MODEL_CATALOG_PRODUCT_EVALUATIONS_JUDGE: Model can judge evaluations.
+         * MODEL_CATALOG_PRODUCT_HARNESS_RUNTIME: Model is enrolled for the harness runtime.
+         * MODEL_CATALOG_PRODUCT_EVALUATION_CANDIDATE: Model can be an evaluation or simulation
+         candidate. It serves a text endpoint and accepts and returns text. Default value is None.
+        :paramtype product: list[str]
+        :keyword capabilities: Require every listed capability. Multiple values use AND semantics.
+         ``coding`` matches a coding specialisation, not only models whose type is coding. Default
+         value is None.
+        :paramtype capabilities: list[str]
+        :keyword item_type: Include foundation models, Inference Router presets, or both. Omit to
+         return both.
+
+
+         * MODEL_CATALOG_ITEM_TYPE_MODEL: A foundation or inference model.
+         * MODEL_CATALOG_ITEM_TYPE_INFERENCE_ROUTER: An Inference Router preset. Default value is None.
+        :paramtype item_type: list[str]
+        :keyword sort_by: Field to sort results by. Default is ``MODEL_CATALOG_SORT_BY_CREATED_AT``.
+
+
+         * MODEL_CATALOG_SORT_BY_CREATED_AT: Sort by creation date.
+         * MODEL_CATALOG_SORT_BY_NAME: Sort by display name, case-insensitive.
+         * MODEL_CATALOG_SORT_BY_PRICE: Sort by input token price.
+         * MODEL_CATALOG_SORT_BY_E2E_LATENCY_P50: Sort by canary end-to-end latency p50, in seconds.
+         Lower is better. Rows without performance data sort after rows with data.
+         * MODEL_CATALOG_SORT_BY_THROUGHPUT_P50: Sort by canary throughput p50, in tokens per second.
+         Higher is better. Rows without performance data sort after rows with data.
+         * MODEL_CATALOG_SORT_BY_TTFT_P50: Sort by canary time to first token p50, in seconds. Lower is
+         better. Rows without performance data sort after rows with data. Known values are:
+         "MODEL_CATALOG_SORT_BY_CREATED_AT", "MODEL_CATALOG_SORT_BY_NAME",
+         "MODEL_CATALOG_SORT_BY_PRICE", "MODEL_CATALOG_SORT_BY_E2E_LATENCY_P50",
+         "MODEL_CATALOG_SORT_BY_THROUGHPUT_P50", and "MODEL_CATALOG_SORT_BY_TTFT_P50". Default value is
+         "MODEL_CATALOG_SORT_BY_CREATED_AT".
+        :paramtype sort_by: str
+        :keyword sort_direction: Sort direction. Defaults to descending when unspecified. Known values
+         are: "SORT_DIRECTION_UNSPECIFIED", "SORT_DIRECTION_ASC", and "SORT_DIRECTION_DESC". Default
+         value is "SORT_DIRECTION_UNSPECIFIED".
+        :paramtype sort_direction: str
+        :keyword creator: Filter by model creator or developer, such as Meta or Google. Multiple values
+         use OR semantics
+         and match case-insensitively. Use ``available_creators`` in the response to discover valid
+         options. Default value is None.
+        :paramtype creator: list[str]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "available_badges": [
+                        "str"  # Optional. Badge values present in the unfiltered catalog.
+                    ],
+                    "available_creators": [
+                        "str"  # Optional. Creator values the client can offer in the creator
+                          filter.
+                    ],
+                    "available_input_modalities": [
+                        "str"  # Optional. Modality values accepted by the input_modality
+                          filter.
+                    ],
+                    "available_model_types": [
+                        "str"  # Optional. Model types present in the unfiltered catalog,
+                          such as chat or embedding. Informational only. V2 has no model_type request
+                          filter; browse by input_modality, output_modality, or capabilities.
+                    ],
+                    "available_output_modalities": [
+                        "str"  # Optional. Modality values accepted by the output_modality
+                          filter.
+                    ],
+                    "available_products": [
+                        "str"  # Optional. Product enrollment values present in the
+                          unfiltered catalog.
+                    ],
+                    "available_serving": [
+                        "str"  # Optional. Serving values present in the unfiltered catalog.
+                    ],
+                    "available_sort_by": [
+                        "str"  # Optional. Sort fields the client can offer in the sort UI.
+                    ],
+                    "available_sort_directions": [
+                        "str"  # Optional. Sort directions the client can offer in the sort
+                          UI.
+                    ],
+                    "data": [
+                        {
+                            "badges": [
+                                "str"  # Optional.
+                            ],
+                            "capabilities": [
+                                "str"  # Optional.
+                            ],
+                            "code_snippets": {
+                                "curl": "str",  # Optional. Code examples for using
+                                  the model.
+                                "javascript": "str",  # Optional. Code examples for
+                                  using the model.
+                                "python": "str",  # Optional. Code examples for using
+                                  the model.
+                                "sdk": "str"  # Optional. Code examples for using the
+                                  model.
+                            },
+                            "context_window": "str",  # Optional.
+                            "created_at": "2020-02-20 00:00:00",  # Optional. RFC 3339
+                              timestamp indicating when the model was added to the catalog.
+                            "creator": "str",  # Optional. Model creator or developer,
+                              such as Meta, Anthropic, or OpenAI.
+                            "description": "str",  # Optional. Full catalog description.
+                              Populated on Get Model Catalog Card V2.
+                            "huggingface_repo_id": "str",  # Optional. Hugging Face
+                              repository ID the model is based on, when applicable.
+                            "id": "str",  # Optional.
+                            "input_modality": [
+                                "str"  # Optional.
+                            ],
+                            "item_type": "MODEL_CATALOG_ITEM_TYPE_UNSPECIFIED",  #
+                              Optional. Default value is "MODEL_CATALOG_ITEM_TYPE_UNSPECIFIED". Whether
+                              a catalog row is a foundation model or an Inference Router preset.   *
+                              MODEL_CATALOG_ITEM_TYPE_MODEL: A foundation or inference model. *
+                              MODEL_CATALOG_ITEM_TYPE_INFERENCE_ROUTER: An Inference Router preset.
+                              Known values are: "MODEL_CATALOG_ITEM_TYPE_UNSPECIFIED",
+                              "MODEL_CATALOG_ITEM_TYPE_MODEL", and
+                              "MODEL_CATALOG_ITEM_TYPE_INFERENCE_ROUTER".
+                            "liveliness": {
+                                "e2e_latency": {
+                                    "days": [
+                                        {
+                                            "day_ms": 0.0,  # Optional.
+                                              Start of the day (00:00 UTC) as Unix milliseconds.
+                                            "p50": 0.0,  # Optional.
+                                              Median value, rounded to 2 decimal places.
+                                            "p75": 0.0,  # Optional. 75th
+                                              percentile value, rounded to 2 decimal places.
+                                            "p95": 0.0,  # Optional. 95th
+                                              percentile value, rounded to 2 decimal places.
+                                            "partial": bool,  # Optional.
+                                              True while the day is still in progress; its values will
+                                              keep changing.
+                                            "samples": 0  # Optional.
+                                              Number of requests the percentiles were computed from.
+                                        }
+                                    ],
+                                    "status": "str",  # Optional. "ok" when days
+                                      has data; "insufficient_data" when there are not enough recent
+                                      samples for this model.
+                                    "unit": "str"  # Optional. Unit of the
+                                      percentile values: "s" for ttft and e2e_latency, "tok/s" for
+                                      throughput.
+                                },
+                                "overall_status": "str",  # Optional. Summary across
+                                  metrics: "ok" when every metric has data, "partial_data" when some do
+                                  and some do not, "insufficient_data" when none do.
+                                "source": "str",  # Optional. Traffic the statistics
+                                  are computed from. Always "canary".
+                                "throughput": {
+                                    "days": [
+                                        {
+                                            "day_ms": 0.0,  # Optional.
+                                              Start of the day (00:00 UTC) as Unix milliseconds.
+                                            "p50": 0.0,  # Optional.
+                                              Median value, rounded to 2 decimal places.
+                                            "p75": 0.0,  # Optional. 75th
+                                              percentile value, rounded to 2 decimal places.
+                                            "p95": 0.0,  # Optional. 95th
+                                              percentile value, rounded to 2 decimal places.
+                                            "partial": bool,  # Optional.
+                                              True while the day is still in progress; its values will
+                                              keep changing.
+                                            "samples": 0  # Optional.
+                                              Number of requests the percentiles were computed from.
+                                        }
+                                    ],
+                                    "status": "str",  # Optional. "ok" when days
+                                      has data; "insufficient_data" when there are not enough recent
+                                      samples for this model.
+                                    "unit": "str"  # Optional. Unit of the
+                                      percentile values: "s" for ttft and e2e_latency, "tok/s" for
+                                      throughput.
+                                },
+                                "ttft": {
+                                    "days": [
+                                        {
+                                            "day_ms": 0.0,  # Optional.
+                                              Start of the day (00:00 UTC) as Unix milliseconds.
+                                            "p50": 0.0,  # Optional.
+                                              Median value, rounded to 2 decimal places.
+                                            "p75": 0.0,  # Optional. 75th
+                                              percentile value, rounded to 2 decimal places.
+                                            "p95": 0.0,  # Optional. 95th
+                                              percentile value, rounded to 2 decimal places.
+                                            "partial": bool,  # Optional.
+                                              True while the day is still in progress; its values will
+                                              keep changing.
+                                            "samples": 0  # Optional.
+                                              Number of requests the percentiles were computed from.
+                                        }
+                                    ],
+                                    "status": "str",  # Optional. "ok" when days
+                                      has data; "insufficient_data" when there are not enough recent
+                                      samples for this model.
+                                    "unit": "str"  # Optional. Unit of the
+                                      percentile values: "s" for ttft and e2e_latency, "tok/s" for
+                                      throughput.
+                                }
+                            },
+                            "max_output_tokens": "str",  # Optional. Maximum number of
+                              output tokens the model can generate in one response.
+                            "max_tokens": {
+                                "default": 0.0,  # Optional. Numeric range with min,
+                                  max, and default values for model tuning parameters.
+                                "max": 0.0,  # Optional. Numeric range with min, max,
+                                  and default values for model tuning parameters.
+                                "min": 0.0  # Optional. Numeric range with min, max,
+                                  and default values for model tuning parameters.
+                            },
+                            "model_id": "str",  # Optional. Model identifier used for
+                              inference API calls, such as llama3.1-70b-instruct.
+                            "name": "str",  # Optional.
+                            "output_modality": [
+                                "str"  # Optional.
+                            ],
+                            "parameter_count_in_billions": 0.0,  # Optional. Parameter
+                              count in billions. For example, 70.0 means 70B.
+                            "performance": {
+                                "e2e_latency_p50_seconds": 0.0,  # Optional.
+                                  End-to-end latency in seconds, p50.
+                                "e2e_latency_p75_seconds": 0.0,  # Optional.
+                                  End-to-end latency in seconds, p75.
+                                "e2e_latency_p95_seconds": 0.0,  # Optional.
+                                  End-to-end latency in seconds, p95.
+                                "samples": 0,  # Optional. Request samples across the
+                                  window. Prefers end-to-end latency, then time to first token, then
+                                  throughput.
+                                "status": "str",  # Optional. "ok" when time to first
+                                  token, end-to-end latency, and throughput all have data,
+                                  "partial_data" when only some do, "insufficient_data" when none do.
+                                "throughput_p50_tok_per_s": 0.0,  # Optional.
+                                  Throughput in tokens per second, p50.
+                                "throughput_p75_tok_per_s": 0.0,  # Optional.
+                                  Throughput in tokens per second, p75.
+                                "throughput_p95_tok_per_s": 0.0,  # Optional.
+                                  Throughput in tokens per second, p95.
+                                "ttft_p50_seconds": 0.0,  # Optional. Time to first
+                                  token in seconds, p50. Streaming canary probes only.
+                                "ttft_p75_seconds": 0.0,  # Optional. Time to first
+                                  token in seconds, p75. Streaming canary probes only.
+                                "ttft_p95_seconds": 0.0,  # Optional. Time to first
+                                  token in seconds, p95. Streaming canary probes only.
+                                "window_days": 0  # Optional. Lookback window length
+                                  in days. 1 is the rolling 24-hour list window.
+                            },
+                            "pricing": {
+                                "cache_read_input_price_per_million": 0.0,  #
+                                  Optional. Per-million cache read rate for standard chat models
+                                  (token_type "cache read input"). Multimodal models use
+                                  text_cache_read_input_price_per_million /
+                                  image_cache_read_input_price_per_million instead.
+                                "cache_write_1h_input_price_per_million": 0.0,  #
+                                  Optional. Price per million tokens written to the prompt cache with a
+                                  1-hour lifetime.
+                                "cache_write_5m_input_price_per_million": 0.0,  #
+                                  Optional. Price per million tokens written to the prompt cache with a
+                                  5-minute lifetime.
+                                "image_cache_read_input_price_per_million": 0.0,  #
+                                  Optional. Pricing per million tokens (aligns with existing ModelPrice
+                                  pattern).
+                                "image_input_price_per_million": 0.0,  # Optional.
+                                  Pricing per million tokens (aligns with existing ModelPrice pattern).
+                                "image_output_price_per_million": 0.0,  # Optional.
+                                  Pricing per million tokens (aligns with existing ModelPrice pattern).
+                                "input_cache_read": 0.0,  # Optional. Cache read
+                                  input price per single token. Equivalent to
+                                  cache_read_input_price_per_million.
+                                "input_price_per_million": 0.0,  # Optional. Pricing
+                                  per million tokens (aligns with existing ModelPrice pattern).
+                                "output_price_per_million": 0.0,  # Optional. Pricing
+                                  per million tokens (aligns with existing ModelPrice pattern).
+                                "price_per_audio": 0.0,  # Optional. Pricing per
+                                  million tokens (aligns with existing ModelPrice pattern).
+                                "price_per_image": 0.0,  # Optional. Unit-based
+                                  pricing for non-token models (e.g., Fal AI image/video/audio
+                                  generation, speech models). At most one of these is typically
+                                  populated per model. Token-based models (chat, embeddings) leave all
+                                  of these at 0 and populate input_price_per_million /
+                                  output_price_per_million instead.
+                                "price_per_megapixel": 0.0,  # Optional. Pricing per
+                                  million tokens (aligns with existing ModelPrice pattern).
+                                "price_per_second": 0.0,  # Optional. Pricing per
+                                  million tokens (aligns with existing ModelPrice pattern).
+                                "price_per_thousand_characters": 0.0,  # Optional.
+                                  Pricing per million tokens (aligns with existing ModelPrice pattern).
+                                "price_per_video": 0.0,  # Optional. Pricing per
+                                  million tokens (aligns with existing ModelPrice pattern).
+                                "reasoning_price_per_million": 0.0,  # Optional.
+                                  Price per million reasoning tokens. 0 if the model does not charge
+                                  separately for reasoning tokens.
+                                "text_cache_read_input_price_per_million": 0.0,  #
+                                  Optional. Pricing per million tokens (aligns with existing ModelPrice
+                                  pattern).
+                                "text_input_price_per_million": 0.0,  # Optional.
+                                  Per-million token rates for models that bill text vs image tokens
+                                  separately (e.g. OpenAI gpt-image-2). Standard chat models leave
+                                  these at 0 and use input_price_per_million / output_price_per_million
+                                  instead. Values align with usage token_type / internal/usage.Type
+                                  string values for each meter.
+                                "text_output_price_per_million": 0.0  # Optional.
+                                  Pricing per million tokens (aligns with existing ModelPrice pattern).
+                            },
+                            "pricing_detail": {
+                                "variants": [
+                                    {
+                                        "currency": "str",  # Optional.
+                                          Currency code for this variant's rates (e.g. ``USD``"" ).
+                                        "label": "str",  # Optional. Display
+                                          name for the variant (e.g. ``Standard``"" , ``Fast Mode``"" ,
+                                          ``1M Context``"" ).
+                                        "mode":
+                                          "MODEL_BILLING_MODE_UNSPECIFIED",  # Optional. Default value
+                                          is "MODEL_BILLING_MODE_UNSPECIFIED". Whether rates apply to
+                                          real-time or batch requests.   *
+                                          MODEL_BILLING_MODE_INTERACTIVE: Real-time request pricing. *
+                                          MODEL_BILLING_MODE_BATCH: Discounted pricing for asynchronous
+                                          batch requests. Known values are:
+                                          "MODEL_BILLING_MODE_UNSPECIFIED",
+                                          "MODEL_BILLING_MODE_INTERACTIVE", and
+                                          "MODEL_BILLING_MODE_BATCH".
+                                        "prices": {
+                "cache_read_input_price_per_million": 0.0,  # Optional.
+                                              Per-million cache read rate for standard chat models
+                                              (token_type "cache read input"). Multimodal models use
+                                              text_cache_read_input_price_per_million /
+                                              image_cache_read_input_price_per_million instead.
+                "cache_write_1h_input_price_per_million": 0.0,  #
+                                              Optional. Price per million tokens written to the prompt
+                                              cache with a 1-hour lifetime.
+                "cache_write_5m_input_price_per_million": 0.0,  #
+                                              Optional. Price per million tokens written to the prompt
+                                              cache with a 5-minute lifetime.
+                "image_cache_read_input_price_per_million": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "image_input_price_per_million": 0.0,  # Optional.
+                                              Pricing per million tokens (aligns with existing
+                                              ModelPrice pattern).
+                "image_output_price_per_million": 0.0,  # Optional.
+                                              Pricing per million tokens (aligns with existing
+                                              ModelPrice pattern).
+                                            "input_cache_read": 0.0,  #
+                                              Optional. Cache read input price per single token.
+                                              Equivalent to cache_read_input_price_per_million.
+                                            "input_price_per_million":
+                                              0.0,  # Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "output_price_per_million":
+                                              0.0,  # Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "price_per_audio": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "price_per_image": 0.0,  #
+                                              Optional. Unit-based pricing for non-token models (e.g.,
+                                              Fal AI image/video/audio generation, speech models). At
+                                              most one of these is typically populated per model.
+                                              Token-based models (chat, embeddings) leave all of these
+                                              at 0 and populate input_price_per_million /
+                                              output_price_per_million instead.
+                                            "price_per_megapixel": 0.0,
+                                              # Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "price_per_second": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "price_per_thousand_characters": 0.0,  # Optional.
+                                              Pricing per million tokens (aligns with existing
+                                              ModelPrice pattern).
+                                            "price_per_video": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "reasoning_price_per_million": 0.0,  # Optional. Price
+                                              per million reasoning tokens. 0 if the model does not
+                                              charge separately for reasoning tokens.
+                "text_cache_read_input_price_per_million": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "text_input_price_per_million": 0.0,  # Optional.
+                                              Per-million token rates for models that bill text vs
+                                              image tokens separately (e.g. OpenAI gpt-image-2).
+                                              Standard chat models leave these at 0 and use
+                                              input_price_per_million / output_price_per_million
+                                              instead. Values align with usage token_type /
+                                              internal/usage.Type string values for each meter.
+                "text_output_price_per_million": 0.0  # Optional. Pricing
+                                              per million tokens (aligns with existing ModelPrice
+                                              pattern).
+                                        },
+                                        "scaled_pricing": {
+                                            "intervals": [
+                                                {
+                                                    "end_time":
+                                                      "2020-02-20 00:00:00",  # Optional. End of the
+                                                      interval, exclusive. Always on the hour.
+                                                    "prices": {
+                "cache_read_input_price_per_million": 0.0,  #
+                                                          Optional. Per-million cache read rate for
+                                                          standard chat models (token_type "cache read
+                                                          input"). Multimodal models use
+                                                          text_cache_read_input_price_per_million /
+                                                          image_cache_read_input_price_per_million
+                                                          instead.
+                "cache_write_1h_input_price_per_million":
+                                                          0.0,  # Optional. Price per million tokens
+                                                          written to the prompt cache with a 1-hour
+                                                          lifetime.
+                "cache_write_5m_input_price_per_million":
+                                                          0.0,  # Optional. Price per million tokens
+                                                          written to the prompt cache with a 5-minute
+                                                          lifetime.
+                "image_cache_read_input_price_per_million":
+                                                          0.0,  # Optional. Pricing per million tokens
+                                                          (aligns with existing ModelPrice pattern).
+                "image_input_price_per_million": 0.0,  #
+                                                          Optional. Pricing per million tokens (aligns
+                                                          with existing ModelPrice pattern).
+                "image_output_price_per_million": 0.0,  #
+                                                          Optional. Pricing per million tokens (aligns
+                                                          with existing ModelPrice pattern).
+                "input_cache_read": 0.0,  # Optional. Cache
+                                                          read input price per single token. Equivalent
+                                                          to cache_read_input_price_per_million.
+                "input_price_per_million": 0.0,  # Optional.
+                                                          Pricing per million tokens (aligns with
+                                                          existing ModelPrice pattern).
+                "output_price_per_million": 0.0,  # Optional.
+                                                          Pricing per million tokens (aligns with
+                                                          existing ModelPrice pattern).
+                "price_per_audio": 0.0,  # Optional. Pricing
+                                                          per million tokens (aligns with existing
+                                                          ModelPrice pattern).
+                "price_per_image": 0.0,  # Optional.
+                                                          Unit-based pricing for non-token models
+                                                          (e.g., Fal AI image/video/audio generation,
+                                                          speech models). At most one of these is
+                                                          typically populated per model. Token-based
+                                                          models (chat, embeddings) leave all of these
+                                                          at 0 and populate input_price_per_million /
+                                                          output_price_per_million instead.
+                "price_per_megapixel": 0.0,  # Optional.
+                                                          Pricing per million tokens (aligns with
+                                                          existing ModelPrice pattern).
+                "price_per_second": 0.0,  # Optional. Pricing
+                                                          per million tokens (aligns with existing
+                                                          ModelPrice pattern).
+                "price_per_thousand_characters": 0.0,  #
+                                                          Optional. Pricing per million tokens (aligns
+                                                          with existing ModelPrice pattern).
+                "price_per_video": 0.0,  # Optional. Pricing
+                                                          per million tokens (aligns with existing
+                                                          ModelPrice pattern).
+                "reasoning_price_per_million": 0.0,  #
+                                                          Optional. Price per million reasoning tokens.
+                                                          0 if the model does not charge separately for
+                                                          reasoning tokens.
+                "text_cache_read_input_price_per_million":
+                                                          0.0,  # Optional. Pricing per million tokens
+                                                          (aligns with existing ModelPrice pattern).
+                "text_input_price_per_million": 0.0,  #
+                                                          Optional. Per-million token rates for models
+                                                          that bill text vs image tokens separately
+                                                          (e.g. OpenAI gpt-image-2). Standard chat
+                                                          models leave these at 0 and use
+                                                          input_price_per_million /
+                                                          output_price_per_million instead. Values
+                                                          align with usage token_type /
+                                                          internal/usage.Type string values for each
+                                                          meter.
+                "text_output_price_per_million": 0.0  #
+                                                          Optional. Pricing per million tokens (aligns
+                                                          with existing ModelPrice pattern).
+                                                    },
+                                                    "start_time":
+                                                      "2020-02-20 00:00:00"  # Optional. Start of the
+                                                      interval, inclusive. Always on the hour.
+                                                }
+                                            ],
+                                            "max_prices": {
+                "cache_read_input_price_per_million": 0.0,  #
+                                                  Optional. Per-million cache read rate for standard
+                                                  chat models (token_type "cache read input").
+                                                  Multimodal models use
+                                                  text_cache_read_input_price_per_million /
+                                                  image_cache_read_input_price_per_million instead.
+                "cache_write_1h_input_price_per_million": 0.0,  #
+                                                  Optional. Price per million tokens written to the
+                                                  prompt cache with a 1-hour lifetime.
+                "cache_write_5m_input_price_per_million": 0.0,  #
+                                                  Optional. Price per million tokens written to the
+                                                  prompt cache with a 5-minute lifetime.
+                "image_cache_read_input_price_per_million": 0.0,  #
+                                                  Optional. Pricing per million tokens (aligns with
+                                                  existing ModelPrice pattern).
+                "image_input_price_per_million": 0.0,  # Optional.
+                                                  Pricing per million tokens (aligns with existing
+                                                  ModelPrice pattern).
+                "image_output_price_per_million": 0.0,  # Optional.
+                                                  Pricing per million tokens (aligns with existing
+                                                  ModelPrice pattern).
+                                                "input_cache_read":
+                                                  0.0,  # Optional. Cache read input price per single
+                                                  token. Equivalent to
+                                                  cache_read_input_price_per_million.
+                "input_price_per_million": 0.0,  # Optional. Pricing
+                                                  per million tokens (aligns with existing ModelPrice
+                                                  pattern).
+                "output_price_per_million": 0.0,  # Optional. Pricing
+                                                  per million tokens (aligns with existing ModelPrice
+                                                  pattern).
+                                                "price_per_audio":
+                                                  0.0,  # Optional. Pricing per million tokens (aligns
+                                                  with existing ModelPrice pattern).
+                                                "price_per_image":
+                                                  0.0,  # Optional. Unit-based pricing for non-token
+                                                  models (e.g., Fal AI image/video/audio generation,
+                                                  speech models). At most one of these is typically
+                                                  populated per model. Token-based models (chat,
+                                                  embeddings) leave all of these at 0 and populate
+                                                  input_price_per_million / output_price_per_million
+                                                  instead.
+                "price_per_megapixel": 0.0,  # Optional. Pricing per
+                                                  million tokens (aligns with existing ModelPrice
+                                                  pattern).
+                                                "price_per_second":
+                                                  0.0,  # Optional. Pricing per million tokens (aligns
+                                                  with existing ModelPrice pattern).
+                "price_per_thousand_characters": 0.0,  # Optional.
+                                                  Pricing per million tokens (aligns with existing
+                                                  ModelPrice pattern).
+                                                "price_per_video":
+                                                  0.0,  # Optional. Pricing per million tokens (aligns
+                                                  with existing ModelPrice pattern).
+                "reasoning_price_per_million": 0.0,  # Optional.
+                                                  Price per million reasoning tokens. 0 if the model
+                                                  does not charge separately for reasoning tokens.
+                "text_cache_read_input_price_per_million": 0.0,  #
+                                                  Optional. Pricing per million tokens (aligns with
+                                                  existing ModelPrice pattern).
+                "text_input_price_per_million": 0.0,  # Optional.
+                                                  Per-million token rates for models that bill text vs
+                                                  image tokens separately (e.g. OpenAI gpt-image-2).
+                                                  Standard chat models leave these at 0 and use
+                                                  input_price_per_million / output_price_per_million
+                                                  instead. Values align with usage token_type /
+                                                  internal/usage.Type string values for each meter.
+                "text_output_price_per_million": 0.0  # Optional.
+                                                  Pricing per million tokens (aligns with existing
+                                                  ModelPrice pattern).
+                                            },
+                                            "min_prices": {
+                "cache_read_input_price_per_million": 0.0,  #
+                                                  Optional. Per-million cache read rate for standard
+                                                  chat models (token_type "cache read input").
+                                                  Multimodal models use
+                                                  text_cache_read_input_price_per_million /
+                                                  image_cache_read_input_price_per_million instead.
+                "cache_write_1h_input_price_per_million": 0.0,  #
+                                                  Optional. Price per million tokens written to the
+                                                  prompt cache with a 1-hour lifetime.
+                "cache_write_5m_input_price_per_million": 0.0,  #
+                                                  Optional. Price per million tokens written to the
+                                                  prompt cache with a 5-minute lifetime.
+                "image_cache_read_input_price_per_million": 0.0,  #
+                                                  Optional. Pricing per million tokens (aligns with
+                                                  existing ModelPrice pattern).
+                "image_input_price_per_million": 0.0,  # Optional.
+                                                  Pricing per million tokens (aligns with existing
+                                                  ModelPrice pattern).
+                "image_output_price_per_million": 0.0,  # Optional.
+                                                  Pricing per million tokens (aligns with existing
+                                                  ModelPrice pattern).
+                                                "input_cache_read":
+                                                  0.0,  # Optional. Cache read input price per single
+                                                  token. Equivalent to
+                                                  cache_read_input_price_per_million.
+                "input_price_per_million": 0.0,  # Optional. Pricing
+                                                  per million tokens (aligns with existing ModelPrice
+                                                  pattern).
+                "output_price_per_million": 0.0,  # Optional. Pricing
+                                                  per million tokens (aligns with existing ModelPrice
+                                                  pattern).
+                                                "price_per_audio":
+                                                  0.0,  # Optional. Pricing per million tokens (aligns
+                                                  with existing ModelPrice pattern).
+                                                "price_per_image":
+                                                  0.0,  # Optional. Unit-based pricing for non-token
+                                                  models (e.g., Fal AI image/video/audio generation,
+                                                  speech models). At most one of these is typically
+                                                  populated per model. Token-based models (chat,
+                                                  embeddings) leave all of these at 0 and populate
+                                                  input_price_per_million / output_price_per_million
+                                                  instead.
+                "price_per_megapixel": 0.0,  # Optional. Pricing per
+                                                  million tokens (aligns with existing ModelPrice
+                                                  pattern).
+                                                "price_per_second":
+                                                  0.0,  # Optional. Pricing per million tokens (aligns
+                                                  with existing ModelPrice pattern).
+                "price_per_thousand_characters": 0.0,  # Optional.
+                                                  Pricing per million tokens (aligns with existing
+                                                  ModelPrice pattern).
+                                                "price_per_video":
+                                                  0.0,  # Optional. Pricing per million tokens (aligns
+                                                  with existing ModelPrice pattern).
+                "reasoning_price_per_million": 0.0,  # Optional.
+                                                  Price per million reasoning tokens. 0 if the model
+                                                  does not charge separately for reasoning tokens.
+                "text_cache_read_input_price_per_million": 0.0,  #
+                                                  Optional. Pricing per million tokens (aligns with
+                                                  existing ModelPrice pattern).
+                "text_input_price_per_million": 0.0,  # Optional.
+                                                  Per-million token rates for models that bill text vs
+                                                  image tokens separately (e.g. OpenAI gpt-image-2).
+                                                  Standard chat models leave these at 0 and use
+                                                  input_price_per_million / output_price_per_million
+                                                  instead. Values align with usage token_type /
+                                                  internal/usage.Type string values for each meter.
+                "text_output_price_per_million": 0.0  # Optional.
+                                                  Pricing per million tokens (aligns with existing
+                                                  ModelPrice pattern).
+                                            }
+                                        },
+                                        "tier":
+                                          "MODEL_PRICING_TIER_UNSPECIFIED"  # Optional. Default value
+                                          is "MODEL_PRICING_TIER_UNSPECIFIED". A pricing variant of a
+                                          model, such as a faster serving option or a larger context
+                                          window.   * MODEL_PRICING_TIER_STANDARD: Default pricing. *
+                                          MODEL_PRICING_TIER_FAST_MODE: Faster, higher-priority serving
+                                          at a premium price. * MODEL_PRICING_TIER_EXTENDED_1M: Pricing
+                                          for the 1M-token context window. *
+                                          MODEL_PRICING_TIER_EXTENDED_272K: Pricing for the 272K-token
+                                          context window. * MODEL_PRICING_TIER_BYOK: Pricing when using
+                                          your own model API key. Known values are:
+                                          "MODEL_PRICING_TIER_UNSPECIFIED",
+                                          "MODEL_PRICING_TIER_STANDARD",
+                                          "MODEL_PRICING_TIER_FAST_MODE",
+                                          "MODEL_PRICING_TIER_EXTENDED_1M",
+                                          "MODEL_PRICING_TIER_EXTENDED_272K", and
+                                          "MODEL_PRICING_TIER_BYOK".
+                                    }
+                                ]
+                            },
+                            "products": [
+                                "str"  # Optional.
+                            ],
+                            "provider": "MODEL_PROVIDER_DIGITALOCEAN",  # Optional.
+                              Default value is "MODEL_PROVIDER_DIGITALOCEAN". Known values are:
+                              "MODEL_PROVIDER_DIGITALOCEAN", "MODEL_PROVIDER_ANTHROPIC", and
+                              "MODEL_PROVIDER_OPENAI".
+                            "reasoning_efforts": [
+                                "str"  # Optional. Supported reasoning effort levels,
+                                  such as low, medium, and high.
+                            ],
+                            "scaled_pricing_enabled": bool,  # Optional. True when this
+                              model's pricing varies over time.
+                            "serving": [
+                                "str"  # Optional.
+                            ],
+                            "short_description": "str",  # Optional.
+                            "supported_endpoints": [
+                                "str"  # Optional. Inference endpoints this model
+                                  serves, such as chat completions or responses. Empty for Inference
+                                  Router presets.
+                            ],
+                            "supports_temperature": bool,  # Optional. Whether the
+                              inference request schema includes a temperature field.
+                            "temperature": {
+                                "default": 0.0,  # Optional. Numeric range with min,
+                                  max, and default values for model tuning parameters.
+                                "max": 0.0,  # Optional. Numeric range with min, max,
+                                  and default values for model tuning parameters.
+                                "min": 0.0  # Optional. Numeric range with min, max,
+                                  and default values for model tuning parameters.
+                            },
+                            "thinking": bool,  # Optional. Whether the model supports
+                              extended thinking.
+                            "top_p": {
+                                "default": 0.0,  # Optional. Numeric range with min,
+                                  max, and default values for model tuning parameters.
+                                "max": 0.0,  # Optional. Numeric range with min, max,
+                                  and default values for model tuning parameters.
+                                "min": 0.0  # Optional. Numeric range with min, max,
+                                  and default values for model tuning parameters.
+                            },
+                            "type": "str"  # Optional. Catalog model type, such as chat
+                              or embedding.
+                        }
+                    ],
+                    "links": {
+                        "pages": {
+                            "first": "str",  # Optional. First page.
+                            "last": "str",  # Optional. Last page.
+                            "next": "str",  # Optional. Next page.
+                            "previous": "str"  # Optional. Previous page.
+                        }
+                    },
+                    "meta": {
+                        "page": 0,  # Optional. The current page.
+                        "pages": 0,  # Optional. Total number of pages.
+                        "total": 0  # Optional. Total amount of items over all pages.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_genai_list_model_catalog_v2_request(
+            page=page,
+            per_page=per_page,
+            search=search,
+            serving=serving,
+            badges=badges,
+            input_modality=input_modality,
+            output_modality=output_modality,
+            product=product,
+            capabilities=capabilities,
+            item_type=item_type,
+            sort_by=sort_by,
+            sort_direction=sort_direction,
+            creator=creator,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_model_catalog_card_v2(
+        self, id: str, *, model_id: Optional[str] = None, **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Get Model Catalog Card V2.
+
+        Returns a V2 catalog card by catalog ID or model ID. Requires authentication.
+        Visibility matches List Model Catalog V2.
+
+        :param id: Catalog ID of the model. Use ``model_id`` instead to look up by the inference model
+         ID. Required.
+        :type id: str
+        :keyword model_id: Inference model ID, such as ``llama3.1-70b-instruct``. Alternative to the
+         catalog ID in the path. Default value is None.
+        :paramtype model_id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "data": {
+                        "badges": [
+                            "str"  # Optional. Catalog row returned by List Model Catalog
+                              V2 and Get Model Catalog Card V2. description, code_snippets,
+                              pricing_detail, and liveliness are populated on the card and empty on
+                              list rows. performance is populated on list rows and the card when canary
+                              data is available.
+                        ],
+                        "capabilities": [
+                            "str"  # Optional. Catalog row returned by List Model Catalog
+                              V2 and Get Model Catalog Card V2. description, code_snippets,
+                              pricing_detail, and liveliness are populated on the card and empty on
+                              list rows. performance is populated on list rows and the card when canary
+                              data is available.
+                        ],
+                        "code_snippets": {
+                            "curl": "str",  # Optional. Code examples for using the
+                              model.
+                            "javascript": "str",  # Optional. Code examples for using the
+                              model.
+                            "python": "str",  # Optional. Code examples for using the
+                              model.
+                            "sdk": "str"  # Optional. Code examples for using the model.
+                        },
+                        "context_window": "str",  # Optional. Catalog row returned by List
+                          Model Catalog V2 and Get Model Catalog Card V2. description, code_snippets,
+                          pricing_detail, and liveliness are populated on the card and empty on list
+                          rows. performance is populated on list rows and the card when canary data is
+                          available.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. RFC 3339 timestamp
+                          indicating when the model was added to the catalog.
+                        "creator": "str",  # Optional. Model creator or developer, such as
+                          Meta, Anthropic, or OpenAI.
+                        "description": "str",  # Optional. Full catalog description.
+                          Populated on Get Model Catalog Card V2.
+                        "huggingface_repo_id": "str",  # Optional. Hugging Face repository ID
+                          the model is based on, when applicable.
+                        "id": "str",  # Optional. Catalog row returned by List Model Catalog
+                          V2 and Get Model Catalog Card V2. description, code_snippets, pricing_detail,
+                          and liveliness are populated on the card and empty on list rows. performance
+                          is populated on list rows and the card when canary data is available.
+                        "input_modality": [
+                            "str"  # Optional. Catalog row returned by List Model Catalog
+                              V2 and Get Model Catalog Card V2. description, code_snippets,
+                              pricing_detail, and liveliness are populated on the card and empty on
+                              list rows. performance is populated on list rows and the card when canary
+                              data is available.
+                        ],
+                        "item_type": "MODEL_CATALOG_ITEM_TYPE_UNSPECIFIED",  # Optional.
+                          Default value is "MODEL_CATALOG_ITEM_TYPE_UNSPECIFIED". Whether a catalog row
+                          is a foundation model or an Inference Router preset.   *
+                          MODEL_CATALOG_ITEM_TYPE_MODEL: A foundation or inference model. *
+                          MODEL_CATALOG_ITEM_TYPE_INFERENCE_ROUTER: An Inference Router preset. Known
+                          values are: "MODEL_CATALOG_ITEM_TYPE_UNSPECIFIED",
+                          "MODEL_CATALOG_ITEM_TYPE_MODEL", and
+                          "MODEL_CATALOG_ITEM_TYPE_INFERENCE_ROUTER".
+                        "liveliness": {
+                            "e2e_latency": {
+                                "days": [
+                                    {
+                                        "day_ms": 0.0,  # Optional. Start of
+                                          the day (00:00 UTC) as Unix milliseconds.
+                                        "p50": 0.0,  # Optional. Median
+                                          value, rounded to 2 decimal places.
+                                        "p75": 0.0,  # Optional. 75th
+                                          percentile value, rounded to 2 decimal places.
+                                        "p95": 0.0,  # Optional. 95th
+                                          percentile value, rounded to 2 decimal places.
+                                        "partial": bool,  # Optional. True
+                                          while the day is still in progress; its values will keep
+                                          changing.
+                                        "samples": 0  # Optional. Number of
+                                          requests the percentiles were computed from.
+                                    }
+                                ],
+                                "status": "str",  # Optional. "ok" when days has
+                                  data; "insufficient_data" when there are not enough recent samples
+                                  for this model.
+                                "unit": "str"  # Optional. Unit of the percentile
+                                  values: "s" for ttft and e2e_latency, "tok/s" for throughput.
+                            },
+                            "overall_status": "str",  # Optional. Summary across metrics:
+                              "ok" when every metric has data, "partial_data" when some do and some do
+                              not, "insufficient_data" when none do.
+                            "source": "str",  # Optional. Traffic the statistics are
+                              computed from. Always "canary".
+                            "throughput": {
+                                "days": [
+                                    {
+                                        "day_ms": 0.0,  # Optional. Start of
+                                          the day (00:00 UTC) as Unix milliseconds.
+                                        "p50": 0.0,  # Optional. Median
+                                          value, rounded to 2 decimal places.
+                                        "p75": 0.0,  # Optional. 75th
+                                          percentile value, rounded to 2 decimal places.
+                                        "p95": 0.0,  # Optional. 95th
+                                          percentile value, rounded to 2 decimal places.
+                                        "partial": bool,  # Optional. True
+                                          while the day is still in progress; its values will keep
+                                          changing.
+                                        "samples": 0  # Optional. Number of
+                                          requests the percentiles were computed from.
+                                    }
+                                ],
+                                "status": "str",  # Optional. "ok" when days has
+                                  data; "insufficient_data" when there are not enough recent samples
+                                  for this model.
+                                "unit": "str"  # Optional. Unit of the percentile
+                                  values: "s" for ttft and e2e_latency, "tok/s" for throughput.
+                            },
+                            "ttft": {
+                                "days": [
+                                    {
+                                        "day_ms": 0.0,  # Optional. Start of
+                                          the day (00:00 UTC) as Unix milliseconds.
+                                        "p50": 0.0,  # Optional. Median
+                                          value, rounded to 2 decimal places.
+                                        "p75": 0.0,  # Optional. 75th
+                                          percentile value, rounded to 2 decimal places.
+                                        "p95": 0.0,  # Optional. 95th
+                                          percentile value, rounded to 2 decimal places.
+                                        "partial": bool,  # Optional. True
+                                          while the day is still in progress; its values will keep
+                                          changing.
+                                        "samples": 0  # Optional. Number of
+                                          requests the percentiles were computed from.
+                                    }
+                                ],
+                                "status": "str",  # Optional. "ok" when days has
+                                  data; "insufficient_data" when there are not enough recent samples
+                                  for this model.
+                                "unit": "str"  # Optional. Unit of the percentile
+                                  values: "s" for ttft and e2e_latency, "tok/s" for throughput.
+                            }
+                        },
+                        "max_output_tokens": "str",  # Optional. Maximum number of output
+                          tokens the model can generate in one response.
+                        "max_tokens": {
+                            "default": 0.0,  # Optional. Numeric range with min, max, and
+                              default values for model tuning parameters.
+                            "max": 0.0,  # Optional. Numeric range with min, max, and
+                              default values for model tuning parameters.
+                            "min": 0.0  # Optional. Numeric range with min, max, and
+                              default values for model tuning parameters.
+                        },
+                        "model_id": "str",  # Optional. Model identifier used for inference
+                          API calls, such as llama3.1-70b-instruct.
+                        "name": "str",  # Optional. Catalog row returned by List Model
+                          Catalog V2 and Get Model Catalog Card V2. description, code_snippets,
+                          pricing_detail, and liveliness are populated on the card and empty on list
+                          rows. performance is populated on list rows and the card when canary data is
+                          available.
+                        "output_modality": [
+                            "str"  # Optional. Catalog row returned by List Model Catalog
+                              V2 and Get Model Catalog Card V2. description, code_snippets,
+                              pricing_detail, and liveliness are populated on the card and empty on
+                              list rows. performance is populated on list rows and the card when canary
+                              data is available.
+                        ],
+                        "parameter_count_in_billions": 0.0,  # Optional. Parameter count in
+                          billions. For example, 70.0 means 70B.
+                        "performance": {
+                            "e2e_latency_p50_seconds": 0.0,  # Optional. End-to-end
+                              latency in seconds, p50.
+                            "e2e_latency_p75_seconds": 0.0,  # Optional. End-to-end
+                              latency in seconds, p75.
+                            "e2e_latency_p95_seconds": 0.0,  # Optional. End-to-end
+                              latency in seconds, p95.
+                            "samples": 0,  # Optional. Request samples across the window.
+                              Prefers end-to-end latency, then time to first token, then throughput.
+                            "status": "str",  # Optional. "ok" when time to first token,
+                              end-to-end latency, and throughput all have data, "partial_data" when
+                              only some do, "insufficient_data" when none do.
+                            "throughput_p50_tok_per_s": 0.0,  # Optional. Throughput in
+                              tokens per second, p50.
+                            "throughput_p75_tok_per_s": 0.0,  # Optional. Throughput in
+                              tokens per second, p75.
+                            "throughput_p95_tok_per_s": 0.0,  # Optional. Throughput in
+                              tokens per second, p95.
+                            "ttft_p50_seconds": 0.0,  # Optional. Time to first token in
+                              seconds, p50. Streaming canary probes only.
+                            "ttft_p75_seconds": 0.0,  # Optional. Time to first token in
+                              seconds, p75. Streaming canary probes only.
+                            "ttft_p95_seconds": 0.0,  # Optional. Time to first token in
+                              seconds, p95. Streaming canary probes only.
+                            "window_days": 0  # Optional. Lookback window length in days.
+                              1 is the rolling 24-hour list window.
+                        },
+                        "pricing": {
+                            "cache_read_input_price_per_million": 0.0,  # Optional.
+                              Per-million cache read rate for standard chat models (token_type "cache
+                              read input"). Multimodal models use
+                              text_cache_read_input_price_per_million /
+                              image_cache_read_input_price_per_million instead.
+                            "cache_write_1h_input_price_per_million": 0.0,  # Optional.
+                              Price per million tokens written to the prompt cache with a 1-hour
+                              lifetime.
+                            "cache_write_5m_input_price_per_million": 0.0,  # Optional.
+                              Price per million tokens written to the prompt cache with a 5-minute
+                              lifetime.
+                            "image_cache_read_input_price_per_million": 0.0,  # Optional.
+                              Pricing per million tokens (aligns with existing ModelPrice pattern).
+                            "image_input_price_per_million": 0.0,  # Optional. Pricing
+                              per million tokens (aligns with existing ModelPrice pattern).
+                            "image_output_price_per_million": 0.0,  # Optional. Pricing
+                              per million tokens (aligns with existing ModelPrice pattern).
+                            "input_cache_read": 0.0,  # Optional. Cache read input price
+                              per single token. Equivalent to cache_read_input_price_per_million.
+                            "input_price_per_million": 0.0,  # Optional. Pricing per
+                              million tokens (aligns with existing ModelPrice pattern).
+                            "output_price_per_million": 0.0,  # Optional. Pricing per
+                              million tokens (aligns with existing ModelPrice pattern).
+                            "price_per_audio": 0.0,  # Optional. Pricing per million
+                              tokens (aligns with existing ModelPrice pattern).
+                            "price_per_image": 0.0,  # Optional. Unit-based pricing for
+                              non-token models (e.g., Fal AI image/video/audio generation, speech
+                              models). At most one of these is typically populated per model.
+                              Token-based models (chat, embeddings) leave all of these at 0 and
+                              populate input_price_per_million / output_price_per_million instead.
+                            "price_per_megapixel": 0.0,  # Optional. Pricing per million
+                              tokens (aligns with existing ModelPrice pattern).
+                            "price_per_second": 0.0,  # Optional. Pricing per million
+                              tokens (aligns with existing ModelPrice pattern).
+                            "price_per_thousand_characters": 0.0,  # Optional. Pricing
+                              per million tokens (aligns with existing ModelPrice pattern).
+                            "price_per_video": 0.0,  # Optional. Pricing per million
+                              tokens (aligns with existing ModelPrice pattern).
+                            "reasoning_price_per_million": 0.0,  # Optional. Price per
+                              million reasoning tokens. 0 if the model does not charge separately for
+                              reasoning tokens.
+                            "text_cache_read_input_price_per_million": 0.0,  # Optional.
+                              Pricing per million tokens (aligns with existing ModelPrice pattern).
+                            "text_input_price_per_million": 0.0,  # Optional. Per-million
+                              token rates for models that bill text vs image tokens separately (e.g.
+                              OpenAI gpt-image-2). Standard chat models leave these at 0 and use
+                              input_price_per_million / output_price_per_million instead. Values align
+                              with usage token_type / internal/usage.Type string values for each meter.
+                            "text_output_price_per_million": 0.0  # Optional. Pricing per
+                              million tokens (aligns with existing ModelPrice pattern).
+                        },
+                        "pricing_detail": {
+                            "variants": [
+                                {
+                                    "currency": "str",  # Optional. Currency code
+                                      for this variant's rates (e.g. ``USD``"" ).
+                                    "label": "str",  # Optional. Display name for
+                                      the variant (e.g. ``Standard``"" , ``Fast Mode``"" , ``1M
+                                      Context``"" ).
+                                    "mode": "MODEL_BILLING_MODE_UNSPECIFIED",  #
+                                      Optional. Default value is "MODEL_BILLING_MODE_UNSPECIFIED".
+                                      Whether rates apply to real-time or batch requests.   *
+                                      MODEL_BILLING_MODE_INTERACTIVE: Real-time request pricing. *
+                                      MODEL_BILLING_MODE_BATCH: Discounted pricing for asynchronous
+                                      batch requests. Known values are:
+                                      "MODEL_BILLING_MODE_UNSPECIFIED",
+                                      "MODEL_BILLING_MODE_INTERACTIVE", and "MODEL_BILLING_MODE_BATCH".
+                                    "prices": {
+                                        "cache_read_input_price_per_million":
+                                          0.0,  # Optional. Per-million cache read rate for standard
+                                          chat models (token_type "cache read input"). Multimodal
+                                          models use text_cache_read_input_price_per_million /
+                                          image_cache_read_input_price_per_million instead.
+                "cache_write_1h_input_price_per_million": 0.0,  # Optional.
+                                          Price per million tokens written to the prompt cache with a
+                                          1-hour lifetime.
+                "cache_write_5m_input_price_per_million": 0.0,  # Optional.
+                                          Price per million tokens written to the prompt cache with a
+                                          5-minute lifetime.
+                "image_cache_read_input_price_per_million": 0.0,  # Optional.
+                                          Pricing per million tokens (aligns with existing ModelPrice
+                                          pattern).
+                                        "image_input_price_per_million": 0.0,
+                                          # Optional. Pricing per million tokens (aligns with existing
+                                          ModelPrice pattern).
+                                        "image_output_price_per_million":
+                                          0.0,  # Optional. Pricing per million tokens (aligns with
+                                          existing ModelPrice pattern).
+                                        "input_cache_read": 0.0,  # Optional.
+                                          Cache read input price per single token. Equivalent to
+                                          cache_read_input_price_per_million.
+                                        "input_price_per_million": 0.0,  #
+                                          Optional. Pricing per million tokens (aligns with existing
+                                          ModelPrice pattern).
+                                        "output_price_per_million": 0.0,  #
+                                          Optional. Pricing per million tokens (aligns with existing
+                                          ModelPrice pattern).
+                                        "price_per_audio": 0.0,  # Optional.
+                                          Pricing per million tokens (aligns with existing ModelPrice
+                                          pattern).
+                                        "price_per_image": 0.0,  # Optional.
+                                          Unit-based pricing for non-token models (e.g., Fal AI
+                                          image/video/audio generation, speech models). At most one of
+                                          these is typically populated per model. Token-based models
+                                          (chat, embeddings) leave all of these at 0 and populate
+                                          input_price_per_million / output_price_per_million instead.
+                                        "price_per_megapixel": 0.0,  #
+                                          Optional. Pricing per million tokens (aligns with existing
+                                          ModelPrice pattern).
+                                        "price_per_second": 0.0,  # Optional.
+                                          Pricing per million tokens (aligns with existing ModelPrice
+                                          pattern).
+                                        "price_per_thousand_characters": 0.0,
+                                          # Optional. Pricing per million tokens (aligns with existing
+                                          ModelPrice pattern).
+                                        "price_per_video": 0.0,  # Optional.
+                                          Pricing per million tokens (aligns with existing ModelPrice
+                                          pattern).
+                                        "reasoning_price_per_million": 0.0,
+                                          # Optional. Price per million reasoning tokens. 0 if the
+                                          model does not charge separately for reasoning tokens.
+                "text_cache_read_input_price_per_million": 0.0,  # Optional.
+                                          Pricing per million tokens (aligns with existing ModelPrice
+                                          pattern).
+                                        "text_input_price_per_million": 0.0,
+                                          # Optional. Per-million token rates for models that bill text
+                                          vs image tokens separately (e.g. OpenAI gpt-image-2).
+                                          Standard chat models leave these at 0 and use
+                                          input_price_per_million / output_price_per_million instead.
+                                          Values align with usage token_type / internal/usage.Type
+                                          string values for each meter.
+                                        "text_output_price_per_million": 0.0
+                                          # Optional. Pricing per million tokens (aligns with existing
+                                          ModelPrice pattern).
+                                    },
+                                    "scaled_pricing": {
+                                        "intervals": [
+                                            {
+                                                "end_time":
+                                                  "2020-02-20 00:00:00",  # Optional. End of the
+                                                  interval, exclusive. Always on the hour.
+                                                "prices": {
+                "cache_read_input_price_per_million": 0.0,  #
+                                                      Optional. Per-million cache read rate for
+                                                      standard chat models (token_type "cache read
+                                                      input"). Multimodal models use
+                                                      text_cache_read_input_price_per_million /
+                                                      image_cache_read_input_price_per_million instead.
+                "cache_write_1h_input_price_per_million": 0.0,  #
+                                                      Optional. Price per million tokens written to the
+                                                      prompt cache with a 1-hour lifetime.
+                "cache_write_5m_input_price_per_million": 0.0,  #
+                                                      Optional. Price per million tokens written to the
+                                                      prompt cache with a 5-minute lifetime.
+                "image_cache_read_input_price_per_million": 0.0,
+                                                      # Optional. Pricing per million tokens (aligns
+                                                      with existing ModelPrice pattern).
+                "image_input_price_per_million": 0.0,  #
+                                                      Optional. Pricing per million tokens (aligns with
+                                                      existing ModelPrice pattern).
+                "image_output_price_per_million": 0.0,  #
+                                                      Optional. Pricing per million tokens (aligns with
+                                                      existing ModelPrice pattern).
+                "input_cache_read": 0.0,  # Optional. Cache read
+                                                      input price per single token. Equivalent to
+                                                      cache_read_input_price_per_million.
+                "input_price_per_million": 0.0,  # Optional.
+                                                      Pricing per million tokens (aligns with existing
+                                                      ModelPrice pattern).
+                "output_price_per_million": 0.0,  # Optional.
+                                                      Pricing per million tokens (aligns with existing
+                                                      ModelPrice pattern).
+                "price_per_audio": 0.0,  # Optional. Pricing per
+                                                      million tokens (aligns with existing ModelPrice
+                                                      pattern).
+                "price_per_image": 0.0,  # Optional. Unit-based
+                                                      pricing for non-token models (e.g., Fal AI
+                                                      image/video/audio generation, speech models). At
+                                                      most one of these is typically populated per
+                                                      model. Token-based models (chat, embeddings)
+                                                      leave all of these at 0 and populate
+                                                      input_price_per_million /
+                                                      output_price_per_million instead.
+                "price_per_megapixel": 0.0,  # Optional. Pricing
+                                                      per million tokens (aligns with existing
+                                                      ModelPrice pattern).
+                "price_per_second": 0.0,  # Optional. Pricing per
+                                                      million tokens (aligns with existing ModelPrice
+                                                      pattern).
+                "price_per_thousand_characters": 0.0,  #
+                                                      Optional. Pricing per million tokens (aligns with
+                                                      existing ModelPrice pattern).
+                "price_per_video": 0.0,  # Optional. Pricing per
+                                                      million tokens (aligns with existing ModelPrice
+                                                      pattern).
+                "reasoning_price_per_million": 0.0,  # Optional.
+                                                      Price per million reasoning tokens. 0 if the
+                                                      model does not charge separately for reasoning
+                                                      tokens.
+                "text_cache_read_input_price_per_million": 0.0,
+                                                      # Optional. Pricing per million tokens (aligns
+                                                      with existing ModelPrice pattern).
+                "text_input_price_per_million": 0.0,  # Optional.
+                                                      Per-million token rates for models that bill text
+                                                      vs image tokens separately (e.g. OpenAI
+                                                      gpt-image-2). Standard chat models leave these at
+                                                      0 and use input_price_per_million /
+                                                      output_price_per_million instead. Values align
+                                                      with usage token_type / internal/usage.Type
+                                                      string values for each meter.
+                "text_output_price_per_million": 0.0  # Optional.
+                                                      Pricing per million tokens (aligns with existing
+                                                      ModelPrice pattern).
+                                                },
+                                                "start_time":
+                                                  "2020-02-20 00:00:00"  # Optional. Start of the
+                                                  interval, inclusive. Always on the hour.
+                                            }
+                                        ],
+                                        "max_prices": {
+                "cache_read_input_price_per_million": 0.0,  # Optional.
+                                              Per-million cache read rate for standard chat models
+                                              (token_type "cache read input"). Multimodal models use
+                                              text_cache_read_input_price_per_million /
+                                              image_cache_read_input_price_per_million instead.
+                "cache_write_1h_input_price_per_million": 0.0,  #
+                                              Optional. Price per million tokens written to the prompt
+                                              cache with a 1-hour lifetime.
+                "cache_write_5m_input_price_per_million": 0.0,  #
+                                              Optional. Price per million tokens written to the prompt
+                                              cache with a 5-minute lifetime.
+                "image_cache_read_input_price_per_million": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "image_input_price_per_million": 0.0,  # Optional.
+                                              Pricing per million tokens (aligns with existing
+                                              ModelPrice pattern).
+                "image_output_price_per_million": 0.0,  # Optional.
+                                              Pricing per million tokens (aligns with existing
+                                              ModelPrice pattern).
+                                            "input_cache_read": 0.0,  #
+                                              Optional. Cache read input price per single token.
+                                              Equivalent to cache_read_input_price_per_million.
+                                            "input_price_per_million":
+                                              0.0,  # Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "output_price_per_million":
+                                              0.0,  # Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "price_per_audio": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "price_per_image": 0.0,  #
+                                              Optional. Unit-based pricing for non-token models (e.g.,
+                                              Fal AI image/video/audio generation, speech models). At
+                                              most one of these is typically populated per model.
+                                              Token-based models (chat, embeddings) leave all of these
+                                              at 0 and populate input_price_per_million /
+                                              output_price_per_million instead.
+                                            "price_per_megapixel": 0.0,
+                                              # Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "price_per_second": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "price_per_thousand_characters": 0.0,  # Optional.
+                                              Pricing per million tokens (aligns with existing
+                                              ModelPrice pattern).
+                                            "price_per_video": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "reasoning_price_per_million": 0.0,  # Optional. Price
+                                              per million reasoning tokens. 0 if the model does not
+                                              charge separately for reasoning tokens.
+                "text_cache_read_input_price_per_million": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "text_input_price_per_million": 0.0,  # Optional.
+                                              Per-million token rates for models that bill text vs
+                                              image tokens separately (e.g. OpenAI gpt-image-2).
+                                              Standard chat models leave these at 0 and use
+                                              input_price_per_million / output_price_per_million
+                                              instead. Values align with usage token_type /
+                                              internal/usage.Type string values for each meter.
+                "text_output_price_per_million": 0.0  # Optional. Pricing
+                                              per million tokens (aligns with existing ModelPrice
+                                              pattern).
+                                        },
+                                        "min_prices": {
+                "cache_read_input_price_per_million": 0.0,  # Optional.
+                                              Per-million cache read rate for standard chat models
+                                              (token_type "cache read input"). Multimodal models use
+                                              text_cache_read_input_price_per_million /
+                                              image_cache_read_input_price_per_million instead.
+                "cache_write_1h_input_price_per_million": 0.0,  #
+                                              Optional. Price per million tokens written to the prompt
+                                              cache with a 1-hour lifetime.
+                "cache_write_5m_input_price_per_million": 0.0,  #
+                                              Optional. Price per million tokens written to the prompt
+                                              cache with a 5-minute lifetime.
+                "image_cache_read_input_price_per_million": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "image_input_price_per_million": 0.0,  # Optional.
+                                              Pricing per million tokens (aligns with existing
+                                              ModelPrice pattern).
+                "image_output_price_per_million": 0.0,  # Optional.
+                                              Pricing per million tokens (aligns with existing
+                                              ModelPrice pattern).
+                                            "input_cache_read": 0.0,  #
+                                              Optional. Cache read input price per single token.
+                                              Equivalent to cache_read_input_price_per_million.
+                                            "input_price_per_million":
+                                              0.0,  # Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "output_price_per_million":
+                                              0.0,  # Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "price_per_audio": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "price_per_image": 0.0,  #
+                                              Optional. Unit-based pricing for non-token models (e.g.,
+                                              Fal AI image/video/audio generation, speech models). At
+                                              most one of these is typically populated per model.
+                                              Token-based models (chat, embeddings) leave all of these
+                                              at 0 and populate input_price_per_million /
+                                              output_price_per_million instead.
+                                            "price_per_megapixel": 0.0,
+                                              # Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "price_per_second": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "price_per_thousand_characters": 0.0,  # Optional.
+                                              Pricing per million tokens (aligns with existing
+                                              ModelPrice pattern).
+                                            "price_per_video": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "reasoning_price_per_million": 0.0,  # Optional. Price
+                                              per million reasoning tokens. 0 if the model does not
+                                              charge separately for reasoning tokens.
+                "text_cache_read_input_price_per_million": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "text_input_price_per_million": 0.0,  # Optional.
+                                              Per-million token rates for models that bill text vs
+                                              image tokens separately (e.g. OpenAI gpt-image-2).
+                                              Standard chat models leave these at 0 and use
+                                              input_price_per_million / output_price_per_million
+                                              instead. Values align with usage token_type /
+                                              internal/usage.Type string values for each meter.
+                "text_output_price_per_million": 0.0  # Optional. Pricing
+                                              per million tokens (aligns with existing ModelPrice
+                                              pattern).
+                                        }
+                                    },
+                                    "tier": "MODEL_PRICING_TIER_UNSPECIFIED"  #
+                                      Optional. Default value is "MODEL_PRICING_TIER_UNSPECIFIED". A
+                                      pricing variant of a model, such as a faster serving option or a
+                                      larger context window.   * MODEL_PRICING_TIER_STANDARD: Default
+                                      pricing. * MODEL_PRICING_TIER_FAST_MODE: Faster, higher-priority
+                                      serving at a premium price. * MODEL_PRICING_TIER_EXTENDED_1M:
+                                      Pricing for the 1M-token context window. *
+                                      MODEL_PRICING_TIER_EXTENDED_272K: Pricing for the 272K-token
+                                      context window. * MODEL_PRICING_TIER_BYOK: Pricing when using
+                                      your own model API key. Known values are:
+                                      "MODEL_PRICING_TIER_UNSPECIFIED", "MODEL_PRICING_TIER_STANDARD",
+                                      "MODEL_PRICING_TIER_FAST_MODE", "MODEL_PRICING_TIER_EXTENDED_1M",
+                                      "MODEL_PRICING_TIER_EXTENDED_272K", and
+                                      "MODEL_PRICING_TIER_BYOK".
+                                }
+                            ]
+                        },
+                        "products": [
+                            "str"  # Optional. Catalog row returned by List Model Catalog
+                              V2 and Get Model Catalog Card V2. description, code_snippets,
+                              pricing_detail, and liveliness are populated on the card and empty on
+                              list rows. performance is populated on list rows and the card when canary
+                              data is available.
+                        ],
+                        "provider": "MODEL_PROVIDER_DIGITALOCEAN",  # Optional. Default value
+                          is "MODEL_PROVIDER_DIGITALOCEAN". Known values are:
+                          "MODEL_PROVIDER_DIGITALOCEAN", "MODEL_PROVIDER_ANTHROPIC", and
+                          "MODEL_PROVIDER_OPENAI".
+                        "reasoning_efforts": [
+                            "str"  # Optional. Supported reasoning effort levels, such as
+                              low, medium, and high.
+                        ],
+                        "scaled_pricing_enabled": bool,  # Optional. True when this model's
+                          pricing varies over time.
+                        "serving": [
+                            "str"  # Optional. Catalog row returned by List Model Catalog
+                              V2 and Get Model Catalog Card V2. description, code_snippets,
+                              pricing_detail, and liveliness are populated on the card and empty on
+                              list rows. performance is populated on list rows and the card when canary
+                              data is available.
+                        ],
+                        "short_description": "str",  # Optional. Catalog row returned by List
+                          Model Catalog V2 and Get Model Catalog Card V2. description, code_snippets,
+                          pricing_detail, and liveliness are populated on the card and empty on list
+                          rows. performance is populated on list rows and the card when canary data is
+                          available.
+                        "supported_endpoints": [
+                            "str"  # Optional. Inference endpoints this model serves,
+                              such as chat completions or responses. Empty for Inference Router
+                              presets.
+                        ],
+                        "supports_temperature": bool,  # Optional. Whether the inference
+                          request schema includes a temperature field.
+                        "temperature": {
+                            "default": 0.0,  # Optional. Numeric range with min, max, and
+                              default values for model tuning parameters.
+                            "max": 0.0,  # Optional. Numeric range with min, max, and
+                              default values for model tuning parameters.
+                            "min": 0.0  # Optional. Numeric range with min, max, and
+                              default values for model tuning parameters.
+                        },
+                        "thinking": bool,  # Optional. Whether the model supports extended
+                          thinking.
+                        "top_p": {
+                            "default": 0.0,  # Optional. Numeric range with min, max, and
+                              default values for model tuning parameters.
+                            "max": 0.0,  # Optional. Numeric range with min, max, and
+                              default values for model tuning parameters.
+                            "min": 0.0  # Optional. Numeric range with min, max, and
+                              default values for model tuning parameters.
+                        },
+                        "type": "str"  # Optional. Catalog model type, such as chat or
+                          embedding.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_genai_get_model_catalog_card_v2_request(
             id=id,
             model_id=model_id,
             headers=_headers,
@@ -331123,6 +333574,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                       the judge.
                 "scoring_prompt": "str",  # Optional.
                                                       Instructions for the judge model (multi-line).
+                                                    "turn_type":
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                      Optional. Default value is
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                                      Whether the metric is for single-turn or
+                                                      multi-turn evaluations. Known values are:
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                     "updated_at":
                                                       "2020-02-20 00:00:00"  # Optional. Configuration
                                                       for a custom model-evaluation metric scored by an
@@ -331172,7 +333632,7 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "range_min": 0.0,  #
                                                   Optional. The minimum value for the metric.
                                                 "source":
-                                                  "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                                  "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                                   Default value is
                                                   "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
                                                   platform catalog metrics from user-defined
@@ -331180,6 +333640,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                                   "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                                   "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             }
                                         ],
                                         "name": "str",  # Optional.
@@ -340062,6 +342531,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -340107,13 +342585,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -341515,6 +344002,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -341559,13 +344055,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -342877,6 +345381,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -342921,13 +345434,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -344241,6 +346762,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -344285,13 +346815,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -345687,6 +348225,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -345731,13 +348278,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -347136,6 +349691,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -347180,13 +349744,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -348501,6 +351073,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -348545,13 +351126,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -349868,6 +352457,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -349912,13 +352510,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -351391,6 +353997,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                       the judge.
                 "scoring_prompt": "str",  # Optional.
                                                       Instructions for the judge model (multi-line).
+                                                    "turn_type":
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                      Optional. Default value is
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                                      Whether the metric is for single-turn or
+                                                      multi-turn evaluations. Known values are:
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                     "updated_at":
                                                       "2020-02-20 00:00:00"  # Optional. Configuration
                                                       for a custom model-evaluation metric scored by an
@@ -351440,7 +354055,7 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "range_min": 0.0,  #
                                                   Optional. The minimum value for the metric.
                                                 "source":
-                                                  "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                                  "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                                   Default value is
                                                   "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
                                                   platform catalog metrics from user-defined
@@ -351448,6 +354063,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                                   "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                                   "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             }
                                         ],
                                         "name": "str",  # Optional.
@@ -352872,6 +355496,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -352916,13 +355549,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -354237,6 +356878,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -354281,13 +356931,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -355605,6 +358263,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -355649,13 +358316,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -355884,6 +358559,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           is not required and is not sent to the judge.
                                         "scoring_prompt": "str",  # Optional.
                                           Instructions for the judge model (multi-line).
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         "updated_at": "2020-02-20 00:00:00"
                                           # Optional. Configuration for a custom model-evaluation
                                           metric scored by an LLM judge. Prompt and model response are
@@ -355919,12 +358602,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                     "range_min": 0.0,  # Optional. The minimum
                                       value for the metric.
                                     "source":
-                                      "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default value
-                                      is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes platform
-                                      catalog metrics from user-defined LLM-as-judge metrics. Known
-                                      values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                                      "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
+                                      value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
+                                      platform catalog metrics from user-defined LLM-as-judge metrics.
+                                      Known values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                       "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                       "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                    "turn_type":
+                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional. Default
+                                      value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                      metric is for single-turn or multi-turn evaluations. Known values
+                                      are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                 }
                             ],
                             "name": "str",  # Optional.
