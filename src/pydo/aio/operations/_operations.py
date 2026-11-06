@@ -271152,6 +271152,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -271197,13 +271206,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -272409,6 +272427,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -272454,13 +272481,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -273713,6 +273749,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -273758,13 +273803,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -276003,6 +276057,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -276048,13 +276111,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -277263,6 +277335,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -277308,13 +277389,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -278533,6 +278623,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -278578,13 +278677,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -279906,6 +280014,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -279951,13 +280068,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -281169,6 +281295,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -281214,13 +281349,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -282443,6 +282587,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -282488,13 +282641,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -283791,6 +283953,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -283836,13 +284007,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -285140,6 +285320,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -285185,13 +285374,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -286400,6 +286598,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -286445,13 +286652,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -287666,6 +287882,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -287711,13 +287936,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -289012,6 +289246,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -289057,13 +289300,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -290338,6 +290590,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -290383,13 +290644,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -291667,6 +291937,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -291712,13 +291991,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -292997,6 +293285,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -293042,13 +293339,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -294972,6 +295278,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -295017,13 +295332,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -296389,6 +296713,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -296434,13 +296767,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -297649,6 +297991,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -297694,13 +298045,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -298981,6 +299341,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -299026,13 +299395,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -300322,6 +300700,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -300367,13 +300754,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -301712,6 +302108,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                       the judge.
                 "scoring_prompt": "str",  # Optional.
                                                       Instructions for the judge model (multi-line).
+                                                    "turn_type":
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                      Optional. Default value is
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                                      Whether the metric is for single-turn or
+                                                      multi-turn evaluations. Known values are:
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                     "updated_at":
                                                       "2020-02-20 00:00:00"  # Optional. Configuration
                                                       for a custom model-evaluation metric scored by an
@@ -301761,7 +302166,7 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "range_min": 0.0,  #
                                                   Optional. The minimum value for the metric.
                                                 "source":
-                                                  "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                                  "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                                   Default value is
                                                   "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
                                                   platform catalog metrics from user-defined
@@ -301769,6 +302174,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                                   "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                                   "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             }
                                         ],
                                         "name": "str",  # Optional.
@@ -303072,6 +303486,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -303117,13 +303540,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -304332,6 +304764,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -304377,13 +304818,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -305598,6 +306048,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -305643,13 +306102,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -308568,6 +309036,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                       the judge.
                 "scoring_prompt": "str",  # Optional.
                                                       Instructions for the judge model (multi-line).
+                                                    "turn_type":
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                      Optional. Default value is
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                                      Whether the metric is for single-turn or
+                                                      multi-turn evaluations. Known values are:
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                     "updated_at":
                                                       "2020-02-20 00:00:00"  # Optional. Configuration
                                                       for a custom model-evaluation metric scored by an
@@ -308617,7 +309094,7 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "range_min": 0.0,  #
                                                   Optional. The minimum value for the metric.
                                                 "source":
-                                                  "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                                  "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                                   Default value is
                                                   "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
                                                   platform catalog metrics from user-defined
@@ -308625,6 +309102,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                                   "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                                   "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             }
                                         ],
                                         "name": "str",  # Optional.
@@ -311435,6 +311921,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   sent to the judge.
                                 "scoring_prompt": "str",  # Optional. Instructions
                                   for the judge model (multi-line).
+                                "turn_type":
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional. Default value
+                                  is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the metric is
+                                  for single-turn or multi-turn evaluations. Known values are:
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                 "updated_at": "2020-02-20 00:00:00"  # Optional.
                                   Configuration for a custom model-evaluation metric scored by an LLM
                                   judge. Prompt and model response are always included in the judge
@@ -311467,12 +311960,18 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               metric.
                             "range_min": 0.0,  # Optional. The minimum value for the
                               metric.
-                            "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
-                              Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
-                              platform catalog metrics from user-defined LLM-as-judge metrics. Known
-                              values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                            "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  #
+                              Optional. Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
+                              Distinguishes platform catalog metrics from user-defined LLM-as-judge
+                              metrics. Known values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                            "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  #
+                              Optional. Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                              Whether the metric is for single-turn or multi-turn evaluations. Known
+                              values are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                         }
                     ]
                 }
@@ -311604,6 +312103,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           ground truth is not required and is not sent to the judge.
                         "scoring_prompt": "str",  # Optional. Instructions for the judge
                           model (multi-line).
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                         "updated_at": "2020-02-20 00:00:00"  # Optional. Configuration for a
                           custom model-evaluation metric scored by an LLM judge. Prompt and model
                           response are always included in the judge context.
@@ -311642,6 +312147,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               When false, ground truth is not required and is not sent to the judge.
                             "scoring_prompt": "str",  # Optional. Instructions for the
                               judge model (multi-line).
+                            "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                              Optional. Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                              Whether the metric is for single-turn or multi-turn evaluations. Known
+                              values are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                             "updated_at": "2020-02-20 00:00:00"  # Optional.
                               Configuration for a custom model-evaluation metric scored by an LLM
                               judge. Prompt and model response are always included in the judge
@@ -311670,11 +312181,17 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                         "range_max": 0.0,  # Optional. The maximum value for the metric.
                         "range_min": 0.0,  # Optional. The minimum value for the metric.
-                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
-                          value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes platform
-                          catalog metrics from user-defined LLM-as-judge metrics. Known values are:
-                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED", "EVALUATION_METRIC_SOURCE_BUILTIN",
-                          and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
+                          platform catalog metrics from user-defined LLM-as-judge metrics. Known values
+                          are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                          "EVALUATION_METRIC_SOURCE_BUILTIN", and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                     }
                 }
                 # response body for status code(s): 404
@@ -311746,6 +312263,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               When false, ground truth is not required and is not sent to the judge.
                             "scoring_prompt": "str",  # Optional. Instructions for the
                               judge model (multi-line).
+                            "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                              Optional. Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                              Whether the metric is for single-turn or multi-turn evaluations. Known
+                              values are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                             "updated_at": "2020-02-20 00:00:00"  # Optional.
                               Configuration for a custom model-evaluation metric scored by an LLM
                               judge. Prompt and model response are always included in the judge
@@ -311774,11 +312297,17 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                         "range_max": 0.0,  # Optional. The maximum value for the metric.
                         "range_min": 0.0,  # Optional. The minimum value for the metric.
-                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
-                          value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes platform
-                          catalog metrics from user-defined LLM-as-judge metrics. Known values are:
-                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED", "EVALUATION_METRIC_SOURCE_BUILTIN",
-                          and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
+                          platform catalog metrics from user-defined LLM-as-judge metrics. Known values
+                          are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                          "EVALUATION_METRIC_SOURCE_BUILTIN", and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                     }
                 }
                 # response body for status code(s): 404
@@ -311826,6 +312355,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           ground truth is not required and is not sent to the judge.
                         "scoring_prompt": "str",  # Optional. Instructions for the judge
                           model (multi-line).
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                         "updated_at": "2020-02-20 00:00:00"  # Optional. Configuration for a
                           custom model-evaluation metric scored by an LLM judge. Prompt and model
                           response are always included in the judge context.
@@ -311864,6 +312399,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               When false, ground truth is not required and is not sent to the judge.
                             "scoring_prompt": "str",  # Optional. Instructions for the
                               judge model (multi-line).
+                            "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                              Optional. Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                              Whether the metric is for single-turn or multi-turn evaluations. Known
+                              values are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                             "updated_at": "2020-02-20 00:00:00"  # Optional.
                               Configuration for a custom model-evaluation metric scored by an LLM
                               judge. Prompt and model response are always included in the judge
@@ -311892,11 +312433,17 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                         "range_max": 0.0,  # Optional. The maximum value for the metric.
                         "range_min": 0.0,  # Optional. The minimum value for the metric.
-                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
-                          value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes platform
-                          catalog metrics from user-defined LLM-as-judge metrics. Known values are:
-                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED", "EVALUATION_METRIC_SOURCE_BUILTIN",
-                          and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
+                          platform catalog metrics from user-defined LLM-as-judge metrics. Known values
+                          are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                          "EVALUATION_METRIC_SOURCE_BUILTIN", and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                     }
                 }
                 # response body for status code(s): 404
@@ -312047,6 +312594,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           ground truth is not required and is not sent to the judge.
                         "scoring_prompt": "str",  # Optional. Instructions for the judge
                           model (multi-line).
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                         "updated_at": "2020-02-20 00:00:00"  # Optional. Configuration for a
                           custom model-evaluation metric scored by an LLM judge. Prompt and model
                           response are always included in the judge context.
@@ -312086,6 +312639,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               When false, ground truth is not required and is not sent to the judge.
                             "scoring_prompt": "str",  # Optional. Instructions for the
                               judge model (multi-line).
+                            "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                              Optional. Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                              Whether the metric is for single-turn or multi-turn evaluations. Known
+                              values are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                             "updated_at": "2020-02-20 00:00:00"  # Optional.
                               Configuration for a custom model-evaluation metric scored by an LLM
                               judge. Prompt and model response are always included in the judge
@@ -312114,11 +312673,17 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                         "range_max": 0.0,  # Optional. The maximum value for the metric.
                         "range_min": 0.0,  # Optional. The minimum value for the metric.
-                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
-                          value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes platform
-                          catalog metrics from user-defined LLM-as-judge metrics. Known values are:
-                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED", "EVALUATION_METRIC_SOURCE_BUILTIN",
-                          and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
+                          platform catalog metrics from user-defined LLM-as-judge metrics. Known values
+                          are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                          "EVALUATION_METRIC_SOURCE_BUILTIN", and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                     }
                 }
                 # response body for status code(s): 404
@@ -312193,6 +312758,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               When false, ground truth is not required and is not sent to the judge.
                             "scoring_prompt": "str",  # Optional. Instructions for the
                               judge model (multi-line).
+                            "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                              Optional. Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                              Whether the metric is for single-turn or multi-turn evaluations. Known
+                              values are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                             "updated_at": "2020-02-20 00:00:00"  # Optional.
                               Configuration for a custom model-evaluation metric scored by an LLM
                               judge. Prompt and model response are always included in the judge
@@ -312221,11 +312792,17 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                         "range_max": 0.0,  # Optional. The maximum value for the metric.
                         "range_min": 0.0,  # Optional. The minimum value for the metric.
-                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
-                          value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes platform
-                          catalog metrics from user-defined LLM-as-judge metrics. Known values are:
-                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED", "EVALUATION_METRIC_SOURCE_BUILTIN",
-                          and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
+                          platform catalog metrics from user-defined LLM-as-judge metrics. Known values
+                          are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                          "EVALUATION_METRIC_SOURCE_BUILTIN", and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                     }
                 }
                 # response body for status code(s): 404
@@ -312278,6 +312855,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           ground truth is not required and is not sent to the judge.
                         "scoring_prompt": "str",  # Optional. Instructions for the judge
                           model (multi-line).
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                         "updated_at": "2020-02-20 00:00:00"  # Optional. Configuration for a
                           custom model-evaluation metric scored by an LLM judge. Prompt and model
                           response are always included in the judge context.
@@ -312317,6 +312900,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               When false, ground truth is not required and is not sent to the judge.
                             "scoring_prompt": "str",  # Optional. Instructions for the
                               judge model (multi-line).
+                            "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                              Optional. Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                              Whether the metric is for single-turn or multi-turn evaluations. Known
+                              values are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                             "updated_at": "2020-02-20 00:00:00"  # Optional.
                               Configuration for a custom model-evaluation metric scored by an LLM
                               judge. Prompt and model response are always included in the judge
@@ -312345,11 +312934,17 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                         "range_max": 0.0,  # Optional. The maximum value for the metric.
                         "range_min": 0.0,  # Optional. The minimum value for the metric.
-                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
-                          value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes platform
-                          catalog metrics from user-defined LLM-as-judge metrics. Known values are:
-                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED", "EVALUATION_METRIC_SOURCE_BUILTIN",
-                          and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
+                          platform catalog metrics from user-defined LLM-as-judge metrics. Known values
+                          are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                          "EVALUATION_METRIC_SOURCE_BUILTIN", and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                     }
                 }
                 # response body for status code(s): 404
@@ -314014,6 +314609,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           is not required and is not sent to the judge.
                                         "scoring_prompt": "str",  # Optional.
                                           Instructions for the judge model (multi-line).
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         "updated_at": "2020-02-20 00:00:00"
                                           # Optional. Configuration for a custom model-evaluation
                                           metric scored by an LLM judge. Prompt and model response are
@@ -314059,12 +314662,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                     "range_min": 0.0,  # Optional. The minimum
                                       value for the metric.
                                     "source":
-                                      "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default value
-                                      is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes platform
-                                      catalog metrics from user-defined LLM-as-judge metrics. Known
-                                      values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                                      "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
+                                      value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
+                                      platform catalog metrics from user-defined LLM-as-judge metrics.
+                                      Known values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                       "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                       "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                    "turn_type":
+                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional. Default
+                                      value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                      metric is for single-turn or multi-turn evaluations. Known values
+                                      are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                 }
                             ],
                             "name": "str",  # Optional. Alternative way of authentication
@@ -314758,6 +315368,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       and is not sent to the judge.
                                     "scoring_prompt": "str",  # Optional.
                                       Instructions for the judge model (multi-line).
+                                    "turn_type":
+                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional. Default
+                                      value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                      metric is for single-turn or multi-turn evaluations. Known values
+                                      are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     "updated_at": "2020-02-20 00:00:00"  #
                                       Optional. Configuration for a custom model-evaluation metric
                                       scored by an LLM judge. Prompt and model response are always
@@ -314791,12 +315408,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   the metric.
                                 "range_min": 0.0,  # Optional. The minimum value for
                                   the metric.
-                                "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  #
+                                "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  #
                                   Optional. Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                   Distinguishes platform catalog metrics from user-defined LLM-as-judge
                                   metrics. Known values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                   "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                   "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                "turn_type":
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional. Default value
+                                  is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the metric is
+                                  for single-turn or multi-turn evaluations. Known values are:
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                             }
                         ],
                         "name": "str",  # Optional.
@@ -320932,13 +321556,23 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
         return cast(JSON, deserialized)  # type: ignore
 
     @distributed_trace_async
-    async def list_model_evaluation_metrics(self, **kwargs: Any) -> JSON:
+    async def list_model_evaluation_metrics(
+        self,
+        *,
+        turn_type: str = "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+        **kwargs: Any
+    ) -> JSON:
         # pylint: disable=line-too-long
         """List Model Evaluation Metrics.
 
         To list all available metrics for model evaluation, send a GET request to
         ``/v2/genai/model_evaluation_metrics``.
 
+        :keyword turn_type: When set, only return metrics compatible with this turn type. Known values
+         are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED", "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+         "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN". Default value is
+         "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+        :paramtype turn_type: str
         :return: JSON object
         :rtype: JSON
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -320979,6 +321613,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   sent to the judge.
                                 "scoring_prompt": "str",  # Optional. Instructions
                                   for the judge model (multi-line).
+                                "turn_type":
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional. Default value
+                                  is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the metric is
+                                  for single-turn or multi-turn evaluations. Known values are:
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                 "updated_at": "2020-02-20 00:00:00"  # Optional.
                                   Configuration for a custom model-evaluation metric scored by an LLM
                                   judge. Prompt and model response are always included in the judge
@@ -321016,12 +321657,18 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               metric.
                             "range_min": 0.0,  # Optional. The minimum value for the
                               metric.
-                            "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
-                              Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
-                              platform catalog metrics from user-defined LLM-as-judge metrics. Known
-                              values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                            "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  #
+                              Optional. Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
+                              Distinguishes platform catalog metrics from user-defined LLM-as-judge
+                              metrics. Known values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                            "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  #
+                              Optional. Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                              Whether the metric is for single-turn or multi-turn evaluations. Known
+                              values are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                         }
                     ]
                 }
@@ -321056,6 +321703,7 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
         _request = build_genai_list_model_evaluation_metrics_request(
+            turn_type=turn_type,
             headers=_headers,
             params=_params,
         )
@@ -321213,6 +321861,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           is not required and is not sent to the judge.
                                         "scoring_prompt": "str",  # Optional.
                                           Instructions for the judge model (multi-line).
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         "updated_at": "2020-02-20 00:00:00"
                                           # Optional. Configuration for a custom model-evaluation
                                           metric scored by an LLM judge. Prompt and model response are
@@ -321258,12 +321914,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                     "range_min": 0.0,  # Optional. The minimum
                                       value for the metric.
                                     "source":
-                                      "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default value
-                                      is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes platform
-                                      catalog metrics from user-defined LLM-as-judge metrics. Known
-                                      values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                                      "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
+                                      value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
+                                      platform catalog metrics from user-defined LLM-as-judge metrics.
+                                      Known values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                       "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                       "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                    "turn_type":
+                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional. Default
+                                      value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                      metric is for single-turn or multi-turn evaluations. Known values
+                                      are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                 }
                             ],
                             "name": "str",  # Optional. Name of the evaluation preset.
@@ -321478,6 +322141,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       and is not sent to the judge.
                                     "scoring_prompt": "str",  # Optional.
                                       Instructions for the judge model (multi-line).
+                                    "turn_type":
+                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional. Default
+                                      value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                      metric is for single-turn or multi-turn evaluations. Known values
+                                      are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     "updated_at": "2020-02-20 00:00:00"  #
                                       Optional. Configuration for a custom model-evaluation metric
                                       scored by an LLM judge. Prompt and model response are always
@@ -321516,12 +322186,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   the metric.
                                 "range_min": 0.0,  # Optional. The minimum value for
                                   the metric.
-                                "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  #
+                                "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  #
                                   Optional. Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                   Distinguishes platform catalog metrics from user-defined LLM-as-judge
                                   metrics. Known values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                   "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                   "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                "turn_type":
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional. Default value
+                                  is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the metric is
+                                  for single-turn or multi-turn evaluations. Known values are:
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                             }
                         ],
                         "name": "str",  # Optional. Name of the evaluation preset.
@@ -322558,6 +323235,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       and is not sent to the judge.
                                     "scoring_prompt": "str",  # Optional.
                                       Instructions for the judge model (multi-line).
+                                    "turn_type":
+                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional. Default
+                                      value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                      metric is for single-turn or multi-turn evaluations. Known values
+                                      are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     "updated_at": "2020-02-20 00:00:00"  #
                                       Optional. Configuration for a custom model-evaluation metric
                                       scored by an LLM judge. Prompt and model response are always
@@ -322596,12 +323280,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   the metric.
                                 "range_min": 0.0,  # Optional. The minimum value for
                                   the metric.
-                                "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  #
+                                "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  #
                                   Optional. Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                   Distinguishes platform catalog metrics from user-defined LLM-as-judge
                                   metrics. Known values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                   "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                   "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                "turn_type":
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional. Default value
+                                  is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the metric is
+                                  for single-turn or multi-turn evaluations. Known values are:
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                             }
                         ],
                         "name": "str",  # Optional. Name of the evaluation run.
@@ -331123,6 +331814,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                       the judge.
                 "scoring_prompt": "str",  # Optional.
                                                       Instructions for the judge model (multi-line).
+                                                    "turn_type":
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                      Optional. Default value is
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                                      Whether the metric is for single-turn or
+                                                      multi-turn evaluations. Known values are:
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                     "updated_at":
                                                       "2020-02-20 00:00:00"  # Optional. Configuration
                                                       for a custom model-evaluation metric scored by an
@@ -331172,7 +331872,7 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "range_min": 0.0,  #
                                                   Optional. The minimum value for the metric.
                                                 "source":
-                                                  "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                                  "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                                   Default value is
                                                   "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
                                                   platform catalog metrics from user-defined
@@ -331180,6 +331880,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                                   "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                                   "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             }
                                         ],
                                         "name": "str",  # Optional.
@@ -340062,6 +340771,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -340107,13 +340825,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -341515,6 +342242,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -341559,13 +342295,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -342877,6 +343621,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -342921,13 +343674,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -344241,6 +345002,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -344285,13 +345055,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -345687,6 +346465,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -345731,13 +346518,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -347136,6 +347931,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -347180,13 +347984,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -348501,6 +349313,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -348545,13 +349366,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -349868,6 +350697,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -349912,13 +350750,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -351391,6 +352237,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                       the judge.
                 "scoring_prompt": "str",  # Optional.
                                                       Instructions for the judge model (multi-line).
+                                                    "turn_type":
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                      Optional. Default value is
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                                      Whether the metric is for single-turn or
+                                                      multi-turn evaluations. Known values are:
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                     "updated_at":
                                                       "2020-02-20 00:00:00"  # Optional. Configuration
                                                       for a custom model-evaluation metric scored by an
@@ -351440,7 +352295,7 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "range_min": 0.0,  #
                                                   Optional. The minimum value for the metric.
                                                 "source":
-                                                  "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                                  "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                                   Default value is
                                                   "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
                                                   platform catalog metrics from user-defined
@@ -351448,6 +352303,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                                   "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                                   "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             }
                                         ],
                                         "name": "str",  # Optional.
@@ -352872,6 +353736,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -352916,13 +353789,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -354237,6 +355118,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -354281,13 +355171,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -355605,6 +356503,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -355649,13 +356556,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -355884,6 +356799,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           is not required and is not sent to the judge.
                                         "scoring_prompt": "str",  # Optional.
                                           Instructions for the judge model (multi-line).
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         "updated_at": "2020-02-20 00:00:00"
                                           # Optional. Configuration for a custom model-evaluation
                                           metric scored by an LLM judge. Prompt and model response are
@@ -355919,12 +356842,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                     "range_min": 0.0,  # Optional. The minimum
                                       value for the metric.
                                     "source":
-                                      "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default value
-                                      is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes platform
-                                      catalog metrics from user-defined LLM-as-judge metrics. Known
-                                      values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                                      "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
+                                      value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
+                                      platform catalog metrics from user-defined LLM-as-judge metrics.
+                                      Known values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                       "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                       "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                    "turn_type":
+                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional. Default
+                                      value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                      metric is for single-turn or multi-turn evaluations. Known values
+                                      are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                 }
                             ],
                             "name": "str",  # Optional.
