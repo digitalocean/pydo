@@ -9,6 +9,8 @@ from ._operations import ProviderCredentialsOperations
 from ._operations import ConnectionsOperations
 from ._operations import McpServersOperations
 from ._operations import OutputViewsOperations
+from ._operations import EndpointsOperations
+from ._operations import EndpointVersionsOperations
 from ._operations import SessionsOperations
 from ._operations import ToolbeltsOperations
 from ._operations import ToolsOperations
@@ -92,6 +94,8 @@ __all__ = [
     "ConnectionsOperations",
     "McpServersOperations",
     "OutputViewsOperations",
+    "EndpointsOperations",
+    "EndpointVersionsOperations",
     "SessionsOperations",
     "ToolbeltsOperations",
     "ToolsOperations",

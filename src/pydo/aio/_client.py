@@ -33,6 +33,8 @@ from .operations import (
     DomainsOperations,
     DropletActionsOperations,
     DropletsOperations,
+    EndpointVersionsOperations,
+    EndpointsOperations,
     FirewallsOperations,
     FunctionsAccessKeyOperations,
     FunctionsOperations,
@@ -111,6 +113,10 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype mcp_servers: pydo.aio.operations.McpServersOperations
     :ivar output_views: OutputViewsOperations operations
     :vartype output_views: pydo.aio.operations.OutputViewsOperations
+    :ivar endpoints: EndpointsOperations operations
+    :vartype endpoints: pydo.aio.operations.EndpointsOperations
+    :ivar endpoint_versions: EndpointVersionsOperations operations
+    :vartype endpoint_versions: pydo.aio.operations.EndpointVersionsOperations
     :ivar sessions: SessionsOperations operations
     :vartype sessions: pydo.aio.operations.SessionsOperations
     :ivar toolbelts: ToolbeltsOperations operations
@@ -310,6 +316,12 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.output_views = OutputViewsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.endpoints = EndpointsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.endpoint_versions = EndpointVersionsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.sessions = SessionsOperations(

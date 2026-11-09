@@ -15,17 +15,22 @@ from pydo.gateway import resolve_gateway_base_url
 
 from .custom_operations import (
     AsyncCodeOperations,
+    AsyncEndpointMCPTransport,
     AsyncGatewayTransport,
     AsyncMCPTransport,
     AsyncRESTTransport,
     AsyncToolsOperations,
     async_execute_tool_calls,
 )
+from .endpoint import AsyncEndpoint, AsyncEndpointsOperations, AsyncEndpointVersion
 from .session import AsyncSession, AsyncSessionsOperations
 
 
 class AsyncGatewayResources:
-    """Async Action Gateway surface attached at ``client.gateway``."""
+    """Async Action Gateway surface attached at ``client.gateway``.
+
+    Primary entry point is :attr:`endpoints`; :attr:`sessions` is deprecated.
+    """
 
     def __init__(
         self,
@@ -38,6 +43,11 @@ class AsyncGatewayResources:
         self._parent = parent_client
         self._gateway_base_url = resolve_gateway_base_url(gateway_endpoint)
         self.provider = provider or default_provider()
+        self.endpoints = AsyncEndpointsOperations(
+            parent_client,
+            gateway_endpoint=gateway_endpoint,
+            provider=self.provider,
+        )
         self.sessions = AsyncSessionsOperations(
             parent_client,
             gateway_endpoint=gateway_endpoint,
@@ -88,10 +98,14 @@ class AsyncGatewayResources:
 
 __all__ = [
     "AsyncGatewayResources",
+    "AsyncEndpoint",
+    "AsyncEndpointsOperations",
+    "AsyncEndpointVersion",
     "AsyncSession",
     "AsyncSessionsOperations",
     "AsyncGatewayTransport",
     "AsyncMCPTransport",
+    "AsyncEndpointMCPTransport",
     "AsyncRESTTransport",
     "AsyncToolsOperations",
     "AsyncCodeOperations",
