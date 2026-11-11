@@ -41,6 +41,7 @@ from pydo.agents.custom_sessions import (
     HistoryPage,
     UploadData,
     WorkspaceTransferError,
+    _manifest_yaml_arg,
     _coerce_upload_content,
     _encode_source_raw,
     _field,
@@ -326,6 +327,16 @@ class AsyncSessionsOperations:
                 "PATCH",
                 f"{_BASE_PATH}/{_quote(session_id)}",
                 body=body,
+            ),
+        )
+
+    async def update_config(self, session_id: str, *, manifest_yaml: str) -> Any:
+        """Patch the live config of a session; see the sync ``update_config``."""
+        return await self._parse_json(
+            await self._send(
+                "PATCH",
+                f"{_BASE_PATH}/{_quote(session_id)}",
+                body={"manifest_yaml": _manifest_yaml_arg(manifest_yaml)},
             ),
         )
 

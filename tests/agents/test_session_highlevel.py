@@ -10,7 +10,13 @@ from typing import Any, List
 
 import pytest
 
-from pydo.agents import AgentEvent, AgentEventType, AgentSession, RunResult
+from pydo.agents import (
+    AgentEvent,
+    AgentEventType,
+    AgentSession,
+    RunResult,
+    SessionConfigUpdateError,
+)
 from pydo.agents.custom_models import HITLOutcome
 from pydo.agents.custom_sessions import _unwrap_harness_sse_chunk
 from pydo.aio.agents import AsyncAgentSession
@@ -339,3 +345,86 @@ async def test_async_context_manager_destroys():
     async with AsyncAgentSession(sessions, "s1") as agent:
         assert agent.session_id == "s1"
     assert sessions.destroyed
+
+
+class _UpdatingSessions:
+    """get() walks through a scripted list of session payloads."""
+
+    def __init__(self, payloads):
+        self._payloads = list(payloads)
+        self.patched = None
+
+    def get(self, session_id):
+        payload = self._payloads.pop(0) if len(self._payloads) > 1 else self._payloads[0]
+        return {"session": {"session_id": session_id, **payload}}
+
+    def update_config(self, session_id, *, manifest_yaml):
+        self.patched = (session_id, manifest_yaml)
+        return {"outcome": "ACCEPTED"}
+
+
+def test_agent_session_update_config_delegates():
+    sessions = _UpdatingSessions([{}])
+    assert AgentSession(sessions, "s1").update_config("tools: []\n") == {
+        "outcome": "ACCEPTED"
+    }
+    assert sessions.patched == ("s1", "tools: []\n")
+
+
+def test_wait_until_updated_returns_final_update():
+    sessions = _UpdatingSessions(
+        [
+            {"status": "SESSION_STATUS_UPDATING"},
+            {
+                "status": "SESSION_STATUS_READY",
+                "update": {"state": "APPLIED", "update_id": "u1"},
+            },
+        ]
+    )
+    update = AgentSession(sessions, "s1").wait_until_updated(poll_interval=0)
+    assert update["state"] == "APPLIED"
+
+
+def test_wait_until_updated_raises_on_failed_with_revert_info():
+    sessions = _UpdatingSessions(
+        [
+            {
+                "status": "SESSION_STATUS_READY",
+                "update": {"state": "FAILED", "reverted": True, "detail": "boom"},
+            }
+        ]
+    )
+    with pytest.raises(SessionConfigUpdateError) as exc:
+        AgentSession(sessions, "s1").wait_until_updated(poll_interval=0)
+    assert exc.value.reverted is True
+    assert exc.value.detail == "boom"
+    assert "boom" in str(exc.value)
+
+
+def test_wait_until_updated_times_out():
+    sessions = _UpdatingSessions([{"status": "SESSION_STATUS_UPDATING"}])
+    with pytest.raises(TimeoutError):
+        AgentSession(sessions, "s1").wait_until_updated(timeout=0, poll_interval=0)
+
+
+@pytest.mark.asyncio
+async def test_async_wait_until_updated():
+    class _S:
+        def __init__(self):
+            self.n = 0
+
+        async def get(self, session_id):
+            self.n += 1
+            if self.n < 2:
+                return {"session": {"session_id": session_id, "status": "SESSION_STATUS_UPDATING"}}
+            return {
+                "session": {
+                    "session_id": session_id,
+                    "status": "SESSION_STATUS_READY",
+                    "update": {"state": "FAILED", "reverted": True, "detail": "x"},
+                }
+            }
+
+    with pytest.raises(SessionConfigUpdateError) as exc:
+        await AsyncAgentSession(_S(), "s1").wait_until_updated(poll_interval=0)
+    assert exc.value.reverted is True

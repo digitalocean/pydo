@@ -29,7 +29,12 @@ import threading
 import time
 from typing import Any, Callable, Dict, Iterator, List, Optional, Union
 
-from .custom_models import HITLOutcome, ResolutionSource, SessionStatus
+from .custom_models import (
+    HITLOutcome,
+    ResolutionSource,
+    SessionConfigUpdateState,
+    SessionStatus,
+)
 from .custom_openai_sandbox import (
     is_openai_codex_session,
     normalize_openai_session_event_type,
@@ -38,7 +43,7 @@ from .custom_openai_sandbox import (
     send_openai_session_input,
     stream_openai_session_events,
 )
-from .custom_sessions import session_create_warnings
+from .custom_sessions import SessionConfigUpdateError, session_create_warnings
 
 # Normalized event type -> raw SPI ``type`` it maps from.
 _RAW_TO_TYPE = {
@@ -514,6 +519,38 @@ class AgentSession:
         """Patch session-scoped settings (e.g. ``resume_on_topoff``)."""
         return self._sessions.update(self.session_id, resume_on_topoff=resume_on_topoff)
 
+    def update_config(self, manifest_yaml: str) -> Any:
+        """Patch the live config (tools, env, secrets) from a partial manifest YAML.
+
+        Returns the PATCH response (``session``, ``outcome``, ``warnings``). On
+        ``ACCEPTED`` call :meth:`wait_until_updated`.
+        """
+        return self._sessions.update_config(
+            self.session_id, manifest_yaml=manifest_yaml
+        )
+
+    def wait_until_updated(
+        self, *, timeout: float = 300.0, poll_interval: float = 2.0
+    ) -> Any:
+        """Block until the session leaves ``UPDATING`` and return its ``update``.
+
+        Raises :class:`SessionConfigUpdateError` (with ``reverted``/``detail``)
+        when the update FAILED, and ``TimeoutError`` on timeout.
+        """
+        deadline = time.monotonic() + timeout
+        while True:
+            info = self.refresh()
+            status = (getattr(info, "get", lambda *_: None))("status")
+            if status != SessionStatus.UPDATING:
+                update = (getattr(info, "get", lambda *_: None))("update")
+                _raise_if_update_failed(self.session_id, update)
+                return update
+            if time.monotonic() > deadline:
+                raise TimeoutError(
+                    f"session {self.session_id} still updating after {timeout}s"
+                )
+            time.sleep(poll_interval)
+
     def exec(
         self,
         *argv: str,
@@ -933,6 +970,22 @@ class _OpenAIEventAdapter:
                     break
         finally:
             self.close()
+
+
+def _raise_if_update_failed(session_id: str, update: Any) -> None:
+    getter = getattr(update, "get", None)
+    if getter is None or getter("state") != SessionConfigUpdateState.FAILED:
+        return
+    detail = getter("detail")
+    reverted = bool(getter("reverted"))
+    msg = f"session {session_id} config update failed"
+    if detail:
+        msg += f": {detail}"
+    if reverted:
+        msg += " (reverted)"
+    raise SessionConfigUpdateError(
+        msg, reverted=reverted, detail=detail, update=update
+    )
 
 
 __all__ = [

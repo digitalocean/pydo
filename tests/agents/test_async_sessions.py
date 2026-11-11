@@ -114,6 +114,30 @@ async def test_async_create_from_manifest_strips_team_id_and_tenant_id():
 
 
 @pytest.mark.asyncio
+async def test_async_update_config_accepts_202():
+    body = {
+        "session": {"session_id": "s1", "status": "SESSION_STATUS_UPDATING"},
+        "outcome": "ACCEPTED",
+    }
+    resources = _make_async_resources([_FakeAsyncResponse(202, body)])
+
+    resp = await resources.sessions.update_config("s1", manifest_yaml="tools: []\n")
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "PATCH"
+    assert call.request.url.endswith("/v2/agents/sessions/s1")
+    assert json.loads(call.request.content) == {"manifest_yaml": "tools: []\n"}
+    assert resp.outcome == "ACCEPTED"
+
+
+@pytest.mark.asyncio
+async def test_async_update_config_rejects_empty():
+    resources = _make_async_resources([])
+    with pytest.raises(ValueError, match="manifest_yaml is required"):
+        await resources.sessions.update_config("s1", manifest_yaml="")
+
+
+@pytest.mark.asyncio
 async def test_async_pause_session():
     resources = _make_async_resources(
         [_FakeAsyncResponse(200, {"session": {"session_id": "abc-123"}})]
