@@ -51,6 +51,8 @@ from ._operations import KubernetesOperations
 from ._operations import LoadBalancersOperations
 from ._operations import MicrovmsOperations
 from ._operations import MicrovmCheckpointsOperations
+from ._operations import MicrovmURLsOperations
+from ._operations import MicrovmAccessTokensOperations
 from ._operations import MonitoringOperations
 from ._operations import NfsOperations
 from ._operations import OrganizationsOperations
@@ -136,6 +138,8 @@ __all__ = [
     "LoadBalancersOperations",
     "MicrovmsOperations",
     "MicrovmCheckpointsOperations",
+    "MicrovmURLsOperations",
+    "MicrovmAccessTokensOperations",
     "MonitoringOperations",
     "NfsOperations",
     "OrganizationsOperations",
