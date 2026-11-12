@@ -355,7 +355,9 @@ class _UpdatingSessions:
         self.patched = None
 
     def get(self, session_id):
-        payload = self._payloads.pop(0) if len(self._payloads) > 1 else self._payloads[0]
+        payload = (
+            self._payloads.pop(0) if len(self._payloads) > 1 else self._payloads[0]
+        )
         return {"session": {"session_id": session_id, **payload}}
 
     def update_config(self, session_id, *, manifest_yaml):
@@ -416,7 +418,12 @@ async def test_async_wait_until_updated():
         async def get(self, session_id):
             self.n += 1
             if self.n < 2:
-                return {"session": {"session_id": session_id, "status": "SESSION_STATUS_UPDATING"}}
+                return {
+                    "session": {
+                        "session_id": session_id,
+                        "status": "SESSION_STATUS_UPDATING",
+                    }
+                }
             return {
                 "session": {
                     "session_id": session_id,
