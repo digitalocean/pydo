@@ -2668,6 +2668,20 @@ def build_harness_list_config_sessions_request(  # pylint: disable=name-too-long
     )
 
 
+def build_harness_list_regions_request(**kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/harness-runtime/regions"
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
+
+
 def build_harness_list_sessions_request(
     *,
     page_size: int = 50,
@@ -12056,6 +12070,32 @@ def build_microvms_delete_request(microvm_id: str, **kwargs: Any) -> HttpRequest
     return HttpRequest(method="DELETE", url=_url, headers=_headers, **kwargs)
 
 
+def build_microvms_update_request(microvm_id: str, **kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/microvms/{microvm_id}"
+    path_format_arguments = {
+        "microvm_id": _SERIALIZER.url("microvm_id", microvm_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="PATCH", url=_url, headers=_headers, **kwargs)
+
+
 def build_microvms_post_pause_request(microvm_id: str, **kwargs: Any) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
 
@@ -12337,6 +12377,125 @@ def build_microvm_checkpoints_create_request(
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
 
     return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_microvm_urls_create_request(microvm_id: str, **kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/microvms/{microvm_id}/urls"
+    path_format_arguments = {
+        "microvm_id": _SERIALIZER.url("microvm_id", microvm_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_microvm_urls_delete_request(
+    microvm_id: str, url_id: str, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/microvms/{microvm_id}/urls/{url_id}"
+    path_format_arguments = {
+        "microvm_id": _SERIALIZER.url("microvm_id", microvm_id, "str"),
+        "url_id": _SERIALIZER.url("url_id", url_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="DELETE", url=_url, headers=_headers, **kwargs)
+
+
+def build_microvm_access_tokens_create_request(  # pylint: disable=name-too-long
+    microvm_id: str, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/microvms/{microvm_id}/access_tokens"
+    path_format_arguments = {
+        "microvm_id": _SERIALIZER.url("microvm_id", microvm_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_microvm_access_tokens_list_request(
+    microvm_id: str, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/microvms/{microvm_id}/access_tokens"
+    path_format_arguments = {
+        "microvm_id": _SERIALIZER.url("microvm_id", microvm_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
+
+
+def build_microvm_access_tokens_delete_request(  # pylint: disable=name-too-long
+    microvm_id: str, token_id: str, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/microvms/{microvm_id}/access_tokens/{token_id}"
+    path_format_arguments = {
+        "microvm_id": _SERIALIZER.url("microvm_id", microvm_id, "str"),
+        "token_id": _SERIALIZER.url("token_id", token_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="DELETE", url=_url, headers=_headers, **kwargs)
 
 
 def build_monitoring_list_alert_policy_request(  # pylint: disable=name-too-long
@@ -15879,7 +16038,12 @@ def build_registry_get_options_request(**kwargs: Any) -> HttpRequest:
 
 
 def build_reserved_ips_list_request(
-    *, per_page: int = 20, page: int = 1, **kwargs: Any
+    *,
+    per_page: int = 20,
+    page: int = 1,
+    sort: Optional[str] = None,
+    sort_direction: Optional[str] = None,
+    **kwargs: Any,
 ) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
     _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
@@ -15896,6 +16060,12 @@ def build_reserved_ips_list_request(
         )
     if page is not None:
         _params["page"] = _SERIALIZER.query("page", page, "int", minimum=1)
+    if sort is not None:
+        _params["sort"] = _SERIALIZER.query("sort", sort, "str")
+    if sort_direction is not None:
+        _params["sort_direction"] = _SERIALIZER.query(
+            "sort_direction", sort_direction, "str"
+        )
 
     # Construct headers
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
@@ -20850,20 +21020,27 @@ def build_genai_create_model_eval_dataset_upload_presigned_urls_request(  # pyli
     return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
 
 
-def build_genai_list_model_evaluation_metrics_request(
-    **kwargs: Any,
-) -> HttpRequest:  # pylint: disable=name-too-long
+def build_genai_list_model_evaluation_metrics_request(  # pylint: disable=name-too-long
+    *, turn_type: str = "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED", **kwargs: Any
+) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
 
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
     _url = "/v2/gen-ai/model_evaluation_metrics"
 
+    # Construct parameters
+    if turn_type is not None:
+        _params["turn_type"] = _SERIALIZER.query("turn_type", turn_type, "str")
+
     # Construct headers
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
 
-    return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
 
 
 def build_genai_list_model_evaluation_presets_request(
@@ -21357,6 +21534,103 @@ def build_genai_get_model_catalog_card_request(  # pylint: disable=name-too-long
 
     # Construct URL
     _url = "/v2/gen-ai/models/catalog/{id}"
+    path_format_arguments = {
+        "id": _SERIALIZER.url("id", id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct parameters
+    if model_id is not None:
+        _params["model_id"] = _SERIALIZER.query("model_id", model_id, "str")
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
+
+
+def build_genai_list_model_catalog_v2_request(  # pylint: disable=name-too-long
+    *,
+    page: Optional[int] = None,
+    per_page: Optional[int] = None,
+    search: Optional[str] = None,
+    serving: Optional[List[str]] = None,
+    badges: Optional[List[str]] = None,
+    input_modality: Optional[List[str]] = None,
+    output_modality: Optional[List[str]] = None,
+    product: Optional[List[str]] = None,
+    capabilities: Optional[List[str]] = None,
+    item_type: Optional[List[str]] = None,
+    sort_by: str = "MODEL_CATALOG_SORT_BY_CREATED_AT",
+    sort_direction: str = "SORT_DIRECTION_UNSPECIFIED",
+    creator: Optional[List[str]] = None,
+    **kwargs: Any,
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/gen-ai/models/catalog_v2"
+
+    # Construct parameters
+    if page is not None:
+        _params["page"] = _SERIALIZER.query("page", page, "int")
+    if per_page is not None:
+        _params["per_page"] = _SERIALIZER.query("per_page", per_page, "int")
+    if search is not None:
+        _params["search"] = _SERIALIZER.query("search", search, "str")
+    if serving is not None:
+        _params["serving"] = _SERIALIZER.query("serving", serving, "[str]")
+    if badges is not None:
+        _params["badges"] = _SERIALIZER.query("badges", badges, "[str]")
+    if input_modality is not None:
+        _params["input_modality"] = _SERIALIZER.query(
+            "input_modality", input_modality, "[str]"
+        )
+    if output_modality is not None:
+        _params["output_modality"] = _SERIALIZER.query(
+            "output_modality", output_modality, "[str]"
+        )
+    if product is not None:
+        _params["product"] = _SERIALIZER.query("product", product, "[str]")
+    if capabilities is not None:
+        _params["capabilities"] = _SERIALIZER.query(
+            "capabilities", capabilities, "[str]"
+        )
+    if item_type is not None:
+        _params["item_type"] = _SERIALIZER.query("item_type", item_type, "[str]")
+    if sort_by is not None:
+        _params["sort_by"] = _SERIALIZER.query("sort_by", sort_by, "str")
+    if sort_direction is not None:
+        _params["sort_direction"] = _SERIALIZER.query(
+            "sort_direction", sort_direction, "str"
+        )
+    if creator is not None:
+        _params["creator"] = _SERIALIZER.query("creator", creator, "[str]")
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
+
+
+def build_genai_get_model_catalog_card_v2_request(  # pylint: disable=name-too-long
+    id: str, *, model_id: Optional[str] = None, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/gen-ai/models/catalog_v2/{id}"
     path_format_arguments = {
         "id": _SERIALIZER.url("id", id, "str"),
     }
@@ -49285,7 +49559,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                         ],
                                         "allowIps": [
                                             "str"  # Optional. Exact
-                                              IPv4/IPv6 literals (not CIDRs).
+                                              IPv4/IPv6 literals (not CIDRs). Present-but-empty with no
+                                              non-empty allow means deny-all; allow: [] with a
+                                              non-empty allowIps is IP-only.
                                         ],
                                         "subnetUuid": "str",  # Optional.
                                           Optional subnet within vpcUuid.
@@ -49707,7 +49983,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                         ],
                                         "allowIps": [
                                             "str"  # Optional. Exact
-                                              IPv4/IPv6 literals (not CIDRs).
+                                              IPv4/IPv6 literals (not CIDRs). Present-but-empty with no
+                                              non-empty allow means deny-all; allow: [] with a
+                                              non-empty allowIps is IP-only.
                                         ],
                                         "subnetUuid": "str",  # Optional.
                                           Optional subnet within vpcUuid.
@@ -50141,7 +50419,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                         ],
                                         "allowIps": [
                                             "str"  # Optional. Exact
-                                              IPv4/IPv6 literals (not CIDRs).
+                                              IPv4/IPv6 literals (not CIDRs). Present-but-empty with no
+                                              non-empty allow means deny-all; allow: [] with a
+                                              non-empty allowIps is IP-only.
                                         ],
                                         "subnetUuid": "str",  # Optional.
                                           Optional subnet within vpcUuid.
@@ -50693,7 +50973,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                         ],
                                         "allowIps": [
                                             "str"  # Optional. Exact
-                                              IPv4/IPv6 literals (not CIDRs).
+                                              IPv4/IPv6 literals (not CIDRs). Present-but-empty with no
+                                              non-empty allow means deny-all; allow: [] with a
+                                              non-empty allowIps is IP-only.
                                         ],
                                         "subnetUuid": "str",  # Optional.
                                           Optional subnet within vpcUuid.
@@ -51366,7 +51648,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                         ],
                                         "allowIps": [
                                             "str"  # Optional. Exact
-                                              IPv4/IPv6 literals (not CIDRs).
+                                              IPv4/IPv6 literals (not CIDRs). Present-but-empty with no
+                                              non-empty allow means deny-all; allow: [] with a
+                                              non-empty allowIps is IP-only.
                                         ],
                                         "subnetUuid": "str",  # Optional.
                                           Optional subnet within vpcUuid.
@@ -51795,7 +52079,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                         ],
                                         "allowIps": [
                                             "str"  # Optional. Exact
-                                              IPv4/IPv6 literals (not CIDRs).
+                                              IPv4/IPv6 literals (not CIDRs). Present-but-empty with no
+                                              non-empty allow means deny-all; allow: [] with a
+                                              non-empty allowIps is IP-only.
                                         ],
                                         "subnetUuid": "str",  # Optional.
                                           Optional subnet within vpcUuid.
@@ -52232,7 +52518,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                         ],
                                         "allowIps": [
                                             "str"  # Optional. Exact
-                                              IPv4/IPv6 literals (not CIDRs).
+                                              IPv4/IPv6 literals (not CIDRs). Present-but-empty with no
+                                              non-empty allow means deny-all; allow: [] with a
+                                              non-empty allowIps is IP-only.
                                         ],
                                         "subnetUuid": "str",  # Optional.
                                           Optional subnet within vpcUuid.
@@ -52844,6 +53132,134 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                 deserialized = None
 
         if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def list_regions(self, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """ListRegions returns the regions the caller's team may create sessions and agent configs in.
+
+        Per-team catalog the UI (and other clients) render as the region picker, instead of hardcoding
+        the list. A region is chosen by the API host you call, not by a field in the request body, so a
+        returned ``slug`` tells you which regional host to target — ``ric1`` means
+        ``https://api-ric1.digitalocean.com``. The default region is always listed and is marked
+        ``is_default``\\ ; its resources are also reachable on the region-less host,
+        ``https://api.digitalocean.com``. Every other open region is listed only when the team holds
+        its placement grant, so a create on a listed region's host is admitted and a region missing
+        from this list is refused. Teams not yet on the regional routing rollout see only the default
+        region, and their responses carry no ``region`` field. Legacy regions are never listed. Sorted
+        by slug; no pagination.
+
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "regions": [
+                        {
+                            "is_default": bool,  # Optional. True for the region the
+                              region-less host, https://api.digitalocean.com, serves. Exactly one
+                              listed region is the default and every team sees it. Preselect it in a
+                              picker instead of hardcoding a slug.
+                            "slug": "str"  # Optional. DO datacenter slug. Names the
+                              regional API host to call to work in this region "u2014 "ric1" means
+                              https://api-ric1.digitalocean.com. A request is placed in the region of
+                              the host that served it; the optional ``region`` field on a create is a
+                              check against that host, not a choice of region.
+                        }
+                    ]
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_harness_list_regions_request(
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
             response_headers["ratelimit-limit"] = self._deserialize(
                 "int", response.headers.get("ratelimit-limit")
             )
@@ -218071,7 +218487,8 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
         ``/v2/insights/notification-channels`` with a ``name`` and exactly one of
         ``email``\\ , ``slack``\\ , or ``webhook``.
 
-        Email recipients must be verified team member addresses. Webhook URLs must
+        Email recipients must be team contact emails added and verified by a team
+        owner. Webhook URLs must
         use HTTPS. Secret fields (\\ ``slack.webhook_url``\\ , webhook credentials) are
         write-only. Subsequent reads never return secret values; they include
         optional ``*_status`` objects when a secret is configured.
@@ -218217,7 +218634,8 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
         ``/v2/insights/notification-channels`` with a ``name`` and exactly one of
         ``email``\\ , ``slack``\\ , or ``webhook``.
 
-        Email recipients must be verified team member addresses. Webhook URLs must
+        Email recipients must be team contact emails added and verified by a team
+        owner. Webhook URLs must
         use HTTPS. Secret fields (\\ ``slack.webhook_url``\\ , webhook credentials) are
         write-only. Subsequent reads never return secret values; they include
         optional ``*_status`` objects when a secret is configured.
@@ -218319,7 +218737,8 @@ class InsightsOperations:  # pylint: disable=abstract-class-instantiated,too-man
         ``/v2/insights/notification-channels`` with a ``name`` and exactly one of
         ``email``\\ , ``slack``\\ , or ``webhook``.
 
-        Email recipients must be verified team member addresses. Webhook URLs must
+        Email recipients must be team contact emails added and verified by a team
+        owner. Webhook URLs must
         use HTTPS. Secret fields (\\ ``slack.webhook_url``\\ , webhook credentials) are
         write-only. Subsequent reads never return secret values; they include
         optional ``*_status`` objects when a secret is configured.
@@ -238020,7 +238439,8 @@ class MicrovmsOperations:
         :paramtype per_page: int
         :keyword region: Only return MicroVMs in this region. Default value is None.
         :paramtype region: str
-        :keyword name: Only return the MicroVM with this exact name. Default value is None.
+        :keyword name: Only return MicroVMs whose name contains this substring (case-insensitive).
+         Default value is None.
         :paramtype name: str
         :keyword tag_name: Only return MicroVMs with this tag. A tag that matches no MicroVMs returns
          an empty list. Default value is None.
@@ -238055,6 +238475,21 @@ class MicrovmsOperations:
                               when it is paused.
                             "created_at": "2020-02-20 00:00:00",  # Optional. When the
                               MicroVM was created, in ISO 8601 format.
+                            "egress_policy": {
+                                "default_action": "deny",  # Optional. Default value
+                                  is "deny". What to do with a destination no rule matches. ``deny``
+                                  refuses it (an HTTP request gets a 403 and a TLS connection is
+                                  closed). Known values are: "deny" and "allow".
+                                "rules": [
+                                    {
+                                        "domain": "str",  # Optional. An
+                                          exact host such as ``api.example.com``"" , or a wildcard such
+                                          as ``*.example.com``.
+                                        "ip": "str"  # Optional. An exact IP
+                                          address. CIDR ranges are not supported.
+                                    }
+                                ]
+                            },
                             "failure_reason": "str",  # Optional. Why the MicroVM failed.
                               Present only when ``state`` is ``failed``.
                             "http_protocol": "str",  # Optional. The protocol the
@@ -238066,13 +238501,15 @@ class MicrovmsOperations:
                               hyphens.
                             "networking": "public",  # Optional. Default value is
                               "public". ``public`` sends outbound traffic through a shared NAT gateway.
-                              ``vpc`` places the MicroVM in the VPC network set by ``vpc_uuid``. Known
-                              values are: "public" and "vpc".
+                              ``vpc`` places the MicroVM in a VPC network. The VPC ID is not returned.
+                              Known values are: "public" and "vpc".
                             "ports": [
                                 0  # Optional. The guest ports declared on the
                                   MicroVM, including the HTTP port. During the public preview, only the
                                   HTTP port is reachable through the MicroVM's endpoint.
                             ],
+                            "project_id": "str",  # Optional. The project the MicroVM
+                              belongs to. Omitted when the project could not be resolved.
                             "region": "str",  # Optional. The slug of the region the
                               MicroVM is in.
                             "size": {
@@ -238107,16 +238544,16 @@ class MicrovmsOperations:
                                       endpoint's hostname. Empty until provisioning finishes. Requests
                                       to the endpoint must include a DigitalOcean API token with the
                                       ``microvm:access`` scope in the ``Authorization`` header.
+                                    "id": "str",  # Optional. The unique ID of
+                                      the URL. Use it to remove the URL with DELETE
+                                      ``/v2/microvms/{microvm_id}/urls/{url_id}``.
                                     "port": 0,  # Optional. The guest port the
                                       endpoint serves.
                                     "status": "str"  # Optional. ``PENDING``
                                       until provisioning finishes, then ``ACTIVE``. Known values are:
                                       "PENDING" and "ACTIVE".
                                 }
-                            ],
-                            "vpc_uuid": "str"  # Optional. The ID of a VPC network in the
-                              same region that belongs to your team. Present only when ``networking``
-                              is ``vpc``.
+                            ]
                         }
                     ]
                 }
@@ -238241,6 +238678,20 @@ class MicrovmsOperations:
                     "auto_resume": True,  # Optional. Default value is True. Whether an HTTP
                       request, command, or console session resumes the MicroVM when it is paused. Set
                       to ``false`` to require a manual resume.
+                    "egress_policy": {
+                        "default_action": "deny",  # Optional. Default value is "deny". What
+                          to do with a destination no rule matches. ``deny`` refuses it (an HTTP
+                          request gets a 403 and a TLS connection is closed). Known values are: "deny"
+                          and "allow".
+                        "rules": [
+                            {
+                                "domain": "str",  # Optional. An exact host such as
+                                  ``api.example.com``"" , or a wildcard such as ``*.example.com``.
+                                "ip": "str"  # Optional. An exact IP address. CIDR
+                                  ranges are not supported.
+                            }
+                        ]
+                    },
                     "environment": {
                         "str": "str"  # Optional. Environment variables passed into the
                           MicroVM at boot, as key and value pairs. Not returned in responses.
@@ -238251,6 +238702,10 @@ class MicrovmsOperations:
                       ports.
                     "http_protocol": "str",  # Optional. The protocol the HTTP port serves. Known
                       values are: "http" and "http2".
+                    "ingress": True,  # Optional. Default value is True. Whether to create the
+                      MicroVM with a default public URL. Defaults to ``true``. Set to ``false`` to
+                      create the MicroVM without one; URLs can be added later with POST
+                      ``/v2/microvms/{microvm_id}/urls``.
                     "networking": "public",  # Optional. Default value is "public". ``public``
                       sends outbound traffic through a shared NAT gateway. ``vpc`` places the MicroVM
                       in the VPC network set by ``vpc_uuid``. Known values are: "public" and "vpc".
@@ -238259,6 +238714,9 @@ class MicrovmsOperations:
                           ``http_port``. Defaults to only the HTTP port. During the public preview,
                           only the HTTP port is reachable through the MicroVM's endpoint.
                     ],
+                    "project_id": "str",  # Optional. The project to place the MicroVM in. Omit
+                      to use the team's default project. A project that does not belong to the team is
+                      rejected.
                     "region": "str",  # Optional. The slug of the region to create the MicroVM
                       in. Required with ``source.oci_ref``.
                     "size": {
@@ -238270,7 +238728,8 @@ class MicrovmsOperations:
                         "str"  # Optional. Tags to apply to the MicroVM.
                     ],
                     "vpc_uuid": "str"  # Optional. The ID of a VPC network in the same region
-                      that belongs to your team. Required when ``networking`` is ``vpc``.
+                      that belongs to your team. When ``networking`` is ``vpc`` and this is omitted,
+                      the team's default VPC is used.
                 }
 
                 # response body for status code(s): 201
@@ -238289,6 +238748,21 @@ class MicrovmsOperations:
                           paused.
                         "created_at": "2020-02-20 00:00:00",  # Optional. When the MicroVM
                           was created, in ISO 8601 format.
+                        "egress_policy": {
+                            "default_action": "deny",  # Optional. Default value is
+                              "deny". What to do with a destination no rule matches. ``deny`` refuses
+                              it (an HTTP request gets a 403 and a TLS connection is closed). Known
+                              values are: "deny" and "allow".
+                            "rules": [
+                                {
+                                    "domain": "str",  # Optional. An exact host
+                                      such as ``api.example.com``"" , or a wildcard such as
+                                      ``*.example.com``.
+                                    "ip": "str"  # Optional. An exact IP address.
+                                      CIDR ranges are not supported.
+                                }
+                            ]
+                        },
                         "failure_reason": "str",  # Optional. Why the MicroVM failed. Present
                           only when ``state`` is ``failed``.
                         "http_protocol": "str",  # Optional. The protocol the MicroVM's HTTP
@@ -238299,13 +238773,15 @@ class MicrovmsOperations:
                           in the region and contain 1 to 63 lowercase letters, digits, and hyphens.
                         "networking": "public",  # Optional. Default value is "public".
                           ``public`` sends outbound traffic through a shared NAT gateway. ``vpc``
-                          places the MicroVM in the VPC network set by ``vpc_uuid``. Known values are:
-                          "public" and "vpc".
+                          places the MicroVM in a VPC network. The VPC ID is not returned. Known values
+                          are: "public" and "vpc".
                         "ports": [
                             0  # Optional. The guest ports declared on the MicroVM,
                               including the HTTP port. During the public preview, only the HTTP port is
                               reachable through the MicroVM's endpoint.
                         ],
+                        "project_id": "str",  # Optional. The project the MicroVM belongs to.
+                          Omitted when the project could not be resolved.
                         "region": "str",  # Optional. The slug of the region the MicroVM is
                           in.
                         "size": {
@@ -238337,16 +238813,16 @@ class MicrovmsOperations:
                                   hostname. Empty until provisioning finishes. Requests to the endpoint
                                   must include a DigitalOcean API token with the ``microvm:access``
                                   scope in the ``Authorization`` header.
+                                "id": "str",  # Optional. The unique ID of the URL.
+                                  Use it to remove the URL with DELETE
+                                  ``/v2/microvms/{microvm_id}/urls/{url_id}``.
                                 "port": 0,  # Optional. The guest port the endpoint
                                   serves.
                                 "status": "str"  # Optional. ``PENDING`` until
                                   provisioning finishes, then ``ACTIVE``. Known values are: "PENDING"
                                   and "ACTIVE".
                             }
-                        ],
-                        "vpc_uuid": "str"  # Optional. The ID of a VPC network in the same
-                          region that belongs to your team. Present only when ``networking`` is
-                          ``vpc``.
+                        ]
                     }
                 }
                 # response body for status code(s): 400, 403
@@ -238403,6 +238879,21 @@ class MicrovmsOperations:
                           paused.
                         "created_at": "2020-02-20 00:00:00",  # Optional. When the MicroVM
                           was created, in ISO 8601 format.
+                        "egress_policy": {
+                            "default_action": "deny",  # Optional. Default value is
+                              "deny". What to do with a destination no rule matches. ``deny`` refuses
+                              it (an HTTP request gets a 403 and a TLS connection is closed). Known
+                              values are: "deny" and "allow".
+                            "rules": [
+                                {
+                                    "domain": "str",  # Optional. An exact host
+                                      such as ``api.example.com``"" , or a wildcard such as
+                                      ``*.example.com``.
+                                    "ip": "str"  # Optional. An exact IP address.
+                                      CIDR ranges are not supported.
+                                }
+                            ]
+                        },
                         "failure_reason": "str",  # Optional. Why the MicroVM failed. Present
                           only when ``state`` is ``failed``.
                         "http_protocol": "str",  # Optional. The protocol the MicroVM's HTTP
@@ -238413,13 +238904,15 @@ class MicrovmsOperations:
                           in the region and contain 1 to 63 lowercase letters, digits, and hyphens.
                         "networking": "public",  # Optional. Default value is "public".
                           ``public`` sends outbound traffic through a shared NAT gateway. ``vpc``
-                          places the MicroVM in the VPC network set by ``vpc_uuid``. Known values are:
-                          "public" and "vpc".
+                          places the MicroVM in a VPC network. The VPC ID is not returned. Known values
+                          are: "public" and "vpc".
                         "ports": [
                             0  # Optional. The guest ports declared on the MicroVM,
                               including the HTTP port. During the public preview, only the HTTP port is
                               reachable through the MicroVM's endpoint.
                         ],
+                        "project_id": "str",  # Optional. The project the MicroVM belongs to.
+                          Omitted when the project could not be resolved.
                         "region": "str",  # Optional. The slug of the region the MicroVM is
                           in.
                         "size": {
@@ -238451,16 +238944,16 @@ class MicrovmsOperations:
                                   hostname. Empty until provisioning finishes. Requests to the endpoint
                                   must include a DigitalOcean API token with the ``microvm:access``
                                   scope in the ``Authorization`` header.
+                                "id": "str",  # Optional. The unique ID of the URL.
+                                  Use it to remove the URL with DELETE
+                                  ``/v2/microvms/{microvm_id}/urls/{url_id}``.
                                 "port": 0,  # Optional. The guest port the endpoint
                                   serves.
                                 "status": "str"  # Optional. ``PENDING`` until
                                   provisioning finishes, then ``ACTIVE``. Known values are: "PENDING"
                                   and "ACTIVE".
                             }
-                        ],
-                        "vpc_uuid": "str"  # Optional. The ID of a VPC network in the same
-                          region that belongs to your team. Present only when ``networking`` is
-                          ``vpc``.
+                        ]
                     }
                 }
                 # response body for status code(s): 400, 403
@@ -238520,6 +239013,20 @@ class MicrovmsOperations:
                     "auto_resume": True,  # Optional. Default value is True. Whether an HTTP
                       request, command, or console session resumes the MicroVM when it is paused. Set
                       to ``false`` to require a manual resume.
+                    "egress_policy": {
+                        "default_action": "deny",  # Optional. Default value is "deny". What
+                          to do with a destination no rule matches. ``deny`` refuses it (an HTTP
+                          request gets a 403 and a TLS connection is closed). Known values are: "deny"
+                          and "allow".
+                        "rules": [
+                            {
+                                "domain": "str",  # Optional. An exact host such as
+                                  ``api.example.com``"" , or a wildcard such as ``*.example.com``.
+                                "ip": "str"  # Optional. An exact IP address. CIDR
+                                  ranges are not supported.
+                            }
+                        ]
+                    },
                     "environment": {
                         "str": "str"  # Optional. Environment variables passed into the
                           MicroVM at boot, as key and value pairs. Not returned in responses.
@@ -238530,6 +239037,10 @@ class MicrovmsOperations:
                       ports.
                     "http_protocol": "str",  # Optional. The protocol the HTTP port serves. Known
                       values are: "http" and "http2".
+                    "ingress": True,  # Optional. Default value is True. Whether to create the
+                      MicroVM with a default public URL. Defaults to ``true``. Set to ``false`` to
+                      create the MicroVM without one; URLs can be added later with POST
+                      ``/v2/microvms/{microvm_id}/urls``.
                     "networking": "public",  # Optional. Default value is "public". ``public``
                       sends outbound traffic through a shared NAT gateway. ``vpc`` places the MicroVM
                       in the VPC network set by ``vpc_uuid``. Known values are: "public" and "vpc".
@@ -238538,6 +239049,9 @@ class MicrovmsOperations:
                           ``http_port``. Defaults to only the HTTP port. During the public preview,
                           only the HTTP port is reachable through the MicroVM's endpoint.
                     ],
+                    "project_id": "str",  # Optional. The project to place the MicroVM in. Omit
+                      to use the team's default project. A project that does not belong to the team is
+                      rejected.
                     "region": "str",  # Optional. The slug of the region to create the MicroVM
                       in. Required with ``source.oci_ref``.
                     "size": {
@@ -238549,7 +239063,8 @@ class MicrovmsOperations:
                         "str"  # Optional. Tags to apply to the MicroVM.
                     ],
                     "vpc_uuid": "str"  # Optional. The ID of a VPC network in the same region
-                      that belongs to your team. Required when ``networking`` is ``vpc``.
+                      that belongs to your team. When ``networking`` is ``vpc`` and this is omitted,
+                      the team's default VPC is used.
                 }
 
                 # response body for status code(s): 201
@@ -238568,6 +239083,21 @@ class MicrovmsOperations:
                           paused.
                         "created_at": "2020-02-20 00:00:00",  # Optional. When the MicroVM
                           was created, in ISO 8601 format.
+                        "egress_policy": {
+                            "default_action": "deny",  # Optional. Default value is
+                              "deny". What to do with a destination no rule matches. ``deny`` refuses
+                              it (an HTTP request gets a 403 and a TLS connection is closed). Known
+                              values are: "deny" and "allow".
+                            "rules": [
+                                {
+                                    "domain": "str",  # Optional. An exact host
+                                      such as ``api.example.com``"" , or a wildcard such as
+                                      ``*.example.com``.
+                                    "ip": "str"  # Optional. An exact IP address.
+                                      CIDR ranges are not supported.
+                                }
+                            ]
+                        },
                         "failure_reason": "str",  # Optional. Why the MicroVM failed. Present
                           only when ``state`` is ``failed``.
                         "http_protocol": "str",  # Optional. The protocol the MicroVM's HTTP
@@ -238578,13 +239108,15 @@ class MicrovmsOperations:
                           in the region and contain 1 to 63 lowercase letters, digits, and hyphens.
                         "networking": "public",  # Optional. Default value is "public".
                           ``public`` sends outbound traffic through a shared NAT gateway. ``vpc``
-                          places the MicroVM in the VPC network set by ``vpc_uuid``. Known values are:
-                          "public" and "vpc".
+                          places the MicroVM in a VPC network. The VPC ID is not returned. Known values
+                          are: "public" and "vpc".
                         "ports": [
                             0  # Optional. The guest ports declared on the MicroVM,
                               including the HTTP port. During the public preview, only the HTTP port is
                               reachable through the MicroVM's endpoint.
                         ],
+                        "project_id": "str",  # Optional. The project the MicroVM belongs to.
+                          Omitted when the project could not be resolved.
                         "region": "str",  # Optional. The slug of the region the MicroVM is
                           in.
                         "size": {
@@ -238616,16 +239148,16 @@ class MicrovmsOperations:
                                   hostname. Empty until provisioning finishes. Requests to the endpoint
                                   must include a DigitalOcean API token with the ``microvm:access``
                                   scope in the ``Authorization`` header.
+                                "id": "str",  # Optional. The unique ID of the URL.
+                                  Use it to remove the URL with DELETE
+                                  ``/v2/microvms/{microvm_id}/urls/{url_id}``.
                                 "port": 0,  # Optional. The guest port the endpoint
                                   serves.
                                 "status": "str"  # Optional. ``PENDING`` until
                                   provisioning finishes, then ``ACTIVE``. Known values are: "PENDING"
                                   and "ACTIVE".
                             }
-                        ],
-                        "vpc_uuid": "str"  # Optional. The ID of a VPC network in the same
-                          region that belongs to your team. Present only when ``networking`` is
-                          ``vpc``.
+                        ]
                     }
                 }
                 # response body for status code(s): 400, 403
@@ -238902,6 +239434,21 @@ class MicrovmsOperations:
                           paused.
                         "created_at": "2020-02-20 00:00:00",  # Optional. When the MicroVM
                           was created, in ISO 8601 format.
+                        "egress_policy": {
+                            "default_action": "deny",  # Optional. Default value is
+                              "deny". What to do with a destination no rule matches. ``deny`` refuses
+                              it (an HTTP request gets a 403 and a TLS connection is closed). Known
+                              values are: "deny" and "allow".
+                            "rules": [
+                                {
+                                    "domain": "str",  # Optional. An exact host
+                                      such as ``api.example.com``"" , or a wildcard such as
+                                      ``*.example.com``.
+                                    "ip": "str"  # Optional. An exact IP address.
+                                      CIDR ranges are not supported.
+                                }
+                            ]
+                        },
                         "failure_reason": "str",  # Optional. Why the MicroVM failed. Present
                           only when ``state`` is ``failed``.
                         "http_protocol": "str",  # Optional. The protocol the MicroVM's HTTP
@@ -238912,13 +239459,15 @@ class MicrovmsOperations:
                           in the region and contain 1 to 63 lowercase letters, digits, and hyphens.
                         "networking": "public",  # Optional. Default value is "public".
                           ``public`` sends outbound traffic through a shared NAT gateway. ``vpc``
-                          places the MicroVM in the VPC network set by ``vpc_uuid``. Known values are:
-                          "public" and "vpc".
+                          places the MicroVM in a VPC network. The VPC ID is not returned. Known values
+                          are: "public" and "vpc".
                         "ports": [
                             0  # Optional. The guest ports declared on the MicroVM,
                               including the HTTP port. During the public preview, only the HTTP port is
                               reachable through the MicroVM's endpoint.
                         ],
+                        "project_id": "str",  # Optional. The project the MicroVM belongs to.
+                          Omitted when the project could not be resolved.
                         "region": "str",  # Optional. The slug of the region the MicroVM is
                           in.
                         "size": {
@@ -238950,16 +239499,16 @@ class MicrovmsOperations:
                                   hostname. Empty until provisioning finishes. Requests to the endpoint
                                   must include a DigitalOcean API token with the ``microvm:access``
                                   scope in the ``Authorization`` header.
+                                "id": "str",  # Optional. The unique ID of the URL.
+                                  Use it to remove the URL with DELETE
+                                  ``/v2/microvms/{microvm_id}/urls/{url_id}``.
                                 "port": 0,  # Optional. The guest port the endpoint
                                   serves.
                                 "status": "str"  # Optional. ``PENDING`` until
                                   provisioning finishes, then ``ACTIVE``. Known values are: "PENDING"
                                   and "ACTIVE".
                             }
-                        ],
-                        "vpc_uuid": "str"  # Optional. The ID of a VPC network in the same
-                          region that belongs to your team. Present only when ``networking`` is
-                          ``vpc``.
+                        ]
                     }
                 }
                 # response body for status code(s): 404
@@ -239144,6 +239693,552 @@ class MicrovmsOperations:
 
         return deserialized  # type: ignore
 
+    @overload
+    def update(
+        self,
+        microvm_id: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update a MicroVM.
+
+        To change a MicroVM's name or tags, send a PATCH request to
+        ``/v2/microvms/{microvm_id}``.
+
+        The MicroVM must be running or paused. Omitted fields keep their current
+        value. Every other field is fixed at create; sending one (for example
+        ``size`` or ``region``\\ ) is rejected with a ``400`` status code, and changing it
+        means creating a new MicroVM.
+
+        ``tags`` replaces the whole tag set: tags not in the list are removed, and an
+        empty list removes every tag.
+
+        :param microvm_id: The unique ID of the MicroVM. Required.
+        :type microvm_id: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "name": "str",  # Optional. The new name. Must be unique in the region and
+                      contain 1 to 63 lowercase letters, digits, and hyphens.
+                    "tags": [
+                        "str"  # Optional. The complete tag set. Replaces the current tags;
+                          tags not in the list are removed, and an empty list removes every tag.
+                    ]
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "microvm": {
+                        "auto_pause": {
+                            "enabled": bool,  # Optional. Whether auto-pause is on.
+                              Always ``true``.
+                            "idle_timeout": "str"  # Optional. How long the MicroVM is
+                              idle before it pauses, as a duration such as ``30s``"" , ``5m``"" , or
+                              ``1h``. Defaults to ``5m``. The maximum is ``4h``. Responses show the
+                              duration in the form ``5m0s``.
+                        },
+                        "auto_resume": True,  # Optional. Default value is True. Whether an
+                          HTTP request, command, or console session resumes the MicroVM when it is
+                          paused.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. When the MicroVM
+                          was created, in ISO 8601 format.
+                        "egress_policy": {
+                            "default_action": "deny",  # Optional. Default value is
+                              "deny". What to do with a destination no rule matches. ``deny`` refuses
+                              it (an HTTP request gets a 403 and a TLS connection is closed). Known
+                              values are: "deny" and "allow".
+                            "rules": [
+                                {
+                                    "domain": "str",  # Optional. An exact host
+                                      such as ``api.example.com``"" , or a wildcard such as
+                                      ``*.example.com``.
+                                    "ip": "str"  # Optional. An exact IP address.
+                                      CIDR ranges are not supported.
+                                }
+                            ]
+                        },
+                        "failure_reason": "str",  # Optional. Why the MicroVM failed. Present
+                          only when ``state`` is ``failed``.
+                        "http_protocol": "str",  # Optional. The protocol the MicroVM's HTTP
+                          port serves. ``null`` if the protocol was not set when the MicroVM was
+                          created. Known values are: "http" and "http2".
+                        "id": "str",  # Optional. The unique ID of the MicroVM.
+                        "name": "str",  # Optional. The name of the MicroVM. Must be unique
+                          in the region and contain 1 to 63 lowercase letters, digits, and hyphens.
+                        "networking": "public",  # Optional. Default value is "public".
+                          ``public`` sends outbound traffic through a shared NAT gateway. ``vpc``
+                          places the MicroVM in a VPC network. The VPC ID is not returned. Known values
+                          are: "public" and "vpc".
+                        "ports": [
+                            0  # Optional. The guest ports declared on the MicroVM,
+                              including the HTTP port. During the public preview, only the HTTP port is
+                              reachable through the MicroVM's endpoint.
+                        ],
+                        "project_id": "str",  # Optional. The project the MicroVM belongs to.
+                          Omitted when the project could not be resolved.
+                        "region": "str",  # Optional. The slug of the region the MicroVM is
+                          in.
+                        "size": {
+                            "cpu": 0,  # The number of vCPUs. Required.
+                            "memory": 0,  # The amount of memory, in MiB. Required.
+                            "disk": 0  # Optional. The size of the disk, in GB. Set by
+                              the size.
+                        },
+                        "source": {
+                            "checkpoint_id": "str",  # Optional. The ID of a checkpoint
+                              to create the MicroVM from. The new MicroVM inherits the checkpoint's
+                              region, size, container image, and environment variables.
+                            "oci_ref": "str"  # Optional. A reference to a
+                              ``linux/amd64`` container image in the form ``registry/repository:tag``.
+                              The image can be public, such as an image on Docker Hub, or private in
+                              your team's DigitalOcean Container Registry.
+                        },
+                        "state": "str",  # Optional. The MicroVM's current state. Known
+                          values are: "creating", "running", "pausing", "paused", "resuming",
+                          "terminating", "terminated", "failed", and "unknown".
+                        "tags": [
+                            "str"  # Optional. The tags applied to the MicroVM.
+                        ],
+                        "urls": [
+                            {
+                                "default": bool,  # Optional. Whether this is the
+                                  endpoint for the MicroVM's HTTP port.
+                                "hostname": "str",  # Optional. The endpoint's
+                                  hostname. Empty until provisioning finishes. Requests to the endpoint
+                                  must include a DigitalOcean API token with the ``microvm:access``
+                                  scope in the ``Authorization`` header.
+                                "id": "str",  # Optional. The unique ID of the URL.
+                                  Use it to remove the URL with DELETE
+                                  ``/v2/microvms/{microvm_id}/urls/{url_id}``.
+                                "port": 0,  # Optional. The guest port the endpoint
+                                  serves.
+                                "status": "str"  # Optional. ``PENDING`` until
+                                  provisioning finishes, then ``ACTIVE``. Known values are: "PENDING"
+                                  and "ACTIVE".
+                            }
+                        ]
+                    }
+                }
+                # response body for status code(s): 400, 404, 409
+                response == {
+                    "code": "str",  # A service-defined error code. Required.
+                    "message": "str"  # A human-readable description of the error. Required.
+                }
+        """
+
+    @overload
+    def update(
+        self,
+        microvm_id: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update a MicroVM.
+
+        To change a MicroVM's name or tags, send a PATCH request to
+        ``/v2/microvms/{microvm_id}``.
+
+        The MicroVM must be running or paused. Omitted fields keep their current
+        value. Every other field is fixed at create; sending one (for example
+        ``size`` or ``region``\\ ) is rejected with a ``400`` status code, and changing it
+        means creating a new MicroVM.
+
+        ``tags`` replaces the whole tag set: tags not in the list are removed, and an
+        empty list removes every tag.
+
+        :param microvm_id: The unique ID of the MicroVM. Required.
+        :type microvm_id: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "microvm": {
+                        "auto_pause": {
+                            "enabled": bool,  # Optional. Whether auto-pause is on.
+                              Always ``true``.
+                            "idle_timeout": "str"  # Optional. How long the MicroVM is
+                              idle before it pauses, as a duration such as ``30s``"" , ``5m``"" , or
+                              ``1h``. Defaults to ``5m``. The maximum is ``4h``. Responses show the
+                              duration in the form ``5m0s``.
+                        },
+                        "auto_resume": True,  # Optional. Default value is True. Whether an
+                          HTTP request, command, or console session resumes the MicroVM when it is
+                          paused.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. When the MicroVM
+                          was created, in ISO 8601 format.
+                        "egress_policy": {
+                            "default_action": "deny",  # Optional. Default value is
+                              "deny". What to do with a destination no rule matches. ``deny`` refuses
+                              it (an HTTP request gets a 403 and a TLS connection is closed). Known
+                              values are: "deny" and "allow".
+                            "rules": [
+                                {
+                                    "domain": "str",  # Optional. An exact host
+                                      such as ``api.example.com``"" , or a wildcard such as
+                                      ``*.example.com``.
+                                    "ip": "str"  # Optional. An exact IP address.
+                                      CIDR ranges are not supported.
+                                }
+                            ]
+                        },
+                        "failure_reason": "str",  # Optional. Why the MicroVM failed. Present
+                          only when ``state`` is ``failed``.
+                        "http_protocol": "str",  # Optional. The protocol the MicroVM's HTTP
+                          port serves. ``null`` if the protocol was not set when the MicroVM was
+                          created. Known values are: "http" and "http2".
+                        "id": "str",  # Optional. The unique ID of the MicroVM.
+                        "name": "str",  # Optional. The name of the MicroVM. Must be unique
+                          in the region and contain 1 to 63 lowercase letters, digits, and hyphens.
+                        "networking": "public",  # Optional. Default value is "public".
+                          ``public`` sends outbound traffic through a shared NAT gateway. ``vpc``
+                          places the MicroVM in a VPC network. The VPC ID is not returned. Known values
+                          are: "public" and "vpc".
+                        "ports": [
+                            0  # Optional. The guest ports declared on the MicroVM,
+                              including the HTTP port. During the public preview, only the HTTP port is
+                              reachable through the MicroVM's endpoint.
+                        ],
+                        "project_id": "str",  # Optional. The project the MicroVM belongs to.
+                          Omitted when the project could not be resolved.
+                        "region": "str",  # Optional. The slug of the region the MicroVM is
+                          in.
+                        "size": {
+                            "cpu": 0,  # The number of vCPUs. Required.
+                            "memory": 0,  # The amount of memory, in MiB. Required.
+                            "disk": 0  # Optional. The size of the disk, in GB. Set by
+                              the size.
+                        },
+                        "source": {
+                            "checkpoint_id": "str",  # Optional. The ID of a checkpoint
+                              to create the MicroVM from. The new MicroVM inherits the checkpoint's
+                              region, size, container image, and environment variables.
+                            "oci_ref": "str"  # Optional. A reference to a
+                              ``linux/amd64`` container image in the form ``registry/repository:tag``.
+                              The image can be public, such as an image on Docker Hub, or private in
+                              your team's DigitalOcean Container Registry.
+                        },
+                        "state": "str",  # Optional. The MicroVM's current state. Known
+                          values are: "creating", "running", "pausing", "paused", "resuming",
+                          "terminating", "terminated", "failed", and "unknown".
+                        "tags": [
+                            "str"  # Optional. The tags applied to the MicroVM.
+                        ],
+                        "urls": [
+                            {
+                                "default": bool,  # Optional. Whether this is the
+                                  endpoint for the MicroVM's HTTP port.
+                                "hostname": "str",  # Optional. The endpoint's
+                                  hostname. Empty until provisioning finishes. Requests to the endpoint
+                                  must include a DigitalOcean API token with the ``microvm:access``
+                                  scope in the ``Authorization`` header.
+                                "id": "str",  # Optional. The unique ID of the URL.
+                                  Use it to remove the URL with DELETE
+                                  ``/v2/microvms/{microvm_id}/urls/{url_id}``.
+                                "port": 0,  # Optional. The guest port the endpoint
+                                  serves.
+                                "status": "str"  # Optional. ``PENDING`` until
+                                  provisioning finishes, then ``ACTIVE``. Known values are: "PENDING"
+                                  and "ACTIVE".
+                            }
+                        ]
+                    }
+                }
+                # response body for status code(s): 400, 404, 409
+                response == {
+                    "code": "str",  # A service-defined error code. Required.
+                    "message": "str"  # A human-readable description of the error. Required.
+                }
+        """
+
+    @distributed_trace
+    def update(
+        self, microvm_id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update a MicroVM.
+
+        To change a MicroVM's name or tags, send a PATCH request to
+        ``/v2/microvms/{microvm_id}``.
+
+        The MicroVM must be running or paused. Omitted fields keep their current
+        value. Every other field is fixed at create; sending one (for example
+        ``size`` or ``region``\\ ) is rejected with a ``400`` status code, and changing it
+        means creating a new MicroVM.
+
+        ``tags`` replaces the whole tag set: tags not in the list are removed, and an
+        empty list removes every tag.
+
+        :param microvm_id: The unique ID of the MicroVM. Required.
+        :type microvm_id: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "name": "str",  # Optional. The new name. Must be unique in the region and
+                      contain 1 to 63 lowercase letters, digits, and hyphens.
+                    "tags": [
+                        "str"  # Optional. The complete tag set. Replaces the current tags;
+                          tags not in the list are removed, and an empty list removes every tag.
+                    ]
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "microvm": {
+                        "auto_pause": {
+                            "enabled": bool,  # Optional. Whether auto-pause is on.
+                              Always ``true``.
+                            "idle_timeout": "str"  # Optional. How long the MicroVM is
+                              idle before it pauses, as a duration such as ``30s``"" , ``5m``"" , or
+                              ``1h``. Defaults to ``5m``. The maximum is ``4h``. Responses show the
+                              duration in the form ``5m0s``.
+                        },
+                        "auto_resume": True,  # Optional. Default value is True. Whether an
+                          HTTP request, command, or console session resumes the MicroVM when it is
+                          paused.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. When the MicroVM
+                          was created, in ISO 8601 format.
+                        "egress_policy": {
+                            "default_action": "deny",  # Optional. Default value is
+                              "deny". What to do with a destination no rule matches. ``deny`` refuses
+                              it (an HTTP request gets a 403 and a TLS connection is closed). Known
+                              values are: "deny" and "allow".
+                            "rules": [
+                                {
+                                    "domain": "str",  # Optional. An exact host
+                                      such as ``api.example.com``"" , or a wildcard such as
+                                      ``*.example.com``.
+                                    "ip": "str"  # Optional. An exact IP address.
+                                      CIDR ranges are not supported.
+                                }
+                            ]
+                        },
+                        "failure_reason": "str",  # Optional. Why the MicroVM failed. Present
+                          only when ``state`` is ``failed``.
+                        "http_protocol": "str",  # Optional. The protocol the MicroVM's HTTP
+                          port serves. ``null`` if the protocol was not set when the MicroVM was
+                          created. Known values are: "http" and "http2".
+                        "id": "str",  # Optional. The unique ID of the MicroVM.
+                        "name": "str",  # Optional. The name of the MicroVM. Must be unique
+                          in the region and contain 1 to 63 lowercase letters, digits, and hyphens.
+                        "networking": "public",  # Optional. Default value is "public".
+                          ``public`` sends outbound traffic through a shared NAT gateway. ``vpc``
+                          places the MicroVM in a VPC network. The VPC ID is not returned. Known values
+                          are: "public" and "vpc".
+                        "ports": [
+                            0  # Optional. The guest ports declared on the MicroVM,
+                              including the HTTP port. During the public preview, only the HTTP port is
+                              reachable through the MicroVM's endpoint.
+                        ],
+                        "project_id": "str",  # Optional. The project the MicroVM belongs to.
+                          Omitted when the project could not be resolved.
+                        "region": "str",  # Optional. The slug of the region the MicroVM is
+                          in.
+                        "size": {
+                            "cpu": 0,  # The number of vCPUs. Required.
+                            "memory": 0,  # The amount of memory, in MiB. Required.
+                            "disk": 0  # Optional. The size of the disk, in GB. Set by
+                              the size.
+                        },
+                        "source": {
+                            "checkpoint_id": "str",  # Optional. The ID of a checkpoint
+                              to create the MicroVM from. The new MicroVM inherits the checkpoint's
+                              region, size, container image, and environment variables.
+                            "oci_ref": "str"  # Optional. A reference to a
+                              ``linux/amd64`` container image in the form ``registry/repository:tag``.
+                              The image can be public, such as an image on Docker Hub, or private in
+                              your team's DigitalOcean Container Registry.
+                        },
+                        "state": "str",  # Optional. The MicroVM's current state. Known
+                          values are: "creating", "running", "pausing", "paused", "resuming",
+                          "terminating", "terminated", "failed", and "unknown".
+                        "tags": [
+                            "str"  # Optional. The tags applied to the MicroVM.
+                        ],
+                        "urls": [
+                            {
+                                "default": bool,  # Optional. Whether this is the
+                                  endpoint for the MicroVM's HTTP port.
+                                "hostname": "str",  # Optional. The endpoint's
+                                  hostname. Empty until provisioning finishes. Requests to the endpoint
+                                  must include a DigitalOcean API token with the ``microvm:access``
+                                  scope in the ``Authorization`` header.
+                                "id": "str",  # Optional. The unique ID of the URL.
+                                  Use it to remove the URL with DELETE
+                                  ``/v2/microvms/{microvm_id}/urls/{url_id}``.
+                                "port": 0,  # Optional. The guest port the endpoint
+                                  serves.
+                                "status": "str"  # Optional. ``PENDING`` until
+                                  provisioning finishes, then ``ACTIVE``. Known values are: "PENDING"
+                                  and "ACTIVE".
+                            }
+                        ]
+                    }
+                }
+                # response body for status code(s): 400, 404, 409
+                response == {
+                    "code": "str",  # A service-defined error code. Required.
+                    "message": "str"  # A human-readable description of the error. Required.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_microvms_update_request(
+            microvm_id=microvm_id,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404, 409]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
     @distributed_trace
     def post_pause(self, microvm_id: str, **kwargs: Any) -> JSON:
         # pylint: disable=line-too-long
@@ -239181,6 +240276,21 @@ class MicrovmsOperations:
                           paused.
                         "created_at": "2020-02-20 00:00:00",  # Optional. When the MicroVM
                           was created, in ISO 8601 format.
+                        "egress_policy": {
+                            "default_action": "deny",  # Optional. Default value is
+                              "deny". What to do with a destination no rule matches. ``deny`` refuses
+                              it (an HTTP request gets a 403 and a TLS connection is closed). Known
+                              values are: "deny" and "allow".
+                            "rules": [
+                                {
+                                    "domain": "str",  # Optional. An exact host
+                                      such as ``api.example.com``"" , or a wildcard such as
+                                      ``*.example.com``.
+                                    "ip": "str"  # Optional. An exact IP address.
+                                      CIDR ranges are not supported.
+                                }
+                            ]
+                        },
                         "failure_reason": "str",  # Optional. Why the MicroVM failed. Present
                           only when ``state`` is ``failed``.
                         "http_protocol": "str",  # Optional. The protocol the MicroVM's HTTP
@@ -239191,8 +240301,8 @@ class MicrovmsOperations:
                           in the region and contain 1 to 63 lowercase letters, digits, and hyphens.
                         "networking": "public",  # Optional. Default value is "public".
                           ``public`` sends outbound traffic through a shared NAT gateway. ``vpc``
-                          places the MicroVM in the VPC network set by ``vpc_uuid``. Known values are:
-                          "public" and "vpc".
+                          places the MicroVM in a VPC network. The VPC ID is not returned. Known values
+                          are: "public" and "vpc".
                         "ports": [
                             0  # Optional. The guest ports declared on the MicroVM,
                               including the HTTP port. During the public preview, only the HTTP port is
@@ -239218,9 +240328,6 @@ class MicrovmsOperations:
                         "state": "str",  # Optional. The MicroVM's current state. Known
                           values are: "creating", "running", "pausing", "paused", "resuming",
                           "terminating", "terminated", "failed", and "unknown".
-                        "tags": [
-                            "str"  # Optional. The tags applied to the MicroVM.
-                        ],
                         "urls": [
                             {
                                 "default": bool,  # Optional. Whether this is the
@@ -239229,16 +240336,16 @@ class MicrovmsOperations:
                                   hostname. Empty until provisioning finishes. Requests to the endpoint
                                   must include a DigitalOcean API token with the ``microvm:access``
                                   scope in the ``Authorization`` header.
+                                "id": "str",  # Optional. The unique ID of the URL.
+                                  Use it to remove the URL with DELETE
+                                  ``/v2/microvms/{microvm_id}/urls/{url_id}``.
                                 "port": 0,  # Optional. The guest port the endpoint
                                   serves.
                                 "status": "str"  # Optional. ``PENDING`` until
                                   provisioning finishes, then ``ACTIVE``. Known values are: "PENDING"
                                   and "ACTIVE".
                             }
-                        ],
-                        "vpc_uuid": "str"  # Optional. The ID of a VPC network in the same
-                          region that belongs to your team. Present only when ``networking`` is
-                          ``vpc``.
+                        ]
                     }
                 }
                 # response body for status code(s): 400, 404
@@ -239378,6 +240485,21 @@ class MicrovmsOperations:
                           paused.
                         "created_at": "2020-02-20 00:00:00",  # Optional. When the MicroVM
                           was created, in ISO 8601 format.
+                        "egress_policy": {
+                            "default_action": "deny",  # Optional. Default value is
+                              "deny". What to do with a destination no rule matches. ``deny`` refuses
+                              it (an HTTP request gets a 403 and a TLS connection is closed). Known
+                              values are: "deny" and "allow".
+                            "rules": [
+                                {
+                                    "domain": "str",  # Optional. An exact host
+                                      such as ``api.example.com``"" , or a wildcard such as
+                                      ``*.example.com``.
+                                    "ip": "str"  # Optional. An exact IP address.
+                                      CIDR ranges are not supported.
+                                }
+                            ]
+                        },
                         "failure_reason": "str",  # Optional. Why the MicroVM failed. Present
                           only when ``state`` is ``failed``.
                         "http_protocol": "str",  # Optional. The protocol the MicroVM's HTTP
@@ -239388,8 +240510,8 @@ class MicrovmsOperations:
                           in the region and contain 1 to 63 lowercase letters, digits, and hyphens.
                         "networking": "public",  # Optional. Default value is "public".
                           ``public`` sends outbound traffic through a shared NAT gateway. ``vpc``
-                          places the MicroVM in the VPC network set by ``vpc_uuid``. Known values are:
-                          "public" and "vpc".
+                          places the MicroVM in a VPC network. The VPC ID is not returned. Known values
+                          are: "public" and "vpc".
                         "ports": [
                             0  # Optional. The guest ports declared on the MicroVM,
                               including the HTTP port. During the public preview, only the HTTP port is
@@ -239415,9 +240537,6 @@ class MicrovmsOperations:
                         "state": "str",  # Optional. The MicroVM's current state. Known
                           values are: "creating", "running", "pausing", "paused", "resuming",
                           "terminating", "terminated", "failed", and "unknown".
-                        "tags": [
-                            "str"  # Optional. The tags applied to the MicroVM.
-                        ],
                         "urls": [
                             {
                                 "default": bool,  # Optional. Whether this is the
@@ -239426,16 +240545,16 @@ class MicrovmsOperations:
                                   hostname. Empty until provisioning finishes. Requests to the endpoint
                                   must include a DigitalOcean API token with the ``microvm:access``
                                   scope in the ``Authorization`` header.
+                                "id": "str",  # Optional. The unique ID of the URL.
+                                  Use it to remove the URL with DELETE
+                                  ``/v2/microvms/{microvm_id}/urls/{url_id}``.
                                 "port": 0,  # Optional. The guest port the endpoint
                                   serves.
                                 "status": "str"  # Optional. ``PENDING`` until
                                   provisioning finishes, then ``ACTIVE``. Known values are: "PENDING"
                                   and "ACTIVE".
                             }
-                        ],
-                        "vpc_uuid": "str"  # Optional. The ID of a VPC network in the same
-                          region that belongs to your team. Present only when ``networking`` is
-                          ``vpc``.
+                        ]
                     }
                 }
                 # response body for status code(s): 400, 404
@@ -239547,6 +240666,7 @@ class MicrovmsOperations:
         content_type: str = "application/json",
         **kwargs: Any,
     ) -> JSON:
+        # pylint: disable=line-too-long
         """Run a command in a MicroVM.
 
         To run a command in a MicroVM's workload container, send a POST request to
@@ -239577,16 +240697,24 @@ class MicrovmsOperations:
                     "argv": [
                         "str"  # The command and its arguments. Required.
                     ],
-                    "cwd": "str"  # Optional. The working directory to run the command in.
+                    "cwd": "str",  # Optional. The working directory to run the command in.
+                    "output_encoding": "utf-8"  # Optional. Default value is "utf-8". How
+                      ``stdout`` and ``stderr`` are returned. ``utf-8`` (the default) is a JSON string;
+                      bytes that are not valid UTF-8 become U+FFFD. ``base64`` returns the exact bytes.
+                      Use ``base64`` when the command may emit binary output. Known values are: "utf-8"
+                      and "base64".
                 }
 
                 # response body for status code(s): 200
                 response == {
                     "exit_code": 0,  # Optional. The command's exit code.
-                    "stderr": "str",  # Optional. The command's standard error. Bytes that are
-                      not valid UTF-8 are replaced.
-                    "stdout": "str",  # Optional. The command's standard output. Bytes that are
-                      not valid UTF-8 are replaced.
+                    "output_encoding": "str",  # Optional. The encoding of ``stdout`` and
+                      ``stderr``"" , echoing the request's ``output_encoding`` (or the ``utf-8``
+                      default). Known values are: "utf-8" and "base64".
+                    "stderr": "str",  # Optional. The command's standard error. A UTF-8 string
+                      when ``output_encoding`` is ``utf-8``"" ; standard Base64 when it is ``base64``.
+                    "stdout": "str",  # Optional. The command's standard output. A UTF-8 string
+                      when ``output_encoding`` is ``utf-8``"" ; standard Base64 when it is ``base64``.
                     "truncated": bool  # Optional. Present and ``true`` when the output exceeded
                       4 MiB and was cut off.
                 }
@@ -239606,6 +240734,7 @@ class MicrovmsOperations:
         content_type: str = "application/json",
         **kwargs: Any,
     ) -> JSON:
+        # pylint: disable=line-too-long
         """Run a command in a MicroVM.
 
         To run a command in a MicroVM's workload container, send a POST request to
@@ -239634,10 +240763,13 @@ class MicrovmsOperations:
                 # response body for status code(s): 200
                 response == {
                     "exit_code": 0,  # Optional. The command's exit code.
-                    "stderr": "str",  # Optional. The command's standard error. Bytes that are
-                      not valid UTF-8 are replaced.
-                    "stdout": "str",  # Optional. The command's standard output. Bytes that are
-                      not valid UTF-8 are replaced.
+                    "output_encoding": "str",  # Optional. The encoding of ``stdout`` and
+                      ``stderr``"" , echoing the request's ``output_encoding`` (or the ``utf-8``
+                      default). Known values are: "utf-8" and "base64".
+                    "stderr": "str",  # Optional. The command's standard error. A UTF-8 string
+                      when ``output_encoding`` is ``utf-8``"" ; standard Base64 when it is ``base64``.
+                    "stdout": "str",  # Optional. The command's standard output. A UTF-8 string
+                      when ``output_encoding`` is ``utf-8``"" ; standard Base64 when it is ``base64``.
                     "truncated": bool  # Optional. Present and ``true`` when the output exceeded
                       4 MiB and was cut off.
                 }
@@ -239652,6 +240784,7 @@ class MicrovmsOperations:
     def run_command(
         self, microvm_id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
     ) -> JSON:
+        # pylint: disable=line-too-long
         """Run a command in a MicroVM.
 
         To run a command in a MicroVM's workload container, send a POST request to
@@ -239679,16 +240812,24 @@ class MicrovmsOperations:
                     "argv": [
                         "str"  # The command and its arguments. Required.
                     ],
-                    "cwd": "str"  # Optional. The working directory to run the command in.
+                    "cwd": "str",  # Optional. The working directory to run the command in.
+                    "output_encoding": "utf-8"  # Optional. Default value is "utf-8". How
+                      ``stdout`` and ``stderr`` are returned. ``utf-8`` (the default) is a JSON string;
+                      bytes that are not valid UTF-8 become U+FFFD. ``base64`` returns the exact bytes.
+                      Use ``base64`` when the command may emit binary output. Known values are: "utf-8"
+                      and "base64".
                 }
 
                 # response body for status code(s): 200
                 response == {
                     "exit_code": 0,  # Optional. The command's exit code.
-                    "stderr": "str",  # Optional. The command's standard error. Bytes that are
-                      not valid UTF-8 are replaced.
-                    "stdout": "str",  # Optional. The command's standard output. Bytes that are
-                      not valid UTF-8 are replaced.
+                    "output_encoding": "str",  # Optional. The encoding of ``stdout`` and
+                      ``stderr``"" , echoing the request's ``output_encoding`` (or the ``utf-8``
+                      default). Known values are: "utf-8" and "base64".
+                    "stderr": "str",  # Optional. The command's standard error. A UTF-8 string
+                      when ``output_encoding`` is ``utf-8``"" ; standard Base64 when it is ``base64``.
+                    "stdout": "str",  # Optional. The command's standard output. A UTF-8 string
+                      when ``output_encoding`` is ``utf-8``"" ; standard Base64 when it is ``base64``.
                     "truncated": bool  # Optional. Present and ``true`` when the output exceeded
                       4 MiB and was cut off.
                 }
@@ -240514,6 +241655,23 @@ class MicrovmCheckpointsOperations:
                               checkpoint was created, in ISO 8601 format.
                             "disk_bytes": 0,  # Optional. The stored size of the
                               checkpoint's disk, in bytes.
+                            "egress_policy": {
+                                "default_action": "deny",  # Optional. Default value
+                                  is "deny". What to do with a destination no rule matches. ``deny``
+                                  refuses it (an HTTP request gets a 403 and a TLS connection is
+                                  closed). Known values are: "deny" and "allow".
+                                "rules": [
+                                    {
+                                        "domain": "str",  # Optional. An
+                                          exact host such as ``api.example.com``"" , or a wildcard such
+                                          as ``*.example.com``.
+                                        "ip": "str"  # Optional. An exact IP
+                                          address. CIDR ranges are not supported.
+                                    }
+                                ]
+                            },
+                            "failure_reason": "str",  # Optional. Why the checkpoint
+                              failed. Present only when ``status`` is ``CHECKPOINT_FAILED``.
                             "id": "str",  # Optional. The unique ID of the checkpoint.
                             "memory_bytes": 0,  # Optional. The stored size of the
                               checkpoint's memory, in bytes.
@@ -240631,6 +241789,23 @@ class MicrovmCheckpointsOperations:
                           was created, in ISO 8601 format.
                         "disk_bytes": 0,  # Optional. The stored size of the checkpoint's
                           disk, in bytes.
+                        "egress_policy": {
+                            "default_action": "deny",  # Optional. Default value is
+                              "deny". What to do with a destination no rule matches. ``deny`` refuses
+                              it (an HTTP request gets a 403 and a TLS connection is closed). Known
+                              values are: "deny" and "allow".
+                            "rules": [
+                                {
+                                    "domain": "str",  # Optional. An exact host
+                                      such as ``api.example.com``"" , or a wildcard such as
+                                      ``*.example.com``.
+                                    "ip": "str"  # Optional. An exact IP address.
+                                      CIDR ranges are not supported.
+                                }
+                            ]
+                        },
+                        "failure_reason": "str",  # Optional. Why the checkpoint failed.
+                          Present only when ``status`` is ``CHECKPOINT_FAILED``.
                         "id": "str",  # Optional. The unique ID of the checkpoint.
                         "memory_bytes": 0,  # Optional. The stored size of the checkpoint's
                           memory, in bytes.
@@ -240897,6 +242072,23 @@ class MicrovmCheckpointsOperations:
                           was created, in ISO 8601 format.
                         "disk_bytes": 0,  # Optional. The stored size of the checkpoint's
                           disk, in bytes.
+                        "egress_policy": {
+                            "default_action": "deny",  # Optional. Default value is
+                              "deny". What to do with a destination no rule matches. ``deny`` refuses
+                              it (an HTTP request gets a 403 and a TLS connection is closed). Known
+                              values are: "deny" and "allow".
+                            "rules": [
+                                {
+                                    "domain": "str",  # Optional. An exact host
+                                      such as ``api.example.com``"" , or a wildcard such as
+                                      ``*.example.com``.
+                                    "ip": "str"  # Optional. An exact IP address.
+                                      CIDR ranges are not supported.
+                                }
+                            ]
+                        },
+                        "failure_reason": "str",  # Optional. Why the checkpoint failed.
+                          Present only when ``status`` is ``CHECKPOINT_FAILED``.
                         "id": "str",  # Optional. The unique ID of the checkpoint.
                         "memory_bytes": 0,  # Optional. The stored size of the checkpoint's
                           memory, in bytes.
@@ -240965,6 +242157,23 @@ class MicrovmCheckpointsOperations:
                           was created, in ISO 8601 format.
                         "disk_bytes": 0,  # Optional. The stored size of the checkpoint's
                           disk, in bytes.
+                        "egress_policy": {
+                            "default_action": "deny",  # Optional. Default value is
+                              "deny". What to do with a destination no rule matches. ``deny`` refuses
+                              it (an HTTP request gets a 403 and a TLS connection is closed). Known
+                              values are: "deny" and "allow".
+                            "rules": [
+                                {
+                                    "domain": "str",  # Optional. An exact host
+                                      such as ``api.example.com``"" , or a wildcard such as
+                                      ``*.example.com``.
+                                    "ip": "str"  # Optional. An exact IP address.
+                                      CIDR ranges are not supported.
+                                }
+                            ]
+                        },
+                        "failure_reason": "str",  # Optional. Why the checkpoint failed.
+                          Present only when ``status`` is ``CHECKPOINT_FAILED``.
                         "id": "str",  # Optional. The unique ID of the checkpoint.
                         "memory_bytes": 0,  # Optional. The stored size of the checkpoint's
                           memory, in bytes.
@@ -241034,6 +242243,23 @@ class MicrovmCheckpointsOperations:
                           was created, in ISO 8601 format.
                         "disk_bytes": 0,  # Optional. The stored size of the checkpoint's
                           disk, in bytes.
+                        "egress_policy": {
+                            "default_action": "deny",  # Optional. Default value is
+                              "deny". What to do with a destination no rule matches. ``deny`` refuses
+                              it (an HTTP request gets a 403 and a TLS connection is closed). Known
+                              values are: "deny" and "allow".
+                            "rules": [
+                                {
+                                    "domain": "str",  # Optional. An exact host
+                                      such as ``api.example.com``"" , or a wildcard such as
+                                      ``*.example.com``.
+                                    "ip": "str"  # Optional. An exact IP address.
+                                      CIDR ranges are not supported.
+                                }
+                            ]
+                        },
+                        "failure_reason": "str",  # Optional. Why the checkpoint failed.
+                          Present only when ``status`` is ``CHECKPOINT_FAILED``.
                         "id": "str",  # Optional. The unique ID of the checkpoint.
                         "memory_bytes": 0,  # Optional. The stored size of the checkpoint's
                           memory, in bytes.
@@ -241172,6 +242398,1014 @@ class MicrovmCheckpointsOperations:
             return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
 
         return cast(JSON, deserialized)  # type: ignore
+
+
+class MicrovmURLsOperations:
+    """
+    .. warning::
+        **DO NOT** instantiate this class directly.
+
+        Instead, you should access the following operations through
+        :class:`~pydo.GeneratedClient`'s
+        :attr:`microvm_urls` attribute.
+    """
+
+    def __init__(self, *args, **kwargs):
+        input_args = list(args)
+        self._client = input_args.pop(0) if input_args else kwargs.pop("client")
+        self._config = input_args.pop(0) if input_args else kwargs.pop("config")
+        self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
+        self._deserialize = (
+            input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        )
+
+    @overload
+    def create(
+        self,
+        microvm_id: str,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Add a URL to a MicroVM.
+
+        To add a public URL to a MicroVM, send a POST request to
+        ``/v2/microvms/{microvm_id}/urls``.
+
+        The URL routes to ``port``\\ , which must be one of the ports declared at create;
+        the MicroVM's port set cannot change. The call returns once the URL is
+        recorded; its ``status`` is ``PENDING`` until the route is published.
+
+        The MicroVM must be running or paused. A MicroVM can have at most 10 URLs,
+        the default one included.
+
+        :param microvm_id: The unique ID of the MicroVM. Required.
+        :type microvm_id: str
+        :param body: Default value is None.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "port": 0  # Optional. The guest port the URL routes to. Must be one of the
+                      MicroVM's ``ports``. Defaults to the MicroVM's HTTP port when omitted.
+                }
+
+                # response body for status code(s): 201
+                response == {
+                    "url": {
+                        "default": bool,  # Optional. Whether this is the endpoint for the
+                          MicroVM's HTTP port.
+                        "hostname": "str",  # Optional. The endpoint's hostname. Empty until
+                          provisioning finishes. Requests to the endpoint must include a DigitalOcean
+                          API token with the ``microvm:access`` scope in the ``Authorization`` header.
+                        "id": "str",  # Optional. The unique ID of the URL. Use it to remove
+                          the URL with DELETE ``/v2/microvms/{microvm_id}/urls/{url_id}``.
+                        "port": 0,  # Optional. The guest port the endpoint serves.
+                        "status": "str"  # Optional. ``PENDING`` until provisioning finishes,
+                          then ``ACTIVE``. Known values are: "PENDING" and "ACTIVE".
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "code": "str",  # A service-defined error code. Required.
+                    "message": "str"  # A human-readable description of the error. Required.
+                }
+        """
+
+    @overload
+    def create(
+        self,
+        microvm_id: str,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Add a URL to a MicroVM.
+
+        To add a public URL to a MicroVM, send a POST request to
+        ``/v2/microvms/{microvm_id}/urls``.
+
+        The URL routes to ``port``\\ , which must be one of the ports declared at create;
+        the MicroVM's port set cannot change. The call returns once the URL is
+        recorded; its ``status`` is ``PENDING`` until the route is published.
+
+        The MicroVM must be running or paused. A MicroVM can have at most 10 URLs,
+        the default one included.
+
+        :param microvm_id: The unique ID of the MicroVM. Required.
+        :type microvm_id: str
+        :param body: Default value is None.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 201
+                response == {
+                    "url": {
+                        "default": bool,  # Optional. Whether this is the endpoint for the
+                          MicroVM's HTTP port.
+                        "hostname": "str",  # Optional. The endpoint's hostname. Empty until
+                          provisioning finishes. Requests to the endpoint must include a DigitalOcean
+                          API token with the ``microvm:access`` scope in the ``Authorization`` header.
+                        "id": "str",  # Optional. The unique ID of the URL. Use it to remove
+                          the URL with DELETE ``/v2/microvms/{microvm_id}/urls/{url_id}``.
+                        "port": 0,  # Optional. The guest port the endpoint serves.
+                        "status": "str"  # Optional. ``PENDING`` until provisioning finishes,
+                          then ``ACTIVE``. Known values are: "PENDING" and "ACTIVE".
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "code": "str",  # A service-defined error code. Required.
+                    "message": "str"  # A human-readable description of the error. Required.
+                }
+        """
+
+    @distributed_trace
+    def create(
+        self,
+        microvm_id: str,
+        body: Optional[Union[JSON, IO[bytes]]] = None,
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Add a URL to a MicroVM.
+
+        To add a public URL to a MicroVM, send a POST request to
+        ``/v2/microvms/{microvm_id}/urls``.
+
+        The URL routes to ``port``\\ , which must be one of the ports declared at create;
+        the MicroVM's port set cannot change. The call returns once the URL is
+        recorded; its ``status`` is ``PENDING`` until the route is published.
+
+        The MicroVM must be running or paused. A MicroVM can have at most 10 URLs,
+        the default one included.
+
+        :param microvm_id: The unique ID of the MicroVM. Required.
+        :type microvm_id: str
+        :param body: Is either a JSON type or a IO[bytes] type. Default value is None.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "port": 0  # Optional. The guest port the URL routes to. Must be one of the
+                      MicroVM's ``ports``. Defaults to the MicroVM's HTTP port when omitted.
+                }
+
+                # response body for status code(s): 201
+                response == {
+                    "url": {
+                        "default": bool,  # Optional. Whether this is the endpoint for the
+                          MicroVM's HTTP port.
+                        "hostname": "str",  # Optional. The endpoint's hostname. Empty until
+                          provisioning finishes. Requests to the endpoint must include a DigitalOcean
+                          API token with the ``microvm:access`` scope in the ``Authorization`` header.
+                        "id": "str",  # Optional. The unique ID of the URL. Use it to remove
+                          the URL with DELETE ``/v2/microvms/{microvm_id}/urls/{url_id}``.
+                        "port": 0,  # Optional. The guest port the endpoint serves.
+                        "status": "str"  # Optional. ``PENDING`` until provisioning finishes,
+                          then ``ACTIVE``. Known values are: "PENDING" and "ACTIVE".
+                    }
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "code": "str",  # A service-defined error code. Required.
+                    "message": "str"  # A human-readable description of the error. Required.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            if body is not None:
+                _json = body
+            else:
+                _json = None
+
+        _request = build_microvm_urls_create_request(
+            microvm_id=microvm_id,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [201, 400, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 201:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def delete(self, microvm_id: str, url_id: str, **kwargs: Any) -> Optional[JSON]:
+        """Remove a URL from a MicroVM.
+
+        To remove a public URL from a MicroVM, send a DELETE request to
+        ``/v2/microvms/{microvm_id}/urls/{url_id}``. The URL stops serving traffic.
+        The system default URL cannot be removed.
+
+        A successful request returns a ``204 No Content`` status code.
+
+        :param microvm_id: The unique ID of the MicroVM. Required.
+        :type microvm_id: str
+        :param url_id: The unique ID of the URL, from the MicroVM's ``urls`` list. Required.
+        :type url_id: str
+        :return: JSON object or None
+        :rtype: JSON or None
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 400, 404
+                response == {
+                    "code": "str",  # A service-defined error code. Required.
+                    "message": "str"  # A human-readable description of the error. Required.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[Optional[JSON]] = kwargs.pop("cls", None)
+
+        _request = build_microvm_urls_delete_request(
+            microvm_id=microvm_id,
+            url_id=url_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [204, 400, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        deserialized = None
+        response_headers = {}
+        if response.status_code == 204:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, deserialized, response_headers)  # type: ignore
+
+        return deserialized  # type: ignore
+
+
+class MicrovmAccessTokensOperations:
+    """
+    .. warning::
+        **DO NOT** instantiate this class directly.
+
+        Instead, you should access the following operations through
+        :class:`~pydo.GeneratedClient`'s
+        :attr:`microvm_access_tokens` attribute.
+    """
+
+    def __init__(self, *args, **kwargs):
+        input_args = list(args)
+        self._client = input_args.pop(0) if input_args else kwargs.pop("client")
+        self._config = input_args.pop(0) if input_args else kwargs.pop("config")
+        self._serialize = input_args.pop(0) if input_args else kwargs.pop("serializer")
+        self._deserialize = (
+            input_args.pop(0) if input_args else kwargs.pop("deserializer")
+        )
+
+    @overload
+    def create(
+        self,
+        microvm_id: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create an access token for a MicroVM.
+
+        To create an API token that grants access to the public endpoint of one
+        MicroVM only, send a POST request to
+        ``/v2/microvms/{microvm_id}/access_tokens``.
+
+        The token value is returned once, in this response. Save it; list never
+        returns it. To recover a lost token, revoke it and create a new one.
+
+        The token works on every URL of the MicroVM: the default URL and any extra
+        URL added with POST ``/v2/microvms/{microvm_id}/urls``. This token does not
+        restrict team tokens: team members with ``microvm:access`` keep their access
+        to the MicroVM. A MicroVM can have at most 10 live access tokens. Deleting
+        the MicroVM revokes its tokens.
+
+        :param microvm_id: The unique ID of the MicroVM. Required.
+        :type microvm_id: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "name": "str",  # A name for the token. Unique among the live access tokens
+                      of the MicroVM. Required.
+                    "expires_in_seconds": 0  # Optional. The lifetime of the token in seconds.
+                      Omit for a token that does not expire.
+                }
+
+                # response body for status code(s): 201
+                response == {
+                    "access_token": {
+                        "created_at": "2020-02-20 00:00:00",  # When the token was created,
+                          in ISO 8601 format. Required.
+                        "id": "str",  # The unique ID of the access token. Use it to revoke
+                          the token with DELETE ``/v2/microvms/{microvm_id}/access_tokens/{token_id}``.
+                          Required.
+                        "micro_vm_id": "str",  # The MicroVM the token grants access to.
+                          Required.
+                        "name": "str",  # The name given at create. Required.
+                        "token": "str",  # The token value. Use it as a bearer token against
+                          the MicroVM's endpoint. Shown once, in this response only. Required.
+                        "expires_at": "2020-02-20 00:00:00"  # Optional. When the token
+                          expires. Absent when the token does not expire.
+                    }
+                }
+                # response body for status code(s): 400, 404, 409
+                response == {
+                    "code": "str",  # A service-defined error code. Required.
+                    "message": "str"  # A human-readable description of the error. Required.
+                }
+        """
+
+    @overload
+    def create(
+        self,
+        microvm_id: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create an access token for a MicroVM.
+
+        To create an API token that grants access to the public endpoint of one
+        MicroVM only, send a POST request to
+        ``/v2/microvms/{microvm_id}/access_tokens``.
+
+        The token value is returned once, in this response. Save it; list never
+        returns it. To recover a lost token, revoke it and create a new one.
+
+        The token works on every URL of the MicroVM: the default URL and any extra
+        URL added with POST ``/v2/microvms/{microvm_id}/urls``. This token does not
+        restrict team tokens: team members with ``microvm:access`` keep their access
+        to the MicroVM. A MicroVM can have at most 10 live access tokens. Deleting
+        the MicroVM revokes its tokens.
+
+        :param microvm_id: The unique ID of the MicroVM. Required.
+        :type microvm_id: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 201
+                response == {
+                    "access_token": {
+                        "created_at": "2020-02-20 00:00:00",  # When the token was created,
+                          in ISO 8601 format. Required.
+                        "id": "str",  # The unique ID of the access token. Use it to revoke
+                          the token with DELETE ``/v2/microvms/{microvm_id}/access_tokens/{token_id}``.
+                          Required.
+                        "micro_vm_id": "str",  # The MicroVM the token grants access to.
+                          Required.
+                        "name": "str",  # The name given at create. Required.
+                        "token": "str",  # The token value. Use it as a bearer token against
+                          the MicroVM's endpoint. Shown once, in this response only. Required.
+                        "expires_at": "2020-02-20 00:00:00"  # Optional. When the token
+                          expires. Absent when the token does not expire.
+                    }
+                }
+                # response body for status code(s): 400, 404, 409
+                response == {
+                    "code": "str",  # A service-defined error code. Required.
+                    "message": "str"  # A human-readable description of the error. Required.
+                }
+        """
+
+    @distributed_trace
+    def create(
+        self, microvm_id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create an access token for a MicroVM.
+
+        To create an API token that grants access to the public endpoint of one
+        MicroVM only, send a POST request to
+        ``/v2/microvms/{microvm_id}/access_tokens``.
+
+        The token value is returned once, in this response. Save it; list never
+        returns it. To recover a lost token, revoke it and create a new one.
+
+        The token works on every URL of the MicroVM: the default URL and any extra
+        URL added with POST ``/v2/microvms/{microvm_id}/urls``. This token does not
+        restrict team tokens: team members with ``microvm:access`` keep their access
+        to the MicroVM. A MicroVM can have at most 10 live access tokens. Deleting
+        the MicroVM revokes its tokens.
+
+        :param microvm_id: The unique ID of the MicroVM. Required.
+        :type microvm_id: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "name": "str",  # A name for the token. Unique among the live access tokens
+                      of the MicroVM. Required.
+                    "expires_in_seconds": 0  # Optional. The lifetime of the token in seconds.
+                      Omit for a token that does not expire.
+                }
+
+                # response body for status code(s): 201
+                response == {
+                    "access_token": {
+                        "created_at": "2020-02-20 00:00:00",  # When the token was created,
+                          in ISO 8601 format. Required.
+                        "id": "str",  # The unique ID of the access token. Use it to revoke
+                          the token with DELETE ``/v2/microvms/{microvm_id}/access_tokens/{token_id}``.
+                          Required.
+                        "micro_vm_id": "str",  # The MicroVM the token grants access to.
+                          Required.
+                        "name": "str",  # The name given at create. Required.
+                        "token": "str",  # The token value. Use it as a bearer token against
+                          the MicroVM's endpoint. Shown once, in this response only. Required.
+                        "expires_at": "2020-02-20 00:00:00"  # Optional. When the token
+                          expires. Absent when the token does not expire.
+                    }
+                }
+                # response body for status code(s): 400, 404, 409
+                response == {
+                    "code": "str",  # A service-defined error code. Required.
+                    "message": "str"  # A human-readable description of the error. Required.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_microvm_access_tokens_create_request(
+            microvm_id=microvm_id,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [201, 400, 404, 409]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 201:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def list(self, microvm_id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """List the access tokens of a MicroVM.
+
+        To list the live access tokens of a MicroVM, send a GET request to
+        ``/v2/microvms/{microvm_id}/access_tokens``. Tokens are returned oldest first.
+        Token values are never returned. The ``id`` of an entry revokes the token
+        with DELETE ``/v2/microvms/{microvm_id}/access_tokens/{token_id}``.
+
+        :param microvm_id: The unique ID of the MicroVM. Required.
+        :type microvm_id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "access_tokens": [
+                        {
+                            "created_at": "2020-02-20 00:00:00",  # When the token was
+                              created, in ISO 8601 format. Required.
+                            "id": "str",  # The unique ID of the access token. Use it to
+                              revoke the token with DELETE
+                              ``/v2/microvms/{microvm_id}/access_tokens/{token_id}``. Required.
+                            "micro_vm_id": "str",  # The MicroVM the token grants access
+                              to. Required.
+                            "name": "str",  # The name given at create. Required.
+                            "expires_at": "2020-02-20 00:00:00"  # Optional. When the
+                              token expires. Absent when the token does not expire.
+                        }
+                    ]
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "code": "str",  # A service-defined error code. Required.
+                    "message": "str"  # A human-readable description of the error. Required.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_microvm_access_tokens_list_request(
+            microvm_id=microvm_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def delete(self, microvm_id: str, token_id: str, **kwargs: Any) -> Optional[JSON]:
+        """Revoke an access token of a MicroVM.
+
+        To revoke an access token, send a DELETE request to
+        ``/v2/microvms/{microvm_id}/access_tokens/{token_id}``. The token stops
+        working at the edge right away and drops out of the list. Revoke is
+        permanent; a revoked token cannot be restored.
+
+        A successful request returns a ``204 No Content`` status code.
+
+        :param microvm_id: The unique ID of the MicroVM. Required.
+        :type microvm_id: str
+        :param token_id: The unique ID of the access token, from the list. Required.
+        :type token_id: str
+        :return: JSON object or None
+        :rtype: JSON or None
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 404
+                response == {
+                    "code": "str",  # A service-defined error code. Required.
+                    "message": "str"  # A human-readable description of the error. Required.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[Optional[JSON]] = kwargs.pop("cls", None)
+
+        _request = build_microvm_access_tokens_delete_request(
+            microvm_id=microvm_id,
+            token_id=token_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [204, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        deserialized = None
+        response_headers = {}
+        if response.status_code == 204:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, deserialized, response_headers)  # type: ignore
+
+        return deserialized  # type: ignore
 
 
 class MonitoringOperations:  # pylint: disable=too-many-public-methods
@@ -266213,7 +268447,15 @@ class ReservedIPsOperations:
         )
 
     @distributed_trace
-    def list(self, *, per_page: int = 20, page: int = 1, **kwargs: Any) -> JSON:
+    def list(
+        self,
+        *,
+        per_page: int = 20,
+        page: int = 1,
+        sort: Optional[str] = None,
+        sort_direction: Optional[str] = None,
+        **kwargs: Any,
+    ) -> JSON:
         # pylint: disable=line-too-long
         """List All Reserved IPs.
 
@@ -266224,6 +268466,20 @@ class ReservedIPsOperations:
         :paramtype per_page: int
         :keyword page: Which 'page' of paginated results to return. Default value is 1.
         :paramtype page: int
+        :keyword sort: Field to sort results by. Possible values are ``created_at``\\ ,
+         ``updated_at``\\ ,
+         ``ip``\\ , ``id``\\ , and ``droplet_id``. Defaults to ``id``. Any other value is treated
+         as ``id``.
+
+         Sorting by ``droplet_id`` orders reserved IPs by the Droplet they are
+         assigned to. Unassigned reserved IPs (\\ ``droplet`` is null) sort as the
+         lowest value, so they are returned first when ``sort_direction`` is ``asc``
+         and last when it is ``desc``. Known values are: "created_at", "updated_at", "ip", "id", and
+         "droplet_id". Default value is None.
+        :paramtype sort: str
+        :keyword sort_direction: Direction to sort results. Possible values are ``asc`` and ``desc``.
+         Defaults to ``asc``. Known values are: "asc" and "desc". Default value is None.
+        :paramtype sort_direction: str
         :return: JSON object
         :rtype: JSON
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -266294,6 +268550,8 @@ class ReservedIPsOperations:
         _request = build_reserved_ips_list_request(
             per_page=per_page,
             page=page,
+            sort=sort,
+            sort_direction=sort_direction,
             headers=_headers,
             params=_params,
         )
@@ -293284,6 +295542,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -293329,13 +295596,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -294541,6 +296817,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -294586,13 +296871,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -295845,6 +298139,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -295890,13 +298193,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -298135,6 +300447,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -298180,13 +300501,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -299395,6 +301725,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -299440,13 +301779,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -300665,6 +303013,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -300710,13 +303067,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -302038,6 +304404,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -302083,13 +304458,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -303301,6 +305685,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -303346,13 +305739,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -304575,6 +306977,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -304620,13 +307031,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -305923,6 +308343,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -305968,13 +308397,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -307272,6 +309710,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -307317,13 +309764,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -308532,6 +310988,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -308577,13 +311042,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -309798,6 +312272,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -309843,13 +312326,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -311144,6 +313636,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -311189,13 +313690,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -312470,6 +314980,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -312515,13 +315034,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -313799,6 +316327,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -313844,13 +316381,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -315129,6 +317675,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -315174,13 +317729,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -317104,6 +319668,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -317149,13 +319722,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -318521,6 +321103,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -318566,13 +321157,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -319781,6 +322381,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -319826,13 +322435,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -321113,6 +323731,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -321158,13 +323785,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -322454,6 +325090,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -322499,13 +325144,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -323844,6 +326498,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                       the judge.
                 "scoring_prompt": "str",  # Optional.
                                                       Instructions for the judge model (multi-line).
+                                                    "turn_type":
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                      Optional. Default value is
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                                      Whether the metric is for single-turn or
+                                                      multi-turn evaluations. Known values are:
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                     "updated_at":
                                                       "2020-02-20 00:00:00"  # Optional. Configuration
                                                       for a custom model-evaluation metric scored by an
@@ -323893,7 +326556,7 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "range_min": 0.0,  #
                                                   Optional. The minimum value for the metric.
                                                 "source":
-                                                  "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                                  "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                                   Default value is
                                                   "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
                                                   platform catalog metrics from user-defined
@@ -323901,6 +326564,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                                   "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                                   "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             }
                                         ],
                                         "name": "str",  # Optional.
@@ -325204,6 +327876,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -325249,13 +327930,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -326464,6 +329154,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -326509,13 +329208,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -327730,6 +330438,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -327775,13 +330492,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -330700,6 +333426,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                       the judge.
                 "scoring_prompt": "str",  # Optional.
                                                       Instructions for the judge model (multi-line).
+                                                    "turn_type":
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                      Optional. Default value is
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                                      Whether the metric is for single-turn or
+                                                      multi-turn evaluations. Known values are:
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                     "updated_at":
                                                       "2020-02-20 00:00:00"  # Optional. Configuration
                                                       for a custom model-evaluation metric scored by an
@@ -330749,7 +333484,7 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "range_min": 0.0,  #
                                                   Optional. The minimum value for the metric.
                                                 "source":
-                                                  "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                                  "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                                   Default value is
                                                   "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
                                                   platform catalog metrics from user-defined
@@ -330757,6 +333492,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                                   "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                                   "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             }
                                         ],
                                         "name": "str",  # Optional.
@@ -333567,6 +336311,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   sent to the judge.
                                 "scoring_prompt": "str",  # Optional. Instructions
                                   for the judge model (multi-line).
+                                "turn_type":
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional. Default value
+                                  is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the metric is
+                                  for single-turn or multi-turn evaluations. Known values are:
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                 "updated_at": "2020-02-20 00:00:00"  # Optional.
                                   Configuration for a custom model-evaluation metric scored by an LLM
                                   judge. Prompt and model response are always included in the judge
@@ -333599,12 +336350,18 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               metric.
                             "range_min": 0.0,  # Optional. The minimum value for the
                               metric.
-                            "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
-                              Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
-                              platform catalog metrics from user-defined LLM-as-judge metrics. Known
-                              values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                            "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  #
+                              Optional. Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
+                              Distinguishes platform catalog metrics from user-defined LLM-as-judge
+                              metrics. Known values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                            "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  #
+                              Optional. Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                              Whether the metric is for single-turn or multi-turn evaluations. Known
+                              values are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                         }
                     ]
                 }
@@ -333736,6 +336493,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           ground truth is not required and is not sent to the judge.
                         "scoring_prompt": "str",  # Optional. Instructions for the judge
                           model (multi-line).
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                         "updated_at": "2020-02-20 00:00:00"  # Optional. Configuration for a
                           custom model-evaluation metric scored by an LLM judge. Prompt and model
                           response are always included in the judge context.
@@ -333774,6 +336537,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               When false, ground truth is not required and is not sent to the judge.
                             "scoring_prompt": "str",  # Optional. Instructions for the
                               judge model (multi-line).
+                            "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                              Optional. Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                              Whether the metric is for single-turn or multi-turn evaluations. Known
+                              values are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                             "updated_at": "2020-02-20 00:00:00"  # Optional.
                               Configuration for a custom model-evaluation metric scored by an LLM
                               judge. Prompt and model response are always included in the judge
@@ -333802,11 +336571,17 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                         "range_max": 0.0,  # Optional. The maximum value for the metric.
                         "range_min": 0.0,  # Optional. The minimum value for the metric.
-                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
-                          value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes platform
-                          catalog metrics from user-defined LLM-as-judge metrics. Known values are:
-                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED", "EVALUATION_METRIC_SOURCE_BUILTIN",
-                          and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
+                          platform catalog metrics from user-defined LLM-as-judge metrics. Known values
+                          are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                          "EVALUATION_METRIC_SOURCE_BUILTIN", and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                     }
                 }
                 # response body for status code(s): 404
@@ -333878,6 +336653,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               When false, ground truth is not required and is not sent to the judge.
                             "scoring_prompt": "str",  # Optional. Instructions for the
                               judge model (multi-line).
+                            "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                              Optional. Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                              Whether the metric is for single-turn or multi-turn evaluations. Known
+                              values are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                             "updated_at": "2020-02-20 00:00:00"  # Optional.
                               Configuration for a custom model-evaluation metric scored by an LLM
                               judge. Prompt and model response are always included in the judge
@@ -333906,11 +336687,17 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                         "range_max": 0.0,  # Optional. The maximum value for the metric.
                         "range_min": 0.0,  # Optional. The minimum value for the metric.
-                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
-                          value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes platform
-                          catalog metrics from user-defined LLM-as-judge metrics. Known values are:
-                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED", "EVALUATION_METRIC_SOURCE_BUILTIN",
-                          and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
+                          platform catalog metrics from user-defined LLM-as-judge metrics. Known values
+                          are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                          "EVALUATION_METRIC_SOURCE_BUILTIN", and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                     }
                 }
                 # response body for status code(s): 404
@@ -333958,6 +336745,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           ground truth is not required and is not sent to the judge.
                         "scoring_prompt": "str",  # Optional. Instructions for the judge
                           model (multi-line).
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                         "updated_at": "2020-02-20 00:00:00"  # Optional. Configuration for a
                           custom model-evaluation metric scored by an LLM judge. Prompt and model
                           response are always included in the judge context.
@@ -333996,6 +336789,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               When false, ground truth is not required and is not sent to the judge.
                             "scoring_prompt": "str",  # Optional. Instructions for the
                               judge model (multi-line).
+                            "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                              Optional. Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                              Whether the metric is for single-turn or multi-turn evaluations. Known
+                              values are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                             "updated_at": "2020-02-20 00:00:00"  # Optional.
                               Configuration for a custom model-evaluation metric scored by an LLM
                               judge. Prompt and model response are always included in the judge
@@ -334024,11 +336823,17 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                         "range_max": 0.0,  # Optional. The maximum value for the metric.
                         "range_min": 0.0,  # Optional. The minimum value for the metric.
-                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
-                          value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes platform
-                          catalog metrics from user-defined LLM-as-judge metrics. Known values are:
-                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED", "EVALUATION_METRIC_SOURCE_BUILTIN",
-                          and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
+                          platform catalog metrics from user-defined LLM-as-judge metrics. Known values
+                          are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                          "EVALUATION_METRIC_SOURCE_BUILTIN", and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                     }
                 }
                 # response body for status code(s): 404
@@ -334179,6 +336984,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           ground truth is not required and is not sent to the judge.
                         "scoring_prompt": "str",  # Optional. Instructions for the judge
                           model (multi-line).
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                         "updated_at": "2020-02-20 00:00:00"  # Optional. Configuration for a
                           custom model-evaluation metric scored by an LLM judge. Prompt and model
                           response are always included in the judge context.
@@ -334218,6 +337029,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               When false, ground truth is not required and is not sent to the judge.
                             "scoring_prompt": "str",  # Optional. Instructions for the
                               judge model (multi-line).
+                            "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                              Optional. Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                              Whether the metric is for single-turn or multi-turn evaluations. Known
+                              values are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                             "updated_at": "2020-02-20 00:00:00"  # Optional.
                               Configuration for a custom model-evaluation metric scored by an LLM
                               judge. Prompt and model response are always included in the judge
@@ -334246,11 +337063,17 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                         "range_max": 0.0,  # Optional. The maximum value for the metric.
                         "range_min": 0.0,  # Optional. The minimum value for the metric.
-                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
-                          value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes platform
-                          catalog metrics from user-defined LLM-as-judge metrics. Known values are:
-                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED", "EVALUATION_METRIC_SOURCE_BUILTIN",
-                          and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
+                          platform catalog metrics from user-defined LLM-as-judge metrics. Known values
+                          are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                          "EVALUATION_METRIC_SOURCE_BUILTIN", and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                     }
                 }
                 # response body for status code(s): 404
@@ -334325,6 +337148,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               When false, ground truth is not required and is not sent to the judge.
                             "scoring_prompt": "str",  # Optional. Instructions for the
                               judge model (multi-line).
+                            "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                              Optional. Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                              Whether the metric is for single-turn or multi-turn evaluations. Known
+                              values are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                             "updated_at": "2020-02-20 00:00:00"  # Optional.
                               Configuration for a custom model-evaluation metric scored by an LLM
                               judge. Prompt and model response are always included in the judge
@@ -334353,11 +337182,17 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                         "range_max": 0.0,  # Optional. The maximum value for the metric.
                         "range_min": 0.0,  # Optional. The minimum value for the metric.
-                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
-                          value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes platform
-                          catalog metrics from user-defined LLM-as-judge metrics. Known values are:
-                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED", "EVALUATION_METRIC_SOURCE_BUILTIN",
-                          and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
+                          platform catalog metrics from user-defined LLM-as-judge metrics. Known values
+                          are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                          "EVALUATION_METRIC_SOURCE_BUILTIN", and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                     }
                 }
                 # response body for status code(s): 404
@@ -334410,6 +337245,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           ground truth is not required and is not sent to the judge.
                         "scoring_prompt": "str",  # Optional. Instructions for the judge
                           model (multi-line).
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                         "updated_at": "2020-02-20 00:00:00"  # Optional. Configuration for a
                           custom model-evaluation metric scored by an LLM judge. Prompt and model
                           response are always included in the judge context.
@@ -334449,6 +337290,12 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               When false, ground truth is not required and is not sent to the judge.
                             "scoring_prompt": "str",  # Optional. Instructions for the
                               judge model (multi-line).
+                            "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                              Optional. Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                              Whether the metric is for single-turn or multi-turn evaluations. Known
+                              values are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                             "updated_at": "2020-02-20 00:00:00"  # Optional.
                               Configuration for a custom model-evaluation metric scored by an LLM
                               judge. Prompt and model response are always included in the judge
@@ -334477,11 +337324,17 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                           "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                         "range_max": 0.0,  # Optional. The maximum value for the metric.
                         "range_min": 0.0,  # Optional. The minimum value for the metric.
-                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
-                          value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes platform
-                          catalog metrics from user-defined LLM-as-judge metrics. Known values are:
-                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED", "EVALUATION_METRIC_SOURCE_BUILTIN",
-                          and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
+                          Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
+                          platform catalog metrics from user-defined LLM-as-judge metrics. Known values
+                          are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                          "EVALUATION_METRIC_SOURCE_BUILTIN", and "EVALUATION_METRIC_SOURCE_CUSTOM".
+                        "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                          metric is for single-turn or multi-turn evaluations. Known values are:
+                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                     }
                 }
                 # response body for status code(s): 404
@@ -336144,6 +338997,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           is not required and is not sent to the judge.
                                         "scoring_prompt": "str",  # Optional.
                                           Instructions for the judge model (multi-line).
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         "updated_at": "2020-02-20 00:00:00"
                                           # Optional. Configuration for a custom model-evaluation
                                           metric scored by an LLM judge. Prompt and model response are
@@ -336189,12 +339050,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                     "range_min": 0.0,  # Optional. The minimum
                                       value for the metric.
                                     "source":
-                                      "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default value
-                                      is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes platform
-                                      catalog metrics from user-defined LLM-as-judge metrics. Known
-                                      values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                                      "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
+                                      value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
+                                      platform catalog metrics from user-defined LLM-as-judge metrics.
+                                      Known values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                       "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                       "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                    "turn_type":
+                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional. Default
+                                      value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                      metric is for single-turn or multi-turn evaluations. Known values
+                                      are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                 }
                             ],
                             "name": "str",  # Optional. Alternative way of authentication
@@ -336888,6 +339756,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       and is not sent to the judge.
                                     "scoring_prompt": "str",  # Optional.
                                       Instructions for the judge model (multi-line).
+                                    "turn_type":
+                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional. Default
+                                      value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                      metric is for single-turn or multi-turn evaluations. Known values
+                                      are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     "updated_at": "2020-02-20 00:00:00"  #
                                       Optional. Configuration for a custom model-evaluation metric
                                       scored by an LLM judge. Prompt and model response are always
@@ -336921,12 +339796,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   the metric.
                                 "range_min": 0.0,  # Optional. The minimum value for
                                   the metric.
-                                "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  #
+                                "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  #
                                   Optional. Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                   Distinguishes platform catalog metrics from user-defined LLM-as-judge
                                   metrics. Known values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                   "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                   "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                "turn_type":
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional. Default value
+                                  is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the metric is
+                                  for single-turn or multi-turn evaluations. Known values are:
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                             }
                         ],
                         "name": "str",  # Optional.
@@ -343062,13 +345944,23 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
         return cast(JSON, deserialized)  # type: ignore
 
     @distributed_trace
-    def list_model_evaluation_metrics(self, **kwargs: Any) -> JSON:
+    def list_model_evaluation_metrics(
+        self,
+        *,
+        turn_type: str = "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+        **kwargs: Any,
+    ) -> JSON:
         # pylint: disable=line-too-long
         """List Model Evaluation Metrics.
 
         To list all available metrics for model evaluation, send a GET request to
         ``/v2/genai/model_evaluation_metrics``.
 
+        :keyword turn_type: When set, only return metrics compatible with this turn type. Known values
+         are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED", "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+         "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN". Default value is
+         "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+        :paramtype turn_type: str
         :return: JSON object
         :rtype: JSON
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -343109,6 +346001,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   sent to the judge.
                                 "scoring_prompt": "str",  # Optional. Instructions
                                   for the judge model (multi-line).
+                                "turn_type":
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional. Default value
+                                  is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the metric is
+                                  for single-turn or multi-turn evaluations. Known values are:
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                 "updated_at": "2020-02-20 00:00:00"  # Optional.
                                   Configuration for a custom model-evaluation metric scored by an LLM
                                   judge. Prompt and model response are always included in the judge
@@ -343146,12 +346045,18 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               metric.
                             "range_min": 0.0,  # Optional. The minimum value for the
                               metric.
-                            "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
-                              Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
-                              platform catalog metrics from user-defined LLM-as-judge metrics. Known
-                              values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                            "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  #
+                              Optional. Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
+                              Distinguishes platform catalog metrics from user-defined LLM-as-judge
+                              metrics. Known values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                            "turn_type": "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  #
+                              Optional. Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                              Whether the metric is for single-turn or multi-turn evaluations. Known
+                              values are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                         }
                     ]
                 }
@@ -343186,6 +346091,7 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
         _request = build_genai_list_model_evaluation_metrics_request(
+            turn_type=turn_type,
             headers=_headers,
             params=_params,
         )
@@ -343343,6 +346249,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           is not required and is not sent to the judge.
                                         "scoring_prompt": "str",  # Optional.
                                           Instructions for the judge model (multi-line).
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         "updated_at": "2020-02-20 00:00:00"
                                           # Optional. Configuration for a custom model-evaluation
                                           metric scored by an LLM judge. Prompt and model response are
@@ -343388,12 +346302,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                     "range_min": 0.0,  # Optional. The minimum
                                       value for the metric.
                                     "source":
-                                      "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default value
-                                      is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes platform
-                                      catalog metrics from user-defined LLM-as-judge metrics. Known
-                                      values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                                      "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
+                                      value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
+                                      platform catalog metrics from user-defined LLM-as-judge metrics.
+                                      Known values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                       "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                       "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                    "turn_type":
+                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional. Default
+                                      value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                      metric is for single-turn or multi-turn evaluations. Known values
+                                      are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                 }
                             ],
                             "name": "str",  # Optional. Name of the evaluation preset.
@@ -343606,6 +346527,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       and is not sent to the judge.
                                     "scoring_prompt": "str",  # Optional.
                                       Instructions for the judge model (multi-line).
+                                    "turn_type":
+                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional. Default
+                                      value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                      metric is for single-turn or multi-turn evaluations. Known values
+                                      are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     "updated_at": "2020-02-20 00:00:00"  #
                                       Optional. Configuration for a custom model-evaluation metric
                                       scored by an LLM judge. Prompt and model response are always
@@ -343644,12 +346572,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   the metric.
                                 "range_min": 0.0,  # Optional. The minimum value for
                                   the metric.
-                                "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  #
+                                "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  #
                                   Optional. Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                   Distinguishes platform catalog metrics from user-defined LLM-as-judge
                                   metrics. Known values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                   "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                   "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                "turn_type":
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional. Default value
+                                  is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the metric is
+                                  for single-turn or multi-turn evaluations. Known values are:
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                             }
                         ],
                         "name": "str",  # Optional. Name of the evaluation preset.
@@ -344686,6 +347621,13 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       and is not sent to the judge.
                                     "scoring_prompt": "str",  # Optional.
                                       Instructions for the judge model (multi-line).
+                                    "turn_type":
+                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional. Default
+                                      value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                      metric is for single-turn or multi-turn evaluations. Known values
+                                      are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     "updated_at": "2020-02-20 00:00:00"  #
                                       Optional. Configuration for a custom model-evaluation metric
                                       scored by an LLM judge. Prompt and model response are always
@@ -344724,12 +347666,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   the metric.
                                 "range_min": 0.0,  # Optional. The minimum value for
                                   the metric.
-                                "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  #
+                                "source": "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  #
                                   Optional. Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                   Distinguishes platform catalog metrics from user-defined LLM-as-judge
                                   metrics. Known values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                   "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                   "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                "turn_type":
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional. Default value
+                                  is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the metric is
+                                  for single-turn or multi-turn evaluations. Known values are:
+                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                             }
                         ],
                         "name": "str",  # Optional. Name of the evaluation run.
@@ -348163,6 +351112,1632 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
         _request = build_genai_get_model_catalog_card_request(
+            id=id,
+            model_id=model_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def list_model_catalog_v2(
+        self,
+        *,
+        page: Optional[int] = None,
+        per_page: Optional[int] = None,
+        search: Optional[str] = None,
+        serving: Optional[List[str]] = None,
+        badges: Optional[List[str]] = None,
+        input_modality: Optional[List[str]] = None,
+        output_modality: Optional[List[str]] = None,
+        product: Optional[List[str]] = None,
+        capabilities: Optional[List[str]] = None,
+        item_type: Optional[List[str]] = None,
+        sort_by: str = "MODEL_CATALOG_SORT_BY_CREATED_AT",
+        sort_direction: str = "SORT_DIRECTION_UNSPECIFIED",
+        creator: Optional[List[str]] = None,
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Model Catalog V2.
+
+        Returns the model catalog using the V2 card shape (typed serving, badges, and modalities).
+        Requires authentication.
+
+        :keyword page: Page number for pagination. Default value is None.
+        :paramtype page: int
+        :keyword per_page: Number of items per page. Default value is None.
+        :paramtype per_page: int
+        :keyword search: Optional partial, case-insensitive match on the display name or model ID.
+         Omit this when filtering only by modality, serving, or product. Default value is None.
+        :paramtype search: str
+        :keyword serving: Filter by where the model is served. Multiple values use OR semantics.
+
+
+         * MODEL_SERVING_SERVERLESS: Serverless inference.
+         * MODEL_SERVING_DEDICATED: Dedicated inference. Default value is None.
+        :paramtype serving: list[str]
+        :keyword badges: Filter by badge. Multiple values use OR semantics.
+
+
+         * MODEL_CATALOG_BADGE_FEATURED: Featured in the catalog.
+         * MODEL_CATALOG_BADGE_NEW: Newly added.
+         * MODEL_CATALOG_BADGE_PREVIEW: Preview.
+         * MODEL_CATALOG_BADGE_DEPRECATING: Scheduled for deprecation.
+         * MODEL_CATALOG_BADGE_INFERENCE_ROUTER: Inference Router preset. Default value is None.
+        :paramtype badges: list[str]
+        :keyword input_modality: Require every listed modality as a model input. Multiple values use
+         AND semantics.
+
+
+         * MODEL_MODALITY_TEXT: plain text
+         * MODEL_MODALITY_IMAGE: still images
+         * MODEL_MODALITY_AUDIO: audio
+         * MODEL_MODALITY_VIDEO: video
+         * MODEL_MODALITY_EMBEDDING: embedding vectors
+         * MODEL_MODALITY_RANKING: document ranking scores produced by reranking models
+         * MODEL_MODALITY_DECISIONS: structured decisions produced by classification models. Default
+         value is None.
+        :paramtype input_modality: list[str]
+        :keyword output_modality: Require every listed modality as a model output. Multiple values use
+         AND semantics.
+
+
+         * MODEL_MODALITY_TEXT: plain text
+         * MODEL_MODALITY_IMAGE: still images
+         * MODEL_MODALITY_AUDIO: audio
+         * MODEL_MODALITY_VIDEO: video
+         * MODEL_MODALITY_EMBEDDING: embedding vectors
+         * MODEL_MODALITY_RANKING: document ranking scores produced by reranking models
+         * MODEL_MODALITY_DECISIONS: structured decisions produced by classification models. Default
+         value is None.
+        :paramtype output_modality: list[str]
+        :keyword product: Filter by product enrollment.
+
+
+         * MODEL_CATALOG_PRODUCT_EVALUATIONS_JUDGE: Model can judge evaluations.
+         * MODEL_CATALOG_PRODUCT_HARNESS_RUNTIME: Model is enrolled for the harness runtime.
+         * MODEL_CATALOG_PRODUCT_EVALUATION_CANDIDATE: Model can be an evaluation or simulation
+         candidate. It serves a text endpoint and accepts and returns text. Default value is None.
+        :paramtype product: list[str]
+        :keyword capabilities: Require every listed capability. Multiple values use AND semantics.
+         ``coding`` matches a coding specialisation, not only models whose type is coding. Default
+         value is None.
+        :paramtype capabilities: list[str]
+        :keyword item_type: Include foundation models, Inference Router presets, or both. Omit to
+         return both.
+
+
+         * MODEL_CATALOG_ITEM_TYPE_MODEL: A foundation or inference model.
+         * MODEL_CATALOG_ITEM_TYPE_INFERENCE_ROUTER: An Inference Router preset. Default value is None.
+        :paramtype item_type: list[str]
+        :keyword sort_by: Field to sort results by. Default is ``MODEL_CATALOG_SORT_BY_CREATED_AT``.
+
+
+         * MODEL_CATALOG_SORT_BY_CREATED_AT: Sort by creation date.
+         * MODEL_CATALOG_SORT_BY_NAME: Sort by display name, case-insensitive.
+         * MODEL_CATALOG_SORT_BY_PRICE: Sort by input token price.
+         * MODEL_CATALOG_SORT_BY_E2E_LATENCY_P50: Sort by canary end-to-end latency p50, in seconds.
+         Lower is better. Rows without performance data sort after rows with data.
+         * MODEL_CATALOG_SORT_BY_THROUGHPUT_P50: Sort by canary throughput p50, in tokens per second.
+         Higher is better. Rows without performance data sort after rows with data.
+         * MODEL_CATALOG_SORT_BY_TTFT_P50: Sort by canary time to first token p50, in seconds. Lower is
+         better. Rows without performance data sort after rows with data. Known values are:
+         "MODEL_CATALOG_SORT_BY_CREATED_AT", "MODEL_CATALOG_SORT_BY_NAME",
+         "MODEL_CATALOG_SORT_BY_PRICE", "MODEL_CATALOG_SORT_BY_E2E_LATENCY_P50",
+         "MODEL_CATALOG_SORT_BY_THROUGHPUT_P50", and "MODEL_CATALOG_SORT_BY_TTFT_P50". Default value is
+         "MODEL_CATALOG_SORT_BY_CREATED_AT".
+        :paramtype sort_by: str
+        :keyword sort_direction: Sort direction. Defaults to descending when unspecified. Known values
+         are: "SORT_DIRECTION_UNSPECIFIED", "SORT_DIRECTION_ASC", and "SORT_DIRECTION_DESC". Default
+         value is "SORT_DIRECTION_UNSPECIFIED".
+        :paramtype sort_direction: str
+        :keyword creator: Filter by model creator or developer, such as Meta or Google. Multiple values
+         use OR semantics
+         and match case-insensitively. Use ``available_creators`` in the response to discover valid
+         options. Default value is None.
+        :paramtype creator: list[str]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "available_badges": [
+                        "str"  # Optional. Badge values present in the unfiltered catalog.
+                    ],
+                    "available_creators": [
+                        "str"  # Optional. Creator values the client can offer in the creator
+                          filter.
+                    ],
+                    "available_input_modalities": [
+                        "str"  # Optional. Modality values accepted by the input_modality
+                          filter.
+                    ],
+                    "available_model_types": [
+                        "str"  # Optional. Model types present in the unfiltered catalog,
+                          such as chat or embedding. Informational only. V2 has no model_type request
+                          filter; browse by input_modality, output_modality, or capabilities.
+                    ],
+                    "available_output_modalities": [
+                        "str"  # Optional. Modality values accepted by the output_modality
+                          filter.
+                    ],
+                    "available_products": [
+                        "str"  # Optional. Product enrollment values present in the
+                          unfiltered catalog.
+                    ],
+                    "available_serving": [
+                        "str"  # Optional. Serving values present in the unfiltered catalog.
+                    ],
+                    "available_sort_by": [
+                        "str"  # Optional. Sort fields the client can offer in the sort UI.
+                    ],
+                    "available_sort_directions": [
+                        "str"  # Optional. Sort directions the client can offer in the sort
+                          UI.
+                    ],
+                    "data": [
+                        {
+                            "badges": [
+                                "str"  # Optional.
+                            ],
+                            "capabilities": [
+                                "str"  # Optional.
+                            ],
+                            "code_snippets": {
+                                "curl": "str",  # Optional. Code examples for using
+                                  the model.
+                                "javascript": "str",  # Optional. Code examples for
+                                  using the model.
+                                "python": "str",  # Optional. Code examples for using
+                                  the model.
+                                "sdk": "str"  # Optional. Code examples for using the
+                                  model.
+                            },
+                            "context_window": "str",  # Optional.
+                            "created_at": "2020-02-20 00:00:00",  # Optional. RFC 3339
+                              timestamp indicating when the model was added to the catalog.
+                            "creator": "str",  # Optional. Model creator or developer,
+                              such as Meta, Anthropic, or OpenAI.
+                            "description": "str",  # Optional. Full catalog description.
+                              Populated on Get Model Catalog Card V2.
+                            "huggingface_repo_id": "str",  # Optional. Hugging Face
+                              repository ID the model is based on, when applicable.
+                            "id": "str",  # Optional.
+                            "input_modality": [
+                                "str"  # Optional.
+                            ],
+                            "item_type": "MODEL_CATALOG_ITEM_TYPE_UNSPECIFIED",  #
+                              Optional. Default value is "MODEL_CATALOG_ITEM_TYPE_UNSPECIFIED". Whether
+                              a catalog row is a foundation model or an Inference Router preset.   *
+                              MODEL_CATALOG_ITEM_TYPE_MODEL: A foundation or inference model. *
+                              MODEL_CATALOG_ITEM_TYPE_INFERENCE_ROUTER: An Inference Router preset.
+                              Known values are: "MODEL_CATALOG_ITEM_TYPE_UNSPECIFIED",
+                              "MODEL_CATALOG_ITEM_TYPE_MODEL", and
+                              "MODEL_CATALOG_ITEM_TYPE_INFERENCE_ROUTER".
+                            "liveliness": {
+                                "e2e_latency": {
+                                    "days": [
+                                        {
+                                            "day_ms": 0.0,  # Optional.
+                                              Start of the day (00:00 UTC) as Unix milliseconds.
+                                            "p50": 0.0,  # Optional.
+                                              Median value, rounded to 2 decimal places.
+                                            "p75": 0.0,  # Optional. 75th
+                                              percentile value, rounded to 2 decimal places.
+                                            "p95": 0.0,  # Optional. 95th
+                                              percentile value, rounded to 2 decimal places.
+                                            "partial": bool,  # Optional.
+                                              True while the day is still in progress; its values will
+                                              keep changing.
+                                            "samples": 0  # Optional.
+                                              Number of requests the percentiles were computed from.
+                                        }
+                                    ],
+                                    "status": "str",  # Optional. "ok" when days
+                                      has data; "insufficient_data" when there are not enough recent
+                                      samples for this model.
+                                    "unit": "str"  # Optional. Unit of the
+                                      percentile values: "s" for ttft and e2e_latency, "tok/s" for
+                                      throughput.
+                                },
+                                "overall_status": "str",  # Optional. Summary across
+                                  metrics: "ok" when every metric has data, "partial_data" when some do
+                                  and some do not, "insufficient_data" when none do.
+                                "source": "str",  # Optional. Traffic the statistics
+                                  are computed from. Always "canary".
+                                "throughput": {
+                                    "days": [
+                                        {
+                                            "day_ms": 0.0,  # Optional.
+                                              Start of the day (00:00 UTC) as Unix milliseconds.
+                                            "p50": 0.0,  # Optional.
+                                              Median value, rounded to 2 decimal places.
+                                            "p75": 0.0,  # Optional. 75th
+                                              percentile value, rounded to 2 decimal places.
+                                            "p95": 0.0,  # Optional. 95th
+                                              percentile value, rounded to 2 decimal places.
+                                            "partial": bool,  # Optional.
+                                              True while the day is still in progress; its values will
+                                              keep changing.
+                                            "samples": 0  # Optional.
+                                              Number of requests the percentiles were computed from.
+                                        }
+                                    ],
+                                    "status": "str",  # Optional. "ok" when days
+                                      has data; "insufficient_data" when there are not enough recent
+                                      samples for this model.
+                                    "unit": "str"  # Optional. Unit of the
+                                      percentile values: "s" for ttft and e2e_latency, "tok/s" for
+                                      throughput.
+                                },
+                                "ttft": {
+                                    "days": [
+                                        {
+                                            "day_ms": 0.0,  # Optional.
+                                              Start of the day (00:00 UTC) as Unix milliseconds.
+                                            "p50": 0.0,  # Optional.
+                                              Median value, rounded to 2 decimal places.
+                                            "p75": 0.0,  # Optional. 75th
+                                              percentile value, rounded to 2 decimal places.
+                                            "p95": 0.0,  # Optional. 95th
+                                              percentile value, rounded to 2 decimal places.
+                                            "partial": bool,  # Optional.
+                                              True while the day is still in progress; its values will
+                                              keep changing.
+                                            "samples": 0  # Optional.
+                                              Number of requests the percentiles were computed from.
+                                        }
+                                    ],
+                                    "status": "str",  # Optional. "ok" when days
+                                      has data; "insufficient_data" when there are not enough recent
+                                      samples for this model.
+                                    "unit": "str"  # Optional. Unit of the
+                                      percentile values: "s" for ttft and e2e_latency, "tok/s" for
+                                      throughput.
+                                }
+                            },
+                            "max_output_tokens": "str",  # Optional. Maximum number of
+                              output tokens the model can generate in one response.
+                            "max_tokens": {
+                                "default": 0.0,  # Optional. Numeric range with min,
+                                  max, and default values for model tuning parameters.
+                                "max": 0.0,  # Optional. Numeric range with min, max,
+                                  and default values for model tuning parameters.
+                                "min": 0.0  # Optional. Numeric range with min, max,
+                                  and default values for model tuning parameters.
+                            },
+                            "model_id": "str",  # Optional. Model identifier used for
+                              inference API calls, such as llama3.1-70b-instruct.
+                            "name": "str",  # Optional.
+                            "output_modality": [
+                                "str"  # Optional.
+                            ],
+                            "parameter_count_in_billions": 0.0,  # Optional. Parameter
+                              count in billions. For example, 70.0 means 70B.
+                            "performance": {
+                                "e2e_latency_p50_seconds": 0.0,  # Optional.
+                                  End-to-end latency in seconds, p50.
+                                "e2e_latency_p75_seconds": 0.0,  # Optional.
+                                  End-to-end latency in seconds, p75.
+                                "e2e_latency_p95_seconds": 0.0,  # Optional.
+                                  End-to-end latency in seconds, p95.
+                                "samples": 0,  # Optional. Request samples across the
+                                  window. Prefers end-to-end latency, then time to first token, then
+                                  throughput.
+                                "status": "str",  # Optional. "ok" when time to first
+                                  token, end-to-end latency, and throughput all have data,
+                                  "partial_data" when only some do, "insufficient_data" when none do.
+                                "throughput_p50_tok_per_s": 0.0,  # Optional.
+                                  Throughput in tokens per second, p50.
+                                "throughput_p75_tok_per_s": 0.0,  # Optional.
+                                  Throughput in tokens per second, p75.
+                                "throughput_p95_tok_per_s": 0.0,  # Optional.
+                                  Throughput in tokens per second, p95.
+                                "ttft_p50_seconds": 0.0,  # Optional. Time to first
+                                  token in seconds, p50. Streaming canary probes only.
+                                "ttft_p75_seconds": 0.0,  # Optional. Time to first
+                                  token in seconds, p75. Streaming canary probes only.
+                                "ttft_p95_seconds": 0.0,  # Optional. Time to first
+                                  token in seconds, p95. Streaming canary probes only.
+                                "window_days": 0  # Optional. Lookback window length
+                                  in days. 1 is the rolling 24-hour list window.
+                            },
+                            "pricing": {
+                                "cache_read_input_price_per_million": 0.0,  #
+                                  Optional. Per-million cache read rate for standard chat models
+                                  (token_type "cache read input"). Multimodal models use
+                                  text_cache_read_input_price_per_million /
+                                  image_cache_read_input_price_per_million instead.
+                                "cache_write_1h_input_price_per_million": 0.0,  #
+                                  Optional. Price per million tokens written to the prompt cache with a
+                                  1-hour lifetime.
+                                "cache_write_5m_input_price_per_million": 0.0,  #
+                                  Optional. Price per million tokens written to the prompt cache with a
+                                  5-minute lifetime.
+                                "image_cache_read_input_price_per_million": 0.0,  #
+                                  Optional. Pricing per million tokens (aligns with existing ModelPrice
+                                  pattern).
+                                "image_input_price_per_million": 0.0,  # Optional.
+                                  Pricing per million tokens (aligns with existing ModelPrice pattern).
+                                "image_output_price_per_million": 0.0,  # Optional.
+                                  Pricing per million tokens (aligns with existing ModelPrice pattern).
+                                "input_cache_read": 0.0,  # Optional. Cache read
+                                  input price per single token. Equivalent to
+                                  cache_read_input_price_per_million.
+                                "input_price_per_million": 0.0,  # Optional. Pricing
+                                  per million tokens (aligns with existing ModelPrice pattern).
+                                "output_price_per_million": 0.0,  # Optional. Pricing
+                                  per million tokens (aligns with existing ModelPrice pattern).
+                                "price_per_audio": 0.0,  # Optional. Pricing per
+                                  million tokens (aligns with existing ModelPrice pattern).
+                                "price_per_image": 0.0,  # Optional. Unit-based
+                                  pricing for non-token models (e.g., Fal AI image/video/audio
+                                  generation, speech models). At most one of these is typically
+                                  populated per model. Token-based models (chat, embeddings) leave all
+                                  of these at 0 and populate input_price_per_million /
+                                  output_price_per_million instead.
+                                "price_per_megapixel": 0.0,  # Optional. Pricing per
+                                  million tokens (aligns with existing ModelPrice pattern).
+                                "price_per_second": 0.0,  # Optional. Pricing per
+                                  million tokens (aligns with existing ModelPrice pattern).
+                                "price_per_thousand_characters": 0.0,  # Optional.
+                                  Pricing per million tokens (aligns with existing ModelPrice pattern).
+                                "price_per_video": 0.0,  # Optional. Pricing per
+                                  million tokens (aligns with existing ModelPrice pattern).
+                                "reasoning_price_per_million": 0.0,  # Optional.
+                                  Price per million reasoning tokens. 0 if the model does not charge
+                                  separately for reasoning tokens.
+                                "text_cache_read_input_price_per_million": 0.0,  #
+                                  Optional. Pricing per million tokens (aligns with existing ModelPrice
+                                  pattern).
+                                "text_input_price_per_million": 0.0,  # Optional.
+                                  Per-million token rates for models that bill text vs image tokens
+                                  separately (e.g. OpenAI gpt-image-2). Standard chat models leave
+                                  these at 0 and use input_price_per_million / output_price_per_million
+                                  instead. Values align with usage token_type / internal/usage.Type
+                                  string values for each meter.
+                                "text_output_price_per_million": 0.0  # Optional.
+                                  Pricing per million tokens (aligns with existing ModelPrice pattern).
+                            },
+                            "pricing_detail": {
+                                "variants": [
+                                    {
+                                        "currency": "str",  # Optional.
+                                          Currency code for this variant's rates (e.g. ``USD``"" ).
+                                        "label": "str",  # Optional. Display
+                                          name for the variant (e.g. ``Standard``"" , ``Fast Mode``"" ,
+                                          ``1M Context``"" ).
+                                        "mode":
+                                          "MODEL_BILLING_MODE_UNSPECIFIED",  # Optional. Default value
+                                          is "MODEL_BILLING_MODE_UNSPECIFIED". Whether rates apply to
+                                          real-time or batch requests.   *
+                                          MODEL_BILLING_MODE_INTERACTIVE: Real-time request pricing. *
+                                          MODEL_BILLING_MODE_BATCH: Discounted pricing for asynchronous
+                                          batch requests. Known values are:
+                                          "MODEL_BILLING_MODE_UNSPECIFIED",
+                                          "MODEL_BILLING_MODE_INTERACTIVE", and
+                                          "MODEL_BILLING_MODE_BATCH".
+                                        "prices": {
+                "cache_read_input_price_per_million": 0.0,  # Optional.
+                                              Per-million cache read rate for standard chat models
+                                              (token_type "cache read input"). Multimodal models use
+                                              text_cache_read_input_price_per_million /
+                                              image_cache_read_input_price_per_million instead.
+                "cache_write_1h_input_price_per_million": 0.0,  #
+                                              Optional. Price per million tokens written to the prompt
+                                              cache with a 1-hour lifetime.
+                "cache_write_5m_input_price_per_million": 0.0,  #
+                                              Optional. Price per million tokens written to the prompt
+                                              cache with a 5-minute lifetime.
+                "image_cache_read_input_price_per_million": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "image_input_price_per_million": 0.0,  # Optional.
+                                              Pricing per million tokens (aligns with existing
+                                              ModelPrice pattern).
+                "image_output_price_per_million": 0.0,  # Optional.
+                                              Pricing per million tokens (aligns with existing
+                                              ModelPrice pattern).
+                                            "input_cache_read": 0.0,  #
+                                              Optional. Cache read input price per single token.
+                                              Equivalent to cache_read_input_price_per_million.
+                                            "input_price_per_million":
+                                              0.0,  # Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "output_price_per_million":
+                                              0.0,  # Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "price_per_audio": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "price_per_image": 0.0,  #
+                                              Optional. Unit-based pricing for non-token models (e.g.,
+                                              Fal AI image/video/audio generation, speech models). At
+                                              most one of these is typically populated per model.
+                                              Token-based models (chat, embeddings) leave all of these
+                                              at 0 and populate input_price_per_million /
+                                              output_price_per_million instead.
+                                            "price_per_megapixel": 0.0,
+                                              # Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "price_per_second": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "price_per_thousand_characters": 0.0,  # Optional.
+                                              Pricing per million tokens (aligns with existing
+                                              ModelPrice pattern).
+                                            "price_per_video": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "reasoning_price_per_million": 0.0,  # Optional. Price
+                                              per million reasoning tokens. 0 if the model does not
+                                              charge separately for reasoning tokens.
+                "text_cache_read_input_price_per_million": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "text_input_price_per_million": 0.0,  # Optional.
+                                              Per-million token rates for models that bill text vs
+                                              image tokens separately (e.g. OpenAI gpt-image-2).
+                                              Standard chat models leave these at 0 and use
+                                              input_price_per_million / output_price_per_million
+                                              instead. Values align with usage token_type /
+                                              internal/usage.Type string values for each meter.
+                "text_output_price_per_million": 0.0  # Optional. Pricing
+                                              per million tokens (aligns with existing ModelPrice
+                                              pattern).
+                                        },
+                                        "scaled_pricing": {
+                                            "intervals": [
+                                                {
+                                                    "end_time":
+                                                      "2020-02-20 00:00:00",  # Optional. End of the
+                                                      interval, exclusive. Always on the hour.
+                                                    "prices": {
+                "cache_read_input_price_per_million": 0.0,  #
+                                                          Optional. Per-million cache read rate for
+                                                          standard chat models (token_type "cache read
+                                                          input"). Multimodal models use
+                                                          text_cache_read_input_price_per_million /
+                                                          image_cache_read_input_price_per_million
+                                                          instead.
+                "cache_write_1h_input_price_per_million":
+                                                          0.0,  # Optional. Price per million tokens
+                                                          written to the prompt cache with a 1-hour
+                                                          lifetime.
+                "cache_write_5m_input_price_per_million":
+                                                          0.0,  # Optional. Price per million tokens
+                                                          written to the prompt cache with a 5-minute
+                                                          lifetime.
+                "image_cache_read_input_price_per_million":
+                                                          0.0,  # Optional. Pricing per million tokens
+                                                          (aligns with existing ModelPrice pattern).
+                "image_input_price_per_million": 0.0,  #
+                                                          Optional. Pricing per million tokens (aligns
+                                                          with existing ModelPrice pattern).
+                "image_output_price_per_million": 0.0,  #
+                                                          Optional. Pricing per million tokens (aligns
+                                                          with existing ModelPrice pattern).
+                "input_cache_read": 0.0,  # Optional. Cache
+                                                          read input price per single token. Equivalent
+                                                          to cache_read_input_price_per_million.
+                "input_price_per_million": 0.0,  # Optional.
+                                                          Pricing per million tokens (aligns with
+                                                          existing ModelPrice pattern).
+                "output_price_per_million": 0.0,  # Optional.
+                                                          Pricing per million tokens (aligns with
+                                                          existing ModelPrice pattern).
+                "price_per_audio": 0.0,  # Optional. Pricing
+                                                          per million tokens (aligns with existing
+                                                          ModelPrice pattern).
+                "price_per_image": 0.0,  # Optional.
+                                                          Unit-based pricing for non-token models
+                                                          (e.g., Fal AI image/video/audio generation,
+                                                          speech models). At most one of these is
+                                                          typically populated per model. Token-based
+                                                          models (chat, embeddings) leave all of these
+                                                          at 0 and populate input_price_per_million /
+                                                          output_price_per_million instead.
+                "price_per_megapixel": 0.0,  # Optional.
+                                                          Pricing per million tokens (aligns with
+                                                          existing ModelPrice pattern).
+                "price_per_second": 0.0,  # Optional. Pricing
+                                                          per million tokens (aligns with existing
+                                                          ModelPrice pattern).
+                "price_per_thousand_characters": 0.0,  #
+                                                          Optional. Pricing per million tokens (aligns
+                                                          with existing ModelPrice pattern).
+                "price_per_video": 0.0,  # Optional. Pricing
+                                                          per million tokens (aligns with existing
+                                                          ModelPrice pattern).
+                "reasoning_price_per_million": 0.0,  #
+                                                          Optional. Price per million reasoning tokens.
+                                                          0 if the model does not charge separately for
+                                                          reasoning tokens.
+                "text_cache_read_input_price_per_million":
+                                                          0.0,  # Optional. Pricing per million tokens
+                                                          (aligns with existing ModelPrice pattern).
+                "text_input_price_per_million": 0.0,  #
+                                                          Optional. Per-million token rates for models
+                                                          that bill text vs image tokens separately
+                                                          (e.g. OpenAI gpt-image-2). Standard chat
+                                                          models leave these at 0 and use
+                                                          input_price_per_million /
+                                                          output_price_per_million instead. Values
+                                                          align with usage token_type /
+                                                          internal/usage.Type string values for each
+                                                          meter.
+                "text_output_price_per_million": 0.0  #
+                                                          Optional. Pricing per million tokens (aligns
+                                                          with existing ModelPrice pattern).
+                                                    },
+                                                    "start_time":
+                                                      "2020-02-20 00:00:00"  # Optional. Start of the
+                                                      interval, inclusive. Always on the hour.
+                                                }
+                                            ],
+                                            "max_prices": {
+                "cache_read_input_price_per_million": 0.0,  #
+                                                  Optional. Per-million cache read rate for standard
+                                                  chat models (token_type "cache read input").
+                                                  Multimodal models use
+                                                  text_cache_read_input_price_per_million /
+                                                  image_cache_read_input_price_per_million instead.
+                "cache_write_1h_input_price_per_million": 0.0,  #
+                                                  Optional. Price per million tokens written to the
+                                                  prompt cache with a 1-hour lifetime.
+                "cache_write_5m_input_price_per_million": 0.0,  #
+                                                  Optional. Price per million tokens written to the
+                                                  prompt cache with a 5-minute lifetime.
+                "image_cache_read_input_price_per_million": 0.0,  #
+                                                  Optional. Pricing per million tokens (aligns with
+                                                  existing ModelPrice pattern).
+                "image_input_price_per_million": 0.0,  # Optional.
+                                                  Pricing per million tokens (aligns with existing
+                                                  ModelPrice pattern).
+                "image_output_price_per_million": 0.0,  # Optional.
+                                                  Pricing per million tokens (aligns with existing
+                                                  ModelPrice pattern).
+                                                "input_cache_read":
+                                                  0.0,  # Optional. Cache read input price per single
+                                                  token. Equivalent to
+                                                  cache_read_input_price_per_million.
+                "input_price_per_million": 0.0,  # Optional. Pricing
+                                                  per million tokens (aligns with existing ModelPrice
+                                                  pattern).
+                "output_price_per_million": 0.0,  # Optional. Pricing
+                                                  per million tokens (aligns with existing ModelPrice
+                                                  pattern).
+                                                "price_per_audio":
+                                                  0.0,  # Optional. Pricing per million tokens (aligns
+                                                  with existing ModelPrice pattern).
+                                                "price_per_image":
+                                                  0.0,  # Optional. Unit-based pricing for non-token
+                                                  models (e.g., Fal AI image/video/audio generation,
+                                                  speech models). At most one of these is typically
+                                                  populated per model. Token-based models (chat,
+                                                  embeddings) leave all of these at 0 and populate
+                                                  input_price_per_million / output_price_per_million
+                                                  instead.
+                "price_per_megapixel": 0.0,  # Optional. Pricing per
+                                                  million tokens (aligns with existing ModelPrice
+                                                  pattern).
+                                                "price_per_second":
+                                                  0.0,  # Optional. Pricing per million tokens (aligns
+                                                  with existing ModelPrice pattern).
+                "price_per_thousand_characters": 0.0,  # Optional.
+                                                  Pricing per million tokens (aligns with existing
+                                                  ModelPrice pattern).
+                                                "price_per_video":
+                                                  0.0,  # Optional. Pricing per million tokens (aligns
+                                                  with existing ModelPrice pattern).
+                "reasoning_price_per_million": 0.0,  # Optional.
+                                                  Price per million reasoning tokens. 0 if the model
+                                                  does not charge separately for reasoning tokens.
+                "text_cache_read_input_price_per_million": 0.0,  #
+                                                  Optional. Pricing per million tokens (aligns with
+                                                  existing ModelPrice pattern).
+                "text_input_price_per_million": 0.0,  # Optional.
+                                                  Per-million token rates for models that bill text vs
+                                                  image tokens separately (e.g. OpenAI gpt-image-2).
+                                                  Standard chat models leave these at 0 and use
+                                                  input_price_per_million / output_price_per_million
+                                                  instead. Values align with usage token_type /
+                                                  internal/usage.Type string values for each meter.
+                "text_output_price_per_million": 0.0  # Optional.
+                                                  Pricing per million tokens (aligns with existing
+                                                  ModelPrice pattern).
+                                            },
+                                            "min_prices": {
+                "cache_read_input_price_per_million": 0.0,  #
+                                                  Optional. Per-million cache read rate for standard
+                                                  chat models (token_type "cache read input").
+                                                  Multimodal models use
+                                                  text_cache_read_input_price_per_million /
+                                                  image_cache_read_input_price_per_million instead.
+                "cache_write_1h_input_price_per_million": 0.0,  #
+                                                  Optional. Price per million tokens written to the
+                                                  prompt cache with a 1-hour lifetime.
+                "cache_write_5m_input_price_per_million": 0.0,  #
+                                                  Optional. Price per million tokens written to the
+                                                  prompt cache with a 5-minute lifetime.
+                "image_cache_read_input_price_per_million": 0.0,  #
+                                                  Optional. Pricing per million tokens (aligns with
+                                                  existing ModelPrice pattern).
+                "image_input_price_per_million": 0.0,  # Optional.
+                                                  Pricing per million tokens (aligns with existing
+                                                  ModelPrice pattern).
+                "image_output_price_per_million": 0.0,  # Optional.
+                                                  Pricing per million tokens (aligns with existing
+                                                  ModelPrice pattern).
+                                                "input_cache_read":
+                                                  0.0,  # Optional. Cache read input price per single
+                                                  token. Equivalent to
+                                                  cache_read_input_price_per_million.
+                "input_price_per_million": 0.0,  # Optional. Pricing
+                                                  per million tokens (aligns with existing ModelPrice
+                                                  pattern).
+                "output_price_per_million": 0.0,  # Optional. Pricing
+                                                  per million tokens (aligns with existing ModelPrice
+                                                  pattern).
+                                                "price_per_audio":
+                                                  0.0,  # Optional. Pricing per million tokens (aligns
+                                                  with existing ModelPrice pattern).
+                                                "price_per_image":
+                                                  0.0,  # Optional. Unit-based pricing for non-token
+                                                  models (e.g., Fal AI image/video/audio generation,
+                                                  speech models). At most one of these is typically
+                                                  populated per model. Token-based models (chat,
+                                                  embeddings) leave all of these at 0 and populate
+                                                  input_price_per_million / output_price_per_million
+                                                  instead.
+                "price_per_megapixel": 0.0,  # Optional. Pricing per
+                                                  million tokens (aligns with existing ModelPrice
+                                                  pattern).
+                                                "price_per_second":
+                                                  0.0,  # Optional. Pricing per million tokens (aligns
+                                                  with existing ModelPrice pattern).
+                "price_per_thousand_characters": 0.0,  # Optional.
+                                                  Pricing per million tokens (aligns with existing
+                                                  ModelPrice pattern).
+                                                "price_per_video":
+                                                  0.0,  # Optional. Pricing per million tokens (aligns
+                                                  with existing ModelPrice pattern).
+                "reasoning_price_per_million": 0.0,  # Optional.
+                                                  Price per million reasoning tokens. 0 if the model
+                                                  does not charge separately for reasoning tokens.
+                "text_cache_read_input_price_per_million": 0.0,  #
+                                                  Optional. Pricing per million tokens (aligns with
+                                                  existing ModelPrice pattern).
+                "text_input_price_per_million": 0.0,  # Optional.
+                                                  Per-million token rates for models that bill text vs
+                                                  image tokens separately (e.g. OpenAI gpt-image-2).
+                                                  Standard chat models leave these at 0 and use
+                                                  input_price_per_million / output_price_per_million
+                                                  instead. Values align with usage token_type /
+                                                  internal/usage.Type string values for each meter.
+                "text_output_price_per_million": 0.0  # Optional.
+                                                  Pricing per million tokens (aligns with existing
+                                                  ModelPrice pattern).
+                                            }
+                                        },
+                                        "tier":
+                                          "MODEL_PRICING_TIER_UNSPECIFIED"  # Optional. Default value
+                                          is "MODEL_PRICING_TIER_UNSPECIFIED". A pricing variant of a
+                                          model, such as a faster serving option or a larger context
+                                          window.   * MODEL_PRICING_TIER_STANDARD: Default pricing. *
+                                          MODEL_PRICING_TIER_FAST_MODE: Faster, higher-priority serving
+                                          at a premium price. * MODEL_PRICING_TIER_EXTENDED_1M: Pricing
+                                          for the 1M-token context window. *
+                                          MODEL_PRICING_TIER_EXTENDED_272K: Pricing for the 272K-token
+                                          context window. * MODEL_PRICING_TIER_BYOK: Pricing when using
+                                          your own model API key. Known values are:
+                                          "MODEL_PRICING_TIER_UNSPECIFIED",
+                                          "MODEL_PRICING_TIER_STANDARD",
+                                          "MODEL_PRICING_TIER_FAST_MODE",
+                                          "MODEL_PRICING_TIER_EXTENDED_1M",
+                                          "MODEL_PRICING_TIER_EXTENDED_272K", and
+                                          "MODEL_PRICING_TIER_BYOK".
+                                    }
+                                ]
+                            },
+                            "products": [
+                                "str"  # Optional.
+                            ],
+                            "provider": "MODEL_PROVIDER_DIGITALOCEAN",  # Optional.
+                              Default value is "MODEL_PROVIDER_DIGITALOCEAN". Known values are:
+                              "MODEL_PROVIDER_DIGITALOCEAN", "MODEL_PROVIDER_ANTHROPIC", and
+                              "MODEL_PROVIDER_OPENAI".
+                            "reasoning_efforts": [
+                                "str"  # Optional. Supported reasoning effort levels,
+                                  such as low, medium, and high.
+                            ],
+                            "scaled_pricing_enabled": bool,  # Optional. True when this
+                              model's pricing varies over time.
+                            "serving": [
+                                "str"  # Optional.
+                            ],
+                            "short_description": "str",  # Optional.
+                            "supported_endpoints": [
+                                "str"  # Optional. Inference endpoints this model
+                                  serves, such as chat completions or responses. Empty for Inference
+                                  Router presets.
+                            ],
+                            "supports_temperature": bool,  # Optional. Whether the
+                              inference request schema includes a temperature field.
+                            "temperature": {
+                                "default": 0.0,  # Optional. Numeric range with min,
+                                  max, and default values for model tuning parameters.
+                                "max": 0.0,  # Optional. Numeric range with min, max,
+                                  and default values for model tuning parameters.
+                                "min": 0.0  # Optional. Numeric range with min, max,
+                                  and default values for model tuning parameters.
+                            },
+                            "thinking": bool,  # Optional. Whether the model supports
+                              extended thinking.
+                            "top_p": {
+                                "default": 0.0,  # Optional. Numeric range with min,
+                                  max, and default values for model tuning parameters.
+                                "max": 0.0,  # Optional. Numeric range with min, max,
+                                  and default values for model tuning parameters.
+                                "min": 0.0  # Optional. Numeric range with min, max,
+                                  and default values for model tuning parameters.
+                            },
+                            "type": "str"  # Optional. Catalog model type, such as chat
+                              or embedding.
+                        }
+                    ],
+                    "links": {
+                        "pages": {
+                            "first": "str",  # Optional. First page.
+                            "last": "str",  # Optional. Last page.
+                            "next": "str",  # Optional. Next page.
+                            "previous": "str"  # Optional. Previous page.
+                        }
+                    },
+                    "meta": {
+                        "page": 0,  # Optional. The current page.
+                        "pages": 0,  # Optional. Total number of pages.
+                        "total": 0  # Optional. Total amount of items over all pages.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_genai_list_model_catalog_v2_request(
+            page=page,
+            per_page=per_page,
+            search=search,
+            serving=serving,
+            badges=badges,
+            input_modality=input_modality,
+            output_modality=output_modality,
+            product=product,
+            capabilities=capabilities,
+            item_type=item_type,
+            sort_by=sort_by,
+            sort_direction=sort_direction,
+            creator=creator,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def get_model_catalog_card_v2(
+        self, id: str, *, model_id: Optional[str] = None, **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Get Model Catalog Card V2.
+
+        Returns a V2 catalog card by catalog ID or model ID. Requires authentication.
+        Visibility matches List Model Catalog V2.
+
+        :param id: Catalog ID of the model. Use ``model_id`` instead to look up by the inference model
+         ID. Required.
+        :type id: str
+        :keyword model_id: Inference model ID, such as ``llama3.1-70b-instruct``. Alternative to the
+         catalog ID in the path. Default value is None.
+        :paramtype model_id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "data": {
+                        "badges": [
+                            "str"  # Optional. Catalog row returned by List Model Catalog
+                              V2 and Get Model Catalog Card V2. description, code_snippets,
+                              pricing_detail, and liveliness are populated on the card and empty on
+                              list rows. performance is populated on list rows and the card when canary
+                              data is available.
+                        ],
+                        "capabilities": [
+                            "str"  # Optional. Catalog row returned by List Model Catalog
+                              V2 and Get Model Catalog Card V2. description, code_snippets,
+                              pricing_detail, and liveliness are populated on the card and empty on
+                              list rows. performance is populated on list rows and the card when canary
+                              data is available.
+                        ],
+                        "code_snippets": {
+                            "curl": "str",  # Optional. Code examples for using the
+                              model.
+                            "javascript": "str",  # Optional. Code examples for using the
+                              model.
+                            "python": "str",  # Optional. Code examples for using the
+                              model.
+                            "sdk": "str"  # Optional. Code examples for using the model.
+                        },
+                        "context_window": "str",  # Optional. Catalog row returned by List
+                          Model Catalog V2 and Get Model Catalog Card V2. description, code_snippets,
+                          pricing_detail, and liveliness are populated on the card and empty on list
+                          rows. performance is populated on list rows and the card when canary data is
+                          available.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. RFC 3339 timestamp
+                          indicating when the model was added to the catalog.
+                        "creator": "str",  # Optional. Model creator or developer, such as
+                          Meta, Anthropic, or OpenAI.
+                        "description": "str",  # Optional. Full catalog description.
+                          Populated on Get Model Catalog Card V2.
+                        "huggingface_repo_id": "str",  # Optional. Hugging Face repository ID
+                          the model is based on, when applicable.
+                        "id": "str",  # Optional. Catalog row returned by List Model Catalog
+                          V2 and Get Model Catalog Card V2. description, code_snippets, pricing_detail,
+                          and liveliness are populated on the card and empty on list rows. performance
+                          is populated on list rows and the card when canary data is available.
+                        "input_modality": [
+                            "str"  # Optional. Catalog row returned by List Model Catalog
+                              V2 and Get Model Catalog Card V2. description, code_snippets,
+                              pricing_detail, and liveliness are populated on the card and empty on
+                              list rows. performance is populated on list rows and the card when canary
+                              data is available.
+                        ],
+                        "item_type": "MODEL_CATALOG_ITEM_TYPE_UNSPECIFIED",  # Optional.
+                          Default value is "MODEL_CATALOG_ITEM_TYPE_UNSPECIFIED". Whether a catalog row
+                          is a foundation model or an Inference Router preset.   *
+                          MODEL_CATALOG_ITEM_TYPE_MODEL: A foundation or inference model. *
+                          MODEL_CATALOG_ITEM_TYPE_INFERENCE_ROUTER: An Inference Router preset. Known
+                          values are: "MODEL_CATALOG_ITEM_TYPE_UNSPECIFIED",
+                          "MODEL_CATALOG_ITEM_TYPE_MODEL", and
+                          "MODEL_CATALOG_ITEM_TYPE_INFERENCE_ROUTER".
+                        "liveliness": {
+                            "e2e_latency": {
+                                "days": [
+                                    {
+                                        "day_ms": 0.0,  # Optional. Start of
+                                          the day (00:00 UTC) as Unix milliseconds.
+                                        "p50": 0.0,  # Optional. Median
+                                          value, rounded to 2 decimal places.
+                                        "p75": 0.0,  # Optional. 75th
+                                          percentile value, rounded to 2 decimal places.
+                                        "p95": 0.0,  # Optional. 95th
+                                          percentile value, rounded to 2 decimal places.
+                                        "partial": bool,  # Optional. True
+                                          while the day is still in progress; its values will keep
+                                          changing.
+                                        "samples": 0  # Optional. Number of
+                                          requests the percentiles were computed from.
+                                    }
+                                ],
+                                "status": "str",  # Optional. "ok" when days has
+                                  data; "insufficient_data" when there are not enough recent samples
+                                  for this model.
+                                "unit": "str"  # Optional. Unit of the percentile
+                                  values: "s" for ttft and e2e_latency, "tok/s" for throughput.
+                            },
+                            "overall_status": "str",  # Optional. Summary across metrics:
+                              "ok" when every metric has data, "partial_data" when some do and some do
+                              not, "insufficient_data" when none do.
+                            "source": "str",  # Optional. Traffic the statistics are
+                              computed from. Always "canary".
+                            "throughput": {
+                                "days": [
+                                    {
+                                        "day_ms": 0.0,  # Optional. Start of
+                                          the day (00:00 UTC) as Unix milliseconds.
+                                        "p50": 0.0,  # Optional. Median
+                                          value, rounded to 2 decimal places.
+                                        "p75": 0.0,  # Optional. 75th
+                                          percentile value, rounded to 2 decimal places.
+                                        "p95": 0.0,  # Optional. 95th
+                                          percentile value, rounded to 2 decimal places.
+                                        "partial": bool,  # Optional. True
+                                          while the day is still in progress; its values will keep
+                                          changing.
+                                        "samples": 0  # Optional. Number of
+                                          requests the percentiles were computed from.
+                                    }
+                                ],
+                                "status": "str",  # Optional. "ok" when days has
+                                  data; "insufficient_data" when there are not enough recent samples
+                                  for this model.
+                                "unit": "str"  # Optional. Unit of the percentile
+                                  values: "s" for ttft and e2e_latency, "tok/s" for throughput.
+                            },
+                            "ttft": {
+                                "days": [
+                                    {
+                                        "day_ms": 0.0,  # Optional. Start of
+                                          the day (00:00 UTC) as Unix milliseconds.
+                                        "p50": 0.0,  # Optional. Median
+                                          value, rounded to 2 decimal places.
+                                        "p75": 0.0,  # Optional. 75th
+                                          percentile value, rounded to 2 decimal places.
+                                        "p95": 0.0,  # Optional. 95th
+                                          percentile value, rounded to 2 decimal places.
+                                        "partial": bool,  # Optional. True
+                                          while the day is still in progress; its values will keep
+                                          changing.
+                                        "samples": 0  # Optional. Number of
+                                          requests the percentiles were computed from.
+                                    }
+                                ],
+                                "status": "str",  # Optional. "ok" when days has
+                                  data; "insufficient_data" when there are not enough recent samples
+                                  for this model.
+                                "unit": "str"  # Optional. Unit of the percentile
+                                  values: "s" for ttft and e2e_latency, "tok/s" for throughput.
+                            }
+                        },
+                        "max_output_tokens": "str",  # Optional. Maximum number of output
+                          tokens the model can generate in one response.
+                        "max_tokens": {
+                            "default": 0.0,  # Optional. Numeric range with min, max, and
+                              default values for model tuning parameters.
+                            "max": 0.0,  # Optional. Numeric range with min, max, and
+                              default values for model tuning parameters.
+                            "min": 0.0  # Optional. Numeric range with min, max, and
+                              default values for model tuning parameters.
+                        },
+                        "model_id": "str",  # Optional. Model identifier used for inference
+                          API calls, such as llama3.1-70b-instruct.
+                        "name": "str",  # Optional. Catalog row returned by List Model
+                          Catalog V2 and Get Model Catalog Card V2. description, code_snippets,
+                          pricing_detail, and liveliness are populated on the card and empty on list
+                          rows. performance is populated on list rows and the card when canary data is
+                          available.
+                        "output_modality": [
+                            "str"  # Optional. Catalog row returned by List Model Catalog
+                              V2 and Get Model Catalog Card V2. description, code_snippets,
+                              pricing_detail, and liveliness are populated on the card and empty on
+                              list rows. performance is populated on list rows and the card when canary
+                              data is available.
+                        ],
+                        "parameter_count_in_billions": 0.0,  # Optional. Parameter count in
+                          billions. For example, 70.0 means 70B.
+                        "performance": {
+                            "e2e_latency_p50_seconds": 0.0,  # Optional. End-to-end
+                              latency in seconds, p50.
+                            "e2e_latency_p75_seconds": 0.0,  # Optional. End-to-end
+                              latency in seconds, p75.
+                            "e2e_latency_p95_seconds": 0.0,  # Optional. End-to-end
+                              latency in seconds, p95.
+                            "samples": 0,  # Optional. Request samples across the window.
+                              Prefers end-to-end latency, then time to first token, then throughput.
+                            "status": "str",  # Optional. "ok" when time to first token,
+                              end-to-end latency, and throughput all have data, "partial_data" when
+                              only some do, "insufficient_data" when none do.
+                            "throughput_p50_tok_per_s": 0.0,  # Optional. Throughput in
+                              tokens per second, p50.
+                            "throughput_p75_tok_per_s": 0.0,  # Optional. Throughput in
+                              tokens per second, p75.
+                            "throughput_p95_tok_per_s": 0.0,  # Optional. Throughput in
+                              tokens per second, p95.
+                            "ttft_p50_seconds": 0.0,  # Optional. Time to first token in
+                              seconds, p50. Streaming canary probes only.
+                            "ttft_p75_seconds": 0.0,  # Optional. Time to first token in
+                              seconds, p75. Streaming canary probes only.
+                            "ttft_p95_seconds": 0.0,  # Optional. Time to first token in
+                              seconds, p95. Streaming canary probes only.
+                            "window_days": 0  # Optional. Lookback window length in days.
+                              1 is the rolling 24-hour list window.
+                        },
+                        "pricing": {
+                            "cache_read_input_price_per_million": 0.0,  # Optional.
+                              Per-million cache read rate for standard chat models (token_type "cache
+                              read input"). Multimodal models use
+                              text_cache_read_input_price_per_million /
+                              image_cache_read_input_price_per_million instead.
+                            "cache_write_1h_input_price_per_million": 0.0,  # Optional.
+                              Price per million tokens written to the prompt cache with a 1-hour
+                              lifetime.
+                            "cache_write_5m_input_price_per_million": 0.0,  # Optional.
+                              Price per million tokens written to the prompt cache with a 5-minute
+                              lifetime.
+                            "image_cache_read_input_price_per_million": 0.0,  # Optional.
+                              Pricing per million tokens (aligns with existing ModelPrice pattern).
+                            "image_input_price_per_million": 0.0,  # Optional. Pricing
+                              per million tokens (aligns with existing ModelPrice pattern).
+                            "image_output_price_per_million": 0.0,  # Optional. Pricing
+                              per million tokens (aligns with existing ModelPrice pattern).
+                            "input_cache_read": 0.0,  # Optional. Cache read input price
+                              per single token. Equivalent to cache_read_input_price_per_million.
+                            "input_price_per_million": 0.0,  # Optional. Pricing per
+                              million tokens (aligns with existing ModelPrice pattern).
+                            "output_price_per_million": 0.0,  # Optional. Pricing per
+                              million tokens (aligns with existing ModelPrice pattern).
+                            "price_per_audio": 0.0,  # Optional. Pricing per million
+                              tokens (aligns with existing ModelPrice pattern).
+                            "price_per_image": 0.0,  # Optional. Unit-based pricing for
+                              non-token models (e.g., Fal AI image/video/audio generation, speech
+                              models). At most one of these is typically populated per model.
+                              Token-based models (chat, embeddings) leave all of these at 0 and
+                              populate input_price_per_million / output_price_per_million instead.
+                            "price_per_megapixel": 0.0,  # Optional. Pricing per million
+                              tokens (aligns with existing ModelPrice pattern).
+                            "price_per_second": 0.0,  # Optional. Pricing per million
+                              tokens (aligns with existing ModelPrice pattern).
+                            "price_per_thousand_characters": 0.0,  # Optional. Pricing
+                              per million tokens (aligns with existing ModelPrice pattern).
+                            "price_per_video": 0.0,  # Optional. Pricing per million
+                              tokens (aligns with existing ModelPrice pattern).
+                            "reasoning_price_per_million": 0.0,  # Optional. Price per
+                              million reasoning tokens. 0 if the model does not charge separately for
+                              reasoning tokens.
+                            "text_cache_read_input_price_per_million": 0.0,  # Optional.
+                              Pricing per million tokens (aligns with existing ModelPrice pattern).
+                            "text_input_price_per_million": 0.0,  # Optional. Per-million
+                              token rates for models that bill text vs image tokens separately (e.g.
+                              OpenAI gpt-image-2). Standard chat models leave these at 0 and use
+                              input_price_per_million / output_price_per_million instead. Values align
+                              with usage token_type / internal/usage.Type string values for each meter.
+                            "text_output_price_per_million": 0.0  # Optional. Pricing per
+                              million tokens (aligns with existing ModelPrice pattern).
+                        },
+                        "pricing_detail": {
+                            "variants": [
+                                {
+                                    "currency": "str",  # Optional. Currency code
+                                      for this variant's rates (e.g. ``USD``"" ).
+                                    "label": "str",  # Optional. Display name for
+                                      the variant (e.g. ``Standard``"" , ``Fast Mode``"" , ``1M
+                                      Context``"" ).
+                                    "mode": "MODEL_BILLING_MODE_UNSPECIFIED",  #
+                                      Optional. Default value is "MODEL_BILLING_MODE_UNSPECIFIED".
+                                      Whether rates apply to real-time or batch requests.   *
+                                      MODEL_BILLING_MODE_INTERACTIVE: Real-time request pricing. *
+                                      MODEL_BILLING_MODE_BATCH: Discounted pricing for asynchronous
+                                      batch requests. Known values are:
+                                      "MODEL_BILLING_MODE_UNSPECIFIED",
+                                      "MODEL_BILLING_MODE_INTERACTIVE", and "MODEL_BILLING_MODE_BATCH".
+                                    "prices": {
+                                        "cache_read_input_price_per_million":
+                                          0.0,  # Optional. Per-million cache read rate for standard
+                                          chat models (token_type "cache read input"). Multimodal
+                                          models use text_cache_read_input_price_per_million /
+                                          image_cache_read_input_price_per_million instead.
+                "cache_write_1h_input_price_per_million": 0.0,  # Optional.
+                                          Price per million tokens written to the prompt cache with a
+                                          1-hour lifetime.
+                "cache_write_5m_input_price_per_million": 0.0,  # Optional.
+                                          Price per million tokens written to the prompt cache with a
+                                          5-minute lifetime.
+                "image_cache_read_input_price_per_million": 0.0,  # Optional.
+                                          Pricing per million tokens (aligns with existing ModelPrice
+                                          pattern).
+                                        "image_input_price_per_million": 0.0,
+                                          # Optional. Pricing per million tokens (aligns with existing
+                                          ModelPrice pattern).
+                                        "image_output_price_per_million":
+                                          0.0,  # Optional. Pricing per million tokens (aligns with
+                                          existing ModelPrice pattern).
+                                        "input_cache_read": 0.0,  # Optional.
+                                          Cache read input price per single token. Equivalent to
+                                          cache_read_input_price_per_million.
+                                        "input_price_per_million": 0.0,  #
+                                          Optional. Pricing per million tokens (aligns with existing
+                                          ModelPrice pattern).
+                                        "output_price_per_million": 0.0,  #
+                                          Optional. Pricing per million tokens (aligns with existing
+                                          ModelPrice pattern).
+                                        "price_per_audio": 0.0,  # Optional.
+                                          Pricing per million tokens (aligns with existing ModelPrice
+                                          pattern).
+                                        "price_per_image": 0.0,  # Optional.
+                                          Unit-based pricing for non-token models (e.g., Fal AI
+                                          image/video/audio generation, speech models). At most one of
+                                          these is typically populated per model. Token-based models
+                                          (chat, embeddings) leave all of these at 0 and populate
+                                          input_price_per_million / output_price_per_million instead.
+                                        "price_per_megapixel": 0.0,  #
+                                          Optional. Pricing per million tokens (aligns with existing
+                                          ModelPrice pattern).
+                                        "price_per_second": 0.0,  # Optional.
+                                          Pricing per million tokens (aligns with existing ModelPrice
+                                          pattern).
+                                        "price_per_thousand_characters": 0.0,
+                                          # Optional. Pricing per million tokens (aligns with existing
+                                          ModelPrice pattern).
+                                        "price_per_video": 0.0,  # Optional.
+                                          Pricing per million tokens (aligns with existing ModelPrice
+                                          pattern).
+                                        "reasoning_price_per_million": 0.0,
+                                          # Optional. Price per million reasoning tokens. 0 if the
+                                          model does not charge separately for reasoning tokens.
+                "text_cache_read_input_price_per_million": 0.0,  # Optional.
+                                          Pricing per million tokens (aligns with existing ModelPrice
+                                          pattern).
+                                        "text_input_price_per_million": 0.0,
+                                          # Optional. Per-million token rates for models that bill text
+                                          vs image tokens separately (e.g. OpenAI gpt-image-2).
+                                          Standard chat models leave these at 0 and use
+                                          input_price_per_million / output_price_per_million instead.
+                                          Values align with usage token_type / internal/usage.Type
+                                          string values for each meter.
+                                        "text_output_price_per_million": 0.0
+                                          # Optional. Pricing per million tokens (aligns with existing
+                                          ModelPrice pattern).
+                                    },
+                                    "scaled_pricing": {
+                                        "intervals": [
+                                            {
+                                                "end_time":
+                                                  "2020-02-20 00:00:00",  # Optional. End of the
+                                                  interval, exclusive. Always on the hour.
+                                                "prices": {
+                "cache_read_input_price_per_million": 0.0,  #
+                                                      Optional. Per-million cache read rate for
+                                                      standard chat models (token_type "cache read
+                                                      input"). Multimodal models use
+                                                      text_cache_read_input_price_per_million /
+                                                      image_cache_read_input_price_per_million instead.
+                "cache_write_1h_input_price_per_million": 0.0,  #
+                                                      Optional. Price per million tokens written to the
+                                                      prompt cache with a 1-hour lifetime.
+                "cache_write_5m_input_price_per_million": 0.0,  #
+                                                      Optional. Price per million tokens written to the
+                                                      prompt cache with a 5-minute lifetime.
+                "image_cache_read_input_price_per_million": 0.0,
+                                                      # Optional. Pricing per million tokens (aligns
+                                                      with existing ModelPrice pattern).
+                "image_input_price_per_million": 0.0,  #
+                                                      Optional. Pricing per million tokens (aligns with
+                                                      existing ModelPrice pattern).
+                "image_output_price_per_million": 0.0,  #
+                                                      Optional. Pricing per million tokens (aligns with
+                                                      existing ModelPrice pattern).
+                "input_cache_read": 0.0,  # Optional. Cache read
+                                                      input price per single token. Equivalent to
+                                                      cache_read_input_price_per_million.
+                "input_price_per_million": 0.0,  # Optional.
+                                                      Pricing per million tokens (aligns with existing
+                                                      ModelPrice pattern).
+                "output_price_per_million": 0.0,  # Optional.
+                                                      Pricing per million tokens (aligns with existing
+                                                      ModelPrice pattern).
+                "price_per_audio": 0.0,  # Optional. Pricing per
+                                                      million tokens (aligns with existing ModelPrice
+                                                      pattern).
+                "price_per_image": 0.0,  # Optional. Unit-based
+                                                      pricing for non-token models (e.g., Fal AI
+                                                      image/video/audio generation, speech models). At
+                                                      most one of these is typically populated per
+                                                      model. Token-based models (chat, embeddings)
+                                                      leave all of these at 0 and populate
+                                                      input_price_per_million /
+                                                      output_price_per_million instead.
+                "price_per_megapixel": 0.0,  # Optional. Pricing
+                                                      per million tokens (aligns with existing
+                                                      ModelPrice pattern).
+                "price_per_second": 0.0,  # Optional. Pricing per
+                                                      million tokens (aligns with existing ModelPrice
+                                                      pattern).
+                "price_per_thousand_characters": 0.0,  #
+                                                      Optional. Pricing per million tokens (aligns with
+                                                      existing ModelPrice pattern).
+                "price_per_video": 0.0,  # Optional. Pricing per
+                                                      million tokens (aligns with existing ModelPrice
+                                                      pattern).
+                "reasoning_price_per_million": 0.0,  # Optional.
+                                                      Price per million reasoning tokens. 0 if the
+                                                      model does not charge separately for reasoning
+                                                      tokens.
+                "text_cache_read_input_price_per_million": 0.0,
+                                                      # Optional. Pricing per million tokens (aligns
+                                                      with existing ModelPrice pattern).
+                "text_input_price_per_million": 0.0,  # Optional.
+                                                      Per-million token rates for models that bill text
+                                                      vs image tokens separately (e.g. OpenAI
+                                                      gpt-image-2). Standard chat models leave these at
+                                                      0 and use input_price_per_million /
+                                                      output_price_per_million instead. Values align
+                                                      with usage token_type / internal/usage.Type
+                                                      string values for each meter.
+                "text_output_price_per_million": 0.0  # Optional.
+                                                      Pricing per million tokens (aligns with existing
+                                                      ModelPrice pattern).
+                                                },
+                                                "start_time":
+                                                  "2020-02-20 00:00:00"  # Optional. Start of the
+                                                  interval, inclusive. Always on the hour.
+                                            }
+                                        ],
+                                        "max_prices": {
+                "cache_read_input_price_per_million": 0.0,  # Optional.
+                                              Per-million cache read rate for standard chat models
+                                              (token_type "cache read input"). Multimodal models use
+                                              text_cache_read_input_price_per_million /
+                                              image_cache_read_input_price_per_million instead.
+                "cache_write_1h_input_price_per_million": 0.0,  #
+                                              Optional. Price per million tokens written to the prompt
+                                              cache with a 1-hour lifetime.
+                "cache_write_5m_input_price_per_million": 0.0,  #
+                                              Optional. Price per million tokens written to the prompt
+                                              cache with a 5-minute lifetime.
+                "image_cache_read_input_price_per_million": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "image_input_price_per_million": 0.0,  # Optional.
+                                              Pricing per million tokens (aligns with existing
+                                              ModelPrice pattern).
+                "image_output_price_per_million": 0.0,  # Optional.
+                                              Pricing per million tokens (aligns with existing
+                                              ModelPrice pattern).
+                                            "input_cache_read": 0.0,  #
+                                              Optional. Cache read input price per single token.
+                                              Equivalent to cache_read_input_price_per_million.
+                                            "input_price_per_million":
+                                              0.0,  # Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "output_price_per_million":
+                                              0.0,  # Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "price_per_audio": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "price_per_image": 0.0,  #
+                                              Optional. Unit-based pricing for non-token models (e.g.,
+                                              Fal AI image/video/audio generation, speech models). At
+                                              most one of these is typically populated per model.
+                                              Token-based models (chat, embeddings) leave all of these
+                                              at 0 and populate input_price_per_million /
+                                              output_price_per_million instead.
+                                            "price_per_megapixel": 0.0,
+                                              # Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "price_per_second": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "price_per_thousand_characters": 0.0,  # Optional.
+                                              Pricing per million tokens (aligns with existing
+                                              ModelPrice pattern).
+                                            "price_per_video": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "reasoning_price_per_million": 0.0,  # Optional. Price
+                                              per million reasoning tokens. 0 if the model does not
+                                              charge separately for reasoning tokens.
+                "text_cache_read_input_price_per_million": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "text_input_price_per_million": 0.0,  # Optional.
+                                              Per-million token rates for models that bill text vs
+                                              image tokens separately (e.g. OpenAI gpt-image-2).
+                                              Standard chat models leave these at 0 and use
+                                              input_price_per_million / output_price_per_million
+                                              instead. Values align with usage token_type /
+                                              internal/usage.Type string values for each meter.
+                "text_output_price_per_million": 0.0  # Optional. Pricing
+                                              per million tokens (aligns with existing ModelPrice
+                                              pattern).
+                                        },
+                                        "min_prices": {
+                "cache_read_input_price_per_million": 0.0,  # Optional.
+                                              Per-million cache read rate for standard chat models
+                                              (token_type "cache read input"). Multimodal models use
+                                              text_cache_read_input_price_per_million /
+                                              image_cache_read_input_price_per_million instead.
+                "cache_write_1h_input_price_per_million": 0.0,  #
+                                              Optional. Price per million tokens written to the prompt
+                                              cache with a 1-hour lifetime.
+                "cache_write_5m_input_price_per_million": 0.0,  #
+                                              Optional. Price per million tokens written to the prompt
+                                              cache with a 5-minute lifetime.
+                "image_cache_read_input_price_per_million": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "image_input_price_per_million": 0.0,  # Optional.
+                                              Pricing per million tokens (aligns with existing
+                                              ModelPrice pattern).
+                "image_output_price_per_million": 0.0,  # Optional.
+                                              Pricing per million tokens (aligns with existing
+                                              ModelPrice pattern).
+                                            "input_cache_read": 0.0,  #
+                                              Optional. Cache read input price per single token.
+                                              Equivalent to cache_read_input_price_per_million.
+                                            "input_price_per_million":
+                                              0.0,  # Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "output_price_per_million":
+                                              0.0,  # Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "price_per_audio": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "price_per_image": 0.0,  #
+                                              Optional. Unit-based pricing for non-token models (e.g.,
+                                              Fal AI image/video/audio generation, speech models). At
+                                              most one of these is typically populated per model.
+                                              Token-based models (chat, embeddings) leave all of these
+                                              at 0 and populate input_price_per_million /
+                                              output_price_per_million instead.
+                                            "price_per_megapixel": 0.0,
+                                              # Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                                            "price_per_second": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "price_per_thousand_characters": 0.0,  # Optional.
+                                              Pricing per million tokens (aligns with existing
+                                              ModelPrice pattern).
+                                            "price_per_video": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "reasoning_price_per_million": 0.0,  # Optional. Price
+                                              per million reasoning tokens. 0 if the model does not
+                                              charge separately for reasoning tokens.
+                "text_cache_read_input_price_per_million": 0.0,  #
+                                              Optional. Pricing per million tokens (aligns with
+                                              existing ModelPrice pattern).
+                "text_input_price_per_million": 0.0,  # Optional.
+                                              Per-million token rates for models that bill text vs
+                                              image tokens separately (e.g. OpenAI gpt-image-2).
+                                              Standard chat models leave these at 0 and use
+                                              input_price_per_million / output_price_per_million
+                                              instead. Values align with usage token_type /
+                                              internal/usage.Type string values for each meter.
+                "text_output_price_per_million": 0.0  # Optional. Pricing
+                                              per million tokens (aligns with existing ModelPrice
+                                              pattern).
+                                        }
+                                    },
+                                    "tier": "MODEL_PRICING_TIER_UNSPECIFIED"  #
+                                      Optional. Default value is "MODEL_PRICING_TIER_UNSPECIFIED". A
+                                      pricing variant of a model, such as a faster serving option or a
+                                      larger context window.   * MODEL_PRICING_TIER_STANDARD: Default
+                                      pricing. * MODEL_PRICING_TIER_FAST_MODE: Faster, higher-priority
+                                      serving at a premium price. * MODEL_PRICING_TIER_EXTENDED_1M:
+                                      Pricing for the 1M-token context window. *
+                                      MODEL_PRICING_TIER_EXTENDED_272K: Pricing for the 272K-token
+                                      context window. * MODEL_PRICING_TIER_BYOK: Pricing when using
+                                      your own model API key. Known values are:
+                                      "MODEL_PRICING_TIER_UNSPECIFIED", "MODEL_PRICING_TIER_STANDARD",
+                                      "MODEL_PRICING_TIER_FAST_MODE", "MODEL_PRICING_TIER_EXTENDED_1M",
+                                      "MODEL_PRICING_TIER_EXTENDED_272K", and
+                                      "MODEL_PRICING_TIER_BYOK".
+                                }
+                            ]
+                        },
+                        "products": [
+                            "str"  # Optional. Catalog row returned by List Model Catalog
+                              V2 and Get Model Catalog Card V2. description, code_snippets,
+                              pricing_detail, and liveliness are populated on the card and empty on
+                              list rows. performance is populated on list rows and the card when canary
+                              data is available.
+                        ],
+                        "provider": "MODEL_PROVIDER_DIGITALOCEAN",  # Optional. Default value
+                          is "MODEL_PROVIDER_DIGITALOCEAN". Known values are:
+                          "MODEL_PROVIDER_DIGITALOCEAN", "MODEL_PROVIDER_ANTHROPIC", and
+                          "MODEL_PROVIDER_OPENAI".
+                        "reasoning_efforts": [
+                            "str"  # Optional. Supported reasoning effort levels, such as
+                              low, medium, and high.
+                        ],
+                        "scaled_pricing_enabled": bool,  # Optional. True when this model's
+                          pricing varies over time.
+                        "serving": [
+                            "str"  # Optional. Catalog row returned by List Model Catalog
+                              V2 and Get Model Catalog Card V2. description, code_snippets,
+                              pricing_detail, and liveliness are populated on the card and empty on
+                              list rows. performance is populated on list rows and the card when canary
+                              data is available.
+                        ],
+                        "short_description": "str",  # Optional. Catalog row returned by List
+                          Model Catalog V2 and Get Model Catalog Card V2. description, code_snippets,
+                          pricing_detail, and liveliness are populated on the card and empty on list
+                          rows. performance is populated on list rows and the card when canary data is
+                          available.
+                        "supported_endpoints": [
+                            "str"  # Optional. Inference endpoints this model serves,
+                              such as chat completions or responses. Empty for Inference Router
+                              presets.
+                        ],
+                        "supports_temperature": bool,  # Optional. Whether the inference
+                          request schema includes a temperature field.
+                        "temperature": {
+                            "default": 0.0,  # Optional. Numeric range with min, max, and
+                              default values for model tuning parameters.
+                            "max": 0.0,  # Optional. Numeric range with min, max, and
+                              default values for model tuning parameters.
+                            "min": 0.0  # Optional. Numeric range with min, max, and
+                              default values for model tuning parameters.
+                        },
+                        "thinking": bool,  # Optional. Whether the model supports extended
+                          thinking.
+                        "top_p": {
+                            "default": 0.0,  # Optional. Numeric range with min, max, and
+                              default values for model tuning parameters.
+                            "max": 0.0,  # Optional. Numeric range with min, max, and
+                              default values for model tuning parameters.
+                            "min": 0.0  # Optional. Numeric range with min, max, and
+                              default values for model tuning parameters.
+                        },
+                        "type": "str"  # Optional. Catalog model type, such as chat or
+                          embedding.
+                    }
+                }
+                # response body for status code(s): 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_genai_get_model_catalog_card_v2_request(
             id=id,
             model_id=model_id,
             headers=_headers,
@@ -353249,6 +357824,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                       the judge.
                 "scoring_prompt": "str",  # Optional.
                                                       Instructions for the judge model (multi-line).
+                                                    "turn_type":
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                      Optional. Default value is
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                                      Whether the metric is for single-turn or
+                                                      multi-turn evaluations. Known values are:
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                     "updated_at":
                                                       "2020-02-20 00:00:00"  # Optional. Configuration
                                                       for a custom model-evaluation metric scored by an
@@ -353298,7 +357882,7 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "range_min": 0.0,  #
                                                   Optional. The minimum value for the metric.
                                                 "source":
-                                                  "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                                  "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                                   Default value is
                                                   "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
                                                   platform catalog metrics from user-defined
@@ -353306,6 +357890,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                                   "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                                   "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             }
                                         ],
                                         "name": "str",  # Optional.
@@ -362186,6 +366779,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "scoring_prompt":
                                                   "str",  # Optional. Instructions for the judge model
                                                   (multi-line).
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                 "updated_at":
                                                   "2020-02-20 00:00:00"  # Optional. Configuration for
                                                   a custom model-evaluation metric scored by an LLM
@@ -362231,13 +366833,22 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                             "range_min": 0.0,  #
                                               Optional. The minimum value for the metric.
                                             "source":
-                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                              "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                               Default value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                               Distinguishes platform catalog metrics from user-defined
                                               LLM-as-judge metrics. Known values are:
                                               "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                               "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                               "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         }
                                     ],
                                     "name": "str",  # Optional. Evaluations.
@@ -363639,6 +368250,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -363683,13 +368303,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -365001,6 +369629,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -365045,13 +369682,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -366365,6 +371010,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -366409,13 +371063,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -367811,6 +372473,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -367855,13 +372526,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -369260,6 +373939,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -369304,13 +373992,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -370625,6 +375321,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -370669,13 +375374,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -371992,6 +376705,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -372036,13 +376758,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -373515,6 +378245,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                       the judge.
                 "scoring_prompt": "str",  # Optional.
                                                       Instructions for the judge model (multi-line).
+                                                    "turn_type":
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  #
+                                                      Optional. Default value is
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                                      Whether the metric is for single-turn or
+                                                      multi-turn evaluations. Known values are:
+                                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                                     "updated_at":
                                                       "2020-02-20 00:00:00"  # Optional. Configuration
                                                       for a custom model-evaluation metric scored by an
@@ -373564,7 +378303,7 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                 "range_min": 0.0,  #
                                                   Optional. The minimum value for the metric.
                                                 "source":
-                                                  "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional.
+                                                  "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional.
                                                   Default value is
                                                   "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
                                                   platform catalog metrics from user-defined
@@ -373572,6 +378311,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                                   "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                                   "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                                   "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                                "turn_type":
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  #
+                                                  Optional. Default value is
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether
+                                                  the metric is for single-turn or multi-turn
+                                                  evaluations. Known values are:
+                                                  "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                                  "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                                  "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             }
                                         ],
                                         "name": "str",  # Optional.
@@ -374996,6 +379744,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -375040,13 +379797,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -376361,6 +381126,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -376405,13 +381179,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -377729,6 +382511,15 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               to the judge.
                                             "scoring_prompt": "str",  #
                                               Optional. Instructions for the judge model (multi-line).
+                                            "turn_type":
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                              Default value is
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                              metric is for single-turn or multi-turn evaluations.
+                                              Known values are:
+                                              "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                              "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                              "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                             "updated_at": "2020-02-20
                                               00:00:00"  # Optional. Configuration for a custom
                                               model-evaluation metric scored by an LLM judge. Prompt
@@ -377773,13 +382564,21 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                         "range_min": 0.0,  # Optional. The
                                           minimum value for the metric.
                                         "source":
-                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default
+                                          "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
                                           value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED".
                                           Distinguishes platform catalog metrics from user-defined
                                           LLM-as-judge metrics. Known values are:
                                           "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                           "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                           "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                     }
                                 ],
                                 "name": "str",  # Optional. Evaluations.
@@ -378008,6 +382807,14 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           is not required and is not sent to the judge.
                                         "scoring_prompt": "str",  # Optional.
                                           Instructions for the judge model (multi-line).
+                                        "turn_type":
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",  # Optional.
+                                          Default value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED".
+                                          Whether the metric is for single-turn or multi-turn
+                                          evaluations. Known values are:
+                                          "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                          "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                          "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                         "updated_at": "2020-02-20 00:00:00"
                                           # Optional. Configuration for a custom model-evaluation
                                           metric scored by an LLM judge. Prompt and model response are
@@ -378043,12 +382850,19 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                     "range_min": 0.0,  # Optional. The minimum
                                       value for the metric.
                                     "source":
-                                      "EVALUATION_METRIC_SOURCE_UNSPECIFIED"  # Optional. Default value
-                                      is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes platform
-                                      catalog metrics from user-defined LLM-as-judge metrics. Known
-                                      values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
+                                      "EVALUATION_METRIC_SOURCE_UNSPECIFIED",  # Optional. Default
+                                      value is "EVALUATION_METRIC_SOURCE_UNSPECIFIED". Distinguishes
+                                      platform catalog metrics from user-defined LLM-as-judge metrics.
+                                      Known values are: "EVALUATION_METRIC_SOURCE_UNSPECIFIED",
                                       "EVALUATION_METRIC_SOURCE_BUILTIN", and
                                       "EVALUATION_METRIC_SOURCE_CUSTOM".
+                                    "turn_type":
+                                      "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED"  # Optional. Default
+                                      value is "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED". Whether the
+                                      metric is for single-turn or multi-turn evaluations. Known values
+                                      are: "EVALUATION_METRIC_TURN_TYPE_UNSPECIFIED",
+                                      "EVALUATION_METRIC_TURN_TYPE_SINGLE_TURN", and
+                                      "EVALUATION_METRIC_TURN_TYPE_MULTI_TURN".
                                 }
                             ],
                             "name": "str",  # Optional.

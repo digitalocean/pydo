@@ -52,7 +52,9 @@ from .operations import (
     KubernetesOperations,
     LoadBalancersOperations,
     McpServersOperations,
+    MicrovmAccessTokensOperations,
     MicrovmCheckpointsOperations,
+    MicrovmURLsOperations,
     MicrovmsOperations,
     MonitoringOperations,
     NfsOperations,
@@ -197,6 +199,10 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype microvms: pydo.operations.MicrovmsOperations
     :ivar microvm_checkpoints: MicrovmCheckpointsOperations operations
     :vartype microvm_checkpoints: pydo.operations.MicrovmCheckpointsOperations
+    :ivar microvm_urls: MicrovmURLsOperations operations
+    :vartype microvm_urls: pydo.operations.MicrovmURLsOperations
+    :ivar microvm_access_tokens: MicrovmAccessTokensOperations operations
+    :vartype microvm_access_tokens: pydo.operations.MicrovmAccessTokensOperations
     :ivar monitoring: MonitoringOperations operations
     :vartype monitoring: pydo.operations.MonitoringOperations
     :ivar nfs: NfsOperations operations
@@ -442,6 +448,12 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.microvm_checkpoints = MicrovmCheckpointsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.microvm_urls = MicrovmURLsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.microvm_access_tokens = MicrovmAccessTokensOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.monitoring = MonitoringOperations(
