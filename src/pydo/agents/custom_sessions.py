@@ -93,6 +93,39 @@ class WorkspaceTransferError(RuntimeError):
     """A workspace transfer failed (integrity check, timeout, or server error)."""
 
 
+class SessionConfigUpdateError(RuntimeError):
+    """A live session config update finished in the FAILED state.
+
+    ``reverted`` is true when the server rolled the session back to its previous
+    config; ``detail`` is the server's explanation; ``update`` is the full
+    ``session["update"]`` object.
+    """
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        reverted: bool = False,
+        detail: Optional[str] = None,
+        update: Any = None,
+    ) -> None:
+        super().__init__(message)
+        self.reverted = reverted
+        self.detail = detail
+        self.update = update
+
+
+def _manifest_yaml_arg(manifest_yaml: Any) -> str:
+    """Validate the ``manifest_yaml`` argument of ``update_config``.
+
+    Only a string is accepted: PyYAML is an optional dependency, so dicts are not
+    serialised here.
+    """
+    if not isinstance(manifest_yaml, str) or not manifest_yaml.strip():
+        raise ValueError("manifest_yaml is required")
+    return manifest_yaml
+
+
 def _field(obj: Any, key: str, default: Any = None) -> Any:
     if obj is None:
         return default
@@ -659,6 +692,26 @@ class SessionsOperations:
                 "PATCH",
                 f"{_BASE_PATH}/{_quote(session_id)}",
                 body=body,
+            ),
+        )
+
+    def update_config(self, session_id: str, *, manifest_yaml: str) -> Any:
+        """Patch the live config of a session (``PATCH .../sessions/{session_id}``).
+
+        ``manifest_yaml`` holds only the sections to change (``tools``, ``env``,
+        ``secrets``); absent sections are untouched. ``tools`` is the full
+        replacement list; ``env`` and ``secrets`` are full sets (a key left out is
+        removed). Returns ``{"session", "outcome", "warnings"}``. ``outcome`` is
+        ``ACCEPTED`` (HTTP 202; the session is ``SESSION_STATUS_UPDATING``, poll
+        until it leaves that status, see ``AgentSession.wait_until_updated``) or
+        ``UNCHANGED`` (HTTP 200). Cannot be combined with ``resume_on_topoff``
+        (use :meth:`update` for that).
+        """
+        return self._parse_json(
+            self._send(
+                "PATCH",
+                f"{_BASE_PATH}/{_quote(session_id)}",
+                body={"manifest_yaml": _manifest_yaml_arg(manifest_yaml)},
             ),
         )
 
@@ -1557,6 +1610,7 @@ class WorkspaceDownload:
 
 
 __all__ = [
+    "SessionConfigUpdateError",
     "SessionsOperations",
     "HarnessEventStream",
     "HarnessStreamError",
