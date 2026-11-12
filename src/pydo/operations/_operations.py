@@ -21375,6 +21375,104 @@ def build_genai_get_model_catalog_card_request(  # pylint: disable=name-too-long
     )
 
 
+
+def build_genai_list_model_catalog_v2_request(  # pylint: disable=name-too-long
+    *,
+    page: Optional[int] = None,
+    per_page: Optional[int] = None,
+    search: Optional[str] = None,
+    serving: Optional[List[str]] = None,
+    badges: Optional[List[str]] = None,
+    input_modality: Optional[List[str]] = None,
+    output_modality: Optional[List[str]] = None,
+    product: Optional[List[str]] = None,
+    capabilities: Optional[List[str]] = None,
+    item_type: Optional[List[str]] = None,
+    sort_by: str = "MODEL_CATALOG_SORT_BY_CREATED_AT",
+    sort_direction: str = "SORT_DIRECTION_UNSPECIFIED",
+    creator: Optional[List[str]] = None,
+    **kwargs: Any,
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/gen-ai/models/catalog_v2"
+
+    # Construct parameters
+    if page is not None:
+        _params["page"] = _SERIALIZER.query("page", page, "int")
+    if per_page is not None:
+        _params["per_page"] = _SERIALIZER.query("per_page", per_page, "int")
+    if search is not None:
+        _params["search"] = _SERIALIZER.query("search", search, "str")
+    if serving is not None:
+        _params["serving"] = _SERIALIZER.query("serving", serving, "[str]")
+    if badges is not None:
+        _params["badges"] = _SERIALIZER.query("badges", badges, "[str]")
+    if input_modality is not None:
+        _params["input_modality"] = _SERIALIZER.query(
+            "input_modality", input_modality, "[str]"
+        )
+    if output_modality is not None:
+        _params["output_modality"] = _SERIALIZER.query(
+            "output_modality", output_modality, "[str]"
+        )
+    if product is not None:
+        _params["product"] = _SERIALIZER.query("product", product, "[str]")
+    if capabilities is not None:
+        _params["capabilities"] = _SERIALIZER.query(
+            "capabilities", capabilities, "[str]"
+        )
+    if item_type is not None:
+        _params["item_type"] = _SERIALIZER.query("item_type", item_type, "[str]")
+    if sort_by is not None:
+        _params["sort_by"] = _SERIALIZER.query("sort_by", sort_by, "str")
+    if sort_direction is not None:
+        _params["sort_direction"] = _SERIALIZER.query(
+            "sort_direction", sort_direction, "str"
+        )
+    if creator is not None:
+        _params["creator"] = _SERIALIZER.query("creator", creator, "[str]")
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
+
+
+def build_genai_get_model_catalog_card_v2_request(  # pylint: disable=name-too-long
+    id: str, *, model_id: Optional[str] = None, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/gen-ai/models/catalog_v2/{id}"
+    path_format_arguments = {
+        "id": _SERIALIZER.url("id", id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct parameters
+    if model_id is not None:
+        _params["model_id"] = _SERIALIZER.query("model_id", model_id, "str")
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
+
+
 def build_genai_list_model_routers_request(
     *, page: Optional[int] = None, per_page: Optional[int] = None, **kwargs: Any
 ) -> HttpRequest:
@@ -348163,6 +348261,263 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
         cls: ClsType[JSON] = kwargs.pop("cls", None)
 
         _request = build_genai_get_model_catalog_card_request(
+            id=id,
+            model_id=model_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+
+    @distributed_trace
+    def list_model_catalog_v2(  # pylint: disable=too-many-locals
+        self,
+        *,
+        page: Optional[int] = None,
+        per_page: Optional[int] = None,
+        search: Optional[str] = None,
+        serving: Optional[List[str]] = None,
+        badges: Optional[List[str]] = None,
+        input_modality: Optional[List[str]] = None,
+        output_modality: Optional[List[str]] = None,
+        product: Optional[List[str]] = None,
+        capabilities: Optional[List[str]] = None,
+        item_type: Optional[List[str]] = None,
+        sort_by: str = "MODEL_CATALOG_SORT_BY_CREATED_AT",
+        sort_direction: str = "SORT_DIRECTION_UNSPECIFIED",
+        creator: Optional[List[str]] = None,
+        **kwargs: Any,
+    ) -> JSON:
+        """List Model Catalog V2.
+
+        Returns the authenticated V2 model catalog. Requires a bearer token with
+        ``genai:read``.
+
+        :keyword page: Page number. Default value is None.
+        :paramtype page: int
+        :keyword per_page: Page size. Default value is None.
+        :paramtype per_page: int
+        :keyword search: Partial, case-insensitive match on display name or model ID.
+         Default value is None.
+        :paramtype search: str
+        :keyword serving: Serving filter. Multiple values use OR semantics. Known values are
+         "MODEL_SERVING_UNSPECIFIED", "MODEL_SERVING_SERVERLESS", and
+         "MODEL_SERVING_DEDICATED". Default value is None.
+        :paramtype serving: list[str]
+        :keyword badges: Badge filter. Multiple values use OR semantics. Default value is None.
+        :paramtype badges: list[str]
+        :keyword input_modality: Required input modalities. Multiple values use AND semantics.
+         Default value is None.
+        :paramtype input_modality: list[str]
+        :keyword output_modality: Required output modalities. Multiple values use AND semantics.
+         Default value is None.
+        :paramtype output_modality: list[str]
+        :keyword product: Product enrollment filter. Default value is None.
+        :paramtype product: list[str]
+        :keyword capabilities: Required capabilities. Multiple values use AND semantics. The value
+         ``coding`` matches model specialisations. Default value is None.
+        :paramtype capabilities: list[str]
+        :keyword item_type: Item type filter. Known values are
+         "MODEL_CATALOG_ITEM_TYPE_UNSPECIFIED", "MODEL_CATALOG_ITEM_TYPE_MODEL", and
+         "MODEL_CATALOG_ITEM_TYPE_INFERENCE_ROUTER". Default value is None.
+        :paramtype item_type: list[str]
+        :keyword sort_by: Sort field. Known values are "MODEL_CATALOG_SORT_BY_CREATED_AT",
+         "MODEL_CATALOG_SORT_BY_NAME", "MODEL_CATALOG_SORT_BY_PRICE",
+         "MODEL_CATALOG_SORT_BY_E2E_LATENCY_P50", "MODEL_CATALOG_SORT_BY_THROUGHPUT_P50", and
+         "MODEL_CATALOG_SORT_BY_TTFT_P50". Default value is "MODEL_CATALOG_SORT_BY_CREATED_AT".
+        :paramtype sort_by: str
+        :keyword sort_direction: Sort direction. Known values are "SORT_DIRECTION_UNSPECIFIED",
+         "SORT_DIRECTION_ASC", and "SORT_DIRECTION_DESC". Default value is
+         "SORT_DIRECTION_UNSPECIFIED".
+        :paramtype sort_direction: str
+        :keyword creator: Creator filter. Multiple values use OR semantics and match
+         case-insensitively. Default value is None.
+        :paramtype creator: list[str]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_genai_list_model_catalog_v2_request(
+            page=page,
+            per_page=per_page,
+            search=search,
+            serving=serving,
+            badges=badges,
+            input_modality=input_modality,
+            output_modality=output_modality,
+            product=product,
+            capabilities=capabilities,
+            item_type=item_type,
+            sort_by=sort_by,
+            sort_direction=sort_direction,
+            creator=creator,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def get_model_catalog_card_v2(
+        self, id: str, *, model_id: Optional[str] = None, **kwargs: Any
+    ) -> JSON:
+        """Get Model Catalog Card V2.
+
+        Returns one authenticated V2 catalog card by catalog ID, or by inference model ID when
+        ``model_id`` is set. Requires a bearer token with ``genai:read``.
+
+        :param id: Catalog ID. When looking up by inference model ID, pass that ID here as well.
+         Required.
+        :type id: str
+        :keyword model_id: Inference model ID, such as ``llama3.1-70b-instruct``. Default value is
+         None.
+        :paramtype model_id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_genai_get_model_catalog_card_v2_request(
             id=id,
             model_id=model_id,
             headers=_headers,
