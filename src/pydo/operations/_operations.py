@@ -16038,7 +16038,12 @@ def build_registry_get_options_request(**kwargs: Any) -> HttpRequest:
 
 
 def build_reserved_ips_list_request(
-    *, per_page: int = 20, page: int = 1, **kwargs: Any
+    *,
+    per_page: int = 20,
+    page: int = 1,
+    sort: Optional[str] = None,
+    sort_direction: Optional[str] = None,
+    **kwargs: Any,
 ) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
     _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
@@ -16055,6 +16060,12 @@ def build_reserved_ips_list_request(
         )
     if page is not None:
         _params["page"] = _SERIALIZER.query("page", page, "int", minimum=1)
+    if sort is not None:
+        _params["sort"] = _SERIALIZER.query("sort", sort, "str")
+    if sort_direction is not None:
+        _params["sort_direction"] = _SERIALIZER.query(
+            "sort_direction", sort_direction, "str"
+        )
 
     # Construct headers
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
@@ -52956,6 +52967,54 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               "AGENT_KIND_CURSOR_CLI", "AGENT_KIND_NONE", "AGENT_KIND_CUSTOM",
                               "AGENT_KIND_HERMES", "AGENT_KIND_OPENAI_CODEX", "AGENT_KIND_LANGGRAPH",
                               and "AGENT_KIND_CREWAI".
+                            "config_diff": {
+                                "env": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                },
+                                "secrets": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                },
+                                "tools": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                }
+                            },
+                            "config_drifted": bool,  # Optional. True when the running
+                              config differs from the manifest the session was created from, for
+                              example after a successful PATCH with ``manifest_yaml``. Omitted when
+                              false.
                             "config_id": "str",  # Optional. Durable Environment Config
                               UUID the session was created from (inline manifests persist a config too,
                               named after the session). Persisted and returned on create/get/list;
@@ -52978,6 +53037,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "last_event_at": "2020-02-20 00:00:00",  # Optional.
                               Timestamp of the most recent event in this session's canonical stream.
                               Drives the inactivity policy that pauses idle sessions.
+                            "manifest": {
+                                "str": {}  # Optional. The effective manifest of the
+                                  session. Present only when ``config_drifted`` is true. Never contains
+                                  secret values.
+                            },
                             "name": "str",  # Optional. User-assignable display name,
                               unique per team among non-terminal sessions. Usable in place of
                               session_id by clients (doctl / Console resolve it to the id via the
@@ -53025,12 +53089,95 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               state of the sandbox + agent pair. SESSION_STATUS_ALL is a ListSessions
                               status-filter value only -- no session is ever actually in this status.
                               SESSION_STATUS_LOCKED is reserved for internal use and never appears in
-                              an end-user-facing response. Known values are:
+                              an end-user-facing response. SESSION_STATUS_UPDATING is reported while a
+                              live config update (PATCH with ``manifest_yaml``"" ) is being applied;
+                              poll the session until it leaves this status. Known values are:
                               "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
                               "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED",
                               "SESSION_STATUS_DESTROYING", "SESSION_STATUS_DESTROYED",
-                              "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED", "SESSION_STATUS_ALL",
-                              and "SESSION_STATUS_LOCKED".
+                              "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED",
+                              "SESSION_STATUS_UPDATING", "SESSION_STATUS_ALL", and
+                              "SESSION_STATUS_LOCKED".
+                            "update": {
+                                "changes": {
+                                    "env": {
+                                        "added": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ]
+                                    },
+                                    "secrets": {
+                                        "added": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ]
+                                    },
+                                    "tools": {
+                                        "added": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ]
+                                    }
+                                },
+                                "detail": "str",  # Optional. Human-readable
+                                  explanation, typically for a failed update.
+                                "error": "str",  # Optional. Failure class; present
+                                  when state is FAILED. Known values are: "update_failed",
+                                  "requires_new_session", and "interrupted".
+                                "finished_at": "2020-02-20 00:00:00",  # Optional.
+                                  One live config update (or automatic rollback) of a session.
+                                "kind": "str",  # Optional. Known values are:
+                                  "update" and "rollback".
+                                "manifest_hash": "str",  # Optional. Hash of the
+                                  manifest after this update.
+                                "previous_hash": "str",  # Optional. Hash of the
+                                  manifest before this update.
+                                "reverted": bool,  # Optional. True when a failed
+                                  update was rolled back to the previous config.
+                                "sections": [
+                                    "str"  # Optional. Manifest sections this
+                                      update touched.
+                                ],
+                                "session_id": "str",  # Optional. One live config
+                                  update (or automatic rollback) of a session.
+                                "started_at": "2020-02-20 00:00:00",  # Optional. One
+                                  live config update (or automatic rollback) of a session.
+                                "state": "str",  # Optional. State of a live config
+                                  update. APPLIED_RESTARTED means the agent was restarted to apply it
+                                  (env and secret changes). FAILED means the update did not take
+                                  effect; see ``reverted`` and ``detail``. Known values are:
+                                  "APPLYING", "APPLIED", "APPLIED_RESTARTED", and "FAILED".
+                                "update_id": "str",  # Optional. One live config
+                                  update (or automatic rollback) of a session.
+                                "user_email": "str",  # Optional. Email of the user
+                                  who requested the update.
+                                "user_uuid": "str"  # Optional. User who requested
+                                  the update.
+                            },
                             "warnings": [
                                 "str"  # Optional. Non-fatal advisories computed from
                                   the manifest at create time: one entry per populated
@@ -53318,7 +53465,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
          the default. Known values are: "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
          "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED", "SESSION_STATUS_DESTROYING",
          "SESSION_STATUS_DESTROYED", "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED",
-         "SESSION_STATUS_ALL", and "SESSION_STATUS_LOCKED". Default value is
+         "SESSION_STATUS_UPDATING", "SESSION_STATUS_ALL", and "SESSION_STATUS_LOCKED". Default value is
          "SESSION_STATUS_UNSPECIFIED".
         :paramtype status: str
         :keyword name: Optional exact-name filter (case-insensitive). Returns the single live
@@ -53363,6 +53510,54 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               "AGENT_KIND_CURSOR_CLI", "AGENT_KIND_NONE", "AGENT_KIND_CUSTOM",
                               "AGENT_KIND_HERMES", "AGENT_KIND_OPENAI_CODEX", "AGENT_KIND_LANGGRAPH",
                               and "AGENT_KIND_CREWAI".
+                            "config_diff": {
+                                "env": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                },
+                                "secrets": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                },
+                                "tools": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                }
+                            },
+                            "config_drifted": bool,  # Optional. True when the running
+                              config differs from the manifest the session was created from, for
+                              example after a successful PATCH with ``manifest_yaml``. Omitted when
+                              false.
                             "config_id": "str",  # Optional. Durable Environment Config
                               UUID the session was created from (inline manifests persist a config too,
                               named after the session). Persisted and returned on create/get/list;
@@ -53385,6 +53580,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "last_event_at": "2020-02-20 00:00:00",  # Optional.
                               Timestamp of the most recent event in this session's canonical stream.
                               Drives the inactivity policy that pauses idle sessions.
+                            "manifest": {
+                                "str": {}  # Optional. The effective manifest of the
+                                  session. Present only when ``config_drifted`` is true. Never contains
+                                  secret values.
+                            },
                             "name": "str",  # Optional. User-assignable display name,
                               unique per team among non-terminal sessions. Usable in place of
                               session_id by clients (doctl / Console resolve it to the id via the
@@ -53432,12 +53632,95 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               state of the sandbox + agent pair. SESSION_STATUS_ALL is a ListSessions
                               status-filter value only -- no session is ever actually in this status.
                               SESSION_STATUS_LOCKED is reserved for internal use and never appears in
-                              an end-user-facing response. Known values are:
+                              an end-user-facing response. SESSION_STATUS_UPDATING is reported while a
+                              live config update (PATCH with ``manifest_yaml``"" ) is being applied;
+                              poll the session until it leaves this status. Known values are:
                               "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
                               "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED",
                               "SESSION_STATUS_DESTROYING", "SESSION_STATUS_DESTROYED",
-                              "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED", "SESSION_STATUS_ALL",
-                              and "SESSION_STATUS_LOCKED".
+                              "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED",
+                              "SESSION_STATUS_UPDATING", "SESSION_STATUS_ALL", and
+                              "SESSION_STATUS_LOCKED".
+                            "update": {
+                                "changes": {
+                                    "env": {
+                                        "added": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ]
+                                    },
+                                    "secrets": {
+                                        "added": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ]
+                                    },
+                                    "tools": {
+                                        "added": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ]
+                                    }
+                                },
+                                "detail": "str",  # Optional. Human-readable
+                                  explanation, typically for a failed update.
+                                "error": "str",  # Optional. Failure class; present
+                                  when state is FAILED. Known values are: "update_failed",
+                                  "requires_new_session", and "interrupted".
+                                "finished_at": "2020-02-20 00:00:00",  # Optional.
+                                  One live config update (or automatic rollback) of a session.
+                                "kind": "str",  # Optional. Known values are:
+                                  "update" and "rollback".
+                                "manifest_hash": "str",  # Optional. Hash of the
+                                  manifest after this update.
+                                "previous_hash": "str",  # Optional. Hash of the
+                                  manifest before this update.
+                                "reverted": bool,  # Optional. True when a failed
+                                  update was rolled back to the previous config.
+                                "sections": [
+                                    "str"  # Optional. Manifest sections this
+                                      update touched.
+                                ],
+                                "session_id": "str",  # Optional. One live config
+                                  update (or automatic rollback) of a session.
+                                "started_at": "2020-02-20 00:00:00",  # Optional. One
+                                  live config update (or automatic rollback) of a session.
+                                "state": "str",  # Optional. State of a live config
+                                  update. APPLIED_RESTARTED means the agent was restarted to apply it
+                                  (env and secret changes). FAILED means the update did not take
+                                  effect; see ``reverted`` and ``detail``. Known values are:
+                                  "APPLYING", "APPLIED", "APPLIED_RESTARTED", and "FAILED".
+                                "update_id": "str",  # Optional. One live config
+                                  update (or automatic rollback) of a session.
+                                "user_email": "str",  # Optional. Email of the user
+                                  who requested the update.
+                                "user_uuid": "str"  # Optional. User who requested
+                                  the update.
+                            },
                             "warnings": [
                                 "str"  # Optional. Non-fatal advisories computed from
                                   the manifest at create time: one entry per populated
@@ -53678,6 +53961,53 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           "AGENT_KIND_CODEX_CLI", "AGENT_KIND_CURSOR_CLI", "AGENT_KIND_NONE",
                           "AGENT_KIND_CUSTOM", "AGENT_KIND_HERMES", "AGENT_KIND_OPENAI_CODEX",
                           "AGENT_KIND_LANGGRAPH", and "AGENT_KIND_CREWAI".
+                        "config_diff": {
+                            "env": {
+                                "added": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ]
+                            },
+                            "secrets": {
+                                "added": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ]
+                            },
+                            "tools": {
+                                "added": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ]
+                            }
+                        },
+                        "config_drifted": bool,  # Optional. True when the running config
+                          differs from the manifest the session was created from, for example after a
+                          successful PATCH with ``manifest_yaml``. Omitted when false.
                         "config_id": "str",  # Optional. Durable Environment Config UUID the
                           session was created from (inline manifests persist a config too, named after
                           the session). Persisted and returned on create/get/list; absent only for
@@ -53700,6 +54030,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "last_event_at": "2020-02-20 00:00:00",  # Optional. Timestamp of the
                           most recent event in this session's canonical stream. Drives the inactivity
                           policy that pauses idle sessions.
+                        "manifest": {
+                            "str": {}  # Optional. The effective manifest of the session.
+                              Present only when ``config_drifted`` is true. Never contains secret
+                              values.
+                        },
                         "name": "str",  # Optional. User-assignable display name, unique per
                           team among non-terminal sessions. Usable in place of session_id by clients
                           (doctl / Console resolve it to the id via the ListSessions ?name= filter; the
@@ -53746,11 +54081,94 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           sandbox + agent pair. SESSION_STATUS_ALL is a ListSessions status-filter
                           value only -- no session is ever actually in this status.
                           SESSION_STATUS_LOCKED is reserved for internal use and never appears in an
-                          end-user-facing response. Known values are: "SESSION_STATUS_UNSPECIFIED",
-                          "SESSION_STATUS_PROVISIONING", "SESSION_STATUS_READY",
-                          "SESSION_STATUS_DETACHED", "SESSION_STATUS_DESTROYING",
-                          "SESSION_STATUS_DESTROYED", "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED",
+                          end-user-facing response. SESSION_STATUS_UPDATING is reported while a live
+                          config update (PATCH with ``manifest_yaml``"" ) is being applied; poll the
+                          session until it leaves this status. Known values are:
+                          "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
+                          "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED",
+                          "SESSION_STATUS_DESTROYING", "SESSION_STATUS_DESTROYED",
+                          "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED", "SESSION_STATUS_UPDATING",
                           "SESSION_STATUS_ALL", and "SESSION_STATUS_LOCKED".
+                        "update": {
+                            "changes": {
+                                "env": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                },
+                                "secrets": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                },
+                                "tools": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                }
+                            },
+                            "detail": "str",  # Optional. Human-readable explanation,
+                              typically for a failed update.
+                            "error": "str",  # Optional. Failure class; present when
+                              state is FAILED. Known values are: "update_failed",
+                              "requires_new_session", and "interrupted".
+                            "finished_at": "2020-02-20 00:00:00",  # Optional. One live
+                              config update (or automatic rollback) of a session.
+                            "kind": "str",  # Optional. Known values are: "update" and
+                              "rollback".
+                            "manifest_hash": "str",  # Optional. Hash of the manifest
+                              after this update.
+                            "previous_hash": "str",  # Optional. Hash of the manifest
+                              before this update.
+                            "reverted": bool,  # Optional. True when a failed update was
+                              rolled back to the previous config.
+                            "sections": [
+                                "str"  # Optional. Manifest sections this update
+                                  touched.
+                            ],
+                            "session_id": "str",  # Optional. One live config update (or
+                              automatic rollback) of a session.
+                            "started_at": "2020-02-20 00:00:00",  # Optional. One live
+                              config update (or automatic rollback) of a session.
+                            "state": "str",  # Optional. State of a live config update.
+                              APPLIED_RESTARTED means the agent was restarted to apply it (env and
+                              secret changes). FAILED means the update did not take effect; see
+                              ``reverted`` and ``detail``. Known values are: "APPLYING", "APPLIED",
+                              "APPLIED_RESTARTED", and "FAILED".
+                            "update_id": "str",  # Optional. One live config update (or
+                              automatic rollback) of a session.
+                            "user_email": "str",  # Optional. Email of the user who
+                              requested the update.
+                            "user_uuid": "str"  # Optional. User who requested the
+                              update.
+                        },
                         "warnings": [
                             "str"  # Optional. Non-fatal advisories computed from the
                               manifest at create time: one entry per populated
@@ -53869,6 +54287,53 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           "AGENT_KIND_CODEX_CLI", "AGENT_KIND_CURSOR_CLI", "AGENT_KIND_NONE",
                           "AGENT_KIND_CUSTOM", "AGENT_KIND_HERMES", "AGENT_KIND_OPENAI_CODEX",
                           "AGENT_KIND_LANGGRAPH", and "AGENT_KIND_CREWAI".
+                        "config_diff": {
+                            "env": {
+                                "added": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ]
+                            },
+                            "secrets": {
+                                "added": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ]
+                            },
+                            "tools": {
+                                "added": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ]
+                            }
+                        },
+                        "config_drifted": bool,  # Optional. True when the running config
+                          differs from the manifest the session was created from, for example after a
+                          successful PATCH with ``manifest_yaml``. Omitted when false.
                         "config_id": "str",  # Optional. Durable Environment Config UUID the
                           session was created from (inline manifests persist a config too, named after
                           the session). Persisted and returned on create/get/list; absent only for
@@ -53891,6 +54356,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "last_event_at": "2020-02-20 00:00:00",  # Optional. Timestamp of the
                           most recent event in this session's canonical stream. Drives the inactivity
                           policy that pauses idle sessions.
+                        "manifest": {
+                            "str": {}  # Optional. The effective manifest of the session.
+                              Present only when ``config_drifted`` is true. Never contains secret
+                              values.
+                        },
                         "name": "str",  # Optional. User-assignable display name, unique per
                           team among non-terminal sessions. Usable in place of session_id by clients
                           (doctl / Console resolve it to the id via the ListSessions ?name= filter; the
@@ -53937,11 +54407,94 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           sandbox + agent pair. SESSION_STATUS_ALL is a ListSessions status-filter
                           value only -- no session is ever actually in this status.
                           SESSION_STATUS_LOCKED is reserved for internal use and never appears in an
-                          end-user-facing response. Known values are: "SESSION_STATUS_UNSPECIFIED",
-                          "SESSION_STATUS_PROVISIONING", "SESSION_STATUS_READY",
-                          "SESSION_STATUS_DETACHED", "SESSION_STATUS_DESTROYING",
-                          "SESSION_STATUS_DESTROYED", "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED",
+                          end-user-facing response. SESSION_STATUS_UPDATING is reported while a live
+                          config update (PATCH with ``manifest_yaml``"" ) is being applied; poll the
+                          session until it leaves this status. Known values are:
+                          "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
+                          "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED",
+                          "SESSION_STATUS_DESTROYING", "SESSION_STATUS_DESTROYED",
+                          "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED", "SESSION_STATUS_UPDATING",
                           "SESSION_STATUS_ALL", and "SESSION_STATUS_LOCKED".
+                        "update": {
+                            "changes": {
+                                "env": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                },
+                                "secrets": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                },
+                                "tools": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                }
+                            },
+                            "detail": "str",  # Optional. Human-readable explanation,
+                              typically for a failed update.
+                            "error": "str",  # Optional. Failure class; present when
+                              state is FAILED. Known values are: "update_failed",
+                              "requires_new_session", and "interrupted".
+                            "finished_at": "2020-02-20 00:00:00",  # Optional. One live
+                              config update (or automatic rollback) of a session.
+                            "kind": "str",  # Optional. Known values are: "update" and
+                              "rollback".
+                            "manifest_hash": "str",  # Optional. Hash of the manifest
+                              after this update.
+                            "previous_hash": "str",  # Optional. Hash of the manifest
+                              before this update.
+                            "reverted": bool,  # Optional. True when a failed update was
+                              rolled back to the previous config.
+                            "sections": [
+                                "str"  # Optional. Manifest sections this update
+                                  touched.
+                            ],
+                            "session_id": "str",  # Optional. One live config update (or
+                              automatic rollback) of a session.
+                            "started_at": "2020-02-20 00:00:00",  # Optional. One live
+                              config update (or automatic rollback) of a session.
+                            "state": "str",  # Optional. State of a live config update.
+                              APPLIED_RESTARTED means the agent was restarted to apply it (env and
+                              secret changes). FAILED means the update did not take effect; see
+                              ``reverted`` and ``detail``. Known values are: "APPLYING", "APPLIED",
+                              "APPLIED_RESTARTED", and "FAILED".
+                            "update_id": "str",  # Optional. One live config update (or
+                              automatic rollback) of a session.
+                            "user_email": "str",  # Optional. Email of the user who
+                              requested the update.
+                            "user_uuid": "str"  # Optional. User who requested the
+                              update.
+                        },
                         "warnings": [
                             "str"  # Optional. Non-fatal advisories computed from the
                               manifest at create time: one entry per populated
@@ -54080,6 +54633,53 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           "AGENT_KIND_CODEX_CLI", "AGENT_KIND_CURSOR_CLI", "AGENT_KIND_NONE",
                           "AGENT_KIND_CUSTOM", "AGENT_KIND_HERMES", "AGENT_KIND_OPENAI_CODEX",
                           "AGENT_KIND_LANGGRAPH", and "AGENT_KIND_CREWAI".
+                        "config_diff": {
+                            "env": {
+                                "added": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ]
+                            },
+                            "secrets": {
+                                "added": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ]
+                            },
+                            "tools": {
+                                "added": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ]
+                            }
+                        },
+                        "config_drifted": bool,  # Optional. True when the running config
+                          differs from the manifest the session was created from, for example after a
+                          successful PATCH with ``manifest_yaml``. Omitted when false.
                         "config_id": "str",  # Optional. Durable Environment Config UUID the
                           session was created from (inline manifests persist a config too, named after
                           the session). Persisted and returned on create/get/list; absent only for
@@ -54102,6 +54702,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "last_event_at": "2020-02-20 00:00:00",  # Optional. Timestamp of the
                           most recent event in this session's canonical stream. Drives the inactivity
                           policy that pauses idle sessions.
+                        "manifest": {
+                            "str": {}  # Optional. The effective manifest of the session.
+                              Present only when ``config_drifted`` is true. Never contains secret
+                              values.
+                        },
                         "name": "str",  # Optional. User-assignable display name, unique per
                           team among non-terminal sessions. Usable in place of session_id by clients
                           (doctl / Console resolve it to the id via the ListSessions ?name= filter; the
@@ -54148,11 +54753,94 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           sandbox + agent pair. SESSION_STATUS_ALL is a ListSessions status-filter
                           value only -- no session is ever actually in this status.
                           SESSION_STATUS_LOCKED is reserved for internal use and never appears in an
-                          end-user-facing response. Known values are: "SESSION_STATUS_UNSPECIFIED",
-                          "SESSION_STATUS_PROVISIONING", "SESSION_STATUS_READY",
-                          "SESSION_STATUS_DETACHED", "SESSION_STATUS_DESTROYING",
-                          "SESSION_STATUS_DESTROYED", "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED",
+                          end-user-facing response. SESSION_STATUS_UPDATING is reported while a live
+                          config update (PATCH with ``manifest_yaml``"" ) is being applied; poll the
+                          session until it leaves this status. Known values are:
+                          "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
+                          "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED",
+                          "SESSION_STATUS_DESTROYING", "SESSION_STATUS_DESTROYED",
+                          "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED", "SESSION_STATUS_UPDATING",
                           "SESSION_STATUS_ALL", and "SESSION_STATUS_LOCKED".
+                        "update": {
+                            "changes": {
+                                "env": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                },
+                                "secrets": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                },
+                                "tools": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                }
+                            },
+                            "detail": "str",  # Optional. Human-readable explanation,
+                              typically for a failed update.
+                            "error": "str",  # Optional. Failure class; present when
+                              state is FAILED. Known values are: "update_failed",
+                              "requires_new_session", and "interrupted".
+                            "finished_at": "2020-02-20 00:00:00",  # Optional. One live
+                              config update (or automatic rollback) of a session.
+                            "kind": "str",  # Optional. Known values are: "update" and
+                              "rollback".
+                            "manifest_hash": "str",  # Optional. Hash of the manifest
+                              after this update.
+                            "previous_hash": "str",  # Optional. Hash of the manifest
+                              before this update.
+                            "reverted": bool,  # Optional. True when a failed update was
+                              rolled back to the previous config.
+                            "sections": [
+                                "str"  # Optional. Manifest sections this update
+                                  touched.
+                            ],
+                            "session_id": "str",  # Optional. One live config update (or
+                              automatic rollback) of a session.
+                            "started_at": "2020-02-20 00:00:00",  # Optional. One live
+                              config update (or automatic rollback) of a session.
+                            "state": "str",  # Optional. State of a live config update.
+                              APPLIED_RESTARTED means the agent was restarted to apply it (env and
+                              secret changes). FAILED means the update did not take effect; see
+                              ``reverted`` and ``detail``. Known values are: "APPLYING", "APPLIED",
+                              "APPLIED_RESTARTED", and "FAILED".
+                            "update_id": "str",  # Optional. One live config update (or
+                              automatic rollback) of a session.
+                            "user_email": "str",  # Optional. Email of the user who
+                              requested the update.
+                            "user_uuid": "str"  # Optional. User who requested the
+                              update.
+                        },
                         "warnings": [
                             "str"  # Optional. Non-fatal advisories computed from the
                               manifest at create time: one entry per populated
@@ -54918,6 +55606,53 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           "AGENT_KIND_CODEX_CLI", "AGENT_KIND_CURSOR_CLI", "AGENT_KIND_NONE",
                           "AGENT_KIND_CUSTOM", "AGENT_KIND_HERMES", "AGENT_KIND_OPENAI_CODEX",
                           "AGENT_KIND_LANGGRAPH", and "AGENT_KIND_CREWAI".
+                        "config_diff": {
+                            "env": {
+                                "added": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ]
+                            },
+                            "secrets": {
+                                "added": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ]
+                            },
+                            "tools": {
+                                "added": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ]
+                            }
+                        },
+                        "config_drifted": bool,  # Optional. True when the running config
+                          differs from the manifest the session was created from, for example after a
+                          successful PATCH with ``manifest_yaml``. Omitted when false.
                         "config_id": "str",  # Optional. Durable Environment Config UUID the
                           session was created from (inline manifests persist a config too, named after
                           the session). Persisted and returned on create/get/list; absent only for
@@ -54940,6 +55675,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "last_event_at": "2020-02-20 00:00:00",  # Optional. Timestamp of the
                           most recent event in this session's canonical stream. Drives the inactivity
                           policy that pauses idle sessions.
+                        "manifest": {
+                            "str": {}  # Optional. The effective manifest of the session.
+                              Present only when ``config_drifted`` is true. Never contains secret
+                              values.
+                        },
                         "name": "str",  # Optional. User-assignable display name, unique per
                           team among non-terminal sessions. Usable in place of session_id by clients
                           (doctl / Console resolve it to the id via the ListSessions ?name= filter; the
@@ -54986,11 +55726,94 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           sandbox + agent pair. SESSION_STATUS_ALL is a ListSessions status-filter
                           value only -- no session is ever actually in this status.
                           SESSION_STATUS_LOCKED is reserved for internal use and never appears in an
-                          end-user-facing response. Known values are: "SESSION_STATUS_UNSPECIFIED",
-                          "SESSION_STATUS_PROVISIONING", "SESSION_STATUS_READY",
-                          "SESSION_STATUS_DETACHED", "SESSION_STATUS_DESTROYING",
-                          "SESSION_STATUS_DESTROYED", "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED",
+                          end-user-facing response. SESSION_STATUS_UPDATING is reported while a live
+                          config update (PATCH with ``manifest_yaml``"" ) is being applied; poll the
+                          session until it leaves this status. Known values are:
+                          "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
+                          "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED",
+                          "SESSION_STATUS_DESTROYING", "SESSION_STATUS_DESTROYED",
+                          "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED", "SESSION_STATUS_UPDATING",
                           "SESSION_STATUS_ALL", and "SESSION_STATUS_LOCKED".
+                        "update": {
+                            "changes": {
+                                "env": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                },
+                                "secrets": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                },
+                                "tools": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                }
+                            },
+                            "detail": "str",  # Optional. Human-readable explanation,
+                              typically for a failed update.
+                            "error": "str",  # Optional. Failure class; present when
+                              state is FAILED. Known values are: "update_failed",
+                              "requires_new_session", and "interrupted".
+                            "finished_at": "2020-02-20 00:00:00",  # Optional. One live
+                              config update (or automatic rollback) of a session.
+                            "kind": "str",  # Optional. Known values are: "update" and
+                              "rollback".
+                            "manifest_hash": "str",  # Optional. Hash of the manifest
+                              after this update.
+                            "previous_hash": "str",  # Optional. Hash of the manifest
+                              before this update.
+                            "reverted": bool,  # Optional. True when a failed update was
+                              rolled back to the previous config.
+                            "sections": [
+                                "str"  # Optional. Manifest sections this update
+                                  touched.
+                            ],
+                            "session_id": "str",  # Optional. One live config update (or
+                              automatic rollback) of a session.
+                            "started_at": "2020-02-20 00:00:00",  # Optional. One live
+                              config update (or automatic rollback) of a session.
+                            "state": "str",  # Optional. State of a live config update.
+                              APPLIED_RESTARTED means the agent was restarted to apply it (env and
+                              secret changes). FAILED means the update did not take effect; see
+                              ``reverted`` and ``detail``. Known values are: "APPLYING", "APPLIED",
+                              "APPLIED_RESTARTED", and "FAILED".
+                            "update_id": "str",  # Optional. One live config update (or
+                              automatic rollback) of a session.
+                            "user_email": "str",  # Optional. Email of the user who
+                              requested the update.
+                            "user_uuid": "str"  # Optional. User who requested the
+                              update.
+                        },
                         "warnings": [
                             "str"  # Optional. Non-fatal advisories computed from the
                               manifest at create time: one entry per populated
@@ -55138,19 +55961,22 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         **kwargs: Any,
     ) -> JSON:
         # pylint: disable=line-too-long
-        """PatchSession updates session-scoped settings on an existing session.
+        """PatchSession updates an existing session (session-scoped settings or live config).
 
-        Partial update of session-scoped settings (not the agent manifest / config). The body must
-        include at least one recognized patchable property; an empty object {} is 400. Only properties
-        listed on PatchSessionRequest are accepted — any other top-level JSON key is rejected with 400.
-        Omitted properties are left unchanged. Today the only patchable field is resume_on_topoff; more
-        session settings may be added over time. Terminal sessions (DESTROYED, FAILED) cannot be
-        patched.
+        Partial update of an existing session. Send exactly one of: ``resume_on_topoff``
+        (session-scoped consent), or ``manifest_yaml`` (live config update of ``tools``\\ , ``env`` and
+        ``secrets``\\ ). The two cannot be combined, and ``{}`` is 400. With ``manifest_yaml``\\ ,
+        absent sections are untouched; ``model`` and ``permissions`` return 501. A config update that
+        changes something returns 202 with outcome ACCEPTED and the session in SESSION_STATUS_UPDATING
+        (update state APPLYING): poll GET on the session every 2-5 seconds until the status leaves
+        UPDATING, then read ``session.update`` (APPLIED, APPLIED_RESTARTED or FAILED). A tools-only
+        update usually finishes in seconds; env and secret changes restart the agent and can take about
+        two minutes. A manifest that changes nothing returns 200 with outcome UNCHANGED. Terminal
+        sessions (DESTROYED, FAILED) cannot be patched.
 
         :param session_id: The session UUID. Required.
         :type session_id: str
-        :param body: PATCH body: allowlisted session-scoped settings. At least one property required.
-         Required.
+        :param body: PATCH body: either resume_on_topoff or manifest_yaml (not both). Required.
         :type body: JSON
         :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
          Default value is "application/json".
@@ -55164,14 +55990,29 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
 
                 # JSON input template you can fill out and use as your body input.
                 body = {
+                    "manifest_yaml": "str",  # Optional. A partial manifest, as YAML, holding
+                      only the sections to change: ``tools``"" , ``env``"" , ``secrets``. Absent
+                      sections are untouched; any other top-level key is 400, and ``model`` /
+                      ``permissions`` return 501. ``tools`` is the full replacement list ("" ``tools:
+                      []`` detaches every MCP server; ``tools: null`` is 400). ``env`` and ``secrets``
+                      are full sets: a key left out is removed. A secret value is a string (set or
+                      rotate) or ``{}`` (keep the current value); per-key ``null`` is 400. Platform and
+                      framework keys and non-plain secrets must be sent back unchanged, or the request
+                      is 422. Cannot be combined with ``resume_on_topoff``. Requires the team to be
+                      enrolled in the config-update feature (403 otherwise).
                     "resume_on_topoff": bool  # Optional. When present, sets whether this session
                       opts in to automatic resumption when the team's prepayment balance is restored
                       after a low-balance pause. Session-scoped consent, not config-scoped. Omitted
-                      properties are not modified.
+                      properties are not modified. Cannot be combined with ``manifest_yaml``.
                 }
 
-                # response body for status code(s): 200
+                # response body for status code(s): 200, 202
                 response == {
+                    "outcome": "str",  # Optional. Present for ``manifest_yaml`` patches.
+                      ACCEPTED (HTTP 202): the update is applying and the session status is
+                      SESSION_STATUS_UPDATING; poll GET until the status leaves UPDATING, then read
+                      ``session.update``. UNCHANGED (HTTP 200): the manifest changes nothing and
+                      nothing was recorded. Known values are: "ACCEPTED" and "UNCHANGED".
                     "session": {
                         "agent_kind": "AGENT_KIND_UNSPECIFIED",  # Optional. Default value is
                           "AGENT_KIND_UNSPECIFIED". AgentKind identifies what runs inside the session
@@ -55189,6 +56030,53 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           "AGENT_KIND_CODEX_CLI", "AGENT_KIND_CURSOR_CLI", "AGENT_KIND_NONE",
                           "AGENT_KIND_CUSTOM", "AGENT_KIND_HERMES", "AGENT_KIND_OPENAI_CODEX",
                           "AGENT_KIND_LANGGRAPH", and "AGENT_KIND_CREWAI".
+                        "config_diff": {
+                            "env": {
+                                "added": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ]
+                            },
+                            "secrets": {
+                                "added": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ]
+                            },
+                            "tools": {
+                                "added": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ]
+                            }
+                        },
+                        "config_drifted": bool,  # Optional. True when the running config
+                          differs from the manifest the session was created from, for example after a
+                          successful PATCH with ``manifest_yaml``. Omitted when false.
                         "config_id": "str",  # Optional. Durable Environment Config UUID the
                           session was created from (inline manifests persist a config too, named after
                           the session). Persisted and returned on create/get/list; absent only for
@@ -55211,6 +56099,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "last_event_at": "2020-02-20 00:00:00",  # Optional. Timestamp of the
                           most recent event in this session's canonical stream. Drives the inactivity
                           policy that pauses idle sessions.
+                        "manifest": {
+                            "str": {}  # Optional. The effective manifest of the session.
+                              Present only when ``config_drifted`` is true. Never contains secret
+                              values.
+                        },
                         "name": "str",  # Optional. User-assignable display name, unique per
                           team among non-terminal sessions. Usable in place of session_id by clients
                           (doctl / Console resolve it to the id via the ListSessions ?name= filter; the
@@ -55257,11 +56150,94 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           sandbox + agent pair. SESSION_STATUS_ALL is a ListSessions status-filter
                           value only -- no session is ever actually in this status.
                           SESSION_STATUS_LOCKED is reserved for internal use and never appears in an
-                          end-user-facing response. Known values are: "SESSION_STATUS_UNSPECIFIED",
-                          "SESSION_STATUS_PROVISIONING", "SESSION_STATUS_READY",
-                          "SESSION_STATUS_DETACHED", "SESSION_STATUS_DESTROYING",
-                          "SESSION_STATUS_DESTROYED", "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED",
+                          end-user-facing response. SESSION_STATUS_UPDATING is reported while a live
+                          config update (PATCH with ``manifest_yaml``"" ) is being applied; poll the
+                          session until it leaves this status. Known values are:
+                          "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
+                          "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED",
+                          "SESSION_STATUS_DESTROYING", "SESSION_STATUS_DESTROYED",
+                          "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED", "SESSION_STATUS_UPDATING",
                           "SESSION_STATUS_ALL", and "SESSION_STATUS_LOCKED".
+                        "update": {
+                            "changes": {
+                                "env": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                },
+                                "secrets": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                },
+                                "tools": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                }
+                            },
+                            "detail": "str",  # Optional. Human-readable explanation,
+                              typically for a failed update.
+                            "error": "str",  # Optional. Failure class; present when
+                              state is FAILED. Known values are: "update_failed",
+                              "requires_new_session", and "interrupted".
+                            "finished_at": "2020-02-20 00:00:00",  # Optional. One live
+                              config update (or automatic rollback) of a session.
+                            "kind": "str",  # Optional. Known values are: "update" and
+                              "rollback".
+                            "manifest_hash": "str",  # Optional. Hash of the manifest
+                              after this update.
+                            "previous_hash": "str",  # Optional. Hash of the manifest
+                              before this update.
+                            "reverted": bool,  # Optional. True when a failed update was
+                              rolled back to the previous config.
+                            "sections": [
+                                "str"  # Optional. Manifest sections this update
+                                  touched.
+                            ],
+                            "session_id": "str",  # Optional. One live config update (or
+                              automatic rollback) of a session.
+                            "started_at": "2020-02-20 00:00:00",  # Optional. One live
+                              config update (or automatic rollback) of a session.
+                            "state": "str",  # Optional. State of a live config update.
+                              APPLIED_RESTARTED means the agent was restarted to apply it (env and
+                              secret changes). FAILED means the update did not take effect; see
+                              ``reverted`` and ``detail``. Known values are: "APPLYING", "APPLIED",
+                              "APPLIED_RESTARTED", and "FAILED".
+                            "update_id": "str",  # Optional. One live config update (or
+                              automatic rollback) of a session.
+                            "user_email": "str",  # Optional. Email of the user who
+                              requested the update.
+                            "user_uuid": "str"  # Optional. User who requested the
+                              update.
+                        },
                         "warnings": [
                             "str"  # Optional. Non-fatal advisories computed from the
                               manifest at create time: one entry per populated
@@ -55275,9 +56251,12 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "workspace_id": "str"  # Optional. The persistent workspace attached
                           to the session, mounted at ``/workspace``. Empty when the session has none.
                           Fork and rollback return 409 for a session that has a workspace.
-                    }
+                    },
+                    "warnings": [
+                        "str"  # Optional. Non-fatal notes about the update.
+                    ]
                 }
-                # response body for status code(s): 400, 403, 404, 409, 423
+                # response body for status code(s): 400, 403, 404, 409, 422, 423, 501
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -55300,19 +56279,22 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         **kwargs: Any,
     ) -> JSON:
         # pylint: disable=line-too-long
-        """PatchSession updates session-scoped settings on an existing session.
+        """PatchSession updates an existing session (session-scoped settings or live config).
 
-        Partial update of session-scoped settings (not the agent manifest / config). The body must
-        include at least one recognized patchable property; an empty object {} is 400. Only properties
-        listed on PatchSessionRequest are accepted — any other top-level JSON key is rejected with 400.
-        Omitted properties are left unchanged. Today the only patchable field is resume_on_topoff; more
-        session settings may be added over time. Terminal sessions (DESTROYED, FAILED) cannot be
-        patched.
+        Partial update of an existing session. Send exactly one of: ``resume_on_topoff``
+        (session-scoped consent), or ``manifest_yaml`` (live config update of ``tools``\\ , ``env`` and
+        ``secrets``\\ ). The two cannot be combined, and ``{}`` is 400. With ``manifest_yaml``\\ ,
+        absent sections are untouched; ``model`` and ``permissions`` return 501. A config update that
+        changes something returns 202 with outcome ACCEPTED and the session in SESSION_STATUS_UPDATING
+        (update state APPLYING): poll GET on the session every 2-5 seconds until the status leaves
+        UPDATING, then read ``session.update`` (APPLIED, APPLIED_RESTARTED or FAILED). A tools-only
+        update usually finishes in seconds; env and secret changes restart the agent and can take about
+        two minutes. A manifest that changes nothing returns 200 with outcome UNCHANGED. Terminal
+        sessions (DESTROYED, FAILED) cannot be patched.
 
         :param session_id: The session UUID. Required.
         :type session_id: str
-        :param body: PATCH body: allowlisted session-scoped settings. At least one property required.
-         Required.
+        :param body: PATCH body: either resume_on_topoff or manifest_yaml (not both). Required.
         :type body: IO[bytes]
         :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
          Default value is "application/json".
@@ -55324,8 +56306,13 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         Example:
             .. code-block:: python
 
-                # response body for status code(s): 200
+                # response body for status code(s): 200, 202
                 response == {
+                    "outcome": "str",  # Optional. Present for ``manifest_yaml`` patches.
+                      ACCEPTED (HTTP 202): the update is applying and the session status is
+                      SESSION_STATUS_UPDATING; poll GET until the status leaves UPDATING, then read
+                      ``session.update``. UNCHANGED (HTTP 200): the manifest changes nothing and
+                      nothing was recorded. Known values are: "ACCEPTED" and "UNCHANGED".
                     "session": {
                         "agent_kind": "AGENT_KIND_UNSPECIFIED",  # Optional. Default value is
                           "AGENT_KIND_UNSPECIFIED". AgentKind identifies what runs inside the session
@@ -55343,6 +56330,53 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           "AGENT_KIND_CODEX_CLI", "AGENT_KIND_CURSOR_CLI", "AGENT_KIND_NONE",
                           "AGENT_KIND_CUSTOM", "AGENT_KIND_HERMES", "AGENT_KIND_OPENAI_CODEX",
                           "AGENT_KIND_LANGGRAPH", and "AGENT_KIND_CREWAI".
+                        "config_diff": {
+                            "env": {
+                                "added": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ]
+                            },
+                            "secrets": {
+                                "added": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ]
+                            },
+                            "tools": {
+                                "added": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ]
+                            }
+                        },
+                        "config_drifted": bool,  # Optional. True when the running config
+                          differs from the manifest the session was created from, for example after a
+                          successful PATCH with ``manifest_yaml``. Omitted when false.
                         "config_id": "str",  # Optional. Durable Environment Config UUID the
                           session was created from (inline manifests persist a config too, named after
                           the session). Persisted and returned on create/get/list; absent only for
@@ -55365,6 +56399,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "last_event_at": "2020-02-20 00:00:00",  # Optional. Timestamp of the
                           most recent event in this session's canonical stream. Drives the inactivity
                           policy that pauses idle sessions.
+                        "manifest": {
+                            "str": {}  # Optional. The effective manifest of the session.
+                              Present only when ``config_drifted`` is true. Never contains secret
+                              values.
+                        },
                         "name": "str",  # Optional. User-assignable display name, unique per
                           team among non-terminal sessions. Usable in place of session_id by clients
                           (doctl / Console resolve it to the id via the ListSessions ?name= filter; the
@@ -55411,11 +56450,94 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           sandbox + agent pair. SESSION_STATUS_ALL is a ListSessions status-filter
                           value only -- no session is ever actually in this status.
                           SESSION_STATUS_LOCKED is reserved for internal use and never appears in an
-                          end-user-facing response. Known values are: "SESSION_STATUS_UNSPECIFIED",
-                          "SESSION_STATUS_PROVISIONING", "SESSION_STATUS_READY",
-                          "SESSION_STATUS_DETACHED", "SESSION_STATUS_DESTROYING",
-                          "SESSION_STATUS_DESTROYED", "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED",
+                          end-user-facing response. SESSION_STATUS_UPDATING is reported while a live
+                          config update (PATCH with ``manifest_yaml``"" ) is being applied; poll the
+                          session until it leaves this status. Known values are:
+                          "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
+                          "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED",
+                          "SESSION_STATUS_DESTROYING", "SESSION_STATUS_DESTROYED",
+                          "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED", "SESSION_STATUS_UPDATING",
                           "SESSION_STATUS_ALL", and "SESSION_STATUS_LOCKED".
+                        "update": {
+                            "changes": {
+                                "env": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                },
+                                "secrets": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                },
+                                "tools": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                }
+                            },
+                            "detail": "str",  # Optional. Human-readable explanation,
+                              typically for a failed update.
+                            "error": "str",  # Optional. Failure class; present when
+                              state is FAILED. Known values are: "update_failed",
+                              "requires_new_session", and "interrupted".
+                            "finished_at": "2020-02-20 00:00:00",  # Optional. One live
+                              config update (or automatic rollback) of a session.
+                            "kind": "str",  # Optional. Known values are: "update" and
+                              "rollback".
+                            "manifest_hash": "str",  # Optional. Hash of the manifest
+                              after this update.
+                            "previous_hash": "str",  # Optional. Hash of the manifest
+                              before this update.
+                            "reverted": bool,  # Optional. True when a failed update was
+                              rolled back to the previous config.
+                            "sections": [
+                                "str"  # Optional. Manifest sections this update
+                                  touched.
+                            ],
+                            "session_id": "str",  # Optional. One live config update (or
+                              automatic rollback) of a session.
+                            "started_at": "2020-02-20 00:00:00",  # Optional. One live
+                              config update (or automatic rollback) of a session.
+                            "state": "str",  # Optional. State of a live config update.
+                              APPLIED_RESTARTED means the agent was restarted to apply it (env and
+                              secret changes). FAILED means the update did not take effect; see
+                              ``reverted`` and ``detail``. Known values are: "APPLYING", "APPLIED",
+                              "APPLIED_RESTARTED", and "FAILED".
+                            "update_id": "str",  # Optional. One live config update (or
+                              automatic rollback) of a session.
+                            "user_email": "str",  # Optional. Email of the user who
+                              requested the update.
+                            "user_uuid": "str"  # Optional. User who requested the
+                              update.
+                        },
                         "warnings": [
                             "str"  # Optional. Non-fatal advisories computed from the
                               manifest at create time: one entry per populated
@@ -55429,9 +56551,12 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "workspace_id": "str"  # Optional. The persistent workspace attached
                           to the session, mounted at ``/workspace``. Empty when the session has none.
                           Fork and rollback return 409 for a session that has a workspace.
-                    }
+                    },
+                    "warnings": [
+                        "str"  # Optional. Non-fatal notes about the update.
+                    ]
                 }
-                # response body for status code(s): 400, 403, 404, 409, 423
+                # response body for status code(s): 400, 403, 404, 409, 422, 423, 501
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -55449,19 +56574,23 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         self, session_id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
     ) -> JSON:
         # pylint: disable=line-too-long
-        """PatchSession updates session-scoped settings on an existing session.
+        """PatchSession updates an existing session (session-scoped settings or live config).
 
-        Partial update of session-scoped settings (not the agent manifest / config). The body must
-        include at least one recognized patchable property; an empty object {} is 400. Only properties
-        listed on PatchSessionRequest are accepted — any other top-level JSON key is rejected with 400.
-        Omitted properties are left unchanged. Today the only patchable field is resume_on_topoff; more
-        session settings may be added over time. Terminal sessions (DESTROYED, FAILED) cannot be
-        patched.
+        Partial update of an existing session. Send exactly one of: ``resume_on_topoff``
+        (session-scoped consent), or ``manifest_yaml`` (live config update of ``tools``\\ , ``env`` and
+        ``secrets``\\ ). The two cannot be combined, and ``{}`` is 400. With ``manifest_yaml``\\ ,
+        absent sections are untouched; ``model`` and ``permissions`` return 501. A config update that
+        changes something returns 202 with outcome ACCEPTED and the session in SESSION_STATUS_UPDATING
+        (update state APPLYING): poll GET on the session every 2-5 seconds until the status leaves
+        UPDATING, then read ``session.update`` (APPLIED, APPLIED_RESTARTED or FAILED). A tools-only
+        update usually finishes in seconds; env and secret changes restart the agent and can take about
+        two minutes. A manifest that changes nothing returns 200 with outcome UNCHANGED. Terminal
+        sessions (DESTROYED, FAILED) cannot be patched.
 
         :param session_id: The session UUID. Required.
         :type session_id: str
-        :param body: PATCH body: allowlisted session-scoped settings. At least one property required.
-         Is either a JSON type or a IO[bytes] type. Required.
+        :param body: PATCH body: either resume_on_topoff or manifest_yaml (not both). Is either a JSON
+         type or a IO[bytes] type. Required.
         :type body: JSON or IO[bytes]
         :return: JSON object
         :rtype: JSON
@@ -55472,14 +56601,29 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
 
                 # JSON input template you can fill out and use as your body input.
                 body = {
+                    "manifest_yaml": "str",  # Optional. A partial manifest, as YAML, holding
+                      only the sections to change: ``tools``"" , ``env``"" , ``secrets``. Absent
+                      sections are untouched; any other top-level key is 400, and ``model`` /
+                      ``permissions`` return 501. ``tools`` is the full replacement list ("" ``tools:
+                      []`` detaches every MCP server; ``tools: null`` is 400). ``env`` and ``secrets``
+                      are full sets: a key left out is removed. A secret value is a string (set or
+                      rotate) or ``{}`` (keep the current value); per-key ``null`` is 400. Platform and
+                      framework keys and non-plain secrets must be sent back unchanged, or the request
+                      is 422. Cannot be combined with ``resume_on_topoff``. Requires the team to be
+                      enrolled in the config-update feature (403 otherwise).
                     "resume_on_topoff": bool  # Optional. When present, sets whether this session
                       opts in to automatic resumption when the team's prepayment balance is restored
                       after a low-balance pause. Session-scoped consent, not config-scoped. Omitted
-                      properties are not modified.
+                      properties are not modified. Cannot be combined with ``manifest_yaml``.
                 }
 
-                # response body for status code(s): 200
+                # response body for status code(s): 200, 202
                 response == {
+                    "outcome": "str",  # Optional. Present for ``manifest_yaml`` patches.
+                      ACCEPTED (HTTP 202): the update is applying and the session status is
+                      SESSION_STATUS_UPDATING; poll GET until the status leaves UPDATING, then read
+                      ``session.update``. UNCHANGED (HTTP 200): the manifest changes nothing and
+                      nothing was recorded. Known values are: "ACCEPTED" and "UNCHANGED".
                     "session": {
                         "agent_kind": "AGENT_KIND_UNSPECIFIED",  # Optional. Default value is
                           "AGENT_KIND_UNSPECIFIED". AgentKind identifies what runs inside the session
@@ -55497,6 +56641,53 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           "AGENT_KIND_CODEX_CLI", "AGENT_KIND_CURSOR_CLI", "AGENT_KIND_NONE",
                           "AGENT_KIND_CUSTOM", "AGENT_KIND_HERMES", "AGENT_KIND_OPENAI_CODEX",
                           "AGENT_KIND_LANGGRAPH", and "AGENT_KIND_CREWAI".
+                        "config_diff": {
+                            "env": {
+                                "added": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ]
+                            },
+                            "secrets": {
+                                "added": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ]
+                            },
+                            "tools": {
+                                "added": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ]
+                            }
+                        },
+                        "config_drifted": bool,  # Optional. True when the running config
+                          differs from the manifest the session was created from, for example after a
+                          successful PATCH with ``manifest_yaml``. Omitted when false.
                         "config_id": "str",  # Optional. Durable Environment Config UUID the
                           session was created from (inline manifests persist a config too, named after
                           the session). Persisted and returned on create/get/list; absent only for
@@ -55519,6 +56710,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "last_event_at": "2020-02-20 00:00:00",  # Optional. Timestamp of the
                           most recent event in this session's canonical stream. Drives the inactivity
                           policy that pauses idle sessions.
+                        "manifest": {
+                            "str": {}  # Optional. The effective manifest of the session.
+                              Present only when ``config_drifted`` is true. Never contains secret
+                              values.
+                        },
                         "name": "str",  # Optional. User-assignable display name, unique per
                           team among non-terminal sessions. Usable in place of session_id by clients
                           (doctl / Console resolve it to the id via the ListSessions ?name= filter; the
@@ -55565,11 +56761,94 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           sandbox + agent pair. SESSION_STATUS_ALL is a ListSessions status-filter
                           value only -- no session is ever actually in this status.
                           SESSION_STATUS_LOCKED is reserved for internal use and never appears in an
-                          end-user-facing response. Known values are: "SESSION_STATUS_UNSPECIFIED",
-                          "SESSION_STATUS_PROVISIONING", "SESSION_STATUS_READY",
-                          "SESSION_STATUS_DETACHED", "SESSION_STATUS_DESTROYING",
-                          "SESSION_STATUS_DESTROYED", "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED",
+                          end-user-facing response. SESSION_STATUS_UPDATING is reported while a live
+                          config update (PATCH with ``manifest_yaml``"" ) is being applied; poll the
+                          session until it leaves this status. Known values are:
+                          "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
+                          "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED",
+                          "SESSION_STATUS_DESTROYING", "SESSION_STATUS_DESTROYED",
+                          "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED", "SESSION_STATUS_UPDATING",
                           "SESSION_STATUS_ALL", and "SESSION_STATUS_LOCKED".
+                        "update": {
+                            "changes": {
+                                "env": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                },
+                                "secrets": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                },
+                                "tools": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                }
+                            },
+                            "detail": "str",  # Optional. Human-readable explanation,
+                              typically for a failed update.
+                            "error": "str",  # Optional. Failure class; present when
+                              state is FAILED. Known values are: "update_failed",
+                              "requires_new_session", and "interrupted".
+                            "finished_at": "2020-02-20 00:00:00",  # Optional. One live
+                              config update (or automatic rollback) of a session.
+                            "kind": "str",  # Optional. Known values are: "update" and
+                              "rollback".
+                            "manifest_hash": "str",  # Optional. Hash of the manifest
+                              after this update.
+                            "previous_hash": "str",  # Optional. Hash of the manifest
+                              before this update.
+                            "reverted": bool,  # Optional. True when a failed update was
+                              rolled back to the previous config.
+                            "sections": [
+                                "str"  # Optional. Manifest sections this update
+                                  touched.
+                            ],
+                            "session_id": "str",  # Optional. One live config update (or
+                              automatic rollback) of a session.
+                            "started_at": "2020-02-20 00:00:00",  # Optional. One live
+                              config update (or automatic rollback) of a session.
+                            "state": "str",  # Optional. State of a live config update.
+                              APPLIED_RESTARTED means the agent was restarted to apply it (env and
+                              secret changes). FAILED means the update did not take effect; see
+                              ``reverted`` and ``detail``. Known values are: "APPLYING", "APPLIED",
+                              "APPLIED_RESTARTED", and "FAILED".
+                            "update_id": "str",  # Optional. One live config update (or
+                              automatic rollback) of a session.
+                            "user_email": "str",  # Optional. Email of the user who
+                              requested the update.
+                            "user_uuid": "str"  # Optional. User who requested the
+                              update.
+                        },
                         "warnings": [
                             "str"  # Optional. Non-fatal advisories computed from the
                               manifest at create time: one entry per populated
@@ -55583,9 +56862,12 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "workspace_id": "str"  # Optional. The persistent workspace attached
                           to the session, mounted at ``/workspace``. Empty when the session has none.
                           Fork and rollback return 409 for a session that has a workspace.
-                    }
+                    },
+                    "warnings": [
+                        "str"  # Optional. Non-fatal notes about the update.
+                    ]
                 }
-                # response body for status code(s): 400, 403, 404, 409, 423
+                # response body for status code(s): 400, 403, 404, 409, 422, 423, 501
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -55645,7 +56927,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
 
         response = pipeline_response.http_response
 
-        if response.status_code not in [200, 400, 403, 404, 409, 423]:
+        if response.status_code not in [200, 202, 400, 403, 404, 409, 422, 423, 501]:
             if _stream:
                 response.read()  # Load the body in memory and close the socket
             map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
@@ -55653,6 +56935,22 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
 
         response_headers = {}
         if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 202:
             response_headers["ratelimit-limit"] = self._deserialize(
                 "int", response.headers.get("ratelimit-limit")
             )
@@ -55732,7 +57030,39 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
             else:
                 deserialized = None
 
+        if response.status_code == 422:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
         if response.status_code == 423:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 501:
             response_headers["ratelimit-limit"] = self._deserialize(
                 "int", response.headers.get("ratelimit-limit")
             )
@@ -56938,6 +58268,53 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           "AGENT_KIND_CODEX_CLI", "AGENT_KIND_CURSOR_CLI", "AGENT_KIND_NONE",
                           "AGENT_KIND_CUSTOM", "AGENT_KIND_HERMES", "AGENT_KIND_OPENAI_CODEX",
                           "AGENT_KIND_LANGGRAPH", and "AGENT_KIND_CREWAI".
+                        "config_diff": {
+                            "env": {
+                                "added": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ]
+                            },
+                            "secrets": {
+                                "added": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ]
+                            },
+                            "tools": {
+                                "added": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Keys touched in one
+                                      manifest section.
+                                ]
+                            }
+                        },
+                        "config_drifted": bool,  # Optional. True when the running config
+                          differs from the manifest the session was created from, for example after a
+                          successful PATCH with ``manifest_yaml``. Omitted when false.
                         "config_id": "str",  # Optional. Durable Environment Config UUID the
                           session was created from (inline manifests persist a config too, named after
                           the session). Persisted and returned on create/get/list; absent only for
@@ -56960,6 +58337,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "last_event_at": "2020-02-20 00:00:00",  # Optional. Timestamp of the
                           most recent event in this session's canonical stream. Drives the inactivity
                           policy that pauses idle sessions.
+                        "manifest": {
+                            "str": {}  # Optional. The effective manifest of the session.
+                              Present only when ``config_drifted`` is true. Never contains secret
+                              values.
+                        },
                         "name": "str",  # Optional. User-assignable display name, unique per
                           team among non-terminal sessions. Usable in place of session_id by clients
                           (doctl / Console resolve it to the id via the ListSessions ?name= filter; the
@@ -57006,11 +58388,94 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           sandbox + agent pair. SESSION_STATUS_ALL is a ListSessions status-filter
                           value only -- no session is ever actually in this status.
                           SESSION_STATUS_LOCKED is reserved for internal use and never appears in an
-                          end-user-facing response. Known values are: "SESSION_STATUS_UNSPECIFIED",
-                          "SESSION_STATUS_PROVISIONING", "SESSION_STATUS_READY",
-                          "SESSION_STATUS_DETACHED", "SESSION_STATUS_DESTROYING",
-                          "SESSION_STATUS_DESTROYED", "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED",
+                          end-user-facing response. SESSION_STATUS_UPDATING is reported while a live
+                          config update (PATCH with ``manifest_yaml``"" ) is being applied; poll the
+                          session until it leaves this status. Known values are:
+                          "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
+                          "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED",
+                          "SESSION_STATUS_DESTROYING", "SESSION_STATUS_DESTROYED",
+                          "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED", "SESSION_STATUS_UPDATING",
                           "SESSION_STATUS_ALL", and "SESSION_STATUS_LOCKED".
+                        "update": {
+                            "changes": {
+                                "env": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                },
+                                "secrets": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                },
+                                "tools": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                }
+                            },
+                            "detail": "str",  # Optional. Human-readable explanation,
+                              typically for a failed update.
+                            "error": "str",  # Optional. Failure class; present when
+                              state is FAILED. Known values are: "update_failed",
+                              "requires_new_session", and "interrupted".
+                            "finished_at": "2020-02-20 00:00:00",  # Optional. One live
+                              config update (or automatic rollback) of a session.
+                            "kind": "str",  # Optional. Known values are: "update" and
+                              "rollback".
+                            "manifest_hash": "str",  # Optional. Hash of the manifest
+                              after this update.
+                            "previous_hash": "str",  # Optional. Hash of the manifest
+                              before this update.
+                            "reverted": bool,  # Optional. True when a failed update was
+                              rolled back to the previous config.
+                            "sections": [
+                                "str"  # Optional. Manifest sections this update
+                                  touched.
+                            ],
+                            "session_id": "str",  # Optional. One live config update (or
+                              automatic rollback) of a session.
+                            "started_at": "2020-02-20 00:00:00",  # Optional. One live
+                              config update (or automatic rollback) of a session.
+                            "state": "str",  # Optional. State of a live config update.
+                              APPLIED_RESTARTED means the agent was restarted to apply it (env and
+                              secret changes). FAILED means the update did not take effect; see
+                              ``reverted`` and ``detail``. Known values are: "APPLYING", "APPLIED",
+                              "APPLIED_RESTARTED", and "FAILED".
+                            "update_id": "str",  # Optional. One live config update (or
+                              automatic rollback) of a session.
+                            "user_email": "str",  # Optional. Email of the user who
+                              requested the update.
+                            "user_uuid": "str"  # Optional. User who requested the
+                              update.
+                        },
                         "warnings": [
                             "str"  # Optional. Non-fatal advisories computed from the
                               manifest at create time: one entry per populated
@@ -57261,6 +58726,54 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               "AGENT_KIND_CURSOR_CLI", "AGENT_KIND_NONE", "AGENT_KIND_CUSTOM",
                               "AGENT_KIND_HERMES", "AGENT_KIND_OPENAI_CODEX", "AGENT_KIND_LANGGRAPH",
                               and "AGENT_KIND_CREWAI".
+                            "config_diff": {
+                                "env": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                },
+                                "secrets": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                },
+                                "tools": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                }
+                            },
+                            "config_drifted": bool,  # Optional. True when the running
+                              config differs from the manifest the session was created from, for
+                              example after a successful PATCH with ``manifest_yaml``. Omitted when
+                              false.
                             "config_id": "str",  # Optional. Durable Environment Config
                               UUID the session was created from (inline manifests persist a config too,
                               named after the session). Persisted and returned on create/get/list;
@@ -57285,6 +58798,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "last_event_at": "2020-02-20 00:00:00",  # Optional.
                               Timestamp of the most recent event in this session's canonical stream.
                               Drives the inactivity policy that pauses idle sessions.
+                            "manifest": {
+                                "str": {}  # Optional. The effective manifest of the
+                                  session. Present only when ``config_drifted`` is true. Never contains
+                                  secret values.
+                            },
                             "name": "str",  # Optional. User-assignable display name,
                               unique per team among non-terminal sessions. Usable in place of
                               session_id by clients (doctl / Console resolve it to the id via the
@@ -57334,12 +58852,95 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               state of the sandbox + agent pair. SESSION_STATUS_ALL is a ListSessions
                               status-filter value only -- no session is ever actually in this status.
                               SESSION_STATUS_LOCKED is reserved for internal use and never appears in
-                              an end-user-facing response. Known values are:
+                              an end-user-facing response. SESSION_STATUS_UPDATING is reported while a
+                              live config update (PATCH with ``manifest_yaml``"" ) is being applied;
+                              poll the session until it leaves this status. Known values are:
                               "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
                               "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED",
                               "SESSION_STATUS_DESTROYING", "SESSION_STATUS_DESTROYED",
-                              "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED", "SESSION_STATUS_ALL",
-                              and "SESSION_STATUS_LOCKED".
+                              "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED",
+                              "SESSION_STATUS_UPDATING", "SESSION_STATUS_ALL", and
+                              "SESSION_STATUS_LOCKED".
+                            "update": {
+                                "changes": {
+                                    "env": {
+                                        "added": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ]
+                                    },
+                                    "secrets": {
+                                        "added": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ]
+                                    },
+                                    "tools": {
+                                        "added": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ]
+                                    }
+                                },
+                                "detail": "str",  # Optional. Human-readable
+                                  explanation, typically for a failed update.
+                                "error": "str",  # Optional. Failure class; present
+                                  when state is FAILED. Known values are: "update_failed",
+                                  "requires_new_session", and "interrupted".
+                                "finished_at": "2020-02-20 00:00:00",  # Optional.
+                                  One live config update (or automatic rollback) of a session.
+                                "kind": "str",  # Optional. Known values are:
+                                  "update" and "rollback".
+                                "manifest_hash": "str",  # Optional. Hash of the
+                                  manifest after this update.
+                                "previous_hash": "str",  # Optional. Hash of the
+                                  manifest before this update.
+                                "reverted": bool,  # Optional. True when a failed
+                                  update was rolled back to the previous config.
+                                "sections": [
+                                    "str"  # Optional. Manifest sections this
+                                      update touched.
+                                ],
+                                "session_id": "str",  # Optional. One live config
+                                  update (or automatic rollback) of a session.
+                                "started_at": "2020-02-20 00:00:00",  # Optional. One
+                                  live config update (or automatic rollback) of a session.
+                                "state": "str",  # Optional. State of a live config
+                                  update. APPLIED_RESTARTED means the agent was restarted to apply it
+                                  (env and secret changes). FAILED means the update did not take
+                                  effect; see ``reverted`` and ``detail``. Known values are:
+                                  "APPLYING", "APPLIED", "APPLIED_RESTARTED", and "FAILED".
+                                "update_id": "str",  # Optional. One live config
+                                  update (or automatic rollback) of a session.
+                                "user_email": "str",  # Optional. Email of the user
+                                  who requested the update.
+                                "user_uuid": "str"  # Optional. User who requested
+                                  the update.
+                            },
                             "warnings": [
                                 "str"  # Optional. Non-fatal advisories computed from
                                   the manifest at create time: one entry per populated
@@ -57424,6 +59025,54 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               "AGENT_KIND_CURSOR_CLI", "AGENT_KIND_NONE", "AGENT_KIND_CUSTOM",
                               "AGENT_KIND_HERMES", "AGENT_KIND_OPENAI_CODEX", "AGENT_KIND_LANGGRAPH",
                               and "AGENT_KIND_CREWAI".
+                            "config_diff": {
+                                "env": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                },
+                                "secrets": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                },
+                                "tools": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                }
+                            },
+                            "config_drifted": bool,  # Optional. True when the running
+                              config differs from the manifest the session was created from, for
+                              example after a successful PATCH with ``manifest_yaml``. Omitted when
+                              false.
                             "config_id": "str",  # Optional. Durable Environment Config
                               UUID the session was created from (inline manifests persist a config too,
                               named after the session). Persisted and returned on create/get/list;
@@ -57448,6 +59097,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "last_event_at": "2020-02-20 00:00:00",  # Optional.
                               Timestamp of the most recent event in this session's canonical stream.
                               Drives the inactivity policy that pauses idle sessions.
+                            "manifest": {
+                                "str": {}  # Optional. The effective manifest of the
+                                  session. Present only when ``config_drifted`` is true. Never contains
+                                  secret values.
+                            },
                             "name": "str",  # Optional. User-assignable display name,
                               unique per team among non-terminal sessions. Usable in place of
                               session_id by clients (doctl / Console resolve it to the id via the
@@ -57497,12 +59151,95 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               state of the sandbox + agent pair. SESSION_STATUS_ALL is a ListSessions
                               status-filter value only -- no session is ever actually in this status.
                               SESSION_STATUS_LOCKED is reserved for internal use and never appears in
-                              an end-user-facing response. Known values are:
+                              an end-user-facing response. SESSION_STATUS_UPDATING is reported while a
+                              live config update (PATCH with ``manifest_yaml``"" ) is being applied;
+                              poll the session until it leaves this status. Known values are:
                               "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
                               "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED",
                               "SESSION_STATUS_DESTROYING", "SESSION_STATUS_DESTROYED",
-                              "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED", "SESSION_STATUS_ALL",
-                              and "SESSION_STATUS_LOCKED".
+                              "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED",
+                              "SESSION_STATUS_UPDATING", "SESSION_STATUS_ALL", and
+                              "SESSION_STATUS_LOCKED".
+                            "update": {
+                                "changes": {
+                                    "env": {
+                                        "added": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ]
+                                    },
+                                    "secrets": {
+                                        "added": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ]
+                                    },
+                                    "tools": {
+                                        "added": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ]
+                                    }
+                                },
+                                "detail": "str",  # Optional. Human-readable
+                                  explanation, typically for a failed update.
+                                "error": "str",  # Optional. Failure class; present
+                                  when state is FAILED. Known values are: "update_failed",
+                                  "requires_new_session", and "interrupted".
+                                "finished_at": "2020-02-20 00:00:00",  # Optional.
+                                  One live config update (or automatic rollback) of a session.
+                                "kind": "str",  # Optional. Known values are:
+                                  "update" and "rollback".
+                                "manifest_hash": "str",  # Optional. Hash of the
+                                  manifest after this update.
+                                "previous_hash": "str",  # Optional. Hash of the
+                                  manifest before this update.
+                                "reverted": bool,  # Optional. True when a failed
+                                  update was rolled back to the previous config.
+                                "sections": [
+                                    "str"  # Optional. Manifest sections this
+                                      update touched.
+                                ],
+                                "session_id": "str",  # Optional. One live config
+                                  update (or automatic rollback) of a session.
+                                "started_at": "2020-02-20 00:00:00",  # Optional. One
+                                  live config update (or automatic rollback) of a session.
+                                "state": "str",  # Optional. State of a live config
+                                  update. APPLIED_RESTARTED means the agent was restarted to apply it
+                                  (env and secret changes). FAILED means the update did not take
+                                  effect; see ``reverted`` and ``detail``. Known values are:
+                                  "APPLYING", "APPLIED", "APPLIED_RESTARTED", and "FAILED".
+                                "update_id": "str",  # Optional. One live config
+                                  update (or automatic rollback) of a session.
+                                "user_email": "str",  # Optional. Email of the user
+                                  who requested the update.
+                                "user_uuid": "str"  # Optional. User who requested
+                                  the update.
+                            },
                             "warnings": [
                                 "str"  # Optional. Non-fatal advisories computed from
                                   the manifest at create time: one entry per populated
@@ -57592,6 +59329,54 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               "AGENT_KIND_CURSOR_CLI", "AGENT_KIND_NONE", "AGENT_KIND_CUSTOM",
                               "AGENT_KIND_HERMES", "AGENT_KIND_OPENAI_CODEX", "AGENT_KIND_LANGGRAPH",
                               and "AGENT_KIND_CREWAI".
+                            "config_diff": {
+                                "env": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                },
+                                "secrets": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                },
+                                "tools": {
+                                    "added": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Keys touched in
+                                          one manifest section.
+                                    ]
+                                }
+                            },
+                            "config_drifted": bool,  # Optional. True when the running
+                              config differs from the manifest the session was created from, for
+                              example after a successful PATCH with ``manifest_yaml``. Omitted when
+                              false.
                             "config_id": "str",  # Optional. Durable Environment Config
                               UUID the session was created from (inline manifests persist a config too,
                               named after the session). Persisted and returned on create/get/list;
@@ -57616,6 +59401,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "last_event_at": "2020-02-20 00:00:00",  # Optional.
                               Timestamp of the most recent event in this session's canonical stream.
                               Drives the inactivity policy that pauses idle sessions.
+                            "manifest": {
+                                "str": {}  # Optional. The effective manifest of the
+                                  session. Present only when ``config_drifted`` is true. Never contains
+                                  secret values.
+                            },
                             "name": "str",  # Optional. User-assignable display name,
                               unique per team among non-terminal sessions. Usable in place of
                               session_id by clients (doctl / Console resolve it to the id via the
@@ -57665,12 +59455,95 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               state of the sandbox + agent pair. SESSION_STATUS_ALL is a ListSessions
                               status-filter value only -- no session is ever actually in this status.
                               SESSION_STATUS_LOCKED is reserved for internal use and never appears in
-                              an end-user-facing response. Known values are:
+                              an end-user-facing response. SESSION_STATUS_UPDATING is reported while a
+                              live config update (PATCH with ``manifest_yaml``"" ) is being applied;
+                              poll the session until it leaves this status. Known values are:
                               "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
                               "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED",
                               "SESSION_STATUS_DESTROYING", "SESSION_STATUS_DESTROYED",
-                              "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED", "SESSION_STATUS_ALL",
-                              and "SESSION_STATUS_LOCKED".
+                              "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED",
+                              "SESSION_STATUS_UPDATING", "SESSION_STATUS_ALL", and
+                              "SESSION_STATUS_LOCKED".
+                            "update": {
+                                "changes": {
+                                    "env": {
+                                        "added": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ]
+                                    },
+                                    "secrets": {
+                                        "added": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ]
+                                    },
+                                    "tools": {
+                                        "added": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Keys
+                                              touched in one manifest section.
+                                        ]
+                                    }
+                                },
+                                "detail": "str",  # Optional. Human-readable
+                                  explanation, typically for a failed update.
+                                "error": "str",  # Optional. Failure class; present
+                                  when state is FAILED. Known values are: "update_failed",
+                                  "requires_new_session", and "interrupted".
+                                "finished_at": "2020-02-20 00:00:00",  # Optional.
+                                  One live config update (or automatic rollback) of a session.
+                                "kind": "str",  # Optional. Known values are:
+                                  "update" and "rollback".
+                                "manifest_hash": "str",  # Optional. Hash of the
+                                  manifest after this update.
+                                "previous_hash": "str",  # Optional. Hash of the
+                                  manifest before this update.
+                                "reverted": bool,  # Optional. True when a failed
+                                  update was rolled back to the previous config.
+                                "sections": [
+                                    "str"  # Optional. Manifest sections this
+                                      update touched.
+                                ],
+                                "session_id": "str",  # Optional. One live config
+                                  update (or automatic rollback) of a session.
+                                "started_at": "2020-02-20 00:00:00",  # Optional. One
+                                  live config update (or automatic rollback) of a session.
+                                "state": "str",  # Optional. State of a live config
+                                  update. APPLIED_RESTARTED means the agent was restarted to apply it
+                                  (env and secret changes). FAILED means the update did not take
+                                  effect; see ``reverted`` and ``detail``. Known values are:
+                                  "APPLYING", "APPLIED", "APPLIED_RESTARTED", and "FAILED".
+                                "update_id": "str",  # Optional. One live config
+                                  update (or automatic rollback) of a session.
+                                "user_email": "str",  # Optional. Email of the user
+                                  who requested the update.
+                                "user_uuid": "str"  # Optional. User who requested
+                                  the update.
+                            },
                             "warnings": [
                                 "str"  # Optional. Non-fatal advisories computed from
                                   the manifest at create time: one entry per populated
@@ -65025,12 +66898,15 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               state of the sandbox + agent pair. SESSION_STATUS_ALL is a ListSessions
                               status-filter value only -- no session is ever actually in this status.
                               SESSION_STATUS_LOCKED is reserved for internal use and never appears in
-                              an end-user-facing response. Known values are:
+                              an end-user-facing response. SESSION_STATUS_UPDATING is reported while a
+                              live config update (PATCH with ``manifest_yaml``"" ) is being applied;
+                              poll the session until it leaves this status. Known values are:
                               "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
                               "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED",
                               "SESSION_STATUS_DESTROYING", "SESSION_STATUS_DESTROYED",
-                              "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED", "SESSION_STATUS_ALL",
-                              and "SESSION_STATUS_LOCKED".
+                              "SESSION_STATUS_FAILED", "SESSION_STATUS_PAUSED",
+                              "SESSION_STATUS_UPDATING", "SESSION_STATUS_ALL", and
+                              "SESSION_STATUS_LOCKED".
                         }
                     ]
                 }
@@ -268436,7 +270312,15 @@ class ReservedIPsOperations:
         )
 
     @distributed_trace
-    def list(self, *, per_page: int = 20, page: int = 1, **kwargs: Any) -> JSON:
+    def list(
+        self,
+        *,
+        per_page: int = 20,
+        page: int = 1,
+        sort: Optional[str] = None,
+        sort_direction: Optional[str] = None,
+        **kwargs: Any,
+    ) -> JSON:
         # pylint: disable=line-too-long
         """List All Reserved IPs.
 
@@ -268447,6 +270331,20 @@ class ReservedIPsOperations:
         :paramtype per_page: int
         :keyword page: Which 'page' of paginated results to return. Default value is 1.
         :paramtype page: int
+        :keyword sort: Field to sort results by. Possible values are ``created_at``\\ ,
+         ``updated_at``\\ ,
+         ``ip``\\ , ``id``\\ , and ``droplet_id``. Defaults to ``id``. Any other value is treated
+         as ``id``.
+
+         Sorting by ``droplet_id`` orders reserved IPs by the Droplet they are
+         assigned to. Unassigned reserved IPs (\\ ``droplet`` is null) sort as the
+         lowest value, so they are returned first when ``sort_direction`` is ``asc``
+         and last when it is ``desc``. Known values are: "created_at", "updated_at", "ip", "id", and
+         "droplet_id". Default value is None.
+        :paramtype sort: str
+        :keyword sort_direction: Direction to sort results. Possible values are ``asc`` and ``desc``.
+         Defaults to ``asc``. Known values are: "asc" and "desc". Default value is None.
+        :paramtype sort_direction: str
         :return: JSON object
         :rtype: JSON
         :raises ~azure.core.exceptions.HttpResponseError:
@@ -268517,6 +270415,8 @@ class ReservedIPsOperations:
         _request = build_reserved_ips_list_request(
             per_page=per_page,
             page=page,
+            sort=sort,
+            sort_direction=sort_direction,
             headers=_headers,
             params=_params,
         )
