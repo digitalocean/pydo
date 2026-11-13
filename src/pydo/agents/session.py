@@ -983,9 +983,7 @@ def _raise_if_update_failed(session_id: str, update: Any) -> None:
         msg += f": {detail}"
     if reverted:
         msg += " (reverted)"
-    raise SessionConfigUpdateError(
-        msg, reverted=reverted, detail=detail, update=update
-    )
+    raise SessionConfigUpdateError(msg, reverted=reverted, detail=detail, update=update)
 
 
 __all__ = [
