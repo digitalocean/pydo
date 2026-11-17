@@ -232,17 +232,21 @@ class TriggersOperations:
     ) -> Any:
         """End a running execution (``POST .../executions/{id}/cancel``).
 
-        Fails the execution and frees the trigger's in-flight slot. A
-        fresh-mode session is destroyed outright; a reuse-mode session is
-        only paused, since the API has no run-interrupt call -- the agent's
-        turn may still be in flight server-side. Cancelling a non-running
-        execution is a no-op that still succeeds.
+        Fails the execution and frees the trigger's in-flight slot or
+        session lock. A fresh-mode session is destroyed. In reuse mode the
+        agent's current turn is cancelled first, and the execution ends
+        only once the agent confirms the turn is over. Until then it stays
+        running and keeps its lock. A non-running execution is a no-op that
+        still succeeds.
 
         A freshly-claimed execution briefly has no run yet while the worker
         dispatches it; cancelling in that window is guarded against a race
         with the in-flight dispatch and raises for ``409`` unless
         ``force=True`` is passed. That window self-resolves within 15
-        minutes regardless, via the platform's own reclaim sweep.
+        minutes regardless, via the platform's own reclaim sweep. In reuse
+        mode ``409`` is also returned when the agent cannot interrupt its
+        turn, and ``503`` when the agent does not confirm the cancel. The
+        execution stays running in both cases.
         """
         return self._parse_json(
             self._send(

@@ -68221,10 +68221,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         # pylint: disable=line-too-long
         """CancelExecution ends a running execution and frees the trigger's in-flight slot.
 
-        Fails the execution and frees the trigger's in-flight slot. A fresh-mode session is destroyed
-        outright. A reuse-mode session is only paused, not stopped - harness has no run-interrupt call,
-        so the agent's turn may still be in flight server-side; this frees the queue, not necessarily
-        the agent's work. A non-running execution is a no-op that still returns 200.
+        Fails the execution and frees the trigger's in-flight slot or session lock. A fresh-mode
+        session is destroyed. In reuse mode the agent's current turn is cancelled first, and the
+        execution is ended only once the agent confirms the turn is over; until then it stays running
+        and keeps its lock (see 409 and 503). The failure reason names the cancelling user. A
+        non-running execution is a no-op that still returns 200.
 
         :param trigger_id: The trigger UUID. Required.
         :type trigger_id: str
