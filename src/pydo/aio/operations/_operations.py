@@ -25628,10 +25628,18 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         # pylint: disable=line-too-long
         """Create a provider connection for one actor.
 
-        Creates, or resumes, the connection ``{provider}`` will use for ``user_id``. ``user_id`` is the
-        actor identifier the connection acts for, not a DigitalOcean user id. A pending connection
-        includes an ``authorization`` object the user still has to complete. An active connection omits
-        it. No token is returned. ``github`` is the provider served today.
+        Creates the connection ``{provider}`` will use for ``user_id``. ``user_id`` is the actor
+        identifier the connection acts for, not a DigitalOcean user id. Each actor has at most one
+        active, pending, or expired connection per provider. If ``user_id`` already has one, the
+        request fails with ``409``. Find that connection's id with ``GET
+        /v2/agents/auth/{provider}/connections?user_id=...``\\ , then resume or restart it with ``POST
+        /v2/agents/auth/{provider}/connections/{connection_id}/reconnect``\\ , which keeps its scopes.
+        Revoked connections do not count toward the limit, and list responses omit them. If the only
+        connection ``user_id`` has for ``{provider}`` is revoked, for example by ``DELETE``\\ , create
+        starts it again under the same connection id, with the scopes in this request. To change a
+        connection's scopes, delete it and then create it. A successful create returns the connection
+        as ``pending``\\ , with an ``authorization`` object for the interactive step. No token is
+        returned. ``github`` is the provider served today.
 
         :param provider: Provider key. ``github`` is the provider served today. Required.
         :type provider: str
@@ -25697,7 +25705,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           for. Not a DigitalOcean user id.
                     }
                 }
-                # response body for status code(s): 400, 404, 501
+                # response body for status code(s): 400, 404, 409, 501
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -25722,10 +25730,18 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         # pylint: disable=line-too-long
         """Create a provider connection for one actor.
 
-        Creates, or resumes, the connection ``{provider}`` will use for ``user_id``. ``user_id`` is the
-        actor identifier the connection acts for, not a DigitalOcean user id. A pending connection
-        includes an ``authorization`` object the user still has to complete. An active connection omits
-        it. No token is returned. ``github`` is the provider served today.
+        Creates the connection ``{provider}`` will use for ``user_id``. ``user_id`` is the actor
+        identifier the connection acts for, not a DigitalOcean user id. Each actor has at most one
+        active, pending, or expired connection per provider. If ``user_id`` already has one, the
+        request fails with ``409``. Find that connection's id with ``GET
+        /v2/agents/auth/{provider}/connections?user_id=...``\\ , then resume or restart it with ``POST
+        /v2/agents/auth/{provider}/connections/{connection_id}/reconnect``\\ , which keeps its scopes.
+        Revoked connections do not count toward the limit, and list responses omit them. If the only
+        connection ``user_id`` has for ``{provider}`` is revoked, for example by ``DELETE``\\ , create
+        starts it again under the same connection id, with the scopes in this request. To change a
+        connection's scopes, delete it and then create it. A successful create returns the connection
+        as ``pending``\\ , with an ``authorization`` object for the interactive step. No token is
+        returned. ``github`` is the provider served today.
 
         :param provider: Provider key. ``github`` is the provider served today. Required.
         :type provider: str
@@ -25782,7 +25798,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           for. Not a DigitalOcean user id.
                     }
                 }
-                # response body for status code(s): 400, 404, 501
+                # response body for status code(s): 400, 404, 409, 501
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -25802,10 +25818,18 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         # pylint: disable=line-too-long
         """Create a provider connection for one actor.
 
-        Creates, or resumes, the connection ``{provider}`` will use for ``user_id``. ``user_id`` is the
-        actor identifier the connection acts for, not a DigitalOcean user id. A pending connection
-        includes an ``authorization`` object the user still has to complete. An active connection omits
-        it. No token is returned. ``github`` is the provider served today.
+        Creates the connection ``{provider}`` will use for ``user_id``. ``user_id`` is the actor
+        identifier the connection acts for, not a DigitalOcean user id. Each actor has at most one
+        active, pending, or expired connection per provider. If ``user_id`` already has one, the
+        request fails with ``409``. Find that connection's id with ``GET
+        /v2/agents/auth/{provider}/connections?user_id=...``\\ , then resume or restart it with ``POST
+        /v2/agents/auth/{provider}/connections/{connection_id}/reconnect``\\ , which keeps its scopes.
+        Revoked connections do not count toward the limit, and list responses omit them. If the only
+        connection ``user_id`` has for ``{provider}`` is revoked, for example by ``DELETE``\\ , create
+        starts it again under the same connection id, with the scopes in this request. To change a
+        connection's scopes, delete it and then create it. A successful create returns the connection
+        as ``pending``\\ , with an ``authorization`` object for the interactive step. No token is
+        returned. ``github`` is the provider served today.
 
         :param provider: Provider key. ``github`` is the provider served today. Required.
         :type provider: str
@@ -25868,7 +25892,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           for. Not a DigitalOcean user id.
                     }
                 }
-                # response body for status code(s): 400, 404, 501
+                # response body for status code(s): 400, 404, 409, 501
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -25928,7 +25952,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
 
         response = pipeline_response.http_response
 
-        if response.status_code not in [200, 400, 404, 501]:
+        if response.status_code not in [200, 400, 404, 409, 501]:
             if _stream:
                 await response.read()  # Load the body in memory and close the socket
             map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
@@ -25968,6 +25992,22 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                 deserialized = None
 
         if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
             response_headers["ratelimit-limit"] = self._deserialize(
                 "int", response.headers.get("ratelimit-limit")
             )
@@ -26367,8 +26407,12 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         # pylint: disable=line-too-long
         """Start a fresh login for an existing connection.
 
-        Begins the interactive step again for a connection that needs it. The response includes
-        ``authorization`` while that step is outstanding. No token is returned.
+        Resumes a pending connection's authorization, or starts a new one for an expired or revoked
+        connection. The connection keeps its id, ``user_id``\\ , and scopes, so environments that use
+        it keep working once it is active again. An active connection is returned unchanged. Only the
+        member who owns the connection can reconnect it; for anyone else the response is ``404``\\ ,
+        the same as for an unknown connection. The response includes ``authorization`` while the
+        interactive step is outstanding. No token is returned.
 
         :param provider: Provider key. ``github`` is the provider served today. Required.
         :type provider: str
@@ -30585,9 +30629,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               sessions.
                             "pause_reason": "str",  # Optional. Why this session is
                               paused. Present only when status is SESSION_STATUS_PAUSED; omitted
-                              otherwise. Known values: manual (PauseSession RPC), idle (inactivity
-                              auto-pause), low_balance (prepay gate). Clients should treat an
-                              unrecognized value as an opaque reason string.
+                              otherwise. Known values: manual (the customer paused the session), idle
+                              (inactivity auto-pause), zero_balance (prepay gate; stored rows may still
+                              say low_balance), trigger (a reuse trigger paused the session after a
+                              firing). Clients should treat an unrecognized value as an opaque reason
+                              string.
                             "region": "str",  # Optional. DO region slug the session
                               lives in, e.g. ric1. Stamped once at create from the region whose API
                               host served the request, and never changed. Returned only for teams on
@@ -31128,9 +31174,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               sessions.
                             "pause_reason": "str",  # Optional. Why this session is
                               paused. Present only when status is SESSION_STATUS_PAUSED; omitted
-                              otherwise. Known values: manual (PauseSession RPC), idle (inactivity
-                              auto-pause), low_balance (prepay gate). Clients should treat an
-                              unrecognized value as an opaque reason string.
+                              otherwise. Known values: manual (the customer paused the session), idle
+                              (inactivity auto-pause), zero_balance (prepay gate; stored rows may still
+                              say low_balance), trigger (a reuse trigger paused the session after a
+                              firing). Clients should treat an unrecognized value as an opaque reason
+                              string.
                             "region": "str",  # Optional. DO region slug the session
                               lives in, e.g. ric1. Stamped once at create from the region whose API
                               host served the request, and never changed. Returned only for teams on
@@ -31577,9 +31625,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           this one was forked from. Omitted/empty for root (non-fork) sessions.
                         "pause_reason": "str",  # Optional. Why this session is paused.
                           Present only when status is SESSION_STATUS_PAUSED; omitted otherwise. Known
-                          values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
-                          (prepay gate). Clients should treat an unrecognized value as an opaque reason
-                          string.
+                          values: manual (the customer paused the session), idle (inactivity
+                          auto-pause), zero_balance (prepay gate; stored rows may still say
+                          low_balance), trigger (a reuse trigger paused the session after a firing).
+                          Clients should treat an unrecognized value as an opaque reason string.
                         "region": "str",  # Optional. DO region slug the session lives in,
                           e.g. ric1. Stamped once at create from the region whose API host served the
                           request, and never changed. Returned only for teams on the regional routing
@@ -31903,9 +31952,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           this one was forked from. Omitted/empty for root (non-fork) sessions.
                         "pause_reason": "str",  # Optional. Why this session is paused.
                           Present only when status is SESSION_STATUS_PAUSED; omitted otherwise. Known
-                          values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
-                          (prepay gate). Clients should treat an unrecognized value as an opaque reason
-                          string.
+                          values: manual (the customer paused the session), idle (inactivity
+                          auto-pause), zero_balance (prepay gate; stored rows may still say
+                          low_balance), trigger (a reuse trigger paused the session after a firing).
+                          Clients should treat an unrecognized value as an opaque reason string.
                         "region": "str",  # Optional. DO region slug the session lives in,
                           e.g. ric1. Stamped once at create from the region whose API host served the
                           request, and never changed. Returned only for teams on the regional routing
@@ -32249,9 +32299,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           this one was forked from. Omitted/empty for root (non-fork) sessions.
                         "pause_reason": "str",  # Optional. Why this session is paused.
                           Present only when status is SESSION_STATUS_PAUSED; omitted otherwise. Known
-                          values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
-                          (prepay gate). Clients should treat an unrecognized value as an opaque reason
-                          string.
+                          values: manual (the customer paused the session), idle (inactivity
+                          auto-pause), zero_balance (prepay gate; stored rows may still say
+                          low_balance), trigger (a reuse trigger paused the session after a firing).
+                          Clients should treat an unrecognized value as an opaque reason string.
                         "region": "str",  # Optional. DO region slug the session lives in,
                           e.g. ric1. Stamped once at create from the region whose API host served the
                           request, and never changed. Returned only for teams on the regional routing
@@ -33222,9 +33273,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           this one was forked from. Omitted/empty for root (non-fork) sessions.
                         "pause_reason": "str",  # Optional. Why this session is paused.
                           Present only when status is SESSION_STATUS_PAUSED; omitted otherwise. Known
-                          values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
-                          (prepay gate). Clients should treat an unrecognized value as an opaque reason
-                          string.
+                          values: manual (the customer paused the session), idle (inactivity
+                          auto-pause), zero_balance (prepay gate; stored rows may still say
+                          low_balance), trigger (a reuse trigger paused the session after a firing).
+                          Clients should treat an unrecognized value as an opaque reason string.
                         "region": "str",  # Optional. DO region slug the session lives in,
                           e.g. ric1. Stamped once at create from the region whose API host served the
                           request, and never changed. Returned only for teams on the regional routing
@@ -33646,9 +33698,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           this one was forked from. Omitted/empty for root (non-fork) sessions.
                         "pause_reason": "str",  # Optional. Why this session is paused.
                           Present only when status is SESSION_STATUS_PAUSED; omitted otherwise. Known
-                          values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
-                          (prepay gate). Clients should treat an unrecognized value as an opaque reason
-                          string.
+                          values: manual (the customer paused the session), idle (inactivity
+                          auto-pause), zero_balance (prepay gate; stored rows may still say
+                          low_balance), trigger (a reuse trigger paused the session after a firing).
+                          Clients should treat an unrecognized value as an opaque reason string.
                         "region": "str",  # Optional. DO region slug the session lives in,
                           e.g. ric1. Stamped once at create from the region whose API host served the
                           request, and never changed. Returned only for teams on the regional routing
@@ -33946,9 +33999,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           this one was forked from. Omitted/empty for root (non-fork) sessions.
                         "pause_reason": "str",  # Optional. Why this session is paused.
                           Present only when status is SESSION_STATUS_PAUSED; omitted otherwise. Known
-                          values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
-                          (prepay gate). Clients should treat an unrecognized value as an opaque reason
-                          string.
+                          values: manual (the customer paused the session), idle (inactivity
+                          auto-pause), zero_balance (prepay gate; stored rows may still say
+                          low_balance), trigger (a reuse trigger paused the session after a firing).
+                          Clients should treat an unrecognized value as an opaque reason string.
                         "region": "str",  # Optional. DO region slug the session lives in,
                           e.g. ric1. Stamped once at create from the region whose API host served the
                           request, and never changed. Returned only for teams on the regional routing
@@ -34257,9 +34311,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           this one was forked from. Omitted/empty for root (non-fork) sessions.
                         "pause_reason": "str",  # Optional. Why this session is paused.
                           Present only when status is SESSION_STATUS_PAUSED; omitted otherwise. Known
-                          values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
-                          (prepay gate). Clients should treat an unrecognized value as an opaque reason
-                          string.
+                          values: manual (the customer paused the session), idle (inactivity
+                          auto-pause), zero_balance (prepay gate; stored rows may still say
+                          low_balance), trigger (a reuse trigger paused the session after a firing).
+                          Clients should treat an unrecognized value as an opaque reason string.
                         "region": "str",  # Optional. DO region slug the session lives in,
                           e.g. ric1. Stamped once at create from the region whose API host served the
                           request, and never changed. Returned only for teams on the regional routing
@@ -35884,9 +35939,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           this one was forked from. Omitted/empty for root (non-fork) sessions.
                         "pause_reason": "str",  # Optional. Why this session is paused.
                           Present only when status is SESSION_STATUS_PAUSED; omitted otherwise. Known
-                          values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
-                          (prepay gate). Clients should treat an unrecognized value as an opaque reason
-                          string.
+                          values: manual (the customer paused the session), idle (inactivity
+                          auto-pause), zero_balance (prepay gate; stored rows may still say
+                          low_balance), trigger (a reuse trigger paused the session after a firing).
+                          Clients should treat an unrecognized value as an opaque reason string.
                         "region": "str",  # Optional. DO region slug the session lives in,
                           e.g. ric1. Stamped once at create from the region whose API host served the
                           request, and never changed. Returned only for teams on the regional routing
@@ -36346,9 +36402,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               sessions.
                             "pause_reason": "str",  # Optional. Why this session is
                               paused. Present only when status is SESSION_STATUS_PAUSED; omitted
-                              otherwise. Known values: manual (PauseSession RPC), idle (inactivity
-                              auto-pause), low_balance (prepay gate). Clients should treat an
-                              unrecognized value as an opaque reason string.
+                              otherwise. Known values: manual (the customer paused the session), idle
+                              (inactivity auto-pause), zero_balance (prepay gate; stored rows may still
+                              say low_balance), trigger (a reuse trigger paused the session after a
+                              firing). Clients should treat an unrecognized value as an opaque reason
+                              string.
                             "region": "str",  # Optional. DO region slug the session
                               lives in, e.g. ric1. Stamped once at create from the region whose API
                               host served the request, and never changed. Returned only for teams on
@@ -36645,9 +36703,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               sessions.
                             "pause_reason": "str",  # Optional. Why this session is
                               paused. Present only when status is SESSION_STATUS_PAUSED; omitted
-                              otherwise. Known values: manual (PauseSession RPC), idle (inactivity
-                              auto-pause), low_balance (prepay gate). Clients should treat an
-                              unrecognized value as an opaque reason string.
+                              otherwise. Known values: manual (the customer paused the session), idle
+                              (inactivity auto-pause), zero_balance (prepay gate; stored rows may still
+                              say low_balance), trigger (a reuse trigger paused the session after a
+                              firing). Clients should treat an unrecognized value as an opaque reason
+                              string.
                             "region": "str",  # Optional. DO region slug the session
                               lives in, e.g. ric1. Stamped once at create from the region whose API
                               host served the request, and never changed. Returned only for teams on
@@ -36949,9 +37009,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               sessions.
                             "pause_reason": "str",  # Optional. Why this session is
                               paused. Present only when status is SESSION_STATUS_PAUSED; omitted
-                              otherwise. Known values: manual (PauseSession RPC), idle (inactivity
-                              auto-pause), low_balance (prepay gate). Clients should treat an
-                              unrecognized value as an opaque reason string.
+                              otherwise. Known values: manual (the customer paused the session), idle
+                              (inactivity auto-pause), zero_balance (prepay gate; stored rows may still
+                              say low_balance), trigger (a reuse trigger paused the session after a
+                              firing). Clients should treat an unrecognized value as an opaque reason
+                              string.
                             "region": "str",  # Optional. DO region slug the session
                               lives in, e.g. ric1. Stamped once at create from the region whose API
                               host served the request, and never changed. Returned only for teams on
@@ -44177,10 +44239,12 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
     @distributed_trace_async
     async def get_trigger_by_session(self, session_id: str, **kwargs: Any) -> JSON:
         # pylint: disable=line-too-long
-        """GetTriggerBySession reverse-looks-up the trigger that produced or binds a session.
+        """Get the newest trigger bound to a session, or the trigger of its newest execution.
 
-        Returns the trigger that produced (fresh) or binds (reuse) the given session. Resolves to the
-        row even after the trigger is soft-deleted.
+        Returns the newest trigger whose bound session is this one. Deleted triggers are skipped. When
+        none is bound, returns the trigger of the newest execution for this session, again skipping
+        deleted triggers. A session can be bound to more than one trigger; only the newest is returned.
+        404 when neither lookup matches.
 
         :param session_id: The session UUID. Required.
         :type session_id: str
@@ -45491,6 +45555,13 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               before then.
                             "status": "str",  # Optional. Per-firing outcome. Known
                               values are: "pending", "running", "succeeded", and "failed".
+                            "status_message": "str",  # Optional. Human-readable detail
+                              for status_reason. Omitted when status_reason is omitted.
+                            "status_reason": "str",  # Optional. Why a running execution
+                              has not started its turn. Omitted when there is nothing to report. Known
+                              value: waiting_for_bound_session (a reuse firing is waiting for its bound
+                              session to pause; status stays running). Clients should treat an
+                              unrecognized value as an opaque string.
                             "trigger_id": "str",  # Optional.
                             "updated_at": "2020-02-20 00:00:00"  # Optional.
                         }
@@ -45637,6 +45708,13 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           the session is created (fresh) or is known (reuse); empty before then.
                         "status": "str",  # Optional. Per-firing outcome. Known values are:
                           "pending", "running", "succeeded", and "failed".
+                        "status_message": "str",  # Optional. Human-readable detail for
+                          status_reason. Omitted when status_reason is omitted.
+                        "status_reason": "str",  # Optional. Why a running execution has not
+                          started its turn. Omitted when there is nothing to report. Known value:
+                          waiting_for_bound_session (a reuse firing is waiting for its bound session to
+                          pause; status stays running). Clients should treat an unrecognized value as
+                          an opaque string.
                         "trigger_id": "str",  # Optional. One row per firing (webhook
                           delivery or cron tick).
                         "updated_at": "2020-02-20 00:00:00"  # Optional. One row per firing
@@ -45791,6 +45869,13 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           the session is created (fresh) or is known (reuse); empty before then.
                         "status": "str",  # Optional. Per-firing outcome. Known values are:
                           "pending", "running", "succeeded", and "failed".
+                        "status_message": "str",  # Optional. Human-readable detail for
+                          status_reason. Omitted when status_reason is omitted.
+                        "status_reason": "str",  # Optional. Why a running execution has not
+                          started its turn. Omitted when there is nothing to report. Known value:
+                          waiting_for_bound_session (a reuse firing is waiting for its bound session to
+                          pause; status stays running). Clients should treat an unrecognized value as
+                          an opaque string.
                         "trigger_id": "str",  # Optional. One row per firing (webhook
                           delivery or cron tick).
                         "updated_at": "2020-02-20 00:00:00"  # Optional. One row per firing
@@ -241579,6 +241664,12 @@ class RegistriesOperations:
                     "name": "str",  # A globally unique name for the container registry. Must be
                       lowercase and be composed only of numbers, letters and ``-``"" , up to a limit of
                       63 characters. Required.
+                    "insights": {
+                        "logs": bool  # Optional. A boolean value indicating whether the
+                          registry's logs are sent to Insights. Set this to ``true`` to send the
+                          registry's logs to Insights. ``false``"" , and omitting ``insights`` or
+                          ``logs``"" , both create the registry with logs not enabled.
+                    },
                     "region": "str",  # Optional. Slug of the region where registry data is
                       stored. When not provided, a region will be selected. Known values are: "nyc3",
                       "sfo3", "sfo2", "ams3", "sgp1", "fra1", "blr1", and "syd1".
@@ -241699,6 +241790,12 @@ class RegistriesOperations:
                     "name": "str",  # A globally unique name for the container registry. Must be
                       lowercase and be composed only of numbers, letters and ``-``"" , up to a limit of
                       63 characters. Required.
+                    "insights": {
+                        "logs": bool  # Optional. A boolean value indicating whether the
+                          registry's logs are sent to Insights. Set this to ``true`` to send the
+                          registry's logs to Insights. ``false``"" , and omitting ``insights`` or
+                          ``logs``"" , both create the registry with logs not enabled.
+                    },
                     "region": "str",  # Optional. Slug of the region where registry data is
                       stored. When not provided, a region will be selected. Known values are: "nyc3",
                       "sfo3", "sfo2", "ams3", "sgp1", "fra1", "blr1", and "syd1".
@@ -244717,6 +244814,12 @@ class RegistryOperations:
                     "subscription_tier_slug": "str",  # The slug of the subscription tier to sign
                       up for. Valid values can be retrieved using the options endpoint. Required. Known
                       values are: "starter", "basic", and "professional".
+                    "insights": {
+                        "logs": bool  # Optional. A boolean value indicating whether the
+                          registry's logs are sent to Insights. Set this to ``true`` to send the
+                          registry's logs to Insights. ``false``"" , and omitting ``insights`` or
+                          ``logs``"" , both create the registry with logs not enabled.
+                    },
                     "region": "str"  # Optional. Slug of the region where registry data is
                       stored. When not provided, a region will be selected. Known values are: "nyc3",
                       "sfo3", "ams3", "sgp1", and "fra1".
@@ -244877,6 +244980,12 @@ class RegistryOperations:
                     "subscription_tier_slug": "str",  # The slug of the subscription tier to sign
                       up for. Valid values can be retrieved using the options endpoint. Required. Known
                       values are: "starter", "basic", and "professional".
+                    "insights": {
+                        "logs": bool  # Optional. A boolean value indicating whether the
+                          registry's logs are sent to Insights. Set this to ``true`` to send the
+                          registry's logs to Insights. ``false``"" , and omitting ``insights`` or
+                          ``logs``"" , both create the registry with logs not enabled.
+                    },
                     "region": "str"  # Optional. Slug of the region where registry data is
                       stored. When not provided, a region will be selected. Known values are: "nyc3",
                       "sfo3", "ams3", "sgp1", and "fra1".
@@ -317322,6 +317431,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   "METRIC_VALUE_TYPE_PERCENTAGE".
                                 "number_value": 0.0,  # Optional. The value of the
                                   metric as a number.
+                                "passed": bool,  # Optional. Whether the score met
+                                  the metric's success threshold. Set for model evaluation results
+                                  only, and only when status is COMPLETED; omitted for skipped or
+                                  failed metrics.
                                 "reasoning": "str",  # Optional. Reasoning of the
                                   metric result.
                                 "status":
@@ -317349,6 +317462,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                             "number_value": 0.0,  # Optional. The value of the metric as
                               a number.
+                            "passed": bool,  # Optional. Whether the score met the
+                              metric's success threshold. Set for model evaluation results only, and
+                              only when status is COMPLETED; omitted for skipped or failed metrics.
                             "reasoning": "str",  # Optional. Reasoning of the metric
                               result.
                             "status": "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",  #
@@ -317527,6 +317643,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   "METRIC_VALUE_TYPE_PERCENTAGE".
                                 "number_value": 0.0,  # Optional. The value of the
                                   metric as a number.
+                                "passed": bool,  # Optional. Whether the score met
+                                  the metric's success threshold. Set for model evaluation results
+                                  only, and only when status is COMPLETED; omitted for skipped or
+                                  failed metrics.
                                 "reasoning": "str",  # Optional. Reasoning of the
                                   metric result.
                                 "status":
@@ -317554,6 +317674,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                             "number_value": 0.0,  # Optional. The value of the metric as
                               a number.
+                            "passed": bool,  # Optional. Whether the score met the
+                              metric's success threshold. Set for model evaluation results only, and
+                              only when status is COMPLETED; omitted for skipped or failed metrics.
                             "reasoning": "str",  # Optional. Reasoning of the metric
                               result.
                             "status": "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",  #
@@ -317637,6 +317760,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               and "METRIC_VALUE_TYPE_PERCENTAGE".
                                             "number_value": 0.0,  #
                                               Optional. The value of the metric as a number.
+                                            "passed": bool,  # Optional.
+                                              Whether the score met the metric's success threshold. Set
+                                              for model evaluation results only, and only when status
+                                              is COMPLETED; omitted for skipped or failed metrics.
                                             "reasoning": "str",  #
                                               Optional. Reasoning of the metric result.
                                             "status":
@@ -317861,6 +317988,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                                     "number_value": 0.0,  # Optional. The value
                                       of the metric as a number.
+                                    "passed": bool,  # Optional. Whether the
+                                      score met the metric's success threshold. Set for model
+                                      evaluation results only, and only when status is COMPLETED;
+                                      omitted for skipped or failed metrics.
                                     "reasoning": "str",  # Optional. Reasoning of
                                       the metric result.
                                     "status":
@@ -318038,6 +318169,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           "METRIC_VALUE_TYPE_PERCENTAGE".
                                         "number_value": 0.0,  # Optional. The
                                           value of the metric as a number.
+                                        "passed": bool,  # Optional. Whether
+                                          the score met the metric's success threshold. Set for model
+                                          evaluation results only, and only when status is COMPLETED;
+                                          omitted for skipped or failed metrics.
                                         "reasoning": "str",  # Optional.
                                           Reasoning of the metric result.
                                         "status":
@@ -318261,6 +318396,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   "METRIC_VALUE_TYPE_PERCENTAGE".
                                 "number_value": 0.0,  # Optional. The value of the
                                   metric as a number.
+                                "passed": bool,  # Optional. Whether the score met
+                                  the metric's success threshold. Set for model evaluation results
+                                  only, and only when status is COMPLETED; omitted for skipped or
+                                  failed metrics.
                                 "reasoning": "str",  # Optional. Reasoning of the
                                   metric result.
                                 "status":
@@ -318989,6 +319128,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                                     "number_value": 0.0,  # Optional. The value
                                       of the metric as a number.
+                                    "passed": bool,  # Optional. Whether the
+                                      score met the metric's success threshold. Set for model
+                                      evaluation results only, and only when status is COMPLETED;
+                                      omitted for skipped or failed metrics.
                                     "reasoning": "str",  # Optional. Reasoning of
                                       the metric result.
                                     "status":
@@ -319017,6 +319160,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   "METRIC_VALUE_TYPE_PERCENTAGE".
                                 "number_value": 0.0,  # Optional. The value of the
                                   metric as a number.
+                                "passed": bool,  # Optional. Whether the score met
+                                  the metric's success threshold. Set for model evaluation results
+                                  only, and only when status is COMPLETED; omitted for skipped or
+                                  failed metrics.
                                 "reasoning": "str",  # Optional. Reasoning of the
                                   metric result.
                                 "status":
@@ -326957,6 +327104,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               and "METRIC_VALUE_TYPE_PERCENTAGE".
                                             "number_value": 0.0,  #
                                               Optional. The value of the metric as a number.
+                                            "passed": bool,  # Optional.
+                                              Whether the score met the metric's success threshold. Set
+                                              for model evaluation results only, and only when status
+                                              is COMPLETED; omitted for skipped or failed metrics.
                                             "reasoning": "str",  #
                                               Optional. Reasoning of the metric result.
                                             "status":
@@ -326997,6 +327148,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                                     "number_value": 0.0,  # Optional. The value
                                       of the metric as a number.
+                                    "passed": bool,  # Optional. Whether the
+                                      score met the metric's success threshold. Set for model
+                                      evaluation results only, and only when status is COMPLETED;
+                                      omitted for skipped or failed metrics.
                                     "reasoning": "str",  # Optional. Reasoning of
                                       the metric result.
                                     "status":
@@ -344606,6 +344761,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   "METRIC_VALUE_TYPE_PERCENTAGE".
                                 "number_value": 0.0,  # Optional. The value of the
                                   metric as a number.
+                                "passed": bool,  # Optional. Whether the score met
+                                  the metric's success threshold. Set for model evaluation results
+                                  only, and only when status is COMPLETED; omitted for skipped or
+                                  failed metrics.
                                 "reasoning": "str",  # Optional. Reasoning of the
                                   metric result.
                                 "status":
