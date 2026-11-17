@@ -2292,7 +2292,7 @@ def build_harness_create_provider_connect_request(  # pylint: disable=name-too-l
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/auth/{provider}"
+    _url = "/v2/harness-runtime/auth/{provider}"
     path_format_arguments = {
         "provider": _SERIALIZER.url("provider", provider, "str"),
     }
@@ -2318,7 +2318,7 @@ def build_harness_get_provider_connect_request(  # pylint: disable=name-too-long
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/auth/{provider}/poll"
+    _url = "/v2/harness-runtime/auth/{provider}/poll"
     path_format_arguments = {
         "provider": _SERIALIZER.url("provider", provider, "str"),
     }
@@ -2351,7 +2351,7 @@ def build_harness_list_provider_connections_request(  # pylint: disable=name-too
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/auth/{provider}/connections"
+    _url = "/v2/harness-runtime/auth/{provider}/connections"
     path_format_arguments = {
         "provider": _SERIALIZER.url("provider", provider, "str"),
     }
@@ -2387,7 +2387,7 @@ def build_harness_create_provider_connection_request(  # pylint: disable=name-to
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/auth/{provider}/connections"
+    _url = "/v2/harness-runtime/auth/{provider}/connections"
     path_format_arguments = {
         "provider": _SERIALIZER.url("provider", provider, "str"),
     }
@@ -2412,7 +2412,7 @@ def build_harness_get_provider_connection_request(  # pylint: disable=name-too-l
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/auth/{provider}/connections/{connection_id}"
+    _url = "/v2/harness-runtime/auth/{provider}/connections/{connection_id}"
     path_format_arguments = {
         "provider": _SERIALIZER.url("provider", provider, "str"),
         "connection_id": _SERIALIZER.url("connection_id", connection_id, "str"),
@@ -2434,7 +2434,7 @@ def build_harness_delete_provider_connection_request(  # pylint: disable=name-to
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/auth/{provider}/connections/{connection_id}"
+    _url = "/v2/harness-runtime/auth/{provider}/connections/{connection_id}"
     path_format_arguments = {
         "provider": _SERIALIZER.url("provider", provider, "str"),
         "connection_id": _SERIALIZER.url("connection_id", connection_id, "str"),
@@ -2456,7 +2456,7 @@ def build_harness_post_provider_connection_reconnect_request(  # pylint: disable
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/auth/{provider}/connections/{connection_id}/reconnect"
+    _url = "/v2/harness-runtime/auth/{provider}/connections/{connection_id}/reconnect"
     path_format_arguments = {
         "provider": _SERIALIZER.url("provider", provider, "str"),
         "connection_id": _SERIALIZER.url("connection_id", connection_id, "str"),
@@ -2485,7 +2485,7 @@ def build_harness_list_image_messages_request(  # pylint: disable=name-too-long
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/image-messages"
+    _url = "/v2/harness-runtime/image-messages"
 
     # Construct parameters
     if type is not None:
@@ -2522,7 +2522,7 @@ def build_harness_list_configs_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/configs"
+    _url = "/v2/harness-runtime/configs"
 
     # Construct parameters
     if page_size is not None:
@@ -2551,7 +2551,7 @@ def build_harness_create_config_request(**kwargs: Any) -> HttpRequest:
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/configs"
+    _url = "/v2/harness-runtime/configs"
 
     # Construct headers
     if content_type is not None:
@@ -2569,7 +2569,7 @@ def build_harness_get_config_request(config_id: str, **kwargs: Any) -> HttpReque
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/configs/{config_id}"
+    _url = "/v2/harness-runtime/configs/{config_id}"
     path_format_arguments = {
         "config_id": _SERIALIZER.url("config_id", config_id, "str"),
     }
@@ -2588,7 +2588,7 @@ def build_harness_delete_config_request(config_id: str, **kwargs: Any) -> HttpRe
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/configs/{config_id}"
+    _url = "/v2/harness-runtime/configs/{config_id}"
     path_format_arguments = {
         "config_id": _SERIALIZER.url("config_id", config_id, "str"),
     }
@@ -2612,7 +2612,7 @@ def build_harness_create_config_clone_request(  # pylint: disable=name-too-long
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/configs/{config_id}/clone"
+    _url = "/v2/harness-runtime/configs/{config_id}/clone"
     path_format_arguments = {
         "config_id": _SERIALIZER.url("config_id", config_id, "str"),
     }
@@ -2643,7 +2643,7 @@ def build_harness_list_config_sessions_request(  # pylint: disable=name-too-long
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/configs/{config_id}/sessions"
+    _url = "/v2/harness-runtime/configs/{config_id}/sessions"
     path_format_arguments = {
         "config_id": _SERIALIZER.url("config_id", config_id, "str"),
     }
@@ -2697,7 +2697,7 @@ def build_harness_list_sessions_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions"
+    _url = "/v2/harness-runtime/sessions"
 
     # Construct parameters
     if page_size is not None:
@@ -2737,7 +2737,7 @@ def build_harness_create_session_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions"
+    _url = "/v2/harness-runtime/sessions"
 
     # Construct parameters
     if openai_session_id is not None:
@@ -2774,7 +2774,7 @@ def build_harness_validate_session_policy_request(  # pylint: disable=name-too-l
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/policy/validate"
+    _url = "/v2/harness-runtime/sessions/policy/validate"
 
     # Construct headers
     _headers["Content-Type"] = _SERIALIZER.header("content_type", content_type, "str")
@@ -2793,7 +2793,7 @@ def build_harness_list_session_sandbox_sizes_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/sandbox/sizes"
+    _url = "/v2/harness-runtime/sessions/sandbox/sizes"
 
     # Construct headers
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
@@ -2809,7 +2809,7 @@ def build_harness_delete_session_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/{session_id}"
+    _url = "/v2/harness-runtime/sessions/{session_id}"
     path_format_arguments = {
         "session_id": _SERIALIZER.url("session_id", session_id, "str"),
     }
@@ -2832,7 +2832,7 @@ def build_harness_get_session_request(session_id: str, **kwargs: Any) -> HttpReq
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/{session_id}"
+    _url = "/v2/harness-runtime/sessions/{session_id}"
     path_format_arguments = {
         "session_id": _SERIALIZER.url("session_id", session_id, "str"),
     }
@@ -2854,7 +2854,7 @@ def build_harness_update_session_request(session_id: str, **kwargs: Any) -> Http
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/{session_id}"
+    _url = "/v2/harness-runtime/sessions/{session_id}"
     path_format_arguments = {
         "session_id": _SERIALIZER.url("session_id", session_id, "str"),
     }
@@ -2884,7 +2884,7 @@ def build_harness_list_session_checkpoints_request(  # pylint: disable=name-too-
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/{session_id}/checkpoints"
+    _url = "/v2/harness-runtime/sessions/{session_id}/checkpoints"
     path_format_arguments = {
         "session_id": _SERIALIZER.url("session_id", session_id, "str"),
     }
@@ -2916,7 +2916,7 @@ def build_harness_create_session_checkpoint_request(  # pylint: disable=name-too
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/{session_id}/checkpoints"
+    _url = "/v2/harness-runtime/sessions/{session_id}/checkpoints"
     path_format_arguments = {
         "session_id": _SERIALIZER.url("session_id", session_id, "str"),
     }
@@ -2941,7 +2941,7 @@ def build_harness_get_session_checkpoint_request(  # pylint: disable=name-too-lo
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/{session_id}/checkpoints/{checkpoint_id}"
+    _url = "/v2/harness-runtime/sessions/{session_id}/checkpoints/{checkpoint_id}"
     path_format_arguments = {
         "session_id": _SERIALIZER.url("session_id", session_id, "str"),
         "checkpoint_id": _SERIALIZER.url("checkpoint_id", checkpoint_id, "str"),
@@ -2963,7 +2963,7 @@ def build_harness_delete_session_checkpoint_request(  # pylint: disable=name-too
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/{session_id}/checkpoints/{checkpoint_id}"
+    _url = "/v2/harness-runtime/sessions/{session_id}/checkpoints/{checkpoint_id}"
     path_format_arguments = {
         "session_id": _SERIALIZER.url("session_id", session_id, "str"),
         "checkpoint_id": _SERIALIZER.url("checkpoint_id", checkpoint_id, "str"),
@@ -2986,7 +2986,7 @@ def build_harness_get_checkpoint_image_messages_request(  # pylint: disable=name
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/{session_id}/checkpoints/{checkpoint_id}/image-messages"
+    _url = "/v2/harness-runtime/sessions/{session_id}/checkpoints/{checkpoint_id}/image-messages"
     path_format_arguments = {
         "session_id": _SERIALIZER.url("session_id", session_id, "str"),
         "checkpoint_id": _SERIALIZER.url("checkpoint_id", checkpoint_id, "str"),
@@ -3014,7 +3014,9 @@ def build_harness_revert_session_checkpoint_request(  # pylint: disable=name-too
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/{session_id}/checkpoints/{checkpoint_id}/rollback"
+    _url = (
+        "/v2/harness-runtime/sessions/{session_id}/checkpoints/{checkpoint_id}/rollback"
+    )
     path_format_arguments = {
         "session_id": _SERIALIZER.url("session_id", session_id, "str"),
         "checkpoint_id": _SERIALIZER.url("checkpoint_id", checkpoint_id, "str"),
@@ -3039,7 +3041,7 @@ def build_harness_create_session_fork_request(  # pylint: disable=name-too-long
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/{session_id}/fork"
+    _url = "/v2/harness-runtime/sessions/{session_id}/fork"
     path_format_arguments = {
         "session_id": _SERIALIZER.url("session_id", session_id, "str"),
     }
@@ -3071,7 +3073,7 @@ def build_harness_post_session_hitl_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/{session_id}/hitl/{request_id}"
+    _url = "/v2/harness-runtime/sessions/{session_id}/hitl/{request_id}"
     path_format_arguments = {
         "session_id": _SERIALIZER.url("session_id", session_id, "str"),
         "request_id": _SERIALIZER.url(
@@ -3106,7 +3108,7 @@ def build_harness_cancel_session_turn_request(  # pylint: disable=name-too-long
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/{session_id}/cancel"
+    _url = "/v2/harness-runtime/sessions/{session_id}/cancel"
     path_format_arguments = {
         "session_id": _SERIALIZER.url("session_id", session_id, "str"),
     }
@@ -3132,7 +3134,7 @@ def build_harness_get_session_image_messages_request(  # pylint: disable=name-to
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/{session_id}/image-messages"
+    _url = "/v2/harness-runtime/sessions/{session_id}/image-messages"
     path_format_arguments = {
         "session_id": _SERIALIZER.url("session_id", session_id, "str"),
     }
@@ -3162,7 +3164,7 @@ def build_harness_create_session_input_request(  # pylint: disable=name-too-long
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/{session_id}/input"
+    _url = "/v2/harness-runtime/sessions/{session_id}/input"
     path_format_arguments = {
         "session_id": _SERIALIZER.url("session_id", session_id, "str"),
     }
@@ -3187,7 +3189,7 @@ def build_harness_post_session_pause_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/{session_id}/pause"
+    _url = "/v2/harness-runtime/sessions/{session_id}/pause"
     path_format_arguments = {
         "session_id": _SERIALIZER.url("session_id", session_id, "str"),
     }
@@ -3212,7 +3214,7 @@ def build_harness_post_session_resume_request(  # pylint: disable=name-too-long
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/{session_id}/resume"
+    _url = "/v2/harness-runtime/sessions/{session_id}/resume"
     path_format_arguments = {
         "session_id": _SERIALIZER.url("session_id", session_id, "str"),
     }
@@ -3240,7 +3242,7 @@ def build_harness_post_session_sandbox_exec_request(  # pylint: disable=name-too
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/{session_id}/sandbox/exec"
+    _url = "/v2/harness-runtime/sessions/{session_id}/sandbox/exec"
     path_format_arguments = {
         "session_id": _SERIALIZER.url("session_id", session_id, "str"),
     }
@@ -3266,7 +3268,7 @@ def build_harness_get_session_workspace_download_request(  # pylint: disable=nam
     accept = _headers.pop("Accept", "application/octet-stream, application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/{session_id}/workspace/download"
+    _url = "/v2/harness-runtime/sessions/{session_id}/workspace/download"
     path_format_arguments = {
         "session_id": _SERIALIZER.url("session_id", session_id, "str"),
     }
@@ -3297,7 +3299,7 @@ def build_harness_create_session_workspace_transfer_request(  # pylint: disable=
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/{session_id}/workspace/transfers"
+    _url = "/v2/harness-runtime/sessions/{session_id}/workspace/transfers"
     path_format_arguments = {
         "session_id": _SERIALIZER.url("session_id", session_id, "str"),
     }
@@ -3322,7 +3324,7 @@ def build_harness_get_session_workspace_transfer_request(  # pylint: disable=nam
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/{session_id}/workspace/transfers/{transfer_id}"
+    _url = "/v2/harness-runtime/sessions/{session_id}/workspace/transfers/{transfer_id}"
     path_format_arguments = {
         "session_id": _SERIALIZER.url("session_id", session_id, "str"),
         "transfer_id": _SERIALIZER.url("transfer_id", transfer_id, "str"),
@@ -3347,7 +3349,7 @@ def build_harness_cancel_session_workspace_transfer_request(  # pylint: disable=
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/{session_id}/workspace/transfers/{transfer_id}/cancel"
+    _url = "/v2/harness-runtime/sessions/{session_id}/workspace/transfers/{transfer_id}/cancel"
     path_format_arguments = {
         "session_id": _SERIALIZER.url("session_id", session_id, "str"),
         "transfer_id": _SERIALIZER.url("transfer_id", transfer_id, "str"),
@@ -3376,7 +3378,7 @@ def build_harness_commit_session_workspace_transfer_request(  # pylint: disable=
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/{session_id}/workspace/transfers/{transfer_id}/commit"
+    _url = "/v2/harness-runtime/sessions/{session_id}/workspace/transfers/{transfer_id}/commit"
     path_format_arguments = {
         "session_id": _SERIALIZER.url("session_id", session_id, "str"),
         "transfer_id": _SERIALIZER.url("transfer_id", transfer_id, "str"),
@@ -3405,7 +3407,7 @@ def build_harness_create_session_workspace_part_upload_urls_request(  # pylint: 
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/{session_id}/workspace/transfers/{transfer_id}/part-upload-urls"
+    _url = "/v2/harness-runtime/sessions/{session_id}/workspace/transfers/{transfer_id}/part-upload-urls"
     path_format_arguments = {
         "session_id": _SERIALIZER.url("session_id", session_id, "str"),
         "transfer_id": _SERIALIZER.url("transfer_id", transfer_id, "str"),
@@ -3441,7 +3443,7 @@ def build_harness_create_session_workspace_upload_request(  # pylint: disable=na
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/{session_id}/workspace/upload"
+    _url = "/v2/harness-runtime/sessions/{session_id}/workspace/upload"
     path_format_arguments = {
         "session_id": _SERIALIZER.url("session_id", session_id, "str"),
     }
@@ -3491,7 +3493,7 @@ def build_harness_get_session_events_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/{session_id}/events"
+    _url = "/v2/harness-runtime/sessions/{session_id}/events"
     path_format_arguments = {
         "session_id": _SERIALIZER.url("session_id", session_id, "str"),
     }
@@ -3532,7 +3534,7 @@ def build_harness_get_session_port_forward_request(  # pylint: disable=name-too-
     accept = _headers.pop("Accept", "text/plain, application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/{session_id}/port-forward/{port}"
+    _url = "/v2/harness-runtime/sessions/{session_id}/port-forward/{port}"
     path_format_arguments = {
         "session_id": _SERIALIZER.url("session_id", session_id, "str"),
         "port": _SERIALIZER.url("port", port, "int", maximum=65535, minimum=1024),
@@ -3554,7 +3556,7 @@ def build_harness_get_session_ingress_request(  # pylint: disable=name-too-long
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/sessions/{session_id}/ingress"
+    _url = "/v2/harness-runtime/sessions/{session_id}/ingress"
     path_format_arguments = {
         "session_id": _SERIALIZER.url("session_id", session_id, "str"),
     }
@@ -3576,7 +3578,7 @@ def build_harness_list_templates_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/templates"
+    _url = "/v2/harness-runtime/templates"
 
     # Construct parameters
     if page_size is not None:
@@ -3601,7 +3603,7 @@ def build_harness_create_template_request(**kwargs: Any) -> HttpRequest:
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/templates"
+    _url = "/v2/harness-runtime/templates"
 
     # Construct headers
     if content_type is not None:
@@ -3619,7 +3621,7 @@ def build_harness_get_template_request(template_id: str, **kwargs: Any) -> HttpR
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/templates/{template_id}"
+    _url = "/v2/harness-runtime/templates/{template_id}"
     path_format_arguments = {
         "template_id": _SERIALIZER.url("template_id", template_id, "str"),
     }
@@ -3643,7 +3645,7 @@ def build_harness_update_template_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/templates/{template_id}"
+    _url = "/v2/harness-runtime/templates/{template_id}"
     path_format_arguments = {
         "template_id": _SERIALIZER.url("template_id", template_id, "str"),
     }
@@ -3668,7 +3670,7 @@ def build_harness_delete_template_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/templates/{template_id}"
+    _url = "/v2/harness-runtime/templates/{template_id}"
     path_format_arguments = {
         "template_id": _SERIALIZER.url("template_id", template_id, "str"),
     }
@@ -3694,7 +3696,7 @@ def build_harness_list_template_builds_request(  # pylint: disable=name-too-long
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/templates/{template_id}/builds"
+    _url = "/v2/harness-runtime/templates/{template_id}/builds"
     path_format_arguments = {
         "template_id": _SERIALIZER.url("template_id", template_id, "str"),
     }
@@ -3723,7 +3725,7 @@ def build_harness_get_template_build_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/templates/{template_id}/builds/{build_id}"
+    _url = "/v2/harness-runtime/templates/{template_id}/builds/{build_id}"
     path_format_arguments = {
         "template_id": _SERIALIZER.url("template_id", template_id, "str"),
         "build_id": _SERIALIZER.url("build_id", build_id, "str"),
@@ -3751,7 +3753,7 @@ def build_harness_list_triggers_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/triggers"
+    _url = "/v2/harness-runtime/triggers"
 
     # Construct parameters
     if page_size is not None:
@@ -3782,7 +3784,7 @@ def build_harness_create_trigger_request(**kwargs: Any) -> HttpRequest:
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/triggers"
+    _url = "/v2/harness-runtime/triggers"
 
     # Construct headers
     if content_type is not None:
@@ -3802,7 +3804,7 @@ def build_harness_get_trigger_by_session_request(  # pylint: disable=name-too-lo
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/triggers/by-session/{session_id}"
+    _url = "/v2/harness-runtime/triggers/by-session/{session_id}"
     path_format_arguments = {
         "session_id": _SERIALIZER.url("session_id", session_id, "str"),
     }
@@ -3824,7 +3826,7 @@ def build_harness_list_reusable_sessions_request(  # pylint: disable=name-too-lo
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/triggers/reusable-sessions"
+    _url = "/v2/harness-runtime/triggers/reusable-sessions"
 
     # Construct parameters
     if page_size is not None:
@@ -3848,7 +3850,7 @@ def build_harness_get_trigger_request(trigger_id: str, **kwargs: Any) -> HttpReq
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/triggers/{trigger_id}"
+    _url = "/v2/harness-runtime/triggers/{trigger_id}"
     path_format_arguments = {
         "trigger_id": _SERIALIZER.url("trigger_id", trigger_id, "str"),
     }
@@ -3870,7 +3872,7 @@ def build_harness_update_trigger_request(trigger_id: str, **kwargs: Any) -> Http
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/triggers/{trigger_id}"
+    _url = "/v2/harness-runtime/triggers/{trigger_id}"
     path_format_arguments = {
         "trigger_id": _SERIALIZER.url("trigger_id", trigger_id, "str"),
     }
@@ -3893,7 +3895,7 @@ def build_harness_delete_trigger_request(trigger_id: str, **kwargs: Any) -> Http
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/triggers/{trigger_id}"
+    _url = "/v2/harness-runtime/triggers/{trigger_id}"
     path_format_arguments = {
         "trigger_id": _SERIALIZER.url("trigger_id", trigger_id, "str"),
     }
@@ -3920,7 +3922,7 @@ def build_harness_list_trigger_executions_request(  # pylint: disable=name-too-l
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/triggers/{trigger_id}/executions"
+    _url = "/v2/harness-runtime/triggers/{trigger_id}/executions"
     path_format_arguments = {
         "trigger_id": _SERIALIZER.url("trigger_id", trigger_id, "str"),
     }
@@ -3953,7 +3955,7 @@ def build_harness_get_trigger_execution_request(  # pylint: disable=name-too-lon
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/triggers/{trigger_id}/executions/{execution_id}"
+    _url = "/v2/harness-runtime/triggers/{trigger_id}/executions/{execution_id}"
     path_format_arguments = {
         "trigger_id": _SERIALIZER.url("trigger_id", trigger_id, "str"),
         "execution_id": _SERIALIZER.url("execution_id", execution_id, "str"),
@@ -3976,7 +3978,7 @@ def build_harness_cancel_trigger_execution_request(  # pylint: disable=name-too-
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/triggers/{trigger_id}/executions/{execution_id}/cancel"
+    _url = "/v2/harness-runtime/triggers/{trigger_id}/executions/{execution_id}/cancel"
     path_format_arguments = {
         "trigger_id": _SERIALIZER.url("trigger_id", trigger_id, "str"),
         "execution_id": _SERIALIZER.url("execution_id", execution_id, "str"),
@@ -4005,7 +4007,7 @@ def build_harness_post_trigger_rotate_secret_request(  # pylint: disable=name-to
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/triggers/{trigger_id}/rotate-secret"
+    _url = "/v2/harness-runtime/triggers/{trigger_id}/rotate-secret"
     path_format_arguments = {
         "trigger_id": _SERIALIZER.url("trigger_id", trigger_id, "str"),
     }
@@ -4037,7 +4039,7 @@ def build_harness_post_trigger_webhook_request(  # pylint: disable=name-too-long
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/triggers/{trigger_id}/webhook"
+    _url = "/v2/harness-runtime/triggers/{trigger_id}/webhook"
     path_format_arguments = {
         "trigger_id": _SERIALIZER.url("trigger_id", trigger_id, "str"),
     }
@@ -4064,7 +4066,7 @@ def build_harness_list_webhook_providers_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/webhook-providers"
+    _url = "/v2/harness-runtime/webhook-providers"
 
     # Construct headers
     _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
@@ -4085,7 +4087,7 @@ def build_harness_list_workspaces_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/workspaces"
+    _url = "/v2/harness-runtime/workspaces"
 
     # Construct parameters
     if page_size is not None:
@@ -4116,7 +4118,7 @@ def build_harness_create_workspace_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/workspaces"
+    _url = "/v2/harness-runtime/workspaces"
 
     # Construct headers
     if idempotency_key is not None:
@@ -4140,7 +4142,7 @@ def build_harness_get_workspace_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/workspaces/{workspace_id}"
+    _url = "/v2/harness-runtime/workspaces/{workspace_id}"
     path_format_arguments = {
         "workspace_id": _SERIALIZER.url("workspace_id", workspace_id, "str"),
     }
@@ -4161,7 +4163,7 @@ def build_harness_delete_workspace_request(
     accept = _headers.pop("Accept", "application/json")
 
     # Construct URL
-    _url = "/v2/agents/workspaces/{workspace_id}"
+    _url = "/v2/harness-runtime/workspaces/{workspace_id}"
     path_format_arguments = {
         "workspace_id": _SERIALIZER.url("workspace_id", workspace_id, "str"),
     }
@@ -48105,10 +48107,18 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         # pylint: disable=line-too-long
         """Create a provider connection for one actor.
 
-        Creates, or resumes, the connection ``{provider}`` will use for ``user_id``. ``user_id`` is the
-        actor identifier the connection acts for, not a DigitalOcean user id. A pending connection
-        includes an ``authorization`` object the user still has to complete. An active connection omits
-        it. No token is returned. ``github`` is the provider served today.
+        Creates the connection ``{provider}`` will use for ``user_id``. ``user_id`` is the actor
+        identifier the connection acts for, not a DigitalOcean user id. Each actor has at most one
+        active, pending, or expired connection per provider. If ``user_id`` already has one, the
+        request fails with ``409``. Find that connection's id with ``GET
+        /v2/harness-runtime/auth/{provider}/connections?user_id=...``\\ , then resume or restart it
+        with ``POST /v2/harness-runtime/auth/{provider}/connections/{connection_id}/reconnect``\\ ,
+        which keeps its scopes. Revoked connections do not count toward the limit, and list responses
+        omit them. If the only connection ``user_id`` has for ``{provider}`` is revoked, for example by
+        ``DELETE``\\ , create starts it again under the same connection id, with the scopes in this
+        request. To change a connection's scopes, delete it and then create it. A successful create
+        returns the connection as ``pending``\\ , with an ``authorization`` object for the interactive
+        step. No token is returned. ``github`` is the provider served today.
 
         :param provider: Provider key. ``github`` is the provider served today. Required.
         :type provider: str
@@ -48174,7 +48184,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           for. Not a DigitalOcean user id.
                     }
                 }
-                # response body for status code(s): 400, 404, 501
+                # response body for status code(s): 400, 404, 409, 501
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -48199,10 +48209,18 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         # pylint: disable=line-too-long
         """Create a provider connection for one actor.
 
-        Creates, or resumes, the connection ``{provider}`` will use for ``user_id``. ``user_id`` is the
-        actor identifier the connection acts for, not a DigitalOcean user id. A pending connection
-        includes an ``authorization`` object the user still has to complete. An active connection omits
-        it. No token is returned. ``github`` is the provider served today.
+        Creates the connection ``{provider}`` will use for ``user_id``. ``user_id`` is the actor
+        identifier the connection acts for, not a DigitalOcean user id. Each actor has at most one
+        active, pending, or expired connection per provider. If ``user_id`` already has one, the
+        request fails with ``409``. Find that connection's id with ``GET
+        /v2/harness-runtime/auth/{provider}/connections?user_id=...``\\ , then resume or restart it
+        with ``POST /v2/harness-runtime/auth/{provider}/connections/{connection_id}/reconnect``\\ ,
+        which keeps its scopes. Revoked connections do not count toward the limit, and list responses
+        omit them. If the only connection ``user_id`` has for ``{provider}`` is revoked, for example by
+        ``DELETE``\\ , create starts it again under the same connection id, with the scopes in this
+        request. To change a connection's scopes, delete it and then create it. A successful create
+        returns the connection as ``pending``\\ , with an ``authorization`` object for the interactive
+        step. No token is returned. ``github`` is the provider served today.
 
         :param provider: Provider key. ``github`` is the provider served today. Required.
         :type provider: str
@@ -48259,7 +48277,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           for. Not a DigitalOcean user id.
                     }
                 }
-                # response body for status code(s): 400, 404, 501
+                # response body for status code(s): 400, 404, 409, 501
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -48279,10 +48297,18 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         # pylint: disable=line-too-long
         """Create a provider connection for one actor.
 
-        Creates, or resumes, the connection ``{provider}`` will use for ``user_id``. ``user_id`` is the
-        actor identifier the connection acts for, not a DigitalOcean user id. A pending connection
-        includes an ``authorization`` object the user still has to complete. An active connection omits
-        it. No token is returned. ``github`` is the provider served today.
+        Creates the connection ``{provider}`` will use for ``user_id``. ``user_id`` is the actor
+        identifier the connection acts for, not a DigitalOcean user id. Each actor has at most one
+        active, pending, or expired connection per provider. If ``user_id`` already has one, the
+        request fails with ``409``. Find that connection's id with ``GET
+        /v2/harness-runtime/auth/{provider}/connections?user_id=...``\\ , then resume or restart it
+        with ``POST /v2/harness-runtime/auth/{provider}/connections/{connection_id}/reconnect``\\ ,
+        which keeps its scopes. Revoked connections do not count toward the limit, and list responses
+        omit them. If the only connection ``user_id`` has for ``{provider}`` is revoked, for example by
+        ``DELETE``\\ , create starts it again under the same connection id, with the scopes in this
+        request. To change a connection's scopes, delete it and then create it. A successful create
+        returns the connection as ``pending``\\ , with an ``authorization`` object for the interactive
+        step. No token is returned. ``github`` is the provider served today.
 
         :param provider: Provider key. ``github`` is the provider served today. Required.
         :type provider: str
@@ -48345,7 +48371,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           for. Not a DigitalOcean user id.
                     }
                 }
-                # response body for status code(s): 400, 404, 501
+                # response body for status code(s): 400, 404, 409, 501
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -48405,7 +48431,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
 
         response = pipeline_response.http_response
 
-        if response.status_code not in [200, 400, 404, 501]:
+        if response.status_code not in [200, 400, 404, 409, 501]:
             if _stream:
                 response.read()  # Load the body in memory and close the socket
             map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
@@ -48445,6 +48471,22 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                 deserialized = None
 
         if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
             response_headers["ratelimit-limit"] = self._deserialize(
                 "int", response.headers.get("ratelimit-limit")
             )
@@ -48844,8 +48886,12 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         # pylint: disable=line-too-long
         """Start a fresh login for an existing connection.
 
-        Begins the interactive step again for a connection that needs it. The response includes
-        ``authorization`` while that step is outstanding. No token is returned.
+        Resumes a pending connection's authorization, or starts a new one for an expired or revoked
+        connection. The connection keeps its id, ``user_id``\\ , and scopes, so environments that use
+        it keep working once it is active again. An active connection is returned unchanged. Only the
+        member who owns the connection can reconnect it; for anyone else the response is ``404``\\ ,
+        the same as for an unknown connection. The response includes ``authorization`` while the
+        interactive step is outstanding. No token is returned.
 
         :param provider: Provider key. ``github`` is the provider served today. Required.
         :type provider: str
@@ -49608,8 +49654,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                       write-only value; metadata.name is cleared while safe metadata
                                       such as labels remains. Required.
                                     "sizeSlug": "str",  # Optional. Requested
-                                      sandbox size (catalog: GET /v2/agents/sessions/sandbox/sizes).
-                                      Empty means the service default.
+                                      sandbox size (catalog: GET
+                                      /v2/harness-runtime/sessions/sandbox/sizes). Empty means the
+                                      service default.
                                     "template": "str"  # Optional. Optional
                                       sandbox template. Empty (or the legacy placeholder "coding")
                                       means "no preference": the template derives from the adapter.
@@ -50032,8 +50079,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                       write-only value; metadata.name is cleared while safe metadata
                                       such as labels remains. Required.
                                     "sizeSlug": "str",  # Optional. Requested
-                                      sandbox size (catalog: GET /v2/agents/sessions/sandbox/sizes).
-                                      Empty means the service default.
+                                      sandbox size (catalog: GET
+                                      /v2/harness-runtime/sessions/sandbox/sizes). Empty means the
+                                      service default.
                                     "template": "str"  # Optional. Optional
                                       sandbox template. Empty (or the legacy placeholder "coding")
                                       means "no preference": the template derives from the adapter.
@@ -50468,8 +50516,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                       write-only value; metadata.name is cleared while safe metadata
                                       such as labels remains. Required.
                                     "sizeSlug": "str",  # Optional. Requested
-                                      sandbox size (catalog: GET /v2/agents/sessions/sandbox/sizes).
-                                      Empty means the service default.
+                                      sandbox size (catalog: GET
+                                      /v2/harness-runtime/sessions/sandbox/sizes). Empty means the
+                                      service default.
                                     "template": "str"  # Optional. Optional
                                       sandbox template. Empty (or the legacy placeholder "coding")
                                       means "no preference": the template derives from the adapter.
@@ -51022,8 +51071,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                       write-only value; metadata.name is cleared while safe metadata
                                       such as labels remains. Required.
                                     "sizeSlug": "str",  # Optional. Requested
-                                      sandbox size (catalog: GET /v2/agents/sessions/sandbox/sizes).
-                                      Empty means the service default.
+                                      sandbox size (catalog: GET
+                                      /v2/harness-runtime/sessions/sandbox/sizes). Empty means the
+                                      service default.
                                     "template": "str"  # Optional. Optional
                                       sandbox template. Empty (or the legacy placeholder "coding")
                                       means "no preference": the template derives from the adapter.
@@ -51697,8 +51747,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                       write-only value; metadata.name is cleared while safe metadata
                                       such as labels remains. Required.
                                     "sizeSlug": "str",  # Optional. Requested
-                                      sandbox size (catalog: GET /v2/agents/sessions/sandbox/sizes).
-                                      Empty means the service default.
+                                      sandbox size (catalog: GET
+                                      /v2/harness-runtime/sessions/sandbox/sizes). Empty means the
+                                      service default.
                                     "template": "str"  # Optional. Optional
                                       sandbox template. Empty (or the legacy placeholder "coding")
                                       means "no preference": the template derives from the adapter.
@@ -52128,8 +52179,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                       write-only value; metadata.name is cleared while safe metadata
                                       such as labels remains. Required.
                                     "sizeSlug": "str",  # Optional. Requested
-                                      sandbox size (catalog: GET /v2/agents/sessions/sandbox/sizes).
-                                      Empty means the service default.
+                                      sandbox size (catalog: GET
+                                      /v2/harness-runtime/sessions/sandbox/sizes). Empty means the
+                                      service default.
                                     "template": "str"  # Optional. Optional
                                       sandbox template. Empty (or the legacy placeholder "coding")
                                       means "no preference": the template derives from the adapter.
@@ -52567,8 +52619,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                       write-only value; metadata.name is cleared while safe metadata
                                       such as labels remains. Required.
                                     "sizeSlug": "str",  # Optional. Requested
-                                      sandbox size (catalog: GET /v2/agents/sessions/sandbox/sizes).
-                                      Empty means the service default.
+                                      sandbox size (catalog: GET
+                                      /v2/harness-runtime/sessions/sandbox/sizes). Empty means the
+                                      service default.
                                     "template": "str"  # Optional. Optional
                                       sandbox template. Empty (or the legacy placeholder "coding")
                                       means "no preference": the template derives from the adapter.
@@ -52920,7 +52973,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
 
         Enumerates the caller's team sessions whose session was created from this durable Environment
         Config. Keyset-paginated on an opaque cursor, newest first, same shape and status semantics as
-        GET /v2/agents/sessions.
+        GET /v2/harness-runtime/sessions.
 
         :param config_id: The Environment Config UUID. Required.
         :type config_id: str
@@ -53062,9 +53115,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               sessions.
                             "pause_reason": "str",  # Optional. Why this session is
                               paused. Present only when status is SESSION_STATUS_PAUSED; omitted
-                              otherwise. Known values: manual (PauseSession RPC), idle (inactivity
-                              auto-pause), low_balance (prepay gate). Clients should treat an
-                              unrecognized value as an opaque reason string.
+                              otherwise. Known values: manual (the customer paused the session), idle
+                              (inactivity auto-pause), zero_balance (prepay gate; stored rows may still
+                              say low_balance), trigger (a reuse trigger paused the session after a
+                              firing). Clients should treat an unrecognized value as an opaque reason
+                              string.
                             "region": "str",  # Optional. DO region slug the session
                               lives in, e.g. ric1. Stamped once at create from the region whose API
                               host served the request, and never changed. Returned only for teams on
@@ -53075,7 +53130,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "resume_on_topoff": bool,  # Optional. Session consents to
                               being resumed automatically when the team's prepayment balance is
                               restored after a low-balance pause. Defaults to false at create time; may
-                              be toggled later via PATCH /v2/agents/sessions/{session_id}
+                              be toggled later via PATCH /v2/harness-runtime/sessions/{session_id}
                               (resume_on_topoff only). Only a session paused with reason low_balance
                               whose latest run did not complete is ever resumed automatically - a
                               session the customer paused themselves, or one that idled out, stays
@@ -53605,9 +53660,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               sessions.
                             "pause_reason": "str",  # Optional. Why this session is
                               paused. Present only when status is SESSION_STATUS_PAUSED; omitted
-                              otherwise. Known values: manual (PauseSession RPC), idle (inactivity
-                              auto-pause), low_balance (prepay gate). Clients should treat an
-                              unrecognized value as an opaque reason string.
+                              otherwise. Known values: manual (the customer paused the session), idle
+                              (inactivity auto-pause), zero_balance (prepay gate; stored rows may still
+                              say low_balance), trigger (a reuse trigger paused the session after a
+                              firing). Clients should treat an unrecognized value as an opaque reason
+                              string.
                             "region": "str",  # Optional. DO region slug the session
                               lives in, e.g. ric1. Stamped once at create from the region whose API
                               host served the request, and never changed. Returned only for teams on
@@ -53618,7 +53675,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "resume_on_topoff": bool,  # Optional. Session consents to
                               being resumed automatically when the team's prepayment balance is
                               restored after a low-balance pause. Defaults to false at create time; may
-                              be toggled later via PATCH /v2/agents/sessions/{session_id}
+                              be toggled later via PATCH /v2/harness-runtime/sessions/{session_id}
                               (resume_on_topoff only). Only a session paused with reason low_balance
                               whose latest run did not complete is ever resumed automatically - a
                               session the customer paused themselves, or one that idled out, stays
@@ -54054,9 +54111,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           this one was forked from. Omitted/empty for root (non-fork) sessions.
                         "pause_reason": "str",  # Optional. Why this session is paused.
                           Present only when status is SESSION_STATUS_PAUSED; omitted otherwise. Known
-                          values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
-                          (prepay gate). Clients should treat an unrecognized value as an opaque reason
-                          string.
+                          values: manual (the customer paused the session), idle (inactivity
+                          auto-pause), zero_balance (prepay gate; stored rows may still say
+                          low_balance), trigger (a reuse trigger paused the session after a firing).
+                          Clients should treat an unrecognized value as an opaque reason string.
                         "region": "str",  # Optional. DO region slug the session lives in,
                           e.g. ric1. Stamped once at create from the region whose API host served the
                           request, and never changed. Returned only for teams on the regional routing
@@ -54067,8 +54125,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "resume_on_topoff": bool,  # Optional. Session consents to being
                           resumed automatically when the team's prepayment balance is restored after a
                           low-balance pause. Defaults to false at create time; may be toggled later via
-                          PATCH /v2/agents/sessions/{session_id} (resume_on_topoff only). Only a
-                          session paused with reason low_balance whose latest run did not complete is
+                          PATCH /v2/harness-runtime/sessions/{session_id} (resume_on_topoff only). Only
+                          a session paused with reason low_balance whose latest run did not complete is
                           ever resumed automatically - a session the customer paused themselves, or one
                           that idled out, stays paused regardless. Not an environment-spec field, and
                           forks do not inherit it. Omitted when false.
@@ -54380,9 +54438,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           this one was forked from. Omitted/empty for root (non-fork) sessions.
                         "pause_reason": "str",  # Optional. Why this session is paused.
                           Present only when status is SESSION_STATUS_PAUSED; omitted otherwise. Known
-                          values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
-                          (prepay gate). Clients should treat an unrecognized value as an opaque reason
-                          string.
+                          values: manual (the customer paused the session), idle (inactivity
+                          auto-pause), zero_balance (prepay gate; stored rows may still say
+                          low_balance), trigger (a reuse trigger paused the session after a firing).
+                          Clients should treat an unrecognized value as an opaque reason string.
                         "region": "str",  # Optional. DO region slug the session lives in,
                           e.g. ric1. Stamped once at create from the region whose API host served the
                           request, and never changed. Returned only for teams on the regional routing
@@ -54393,8 +54452,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "resume_on_topoff": bool,  # Optional. Session consents to being
                           resumed automatically when the team's prepayment balance is restored after a
                           low-balance pause. Defaults to false at create time; may be toggled later via
-                          PATCH /v2/agents/sessions/{session_id} (resume_on_topoff only). Only a
-                          session paused with reason low_balance whose latest run did not complete is
+                          PATCH /v2/harness-runtime/sessions/{session_id} (resume_on_topoff only). Only
+                          a session paused with reason low_balance whose latest run did not complete is
                           ever resumed automatically - a session the customer paused themselves, or one
                           that idled out, stays paused regardless. Not an environment-spec field, and
                           forks do not inherit it. Omitted when false.
@@ -54726,9 +54785,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           this one was forked from. Omitted/empty for root (non-fork) sessions.
                         "pause_reason": "str",  # Optional. Why this session is paused.
                           Present only when status is SESSION_STATUS_PAUSED; omitted otherwise. Known
-                          values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
-                          (prepay gate). Clients should treat an unrecognized value as an opaque reason
-                          string.
+                          values: manual (the customer paused the session), idle (inactivity
+                          auto-pause), zero_balance (prepay gate; stored rows may still say
+                          low_balance), trigger (a reuse trigger paused the session after a firing).
+                          Clients should treat an unrecognized value as an opaque reason string.
                         "region": "str",  # Optional. DO region slug the session lives in,
                           e.g. ric1. Stamped once at create from the region whose API host served the
                           request, and never changed. Returned only for teams on the regional routing
@@ -54739,8 +54799,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "resume_on_topoff": bool,  # Optional. Session consents to being
                           resumed automatically when the team's prepayment balance is restored after a
                           low-balance pause. Defaults to false at create time; may be toggled later via
-                          PATCH /v2/agents/sessions/{session_id} (resume_on_topoff only). Only a
-                          session paused with reason low_balance whose latest run did not complete is
+                          PATCH /v2/harness-runtime/sessions/{session_id} (resume_on_topoff only). Only
+                          a session paused with reason low_balance whose latest run did not complete is
                           ever resumed automatically - a session the customer paused themselves, or one
                           that idled out, stays paused regardless. Not an environment-spec field, and
                           forks do not inherit it. Omitted when false.
@@ -55699,9 +55759,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           this one was forked from. Omitted/empty for root (non-fork) sessions.
                         "pause_reason": "str",  # Optional. Why this session is paused.
                           Present only when status is SESSION_STATUS_PAUSED; omitted otherwise. Known
-                          values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
-                          (prepay gate). Clients should treat an unrecognized value as an opaque reason
-                          string.
+                          values: manual (the customer paused the session), idle (inactivity
+                          auto-pause), zero_balance (prepay gate; stored rows may still say
+                          low_balance), trigger (a reuse trigger paused the session after a firing).
+                          Clients should treat an unrecognized value as an opaque reason string.
                         "region": "str",  # Optional. DO region slug the session lives in,
                           e.g. ric1. Stamped once at create from the region whose API host served the
                           request, and never changed. Returned only for teams on the regional routing
@@ -55712,8 +55773,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "resume_on_topoff": bool,  # Optional. Session consents to being
                           resumed automatically when the team's prepayment balance is restored after a
                           low-balance pause. Defaults to false at create time; may be toggled later via
-                          PATCH /v2/agents/sessions/{session_id} (resume_on_topoff only). Only a
-                          session paused with reason low_balance whose latest run did not complete is
+                          PATCH /v2/harness-runtime/sessions/{session_id} (resume_on_topoff only). Only
+                          a session paused with reason low_balance whose latest run did not complete is
                           ever resumed automatically - a session the customer paused themselves, or one
                           that idled out, stays paused regardless. Not an environment-spec field, and
                           forks do not inherit it. Omitted when false.
@@ -56123,9 +56184,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           this one was forked from. Omitted/empty for root (non-fork) sessions.
                         "pause_reason": "str",  # Optional. Why this session is paused.
                           Present only when status is SESSION_STATUS_PAUSED; omitted otherwise. Known
-                          values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
-                          (prepay gate). Clients should treat an unrecognized value as an opaque reason
-                          string.
+                          values: manual (the customer paused the session), idle (inactivity
+                          auto-pause), zero_balance (prepay gate; stored rows may still say
+                          low_balance), trigger (a reuse trigger paused the session after a firing).
+                          Clients should treat an unrecognized value as an opaque reason string.
                         "region": "str",  # Optional. DO region slug the session lives in,
                           e.g. ric1. Stamped once at create from the region whose API host served the
                           request, and never changed. Returned only for teams on the regional routing
@@ -56136,8 +56198,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "resume_on_topoff": bool,  # Optional. Session consents to being
                           resumed automatically when the team's prepayment balance is restored after a
                           low-balance pause. Defaults to false at create time; may be toggled later via
-                          PATCH /v2/agents/sessions/{session_id} (resume_on_topoff only). Only a
-                          session paused with reason low_balance whose latest run did not complete is
+                          PATCH /v2/harness-runtime/sessions/{session_id} (resume_on_topoff only). Only
+                          a session paused with reason low_balance whose latest run did not complete is
                           ever resumed automatically - a session the customer paused themselves, or one
                           that idled out, stays paused regardless. Not an environment-spec field, and
                           forks do not inherit it. Omitted when false.
@@ -56423,9 +56485,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           this one was forked from. Omitted/empty for root (non-fork) sessions.
                         "pause_reason": "str",  # Optional. Why this session is paused.
                           Present only when status is SESSION_STATUS_PAUSED; omitted otherwise. Known
-                          values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
-                          (prepay gate). Clients should treat an unrecognized value as an opaque reason
-                          string.
+                          values: manual (the customer paused the session), idle (inactivity
+                          auto-pause), zero_balance (prepay gate; stored rows may still say
+                          low_balance), trigger (a reuse trigger paused the session after a firing).
+                          Clients should treat an unrecognized value as an opaque reason string.
                         "region": "str",  # Optional. DO region slug the session lives in,
                           e.g. ric1. Stamped once at create from the region whose API host served the
                           request, and never changed. Returned only for teams on the regional routing
@@ -56436,8 +56499,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "resume_on_topoff": bool,  # Optional. Session consents to being
                           resumed automatically when the team's prepayment balance is restored after a
                           low-balance pause. Defaults to false at create time; may be toggled later via
-                          PATCH /v2/agents/sessions/{session_id} (resume_on_topoff only). Only a
-                          session paused with reason low_balance whose latest run did not complete is
+                          PATCH /v2/harness-runtime/sessions/{session_id} (resume_on_topoff only). Only
+                          a session paused with reason low_balance whose latest run did not complete is
                           ever resumed automatically - a session the customer paused themselves, or one
                           that idled out, stays paused regardless. Not an environment-spec field, and
                           forks do not inherit it. Omitted when false.
@@ -56734,9 +56797,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           this one was forked from. Omitted/empty for root (non-fork) sessions.
                         "pause_reason": "str",  # Optional. Why this session is paused.
                           Present only when status is SESSION_STATUS_PAUSED; omitted otherwise. Known
-                          values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
-                          (prepay gate). Clients should treat an unrecognized value as an opaque reason
-                          string.
+                          values: manual (the customer paused the session), idle (inactivity
+                          auto-pause), zero_balance (prepay gate; stored rows may still say
+                          low_balance), trigger (a reuse trigger paused the session after a firing).
+                          Clients should treat an unrecognized value as an opaque reason string.
                         "region": "str",  # Optional. DO region slug the session lives in,
                           e.g. ric1. Stamped once at create from the region whose API host served the
                           request, and never changed. Returned only for teams on the regional routing
@@ -56747,8 +56811,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "resume_on_topoff": bool,  # Optional. Session consents to being
                           resumed automatically when the team's prepayment balance is restored after a
                           low-balance pause. Defaults to false at create time; may be toggled later via
-                          PATCH /v2/agents/sessions/{session_id} (resume_on_topoff only). Only a
-                          session paused with reason low_balance whose latest run did not complete is
+                          PATCH /v2/harness-runtime/sessions/{session_id} (resume_on_topoff only). Only
+                          a session paused with reason low_balance whose latest run did not complete is
                           ever resumed automatically - a session the customer paused themselves, or one
                           that idled out, stays paused regardless. Not an environment-spec field, and
                           forks do not inherit it. Omitted when false.
@@ -58361,9 +58425,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           this one was forked from. Omitted/empty for root (non-fork) sessions.
                         "pause_reason": "str",  # Optional. Why this session is paused.
                           Present only when status is SESSION_STATUS_PAUSED; omitted otherwise. Known
-                          values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
-                          (prepay gate). Clients should treat an unrecognized value as an opaque reason
-                          string.
+                          values: manual (the customer paused the session), idle (inactivity
+                          auto-pause), zero_balance (prepay gate; stored rows may still say
+                          low_balance), trigger (a reuse trigger paused the session after a firing).
+                          Clients should treat an unrecognized value as an opaque reason string.
                         "region": "str",  # Optional. DO region slug the session lives in,
                           e.g. ric1. Stamped once at create from the region whose API host served the
                           request, and never changed. Returned only for teams on the regional routing
@@ -58374,8 +58439,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "resume_on_topoff": bool,  # Optional. Session consents to being
                           resumed automatically when the team's prepayment balance is restored after a
                           low-balance pause. Defaults to false at create time; may be toggled later via
-                          PATCH /v2/agents/sessions/{session_id} (resume_on_topoff only). Only a
-                          session paused with reason low_balance whose latest run did not complete is
+                          PATCH /v2/harness-runtime/sessions/{session_id} (resume_on_topoff only). Only
+                          a session paused with reason low_balance whose latest run did not complete is
                           ever resumed automatically - a session the customer paused themselves, or one
                           that idled out, stays paused regardless. Not an environment-spec field, and
                           forks do not inherit it. Omitted when false.
@@ -58823,9 +58888,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               sessions.
                             "pause_reason": "str",  # Optional. Why this session is
                               paused. Present only when status is SESSION_STATUS_PAUSED; omitted
-                              otherwise. Known values: manual (PauseSession RPC), idle (inactivity
-                              auto-pause), low_balance (prepay gate). Clients should treat an
-                              unrecognized value as an opaque reason string.
+                              otherwise. Known values: manual (the customer paused the session), idle
+                              (inactivity auto-pause), zero_balance (prepay gate; stored rows may still
+                              say low_balance), trigger (a reuse trigger paused the session after a
+                              firing). Clients should treat an unrecognized value as an opaque reason
+                              string.
                             "region": "str",  # Optional. DO region slug the session
                               lives in, e.g. ric1. Stamped once at create from the region whose API
                               host served the request, and never changed. Returned only for teams on
@@ -58836,7 +58903,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "resume_on_topoff": bool,  # Optional. Session consents to
                               being resumed automatically when the team's prepayment balance is
                               restored after a low-balance pause. Defaults to false at create time; may
-                              be toggled later via PATCH /v2/agents/sessions/{session_id}
+                              be toggled later via PATCH /v2/harness-runtime/sessions/{session_id}
                               (resume_on_topoff only). Only a session paused with reason low_balance
                               whose latest run did not complete is ever resumed automatically - a
                               session the customer paused themselves, or one that idled out, stays
@@ -59122,9 +59189,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               sessions.
                             "pause_reason": "str",  # Optional. Why this session is
                               paused. Present only when status is SESSION_STATUS_PAUSED; omitted
-                              otherwise. Known values: manual (PauseSession RPC), idle (inactivity
-                              auto-pause), low_balance (prepay gate). Clients should treat an
-                              unrecognized value as an opaque reason string.
+                              otherwise. Known values: manual (the customer paused the session), idle
+                              (inactivity auto-pause), zero_balance (prepay gate; stored rows may still
+                              say low_balance), trigger (a reuse trigger paused the session after a
+                              firing). Clients should treat an unrecognized value as an opaque reason
+                              string.
                             "region": "str",  # Optional. DO region slug the session
                               lives in, e.g. ric1. Stamped once at create from the region whose API
                               host served the request, and never changed. Returned only for teams on
@@ -59135,7 +59204,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "resume_on_topoff": bool,  # Optional. Session consents to
                               being resumed automatically when the team's prepayment balance is
                               restored after a low-balance pause. Defaults to false at create time; may
-                              be toggled later via PATCH /v2/agents/sessions/{session_id}
+                              be toggled later via PATCH /v2/harness-runtime/sessions/{session_id}
                               (resume_on_topoff only). Only a session paused with reason low_balance
                               whose latest run did not complete is ever resumed automatically - a
                               session the customer paused themselves, or one that idled out, stays
@@ -59426,9 +59495,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               sessions.
                             "pause_reason": "str",  # Optional. Why this session is
                               paused. Present only when status is SESSION_STATUS_PAUSED; omitted
-                              otherwise. Known values: manual (PauseSession RPC), idle (inactivity
-                              auto-pause), low_balance (prepay gate). Clients should treat an
-                              unrecognized value as an opaque reason string.
+                              otherwise. Known values: manual (the customer paused the session), idle
+                              (inactivity auto-pause), zero_balance (prepay gate; stored rows may still
+                              say low_balance), trigger (a reuse trigger paused the session after a
+                              firing). Clients should treat an unrecognized value as an opaque reason
+                              string.
                             "region": "str",  # Optional. DO region slug the session
                               lives in, e.g. ric1. Stamped once at create from the region whose API
                               host served the request, and never changed. Returned only for teams on
@@ -59439,7 +59510,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "resume_on_topoff": bool,  # Optional. Session consents to
                               being resumed automatically when the team's prepayment balance is
                               restored after a low-balance pause. Defaults to false at create time; may
-                              be toggled later via PATCH /v2/agents/sessions/{session_id}
+                              be toggled later via PATCH /v2/harness-runtime/sessions/{session_id}
                               (resume_on_topoff only). Only a session paused with reason low_balance
                               whose latest run did not complete is ever resumed automatically - a
                               session the customer paused themselves, or one that idled out, stays
@@ -64116,8 +64187,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         a descriptive WebSocket close code when the tunnel ends. This is the raw TCP tunnel; browser
         clients
         reaching the in-guest OpenHands Agent Server use the ingress URL
-        (\\ ``GET /v2/agents/sessions/{session_id}/ingress``\\ ), which has replaced this bridge for
-        them.
+        (\\ ``GET /v2/harness-runtime/sessions/{session_id}/ingress``\\ ), which has replaced this
+        bridge for them.
 
         WebSocket is not expressible in OpenAPI; this documents the GET that initiates the upgrade
         handshake
@@ -65883,7 +65954,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                   create defaults to custom. Known values are: "github", "gitlab", and
                                   "custom".
                                 "webhook_url": "str"  # Optional. The Payload URL to
-                                  configure in the external system.
+                                  configure in the external system. The service returns the
+                                  ``/v2/agents`` spelling. Paste that value unchanged.
                             }
                         }
                     ]
@@ -66143,7 +66215,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               applied to a delivery. Omitted on create defaults to custom. Known values
                               are: "github", "gitlab", and "custom".
                             "webhook_url": "str"  # Optional. The Payload URL to
-                              configure in the external system.
+                              configure in the external system. The service returns the ``/v2/agents``
+                              spelling. Paste that value unchanged.
                         }
                     },
                     "webhook_secret": "str"  # Optional. The generated webhook secret. Present
@@ -66282,7 +66355,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               applied to a delivery. Omitted on create defaults to custom. Known values
                               are: "github", "gitlab", and "custom".
                             "webhook_url": "str"  # Optional. The Payload URL to
-                              configure in the external system.
+                              configure in the external system. The service returns the ``/v2/agents``
+                              spelling. Paste that value unchanged.
                         }
                     },
                     "webhook_secret": "str"  # Optional. The generated webhook secret. Present
@@ -66459,7 +66533,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               applied to a delivery. Omitted on create defaults to custom. Known values
                               are: "github", "gitlab", and "custom".
                             "webhook_url": "str"  # Optional. The Payload URL to
-                              configure in the external system.
+                              configure in the external system. The service returns the ``/v2/agents``
+                              spelling. Paste that value unchanged.
                         }
                     },
                     "webhook_secret": "str"  # Optional. The generated webhook secret. Present
@@ -66652,10 +66727,12 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
     @distributed_trace
     def get_trigger_by_session(self, session_id: str, **kwargs: Any) -> JSON:
         # pylint: disable=line-too-long
-        """GetTriggerBySession reverse-looks-up the trigger that produced or binds a session.
+        """Get the newest trigger bound to a session, or the trigger of its newest execution.
 
-        Returns the trigger that produced (fresh) or binds (reuse) the given session. Resolves to the
-        row even after the trigger is soft-deleted.
+        Returns the newest trigger whose bound session is this one. Deleted triggers are skipped. When
+        none is bound, returns the trigger of the newest execution for this session, again skipping
+        deleted triggers. A session can be bound to more than one trigger; only the newest is returned.
+        404 when neither lookup matches.
 
         :param session_id: The session UUID. Required.
         :type session_id: str
@@ -66744,7 +66821,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               applied to a delivery. Omitted on create defaults to custom. Known values
                               are: "github", "gitlab", and "custom".
                             "webhook_url": "str"  # Optional. The Payload URL to
-                              configure in the external system.
+                              configure in the external system. The service returns the ``/v2/agents``
+                              spelling. Paste that value unchanged.
                         }
                     }
                 }
@@ -67068,7 +67146,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               applied to a delivery. Omitted on create defaults to custom. Known values
                               are: "github", "gitlab", and "custom".
                             "webhook_url": "str"  # Optional. The Payload URL to
-                              configure in the external system.
+                              configure in the external system. The service returns the ``/v2/agents``
+                              spelling. Paste that value unchanged.
                         }
                     }
                 }
@@ -67309,7 +67388,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               applied to a delivery. Omitted on create defaults to custom. Known values
                               are: "github", "gitlab", and "custom".
                             "webhook_url": "str"  # Optional. The Payload URL to
-                              configure in the external system.
+                              configure in the external system. The service returns the ``/v2/agents``
+                              spelling. Paste that value unchanged.
                         }
                     }
                 }
@@ -67440,7 +67520,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               applied to a delivery. Omitted on create defaults to custom. Known values
                               are: "github", "gitlab", and "custom".
                             "webhook_url": "str"  # Optional. The Payload URL to
-                              configure in the external system.
+                              configure in the external system. The service returns the ``/v2/agents``
+                              spelling. Paste that value unchanged.
                         }
                     }
                 }
@@ -67596,7 +67677,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               applied to a delivery. Omitted on create defaults to custom. Known values
                               are: "github", "gitlab", and "custom".
                             "webhook_url": "str"  # Optional. The Payload URL to
-                              configure in the external system.
+                              configure in the external system. The service returns the ``/v2/agents``
+                              spelling. Paste that value unchanged.
                         }
                     }
                 }
@@ -67966,6 +68048,13 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               before then.
                             "status": "str",  # Optional. Per-firing outcome. Known
                               values are: "pending", "running", "succeeded", and "failed".
+                            "status_message": "str",  # Optional. Human-readable detail
+                              for status_reason. Omitted when status_reason is omitted.
+                            "status_reason": "str",  # Optional. Why a running execution
+                              has not started its turn. Omitted when there is nothing to report. Known
+                              value: waiting_for_bound_session (a reuse firing is waiting for its bound
+                              session to pause; status stays running). Clients should treat an
+                              unrecognized value as an opaque string.
                             "trigger_id": "str",  # Optional.
                             "updated_at": "2020-02-20 00:00:00"  # Optional.
                         }
@@ -68112,6 +68201,13 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           the session is created (fresh) or is known (reuse); empty before then.
                         "status": "str",  # Optional. Per-firing outcome. Known values are:
                           "pending", "running", "succeeded", and "failed".
+                        "status_message": "str",  # Optional. Human-readable detail for
+                          status_reason. Omitted when status_reason is omitted.
+                        "status_reason": "str",  # Optional. Why a running execution has not
+                          started its turn. Omitted when there is nothing to report. Known value:
+                          waiting_for_bound_session (a reuse firing is waiting for its bound session to
+                          pause; status stays running). Clients should treat an unrecognized value as
+                          an opaque string.
                         "trigger_id": "str",  # Optional. One row per firing (webhook
                           delivery or cron tick).
                         "updated_at": "2020-02-20 00:00:00"  # Optional. One row per firing
@@ -68267,13 +68363,20 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           the session is created (fresh) or is known (reuse); empty before then.
                         "status": "str",  # Optional. Per-firing outcome. Known values are:
                           "pending", "running", "succeeded", and "failed".
+                        "status_message": "str",  # Optional. Human-readable detail for
+                          status_reason. Omitted when status_reason is omitted.
+                        "status_reason": "str",  # Optional. Why a running execution has not
+                          started its turn. Omitted when there is nothing to report. Known value:
+                          waiting_for_bound_session (a reuse firing is waiting for its bound session to
+                          pause; status stays running). Clients should treat an unrecognized value as
+                          an opaque string.
                         "trigger_id": "str",  # Optional. One row per firing (webhook
                           delivery or cron tick).
                         "updated_at": "2020-02-20 00:00:00"  # Optional. One row per firing
                           (webhook delivery or cron tick).
                     }
                 }
-                # response body for status code(s): 404, 409
+                # response body for status code(s): 404, 409, 503
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -68321,7 +68424,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
 
         response = pipeline_response.http_response
 
-        if response.status_code not in [200, 404, 409]:
+        if response.status_code not in [200, 404, 409, 503]:
             if _stream:
                 response.read()  # Load the body in memory and close the socket
             map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
@@ -68361,6 +68464,22 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                 deserialized = None
 
         if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 503:
             response_headers["ratelimit-limit"] = self._deserialize(
                 "int", response.headers.get("ratelimit-limit")
             )
@@ -68582,6 +68701,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         execution_id. A delivery to a paused trigger returns 202 with no body and queues nothing
         (deliberately
         not 409, so providers do not auto-disable the webhook after repeated non-2xx).
+
+        Both ``/v2/agents/triggers/{trigger_id}/webhook`` and
+        ``/v2/harness-runtime/triggers/{trigger_id}/webhook`` are accepted and keep working
+        indefinitely. Paste the ``webhook_url`` returned on the trigger into the external system
+        unchanged.
 
         :param trigger_id: The trigger UUID. Required.
         :type trigger_id: str
@@ -263991,6 +264115,12 @@ class RegistriesOperations:
                     "name": "str",  # A globally unique name for the container registry. Must be
                       lowercase and be composed only of numbers, letters and ``-``"" , up to a limit of
                       63 characters. Required.
+                    "insights": {
+                        "logs": bool  # Optional. A boolean value indicating whether the
+                          registry's logs are sent to Insights. Set this to ``true`` to send the
+                          registry's logs to Insights. ``false``"" , and omitting ``insights`` or
+                          ``logs``"" , both create the registry with logs not enabled.
+                    },
                     "region": "str",  # Optional. Slug of the region where registry data is
                       stored. When not provided, a region will be selected. Known values are: "nyc3",
                       "sfo3", "sfo2", "ams3", "sgp1", "fra1", "blr1", and "syd1".
@@ -264111,6 +264241,12 @@ class RegistriesOperations:
                     "name": "str",  # A globally unique name for the container registry. Must be
                       lowercase and be composed only of numbers, letters and ``-``"" , up to a limit of
                       63 characters. Required.
+                    "insights": {
+                        "logs": bool  # Optional. A boolean value indicating whether the
+                          registry's logs are sent to Insights. Set this to ``true`` to send the
+                          registry's logs to Insights. ``false``"" , and omitting ``insights`` or
+                          ``logs``"" , both create the registry with logs not enabled.
+                    },
                     "region": "str",  # Optional. Slug of the region where registry data is
                       stored. When not provided, a region will be selected. Known values are: "nyc3",
                       "sfo3", "sfo2", "ams3", "sgp1", "fra1", "blr1", and "syd1".
@@ -267129,6 +267265,12 @@ class RegistryOperations:
                     "subscription_tier_slug": "str",  # The slug of the subscription tier to sign
                       up for. Valid values can be retrieved using the options endpoint. Required. Known
                       values are: "starter", "basic", and "professional".
+                    "insights": {
+                        "logs": bool  # Optional. A boolean value indicating whether the
+                          registry's logs are sent to Insights. Set this to ``true`` to send the
+                          registry's logs to Insights. ``false``"" , and omitting ``insights`` or
+                          ``logs``"" , both create the registry with logs not enabled.
+                    },
                     "region": "str"  # Optional. Slug of the region where registry data is
                       stored. When not provided, a region will be selected. Known values are: "nyc3",
                       "sfo3", "ams3", "sgp1", and "fra1".
@@ -267289,6 +267431,12 @@ class RegistryOperations:
                     "subscription_tier_slug": "str",  # The slug of the subscription tier to sign
                       up for. Valid values can be retrieved using the options endpoint. Required. Known
                       values are: "starter", "basic", and "professional".
+                    "insights": {
+                        "logs": bool  # Optional. A boolean value indicating whether the
+                          registry's logs are sent to Insights. Set this to ``true`` to send the
+                          registry's logs to Insights. ``false``"" , and omitting ``insights`` or
+                          ``logs``"" , both create the registry with logs not enabled.
+                    },
                     "region": "str"  # Optional. Slug of the region where registry data is
                       stored. When not provided, a region will be selected. Known values are: "nyc3",
                       "sfo3", "ams3", "sgp1", and "fra1".
@@ -339714,6 +339862,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   "METRIC_VALUE_TYPE_PERCENTAGE".
                                 "number_value": 0.0,  # Optional. The value of the
                                   metric as a number.
+                                "passed": bool,  # Optional. Whether the score met
+                                  the metric's success threshold. Set for model evaluation results
+                                  only, and only when status is COMPLETED; omitted for skipped or
+                                  failed metrics.
                                 "reasoning": "str",  # Optional. Reasoning of the
                                   metric result.
                                 "status":
@@ -339741,6 +339893,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                             "number_value": 0.0,  # Optional. The value of the metric as
                               a number.
+                            "passed": bool,  # Optional. Whether the score met the
+                              metric's success threshold. Set for model evaluation results only, and
+                              only when status is COMPLETED; omitted for skipped or failed metrics.
                             "reasoning": "str",  # Optional. Reasoning of the metric
                               result.
                             "status": "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",  #
@@ -339919,6 +340074,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   "METRIC_VALUE_TYPE_PERCENTAGE".
                                 "number_value": 0.0,  # Optional. The value of the
                                   metric as a number.
+                                "passed": bool,  # Optional. Whether the score met
+                                  the metric's success threshold. Set for model evaluation results
+                                  only, and only when status is COMPLETED; omitted for skipped or
+                                  failed metrics.
                                 "reasoning": "str",  # Optional. Reasoning of the
                                   metric result.
                                 "status":
@@ -339946,6 +340105,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                             "number_value": 0.0,  # Optional. The value of the metric as
                               a number.
+                            "passed": bool,  # Optional. Whether the score met the
+                              metric's success threshold. Set for model evaluation results only, and
+                              only when status is COMPLETED; omitted for skipped or failed metrics.
                             "reasoning": "str",  # Optional. Reasoning of the metric
                               result.
                             "status": "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",  #
@@ -340029,6 +340191,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               and "METRIC_VALUE_TYPE_PERCENTAGE".
                                             "number_value": 0.0,  #
                                               Optional. The value of the metric as a number.
+                                            "passed": bool,  # Optional.
+                                              Whether the score met the metric's success threshold. Set
+                                              for model evaluation results only, and only when status
+                                              is COMPLETED; omitted for skipped or failed metrics.
                                             "reasoning": "str",  #
                                               Optional. Reasoning of the metric result.
                                             "status":
@@ -340253,6 +340419,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                                     "number_value": 0.0,  # Optional. The value
                                       of the metric as a number.
+                                    "passed": bool,  # Optional. Whether the
+                                      score met the metric's success threshold. Set for model
+                                      evaluation results only, and only when status is COMPLETED;
+                                      omitted for skipped or failed metrics.
                                     "reasoning": "str",  # Optional. Reasoning of
                                       the metric result.
                                     "status":
@@ -340430,6 +340600,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           "METRIC_VALUE_TYPE_PERCENTAGE".
                                         "number_value": 0.0,  # Optional. The
                                           value of the metric as a number.
+                                        "passed": bool,  # Optional. Whether
+                                          the score met the metric's success threshold. Set for model
+                                          evaluation results only, and only when status is COMPLETED;
+                                          omitted for skipped or failed metrics.
                                         "reasoning": "str",  # Optional.
                                           Reasoning of the metric result.
                                         "status":
@@ -340653,6 +340827,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   "METRIC_VALUE_TYPE_PERCENTAGE".
                                 "number_value": 0.0,  # Optional. The value of the
                                   metric as a number.
+                                "passed": bool,  # Optional. Whether the score met
+                                  the metric's success threshold. Set for model evaluation results
+                                  only, and only when status is COMPLETED; omitted for skipped or
+                                  failed metrics.
                                 "reasoning": "str",  # Optional. Reasoning of the
                                   metric result.
                                 "status":
@@ -341381,6 +341559,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                                     "number_value": 0.0,  # Optional. The value
                                       of the metric as a number.
+                                    "passed": bool,  # Optional. Whether the
+                                      score met the metric's success threshold. Set for model
+                                      evaluation results only, and only when status is COMPLETED;
+                                      omitted for skipped or failed metrics.
                                     "reasoning": "str",  # Optional. Reasoning of
                                       the metric result.
                                     "status":
@@ -341409,6 +341591,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   "METRIC_VALUE_TYPE_PERCENTAGE".
                                 "number_value": 0.0,  # Optional. The value of the
                                   metric as a number.
+                                "passed": bool,  # Optional. Whether the score met
+                                  the metric's success threshold. Set for model evaluation results
+                                  only, and only when status is COMPLETED; omitted for skipped or
+                                  failed metrics.
                                 "reasoning": "str",  # Optional. Reasoning of the
                                   metric result.
                                 "status":
@@ -349347,6 +349533,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               and "METRIC_VALUE_TYPE_PERCENTAGE".
                                             "number_value": 0.0,  #
                                               Optional. The value of the metric as a number.
+                                            "passed": bool,  # Optional.
+                                              Whether the score met the metric's success threshold. Set
+                                              for model evaluation results only, and only when status
+                                              is COMPLETED; omitted for skipped or failed metrics.
                                             "reasoning": "str",  #
                                               Optional. Reasoning of the metric result.
                                             "status":
@@ -349387,6 +349577,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                                     "number_value": 0.0,  # Optional. The value
                                       of the metric as a number.
+                                    "passed": bool,  # Optional. Whether the
+                                      score met the metric's success threshold. Set for model
+                                      evaluation results only, and only when status is COMPLETED;
+                                      omitted for skipped or failed metrics.
                                     "reasoning": "str",  # Optional. Reasoning of
                                       the metric result.
                                     "status":
@@ -366992,6 +367186,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   "METRIC_VALUE_TYPE_PERCENTAGE".
                                 "number_value": 0.0,  # Optional. The value of the
                                   metric as a number.
+                                "passed": bool,  # Optional. Whether the score met
+                                  the metric's success threshold. Set for model evaluation results
+                                  only, and only when status is COMPLETED; omitted for skipped or
+                                  failed metrics.
                                 "reasoning": "str",  # Optional. Reasoning of the
                                   metric result.
                                 "status":
