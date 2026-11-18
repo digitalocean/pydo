@@ -487,6 +487,7 @@ from ...operations._operations import (
     build_harness_post_session_pause_request,
     build_harness_post_session_resume_request,
     build_harness_post_session_sandbox_exec_request,
+    build_harness_post_session_sandbox_exec_stdin_request,
     build_harness_post_trigger_rotate_secret_request,
     build_harness_post_trigger_webhook_request,
     build_harness_revert_session_checkpoint_request,
@@ -874,6 +875,7 @@ from ...operations._operations import (
     build_tools_list_search_providers_request,
     build_tools_list_search_request,
     build_tools_list_toolkits_request,
+    build_tools_list_versions_request,
     build_uptime_create_alert_request,
     build_uptime_create_check_request,
     build_uptime_delete_alert_request,
@@ -17618,6 +17620,209 @@ class ToolsOperations:
         return cast(JSON, deserialized)  # type: ignore
 
     @distributed_trace_async
+    async def list_versions(
+        self,
+        tool_slug: str,
+        *,
+        page_size: int = 20,
+        page_token: Optional[str] = None,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Tool Versions.
+
+        Returns the released versions of one catalog tool, newest first, each with the changes from the
+        version released before it. Every version listed can be pinned as ``<tool_slug>@<version>`` in
+        an endpoint or toolbelt, and a pin keeps calling that version after newer versions are
+        released. A tool named without a version always calls the latest release, marked ``latest``.
+
+        Changes are computed by comparing each version's input schema, output schema, and required
+        OAuth scopes with the previous released version. ``breaking`` marks a change that can make a
+        call that worked against the previous version fail; review those before moving a pin or relying
+        on the latest release. Returns 404 when ``tool_slug`` is not a catalog tool. Tools of your
+        team's MCP servers are not listed.
+
+        :param tool_slug: Catalog tool slug, for example ``exa_search``. Required. Required.
+        :type tool_slug: str
+        :keyword page_size: Page size, 1 to 100. Defaults to 20 when omitted or 0; other values are
+         rejected with 400. Default value is 20.
+        :paramtype page_size: int
+        :keyword page_token: ``next_page_token`` from the previous response. Valid only with the same
+         tool selection; otherwise the request is rejected with 400. Default value is None.
+        :paramtype page_token: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "next_page_token": "str",  # Optional. Pass as ``page_token`` to read older
+                      versions. Empty on the last page.
+                    "versions": [
+                        {
+                            "breaking": bool,  # Optional. True when any change is
+                              breaking.
+                            "changes": [
+                                {
+                                    "breaking": bool,  # Optional. True when a
+                                      call that worked against the previous version can fail against
+                                      this one.
+                                    "path": "str",  # Optional. Dotted path of
+                                      the schema property that changed, for example ``page.cursor``.
+                                      ``items[]`` names an array's elements. Empty for the schema root
+                                      and for scope changes.
+                                    "type": "str",  # Optional. What changed.
+                                      ``inputPropertyAdded`` is breaking when the property is required.
+                                      ``inputTypeChanged`` and ``outputTypeChanged`` list the new types
+                                      in ``values``"" , and are breaking when a previously accepted
+                                      input type is no longer accepted or an output can hold a new
+                                      type. ``requiredScopesAdded`` is breaking because a connection
+                                      authorized before the version may lack the scopes and must be
+                                      reconnected. ``inputSchemaChanged`` and ``outputSchemaChanged``
+                                      cover other schema changes and are reported as breaking, except
+                                      when an output schema is declared for the first time. Known
+                                      values are: "inputPropertyAdded", "inputPropertyRemoved",
+                                      "inputPropertyRequired", "inputPropertyOptional",
+                                      "inputTypeChanged", "inputEnumValuesAdded",
+                                      "inputEnumValuesRemoved", "inputSchemaChanged",
+                                      "outputPropertyAdded", "outputPropertyRemoved",
+                                      "outputPropertyOptional", "outputTypeChanged",
+                                      "outputEnumValuesAdded", "outputSchemaChanged",
+                                      "requiredScopesAdded", and "requiredScopesRemoved".
+                                    "values": [
+                                        "str"  # Optional. The values the
+                                          change concerns, sorted: enum values added or removed, the
+                                          property's new types, or the scopes added or removed. Empty
+                                          otherwise.
+                                    ]
+                                }
+                            ],
+                            "latest": bool,  # Optional. True for the version calls
+                              without a pinned version currently use. At most one version is latest;
+                              none is while a tool is withdrawn from the catalog.
+                            "previous_version": "str",  # Optional. The released version
+                              this one is compared with. Empty for the oldest version listed, which has
+                              no changes.
+                            "released_at": "2020-02-20 00:00:00",  # Optional. When this
+                              version was first released.
+                            "tool_slug": "str",  # Optional. Catalog tool slug.
+                            "version": "str"  # Optional. Version, for example ``v3``.
+                              Pin it as ``<tool_slug>@v3``.
+                        }
+                    ]
+                }
+                # response body for status code(s): 400, 404
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_tools_list_versions_request(
+            tool_slug=tool_slug,
+            page_size=page_size,
+            page_token=page_token,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
     async def list_providers(self, **kwargs: Any) -> JSON:
         # pylint: disable=line-too-long
         """List Providers.
@@ -19636,6 +19841,11 @@ class GatewayToolsOperations:
         needs the end user to connect a provider fails with ``_meta.status`` set to
         ``requires_authorization`` or ``requires_connection_configuration``.
 
+        A call that pins an older released version, such as ``version: v16`` while ``v17`` is current,
+        returns ``_meta.latest_version`` with the current release's version. Calls without a version,
+        and calls pinned to the current release, omit it. List a tool's versions and their changes with
+        ``GET /v2/action-gateway/tools/{tool_slug}/versions``.
+
         Tools opted into result caching use the session's settings automatically. Set cache on an
         individual tools entry to bypass caching or require a fresher result. The result's _meta.cache
         reports cache hits. Hits still incur the standard gateway invocation charge but no additional
@@ -19819,6 +20029,11 @@ class GatewayToolsOperations:
         needs the end user to connect a provider fails with ``_meta.status`` set to
         ``requires_authorization`` or ``requires_connection_configuration``.
 
+        A call that pins an older released version, such as ``version: v16`` while ``v17`` is current,
+        returns ``_meta.latest_version`` with the current release's version. Calls without a version,
+        and calls pinned to the current release, omit it. List a tool's versions and their changes with
+        ``GET /v2/action-gateway/tools/{tool_slug}/versions``.
+
         Tools opted into result caching use the session's settings automatically. Set cache on an
         individual tools entry to bypass caching or require a fresher result. The result's _meta.cache
         reports cache hits. Hits still incur the standard gateway invocation charge but no additional
@@ -19970,6 +20185,11 @@ class GatewayToolsOperations:
         Have the session's owner approve it, then repeat the call with the same arguments. A call that
         needs the end user to connect a provider fails with ``_meta.status`` set to
         ``requires_authorization`` or ``requires_connection_configuration``.
+
+        A call that pins an older released version, such as ``version: v16`` while ``v17`` is current,
+        returns ``_meta.latest_version`` with the current release's version. Calls without a version,
+        and calls pinned to the current release, omit it. List a tool's versions and their changes with
+        ``GET /v2/action-gateway/tools/{tool_slug}/versions``.
 
         Tools opted into result caching use the session's settings automatically. Set cache on an
         individual tools entry to bypass caching or require a fresher result. The result's _meta.cache
@@ -25628,10 +25848,18 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         # pylint: disable=line-too-long
         """Create a provider connection for one actor.
 
-        Creates, or resumes, the connection ``{provider}`` will use for ``user_id``. ``user_id`` is the
-        actor identifier the connection acts for, not a DigitalOcean user id. A pending connection
-        includes an ``authorization`` object the user still has to complete. An active connection omits
-        it. No token is returned. ``github`` is the provider served today.
+        Creates the connection ``{provider}`` will use for ``user_id``. ``user_id`` is the actor
+        identifier the connection acts for, not a DigitalOcean user id. Each actor has at most one
+        active, pending, or expired connection per provider. If ``user_id`` already has one, the
+        request fails with ``409``. Find that connection's id with ``GET
+        /v2/harness-runtime/auth/{provider}/connections?user_id=...``\\ , then resume or restart it
+        with ``POST /v2/harness-runtime/auth/{provider}/connections/{connection_id}/reconnect``\\ ,
+        which keeps its scopes. Revoked connections do not count toward the limit, and list responses
+        omit them. If the only connection ``user_id`` has for ``{provider}`` is revoked, for example by
+        ``DELETE``\\ , create starts it again under the same connection id, with the scopes in this
+        request. To change a connection's scopes, delete it and then create it. A successful create
+        returns the connection as ``pending``\\ , with an ``authorization`` object for the interactive
+        step. No token is returned. ``github`` is the provider served today.
 
         :param provider: Provider key. ``github`` is the provider served today. Required.
         :type provider: str
@@ -25697,7 +25925,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           for. Not a DigitalOcean user id.
                     }
                 }
-                # response body for status code(s): 400, 404, 501
+                # response body for status code(s): 400, 404, 409, 501
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -25722,10 +25950,18 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         # pylint: disable=line-too-long
         """Create a provider connection for one actor.
 
-        Creates, or resumes, the connection ``{provider}`` will use for ``user_id``. ``user_id`` is the
-        actor identifier the connection acts for, not a DigitalOcean user id. A pending connection
-        includes an ``authorization`` object the user still has to complete. An active connection omits
-        it. No token is returned. ``github`` is the provider served today.
+        Creates the connection ``{provider}`` will use for ``user_id``. ``user_id`` is the actor
+        identifier the connection acts for, not a DigitalOcean user id. Each actor has at most one
+        active, pending, or expired connection per provider. If ``user_id`` already has one, the
+        request fails with ``409``. Find that connection's id with ``GET
+        /v2/harness-runtime/auth/{provider}/connections?user_id=...``\\ , then resume or restart it
+        with ``POST /v2/harness-runtime/auth/{provider}/connections/{connection_id}/reconnect``\\ ,
+        which keeps its scopes. Revoked connections do not count toward the limit, and list responses
+        omit them. If the only connection ``user_id`` has for ``{provider}`` is revoked, for example by
+        ``DELETE``\\ , create starts it again under the same connection id, with the scopes in this
+        request. To change a connection's scopes, delete it and then create it. A successful create
+        returns the connection as ``pending``\\ , with an ``authorization`` object for the interactive
+        step. No token is returned. ``github`` is the provider served today.
 
         :param provider: Provider key. ``github`` is the provider served today. Required.
         :type provider: str
@@ -25782,7 +26018,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           for. Not a DigitalOcean user id.
                     }
                 }
-                # response body for status code(s): 400, 404, 501
+                # response body for status code(s): 400, 404, 409, 501
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -25802,10 +26038,18 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         # pylint: disable=line-too-long
         """Create a provider connection for one actor.
 
-        Creates, or resumes, the connection ``{provider}`` will use for ``user_id``. ``user_id`` is the
-        actor identifier the connection acts for, not a DigitalOcean user id. A pending connection
-        includes an ``authorization`` object the user still has to complete. An active connection omits
-        it. No token is returned. ``github`` is the provider served today.
+        Creates the connection ``{provider}`` will use for ``user_id``. ``user_id`` is the actor
+        identifier the connection acts for, not a DigitalOcean user id. Each actor has at most one
+        active, pending, or expired connection per provider. If ``user_id`` already has one, the
+        request fails with ``409``. Find that connection's id with ``GET
+        /v2/harness-runtime/auth/{provider}/connections?user_id=...``\\ , then resume or restart it
+        with ``POST /v2/harness-runtime/auth/{provider}/connections/{connection_id}/reconnect``\\ ,
+        which keeps its scopes. Revoked connections do not count toward the limit, and list responses
+        omit them. If the only connection ``user_id`` has for ``{provider}`` is revoked, for example by
+        ``DELETE``\\ , create starts it again under the same connection id, with the scopes in this
+        request. To change a connection's scopes, delete it and then create it. A successful create
+        returns the connection as ``pending``\\ , with an ``authorization`` object for the interactive
+        step. No token is returned. ``github`` is the provider served today.
 
         :param provider: Provider key. ``github`` is the provider served today. Required.
         :type provider: str
@@ -25868,7 +26112,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           for. Not a DigitalOcean user id.
                     }
                 }
-                # response body for status code(s): 400, 404, 501
+                # response body for status code(s): 400, 404, 409, 501
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -25928,7 +26172,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
 
         response = pipeline_response.http_response
 
-        if response.status_code not in [200, 400, 404, 501]:
+        if response.status_code not in [200, 400, 404, 409, 501]:
             if _stream:
                 await response.read()  # Load the body in memory and close the socket
             map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
@@ -25968,6 +26212,22 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                 deserialized = None
 
         if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
             response_headers["ratelimit-limit"] = self._deserialize(
                 "int", response.headers.get("ratelimit-limit")
             )
@@ -26367,8 +26627,12 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         # pylint: disable=line-too-long
         """Start a fresh login for an existing connection.
 
-        Begins the interactive step again for a connection that needs it. The response includes
-        ``authorization`` while that step is outstanding. No token is returned.
+        Resumes a pending connection's authorization, or starts a new one for an expired or revoked
+        connection. The connection keeps its id, ``user_id``\\ , and scopes, so environments that use
+        it keep working once it is active again. An active connection is returned unchanged. Only the
+        member who owns the connection can reconnect it; for anyone else the response is ``404``\\ ,
+        the same as for an unknown connection. The response includes ``authorization`` while the
+        interactive step is outstanding. No token is returned.
 
         :param provider: Provider key. ``github`` is the provider served today. Required.
         :type provider: str
@@ -27131,8 +27395,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                       write-only value; metadata.name is cleared while safe metadata
                                       such as labels remains. Required.
                                     "sizeSlug": "str",  # Optional. Requested
-                                      sandbox size (catalog: GET /v2/agents/sessions/sandbox/sizes).
-                                      Empty means the service default.
+                                      sandbox size (catalog: GET
+                                      /v2/harness-runtime/sessions/sandbox/sizes). Empty means the
+                                      service default.
                                     "template": "str"  # Optional. Optional
                                       sandbox template. Empty (or the legacy placeholder "coding")
                                       means "no preference": the template derives from the adapter.
@@ -27555,8 +27820,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                       write-only value; metadata.name is cleared while safe metadata
                                       such as labels remains. Required.
                                     "sizeSlug": "str",  # Optional. Requested
-                                      sandbox size (catalog: GET /v2/agents/sessions/sandbox/sizes).
-                                      Empty means the service default.
+                                      sandbox size (catalog: GET
+                                      /v2/harness-runtime/sessions/sandbox/sizes). Empty means the
+                                      service default.
                                     "template": "str"  # Optional. Optional
                                       sandbox template. Empty (or the legacy placeholder "coding")
                                       means "no preference": the template derives from the adapter.
@@ -27991,8 +28257,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                       write-only value; metadata.name is cleared while safe metadata
                                       such as labels remains. Required.
                                     "sizeSlug": "str",  # Optional. Requested
-                                      sandbox size (catalog: GET /v2/agents/sessions/sandbox/sizes).
-                                      Empty means the service default.
+                                      sandbox size (catalog: GET
+                                      /v2/harness-runtime/sessions/sandbox/sizes). Empty means the
+                                      service default.
                                     "template": "str"  # Optional. Optional
                                       sandbox template. Empty (or the legacy placeholder "coding")
                                       means "no preference": the template derives from the adapter.
@@ -28545,8 +28812,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                       write-only value; metadata.name is cleared while safe metadata
                                       such as labels remains. Required.
                                     "sizeSlug": "str",  # Optional. Requested
-                                      sandbox size (catalog: GET /v2/agents/sessions/sandbox/sizes).
-                                      Empty means the service default.
+                                      sandbox size (catalog: GET
+                                      /v2/harness-runtime/sessions/sandbox/sizes). Empty means the
+                                      service default.
                                     "template": "str"  # Optional. Optional
                                       sandbox template. Empty (or the legacy placeholder "coding")
                                       means "no preference": the template derives from the adapter.
@@ -29220,8 +29488,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                       write-only value; metadata.name is cleared while safe metadata
                                       such as labels remains. Required.
                                     "sizeSlug": "str",  # Optional. Requested
-                                      sandbox size (catalog: GET /v2/agents/sessions/sandbox/sizes).
-                                      Empty means the service default.
+                                      sandbox size (catalog: GET
+                                      /v2/harness-runtime/sessions/sandbox/sizes). Empty means the
+                                      service default.
                                     "template": "str"  # Optional. Optional
                                       sandbox template. Empty (or the legacy placeholder "coding")
                                       means "no preference": the template derives from the adapter.
@@ -29651,8 +29920,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                       write-only value; metadata.name is cleared while safe metadata
                                       such as labels remains. Required.
                                     "sizeSlug": "str",  # Optional. Requested
-                                      sandbox size (catalog: GET /v2/agents/sessions/sandbox/sizes).
-                                      Empty means the service default.
+                                      sandbox size (catalog: GET
+                                      /v2/harness-runtime/sessions/sandbox/sizes). Empty means the
+                                      service default.
                                     "template": "str"  # Optional. Optional
                                       sandbox template. Empty (or the legacy placeholder "coding")
                                       means "no preference": the template derives from the adapter.
@@ -30090,8 +30360,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                       write-only value; metadata.name is cleared while safe metadata
                                       such as labels remains. Required.
                                     "sizeSlug": "str",  # Optional. Requested
-                                      sandbox size (catalog: GET /v2/agents/sessions/sandbox/sizes).
-                                      Empty means the service default.
+                                      sandbox size (catalog: GET
+                                      /v2/harness-runtime/sessions/sandbox/sizes). Empty means the
+                                      service default.
                                     "template": "str"  # Optional. Optional
                                       sandbox template. Empty (or the legacy placeholder "coding")
                                       means "no preference": the template derives from the adapter.
@@ -30443,7 +30714,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
 
         Enumerates the caller's team sessions whose session was created from this durable Environment
         Config. Keyset-paginated on an opaque cursor, newest first, same shape and status semantics as
-        GET /v2/agents/sessions.
+        GET /v2/harness-runtime/sessions.
 
         :param config_id: The Environment Config UUID. Required.
         :type config_id: str
@@ -30585,9 +30856,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               sessions.
                             "pause_reason": "str",  # Optional. Why this session is
                               paused. Present only when status is SESSION_STATUS_PAUSED; omitted
-                              otherwise. Known values: manual (PauseSession RPC), idle (inactivity
-                              auto-pause), low_balance (prepay gate). Clients should treat an
-                              unrecognized value as an opaque reason string.
+                              otherwise. Known values: manual (the customer paused the session), idle
+                              (inactivity auto-pause), zero_balance (prepay gate; stored rows may still
+                              say low_balance), trigger (a reuse trigger paused the session after a
+                              firing). Clients should treat an unrecognized value as an opaque reason
+                              string.
                             "region": "str",  # Optional. DO region slug the session
                               lives in, e.g. ric1. Stamped once at create from the region whose API
                               host served the request, and never changed. Returned only for teams on
@@ -30598,7 +30871,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "resume_on_topoff": bool,  # Optional. Session consents to
                               being resumed automatically when the team's prepayment balance is
                               restored after a low-balance pause. Defaults to false at create time; may
-                              be toggled later via PATCH /v2/agents/sessions/{session_id}
+                              be toggled later via PATCH /v2/harness-runtime/sessions/{session_id}
                               (resume_on_topoff only). Only a session paused with reason low_balance
                               whose latest run did not complete is ever resumed automatically - a
                               session the customer paused themselves, or one that idled out, stays
@@ -31128,9 +31401,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               sessions.
                             "pause_reason": "str",  # Optional. Why this session is
                               paused. Present only when status is SESSION_STATUS_PAUSED; omitted
-                              otherwise. Known values: manual (PauseSession RPC), idle (inactivity
-                              auto-pause), low_balance (prepay gate). Clients should treat an
-                              unrecognized value as an opaque reason string.
+                              otherwise. Known values: manual (the customer paused the session), idle
+                              (inactivity auto-pause), zero_balance (prepay gate; stored rows may still
+                              say low_balance), trigger (a reuse trigger paused the session after a
+                              firing). Clients should treat an unrecognized value as an opaque reason
+                              string.
                             "region": "str",  # Optional. DO region slug the session
                               lives in, e.g. ric1. Stamped once at create from the region whose API
                               host served the request, and never changed. Returned only for teams on
@@ -31141,7 +31416,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "resume_on_topoff": bool,  # Optional. Session consents to
                               being resumed automatically when the team's prepayment balance is
                               restored after a low-balance pause. Defaults to false at create time; may
-                              be toggled later via PATCH /v2/agents/sessions/{session_id}
+                              be toggled later via PATCH /v2/harness-runtime/sessions/{session_id}
                               (resume_on_topoff only). Only a session paused with reason low_balance
                               whose latest run did not complete is ever resumed automatically - a
                               session the customer paused themselves, or one that idled out, stays
@@ -31577,9 +31852,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           this one was forked from. Omitted/empty for root (non-fork) sessions.
                         "pause_reason": "str",  # Optional. Why this session is paused.
                           Present only when status is SESSION_STATUS_PAUSED; omitted otherwise. Known
-                          values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
-                          (prepay gate). Clients should treat an unrecognized value as an opaque reason
-                          string.
+                          values: manual (the customer paused the session), idle (inactivity
+                          auto-pause), zero_balance (prepay gate; stored rows may still say
+                          low_balance), trigger (a reuse trigger paused the session after a firing).
+                          Clients should treat an unrecognized value as an opaque reason string.
                         "region": "str",  # Optional. DO region slug the session lives in,
                           e.g. ric1. Stamped once at create from the region whose API host served the
                           request, and never changed. Returned only for teams on the regional routing
@@ -31590,8 +31866,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "resume_on_topoff": bool,  # Optional. Session consents to being
                           resumed automatically when the team's prepayment balance is restored after a
                           low-balance pause. Defaults to false at create time; may be toggled later via
-                          PATCH /v2/agents/sessions/{session_id} (resume_on_topoff only). Only a
-                          session paused with reason low_balance whose latest run did not complete is
+                          PATCH /v2/harness-runtime/sessions/{session_id} (resume_on_topoff only). Only
+                          a session paused with reason low_balance whose latest run did not complete is
                           ever resumed automatically - a session the customer paused themselves, or one
                           that idled out, stays paused regardless. Not an environment-spec field, and
                           forks do not inherit it. Omitted when false.
@@ -31903,9 +32179,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           this one was forked from. Omitted/empty for root (non-fork) sessions.
                         "pause_reason": "str",  # Optional. Why this session is paused.
                           Present only when status is SESSION_STATUS_PAUSED; omitted otherwise. Known
-                          values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
-                          (prepay gate). Clients should treat an unrecognized value as an opaque reason
-                          string.
+                          values: manual (the customer paused the session), idle (inactivity
+                          auto-pause), zero_balance (prepay gate; stored rows may still say
+                          low_balance), trigger (a reuse trigger paused the session after a firing).
+                          Clients should treat an unrecognized value as an opaque reason string.
                         "region": "str",  # Optional. DO region slug the session lives in,
                           e.g. ric1. Stamped once at create from the region whose API host served the
                           request, and never changed. Returned only for teams on the regional routing
@@ -31916,8 +32193,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "resume_on_topoff": bool,  # Optional. Session consents to being
                           resumed automatically when the team's prepayment balance is restored after a
                           low-balance pause. Defaults to false at create time; may be toggled later via
-                          PATCH /v2/agents/sessions/{session_id} (resume_on_topoff only). Only a
-                          session paused with reason low_balance whose latest run did not complete is
+                          PATCH /v2/harness-runtime/sessions/{session_id} (resume_on_topoff only). Only
+                          a session paused with reason low_balance whose latest run did not complete is
                           ever resumed automatically - a session the customer paused themselves, or one
                           that idled out, stays paused regardless. Not an environment-spec field, and
                           forks do not inherit it. Omitted when false.
@@ -32249,9 +32526,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           this one was forked from. Omitted/empty for root (non-fork) sessions.
                         "pause_reason": "str",  # Optional. Why this session is paused.
                           Present only when status is SESSION_STATUS_PAUSED; omitted otherwise. Known
-                          values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
-                          (prepay gate). Clients should treat an unrecognized value as an opaque reason
-                          string.
+                          values: manual (the customer paused the session), idle (inactivity
+                          auto-pause), zero_balance (prepay gate; stored rows may still say
+                          low_balance), trigger (a reuse trigger paused the session after a firing).
+                          Clients should treat an unrecognized value as an opaque reason string.
                         "region": "str",  # Optional. DO region slug the session lives in,
                           e.g. ric1. Stamped once at create from the region whose API host served the
                           request, and never changed. Returned only for teams on the regional routing
@@ -32262,8 +32540,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "resume_on_topoff": bool,  # Optional. Session consents to being
                           resumed automatically when the team's prepayment balance is restored after a
                           low-balance pause. Defaults to false at create time; may be toggled later via
-                          PATCH /v2/agents/sessions/{session_id} (resume_on_topoff only). Only a
-                          session paused with reason low_balance whose latest run did not complete is
+                          PATCH /v2/harness-runtime/sessions/{session_id} (resume_on_topoff only). Only
+                          a session paused with reason low_balance whose latest run did not complete is
                           ever resumed automatically - a session the customer paused themselves, or one
                           that idled out, stays paused regardless. Not an environment-spec field, and
                           forks do not inherit it. Omitted when false.
@@ -33222,9 +33500,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           this one was forked from. Omitted/empty for root (non-fork) sessions.
                         "pause_reason": "str",  # Optional. Why this session is paused.
                           Present only when status is SESSION_STATUS_PAUSED; omitted otherwise. Known
-                          values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
-                          (prepay gate). Clients should treat an unrecognized value as an opaque reason
-                          string.
+                          values: manual (the customer paused the session), idle (inactivity
+                          auto-pause), zero_balance (prepay gate; stored rows may still say
+                          low_balance), trigger (a reuse trigger paused the session after a firing).
+                          Clients should treat an unrecognized value as an opaque reason string.
                         "region": "str",  # Optional. DO region slug the session lives in,
                           e.g. ric1. Stamped once at create from the region whose API host served the
                           request, and never changed. Returned only for teams on the regional routing
@@ -33235,8 +33514,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "resume_on_topoff": bool,  # Optional. Session consents to being
                           resumed automatically when the team's prepayment balance is restored after a
                           low-balance pause. Defaults to false at create time; may be toggled later via
-                          PATCH /v2/agents/sessions/{session_id} (resume_on_topoff only). Only a
-                          session paused with reason low_balance whose latest run did not complete is
+                          PATCH /v2/harness-runtime/sessions/{session_id} (resume_on_topoff only). Only
+                          a session paused with reason low_balance whose latest run did not complete is
                           ever resumed automatically - a session the customer paused themselves, or one
                           that idled out, stays paused regardless. Not an environment-spec field, and
                           forks do not inherit it. Omitted when false.
@@ -33646,9 +33925,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           this one was forked from. Omitted/empty for root (non-fork) sessions.
                         "pause_reason": "str",  # Optional. Why this session is paused.
                           Present only when status is SESSION_STATUS_PAUSED; omitted otherwise. Known
-                          values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
-                          (prepay gate). Clients should treat an unrecognized value as an opaque reason
-                          string.
+                          values: manual (the customer paused the session), idle (inactivity
+                          auto-pause), zero_balance (prepay gate; stored rows may still say
+                          low_balance), trigger (a reuse trigger paused the session after a firing).
+                          Clients should treat an unrecognized value as an opaque reason string.
                         "region": "str",  # Optional. DO region slug the session lives in,
                           e.g. ric1. Stamped once at create from the region whose API host served the
                           request, and never changed. Returned only for teams on the regional routing
@@ -33659,8 +33939,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "resume_on_topoff": bool,  # Optional. Session consents to being
                           resumed automatically when the team's prepayment balance is restored after a
                           low-balance pause. Defaults to false at create time; may be toggled later via
-                          PATCH /v2/agents/sessions/{session_id} (resume_on_topoff only). Only a
-                          session paused with reason low_balance whose latest run did not complete is
+                          PATCH /v2/harness-runtime/sessions/{session_id} (resume_on_topoff only). Only
+                          a session paused with reason low_balance whose latest run did not complete is
                           ever resumed automatically - a session the customer paused themselves, or one
                           that idled out, stays paused regardless. Not an environment-spec field, and
                           forks do not inherit it. Omitted when false.
@@ -33946,9 +34226,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           this one was forked from. Omitted/empty for root (non-fork) sessions.
                         "pause_reason": "str",  # Optional. Why this session is paused.
                           Present only when status is SESSION_STATUS_PAUSED; omitted otherwise. Known
-                          values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
-                          (prepay gate). Clients should treat an unrecognized value as an opaque reason
-                          string.
+                          values: manual (the customer paused the session), idle (inactivity
+                          auto-pause), zero_balance (prepay gate; stored rows may still say
+                          low_balance), trigger (a reuse trigger paused the session after a firing).
+                          Clients should treat an unrecognized value as an opaque reason string.
                         "region": "str",  # Optional. DO region slug the session lives in,
                           e.g. ric1. Stamped once at create from the region whose API host served the
                           request, and never changed. Returned only for teams on the regional routing
@@ -33959,8 +34240,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "resume_on_topoff": bool,  # Optional. Session consents to being
                           resumed automatically when the team's prepayment balance is restored after a
                           low-balance pause. Defaults to false at create time; may be toggled later via
-                          PATCH /v2/agents/sessions/{session_id} (resume_on_topoff only). Only a
-                          session paused with reason low_balance whose latest run did not complete is
+                          PATCH /v2/harness-runtime/sessions/{session_id} (resume_on_topoff only). Only
+                          a session paused with reason low_balance whose latest run did not complete is
                           ever resumed automatically - a session the customer paused themselves, or one
                           that idled out, stays paused regardless. Not an environment-spec field, and
                           forks do not inherit it. Omitted when false.
@@ -34257,9 +34538,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           this one was forked from. Omitted/empty for root (non-fork) sessions.
                         "pause_reason": "str",  # Optional. Why this session is paused.
                           Present only when status is SESSION_STATUS_PAUSED; omitted otherwise. Known
-                          values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
-                          (prepay gate). Clients should treat an unrecognized value as an opaque reason
-                          string.
+                          values: manual (the customer paused the session), idle (inactivity
+                          auto-pause), zero_balance (prepay gate; stored rows may still say
+                          low_balance), trigger (a reuse trigger paused the session after a firing).
+                          Clients should treat an unrecognized value as an opaque reason string.
                         "region": "str",  # Optional. DO region slug the session lives in,
                           e.g. ric1. Stamped once at create from the region whose API host served the
                           request, and never changed. Returned only for teams on the regional routing
@@ -34270,8 +34552,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "resume_on_topoff": bool,  # Optional. Session consents to being
                           resumed automatically when the team's prepayment balance is restored after a
                           low-balance pause. Defaults to false at create time; may be toggled later via
-                          PATCH /v2/agents/sessions/{session_id} (resume_on_topoff only). Only a
-                          session paused with reason low_balance whose latest run did not complete is
+                          PATCH /v2/harness-runtime/sessions/{session_id} (resume_on_topoff only). Only
+                          a session paused with reason low_balance whose latest run did not complete is
                           ever resumed automatically - a session the customer paused themselves, or one
                           that idled out, stays paused regardless. Not an environment-spec field, and
                           forks do not inherit it. Omitted when false.
@@ -35610,7 +35892,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           array when the image has no notice.
                     }
                 }
-                # response body for status code(s): 400, 403, 404, 501
+                # response body for status code(s): 400, 404, 501
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -35658,7 +35940,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
 
         response = pipeline_response.http_response
 
-        if response.status_code not in [200, 400, 403, 404, 501]:
+        if response.status_code not in [200, 400, 404, 501]:
             if _stream:
                 await response.read()  # Load the body in memory and close the socket
             map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
@@ -35682,22 +35964,6 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                 deserialized = None
 
         if response.status_code == 400:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 403:
             response_headers["ratelimit-limit"] = self._deserialize(
                 "int", response.headers.get("ratelimit-limit")
             )
@@ -35884,9 +36150,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           this one was forked from. Omitted/empty for root (non-fork) sessions.
                         "pause_reason": "str",  # Optional. Why this session is paused.
                           Present only when status is SESSION_STATUS_PAUSED; omitted otherwise. Known
-                          values: manual (PauseSession RPC), idle (inactivity auto-pause), low_balance
-                          (prepay gate). Clients should treat an unrecognized value as an opaque reason
-                          string.
+                          values: manual (the customer paused the session), idle (inactivity
+                          auto-pause), zero_balance (prepay gate; stored rows may still say
+                          low_balance), trigger (a reuse trigger paused the session after a firing).
+                          Clients should treat an unrecognized value as an opaque reason string.
                         "region": "str",  # Optional. DO region slug the session lives in,
                           e.g. ric1. Stamped once at create from the region whose API host served the
                           request, and never changed. Returned only for teams on the regional routing
@@ -35897,8 +36164,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "resume_on_topoff": bool,  # Optional. Session consents to being
                           resumed automatically when the team's prepayment balance is restored after a
                           low-balance pause. Defaults to false at create time; may be toggled later via
-                          PATCH /v2/agents/sessions/{session_id} (resume_on_topoff only). Only a
-                          session paused with reason low_balance whose latest run did not complete is
+                          PATCH /v2/harness-runtime/sessions/{session_id} (resume_on_topoff only). Only
+                          a session paused with reason low_balance whose latest run did not complete is
                           ever resumed automatically - a session the customer paused themselves, or one
                           that idled out, stays paused regardless. Not an environment-spec field, and
                           forks do not inherit it. Omitted when false.
@@ -36346,9 +36613,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               sessions.
                             "pause_reason": "str",  # Optional. Why this session is
                               paused. Present only when status is SESSION_STATUS_PAUSED; omitted
-                              otherwise. Known values: manual (PauseSession RPC), idle (inactivity
-                              auto-pause), low_balance (prepay gate). Clients should treat an
-                              unrecognized value as an opaque reason string.
+                              otherwise. Known values: manual (the customer paused the session), idle
+                              (inactivity auto-pause), zero_balance (prepay gate; stored rows may still
+                              say low_balance), trigger (a reuse trigger paused the session after a
+                              firing). Clients should treat an unrecognized value as an opaque reason
+                              string.
                             "region": "str",  # Optional. DO region slug the session
                               lives in, e.g. ric1. Stamped once at create from the region whose API
                               host served the request, and never changed. Returned only for teams on
@@ -36359,7 +36628,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "resume_on_topoff": bool,  # Optional. Session consents to
                               being resumed automatically when the team's prepayment balance is
                               restored after a low-balance pause. Defaults to false at create time; may
-                              be toggled later via PATCH /v2/agents/sessions/{session_id}
+                              be toggled later via PATCH /v2/harness-runtime/sessions/{session_id}
                               (resume_on_topoff only). Only a session paused with reason low_balance
                               whose latest run did not complete is ever resumed automatically - a
                               session the customer paused themselves, or one that idled out, stays
@@ -36645,9 +36914,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               sessions.
                             "pause_reason": "str",  # Optional. Why this session is
                               paused. Present only when status is SESSION_STATUS_PAUSED; omitted
-                              otherwise. Known values: manual (PauseSession RPC), idle (inactivity
-                              auto-pause), low_balance (prepay gate). Clients should treat an
-                              unrecognized value as an opaque reason string.
+                              otherwise. Known values: manual (the customer paused the session), idle
+                              (inactivity auto-pause), zero_balance (prepay gate; stored rows may still
+                              say low_balance), trigger (a reuse trigger paused the session after a
+                              firing). Clients should treat an unrecognized value as an opaque reason
+                              string.
                             "region": "str",  # Optional. DO region slug the session
                               lives in, e.g. ric1. Stamped once at create from the region whose API
                               host served the request, and never changed. Returned only for teams on
@@ -36658,7 +36929,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "resume_on_topoff": bool,  # Optional. Session consents to
                               being resumed automatically when the team's prepayment balance is
                               restored after a low-balance pause. Defaults to false at create time; may
-                              be toggled later via PATCH /v2/agents/sessions/{session_id}
+                              be toggled later via PATCH /v2/harness-runtime/sessions/{session_id}
                               (resume_on_topoff only). Only a session paused with reason low_balance
                               whose latest run did not complete is ever resumed automatically - a
                               session the customer paused themselves, or one that idled out, stays
@@ -36949,9 +37220,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               sessions.
                             "pause_reason": "str",  # Optional. Why this session is
                               paused. Present only when status is SESSION_STATUS_PAUSED; omitted
-                              otherwise. Known values: manual (PauseSession RPC), idle (inactivity
-                              auto-pause), low_balance (prepay gate). Clients should treat an
-                              unrecognized value as an opaque reason string.
+                              otherwise. Known values: manual (the customer paused the session), idle
+                              (inactivity auto-pause), zero_balance (prepay gate; stored rows may still
+                              say low_balance), trigger (a reuse trigger paused the session after a
+                              firing). Clients should treat an unrecognized value as an opaque reason
+                              string.
                             "region": "str",  # Optional. DO region slug the session
                               lives in, e.g. ric1. Stamped once at create from the region whose API
                               host served the request, and never changed. Returned only for teams on
@@ -36962,7 +37235,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "resume_on_topoff": bool,  # Optional. Session consents to
                               being resumed automatically when the team's prepayment balance is
                               restored after a low-balance pause. Defaults to false at create time; may
-                              be toggled later via PATCH /v2/agents/sessions/{session_id}
+                              be toggled later via PATCH /v2/harness-runtime/sessions/{session_id}
                               (resume_on_topoff only). Only a session paused with reason low_balance
                               whose latest run did not complete is ever resumed automatically - a
                               session the customer paused themselves, or one that idled out, stays
@@ -37962,7 +38235,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         """Read sandbox-image notices for one session.
 
         Returns the live notices on the session's sandbox image. ``type`` filters the notice kind; the
-        only documented value is ``vulnerability``. A session owned by another team returns 403.
+        only documented value is ``vulnerability``. A session owned by another team returns 404, the
+        same as an unknown session.
 
         :param session_id: The session UUID. Required.
         :type session_id: str
@@ -38019,7 +38293,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           array when the image has no notice.
                     }
                 }
-                # response body for status code(s): 400, 403, 404, 501
+                # response body for status code(s): 400, 404, 501
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -38066,7 +38340,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
 
         response = pipeline_response.http_response
 
-        if response.status_code not in [200, 400, 403, 404, 501]:
+        if response.status_code not in [200, 400, 404, 501]:
             if _stream:
                 await response.read()  # Load the body in memory and close the socket
             map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
@@ -38090,22 +38364,6 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                 deserialized = None
 
         if response.status_code == 400:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 403:
             response_headers["ratelimit-limit"] = self._deserialize(
                 "int", response.headers.get("ratelimit-limit")
             )
@@ -38872,10 +39130,19 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         # pylint: disable=line-too-long
         """ExecInSandbox runs a one-shot command inside the session's sandbox.
 
-        Runs ``argv`` directly in the guest (no shell). Stdout/stderr are buffered and capped at 1 MiB
-        each;
-        truncation is indicated via response headers when present. A non-zero exit code is still HTTP
-        200.
+        Runs ``argv`` directly in the guest (no shell). The default response is buffered JSON.
+        Stdout and stderr are capped at 1 MiB each; truncation is indicated via response headers when
+        present.
+        A non-zero exit code is still HTTP 200.
+        With Accept ``text/event-stream`` or ``stream=1``\\ , the response is an event stream of
+        stdout, stderr, and exit.
+        Set ``keep_stdin_open`` to leave the process stdin open. The stream then starts with ``event:
+        started`` and an ``exec_id``.
+        Later bytes are POST
+        ``/v2/harness-runtime/sessions/{session_id}/sandbox/exec/{exec_id}/stdin``.
+        ``keep_stdin_open`` without the event stream returns 400.
+        If the session cannot accept interactive stdin, the call returns 409 before any event-stream
+        header.
 
         :param session_id: The session UUID. Required.
         :type session_id: str
@@ -38897,9 +39164,23 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "str"  # Program and arguments. Required and non-empty; run directly,
                           with no shell interpretation. Required.
                     ],
+                    "env": {
+                        "str": "str"  # Optional. Optional environment variables for this
+                          command only; nothing is stored on the session and values are not logged, but
+                          any process in the sandbox can read them. For credentials the platform holds,
+                          use ``spec.secrets``. Keys must match ``[A-Z][A-Z0-9_]*`` and must not be
+                          platform-reserved keys (the same rule as ``spec.env``"" ). At most 64
+                          entries, keys up to 256 bytes, values up to 64 KiB.
+                    },
+                    "keep_stdin_open": bool,  # Optional. Leave the process stdin open. Requires
+                      an event-stream response (Accept text/event-stream, or stream=1). The stream
+                      starts with event started and an exec_id. A buffered request with this set
+                      returns 400.
                     "stdin": bytes("bytes", encoding="utf-8"),  # Optional. Optional base64 stdin
-                      payload, delivered in full and then closed so the process sees EOF. One-shot only
-                      "u2014 there is no streaming stdin on this endpoint.
+                      payload. Without keep_stdin_open it is delivered in full and then closed so the
+                      process sees EOF. With keep_stdin_open it is the optional first chunk. Later
+                      bytes use POST
+                      /v2/harness-runtime/sessions/{session_id}/sandbox/exec/{exec_id}/stdin.
                     "timeout_seconds": 0,  # Optional. Optional timeout. Clamped server-side
                       (default 60, maximum 240) regardless of the value sent.
                     "workdir": "str"  # Optional. Working directory inside the sandbox. Empty
@@ -38942,10 +39223,19 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         # pylint: disable=line-too-long
         """ExecInSandbox runs a one-shot command inside the session's sandbox.
 
-        Runs ``argv`` directly in the guest (no shell). Stdout/stderr are buffered and capped at 1 MiB
-        each;
-        truncation is indicated via response headers when present. A non-zero exit code is still HTTP
-        200.
+        Runs ``argv`` directly in the guest (no shell). The default response is buffered JSON.
+        Stdout and stderr are capped at 1 MiB each; truncation is indicated via response headers when
+        present.
+        A non-zero exit code is still HTTP 200.
+        With Accept ``text/event-stream`` or ``stream=1``\\ , the response is an event stream of
+        stdout, stderr, and exit.
+        Set ``keep_stdin_open`` to leave the process stdin open. The stream then starts with ``event:
+        started`` and an ``exec_id``.
+        Later bytes are POST
+        ``/v2/harness-runtime/sessions/{session_id}/sandbox/exec/{exec_id}/stdin``.
+        ``keep_stdin_open`` without the event stream returns 400.
+        If the session cannot accept interactive stdin, the call returns 409 before any event-stream
+        header.
 
         :param session_id: The session UUID. Required.
         :type session_id: str
@@ -38992,10 +39282,19 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         # pylint: disable=line-too-long
         """ExecInSandbox runs a one-shot command inside the session's sandbox.
 
-        Runs ``argv`` directly in the guest (no shell). Stdout/stderr are buffered and capped at 1 MiB
-        each;
-        truncation is indicated via response headers when present. A non-zero exit code is still HTTP
-        200.
+        Runs ``argv`` directly in the guest (no shell). The default response is buffered JSON.
+        Stdout and stderr are capped at 1 MiB each; truncation is indicated via response headers when
+        present.
+        A non-zero exit code is still HTTP 200.
+        With Accept ``text/event-stream`` or ``stream=1``\\ , the response is an event stream of
+        stdout, stderr, and exit.
+        Set ``keep_stdin_open`` to leave the process stdin open. The stream then starts with ``event:
+        started`` and an ``exec_id``.
+        Later bytes are POST
+        ``/v2/harness-runtime/sessions/{session_id}/sandbox/exec/{exec_id}/stdin``.
+        ``keep_stdin_open`` without the event stream returns 400.
+        If the session cannot accept interactive stdin, the call returns 409 before any event-stream
+        header.
 
         :param session_id: The session UUID. Required.
         :type session_id: str
@@ -39015,9 +39314,23 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "str"  # Program and arguments. Required and non-empty; run directly,
                           with no shell interpretation. Required.
                     ],
+                    "env": {
+                        "str": "str"  # Optional. Optional environment variables for this
+                          command only; nothing is stored on the session and values are not logged, but
+                          any process in the sandbox can read them. For credentials the platform holds,
+                          use ``spec.secrets``. Keys must match ``[A-Z][A-Z0-9_]*`` and must not be
+                          platform-reserved keys (the same rule as ``spec.env``"" ). At most 64
+                          entries, keys up to 256 bytes, values up to 64 KiB.
+                    },
+                    "keep_stdin_open": bool,  # Optional. Leave the process stdin open. Requires
+                      an event-stream response (Accept text/event-stream, or stream=1). The stream
+                      starts with event started and an exec_id. A buffered request with this set
+                      returns 400.
                     "stdin": bytes("bytes", encoding="utf-8"),  # Optional. Optional base64 stdin
-                      payload, delivered in full and then closed so the process sees EOF. One-shot only
-                      "u2014 there is no streaming stdin on this endpoint.
+                      payload. Without keep_stdin_open it is delivered in full and then closed so the
+                      process sees EOF. With keep_stdin_open it is the optional first chunk. Later
+                      bytes use POST
+                      /v2/harness-runtime/sessions/{session_id}/sandbox/exec/{exec_id}/stdin.
                     "timeout_seconds": 0,  # Optional. Optional timeout. Clamped server-side
                       (default 60, maximum 240) regardless of the value sent.
                     "workdir": "str"  # Optional. Working directory inside the sandbox. Empty
@@ -39078,6 +39391,357 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
 
         _request = build_harness_post_session_sandbox_exec_request(
             session_id=session_id,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 402, 403, 404, 409, 423]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 402:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 423:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def post_session_sandbox_exec_stdin(
+        self,
+        session_id: str,
+        exec_id: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Write one chunk of stdin to a command started with keep_stdin_open.
+
+        ``offset`` is required and is the count of stdin bytes already accepted.
+        An equal offset appends. A lower offset retries and trims the overlap. A higher offset returns
+        409.
+        ``data`` is base64. ``eof`` closes stdin. A write needs ``data``\\ , ``eof``\\ , or both. Each
+        write is at most 1 MiB.
+        The exec id comes from the ``started`` event on the exec stream.
+        An unknown or finished exec returns 404.
+        A closed stdin, an offset gap, or a session that cannot accept interactive stdin returns 409.
+
+        :param session_id: The session UUID. Required.
+        :type session_id: str
+        :param exec_id: The exec id from the started event. Required.
+        :type exec_id: str
+        :param body: Stdin bytes to append, or eof. Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "offset": 0,  # Required. Count of stdin bytes already accepted. An equal
+                      offset appends. A lower offset retries and trims the overlap. A higher offset
+                      returns 409. Required.
+                    "data": bytes("bytes", encoding="utf-8"),  # Optional. Base64 stdin bytes to
+                      append. Omit on an eof-only write.
+                    "eof": bool  # Optional. Close stdin after this write. A later write, or a
+                      second eof, returns 409.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "offset": 0  # Optional. Count of stdin bytes accepted after this write.
+                }
+                # response body for status code(s): 400, 402, 403, 404, 409, 423
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @overload
+    async def post_session_sandbox_exec_stdin(
+        self,
+        session_id: str,
+        exec_id: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Write one chunk of stdin to a command started with keep_stdin_open.
+
+        ``offset`` is required and is the count of stdin bytes already accepted.
+        An equal offset appends. A lower offset retries and trims the overlap. A higher offset returns
+        409.
+        ``data`` is base64. ``eof`` closes stdin. A write needs ``data``\\ , ``eof``\\ , or both. Each
+        write is at most 1 MiB.
+        The exec id comes from the ``started`` event on the exec stream.
+        An unknown or finished exec returns 404.
+        A closed stdin, an offset gap, or a session that cannot accept interactive stdin returns 409.
+
+        :param session_id: The session UUID. Required.
+        :type session_id: str
+        :param exec_id: The exec id from the started event. Required.
+        :type exec_id: str
+        :param body: Stdin bytes to append, or eof. Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "offset": 0  # Optional. Count of stdin bytes accepted after this write.
+                }
+                # response body for status code(s): 400, 402, 403, 404, 409, 423
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+
+    @distributed_trace_async
+    async def post_session_sandbox_exec_stdin(
+        self, session_id: str, exec_id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Write one chunk of stdin to a command started with keep_stdin_open.
+
+        ``offset`` is required and is the count of stdin bytes already accepted.
+        An equal offset appends. A lower offset retries and trims the overlap. A higher offset returns
+        409.
+        ``data`` is base64. ``eof`` closes stdin. A write needs ``data``\\ , ``eof``\\ , or both. Each
+        write is at most 1 MiB.
+        The exec id comes from the ``started`` event on the exec stream.
+        An unknown or finished exec returns 404.
+        A closed stdin, an offset gap, or a session that cannot accept interactive stdin returns 409.
+
+        :param session_id: The session UUID. Required.
+        :type session_id: str
+        :param exec_id: The exec id from the started event. Required.
+        :type exec_id: str
+        :param body: Stdin bytes to append, or eof. Is either a JSON type or a IO[bytes] type.
+         Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "offset": 0,  # Required. Count of stdin bytes already accepted. An equal
+                      offset appends. A lower offset retries and trims the overlap. A higher offset
+                      returns 409. Required.
+                    "data": bytes("bytes", encoding="utf-8"),  # Optional. Base64 stdin bytes to
+                      append. Omit on an eof-only write.
+                    "eof": bool  # Optional. Close stdin after this write. A later write, or a
+                      second eof, returns 409.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "offset": 0  # Optional. Count of stdin bytes accepted after this write.
+                }
+                # response body for status code(s): 400, 402, 403, 404, 409, 423
+                response == {
+                    "id": "str",  # A short identifier corresponding to the HTTP status code
+                      returned. For  example, the ID for a response returning a 404 status code would
+                      be "not_found.". Required.
+                    "message": "str",  # A message providing additional information about the
+                      error, including  details to help resolve it when possible. Required.
+                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
+                      request ID that should be  provided when reporting bugs or opening support
+                      tickets to help  identify the issue.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_harness_post_session_sandbox_exec_stdin_request(
+            session_id=session_id,
+            exec_id=exec_id,
             content_type=content_type,
             json=_json,
             content=_content,
@@ -41639,8 +42303,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         a descriptive WebSocket close code when the tunnel ends. This is the raw TCP tunnel; browser
         clients
         reaching the in-guest OpenHands Agent Server use the ingress URL
-        (\\ ``GET /v2/agents/sessions/{session_id}/ingress``\\ ), which has replaced this bridge for
-        them.
+        (\\ ``GET /v2/harness-runtime/sessions/{session_id}/ingress``\\ ), which has replaced this
+        bridge for them.
 
         WebSocket is not expressible in OpenAPI; this documents the GET that initiates the upgrade
         handshake
@@ -43408,7 +44072,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                   create defaults to custom. Known values are: "github", "gitlab", and
                                   "custom".
                                 "webhook_url": "str"  # Optional. The Payload URL to
-                                  configure in the external system.
+                                  configure in the external system. The service returns the
+                                  ``/v2/agents`` spelling. Paste that value unchanged.
                             }
                         }
                     ]
@@ -43668,7 +44333,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               applied to a delivery. Omitted on create defaults to custom. Known values
                               are: "github", "gitlab", and "custom".
                             "webhook_url": "str"  # Optional. The Payload URL to
-                              configure in the external system.
+                              configure in the external system. The service returns the ``/v2/agents``
+                              spelling. Paste that value unchanged.
                         }
                     },
                     "webhook_secret": "str"  # Optional. The generated webhook secret. Present
@@ -43807,7 +44473,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               applied to a delivery. Omitted on create defaults to custom. Known values
                               are: "github", "gitlab", and "custom".
                             "webhook_url": "str"  # Optional. The Payload URL to
-                              configure in the external system.
+                              configure in the external system. The service returns the ``/v2/agents``
+                              spelling. Paste that value unchanged.
                         }
                     },
                     "webhook_secret": "str"  # Optional. The generated webhook secret. Present
@@ -43984,7 +44651,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               applied to a delivery. Omitted on create defaults to custom. Known values
                               are: "github", "gitlab", and "custom".
                             "webhook_url": "str"  # Optional. The Payload URL to
-                              configure in the external system.
+                              configure in the external system. The service returns the ``/v2/agents``
+                              spelling. Paste that value unchanged.
                         }
                     },
                     "webhook_secret": "str"  # Optional. The generated webhook secret. Present
@@ -44177,10 +44845,12 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
     @distributed_trace_async
     async def get_trigger_by_session(self, session_id: str, **kwargs: Any) -> JSON:
         # pylint: disable=line-too-long
-        """GetTriggerBySession reverse-looks-up the trigger that produced or binds a session.
+        """Get the newest trigger bound to a session, or the trigger of its newest execution.
 
-        Returns the trigger that produced (fresh) or binds (reuse) the given session. Resolves to the
-        row even after the trigger is soft-deleted.
+        Returns the newest trigger whose bound session is this one. Deleted triggers are skipped. When
+        none is bound, returns the trigger of the newest execution for this session, again skipping
+        deleted triggers. A session can be bound to more than one trigger; only the newest is returned.
+        404 when neither lookup matches.
 
         :param session_id: The session UUID. Required.
         :type session_id: str
@@ -44269,7 +44939,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               applied to a delivery. Omitted on create defaults to custom. Known values
                               are: "github", "gitlab", and "custom".
                             "webhook_url": "str"  # Optional. The Payload URL to
-                              configure in the external system.
+                              configure in the external system. The service returns the ``/v2/agents``
+                              spelling. Paste that value unchanged.
                         }
                     }
                 }
@@ -44593,7 +45264,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               applied to a delivery. Omitted on create defaults to custom. Known values
                               are: "github", "gitlab", and "custom".
                             "webhook_url": "str"  # Optional. The Payload URL to
-                              configure in the external system.
+                              configure in the external system. The service returns the ``/v2/agents``
+                              spelling. Paste that value unchanged.
                         }
                     }
                 }
@@ -44834,7 +45506,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               applied to a delivery. Omitted on create defaults to custom. Known values
                               are: "github", "gitlab", and "custom".
                             "webhook_url": "str"  # Optional. The Payload URL to
-                              configure in the external system.
+                              configure in the external system. The service returns the ``/v2/agents``
+                              spelling. Paste that value unchanged.
                         }
                     }
                 }
@@ -44965,7 +45638,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               applied to a delivery. Omitted on create defaults to custom. Known values
                               are: "github", "gitlab", and "custom".
                             "webhook_url": "str"  # Optional. The Payload URL to
-                              configure in the external system.
+                              configure in the external system. The service returns the ``/v2/agents``
+                              spelling. Paste that value unchanged.
                         }
                     }
                 }
@@ -45121,7 +45795,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               applied to a delivery. Omitted on create defaults to custom. Known values
                               are: "github", "gitlab", and "custom".
                             "webhook_url": "str"  # Optional. The Payload URL to
-                              configure in the external system.
+                              configure in the external system. The service returns the ``/v2/agents``
+                              spelling. Paste that value unchanged.
                         }
                     }
                 }
@@ -45491,6 +46166,13 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               before then.
                             "status": "str",  # Optional. Per-firing outcome. Known
                               values are: "pending", "running", "succeeded", and "failed".
+                            "status_message": "str",  # Optional. Human-readable detail
+                              for status_reason. Omitted when status_reason is omitted.
+                            "status_reason": "str",  # Optional. Why a running execution
+                              has not started its turn. Omitted when there is nothing to report. Known
+                              value: waiting_for_bound_session (a reuse firing is waiting for its bound
+                              session to pause; status stays running). Clients should treat an
+                              unrecognized value as an opaque string.
                             "trigger_id": "str",  # Optional.
                             "updated_at": "2020-02-20 00:00:00"  # Optional.
                         }
@@ -45637,6 +46319,13 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           the session is created (fresh) or is known (reuse); empty before then.
                         "status": "str",  # Optional. Per-firing outcome. Known values are:
                           "pending", "running", "succeeded", and "failed".
+                        "status_message": "str",  # Optional. Human-readable detail for
+                          status_reason. Omitted when status_reason is omitted.
+                        "status_reason": "str",  # Optional. Why a running execution has not
+                          started its turn. Omitted when there is nothing to report. Known value:
+                          waiting_for_bound_session (a reuse firing is waiting for its bound session to
+                          pause; status stays running). Clients should treat an unrecognized value as
+                          an opaque string.
                         "trigger_id": "str",  # Optional. One row per firing (webhook
                           delivery or cron tick).
                         "updated_at": "2020-02-20 00:00:00"  # Optional. One row per firing
@@ -45792,13 +46481,20 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           the session is created (fresh) or is known (reuse); empty before then.
                         "status": "str",  # Optional. Per-firing outcome. Known values are:
                           "pending", "running", "succeeded", and "failed".
+                        "status_message": "str",  # Optional. Human-readable detail for
+                          status_reason. Omitted when status_reason is omitted.
+                        "status_reason": "str",  # Optional. Why a running execution has not
+                          started its turn. Omitted when there is nothing to report. Known value:
+                          waiting_for_bound_session (a reuse firing is waiting for its bound session to
+                          pause; status stays running). Clients should treat an unrecognized value as
+                          an opaque string.
                         "trigger_id": "str",  # Optional. One row per firing (webhook
                           delivery or cron tick).
                         "updated_at": "2020-02-20 00:00:00"  # Optional. One row per firing
                           (webhook delivery or cron tick).
                     }
                 }
-                # response body for status code(s): 404, 409
+                # response body for status code(s): 404, 409, 503
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -45846,7 +46542,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
 
         response = pipeline_response.http_response
 
-        if response.status_code not in [200, 404, 409]:
+        if response.status_code not in [200, 404, 409, 503]:
             if _stream:
                 await response.read()  # Load the body in memory and close the socket
             map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
@@ -45886,6 +46582,22 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                 deserialized = None
 
         if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 503:
             response_headers["ratelimit-limit"] = self._deserialize(
                 "int", response.headers.get("ratelimit-limit")
             )
@@ -46107,6 +46819,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         execution_id. A delivery to a paused trigger returns 202 with no body and queues nothing
         (deliberately
         not 409, so providers do not auto-disable the webhook after repeated non-2xx).
+
+        Both ``/v2/agents/triggers/{trigger_id}/webhook`` and
+        ``/v2/harness-runtime/triggers/{trigger_id}/webhook`` are accepted and keep working
+        indefinitely. Paste the ``webhook_url`` returned on the trigger into the external system
+        unchanged.
 
         :param trigger_id: The trigger UUID. Required.
         :type trigger_id: str
@@ -217917,6 +218634,22 @@ class MicrovmsOperations:
                             "created_at": "2020-02-20 00:00:00",  # Optional. When the
                               MicroVM was created, in ISO 8601 format.
                             "egress_policy": {
+                                "credentials": [
+                                    {
+                                        "host": "str",  # An exact host.
+                                          Wildcards and IP addresses are not allowed. Required.
+                                        "secret": "str",  # The credential
+                                          value. It is stored in a secrets vault, never returned by the
+                                          API, and cannot be read back. Required.
+                                        "path_prefix": "str",  # Optional.
+                                          Only requests whose path starts with this prefix get the
+                                          credential. Must start with ``/``. Defaults to every path.
+                                        "scheme": "bearer"  # Optional.
+                                          Default value is "bearer". How the value is sent. ``bearer``
+                                          sends ``Bearer <secret>``"" ; ``raw`` sends the secret as is.
+                                          Known values are: "bearer" and "raw".
+                                    }
+                                ],
                                 "default_action": "deny",  # Optional. Default value
                                   is "deny". What to do with a destination no rule matches. ``deny``
                                   refuses it (an HTTP request gets a 403 and a TLS connection is
@@ -218120,6 +218853,22 @@ class MicrovmsOperations:
                       request, command, or console session resumes the MicroVM when it is paused. Set
                       to ``false`` to require a manual resume.
                     "egress_policy": {
+                        "credentials": [
+                            {
+                                "host": "str",  # An exact host. Wildcards and IP
+                                  addresses are not allowed. Required.
+                                "secret": "str",  # The credential value. It is
+                                  stored in a secrets vault, never returned by the API, and cannot be
+                                  read back. Required.
+                                "path_prefix": "str",  # Optional. Only requests
+                                  whose path starts with this prefix get the credential. Must start
+                                  with ``/``. Defaults to every path.
+                                "scheme": "bearer"  # Optional. Default value is
+                                  "bearer". How the value is sent. ``bearer`` sends ``Bearer
+                                  <secret>``"" ; ``raw`` sends the secret as is. Known values are:
+                                  "bearer" and "raw".
+                            }
+                        ],
                         "default_action": "deny",  # Optional. Default value is "deny". What
                           to do with a destination no rule matches. ``deny`` refuses it (an HTTP
                           request gets a 403 and a TLS connection is closed). Known values are: "deny"
@@ -218190,6 +218939,22 @@ class MicrovmsOperations:
                         "created_at": "2020-02-20 00:00:00",  # Optional. When the MicroVM
                           was created, in ISO 8601 format.
                         "egress_policy": {
+                            "credentials": [
+                                {
+                                    "host": "str",  # An exact host. Wildcards
+                                      and IP addresses are not allowed. Required.
+                                    "secret": "str",  # The credential value. It
+                                      is stored in a secrets vault, never returned by the API, and
+                                      cannot be read back. Required.
+                                    "path_prefix": "str",  # Optional. Only
+                                      requests whose path starts with this prefix get the credential.
+                                      Must start with ``/``. Defaults to every path.
+                                    "scheme": "bearer"  # Optional. Default value
+                                      is "bearer". How the value is sent. ``bearer`` sends ``Bearer
+                                      <secret>``"" ; ``raw`` sends the secret as is. Known values are:
+                                      "bearer" and "raw".
+                                }
+                            ],
                             "default_action": "deny",  # Optional. Default value is
                               "deny". What to do with a destination no rule matches. ``deny`` refuses
                               it (an HTTP request gets a 403 and a TLS connection is closed). Known
@@ -218321,6 +219086,22 @@ class MicrovmsOperations:
                         "created_at": "2020-02-20 00:00:00",  # Optional. When the MicroVM
                           was created, in ISO 8601 format.
                         "egress_policy": {
+                            "credentials": [
+                                {
+                                    "host": "str",  # An exact host. Wildcards
+                                      and IP addresses are not allowed. Required.
+                                    "secret": "str",  # The credential value. It
+                                      is stored in a secrets vault, never returned by the API, and
+                                      cannot be read back. Required.
+                                    "path_prefix": "str",  # Optional. Only
+                                      requests whose path starts with this prefix get the credential.
+                                      Must start with ``/``. Defaults to every path.
+                                    "scheme": "bearer"  # Optional. Default value
+                                      is "bearer". How the value is sent. ``bearer`` sends ``Bearer
+                                      <secret>``"" ; ``raw`` sends the secret as is. Known values are:
+                                      "bearer" and "raw".
+                                }
+                            ],
                             "default_action": "deny",  # Optional. Default value is
                               "deny". What to do with a destination no rule matches. ``deny`` refuses
                               it (an HTTP request gets a 403 and a TLS connection is closed). Known
@@ -218455,6 +219236,22 @@ class MicrovmsOperations:
                       request, command, or console session resumes the MicroVM when it is paused. Set
                       to ``false`` to require a manual resume.
                     "egress_policy": {
+                        "credentials": [
+                            {
+                                "host": "str",  # An exact host. Wildcards and IP
+                                  addresses are not allowed. Required.
+                                "secret": "str",  # The credential value. It is
+                                  stored in a secrets vault, never returned by the API, and cannot be
+                                  read back. Required.
+                                "path_prefix": "str",  # Optional. Only requests
+                                  whose path starts with this prefix get the credential. Must start
+                                  with ``/``. Defaults to every path.
+                                "scheme": "bearer"  # Optional. Default value is
+                                  "bearer". How the value is sent. ``bearer`` sends ``Bearer
+                                  <secret>``"" ; ``raw`` sends the secret as is. Known values are:
+                                  "bearer" and "raw".
+                            }
+                        ],
                         "default_action": "deny",  # Optional. Default value is "deny". What
                           to do with a destination no rule matches. ``deny`` refuses it (an HTTP
                           request gets a 403 and a TLS connection is closed). Known values are: "deny"
@@ -218525,6 +219322,22 @@ class MicrovmsOperations:
                         "created_at": "2020-02-20 00:00:00",  # Optional. When the MicroVM
                           was created, in ISO 8601 format.
                         "egress_policy": {
+                            "credentials": [
+                                {
+                                    "host": "str",  # An exact host. Wildcards
+                                      and IP addresses are not allowed. Required.
+                                    "secret": "str",  # The credential value. It
+                                      is stored in a secrets vault, never returned by the API, and
+                                      cannot be read back. Required.
+                                    "path_prefix": "str",  # Optional. Only
+                                      requests whose path starts with this prefix get the credential.
+                                      Must start with ``/``. Defaults to every path.
+                                    "scheme": "bearer"  # Optional. Default value
+                                      is "bearer". How the value is sent. ``bearer`` sends ``Bearer
+                                      <secret>``"" ; ``raw`` sends the secret as is. Known values are:
+                                      "bearer" and "raw".
+                                }
+                            ],
                             "default_action": "deny",  # Optional. Default value is
                               "deny". What to do with a destination no rule matches. ``deny`` refuses
                               it (an HTTP request gets a 403 and a TLS connection is closed). Known
@@ -218876,6 +219689,22 @@ class MicrovmsOperations:
                         "created_at": "2020-02-20 00:00:00",  # Optional. When the MicroVM
                           was created, in ISO 8601 format.
                         "egress_policy": {
+                            "credentials": [
+                                {
+                                    "host": "str",  # An exact host. Wildcards
+                                      and IP addresses are not allowed. Required.
+                                    "secret": "str",  # The credential value. It
+                                      is stored in a secrets vault, never returned by the API, and
+                                      cannot be read back. Required.
+                                    "path_prefix": "str",  # Optional. Only
+                                      requests whose path starts with this prefix get the credential.
+                                      Must start with ``/``. Defaults to every path.
+                                    "scheme": "bearer"  # Optional. Default value
+                                      is "bearer". How the value is sent. ``bearer`` sends ``Bearer
+                                      <secret>``"" ; ``raw`` sends the secret as is. Known values are:
+                                      "bearer" and "raw".
+                                }
+                            ],
                             "default_action": "deny",  # Optional. Default value is
                               "deny". What to do with a destination no rule matches. ``deny`` refuses
                               it (an HTTP request gets a 403 and a TLS connection is closed). Known
@@ -219198,6 +220027,22 @@ class MicrovmsOperations:
                         "created_at": "2020-02-20 00:00:00",  # Optional. When the MicroVM
                           was created, in ISO 8601 format.
                         "egress_policy": {
+                            "credentials": [
+                                {
+                                    "host": "str",  # An exact host. Wildcards
+                                      and IP addresses are not allowed. Required.
+                                    "secret": "str",  # The credential value. It
+                                      is stored in a secrets vault, never returned by the API, and
+                                      cannot be read back. Required.
+                                    "path_prefix": "str",  # Optional. Only
+                                      requests whose path starts with this prefix get the credential.
+                                      Must start with ``/``. Defaults to every path.
+                                    "scheme": "bearer"  # Optional. Default value
+                                      is "bearer". How the value is sent. ``bearer`` sends ``Bearer
+                                      <secret>``"" ; ``raw`` sends the secret as is. Known values are:
+                                      "bearer" and "raw".
+                                }
+                            ],
                             "default_action": "deny",  # Optional. Default value is
                               "deny". What to do with a destination no rule matches. ``deny`` refuses
                               it (an HTTP request gets a 403 and a TLS connection is closed). Known
@@ -219335,6 +220180,22 @@ class MicrovmsOperations:
                         "created_at": "2020-02-20 00:00:00",  # Optional. When the MicroVM
                           was created, in ISO 8601 format.
                         "egress_policy": {
+                            "credentials": [
+                                {
+                                    "host": "str",  # An exact host. Wildcards
+                                      and IP addresses are not allowed. Required.
+                                    "secret": "str",  # The credential value. It
+                                      is stored in a secrets vault, never returned by the API, and
+                                      cannot be read back. Required.
+                                    "path_prefix": "str",  # Optional. Only
+                                      requests whose path starts with this prefix get the credential.
+                                      Must start with ``/``. Defaults to every path.
+                                    "scheme": "bearer"  # Optional. Default value
+                                      is "bearer". How the value is sent. ``bearer`` sends ``Bearer
+                                      <secret>``"" ; ``raw`` sends the secret as is. Known values are:
+                                      "bearer" and "raw".
+                                }
+                            ],
                             "default_action": "deny",  # Optional. Default value is
                               "deny". What to do with a destination no rule matches. ``deny`` refuses
                               it (an HTTP request gets a 403 and a TLS connection is closed). Known
@@ -219474,6 +220335,22 @@ class MicrovmsOperations:
                         "created_at": "2020-02-20 00:00:00",  # Optional. When the MicroVM
                           was created, in ISO 8601 format.
                         "egress_policy": {
+                            "credentials": [
+                                {
+                                    "host": "str",  # An exact host. Wildcards
+                                      and IP addresses are not allowed. Required.
+                                    "secret": "str",  # The credential value. It
+                                      is stored in a secrets vault, never returned by the API, and
+                                      cannot be read back. Required.
+                                    "path_prefix": "str",  # Optional. Only
+                                      requests whose path starts with this prefix get the credential.
+                                      Must start with ``/``. Defaults to every path.
+                                    "scheme": "bearer"  # Optional. Default value
+                                      is "bearer". How the value is sent. ``bearer`` sends ``Bearer
+                                      <secret>``"" ; ``raw`` sends the secret as is. Known values are:
+                                      "bearer" and "raw".
+                                }
+                            ],
                             "default_action": "deny",  # Optional. Default value is
                               "deny". What to do with a destination no rule matches. ``deny`` refuses
                               it (an HTTP request gets a 403 and a TLS connection is closed). Known
@@ -219718,6 +220595,22 @@ class MicrovmsOperations:
                         "created_at": "2020-02-20 00:00:00",  # Optional. When the MicroVM
                           was created, in ISO 8601 format.
                         "egress_policy": {
+                            "credentials": [
+                                {
+                                    "host": "str",  # An exact host. Wildcards
+                                      and IP addresses are not allowed. Required.
+                                    "secret": "str",  # The credential value. It
+                                      is stored in a secrets vault, never returned by the API, and
+                                      cannot be read back. Required.
+                                    "path_prefix": "str",  # Optional. Only
+                                      requests whose path starts with this prefix get the credential.
+                                      Must start with ``/``. Defaults to every path.
+                                    "scheme": "bearer"  # Optional. Default value
+                                      is "bearer". How the value is sent. ``bearer`` sends ``Bearer
+                                      <secret>``"" ; ``raw`` sends the secret as is. Known values are:
+                                      "bearer" and "raw".
+                                }
+                            ],
                             "default_action": "deny",  # Optional. Default value is
                               "deny". What to do with a destination no rule matches. ``deny`` refuses
                               it (an HTTP request gets a 403 and a TLS connection is closed). Known
@@ -219927,6 +220820,22 @@ class MicrovmsOperations:
                         "created_at": "2020-02-20 00:00:00",  # Optional. When the MicroVM
                           was created, in ISO 8601 format.
                         "egress_policy": {
+                            "credentials": [
+                                {
+                                    "host": "str",  # An exact host. Wildcards
+                                      and IP addresses are not allowed. Required.
+                                    "secret": "str",  # The credential value. It
+                                      is stored in a secrets vault, never returned by the API, and
+                                      cannot be read back. Required.
+                                    "path_prefix": "str",  # Optional. Only
+                                      requests whose path starts with this prefix get the credential.
+                                      Must start with ``/``. Defaults to every path.
+                                    "scheme": "bearer"  # Optional. Default value
+                                      is "bearer". How the value is sent. ``bearer`` sends ``Bearer
+                                      <secret>``"" ; ``raw`` sends the secret as is. Known values are:
+                                      "bearer" and "raw".
+                                }
+                            ],
                             "default_action": "deny",  # Optional. Default value is
                               "deny". What to do with a destination no rule matches. ``deny`` refuses
                               it (an HTTP request gets a 403 and a TLS connection is closed). Known
@@ -221097,6 +222006,22 @@ class MicrovmCheckpointsOperations:
                             "disk_bytes": 0,  # Optional. The stored size of the
                               checkpoint's disk, in bytes.
                             "egress_policy": {
+                                "credentials": [
+                                    {
+                                        "host": "str",  # An exact host.
+                                          Wildcards and IP addresses are not allowed. Required.
+                                        "secret": "str",  # The credential
+                                          value. It is stored in a secrets vault, never returned by the
+                                          API, and cannot be read back. Required.
+                                        "path_prefix": "str",  # Optional.
+                                          Only requests whose path starts with this prefix get the
+                                          credential. Must start with ``/``. Defaults to every path.
+                                        "scheme": "bearer"  # Optional.
+                                          Default value is "bearer". How the value is sent. ``bearer``
+                                          sends ``Bearer <secret>``"" ; ``raw`` sends the secret as is.
+                                          Known values are: "bearer" and "raw".
+                                    }
+                                ],
                                 "default_action": "deny",  # Optional. Default value
                                   is "deny". What to do with a destination no rule matches. ``deny``
                                   refuses it (an HTTP request gets a 403 and a TLS connection is
@@ -221231,6 +222156,22 @@ class MicrovmCheckpointsOperations:
                         "disk_bytes": 0,  # Optional. The stored size of the checkpoint's
                           disk, in bytes.
                         "egress_policy": {
+                            "credentials": [
+                                {
+                                    "host": "str",  # An exact host. Wildcards
+                                      and IP addresses are not allowed. Required.
+                                    "secret": "str",  # The credential value. It
+                                      is stored in a secrets vault, never returned by the API, and
+                                      cannot be read back. Required.
+                                    "path_prefix": "str",  # Optional. Only
+                                      requests whose path starts with this prefix get the credential.
+                                      Must start with ``/``. Defaults to every path.
+                                    "scheme": "bearer"  # Optional. Default value
+                                      is "bearer". How the value is sent. ``bearer`` sends ``Bearer
+                                      <secret>``"" ; ``raw`` sends the secret as is. Known values are:
+                                      "bearer" and "raw".
+                                }
+                            ],
                             "default_action": "deny",  # Optional. Default value is
                               "deny". What to do with a destination no rule matches. ``deny`` refuses
                               it (an HTTP request gets a 403 and a TLS connection is closed). Known
@@ -221514,6 +222455,22 @@ class MicrovmCheckpointsOperations:
                         "disk_bytes": 0,  # Optional. The stored size of the checkpoint's
                           disk, in bytes.
                         "egress_policy": {
+                            "credentials": [
+                                {
+                                    "host": "str",  # An exact host. Wildcards
+                                      and IP addresses are not allowed. Required.
+                                    "secret": "str",  # The credential value. It
+                                      is stored in a secrets vault, never returned by the API, and
+                                      cannot be read back. Required.
+                                    "path_prefix": "str",  # Optional. Only
+                                      requests whose path starts with this prefix get the credential.
+                                      Must start with ``/``. Defaults to every path.
+                                    "scheme": "bearer"  # Optional. Default value
+                                      is "bearer". How the value is sent. ``bearer`` sends ``Bearer
+                                      <secret>``"" ; ``raw`` sends the secret as is. Known values are:
+                                      "bearer" and "raw".
+                                }
+                            ],
                             "default_action": "deny",  # Optional. Default value is
                               "deny". What to do with a destination no rule matches. ``deny`` refuses
                               it (an HTTP request gets a 403 and a TLS connection is closed). Known
@@ -221599,6 +222556,22 @@ class MicrovmCheckpointsOperations:
                         "disk_bytes": 0,  # Optional. The stored size of the checkpoint's
                           disk, in bytes.
                         "egress_policy": {
+                            "credentials": [
+                                {
+                                    "host": "str",  # An exact host. Wildcards
+                                      and IP addresses are not allowed. Required.
+                                    "secret": "str",  # The credential value. It
+                                      is stored in a secrets vault, never returned by the API, and
+                                      cannot be read back. Required.
+                                    "path_prefix": "str",  # Optional. Only
+                                      requests whose path starts with this prefix get the credential.
+                                      Must start with ``/``. Defaults to every path.
+                                    "scheme": "bearer"  # Optional. Default value
+                                      is "bearer". How the value is sent. ``bearer`` sends ``Bearer
+                                      <secret>``"" ; ``raw`` sends the secret as is. Known values are:
+                                      "bearer" and "raw".
+                                }
+                            ],
                             "default_action": "deny",  # Optional. Default value is
                               "deny". What to do with a destination no rule matches. ``deny`` refuses
                               it (an HTTP request gets a 403 and a TLS connection is closed). Known
@@ -221685,6 +222658,22 @@ class MicrovmCheckpointsOperations:
                         "disk_bytes": 0,  # Optional. The stored size of the checkpoint's
                           disk, in bytes.
                         "egress_policy": {
+                            "credentials": [
+                                {
+                                    "host": "str",  # An exact host. Wildcards
+                                      and IP addresses are not allowed. Required.
+                                    "secret": "str",  # The credential value. It
+                                      is stored in a secrets vault, never returned by the API, and
+                                      cannot be read back. Required.
+                                    "path_prefix": "str",  # Optional. Only
+                                      requests whose path starts with this prefix get the credential.
+                                      Must start with ``/``. Defaults to every path.
+                                    "scheme": "bearer"  # Optional. Default value
+                                      is "bearer". How the value is sent. ``bearer`` sends ``Bearer
+                                      <secret>``"" ; ``raw`` sends the secret as is. Known values are:
+                                      "bearer" and "raw".
+                                }
+                            ],
                             "default_action": "deny",  # Optional. Default value is
                               "deny". What to do with a destination no rule matches. ``deny`` refuses
                               it (an HTTP request gets a 403 and a TLS connection is closed). Known
@@ -241580,6 +242569,12 @@ class RegistriesOperations:
                     "name": "str",  # A globally unique name for the container registry. Must be
                       lowercase and be composed only of numbers, letters and ``-``"" , up to a limit of
                       63 characters. Required.
+                    "insights": {
+                        "logs": bool  # Optional. A boolean value indicating whether the
+                          registry's logs are sent to Insights. Set this to ``true`` to send the
+                          registry's logs to Insights. ``false``"" , and omitting ``insights`` or
+                          ``logs``"" , both create the registry with logs not enabled.
+                    },
                     "region": "str",  # Optional. Slug of the region where registry data is
                       stored. When not provided, a region will be selected. Known values are: "nyc3",
                       "sfo3", "sfo2", "ams3", "sgp1", "fra1", "blr1", and "syd1".
@@ -241700,6 +242695,12 @@ class RegistriesOperations:
                     "name": "str",  # A globally unique name for the container registry. Must be
                       lowercase and be composed only of numbers, letters and ``-``"" , up to a limit of
                       63 characters. Required.
+                    "insights": {
+                        "logs": bool  # Optional. A boolean value indicating whether the
+                          registry's logs are sent to Insights. Set this to ``true`` to send the
+                          registry's logs to Insights. ``false``"" , and omitting ``insights`` or
+                          ``logs``"" , both create the registry with logs not enabled.
+                    },
                     "region": "str",  # Optional. Slug of the region where registry data is
                       stored. When not provided, a region will be selected. Known values are: "nyc3",
                       "sfo3", "sfo2", "ams3", "sgp1", "fra1", "blr1", and "syd1".
@@ -244718,6 +245719,12 @@ class RegistryOperations:
                     "subscription_tier_slug": "str",  # The slug of the subscription tier to sign
                       up for. Valid values can be retrieved using the options endpoint. Required. Known
                       values are: "starter", "basic", and "professional".
+                    "insights": {
+                        "logs": bool  # Optional. A boolean value indicating whether the
+                          registry's logs are sent to Insights. Set this to ``true`` to send the
+                          registry's logs to Insights. ``false``"" , and omitting ``insights`` or
+                          ``logs``"" , both create the registry with logs not enabled.
+                    },
                     "region": "str"  # Optional. Slug of the region where registry data is
                       stored. When not provided, a region will be selected. Known values are: "nyc3",
                       "sfo3", "ams3", "sgp1", and "fra1".
@@ -244878,6 +245885,12 @@ class RegistryOperations:
                     "subscription_tier_slug": "str",  # The slug of the subscription tier to sign
                       up for. Valid values can be retrieved using the options endpoint. Required. Known
                       values are: "starter", "basic", and "professional".
+                    "insights": {
+                        "logs": bool  # Optional. A boolean value indicating whether the
+                          registry's logs are sent to Insights. Set this to ``true`` to send the
+                          registry's logs to Insights. ``false``"" , and omitting ``insights`` or
+                          ``logs``"" , both create the registry with logs not enabled.
+                    },
                     "region": "str"  # Optional. Slug of the region where registry data is
                       stored. When not provided, a region will be selected. Known values are: "nyc3",
                       "sfo3", "ams3", "sgp1", and "fra1".
@@ -317323,6 +318336,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   "METRIC_VALUE_TYPE_PERCENTAGE".
                                 "number_value": 0.0,  # Optional. The value of the
                                   metric as a number.
+                                "passed": bool,  # Optional. Whether the score met
+                                  the metric's success threshold. Set for model evaluation results
+                                  only, and only when status is COMPLETED; omitted for skipped or
+                                  failed metrics.
                                 "reasoning": "str",  # Optional. Reasoning of the
                                   metric result.
                                 "status":
@@ -317350,6 +318367,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                             "number_value": 0.0,  # Optional. The value of the metric as
                               a number.
+                            "passed": bool,  # Optional. Whether the score met the
+                              metric's success threshold. Set for model evaluation results only, and
+                              only when status is COMPLETED; omitted for skipped or failed metrics.
                             "reasoning": "str",  # Optional. Reasoning of the metric
                               result.
                             "status": "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",  #
@@ -317528,6 +318548,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   "METRIC_VALUE_TYPE_PERCENTAGE".
                                 "number_value": 0.0,  # Optional. The value of the
                                   metric as a number.
+                                "passed": bool,  # Optional. Whether the score met
+                                  the metric's success threshold. Set for model evaluation results
+                                  only, and only when status is COMPLETED; omitted for skipped or
+                                  failed metrics.
                                 "reasoning": "str",  # Optional. Reasoning of the
                                   metric result.
                                 "status":
@@ -317555,6 +318579,9 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                               "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                             "number_value": 0.0,  # Optional. The value of the metric as
                               a number.
+                            "passed": bool,  # Optional. Whether the score met the
+                              metric's success threshold. Set for model evaluation results only, and
+                              only when status is COMPLETED; omitted for skipped or failed metrics.
                             "reasoning": "str",  # Optional. Reasoning of the metric
                               result.
                             "status": "EVALUATION_METRIC_RESULT_STATUS_UNSPECIFIED",  #
@@ -317638,6 +318665,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               and "METRIC_VALUE_TYPE_PERCENTAGE".
                                             "number_value": 0.0,  #
                                               Optional. The value of the metric as a number.
+                                            "passed": bool,  # Optional.
+                                              Whether the score met the metric's success threshold. Set
+                                              for model evaluation results only, and only when status
+                                              is COMPLETED; omitted for skipped or failed metrics.
                                             "reasoning": "str",  #
                                               Optional. Reasoning of the metric result.
                                             "status":
@@ -317862,6 +318893,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                                     "number_value": 0.0,  # Optional. The value
                                       of the metric as a number.
+                                    "passed": bool,  # Optional. Whether the
+                                      score met the metric's success threshold. Set for model
+                                      evaluation results only, and only when status is COMPLETED;
+                                      omitted for skipped or failed metrics.
                                     "reasoning": "str",  # Optional. Reasoning of
                                       the metric result.
                                     "status":
@@ -318039,6 +319074,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                           "METRIC_VALUE_TYPE_PERCENTAGE".
                                         "number_value": 0.0,  # Optional. The
                                           value of the metric as a number.
+                                        "passed": bool,  # Optional. Whether
+                                          the score met the metric's success threshold. Set for model
+                                          evaluation results only, and only when status is COMPLETED;
+                                          omitted for skipped or failed metrics.
                                         "reasoning": "str",  # Optional.
                                           Reasoning of the metric result.
                                         "status":
@@ -318262,6 +319301,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   "METRIC_VALUE_TYPE_PERCENTAGE".
                                 "number_value": 0.0,  # Optional. The value of the
                                   metric as a number.
+                                "passed": bool,  # Optional. Whether the score met
+                                  the metric's success threshold. Set for model evaluation results
+                                  only, and only when status is COMPLETED; omitted for skipped or
+                                  failed metrics.
                                 "reasoning": "str",  # Optional. Reasoning of the
                                   metric result.
                                 "status":
@@ -318990,6 +320033,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                                     "number_value": 0.0,  # Optional. The value
                                       of the metric as a number.
+                                    "passed": bool,  # Optional. Whether the
+                                      score met the metric's success threshold. Set for model
+                                      evaluation results only, and only when status is COMPLETED;
+                                      omitted for skipped or failed metrics.
                                     "reasoning": "str",  # Optional. Reasoning of
                                       the metric result.
                                     "status":
@@ -319018,6 +320065,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   "METRIC_VALUE_TYPE_PERCENTAGE".
                                 "number_value": 0.0,  # Optional. The value of the
                                   metric as a number.
+                                "passed": bool,  # Optional. Whether the score met
+                                  the metric's success threshold. Set for model evaluation results
+                                  only, and only when status is COMPLETED; omitted for skipped or
+                                  failed metrics.
                                 "reasoning": "str",  # Optional. Reasoning of the
                                   metric result.
                                 "status":
@@ -326958,6 +328009,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                               and "METRIC_VALUE_TYPE_PERCENTAGE".
                                             "number_value": 0.0,  #
                                               Optional. The value of the metric as a number.
+                                            "passed": bool,  # Optional.
+                                              Whether the score met the metric's success threshold. Set
+                                              for model evaluation results only, and only when status
+                                              is COMPLETED; omitted for skipped or failed metrics.
                                             "reasoning": "str",  #
                                               Optional. Reasoning of the metric result.
                                             "status":
@@ -326998,6 +328053,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                       "METRIC_VALUE_TYPE_STRING", and "METRIC_VALUE_TYPE_PERCENTAGE".
                                     "number_value": 0.0,  # Optional. The value
                                       of the metric as a number.
+                                    "passed": bool,  # Optional. Whether the
+                                      score met the metric's success threshold. Set for model
+                                      evaluation results only, and only when status is COMPLETED;
+                                      omitted for skipped or failed metrics.
                                     "reasoning": "str",  # Optional. Reasoning of
                                       the metric result.
                                     "status":
@@ -344607,6 +345666,10 @@ class GenaiOperations:  # pylint: disable=too-many-public-methods
                                   "METRIC_VALUE_TYPE_PERCENTAGE".
                                 "number_value": 0.0,  # Optional. The value of the
                                   metric as a number.
+                                "passed": bool,  # Optional. Whether the score met
+                                  the metric's success threshold. Set for model evaluation results
+                                  only, and only when status is COMPLETED; omitted for skipped or
+                                  failed metrics.
                                 "reasoning": "str",  # Optional. Reasoning of the
                                   metric result.
                                 "status":
