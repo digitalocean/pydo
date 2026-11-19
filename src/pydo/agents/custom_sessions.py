@@ -700,8 +700,12 @@ class SessionsOperations:
 
         ``manifest_yaml`` holds only the sections to change (``tools``, ``env``,
         ``secrets``); absent sections are untouched. ``tools`` is the full
-        replacement list; ``env`` and ``secrets`` are full sets (a key left out is
-        removed). Returns ``{"session", "outcome", "warnings"}``. ``outcome`` is
+        replacement list, but only Action Gateway (``do.actions``) entries can
+        change: include the session's custom MCP servers exactly as they are
+        (adding, removing or changing one is ``422``). ``env`` and ``secrets`` are
+        full sets (a key left out is removed). A top-level ``model`` (set
+        ``HARNESS_INFERENCE_MODEL`` in ``env`` instead) or ``permissions`` section
+        is ``400``. Returns ``{"session", "outcome", "warnings"}``. ``outcome`` is
         ``ACCEPTED`` (HTTP 202; the session is ``SESSION_STATUS_UPDATING``, poll
         until it leaves that status, see ``AgentSession.wait_until_updated``) or
         ``UNCHANGED`` (HTTP 200). Cannot be combined with ``resume_on_topoff``

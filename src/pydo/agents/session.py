@@ -522,6 +522,10 @@ class AgentSession:
     def update_config(self, manifest_yaml: str) -> Any:
         """Patch the live config (tools, env, secrets) from a partial manifest YAML.
 
+        Only Action Gateway (``do.actions``) tools can change; custom MCP
+        servers must be sent back unchanged. See
+        :meth:`SessionsOperations.update_config` for the full rules.
+
         Returns the PATCH response (``session``, ``outcome``, ``warnings``). On
         ``ACCEPTED`` call :meth:`wait_until_updated`.
         """
