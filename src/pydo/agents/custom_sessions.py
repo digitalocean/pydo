@@ -695,6 +695,10 @@ class SessionsOperations:
             ),
         )
 
+    # The generated operations module still describes the older rules (``model``
+    # and ``permissions`` as 501, ``tools: []`` as a way to detach every MCP
+    # server) and catches up on the next regeneration from openapi. Do not
+    # reconcile the docstring below back to it.
     def update_config(self, session_id: str, *, manifest_yaml: str) -> Any:
         """Patch the live config of a session (``PATCH .../sessions/{session_id}``).
 
@@ -715,8 +719,9 @@ class SessionsOperations:
         ``SESSION_STATUS_DETACHED`` or ``SESSION_STATUS_PAUSED`` (a paused session
         is resumed for the update and paused again, unless it was paused for zero
         balance), with no turn running and no approval pending. Any other status,
-        including ``PROVISIONING`` and ``UPDATING``, is ``409``; a locked session
-        is ``423``. Returns ``{"session", "outcome", "warnings"}``. ``outcome`` is
+        including ``SESSION_STATUS_PROVISIONING`` and ``SESSION_STATUS_UPDATING``,
+        is ``409``; a locked session is ``423``. Returns
+        ``{"session", "outcome", "warnings"}``. ``outcome`` is
         ``ACCEPTED`` (HTTP 202; the session is ``SESSION_STATUS_UPDATING``, poll
         until it leaves that status, see ``AgentSession.wait_until_updated``) or
         ``UNCHANGED`` (HTTP 200). Cannot be combined with ``resume_on_topoff``
