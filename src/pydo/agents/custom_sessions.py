@@ -703,9 +703,20 @@ class SessionsOperations:
         replacement list, but only Action Gateway (``do.actions``) entries can
         change: include the session's custom MCP servers exactly as they are
         (adding, removing or changing one is ``422``). ``env`` and ``secrets`` are
-        full sets (a key left out is removed). A top-level ``model`` (set
-        ``HARNESS_INFERENCE_MODEL`` in ``env`` instead) or ``permissions`` section
-        is ``400``. Returns ``{"session", "outcome", "warnings"}``. ``outcome`` is
+        full sets (a key left out is removed). A top-level ``model`` or
+        ``permissions`` section is ``400``. The model can change only when the
+        session's model provider is DigitalOcean Serverless Inference (created
+        with ``HARNESS_INFERENCE_MODEL`` and no inference endpoint of its own):
+        set ``HARNESS_INFERENCE_MODEL`` in ``env`` to another Serverless
+        Inference model id or ``router:<name>``. A session on any other model
+        provider cannot change its model (``422``).
+
+        The session status must be ``SESSION_STATUS_READY``,
+        ``SESSION_STATUS_DETACHED`` or ``SESSION_STATUS_PAUSED`` (a paused session
+        is resumed for the update and paused again, unless it was paused for zero
+        balance), with no turn running and no approval pending. Any other status,
+        including ``PROVISIONING`` and ``UPDATING``, is ``409``; a locked session
+        is ``423``. Returns ``{"session", "outcome", "warnings"}``. ``outcome`` is
         ``ACCEPTED`` (HTTP 202; the session is ``SESSION_STATUS_UPDATING``, poll
         until it leaves that status, see ``AgentSession.wait_until_updated``) or
         ``UNCHANGED`` (HTTP 200). Cannot be combined with ``resume_on_topoff``

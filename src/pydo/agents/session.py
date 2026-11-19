@@ -523,7 +523,11 @@ class AgentSession:
         """Patch the live config (tools, env, secrets) from a partial manifest YAML.
 
         Only Action Gateway (``do.actions``) tools can change; custom MCP
-        servers must be sent back unchanged. See
+        servers must be sent back unchanged. The model changes only through
+        ``env.HARNESS_INFERENCE_MODEL``, and only on a session whose model
+        provider is DigitalOcean Serverless Inference. The session must be
+        ``READY``, ``DETACHED`` or ``PAUSED`` (not paused for zero balance) and
+        idle. See
         :meth:`SessionsOperations.update_config` for the full rules.
 
         Returns the PATCH response (``session``, ``outcome``, ``warnings``). On
