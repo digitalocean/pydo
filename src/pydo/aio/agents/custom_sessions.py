@@ -331,7 +331,10 @@ class AsyncSessionsOperations:
         )
 
     async def update_config(self, session_id: str, *, manifest_yaml: str) -> Any:
-        """Patch the live config of a session; see the sync ``update_config``."""
+        """Patch the live config of a session (``PATCH .../sessions/{session_id}``).
+
+        See :meth:`pydo.agents.custom_sessions.SessionsOperations.update_config`.
+        """
         return await self._parse_json(
             await self._send(
                 "PATCH",
