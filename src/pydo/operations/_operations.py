@@ -16981,41 +16981,6 @@ def build_security_list_secret_versions_request(  # pylint: disable=name-too-lon
     )
 
 
-def build_security_revert_secret_request(
-    secret: str, version: int, *, region: str, **kwargs: Any
-) -> HttpRequest:
-    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
-
-    content_type: Optional[str] = kwargs.pop(
-        "content_type", _headers.pop("Content-Type", None)
-    )
-    accept = _headers.pop("Accept", "application/json")
-
-    # Construct URL
-    _url = "/v2/security/secrets/{secret}/versions/{version}/revert"
-    path_format_arguments = {
-        "secret": _SERIALIZER.url("secret", secret, "str"),
-        "version": _SERIALIZER.url("version", version, "int", minimum=1),
-    }
-
-    _url: str = _url.format(**path_format_arguments)  # type: ignore
-
-    # Construct parameters
-    _params["region"] = _SERIALIZER.query("region", region, "str")
-
-    # Construct headers
-    if content_type is not None:
-        _headers["Content-Type"] = _SERIALIZER.header(
-            "content_type", content_type, "str"
-        )
-    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
-
-    return HttpRequest(
-        method="POST", url=_url, params=_params, headers=_headers, **kwargs
-    )
-
-
 def build_security_post_restore_secret_request(  # pylint: disable=name-too-long
     secret: str, *, region: str, **kwargs: Any
 ) -> HttpRequest:
@@ -53306,44 +53271,44 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "config_diff": {
                                 "env": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 },
                                 "secrets": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 },
                                 "tools": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 }
                             },
@@ -53428,8 +53393,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               status-filter value only -- no session is ever actually in this status.
                               SESSION_STATUS_LOCKED is reserved for internal use and never appears in
                               an end-user-facing response. SESSION_STATUS_UPDATING is reported while a
-                              live config update (PATCH with ``manifest_yaml``"" ) is being applied;
-                              poll the session until it leaves this status. Known values are:
+                              session settings update (PATCH with ``manifest_yaml``"" ) is being
+                              applied; poll the session until it leaves this status. Known values are:
                               "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
                               "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED",
                               "SESSION_STATUS_DESTROYING", "SESSION_STATUS_DESTROYED",
@@ -53440,44 +53405,53 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "changes": {
                                     "env": {
                                         "added": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "changed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "removed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ]
                                     },
                                     "secrets": {
                                         "added": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "changed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "removed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ]
                                     },
                                     "tools": {
                                         "added": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "changed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "removed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ]
                                     }
                                 },
@@ -53487,7 +53461,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                   when state is FAILED. Known values are: "update_failed",
                                   "requires_new_session", and "interrupted".
                                 "finished_at": "2020-02-20 00:00:00",  # Optional.
-                                  One live config update (or automatic rollback) of a session.
+                                  The most recent session settings update to the session, or the
+                                  automatic rollback of a failed one.
                                 "kind": "str",  # Optional. Known values are:
                                   "update" and "rollback".
                                 "manifest_hash": "str",  # Optional. Hash of the
@@ -53500,17 +53475,21 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "str"  # Optional. Manifest sections this
                                       update touched.
                                 ],
-                                "session_id": "str",  # Optional. One live config
-                                  update (or automatic rollback) of a session.
-                                "started_at": "2020-02-20 00:00:00",  # Optional. One
-                                  live config update (or automatic rollback) of a session.
-                                "state": "str",  # Optional. State of a live config
-                                  update. APPLIED_RESTARTED means the agent was restarted to apply it
-                                  (env and secret changes). FAILED means the update did not take
+                                "session_id": "str",  # Optional. The most recent
+                                  session settings update to the session, or the automatic rollback of
+                                  a failed one.
+                                "started_at": "2020-02-20 00:00:00",  # Optional. The
+                                  most recent session settings update to the session, or the automatic
+                                  rollback of a failed one.
+                                "state": "str",  # Optional. State of a session
+                                  settings update. `APPLYING`: in progress. `APPLIED`: live.
+                                  `APPLIED_RESTARTED`: live, and the agent was restarted to apply it
+                                  (`env` and `secrets` changes). `FAILED`: the update did not take
                                   effect; see ``reverted`` and ``detail``. Known values are:
                                   "APPLYING", "APPLIED", "APPLIED_RESTARTED", and "FAILED".
-                                "update_id": "str",  # Optional. One live config
-                                  update (or automatic rollback) of a session.
+                                "update_id": "str",  # Optional. The most recent
+                                  session settings update to the session, or the automatic rollback of
+                                  a failed one.
                                 "user_email": "str",  # Optional. Email of the user
                                   who requested the update.
                                 "user_uuid": "str"  # Optional. User who requested
@@ -53851,44 +53830,44 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "config_diff": {
                                 "env": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 },
                                 "secrets": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 },
                                 "tools": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 }
                             },
@@ -53973,8 +53952,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               status-filter value only -- no session is ever actually in this status.
                               SESSION_STATUS_LOCKED is reserved for internal use and never appears in
                               an end-user-facing response. SESSION_STATUS_UPDATING is reported while a
-                              live config update (PATCH with ``manifest_yaml``"" ) is being applied;
-                              poll the session until it leaves this status. Known values are:
+                              session settings update (PATCH with ``manifest_yaml``"" ) is being
+                              applied; poll the session until it leaves this status. Known values are:
                               "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
                               "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED",
                               "SESSION_STATUS_DESTROYING", "SESSION_STATUS_DESTROYED",
@@ -53985,44 +53964,53 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "changes": {
                                     "env": {
                                         "added": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "changed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "removed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ]
                                     },
                                     "secrets": {
                                         "added": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "changed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "removed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ]
                                     },
                                     "tools": {
                                         "added": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "changed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "removed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ]
                                     }
                                 },
@@ -54032,7 +54020,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                   when state is FAILED. Known values are: "update_failed",
                                   "requires_new_session", and "interrupted".
                                 "finished_at": "2020-02-20 00:00:00",  # Optional.
-                                  One live config update (or automatic rollback) of a session.
+                                  The most recent session settings update to the session, or the
+                                  automatic rollback of a failed one.
                                 "kind": "str",  # Optional. Known values are:
                                   "update" and "rollback".
                                 "manifest_hash": "str",  # Optional. Hash of the
@@ -54045,17 +54034,21 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "str"  # Optional. Manifest sections this
                                       update touched.
                                 ],
-                                "session_id": "str",  # Optional. One live config
-                                  update (or automatic rollback) of a session.
-                                "started_at": "2020-02-20 00:00:00",  # Optional. One
-                                  live config update (or automatic rollback) of a session.
-                                "state": "str",  # Optional. State of a live config
-                                  update. APPLIED_RESTARTED means the agent was restarted to apply it
-                                  (env and secret changes). FAILED means the update did not take
+                                "session_id": "str",  # Optional. The most recent
+                                  session settings update to the session, or the automatic rollback of
+                                  a failed one.
+                                "started_at": "2020-02-20 00:00:00",  # Optional. The
+                                  most recent session settings update to the session, or the automatic
+                                  rollback of a failed one.
+                                "state": "str",  # Optional. State of a session
+                                  settings update. `APPLYING`: in progress. `APPLIED`: live.
+                                  `APPLIED_RESTARTED`: live, and the agent was restarted to apply it
+                                  (`env` and `secrets` changes). `FAILED`: the update did not take
                                   effect; see ``reverted`` and ``detail``. Known values are:
                                   "APPLYING", "APPLIED", "APPLIED_RESTARTED", and "FAILED".
-                                "update_id": "str",  # Optional. One live config
-                                  update (or automatic rollback) of a session.
+                                "update_id": "str",  # Optional. The most recent
+                                  session settings update to the session, or the automatic rollback of
+                                  a failed one.
                                 "user_email": "str",  # Optional. Email of the user
                                   who requested the update.
                                 "user_uuid": "str"  # Optional. User who requested
@@ -54304,44 +54297,44 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "config_diff": {
                             "env": {
                                 "added": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ]
                             },
                             "secrets": {
                                 "added": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ]
                             },
                             "tools": {
                                 "added": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ]
                             }
                         },
@@ -54422,8 +54415,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           sandbox + agent pair. SESSION_STATUS_ALL is a ListSessions status-filter
                           value only -- no session is ever actually in this status.
                           SESSION_STATUS_LOCKED is reserved for internal use and never appears in an
-                          end-user-facing response. SESSION_STATUS_UPDATING is reported while a live
-                          config update (PATCH with ``manifest_yaml``"" ) is being applied; poll the
+                          end-user-facing response. SESSION_STATUS_UPDATING is reported while a session
+                          settings update (PATCH with ``manifest_yaml``"" ) is being applied; poll the
                           session until it leaves this status. Known values are:
                           "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
                           "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED",
@@ -54434,44 +54427,44 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "changes": {
                                 "env": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 },
                                 "secrets": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 },
                                 "tools": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 }
                             },
@@ -54480,8 +54473,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "error": "str",  # Optional. Failure class; present when
                               state is FAILED. Known values are: "update_failed",
                               "requires_new_session", and "interrupted".
-                            "finished_at": "2020-02-20 00:00:00",  # Optional. One live
-                              config update (or automatic rollback) of a session.
+                            "finished_at": "2020-02-20 00:00:00",  # Optional. The most
+                              recent session settings update to the session, or the automatic rollback
+                              of a failed one.
                             "kind": "str",  # Optional. Known values are: "update" and
                               "rollback".
                             "manifest_hash": "str",  # Optional. Hash of the manifest
@@ -54494,17 +54488,21 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "str"  # Optional. Manifest sections this update
                                   touched.
                             ],
-                            "session_id": "str",  # Optional. One live config update (or
-                              automatic rollback) of a session.
-                            "started_at": "2020-02-20 00:00:00",  # Optional. One live
-                              config update (or automatic rollback) of a session.
-                            "state": "str",  # Optional. State of a live config update.
-                              APPLIED_RESTARTED means the agent was restarted to apply it (env and
-                              secret changes). FAILED means the update did not take effect; see
-                              ``reverted`` and ``detail``. Known values are: "APPLYING", "APPLIED",
-                              "APPLIED_RESTARTED", and "FAILED".
-                            "update_id": "str",  # Optional. One live config update (or
-                              automatic rollback) of a session.
+                            "session_id": "str",  # Optional. The most recent session
+                              settings update to the session, or the automatic rollback of a failed
+                              one.
+                            "started_at": "2020-02-20 00:00:00",  # Optional. The most
+                              recent session settings update to the session, or the automatic rollback
+                              of a failed one.
+                            "state": "str",  # Optional. State of a session settings
+                              update. `APPLYING`: in progress. `APPLIED`: live. `APPLIED_RESTARTED`:
+                              live, and the agent was restarted to apply it (`env` and `secrets`
+                              changes). `FAILED`: the update did not take effect; see ``reverted`` and
+                              ``detail``. Known values are: "APPLYING", "APPLIED", "APPLIED_RESTARTED",
+                              and "FAILED".
+                            "update_id": "str",  # Optional. The most recent session
+                              settings update to the session, or the automatic rollback of a failed
+                              one.
                             "user_email": "str",  # Optional. Email of the user who
                               requested the update.
                             "user_uuid": "str"  # Optional. User who requested the
@@ -54631,44 +54629,44 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "config_diff": {
                             "env": {
                                 "added": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ]
                             },
                             "secrets": {
                                 "added": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ]
                             },
                             "tools": {
                                 "added": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ]
                             }
                         },
@@ -54749,8 +54747,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           sandbox + agent pair. SESSION_STATUS_ALL is a ListSessions status-filter
                           value only -- no session is ever actually in this status.
                           SESSION_STATUS_LOCKED is reserved for internal use and never appears in an
-                          end-user-facing response. SESSION_STATUS_UPDATING is reported while a live
-                          config update (PATCH with ``manifest_yaml``"" ) is being applied; poll the
+                          end-user-facing response. SESSION_STATUS_UPDATING is reported while a session
+                          settings update (PATCH with ``manifest_yaml``"" ) is being applied; poll the
                           session until it leaves this status. Known values are:
                           "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
                           "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED",
@@ -54761,44 +54759,44 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "changes": {
                                 "env": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 },
                                 "secrets": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 },
                                 "tools": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 }
                             },
@@ -54807,8 +54805,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "error": "str",  # Optional. Failure class; present when
                               state is FAILED. Known values are: "update_failed",
                               "requires_new_session", and "interrupted".
-                            "finished_at": "2020-02-20 00:00:00",  # Optional. One live
-                              config update (or automatic rollback) of a session.
+                            "finished_at": "2020-02-20 00:00:00",  # Optional. The most
+                              recent session settings update to the session, or the automatic rollback
+                              of a failed one.
                             "kind": "str",  # Optional. Known values are: "update" and
                               "rollback".
                             "manifest_hash": "str",  # Optional. Hash of the manifest
@@ -54821,17 +54820,21 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "str"  # Optional. Manifest sections this update
                                   touched.
                             ],
-                            "session_id": "str",  # Optional. One live config update (or
-                              automatic rollback) of a session.
-                            "started_at": "2020-02-20 00:00:00",  # Optional. One live
-                              config update (or automatic rollback) of a session.
-                            "state": "str",  # Optional. State of a live config update.
-                              APPLIED_RESTARTED means the agent was restarted to apply it (env and
-                              secret changes). FAILED means the update did not take effect; see
-                              ``reverted`` and ``detail``. Known values are: "APPLYING", "APPLIED",
-                              "APPLIED_RESTARTED", and "FAILED".
-                            "update_id": "str",  # Optional. One live config update (or
-                              automatic rollback) of a session.
+                            "session_id": "str",  # Optional. The most recent session
+                              settings update to the session, or the automatic rollback of a failed
+                              one.
+                            "started_at": "2020-02-20 00:00:00",  # Optional. The most
+                              recent session settings update to the session, or the automatic rollback
+                              of a failed one.
+                            "state": "str",  # Optional. State of a session settings
+                              update. `APPLYING`: in progress. `APPLIED`: live. `APPLIED_RESTARTED`:
+                              live, and the agent was restarted to apply it (`env` and `secrets`
+                              changes). `FAILED`: the update did not take effect; see ``reverted`` and
+                              ``detail``. Known values are: "APPLYING", "APPLIED", "APPLIED_RESTARTED",
+                              and "FAILED".
+                            "update_id": "str",  # Optional. The most recent session
+                              settings update to the session, or the automatic rollback of a failed
+                              one.
                             "user_email": "str",  # Optional. Email of the user who
                               requested the update.
                             "user_uuid": "str"  # Optional. User who requested the
@@ -54978,44 +54981,44 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "config_diff": {
                             "env": {
                                 "added": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ]
                             },
                             "secrets": {
                                 "added": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ]
                             },
                             "tools": {
                                 "added": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ]
                             }
                         },
@@ -55096,8 +55099,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           sandbox + agent pair. SESSION_STATUS_ALL is a ListSessions status-filter
                           value only -- no session is ever actually in this status.
                           SESSION_STATUS_LOCKED is reserved for internal use and never appears in an
-                          end-user-facing response. SESSION_STATUS_UPDATING is reported while a live
-                          config update (PATCH with ``manifest_yaml``"" ) is being applied; poll the
+                          end-user-facing response. SESSION_STATUS_UPDATING is reported while a session
+                          settings update (PATCH with ``manifest_yaml``"" ) is being applied; poll the
                           session until it leaves this status. Known values are:
                           "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
                           "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED",
@@ -55108,44 +55111,44 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "changes": {
                                 "env": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 },
                                 "secrets": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 },
                                 "tools": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 }
                             },
@@ -55154,8 +55157,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "error": "str",  # Optional. Failure class; present when
                               state is FAILED. Known values are: "update_failed",
                               "requires_new_session", and "interrupted".
-                            "finished_at": "2020-02-20 00:00:00",  # Optional. One live
-                              config update (or automatic rollback) of a session.
+                            "finished_at": "2020-02-20 00:00:00",  # Optional. The most
+                              recent session settings update to the session, or the automatic rollback
+                              of a failed one.
                             "kind": "str",  # Optional. Known values are: "update" and
                               "rollback".
                             "manifest_hash": "str",  # Optional. Hash of the manifest
@@ -55168,17 +55172,21 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "str"  # Optional. Manifest sections this update
                                   touched.
                             ],
-                            "session_id": "str",  # Optional. One live config update (or
-                              automatic rollback) of a session.
-                            "started_at": "2020-02-20 00:00:00",  # Optional. One live
-                              config update (or automatic rollback) of a session.
-                            "state": "str",  # Optional. State of a live config update.
-                              APPLIED_RESTARTED means the agent was restarted to apply it (env and
-                              secret changes). FAILED means the update did not take effect; see
-                              ``reverted`` and ``detail``. Known values are: "APPLYING", "APPLIED",
-                              "APPLIED_RESTARTED", and "FAILED".
-                            "update_id": "str",  # Optional. One live config update (or
-                              automatic rollback) of a session.
+                            "session_id": "str",  # Optional. The most recent session
+                              settings update to the session, or the automatic rollback of a failed
+                              one.
+                            "started_at": "2020-02-20 00:00:00",  # Optional. The most
+                              recent session settings update to the session, or the automatic rollback
+                              of a failed one.
+                            "state": "str",  # Optional. State of a session settings
+                              update. `APPLYING`: in progress. `APPLIED`: live. `APPLIED_RESTARTED`:
+                              live, and the agent was restarted to apply it (`env` and `secrets`
+                              changes). `FAILED`: the update did not take effect; see ``reverted`` and
+                              ``detail``. Known values are: "APPLYING", "APPLIED", "APPLIED_RESTARTED",
+                              and "FAILED".
+                            "update_id": "str",  # Optional. The most recent session
+                              settings update to the session, or the automatic rollback of a failed
+                              one.
                             "user_email": "str",  # Optional. Email of the user who
                               requested the update.
                             "user_uuid": "str"  # Optional. User who requested the
@@ -55952,44 +55960,44 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "config_diff": {
                             "env": {
                                 "added": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ]
                             },
                             "secrets": {
                                 "added": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ]
                             },
                             "tools": {
                                 "added": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ]
                             }
                         },
@@ -56070,8 +56078,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           sandbox + agent pair. SESSION_STATUS_ALL is a ListSessions status-filter
                           value only -- no session is ever actually in this status.
                           SESSION_STATUS_LOCKED is reserved for internal use and never appears in an
-                          end-user-facing response. SESSION_STATUS_UPDATING is reported while a live
-                          config update (PATCH with ``manifest_yaml``"" ) is being applied; poll the
+                          end-user-facing response. SESSION_STATUS_UPDATING is reported while a session
+                          settings update (PATCH with ``manifest_yaml``"" ) is being applied; poll the
                           session until it leaves this status. Known values are:
                           "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
                           "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED",
@@ -56082,44 +56090,44 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "changes": {
                                 "env": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 },
                                 "secrets": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 },
                                 "tools": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 }
                             },
@@ -56128,8 +56136,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "error": "str",  # Optional. Failure class; present when
                               state is FAILED. Known values are: "update_failed",
                               "requires_new_session", and "interrupted".
-                            "finished_at": "2020-02-20 00:00:00",  # Optional. One live
-                              config update (or automatic rollback) of a session.
+                            "finished_at": "2020-02-20 00:00:00",  # Optional. The most
+                              recent session settings update to the session, or the automatic rollback
+                              of a failed one.
                             "kind": "str",  # Optional. Known values are: "update" and
                               "rollback".
                             "manifest_hash": "str",  # Optional. Hash of the manifest
@@ -56142,17 +56151,21 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "str"  # Optional. Manifest sections this update
                                   touched.
                             ],
-                            "session_id": "str",  # Optional. One live config update (or
-                              automatic rollback) of a session.
-                            "started_at": "2020-02-20 00:00:00",  # Optional. One live
-                              config update (or automatic rollback) of a session.
-                            "state": "str",  # Optional. State of a live config update.
-                              APPLIED_RESTARTED means the agent was restarted to apply it (env and
-                              secret changes). FAILED means the update did not take effect; see
-                              ``reverted`` and ``detail``. Known values are: "APPLYING", "APPLIED",
-                              "APPLIED_RESTARTED", and "FAILED".
-                            "update_id": "str",  # Optional. One live config update (or
-                              automatic rollback) of a session.
+                            "session_id": "str",  # Optional. The most recent session
+                              settings update to the session, or the automatic rollback of a failed
+                              one.
+                            "started_at": "2020-02-20 00:00:00",  # Optional. The most
+                              recent session settings update to the session, or the automatic rollback
+                              of a failed one.
+                            "state": "str",  # Optional. State of a session settings
+                              update. `APPLYING`: in progress. `APPLIED`: live. `APPLIED_RESTARTED`:
+                              live, and the agent was restarted to apply it (`env` and `secrets`
+                              changes). `FAILED`: the update did not take effect; see ``reverted`` and
+                              ``detail``. Known values are: "APPLYING", "APPLIED", "APPLIED_RESTARTED",
+                              and "FAILED".
+                            "update_id": "str",  # Optional. The most recent session
+                              settings update to the session, or the automatic rollback of a failed
+                              one.
                             "user_email": "str",  # Optional. Email of the user who
                               requested the update.
                             "user_uuid": "str"  # Optional. User who requested the
@@ -56305,22 +56318,110 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         **kwargs: Any,
     ) -> JSON:
         # pylint: disable=line-too-long
-        """PatchSession updates an existing session (session-scoped settings or live config).
+        """Update a session's settings.
 
-        Partial update of an existing session. Send exactly one of: ``resume_on_topoff``
-        (session-scoped consent), or ``manifest_yaml`` (live config update of ``tools``\\ , ``env`` and
-        ``secrets``\\ ). The two cannot be combined, and ``{}`` is 400. With ``manifest_yaml``\\ ,
-        absent sections are untouched; ``model`` and ``permissions`` return 501. A config update that
-        changes something returns 202 with outcome ACCEPTED and the session in SESSION_STATUS_UPDATING
-        (update state APPLYING): poll GET on the session every 2-5 seconds until the status leaves
-        UPDATING, then read ``session.update`` (APPLIED, APPLIED_RESTARTED or FAILED). A tools-only
-        update usually finishes in seconds; env and secret changes restart the agent and can take about
-        two minutes. A manifest that changes nothing returns 200 with outcome UNCHANGED. Terminal
-        sessions (DESTROYED, FAILED) cannot be patched.
+        Updates the settings of an existing session. Changes apply to this session only; the agent
+        config the session was created from is not modified.
+
+        Each request makes one of two kinds of update, and the two can't be combined:
+
+
+        * **Session preferences**\\ : set ``resume_on_topoff``. Applied immediately; returns ``200``.
+        * **Session settings**\\ : set ``manifest_yaml`` to a partial manifest that holds only the
+        sections
+          to change. Applied in the background; returns ``202``.
+
+        An empty body (\\ ``{}``\\ ) returns ``400``.
+
+        Updatable session settings
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+        .. list-table::
+           :header-rows: 1
+
+           * - Section
+             - What it changes
+             - Agent restart
+           * - ``tools``
+             - The session's Action Gateway tools (\\ ``do.actions`` entries). Custom MCP servers can't
+        be changed.
+             - No
+           * - ``env``
+             - Environment variables (name and value).
+             - Yes
+           * - ``env.HARNESS_INFERENCE_MODEL``
+             - The model, for sessions that use DigitalOcean Serverless Inference.
+             - Yes
+           * - ``secrets``
+             - Plain secrets (name and value).
+             - Yes
+
+
+        Sections you omit are not changed. Each section you include replaces that section in full; see
+        ``manifest_yaml`` for the exact rules.
+
+        The only way to change a session's model is to set ``HARNESS_INFERENCE_MODEL`` in ``env``. This
+        works only for sessions that were created with a DigitalOcean Serverless Inference model;
+        sessions that use a third-party model provider can't change their model. A top-level ``model``
+        section returns ``400``.
+
+        The following can't be changed on an existing session: custom MCP servers, egress rules, GitHub
+        OAuth connections, URL-bound secrets, platform-managed model keys, and ``permissions`` (\\
+        ``400``\\ ).
+
+        Tracking an update
+        ^^^^^^^^^^^^^^^^^^
+
+
+        #. A request that changes the session settings returns ``202`` with ``outcome`` set to
+        ``ACCEPTED``.
+           The session status becomes ``SESSION_STATUS_UPDATING``.
+        #. Poll `\\ ``GET /v2/harness-runtime/sessions/{session_id}``
+        <#operation/harness_get_session>`_
+           every 2 to 5 seconds until the status is ``SESSION_STATUS_READY``\\ , or
+        ``SESSION_STATUS_PAUSED``
+           if the session was paused when you sent the update. The session returns to that status
+           whether the update succeeded or failed.
+        #. Read ``session.update.state``\\ :
+
+           * ``APPLIED``\\ : the update is live.
+           * ``APPLIED_RESTARTED``\\ : the update is live and the agent was restarted to apply it.
+           * ``FAILED``\\ : the update did not take effect. ``session.update.detail`` explains why, and
+             ``session.update.reverted`` is ``true`` if the previous settings were restored.
+
+        Tool updates usually finish within a few seconds. Updates to ``env`` (including the model) or
+        ``secrets`` restart the agent and can take up to about two minutes.
+
+        If the request matches the session's current settings, it returns ``200`` with ``outcome`` set
+        to
+        ``UNCHANGED`` and nothing is applied.
+
+        Versioning
+        ^^^^^^^^^^
+
+        Each accepted update is recorded with its own ``update_id`` and the manifest hashes before and
+        after the change (\\ ``session.update.previous_hash`` and ``session.update.manifest_hash``\\ ).
+        When an
+        update fails, the session is rolled back to its previous settings and
+        ``session.update.reverted``
+        is ``true``. Once a session's settings differ from its agent config, the session reports
+        ``config_drifted: true``\\ , ``config_diff`` lists the changed entries, and ``manifest`` holds
+        the
+        settings the session now runs with (without secret values).
+
+        Requirements
+        ^^^^^^^^^^^^
+
+
+        * The session must be idle: not provisioning, not already updating, and with no agent turn or
+          approval in progress. Sessions paused for zero balance and destroyed sessions
+          (\\ ``SESSION_STATUS_DESTROYED``\\ ) can't be updated.
+        * Session settings updates must be enabled for your team.
+        * Not every agent runtime supports every section. An unsupported change returns ``409``.
 
         :param session_id: The session UUID. Required.
         :type session_id: str
-        :param body: PATCH body: either resume_on_topoff or manifest_yaml (not both). Required.
+        :param body: Set either ``resume_on_topoff`` or ``manifest_yaml``\\ , not both. Required.
         :type body: JSON
         :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
          Default value is "application/json".
@@ -56334,29 +56435,57 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
 
                 # JSON input template you can fill out and use as your body input.
                 body = {
-                    "manifest_yaml": "str",  # Optional. A partial manifest, as YAML, holding
-                      only the sections to change: ``tools``"" , ``env``"" , ``secrets``. Absent
-                      sections are untouched; any other top-level key is 400, and ``model`` /
-                      ``permissions`` return 501. ``tools`` is the full replacement list ("" ``tools:
-                      []`` detaches every MCP server; ``tools: null`` is 400). ``env`` and ``secrets``
-                      are full sets: a key left out is removed. A secret value is a string (set or
-                      rotate) or ``{}`` (keep the current value); per-key ``null`` is 400. Platform and
-                      framework keys and non-plain secrets must be sent back unchanged, or the request
-                      is 422. Cannot be combined with ``resume_on_topoff``. Requires the team to be
-                      enrolled in the config-update feature (403 otherwise).
-                    "resume_on_topoff": bool  # Optional. When present, sets whether this session
-                      opts in to automatic resumption when the team's prepayment balance is restored
-                      after a low-balance pause. Session-scoped consent, not config-scoped. Omitted
-                      properties are not modified. Cannot be combined with ``manifest_yaml``.
+                    "manifest_yaml": "str",  # Optional. A partial agent manifest, as a YAML
+                      string, that holds only the sections to change. Can't be combined with
+                      ``resume_on_topoff``. Requires session settings updates to be enabled for your
+                      team ("" ``403`` otherwise).  Supported sections are ``tools``"" , ``env``"" ,
+                      and ``secrets``. Sections you omit are not changed. Any other top-level key
+                      returns ``400``"" , including ``model`` (to change the model, set
+                      ``HARNESS_INFERENCE_MODEL`` in ``env``"" ) and ``permissions`` (can't be changed
+                      on an existing session).  Each section you include replaces that section in full:
+                      * ``tools``"" : the complete list of tools for the session. Only Action Gateway
+                      tools   ("" ``do.actions`` entries) can be added, removed, or changed. Custom MCP
+                      servers can't be   changed on an existing session: include the session's current
+                      custom MCP servers   exactly as they are. To remove all Action Gateway tools from
+                      a session that has no custom   MCP servers, send ``tools: []``. ``tools: null``
+                      returns ``400``. * ``env``"" : the complete set of environment variables, as
+                      name-value pairs. A variable you   leave out is removed. ``env: {}`` removes all
+                      variables; ``env: null`` returns ``400``. * ``secrets``"" : the complete set of
+                      secrets, as name-value pairs. A secret you leave out is   removed. For each
+                      secret, set the value to a string to add or rotate it, or to ``{}`` to   keep its
+                      current value. A ``null`` value returns ``400``.  **Changing the model.** The
+                      only way to change a session's model is through ``env``. Set
+                      ``HARNESS_INFERENCE_MODEL`` to a DigitalOcean Serverless Inference model ID, or
+                      to ``router:<name>`` for an inference router. This works only on sessions created
+                      with ``HARNESS_INFERENCE_MODEL`` set and without their own inference endpoint.
+                      Adding, removing, or changing the key on any other session, or moving a session
+                      to its own endpoint, returns ``422``. A malformed value (empty, multi-line, or
+                      over 256 bytes) returns ``400``. Whether the model exists is not checked when you
+                      send the request; an unknown model fails on the agent's next turn.  **Reserved
+                      keys.** ``HARNESS_INFERENCE_API_KEY`` and ``HARNESS_INFERENCE_BASE_URL`` are
+                      managed by the platform: include them with their current values, or the request
+                      returns ``422``. Framework keys can't be changed either ("" ``422``"" ). Secrets
+                      that are not plain values (such as URL-bound or OAuth secrets) can't be changed
+                      on an existing session ("" ``422``"" ).  Example that changes the model, keeps
+                      one secret, and rotates another. Because each section is a full replacement, the
+                      example assumes the session has no other env variables or secrets:  ..
+                      code-block:: yaml     env:      HARNESS_INFERENCE_MODEL: llama3.3-70b-instruct
+                      LOG_LEVEL: info    secrets:      GITHUB_TOKEN: {}      JIRA_API_TOKEN:
+                      new-token-value.
+                    "resume_on_topoff": bool  # Optional. Whether this session resumes
+                      automatically after it is paused for low balance and your team's prepaid balance
+                      is topped up. Applies to this session only. Can't be combined with
+                      ``manifest_yaml``.
                 }
 
                 # response body for status code(s): 200, 202
                 response == {
-                    "outcome": "str",  # Optional. Present for ``manifest_yaml`` patches.
-                      ACCEPTED (HTTP 202): the update is applying and the session status is
-                      SESSION_STATUS_UPDATING; poll GET until the status leaves UPDATING, then read
-                      ``session.update``. UNCHANGED (HTTP 200): the manifest changes nothing and
-                      nothing was recorded. Known values are: "ACCEPTED" and "UNCHANGED".
+                    "outcome": "str",  # Optional. Returned for ``manifest_yaml`` requests.
+                      ``ACCEPTED`` (HTTP 202): the update is being applied and the session status is
+                      ``SESSION_STATUS_UPDATING``. Poll the session until the status changes, then read
+                      ``session.update``. ``UNCHANGED`` (HTTP 200): the requested settings match the
+                      current ones, so nothing was applied. Known values are: "ACCEPTED" and
+                      "UNCHANGED".
                     "session": {
                         "agent_kind": "AGENT_KIND_UNSPECIFIED",  # Optional. Default value is
                           "AGENT_KIND_UNSPECIFIED". AgentKind identifies what runs inside the session
@@ -56377,44 +56506,44 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "config_diff": {
                             "env": {
                                 "added": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ]
                             },
                             "secrets": {
                                 "added": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ]
                             },
                             "tools": {
                                 "added": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ]
                             }
                         },
@@ -56495,8 +56624,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           sandbox + agent pair. SESSION_STATUS_ALL is a ListSessions status-filter
                           value only -- no session is ever actually in this status.
                           SESSION_STATUS_LOCKED is reserved for internal use and never appears in an
-                          end-user-facing response. SESSION_STATUS_UPDATING is reported while a live
-                          config update (PATCH with ``manifest_yaml``"" ) is being applied; poll the
+                          end-user-facing response. SESSION_STATUS_UPDATING is reported while a session
+                          settings update (PATCH with ``manifest_yaml``"" ) is being applied; poll the
                           session until it leaves this status. Known values are:
                           "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
                           "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED",
@@ -56507,44 +56636,44 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "changes": {
                                 "env": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 },
                                 "secrets": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 },
                                 "tools": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 }
                             },
@@ -56553,8 +56682,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "error": "str",  # Optional. Failure class; present when
                               state is FAILED. Known values are: "update_failed",
                               "requires_new_session", and "interrupted".
-                            "finished_at": "2020-02-20 00:00:00",  # Optional. One live
-                              config update (or automatic rollback) of a session.
+                            "finished_at": "2020-02-20 00:00:00",  # Optional. The most
+                              recent session settings update to the session, or the automatic rollback
+                              of a failed one.
                             "kind": "str",  # Optional. Known values are: "update" and
                               "rollback".
                             "manifest_hash": "str",  # Optional. Hash of the manifest
@@ -56567,17 +56697,21 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "str"  # Optional. Manifest sections this update
                                   touched.
                             ],
-                            "session_id": "str",  # Optional. One live config update (or
-                              automatic rollback) of a session.
-                            "started_at": "2020-02-20 00:00:00",  # Optional. One live
-                              config update (or automatic rollback) of a session.
-                            "state": "str",  # Optional. State of a live config update.
-                              APPLIED_RESTARTED means the agent was restarted to apply it (env and
-                              secret changes). FAILED means the update did not take effect; see
-                              ``reverted`` and ``detail``. Known values are: "APPLYING", "APPLIED",
-                              "APPLIED_RESTARTED", and "FAILED".
-                            "update_id": "str",  # Optional. One live config update (or
-                              automatic rollback) of a session.
+                            "session_id": "str",  # Optional. The most recent session
+                              settings update to the session, or the automatic rollback of a failed
+                              one.
+                            "started_at": "2020-02-20 00:00:00",  # Optional. The most
+                              recent session settings update to the session, or the automatic rollback
+                              of a failed one.
+                            "state": "str",  # Optional. State of a session settings
+                              update. `APPLYING`: in progress. `APPLIED`: live. `APPLIED_RESTARTED`:
+                              live, and the agent was restarted to apply it (`env` and `secrets`
+                              changes). `FAILED`: the update did not take effect; see ``reverted`` and
+                              ``detail``. Known values are: "APPLYING", "APPLIED", "APPLIED_RESTARTED",
+                              and "FAILED".
+                            "update_id": "str",  # Optional. The most recent session
+                              settings update to the session, or the automatic rollback of a failed
+                              one.
                             "user_email": "str",  # Optional. Email of the user who
                               requested the update.
                             "user_uuid": "str"  # Optional. User who requested the
@@ -56598,10 +56732,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           Fork and rollback return 409 for a session that has a workspace.
                     },
                     "warnings": [
-                        "str"  # Optional. Non-fatal notes about the update.
+                        "str"  # Optional. Warnings about the update that did not stop it
+                          from being accepted.
                     ]
                 }
-                # response body for status code(s): 400, 403, 404, 409, 422, 423, 501
+                # response body for status code(s): 400, 403, 404, 409, 422, 423
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -56624,22 +56759,110 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         **kwargs: Any,
     ) -> JSON:
         # pylint: disable=line-too-long
-        """PatchSession updates an existing session (session-scoped settings or live config).
+        """Update a session's settings.
 
-        Partial update of an existing session. Send exactly one of: ``resume_on_topoff``
-        (session-scoped consent), or ``manifest_yaml`` (live config update of ``tools``\\ , ``env`` and
-        ``secrets``\\ ). The two cannot be combined, and ``{}`` is 400. With ``manifest_yaml``\\ ,
-        absent sections are untouched; ``model`` and ``permissions`` return 501. A config update that
-        changes something returns 202 with outcome ACCEPTED and the session in SESSION_STATUS_UPDATING
-        (update state APPLYING): poll GET on the session every 2-5 seconds until the status leaves
-        UPDATING, then read ``session.update`` (APPLIED, APPLIED_RESTARTED or FAILED). A tools-only
-        update usually finishes in seconds; env and secret changes restart the agent and can take about
-        two minutes. A manifest that changes nothing returns 200 with outcome UNCHANGED. Terminal
-        sessions (DESTROYED, FAILED) cannot be patched.
+        Updates the settings of an existing session. Changes apply to this session only; the agent
+        config the session was created from is not modified.
+
+        Each request makes one of two kinds of update, and the two can't be combined:
+
+
+        * **Session preferences**\\ : set ``resume_on_topoff``. Applied immediately; returns ``200``.
+        * **Session settings**\\ : set ``manifest_yaml`` to a partial manifest that holds only the
+        sections
+          to change. Applied in the background; returns ``202``.
+
+        An empty body (\\ ``{}``\\ ) returns ``400``.
+
+        Updatable session settings
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+        .. list-table::
+           :header-rows: 1
+
+           * - Section
+             - What it changes
+             - Agent restart
+           * - ``tools``
+             - The session's Action Gateway tools (\\ ``do.actions`` entries). Custom MCP servers can't
+        be changed.
+             - No
+           * - ``env``
+             - Environment variables (name and value).
+             - Yes
+           * - ``env.HARNESS_INFERENCE_MODEL``
+             - The model, for sessions that use DigitalOcean Serverless Inference.
+             - Yes
+           * - ``secrets``
+             - Plain secrets (name and value).
+             - Yes
+
+
+        Sections you omit are not changed. Each section you include replaces that section in full; see
+        ``manifest_yaml`` for the exact rules.
+
+        The only way to change a session's model is to set ``HARNESS_INFERENCE_MODEL`` in ``env``. This
+        works only for sessions that were created with a DigitalOcean Serverless Inference model;
+        sessions that use a third-party model provider can't change their model. A top-level ``model``
+        section returns ``400``.
+
+        The following can't be changed on an existing session: custom MCP servers, egress rules, GitHub
+        OAuth connections, URL-bound secrets, platform-managed model keys, and ``permissions`` (\\
+        ``400``\\ ).
+
+        Tracking an update
+        ^^^^^^^^^^^^^^^^^^
+
+
+        #. A request that changes the session settings returns ``202`` with ``outcome`` set to
+        ``ACCEPTED``.
+           The session status becomes ``SESSION_STATUS_UPDATING``.
+        #. Poll `\\ ``GET /v2/harness-runtime/sessions/{session_id}``
+        <#operation/harness_get_session>`_
+           every 2 to 5 seconds until the status is ``SESSION_STATUS_READY``\\ , or
+        ``SESSION_STATUS_PAUSED``
+           if the session was paused when you sent the update. The session returns to that status
+           whether the update succeeded or failed.
+        #. Read ``session.update.state``\\ :
+
+           * ``APPLIED``\\ : the update is live.
+           * ``APPLIED_RESTARTED``\\ : the update is live and the agent was restarted to apply it.
+           * ``FAILED``\\ : the update did not take effect. ``session.update.detail`` explains why, and
+             ``session.update.reverted`` is ``true`` if the previous settings were restored.
+
+        Tool updates usually finish within a few seconds. Updates to ``env`` (including the model) or
+        ``secrets`` restart the agent and can take up to about two minutes.
+
+        If the request matches the session's current settings, it returns ``200`` with ``outcome`` set
+        to
+        ``UNCHANGED`` and nothing is applied.
+
+        Versioning
+        ^^^^^^^^^^
+
+        Each accepted update is recorded with its own ``update_id`` and the manifest hashes before and
+        after the change (\\ ``session.update.previous_hash`` and ``session.update.manifest_hash``\\ ).
+        When an
+        update fails, the session is rolled back to its previous settings and
+        ``session.update.reverted``
+        is ``true``. Once a session's settings differ from its agent config, the session reports
+        ``config_drifted: true``\\ , ``config_diff`` lists the changed entries, and ``manifest`` holds
+        the
+        settings the session now runs with (without secret values).
+
+        Requirements
+        ^^^^^^^^^^^^
+
+
+        * The session must be idle: not provisioning, not already updating, and with no agent turn or
+          approval in progress. Sessions paused for zero balance and destroyed sessions
+          (\\ ``SESSION_STATUS_DESTROYED``\\ ) can't be updated.
+        * Session settings updates must be enabled for your team.
+        * Not every agent runtime supports every section. An unsupported change returns ``409``.
 
         :param session_id: The session UUID. Required.
         :type session_id: str
-        :param body: PATCH body: either resume_on_topoff or manifest_yaml (not both). Required.
+        :param body: Set either ``resume_on_topoff`` or ``manifest_yaml``\\ , not both. Required.
         :type body: IO[bytes]
         :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
          Default value is "application/json".
@@ -56653,11 +56876,12 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
 
                 # response body for status code(s): 200, 202
                 response == {
-                    "outcome": "str",  # Optional. Present for ``manifest_yaml`` patches.
-                      ACCEPTED (HTTP 202): the update is applying and the session status is
-                      SESSION_STATUS_UPDATING; poll GET until the status leaves UPDATING, then read
-                      ``session.update``. UNCHANGED (HTTP 200): the manifest changes nothing and
-                      nothing was recorded. Known values are: "ACCEPTED" and "UNCHANGED".
+                    "outcome": "str",  # Optional. Returned for ``manifest_yaml`` requests.
+                      ``ACCEPTED`` (HTTP 202): the update is being applied and the session status is
+                      ``SESSION_STATUS_UPDATING``. Poll the session until the status changes, then read
+                      ``session.update``. ``UNCHANGED`` (HTTP 200): the requested settings match the
+                      current ones, so nothing was applied. Known values are: "ACCEPTED" and
+                      "UNCHANGED".
                     "session": {
                         "agent_kind": "AGENT_KIND_UNSPECIFIED",  # Optional. Default value is
                           "AGENT_KIND_UNSPECIFIED". AgentKind identifies what runs inside the session
@@ -56678,44 +56902,44 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "config_diff": {
                             "env": {
                                 "added": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ]
                             },
                             "secrets": {
                                 "added": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ]
                             },
                             "tools": {
                                 "added": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ]
                             }
                         },
@@ -56796,8 +57020,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           sandbox + agent pair. SESSION_STATUS_ALL is a ListSessions status-filter
                           value only -- no session is ever actually in this status.
                           SESSION_STATUS_LOCKED is reserved for internal use and never appears in an
-                          end-user-facing response. SESSION_STATUS_UPDATING is reported while a live
-                          config update (PATCH with ``manifest_yaml``"" ) is being applied; poll the
+                          end-user-facing response. SESSION_STATUS_UPDATING is reported while a session
+                          settings update (PATCH with ``manifest_yaml``"" ) is being applied; poll the
                           session until it leaves this status. Known values are:
                           "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
                           "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED",
@@ -56808,44 +57032,44 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "changes": {
                                 "env": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 },
                                 "secrets": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 },
                                 "tools": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 }
                             },
@@ -56854,8 +57078,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "error": "str",  # Optional. Failure class; present when
                               state is FAILED. Known values are: "update_failed",
                               "requires_new_session", and "interrupted".
-                            "finished_at": "2020-02-20 00:00:00",  # Optional. One live
-                              config update (or automatic rollback) of a session.
+                            "finished_at": "2020-02-20 00:00:00",  # Optional. The most
+                              recent session settings update to the session, or the automatic rollback
+                              of a failed one.
                             "kind": "str",  # Optional. Known values are: "update" and
                               "rollback".
                             "manifest_hash": "str",  # Optional. Hash of the manifest
@@ -56868,17 +57093,21 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "str"  # Optional. Manifest sections this update
                                   touched.
                             ],
-                            "session_id": "str",  # Optional. One live config update (or
-                              automatic rollback) of a session.
-                            "started_at": "2020-02-20 00:00:00",  # Optional. One live
-                              config update (or automatic rollback) of a session.
-                            "state": "str",  # Optional. State of a live config update.
-                              APPLIED_RESTARTED means the agent was restarted to apply it (env and
-                              secret changes). FAILED means the update did not take effect; see
-                              ``reverted`` and ``detail``. Known values are: "APPLYING", "APPLIED",
-                              "APPLIED_RESTARTED", and "FAILED".
-                            "update_id": "str",  # Optional. One live config update (or
-                              automatic rollback) of a session.
+                            "session_id": "str",  # Optional. The most recent session
+                              settings update to the session, or the automatic rollback of a failed
+                              one.
+                            "started_at": "2020-02-20 00:00:00",  # Optional. The most
+                              recent session settings update to the session, or the automatic rollback
+                              of a failed one.
+                            "state": "str",  # Optional. State of a session settings
+                              update. `APPLYING`: in progress. `APPLIED`: live. `APPLIED_RESTARTED`:
+                              live, and the agent was restarted to apply it (`env` and `secrets`
+                              changes). `FAILED`: the update did not take effect; see ``reverted`` and
+                              ``detail``. Known values are: "APPLYING", "APPLIED", "APPLIED_RESTARTED",
+                              and "FAILED".
+                            "update_id": "str",  # Optional. The most recent session
+                              settings update to the session, or the automatic rollback of a failed
+                              one.
                             "user_email": "str",  # Optional. Email of the user who
                               requested the update.
                             "user_uuid": "str"  # Optional. User who requested the
@@ -56899,10 +57128,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           Fork and rollback return 409 for a session that has a workspace.
                     },
                     "warnings": [
-                        "str"  # Optional. Non-fatal notes about the update.
+                        "str"  # Optional. Warnings about the update that did not stop it
+                          from being accepted.
                     ]
                 }
-                # response body for status code(s): 400, 403, 404, 409, 422, 423, 501
+                # response body for status code(s): 400, 403, 404, 409, 422, 423
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -56920,23 +57150,111 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         self, session_id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
     ) -> JSON:
         # pylint: disable=line-too-long
-        """PatchSession updates an existing session (session-scoped settings or live config).
+        """Update a session's settings.
 
-        Partial update of an existing session. Send exactly one of: ``resume_on_topoff``
-        (session-scoped consent), or ``manifest_yaml`` (live config update of ``tools``\\ , ``env`` and
-        ``secrets``\\ ). The two cannot be combined, and ``{}`` is 400. With ``manifest_yaml``\\ ,
-        absent sections are untouched; ``model`` and ``permissions`` return 501. A config update that
-        changes something returns 202 with outcome ACCEPTED and the session in SESSION_STATUS_UPDATING
-        (update state APPLYING): poll GET on the session every 2-5 seconds until the status leaves
-        UPDATING, then read ``session.update`` (APPLIED, APPLIED_RESTARTED or FAILED). A tools-only
-        update usually finishes in seconds; env and secret changes restart the agent and can take about
-        two minutes. A manifest that changes nothing returns 200 with outcome UNCHANGED. Terminal
-        sessions (DESTROYED, FAILED) cannot be patched.
+        Updates the settings of an existing session. Changes apply to this session only; the agent
+        config the session was created from is not modified.
+
+        Each request makes one of two kinds of update, and the two can't be combined:
+
+
+        * **Session preferences**\\ : set ``resume_on_topoff``. Applied immediately; returns ``200``.
+        * **Session settings**\\ : set ``manifest_yaml`` to a partial manifest that holds only the
+        sections
+          to change. Applied in the background; returns ``202``.
+
+        An empty body (\\ ``{}``\\ ) returns ``400``.
+
+        Updatable session settings
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+        .. list-table::
+           :header-rows: 1
+
+           * - Section
+             - What it changes
+             - Agent restart
+           * - ``tools``
+             - The session's Action Gateway tools (\\ ``do.actions`` entries). Custom MCP servers can't
+        be changed.
+             - No
+           * - ``env``
+             - Environment variables (name and value).
+             - Yes
+           * - ``env.HARNESS_INFERENCE_MODEL``
+             - The model, for sessions that use DigitalOcean Serverless Inference.
+             - Yes
+           * - ``secrets``
+             - Plain secrets (name and value).
+             - Yes
+
+
+        Sections you omit are not changed. Each section you include replaces that section in full; see
+        ``manifest_yaml`` for the exact rules.
+
+        The only way to change a session's model is to set ``HARNESS_INFERENCE_MODEL`` in ``env``. This
+        works only for sessions that were created with a DigitalOcean Serverless Inference model;
+        sessions that use a third-party model provider can't change their model. A top-level ``model``
+        section returns ``400``.
+
+        The following can't be changed on an existing session: custom MCP servers, egress rules, GitHub
+        OAuth connections, URL-bound secrets, platform-managed model keys, and ``permissions`` (\\
+        ``400``\\ ).
+
+        Tracking an update
+        ^^^^^^^^^^^^^^^^^^
+
+
+        #. A request that changes the session settings returns ``202`` with ``outcome`` set to
+        ``ACCEPTED``.
+           The session status becomes ``SESSION_STATUS_UPDATING``.
+        #. Poll `\\ ``GET /v2/harness-runtime/sessions/{session_id}``
+        <#operation/harness_get_session>`_
+           every 2 to 5 seconds until the status is ``SESSION_STATUS_READY``\\ , or
+        ``SESSION_STATUS_PAUSED``
+           if the session was paused when you sent the update. The session returns to that status
+           whether the update succeeded or failed.
+        #. Read ``session.update.state``\\ :
+
+           * ``APPLIED``\\ : the update is live.
+           * ``APPLIED_RESTARTED``\\ : the update is live and the agent was restarted to apply it.
+           * ``FAILED``\\ : the update did not take effect. ``session.update.detail`` explains why, and
+             ``session.update.reverted`` is ``true`` if the previous settings were restored.
+
+        Tool updates usually finish within a few seconds. Updates to ``env`` (including the model) or
+        ``secrets`` restart the agent and can take up to about two minutes.
+
+        If the request matches the session's current settings, it returns ``200`` with ``outcome`` set
+        to
+        ``UNCHANGED`` and nothing is applied.
+
+        Versioning
+        ^^^^^^^^^^
+
+        Each accepted update is recorded with its own ``update_id`` and the manifest hashes before and
+        after the change (\\ ``session.update.previous_hash`` and ``session.update.manifest_hash``\\ ).
+        When an
+        update fails, the session is rolled back to its previous settings and
+        ``session.update.reverted``
+        is ``true``. Once a session's settings differ from its agent config, the session reports
+        ``config_drifted: true``\\ , ``config_diff`` lists the changed entries, and ``manifest`` holds
+        the
+        settings the session now runs with (without secret values).
+
+        Requirements
+        ^^^^^^^^^^^^
+
+
+        * The session must be idle: not provisioning, not already updating, and with no agent turn or
+          approval in progress. Sessions paused for zero balance and destroyed sessions
+          (\\ ``SESSION_STATUS_DESTROYED``\\ ) can't be updated.
+        * Session settings updates must be enabled for your team.
+        * Not every agent runtime supports every section. An unsupported change returns ``409``.
 
         :param session_id: The session UUID. Required.
         :type session_id: str
-        :param body: PATCH body: either resume_on_topoff or manifest_yaml (not both). Is either a JSON
-         type or a IO[bytes] type. Required.
+        :param body: Set either ``resume_on_topoff`` or ``manifest_yaml``\\ , not both. Is either a
+         JSON type or a IO[bytes] type. Required.
         :type body: JSON or IO[bytes]
         :return: JSON object
         :rtype: JSON
@@ -56947,29 +57265,57 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
 
                 # JSON input template you can fill out and use as your body input.
                 body = {
-                    "manifest_yaml": "str",  # Optional. A partial manifest, as YAML, holding
-                      only the sections to change: ``tools``"" , ``env``"" , ``secrets``. Absent
-                      sections are untouched; any other top-level key is 400, and ``model`` /
-                      ``permissions`` return 501. ``tools`` is the full replacement list ("" ``tools:
-                      []`` detaches every MCP server; ``tools: null`` is 400). ``env`` and ``secrets``
-                      are full sets: a key left out is removed. A secret value is a string (set or
-                      rotate) or ``{}`` (keep the current value); per-key ``null`` is 400. Platform and
-                      framework keys and non-plain secrets must be sent back unchanged, or the request
-                      is 422. Cannot be combined with ``resume_on_topoff``. Requires the team to be
-                      enrolled in the config-update feature (403 otherwise).
-                    "resume_on_topoff": bool  # Optional. When present, sets whether this session
-                      opts in to automatic resumption when the team's prepayment balance is restored
-                      after a low-balance pause. Session-scoped consent, not config-scoped. Omitted
-                      properties are not modified. Cannot be combined with ``manifest_yaml``.
+                    "manifest_yaml": "str",  # Optional. A partial agent manifest, as a YAML
+                      string, that holds only the sections to change. Can't be combined with
+                      ``resume_on_topoff``. Requires session settings updates to be enabled for your
+                      team ("" ``403`` otherwise).  Supported sections are ``tools``"" , ``env``"" ,
+                      and ``secrets``. Sections you omit are not changed. Any other top-level key
+                      returns ``400``"" , including ``model`` (to change the model, set
+                      ``HARNESS_INFERENCE_MODEL`` in ``env``"" ) and ``permissions`` (can't be changed
+                      on an existing session).  Each section you include replaces that section in full:
+                      * ``tools``"" : the complete list of tools for the session. Only Action Gateway
+                      tools   ("" ``do.actions`` entries) can be added, removed, or changed. Custom MCP
+                      servers can't be   changed on an existing session: include the session's current
+                      custom MCP servers   exactly as they are. To remove all Action Gateway tools from
+                      a session that has no custom   MCP servers, send ``tools: []``. ``tools: null``
+                      returns ``400``. * ``env``"" : the complete set of environment variables, as
+                      name-value pairs. A variable you   leave out is removed. ``env: {}`` removes all
+                      variables; ``env: null`` returns ``400``. * ``secrets``"" : the complete set of
+                      secrets, as name-value pairs. A secret you leave out is   removed. For each
+                      secret, set the value to a string to add or rotate it, or to ``{}`` to   keep its
+                      current value. A ``null`` value returns ``400``.  **Changing the model.** The
+                      only way to change a session's model is through ``env``. Set
+                      ``HARNESS_INFERENCE_MODEL`` to a DigitalOcean Serverless Inference model ID, or
+                      to ``router:<name>`` for an inference router. This works only on sessions created
+                      with ``HARNESS_INFERENCE_MODEL`` set and without their own inference endpoint.
+                      Adding, removing, or changing the key on any other session, or moving a session
+                      to its own endpoint, returns ``422``. A malformed value (empty, multi-line, or
+                      over 256 bytes) returns ``400``. Whether the model exists is not checked when you
+                      send the request; an unknown model fails on the agent's next turn.  **Reserved
+                      keys.** ``HARNESS_INFERENCE_API_KEY`` and ``HARNESS_INFERENCE_BASE_URL`` are
+                      managed by the platform: include them with their current values, or the request
+                      returns ``422``. Framework keys can't be changed either ("" ``422``"" ). Secrets
+                      that are not plain values (such as URL-bound or OAuth secrets) can't be changed
+                      on an existing session ("" ``422``"" ).  Example that changes the model, keeps
+                      one secret, and rotates another. Because each section is a full replacement, the
+                      example assumes the session has no other env variables or secrets:  ..
+                      code-block:: yaml     env:      HARNESS_INFERENCE_MODEL: llama3.3-70b-instruct
+                      LOG_LEVEL: info    secrets:      GITHUB_TOKEN: {}      JIRA_API_TOKEN:
+                      new-token-value.
+                    "resume_on_topoff": bool  # Optional. Whether this session resumes
+                      automatically after it is paused for low balance and your team's prepaid balance
+                      is topped up. Applies to this session only. Can't be combined with
+                      ``manifest_yaml``.
                 }
 
                 # response body for status code(s): 200, 202
                 response == {
-                    "outcome": "str",  # Optional. Present for ``manifest_yaml`` patches.
-                      ACCEPTED (HTTP 202): the update is applying and the session status is
-                      SESSION_STATUS_UPDATING; poll GET until the status leaves UPDATING, then read
-                      ``session.update``. UNCHANGED (HTTP 200): the manifest changes nothing and
-                      nothing was recorded. Known values are: "ACCEPTED" and "UNCHANGED".
+                    "outcome": "str",  # Optional. Returned for ``manifest_yaml`` requests.
+                      ``ACCEPTED`` (HTTP 202): the update is being applied and the session status is
+                      ``SESSION_STATUS_UPDATING``. Poll the session until the status changes, then read
+                      ``session.update``. ``UNCHANGED`` (HTTP 200): the requested settings match the
+                      current ones, so nothing was applied. Known values are: "ACCEPTED" and
+                      "UNCHANGED".
                     "session": {
                         "agent_kind": "AGENT_KIND_UNSPECIFIED",  # Optional. Default value is
                           "AGENT_KIND_UNSPECIFIED". AgentKind identifies what runs inside the session
@@ -56990,44 +57336,44 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "config_diff": {
                             "env": {
                                 "added": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ]
                             },
                             "secrets": {
                                 "added": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ]
                             },
                             "tools": {
                                 "added": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ]
                             }
                         },
@@ -57108,8 +57454,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           sandbox + agent pair. SESSION_STATUS_ALL is a ListSessions status-filter
                           value only -- no session is ever actually in this status.
                           SESSION_STATUS_LOCKED is reserved for internal use and never appears in an
-                          end-user-facing response. SESSION_STATUS_UPDATING is reported while a live
-                          config update (PATCH with ``manifest_yaml``"" ) is being applied; poll the
+                          end-user-facing response. SESSION_STATUS_UPDATING is reported while a session
+                          settings update (PATCH with ``manifest_yaml``"" ) is being applied; poll the
                           session until it leaves this status. Known values are:
                           "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
                           "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED",
@@ -57120,44 +57466,44 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "changes": {
                                 "env": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 },
                                 "secrets": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 },
                                 "tools": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 }
                             },
@@ -57166,8 +57512,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "error": "str",  # Optional. Failure class; present when
                               state is FAILED. Known values are: "update_failed",
                               "requires_new_session", and "interrupted".
-                            "finished_at": "2020-02-20 00:00:00",  # Optional. One live
-                              config update (or automatic rollback) of a session.
+                            "finished_at": "2020-02-20 00:00:00",  # Optional. The most
+                              recent session settings update to the session, or the automatic rollback
+                              of a failed one.
                             "kind": "str",  # Optional. Known values are: "update" and
                               "rollback".
                             "manifest_hash": "str",  # Optional. Hash of the manifest
@@ -57180,17 +57527,21 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "str"  # Optional. Manifest sections this update
                                   touched.
                             ],
-                            "session_id": "str",  # Optional. One live config update (or
-                              automatic rollback) of a session.
-                            "started_at": "2020-02-20 00:00:00",  # Optional. One live
-                              config update (or automatic rollback) of a session.
-                            "state": "str",  # Optional. State of a live config update.
-                              APPLIED_RESTARTED means the agent was restarted to apply it (env and
-                              secret changes). FAILED means the update did not take effect; see
-                              ``reverted`` and ``detail``. Known values are: "APPLYING", "APPLIED",
-                              "APPLIED_RESTARTED", and "FAILED".
-                            "update_id": "str",  # Optional. One live config update (or
-                              automatic rollback) of a session.
+                            "session_id": "str",  # Optional. The most recent session
+                              settings update to the session, or the automatic rollback of a failed
+                              one.
+                            "started_at": "2020-02-20 00:00:00",  # Optional. The most
+                              recent session settings update to the session, or the automatic rollback
+                              of a failed one.
+                            "state": "str",  # Optional. State of a session settings
+                              update. `APPLYING`: in progress. `APPLIED`: live. `APPLIED_RESTARTED`:
+                              live, and the agent was restarted to apply it (`env` and `secrets`
+                              changes). `FAILED`: the update did not take effect; see ``reverted`` and
+                              ``detail``. Known values are: "APPLYING", "APPLIED", "APPLIED_RESTARTED",
+                              and "FAILED".
+                            "update_id": "str",  # Optional. The most recent session
+                              settings update to the session, or the automatic rollback of a failed
+                              one.
                             "user_email": "str",  # Optional. Email of the user who
                               requested the update.
                             "user_uuid": "str"  # Optional. User who requested the
@@ -57211,10 +57562,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           Fork and rollback return 409 for a session that has a workspace.
                     },
                     "warnings": [
-                        "str"  # Optional. Non-fatal notes about the update.
+                        "str"  # Optional. Warnings about the update that did not stop it
+                          from being accepted.
                     ]
                 }
-                # response body for status code(s): 400, 403, 404, 409, 422, 423, 501
+                # response body for status code(s): 400, 403, 404, 409, 422, 423
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -57274,7 +57626,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
 
         response = pipeline_response.http_response
 
-        if response.status_code not in [200, 202, 400, 403, 404, 409, 422, 423, 501]:
+        if response.status_code not in [200, 202, 400, 403, 404, 409, 422, 423]:
             if _stream:
                 response.read()  # Load the body in memory and close the socket
             map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
@@ -57394,22 +57746,6 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                 deserialized = None
 
         if response.status_code == 423:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 501:
             response_headers["ratelimit-limit"] = self._deserialize(
                 "int", response.headers.get("ratelimit-limit")
             )
@@ -58602,44 +58938,44 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         "config_diff": {
                             "env": {
                                 "added": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ]
                             },
                             "secrets": {
                                 "added": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ]
                             },
                             "tools": {
                                 "added": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Keys touched in one
-                                      manifest section.
+                                    "str"  # Optional. Names of the entries
+                                      added, removed, or changed in one manifest section.
                                 ]
                             }
                         },
@@ -58720,8 +59056,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           sandbox + agent pair. SESSION_STATUS_ALL is a ListSessions status-filter
                           value only -- no session is ever actually in this status.
                           SESSION_STATUS_LOCKED is reserved for internal use and never appears in an
-                          end-user-facing response. SESSION_STATUS_UPDATING is reported while a live
-                          config update (PATCH with ``manifest_yaml``"" ) is being applied; poll the
+                          end-user-facing response. SESSION_STATUS_UPDATING is reported while a session
+                          settings update (PATCH with ``manifest_yaml``"" ) is being applied; poll the
                           session until it leaves this status. Known values are:
                           "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
                           "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED",
@@ -58732,44 +59068,44 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "changes": {
                                 "env": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 },
                                 "secrets": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 },
                                 "tools": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 }
                             },
@@ -58778,8 +59114,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "error": "str",  # Optional. Failure class; present when
                               state is FAILED. Known values are: "update_failed",
                               "requires_new_session", and "interrupted".
-                            "finished_at": "2020-02-20 00:00:00",  # Optional. One live
-                              config update (or automatic rollback) of a session.
+                            "finished_at": "2020-02-20 00:00:00",  # Optional. The most
+                              recent session settings update to the session, or the automatic rollback
+                              of a failed one.
                             "kind": "str",  # Optional. Known values are: "update" and
                               "rollback".
                             "manifest_hash": "str",  # Optional. Hash of the manifest
@@ -58792,17 +59129,21 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "str"  # Optional. Manifest sections this update
                                   touched.
                             ],
-                            "session_id": "str",  # Optional. One live config update (or
-                              automatic rollback) of a session.
-                            "started_at": "2020-02-20 00:00:00",  # Optional. One live
-                              config update (or automatic rollback) of a session.
-                            "state": "str",  # Optional. State of a live config update.
-                              APPLIED_RESTARTED means the agent was restarted to apply it (env and
-                              secret changes). FAILED means the update did not take effect; see
-                              ``reverted`` and ``detail``. Known values are: "APPLYING", "APPLIED",
-                              "APPLIED_RESTARTED", and "FAILED".
-                            "update_id": "str",  # Optional. One live config update (or
-                              automatic rollback) of a session.
+                            "session_id": "str",  # Optional. The most recent session
+                              settings update to the session, or the automatic rollback of a failed
+                              one.
+                            "started_at": "2020-02-20 00:00:00",  # Optional. The most
+                              recent session settings update to the session, or the automatic rollback
+                              of a failed one.
+                            "state": "str",  # Optional. State of a session settings
+                              update. `APPLYING`: in progress. `APPLIED`: live. `APPLIED_RESTARTED`:
+                              live, and the agent was restarted to apply it (`env` and `secrets`
+                              changes). `FAILED`: the update did not take effect; see ``reverted`` and
+                              ``detail``. Known values are: "APPLYING", "APPLIED", "APPLIED_RESTARTED",
+                              and "FAILED".
+                            "update_id": "str",  # Optional. The most recent session
+                              settings update to the session, or the automatic rollback of a failed
+                              one.
                             "user_email": "str",  # Optional. Email of the user who
                               requested the update.
                             "user_uuid": "str"  # Optional. User who requested the
@@ -59061,44 +59402,44 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "config_diff": {
                                 "env": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 },
                                 "secrets": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 },
                                 "tools": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 }
                             },
@@ -59187,8 +59528,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               status-filter value only -- no session is ever actually in this status.
                               SESSION_STATUS_LOCKED is reserved for internal use and never appears in
                               an end-user-facing response. SESSION_STATUS_UPDATING is reported while a
-                              live config update (PATCH with ``manifest_yaml``"" ) is being applied;
-                              poll the session until it leaves this status. Known values are:
+                              session settings update (PATCH with ``manifest_yaml``"" ) is being
+                              applied; poll the session until it leaves this status. Known values are:
                               "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
                               "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED",
                               "SESSION_STATUS_DESTROYING", "SESSION_STATUS_DESTROYED",
@@ -59199,44 +59540,53 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "changes": {
                                     "env": {
                                         "added": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "changed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "removed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ]
                                     },
                                     "secrets": {
                                         "added": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "changed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "removed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ]
                                     },
                                     "tools": {
                                         "added": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "changed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "removed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ]
                                     }
                                 },
@@ -59246,7 +59596,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                   when state is FAILED. Known values are: "update_failed",
                                   "requires_new_session", and "interrupted".
                                 "finished_at": "2020-02-20 00:00:00",  # Optional.
-                                  One live config update (or automatic rollback) of a session.
+                                  The most recent session settings update to the session, or the
+                                  automatic rollback of a failed one.
                                 "kind": "str",  # Optional. Known values are:
                                   "update" and "rollback".
                                 "manifest_hash": "str",  # Optional. Hash of the
@@ -59259,17 +59610,21 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "str"  # Optional. Manifest sections this
                                       update touched.
                                 ],
-                                "session_id": "str",  # Optional. One live config
-                                  update (or automatic rollback) of a session.
-                                "started_at": "2020-02-20 00:00:00",  # Optional. One
-                                  live config update (or automatic rollback) of a session.
-                                "state": "str",  # Optional. State of a live config
-                                  update. APPLIED_RESTARTED means the agent was restarted to apply it
-                                  (env and secret changes). FAILED means the update did not take
+                                "session_id": "str",  # Optional. The most recent
+                                  session settings update to the session, or the automatic rollback of
+                                  a failed one.
+                                "started_at": "2020-02-20 00:00:00",  # Optional. The
+                                  most recent session settings update to the session, or the automatic
+                                  rollback of a failed one.
+                                "state": "str",  # Optional. State of a session
+                                  settings update. `APPLYING`: in progress. `APPLIED`: live.
+                                  `APPLIED_RESTARTED`: live, and the agent was restarted to apply it
+                                  (`env` and `secrets` changes). `FAILED`: the update did not take
                                   effect; see ``reverted`` and ``detail``. Known values are:
                                   "APPLYING", "APPLIED", "APPLIED_RESTARTED", and "FAILED".
-                                "update_id": "str",  # Optional. One live config
-                                  update (or automatic rollback) of a session.
+                                "update_id": "str",  # Optional. The most recent
+                                  session settings update to the session, or the automatic rollback of
+                                  a failed one.
                                 "user_email": "str",  # Optional. Email of the user
                                   who requested the update.
                                 "user_uuid": "str"  # Optional. User who requested
@@ -59362,44 +59717,44 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "config_diff": {
                                 "env": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 },
                                 "secrets": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 },
                                 "tools": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 }
                             },
@@ -59488,8 +59843,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               status-filter value only -- no session is ever actually in this status.
                               SESSION_STATUS_LOCKED is reserved for internal use and never appears in
                               an end-user-facing response. SESSION_STATUS_UPDATING is reported while a
-                              live config update (PATCH with ``manifest_yaml``"" ) is being applied;
-                              poll the session until it leaves this status. Known values are:
+                              session settings update (PATCH with ``manifest_yaml``"" ) is being
+                              applied; poll the session until it leaves this status. Known values are:
                               "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
                               "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED",
                               "SESSION_STATUS_DESTROYING", "SESSION_STATUS_DESTROYED",
@@ -59500,44 +59855,53 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "changes": {
                                     "env": {
                                         "added": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "changed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "removed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ]
                                     },
                                     "secrets": {
                                         "added": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "changed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "removed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ]
                                     },
                                     "tools": {
                                         "added": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "changed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "removed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ]
                                     }
                                 },
@@ -59547,7 +59911,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                   when state is FAILED. Known values are: "update_failed",
                                   "requires_new_session", and "interrupted".
                                 "finished_at": "2020-02-20 00:00:00",  # Optional.
-                                  One live config update (or automatic rollback) of a session.
+                                  The most recent session settings update to the session, or the
+                                  automatic rollback of a failed one.
                                 "kind": "str",  # Optional. Known values are:
                                   "update" and "rollback".
                                 "manifest_hash": "str",  # Optional. Hash of the
@@ -59560,17 +59925,21 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "str"  # Optional. Manifest sections this
                                       update touched.
                                 ],
-                                "session_id": "str",  # Optional. One live config
-                                  update (or automatic rollback) of a session.
-                                "started_at": "2020-02-20 00:00:00",  # Optional. One
-                                  live config update (or automatic rollback) of a session.
-                                "state": "str",  # Optional. State of a live config
-                                  update. APPLIED_RESTARTED means the agent was restarted to apply it
-                                  (env and secret changes). FAILED means the update did not take
+                                "session_id": "str",  # Optional. The most recent
+                                  session settings update to the session, or the automatic rollback of
+                                  a failed one.
+                                "started_at": "2020-02-20 00:00:00",  # Optional. The
+                                  most recent session settings update to the session, or the automatic
+                                  rollback of a failed one.
+                                "state": "str",  # Optional. State of a session
+                                  settings update. `APPLYING`: in progress. `APPLIED`: live.
+                                  `APPLIED_RESTARTED`: live, and the agent was restarted to apply it
+                                  (`env` and `secrets` changes). `FAILED`: the update did not take
                                   effect; see ``reverted`` and ``detail``. Known values are:
                                   "APPLYING", "APPLIED", "APPLIED_RESTARTED", and "FAILED".
-                                "update_id": "str",  # Optional. One live config
-                                  update (or automatic rollback) of a session.
+                                "update_id": "str",  # Optional. The most recent
+                                  session settings update to the session, or the automatic rollback of
+                                  a failed one.
                                 "user_email": "str",  # Optional. Email of the user
                                   who requested the update.
                                 "user_uuid": "str"  # Optional. User who requested
@@ -59668,44 +60037,44 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "config_diff": {
                                 "env": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 },
                                 "secrets": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 },
                                 "tools": {
                                     "added": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Keys touched in
-                                          one manifest section.
+                                        "str"  # Optional. Names of the
+                                          entries added, removed, or changed in one manifest section.
                                     ]
                                 }
                             },
@@ -59794,8 +60163,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               status-filter value only -- no session is ever actually in this status.
                               SESSION_STATUS_LOCKED is reserved for internal use and never appears in
                               an end-user-facing response. SESSION_STATUS_UPDATING is reported while a
-                              live config update (PATCH with ``manifest_yaml``"" ) is being applied;
-                              poll the session until it leaves this status. Known values are:
+                              session settings update (PATCH with ``manifest_yaml``"" ) is being
+                              applied; poll the session until it leaves this status. Known values are:
                               "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
                               "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED",
                               "SESSION_STATUS_DESTROYING", "SESSION_STATUS_DESTROYED",
@@ -59806,44 +60175,53 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "changes": {
                                     "env": {
                                         "added": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "changed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "removed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ]
                                     },
                                     "secrets": {
                                         "added": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "changed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "removed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ]
                                     },
                                     "tools": {
                                         "added": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "changed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ],
                                         "removed": [
-                                            "str"  # Optional. Keys
-                                              touched in one manifest section.
+                                            "str"  # Optional. Names of
+                                              the entries added, removed, or changed in one manifest
+                                              section.
                                         ]
                                     }
                                 },
@@ -59853,7 +60231,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                   when state is FAILED. Known values are: "update_failed",
                                   "requires_new_session", and "interrupted".
                                 "finished_at": "2020-02-20 00:00:00",  # Optional.
-                                  One live config update (or automatic rollback) of a session.
+                                  The most recent session settings update to the session, or the
+                                  automatic rollback of a failed one.
                                 "kind": "str",  # Optional. Known values are:
                                   "update" and "rollback".
                                 "manifest_hash": "str",  # Optional. Hash of the
@@ -59866,17 +60245,21 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "str"  # Optional. Manifest sections this
                                       update touched.
                                 ],
-                                "session_id": "str",  # Optional. One live config
-                                  update (or automatic rollback) of a session.
-                                "started_at": "2020-02-20 00:00:00",  # Optional. One
-                                  live config update (or automatic rollback) of a session.
-                                "state": "str",  # Optional. State of a live config
-                                  update. APPLIED_RESTARTED means the agent was restarted to apply it
-                                  (env and secret changes). FAILED means the update did not take
+                                "session_id": "str",  # Optional. The most recent
+                                  session settings update to the session, or the automatic rollback of
+                                  a failed one.
+                                "started_at": "2020-02-20 00:00:00",  # Optional. The
+                                  most recent session settings update to the session, or the automatic
+                                  rollback of a failed one.
+                                "state": "str",  # Optional. State of a session
+                                  settings update. `APPLYING`: in progress. `APPLIED`: live.
+                                  `APPLIED_RESTARTED`: live, and the agent was restarted to apply it
+                                  (`env` and `secrets` changes). `FAILED`: the update did not take
                                   effect; see ``reverted`` and ``detail``. Known values are:
                                   "APPLYING", "APPLIED", "APPLIED_RESTARTED", and "FAILED".
-                                "update_id": "str",  # Optional. One live config
-                                  update (or automatic rollback) of a session.
+                                "update_id": "str",  # Optional. The most recent
+                                  session settings update to the session, or the automatic rollback of
+                                  a failed one.
                                 "user_email": "str",  # Optional. Email of the user
                                   who requested the update.
                                 "user_uuid": "str"  # Optional. User who requested
@@ -67635,8 +68018,8 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               status-filter value only -- no session is ever actually in this status.
                               SESSION_STATUS_LOCKED is reserved for internal use and never appears in
                               an end-user-facing response. SESSION_STATUS_UPDATING is reported while a
-                              live config update (PATCH with ``manifest_yaml``"" ) is being applied;
-                              poll the session until it leaves this status. Known values are:
+                              session settings update (PATCH with ``manifest_yaml``"" ) is being
+                              applied; poll the session until it leaves this status. Known values are:
                               "SESSION_STATUS_UNSPECIFIED", "SESSION_STATUS_PROVISIONING",
                               "SESSION_STATUS_READY", "SESSION_STATUS_DETACHED",
                               "SESSION_STATUS_DESTROYING", "SESSION_STATUS_DESTROYED",
@@ -277974,332 +278357,6 @@ class SecurityOperations:
                 deserialized = None
 
         if response.status_code == 404:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if cls:
-            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
-
-        return cast(JSON, deserialized)  # type: ignore
-
-    @overload
-    def revert_secret(
-        self,
-        secret: str,
-        version: int,
-        body: JSON,
-        *,
-        region: str,
-        content_type: str = "application/json",
-        **kwargs: Any,
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Revert Secret.
-
-        To revert a secret to a prior version, send a POST request to
-        ``/v2/security/secrets/{secret}/versions/{version}/revert``.
-
-        ``region`` is required. ``current_version`` must be the secret's current version.
-        If it does not match, the request returns a ``409`` response. A successful
-        revert creates a new version with the contents of the target version.
-
-        :param secret: The name of the secret. Required.
-        :type secret: str
-        :param version: The target version to revert to. Reverting creates a new version with the
-         contents of this version. Required.
-        :type version: int
-        :param body: Required.
-        :type body: JSON
-        :keyword region: The region where the secret is stored. Required.
-        :paramtype region: str
-        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
-         Default value is "application/json".
-        :paramtype content_type: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # JSON input template you can fill out and use as your body input.
-                body = {
-                    "current_version": 0  # The current version of the secret. Used to reject the
-                      request if the secret changed. Required.
-                }
-
-                # response body for status code(s): 200
-                response == {
-                    "name": "str",  # Optional. The name of the secret.
-                    "region": "str",  # Optional. The region where the secret is stored.
-                    "version": 0  # Optional. The version of the secret after the operation.
-                }
-                # response body for status code(s): 400, 403, 404, 409
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-
-    @overload
-    def revert_secret(
-        self,
-        secret: str,
-        version: int,
-        body: IO[bytes],
-        *,
-        region: str,
-        content_type: str = "application/json",
-        **kwargs: Any,
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Revert Secret.
-
-        To revert a secret to a prior version, send a POST request to
-        ``/v2/security/secrets/{secret}/versions/{version}/revert``.
-
-        ``region`` is required. ``current_version`` must be the secret's current version.
-        If it does not match, the request returns a ``409`` response. A successful
-        revert creates a new version with the contents of the target version.
-
-        :param secret: The name of the secret. Required.
-        :type secret: str
-        :param version: The target version to revert to. Reverting creates a new version with the
-         contents of this version. Required.
-        :type version: int
-        :param body: Required.
-        :type body: IO[bytes]
-        :keyword region: The region where the secret is stored. Required.
-        :paramtype region: str
-        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
-         Default value is "application/json".
-        :paramtype content_type: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # response body for status code(s): 200
-                response == {
-                    "name": "str",  # Optional. The name of the secret.
-                    "region": "str",  # Optional. The region where the secret is stored.
-                    "version": 0  # Optional. The version of the secret after the operation.
-                }
-                # response body for status code(s): 400, 403, 404, 409
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-
-    @distributed_trace
-    def revert_secret(
-        self,
-        secret: str,
-        version: int,
-        body: Union[JSON, IO[bytes]],
-        *,
-        region: str,
-        **kwargs: Any,
-    ) -> JSON:
-        # pylint: disable=line-too-long
-        """Revert Secret.
-
-        To revert a secret to a prior version, send a POST request to
-        ``/v2/security/secrets/{secret}/versions/{version}/revert``.
-
-        ``region`` is required. ``current_version`` must be the secret's current version.
-        If it does not match, the request returns a ``409`` response. A successful
-        revert creates a new version with the contents of the target version.
-
-        :param secret: The name of the secret. Required.
-        :type secret: str
-        :param version: The target version to revert to. Reverting creates a new version with the
-         contents of this version. Required.
-        :type version: int
-        :param body: Is either a JSON type or a IO[bytes] type. Required.
-        :type body: JSON or IO[bytes]
-        :keyword region: The region where the secret is stored. Required.
-        :paramtype region: str
-        :return: JSON object
-        :rtype: JSON
-        :raises ~azure.core.exceptions.HttpResponseError:
-
-        Example:
-            .. code-block:: python
-
-                # JSON input template you can fill out and use as your body input.
-                body = {
-                    "current_version": 0  # The current version of the secret. Used to reject the
-                      request if the secret changed. Required.
-                }
-
-                # response body for status code(s): 200
-                response == {
-                    "name": "str",  # Optional. The name of the secret.
-                    "region": "str",  # Optional. The region where the secret is stored.
-                    "version": 0  # Optional. The version of the secret after the operation.
-                }
-                # response body for status code(s): 400, 403, 404, 409
-                response == {
-                    "id": "str",  # A short identifier corresponding to the HTTP status code
-                      returned. For  example, the ID for a response returning a 404 status code would
-                      be "not_found.". Required.
-                    "message": "str",  # A message providing additional information about the
-                      error, including  details to help resolve it when possible. Required.
-                    "request_id": "str"  # Optional. Optionally, some endpoints may include a
-                      request ID that should be  provided when reporting bugs or opening support
-                      tickets to help  identify the issue.
-                }
-        """
-        error_map: MutableMapping[int, Type[HttpResponseError]] = {
-            404: ResourceNotFoundError,
-            409: ResourceExistsError,
-            304: ResourceNotModifiedError,
-            401: cast(
-                Type[HttpResponseError],
-                lambda response: ClientAuthenticationError(response=response),
-            ),
-            429: HttpResponseError,
-            500: HttpResponseError,
-        }
-        error_map.update(kwargs.pop("error_map", {}) or {})
-
-        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
-        _params = kwargs.pop("params", {}) or {}
-
-        content_type: Optional[str] = kwargs.pop(
-            "content_type", _headers.pop("Content-Type", None)
-        )
-        cls: ClsType[JSON] = kwargs.pop("cls", None)
-
-        content_type = content_type or "application/json"
-        _json = None
-        _content = None
-        if isinstance(body, (IOBase, bytes)):
-            _content = body
-        else:
-            _json = body
-
-        _request = build_security_revert_secret_request(
-            secret=secret,
-            version=version,
-            region=region,
-            content_type=content_type,
-            json=_json,
-            content=_content,
-            headers=_headers,
-            params=_params,
-        )
-        _request.url = self._client.format_url(_request.url)
-
-        _stream = False
-        pipeline_response: PipelineResponse = (
-            self._client._pipeline.run(  # pylint: disable=protected-access
-                _request, stream=_stream, **kwargs
-            )
-        )
-
-        response = pipeline_response.http_response
-
-        if response.status_code not in [200, 400, 403, 404, 409]:
-            if _stream:
-                response.read()  # Load the body in memory and close the socket
-            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
-            raise HttpResponseError(response=response)
-
-        response_headers = {}
-        if response.status_code == 200:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 400:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 403:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 404:
-            response_headers["ratelimit-limit"] = self._deserialize(
-                "int", response.headers.get("ratelimit-limit")
-            )
-            response_headers["ratelimit-remaining"] = self._deserialize(
-                "int", response.headers.get("ratelimit-remaining")
-            )
-            response_headers["ratelimit-reset"] = self._deserialize(
-                "int", response.headers.get("ratelimit-reset")
-            )
-
-            if response.content:
-                deserialized = response.json()
-            else:
-                deserialized = None
-
-        if response.status_code == 409:
             response_headers["ratelimit-limit"] = self._deserialize(
                 "int", response.headers.get("ratelimit-limit")
             )
