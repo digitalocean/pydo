@@ -132,6 +132,93 @@ ID: 123457, NAME: my_prod_ssh_key, FINGERPRINT: eb:76:c7:2a:d3:3e:80:5d:ef:2e:ca
 
 **Note**: More working examples can be found [here](https://github.com/digitalocean/pydo/tree/main/examples).
 
+## **Sandboxes**
+
+`Sandbox` creates and manages DigitalOcean Sandboxes (`/v2/sandboxes`). It reads the token from `DIGITALOCEAN_ACCESS_TOKEN`, or you can pass `token=`. Import it from `pydo` (or `pydo.sandbox`); the async version is in `pydo.aio`. The sandbox code loads on first use, not on `import pydo`. Errors and types live in `pydo.sandbox`.
+
+```python
+from pydo import Sandbox
+
+sandbox = Sandbox.create(
+    template="coding-base",        # optional, defaults to coding-base
+    size="mars-2vcpu-4gb",         # optional, defaults to mars-2vcpu-4gb
+    allow_internet_access=True,    # optional, False limits egress to the platform file-transfer host
+    env_vars={"MY_KEY": "value"},  # optional, values are secrets
+)
+print(sandbox.sandbox_id, sandbox.state)
+
+sandbox.pause()
+sandbox.resume()
+sandbox.kill()
+```
+
+Find existing sandboxes:
+
+```python
+again = Sandbox.get(sandbox_id)        # fetch by id
+ready = Sandbox.connect(sandbox_id)    # fetch, and resume it if it is paused
+
+for sb in Sandbox.list(state="SANDBOX_STATE_RUNNING"):   # walks every page
+    print(sb.sandbox_id, sb.template, sb.info.size_slug)
+
+pages = Sandbox.list(limit=50)         # or one page at a time
+while pages.has_next:
+    for sb in pages.next_items():
+        print(sb.sandbox_id)
+```
+
+Clean up:
+
+```python
+Sandbox.kill(sandbox_id)    # False if it is already gone
+Sandbox.pause(sandbox_id)
+
+with Sandbox.create(template="coding-base") as sandbox:   # killed at the end of the block
+    ...
+```
+
+`sandbox.get_info()` re-reads the sandbox, `sandbox.is_running()` checks its state, `sandbox.wait_until_running()` polls until it is running, and `sandbox.close()` closes its connection without deleting it.
+
+To bind a token once:
+
+```python
+from pydo import SandboxClient
+
+client = SandboxClient(token=os.environ["DIGITALOCEAN_ACCESS_TOKEN"])
+sandbox = client.Sandbox.create(template="coding-base")
+```
+
+The async version has the same names in `pydo.aio`:
+
+```python
+from pydo.aio import Sandbox
+
+async with await Sandbox.create(template="coding-base") as sandbox:
+    await sandbox.pause()
+    await sandbox.resume()
+
+async for sb in Sandbox.list():
+    print(sb.sandbox_id)
+```
+
+Every failed call raises a subclass of `SandboxError` with `status`, `code`, `request_id` and, for 429, `retry_after`:
+
+```python
+from pydo import Sandbox
+from pydo.sandbox import NotFoundError, RateLimitError
+
+try:
+    Sandbox.create(template="missing")
+except NotFoundError as err:
+    print("no such template", err.request_id)
+except RateLimitError as err:
+    print("retry in", err.retry_after, "s")
+```
+
+The other types are `AuthenticationError` (401), `PermissionDeniedError` (403), `InvalidRequestError` (400, 422), `ConflictError` (409), `ServiceError` (5xx) and `SandboxTimeoutError`. An argument the SDK does not support, such as `timeout=` on `create`, raises `TypeError` before any request is sent.
+
+Running commands and file transfer are not available yet: they need data-plane routes that are not in the API.
+
 ## **AI & Inference**
 
 > Talk to models on DigitalOcean's

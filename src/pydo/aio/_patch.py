@@ -202,6 +202,40 @@ class Client(  # type: ignore
 __all__ = ["Client"]  # type: List[str]
 
 
+_LAZY_SANDBOX = {"Sandbox", "SandboxClient"}
+
+
+def _install_lazy_sandbox(package_name: str, sandbox_module: str) -> None:
+    """Makes ``from <package> import Sandbox`` work without importing it eagerly.
+
+    The sandbox package is loaded on first access, so ``import pydo`` does not
+    pay for it, and a missing ``sandbox/`` folder only breaks ``Sandbox`` itself
+    (PEP 562 module ``__getattr__``).
+    """
+    import importlib  # pylint: disable=import-outside-toplevel
+    import sys  # pylint: disable=import-outside-toplevel
+
+    module = sys.modules[package_name]
+    previous = getattr(module, "__getattr__", None)
+
+    def __getattr__(name: str):
+        if name in _LAZY_SANDBOX:
+            try:
+                value = getattr(importlib.import_module(sandbox_module), name)
+            except ImportError as err:
+                raise AttributeError(
+                    "module %r has no attribute %r (%s could not be imported: %s)"
+                    % (package_name, name, sandbox_module, err)
+                ) from err
+            setattr(module, name, value)
+            return value
+        if previous is not None:
+            return previous(name)
+        raise AttributeError("module %r has no attribute %r" % (package_name, name))
+
+    module.__getattr__ = __getattr__  # type: ignore[attr-defined]
+
+
 def patch_sdk():
     """Do not remove from this file.
 
@@ -209,3 +243,5 @@ def patch_sdk():
     you can't accomplish using the techniques described in
     https://aka.ms/azsdk/python/dpcodegen/python/customize
     """
+
+    _install_lazy_sandbox("pydo.aio", "pydo.aio.sandbox")

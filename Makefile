@@ -30,6 +30,8 @@ clean: ## Removes all generated code (except _patch.py files)
 		! -name "_patch.py" ! -name "custom_*.py" ! -name "exceptions.py" \
 		! -path "src/pydo/agents/*" \
 		! -path "src/pydo/aio/agents/*" \
+		! -path "src/pydo/sandbox/*" \
+		! -path "src/pydo/aio/sandbox/*" \
 		! -path "*/gateway/*" \
 		! -path "*/action_gateway/*" \
 		-exec rm -rf {} +
