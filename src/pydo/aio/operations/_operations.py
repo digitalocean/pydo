@@ -621,6 +621,7 @@ from ...operations._operations import (
     build_microvms_get_console_request,
     build_microvms_get_file_request,
     build_microvms_get_options_request,
+    build_microvms_get_port_forward_request,
     build_microvms_get_request,
     build_microvms_list_request,
     build_microvms_post_pause_request,
@@ -221853,6 +221854,150 @@ class MicrovmsOperations:
             response_headers["ratelimit-reset"] = self._deserialize(
                 "int", response.headers.get("ratelimit-reset")
             )
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, deserialized, response_headers)  # type: ignore
+
+        return deserialized  # type: ignore
+
+    @distributed_trace_async
+    async def get_port_forward(
+        self, microvm_id: str, *, port: int, **kwargs: Any
+    ) -> Optional[JSON]:
+        """Forward a port to a MicroVM.
+
+        To open a TCP connection to a port inside a MicroVM, open a WebSocket connection to
+        ``wss://api.digitalocean.com/v2/microvms/{microvm_id}/port_forward?port={port}``. The
+        connection goes to ``127.0.0.1:{port}`` in the MicroVM, so the port does not need to be
+        public.
+
+        One WebSocket carries one TCP connection. To forward a local port, open a new WebSocket
+        for each local connection.
+
+        Send the API token in the ``Authorization`` header of the handshake. Browsers cannot set this
+        header, so you cannot open a port forward from browser JavaScript. Requires the
+        ``port_forward`` feature. If the MicroVM is paused and auto-resume is on, opening a port
+        forward resumes it.
+
+        :param microvm_id: The unique ID of the MicroVM. Required.
+        :type microvm_id: str
+        :keyword port: The TCP port to connect to inside the MicroVM. Port 50051 is reserved and cannot
+         be forwarded. Required.
+        :paramtype port: int
+        :return: JSON object or None
+        :rtype: JSON or None
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 400, 403, 404
+                response == {
+                    "code": "str",  # A service-defined error code. Required.
+                    "message": "str"  # A human-readable description of the error. Required.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[Optional[JSON]] = kwargs.pop("cls", None)
+
+        _request = build_microvms_get_port_forward_request(
+            microvm_id=microvm_id,
+            port=port,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [101, 400, 403, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        deserialized = None
+        response_headers = {}
+        if response.status_code == 101:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
 
         if response.status_code == 403:
             response_headers["ratelimit-limit"] = self._deserialize(
