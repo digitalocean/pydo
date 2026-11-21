@@ -513,7 +513,7 @@ class SSEStream:
 
     def _iter_events(self) -> Iterator[dict]:
         buf = ""
-        decoder = codecs.getincrementaldecoder("utf-8")("replace")
+        decoder = codecs.getincrementaldecoder("utf-8-sig")("replace")
         try:
             for raw in self._response.iter_bytes():
                 text = decoder.decode(raw, False) if isinstance(raw, bytes) else raw
@@ -583,7 +583,7 @@ class AsyncSSEStream:
 
     async def _iter_events(self) -> AsyncIterator[dict]:
         buf = ""
-        decoder = codecs.getincrementaldecoder("utf-8")("replace")
+        decoder = codecs.getincrementaldecoder("utf-8-sig")("replace")
         try:
             async for raw in self._response.iter_bytes():
                 text = decoder.decode(raw, False) if isinstance(raw, bytes) else raw

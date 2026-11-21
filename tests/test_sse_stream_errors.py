@@ -149,3 +149,34 @@ def test_async_iter_sse_with_retry_recover_before_first_chunk():
     chunks = asyncio.run(_run())
     assert chunks == [{"recovered": True}]
     assert len(calls) == 2
+
+
+@pytest.mark.parametrize("with_bom", [False, True])
+@pytest.mark.parametrize("chunk_size", [1, 2, 1000])
+@pytest.mark.parametrize("is_async", [False, True])
+def test_sse_stream_preserves_first_event_with_optional_bom(
+    with_bom, chunk_size, is_async
+):
+    payload = (
+        'data: {"text": "雪\ufeff"}\n\ndata: {"last": true}\n\ndata: [DONE]\n\n'.encode(
+            "utf-8"
+        )
+    )
+    if with_bom:
+        payload = b"\xef\xbb\xbf" + payload
+    chunks = [payload[i : i + chunk_size] for i in range(0, len(payload), chunk_size)]
+    expected = [{"text": "雪\ufeff"}, {"last": True}]
+    if is_async:
+
+        class AsyncBytes:
+            async def iter_bytes(self):
+                for chunk in chunks:
+                    yield chunk
+
+        async def consume():
+            return [event async for event in AsyncSSEStream(AsyncBytes())]
+
+        result = asyncio.run(consume())
+    else:
+        result = list(SSEStream(_SyncBytes(chunks)))
+    assert result == expected
