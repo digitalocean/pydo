@@ -89,7 +89,7 @@ def test_list_templates_pagination():
 
     call = _last_call(resources)
     assert call.request.method == "GET"
-    assert _path(call.request.url).endswith("/v2/agents/templates")
+    assert _path(call.request.url).endswith("/v2/harness-runtime/templates")
     assert "page_size=25" in call.request.url
     assert "page_token=tok" in call.request.url
     assert resp.templates[0].template_id == "tmpl-1"
@@ -110,7 +110,7 @@ def test_get_template():
 
     call = _last_call(resources)
     assert call.request.method == "GET"
-    assert _path(call.request.url).endswith("/v2/agents/templates/tmpl-1")
+    assert _path(call.request.url).endswith("/v2/harness-runtime/templates/tmpl-1")
     assert resp.template.name == "demo"
 
 
@@ -134,7 +134,7 @@ def test_create_template():
 
     call = _last_call(resources)
     assert call.request.method == "POST"
-    assert _path(call.request.url).endswith("/v2/agents/templates")
+    assert _path(call.request.url).endswith("/v2/harness-runtime/templates")
     assert call.request.headers.get("Content-Type") == "application/json"
     assert resp.template.template_id == "tmpl-new"
 
@@ -161,7 +161,7 @@ def test_update_template():
 
     call = _last_call(resources)
     assert call.request.method == "PUT"
-    assert _path(call.request.url).endswith("/v2/agents/templates/tmpl-1")
+    assert _path(call.request.url).endswith("/v2/harness-runtime/templates/tmpl-1")
     assert resp.template.template_id == "tmpl-1"
 
 
@@ -179,7 +179,7 @@ def test_delete_template():
 
     call = _last_call(resources)
     assert call.request.method == "DELETE"
-    assert _path(call.request.url).endswith("/v2/agents/templates/tmpl-1")
+    assert _path(call.request.url).endswith("/v2/harness-runtime/templates/tmpl-1")
     assert resp.deleted is True
 
 
@@ -200,7 +200,9 @@ def test_list_builds():
 
     call = _last_call(resources)
     assert call.request.method == "GET"
-    assert _path(call.request.url).endswith("/v2/agents/templates/tmpl-1/builds")
+    assert _path(call.request.url).endswith(
+        "/v2/harness-runtime/templates/tmpl-1/builds"
+    )
     assert "page_size=10" in call.request.url
     assert resp.builds[0].build_id == "bld-1"
 
@@ -220,7 +222,9 @@ def test_get_build():
 
     call = _last_call(resources)
     assert call.request.method == "GET"
-    assert _path(call.request.url).endswith("/v2/agents/templates/tmpl-1/builds/bld-1")
+    assert _path(call.request.url).endswith(
+        "/v2/harness-runtime/templates/tmpl-1/builds/bld-1"
+    )
     assert resp.build.error == "boom"
 
 
@@ -233,7 +237,7 @@ def test_get_build_logs():
     call = _last_call(resources)
     assert call.request.method == "GET"
     assert _path(call.request.url).endswith(
-        "/v2/agents/templates/tmpl-1/builds/bld-1/logs"
+        "/v2/harness-runtime/templates/tmpl-1/builds/bld-1/logs"
     )
     assert resp.signed_url.endswith("sig=abc")
 

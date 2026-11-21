@@ -2,7 +2,7 @@
 # Copyright (c) DigitalOcean.
 # Licensed under the Apache-2.0 License.
 # ------------------------------------
-"""Sync Hosted Agents trigger operations (``/v2/agents/triggers/...``).
+"""Sync Hosted Agents trigger operations (``/v2/harness-runtime/triggers/...``).
 
 Hand-written against harness-trigger's public contract
 (``contracts/trigger.swagger.json``). Preserved across ``make generate``.
@@ -19,8 +19,8 @@ from azure.core.rest import HttpRequest
 from pydo.agents.custom_sessions import _OK_STATUS, _raise_agents_http_error
 from pydo.custom_extensions import _wrap
 
-_TRIGGERS_PATH = "/v2/agents/triggers"
-_WEBHOOK_PROVIDERS_PATH = "/v2/agents/webhook-providers"
+_TRIGGERS_PATH = "/v2/harness-runtime/triggers"
+_WEBHOOK_PROVIDERS_PATH = "/v2/harness-runtime/webhook-providers"
 
 
 def _quote(value: str) -> str:
@@ -34,7 +34,7 @@ class TriggersOperations:
     reusable-session listing, and the webhook-provider registry.
 
     The public webhook ingress
-    (``POST /v2/agents/triggers/{id}/webhook``) is intentionally omitted —
+    (``POST /v2/harness-runtime/triggers/{id}/webhook``) is intentionally omitted —
     it is authenticated by the per-trigger HMAC secret, not a DO bearer token,
     and is meant for external systems rather than SDK callers.
     """
@@ -92,7 +92,7 @@ class TriggersOperations:
         kind: Optional[str] = None,
         status: Optional[str] = None,
     ) -> Any:
-        """List the calling team's triggers (``GET /v2/agents/triggers``).
+        """List the calling team's triggers (``GET /v2/harness-runtime/triggers``).
 
         Keyset-paginated. Soft-deleted triggers are excluded. Optional
         ``kind`` (``webhook`` / ``cron``) and ``status`` (``active`` /
@@ -112,7 +112,7 @@ class TriggersOperations:
         )
 
     def create(self, body: Dict[str, Any]) -> Any:
-        """Create a webhook or cron trigger (``POST /v2/agents/triggers``).
+        """Create a webhook or cron trigger (``POST /v2/harness-runtime/triggers``).
 
         For webhook triggers the response includes ``webhook_secret`` exactly
         once — it is never returned again. Cron triggers return no secret.
@@ -127,13 +127,13 @@ class TriggersOperations:
         )
 
     def get(self, trigger_id: str) -> Any:
-        """Get a single trigger by id (``GET /v2/agents/triggers/{id}``)."""
+        """Get a single trigger by id (``GET /v2/harness-runtime/triggers/{id}``)."""
         return self._parse_json(
             self._send("GET", f"{_TRIGGERS_PATH}/{_quote(trigger_id)}"),
         )
 
     def update(self, trigger_id: str, body: Dict[str, Any]) -> Any:
-        """Partial-update a trigger (``PATCH /v2/agents/triggers/{id}``).
+        """Partial-update a trigger (``PATCH /v2/harness-runtime/triggers/{id}``).
 
         Only supplied fields change. Pause / re-enable by sending
         ``{"status": "paused"}`` or ``{"status": "active"}``.
@@ -150,7 +150,7 @@ class TriggersOperations:
         )
 
     def delete(self, trigger_id: str) -> None:
-        """Soft-delete a trigger (``DELETE /v2/agents/triggers/{id}``).
+        """Soft-delete a trigger (``DELETE /v2/harness-runtime/triggers/{id}``).
 
         Returns ``204`` with no body. A reuse trigger only unbinds — it never
         destroys the customer's session.

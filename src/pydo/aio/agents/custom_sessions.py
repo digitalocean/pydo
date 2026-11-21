@@ -56,7 +56,7 @@ from pydo.agents.custom_sessions import (
 )
 from pydo.custom_extensions import AsyncSSEStream, _wrap
 
-_BASE_PATH = "/v2/agents/sessions"
+_BASE_PATH = "/v2/harness-runtime/sessions"
 
 
 def _quote(value: str) -> str:
@@ -222,7 +222,7 @@ class AsyncSessionsOperations:
     ) -> Any:
         """List sessions, optionally filtered by ``status`` and/or ``name``.
 
-        ``name`` filters server-side (``GET /v2/agents/sessions?name=...``) and
+        ``name`` filters server-side (``GET /v2/harness-runtime/sessions?name=...``) and
         may match more than one session (e.g. a name reused over time).
         """
         return await self._parse_json(
@@ -562,7 +562,7 @@ class AsyncSessionsOperations:
         return await self._parse_json(
             await self._send(
                 "POST",
-                f"/v2/agents/auth/{_quote(provider)}",
+                f"/v2/harness-runtime/auth/{_quote(provider)}",
                 body={},
             ),
         )
@@ -578,7 +578,7 @@ class AsyncSessionsOperations:
         return await self._parse_json(
             await self._send(
                 "GET",
-                f"/v2/agents/auth/{_quote(provider)}/poll",
+                f"/v2/harness-runtime/auth/{_quote(provider)}/poll",
                 params={"poll_url": poll_url},
             ),
         )
@@ -594,7 +594,7 @@ class AsyncSessionsOperations:
     ) -> Any:
         """List the team's external-provider connections (actor-scoped auth).
 
-        ``GET /v2/agents/auth/{provider}/connections``. This is the newer
+        ``GET /v2/harness-runtime/auth/{provider}/connections``. This is the newer
         actor-scoped flow, separate from the team-wide
         :meth:`start_provider_auth`. Each connection binds a ``user_id`` (the
         actor a manifest's oauth slot references) to the provider and holds the
@@ -605,7 +605,7 @@ class AsyncSessionsOperations:
         return await self._parse_json(
             await self._send(
                 "GET",
-                f"/v2/agents/auth/{_quote(provider)}/connections",
+                f"/v2/harness-runtime/auth/{_quote(provider)}/connections",
                 params={
                     "user_id": user_id,
                     "status": status,
@@ -624,7 +624,7 @@ class AsyncSessionsOperations:
     ) -> Any:
         """Create a connection for an actor.
 
-        ``POST /v2/agents/auth/{provider}/connections`` with ``{"user_id":
+        ``POST /v2/harness-runtime/auth/{provider}/connections`` with ``{"user_id":
         ..., "scopes": [...]}``. ``user_id`` is the actor the connection acts
         for (required). Omit ``scopes`` to request the provider's full
         configured scope set. A new connection comes back ``pending`` with an
@@ -644,7 +644,7 @@ class AsyncSessionsOperations:
         return await self._parse_json(
             await self._send(
                 "POST",
-                f"/v2/agents/auth/{_quote(provider)}/connections",
+                f"/v2/harness-runtime/auth/{_quote(provider)}/connections",
                 body=body,
             ),
         )
@@ -660,7 +660,7 @@ class AsyncSessionsOperations:
         return await self._parse_json(
             await self._send(
                 "GET",
-                f"/v2/agents/auth/{_quote(provider)}/connections/"
+                f"/v2/harness-runtime/auth/{_quote(provider)}/connections/"
                 f"{_quote(connection_id)}",
             ),
         )
@@ -676,7 +676,7 @@ class AsyncSessionsOperations:
         return await self._parse_json(
             await self._send(
                 "DELETE",
-                f"/v2/agents/auth/{_quote(provider)}/connections/"
+                f"/v2/harness-runtime/auth/{_quote(provider)}/connections/"
                 f"{_quote(connection_id)}",
             ),
         )
@@ -697,7 +697,7 @@ class AsyncSessionsOperations:
         return await self._parse_json(
             await self._send(
                 "POST",
-                f"/v2/agents/auth/{_quote(provider)}/connections/"
+                f"/v2/harness-runtime/auth/{_quote(provider)}/connections/"
                 f"{_quote(connection_id)}/reconnect",
                 body={},
             ),
