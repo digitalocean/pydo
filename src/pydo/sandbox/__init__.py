@@ -24,6 +24,8 @@ from .client import SandboxClient
 from .commands import Command, Commands
 from ._templates import ImageSource, TemplateBuildInfo, TemplateInfo, TemplateStatus
 from .templates import Pages, Template
+from ._snapshots import SnapshotInfo, SnapshotState
+from .snapshots import Snapshot
 from .errors import (
     AuthenticationError,
     ConflictError,
@@ -47,6 +49,9 @@ __all__ = [
     "Commands",
     "ImageSource",
     "Pages",
+    "Snapshot",
+    "SnapshotInfo",
+    "SnapshotState",
     "Template",
     "TemplateBuildInfo",
     "TemplateInfo",

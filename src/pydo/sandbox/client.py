@@ -7,6 +7,7 @@
 from typing import Mapping, Optional
 
 from .sandbox import Sandbox, SandboxPaginator
+from .snapshots import Snapshot
 from .templates import Pages, Template
 from .types import SandboxInfo, SandboxState
 
@@ -85,6 +86,39 @@ class _BoundTemplate:
         return Template.delete(template_id, **self._conn)
 
 
+class _BoundSnapshot:
+    """``Snapshot`` with the client's token and API origin filled in."""
+
+    def __init__(self, token: Optional[str], api_url: Optional[str]) -> None:
+        self._conn = {"token": token, "api_url": api_url}
+
+    def create(
+        self,
+        sandbox_id: str,
+        *,
+        name: Optional[str] = None,
+        ttl: Optional[str] = None,
+    ) -> Snapshot:
+        return Snapshot.create(sandbox_id, name=name, ttl=ttl, **self._conn)
+
+    def get(self, snapshot_id: str) -> Snapshot:
+        return Snapshot.get(snapshot_id, **self._conn)
+
+    def list(
+        self,
+        *,
+        sandbox_id: Optional[str] = None,
+        limit: Optional[int] = None,
+        next_token: Optional[str] = None,
+    ) -> Pages:
+        return Snapshot.list(
+            sandbox_id=sandbox_id, limit=limit, next_token=next_token, **self._conn
+        )
+
+    def delete(self, snapshot_id: str) -> bool:
+        return Snapshot.delete(snapshot_id, **self._conn)
+
+
 class SandboxClient:
     """Binds connection options once.
 
@@ -99,6 +133,7 @@ class SandboxClient:
     ) -> None:
         self.Sandbox = _BoundSandbox(token, api_url)  # pylint: disable=invalid-name
         self.Template = _BoundTemplate(token, api_url)  # pylint: disable=invalid-name
+        self.Snapshot = _BoundSnapshot(token, api_url)  # pylint: disable=invalid-name
 
 
 __all__ = ["SandboxClient"]

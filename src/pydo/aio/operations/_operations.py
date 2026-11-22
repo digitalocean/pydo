@@ -252896,7 +252896,7 @@ class ByoipPrefixesOperations:
         return cast(JSON, deserialized)  # type: ignore
 
 
-class SandboxesOperations:
+class SandboxesOperations:  # pylint: disable=too-many-public-methods
     """
     .. warning::
         **DO NOT** instantiate this class directly.
@@ -253431,6 +253431,439 @@ class SandboxesOperations:
                 deserialized = None
 
         if response.status_code == 429:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def list_snapshots(
+        self,
+        *,
+        sandbox_id: Optional[str] = None,
+        page_size: Optional[int] = None,
+        page_token: Optional[str] = None,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Snapshots.
+
+        List your team's snapshots, newest first. Pass ``sandbox_id`` to list the
+        snapshots of one sandbox.
+
+        :keyword sandbox_id: Return only the snapshots of this sandbox. When unset, return every
+         snapshot of your team. Default value is None.
+        :paramtype sandbox_id: str
+        :keyword page_size: The maximum number of sandboxes to return. Default value is None.
+        :paramtype page_size: int
+        :keyword page_token: The ``next_page_token`` of the previous page. Empty starts from the
+         beginning. Default value is None.
+        :paramtype page_token: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "next_page_token": "str",  # Optional. Pass this as ``page_token`` to get the
+                      next page. Empty on the last page.
+                    "snapshots": [
+                        {
+                            "created_at": "2020-02-20 00:00:00",  # The time the snapshot
+                              was created, in ISO 8601 format. Required.
+                            "sandbox_id": "str",  # The ID of the sandbox the snapshot
+                              was taken from. Required.
+                            "snapshot_id": "str",  # The ID of the snapshot. Required.
+                            "state": "SNAPSHOT_STATE_UNSPECIFIED",  # Default value is
+                              "SNAPSHOT_STATE_UNSPECIFIED". Where a snapshot is in its life.   *
+                              ``SNAPSHOT_STATE_CREATING``"" : The capture is in progress. *
+                              ``SNAPSHOT_STATE_UPLOADING``"" : The capture finished and the artifacts
+                              are uploading to storage. * ``SNAPSHOT_STATE_COMPLETE``"" : The snapshot
+                              is ready. You can start sandboxes from it. * ``SNAPSHOT_STATE_FAILED``""
+                              : The snapshot failed. See ``error_message``. Known values are:
+                              "SNAPSHOT_STATE_UNSPECIFIED", "SNAPSHOT_STATE_CREATING",
+                              "SNAPSHOT_STATE_UPLOADING", "SNAPSHOT_STATE_COMPLETE", and
+                              "SNAPSHOT_STATE_FAILED".
+                            "error_message": "str",  # Optional. Why the snapshot failed.
+                              Set when the state is ``FAILED``.
+                            "name": "str",  # Optional. The name given when the snapshot
+                              was created, if any.
+                            "size_bytes": "str",  # Optional. The size of the snapshot in
+                              bytes. Set when the snapshot is ``COMPLETE``.
+                            "ttl": "str"  # Optional. How long the snapshot is kept.
+                              Unset when the platform default applies.
+                        }
+                    ]
+                }
+                # response body for status code(s): 403, 404
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_sandboxes_list_snapshots_request(
+            sandbox_id=sandbox_id,
+            page_size=page_size,
+            page_token=page_token,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 403, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def delete_snapshot(self, snapshot_id: str, **kwargs: Any) -> JSON:
+        """Delete a Snapshot.
+
+        Delete a snapshot. Sandboxes already started from it are not affected.
+
+        :param snapshot_id: The ID of the snapshot. Required.
+        :type snapshot_id: str
+        :return: JSON or JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 403, 404
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_sandboxes_delete_snapshot_request(
+            snapshot_id=snapshot_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 403, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_snapshot(self, snapshot_id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve a Snapshot.
+
+        Retrieve a snapshot by its ID. Use it to poll a snapshot until it is
+        ``COMPLETE``. The snapshot must belong to your team.
+
+        :param snapshot_id: The ID of the snapshot. Required.
+        :type snapshot_id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "snapshot": {
+                        "created_at": "2020-02-20 00:00:00",  # The time the snapshot was
+                          created, in ISO 8601 format. Required.
+                        "sandbox_id": "str",  # The ID of the sandbox the snapshot was taken
+                          from. Required.
+                        "snapshot_id": "str",  # The ID of the snapshot. Required.
+                        "state": "SNAPSHOT_STATE_UNSPECIFIED",  # Default value is
+                          "SNAPSHOT_STATE_UNSPECIFIED". Where a snapshot is in its life.   *
+                          ``SNAPSHOT_STATE_CREATING``"" : The capture is in progress. *
+                          ``SNAPSHOT_STATE_UPLOADING``"" : The capture finished and the artifacts are
+                          uploading to storage. * ``SNAPSHOT_STATE_COMPLETE``"" : The snapshot is
+                          ready. You can start sandboxes from it. * ``SNAPSHOT_STATE_FAILED``"" : The
+                          snapshot failed. See ``error_message``. Known values are:
+                          "SNAPSHOT_STATE_UNSPECIFIED", "SNAPSHOT_STATE_CREATING",
+                          "SNAPSHOT_STATE_UPLOADING", "SNAPSHOT_STATE_COMPLETE", and
+                          "SNAPSHOT_STATE_FAILED".
+                        "error_message": "str",  # Optional. Why the snapshot failed. Set
+                          when the state is ``FAILED``.
+                        "name": "str",  # Optional. The name given when the snapshot was
+                          created, if any.
+                        "size_bytes": "str",  # Optional. The size of the snapshot in bytes.
+                          Set when the snapshot is ``COMPLETE``.
+                        "ttl": "str"  # Optional. How long the snapshot is kept. Unset when
+                          the platform default applies.
+                    }
+                }
+                # response body for status code(s): 403, 404
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_sandboxes_get_snapshot_request(
+            snapshot_id=snapshot_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 403, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
             response_headers["ratelimit-limit"] = self._deserialize(
                 "int", response.headers.get("ratelimit-limit")
             )
@@ -256543,6 +256976,369 @@ class SandboxesOperations:
 
         response_headers = {}
         if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def create_snapshot(
+        self,
+        sandbox_id: str,
+        body: Optional[JSON] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Snapshot.
+
+        Start a snapshot of a ready or paused sandbox. The snapshot is created
+        asynchronously: the response is ``202`` with state ``CREATING``. Poll retrieve
+        a snapshot until the state is ``COMPLETE`` or ``FAILED``. The sandbox must be
+        on a microVM cell. The snapshot captures the boot disk and memory, not the
+        workspace data disk.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param body: Default value is None.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "name": "str",  # Optional. An optional name for the snapshot. 1 to 63
+                      characters: lowercase letters, digits and hyphens.
+                    "ttl": "str"  # Optional. How long to keep the snapshot. When unset, the
+                      platform default applies.
+                }
+
+                # response body for status code(s): 200, 202
+                response == {
+                    "snapshot": {
+                        "created_at": "2020-02-20 00:00:00",  # The time the snapshot was
+                          created, in ISO 8601 format. Required.
+                        "sandbox_id": "str",  # The ID of the sandbox the snapshot was taken
+                          from. Required.
+                        "snapshot_id": "str",  # The ID of the snapshot. Required.
+                        "state": "SNAPSHOT_STATE_UNSPECIFIED",  # Default value is
+                          "SNAPSHOT_STATE_UNSPECIFIED". Where a snapshot is in its life.   *
+                          ``SNAPSHOT_STATE_CREATING``"" : The capture is in progress. *
+                          ``SNAPSHOT_STATE_UPLOADING``"" : The capture finished and the artifacts are
+                          uploading to storage. * ``SNAPSHOT_STATE_COMPLETE``"" : The snapshot is
+                          ready. You can start sandboxes from it. * ``SNAPSHOT_STATE_FAILED``"" : The
+                          snapshot failed. See ``error_message``. Known values are:
+                          "SNAPSHOT_STATE_UNSPECIFIED", "SNAPSHOT_STATE_CREATING",
+                          "SNAPSHOT_STATE_UPLOADING", "SNAPSHOT_STATE_COMPLETE", and
+                          "SNAPSHOT_STATE_FAILED".
+                        "error_message": "str",  # Optional. Why the snapshot failed. Set
+                          when the state is ``FAILED``.
+                        "name": "str",  # Optional. The name given when the snapshot was
+                          created, if any.
+                        "size_bytes": "str",  # Optional. The size of the snapshot in bytes.
+                          Set when the snapshot is ``COMPLETE``.
+                        "ttl": "str"  # Optional. How long the snapshot is kept. Unset when
+                          the platform default applies.
+                    }
+                }
+                # response body for status code(s): 400, 403, 404
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+
+    @overload
+    async def create_snapshot(
+        self,
+        sandbox_id: str,
+        body: Optional[IO[bytes]] = None,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Snapshot.
+
+        Start a snapshot of a ready or paused sandbox. The snapshot is created
+        asynchronously: the response is ``202`` with state ``CREATING``. Poll retrieve
+        a snapshot until the state is ``COMPLETE`` or ``FAILED``. The sandbox must be
+        on a microVM cell. The snapshot captures the boot disk and memory, not the
+        workspace data disk.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param body: Default value is None.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200, 202
+                response == {
+                    "snapshot": {
+                        "created_at": "2020-02-20 00:00:00",  # The time the snapshot was
+                          created, in ISO 8601 format. Required.
+                        "sandbox_id": "str",  # The ID of the sandbox the snapshot was taken
+                          from. Required.
+                        "snapshot_id": "str",  # The ID of the snapshot. Required.
+                        "state": "SNAPSHOT_STATE_UNSPECIFIED",  # Default value is
+                          "SNAPSHOT_STATE_UNSPECIFIED". Where a snapshot is in its life.   *
+                          ``SNAPSHOT_STATE_CREATING``"" : The capture is in progress. *
+                          ``SNAPSHOT_STATE_UPLOADING``"" : The capture finished and the artifacts are
+                          uploading to storage. * ``SNAPSHOT_STATE_COMPLETE``"" : The snapshot is
+                          ready. You can start sandboxes from it. * ``SNAPSHOT_STATE_FAILED``"" : The
+                          snapshot failed. See ``error_message``. Known values are:
+                          "SNAPSHOT_STATE_UNSPECIFIED", "SNAPSHOT_STATE_CREATING",
+                          "SNAPSHOT_STATE_UPLOADING", "SNAPSHOT_STATE_COMPLETE", and
+                          "SNAPSHOT_STATE_FAILED".
+                        "error_message": "str",  # Optional. Why the snapshot failed. Set
+                          when the state is ``FAILED``.
+                        "name": "str",  # Optional. The name given when the snapshot was
+                          created, if any.
+                        "size_bytes": "str",  # Optional. The size of the snapshot in bytes.
+                          Set when the snapshot is ``COMPLETE``.
+                        "ttl": "str"  # Optional. How long the snapshot is kept. Unset when
+                          the platform default applies.
+                    }
+                }
+                # response body for status code(s): 400, 403, 404
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+
+    @distributed_trace_async
+    async def create_snapshot(
+        self,
+        sandbox_id: str,
+        body: Optional[Union[JSON, IO[bytes]]] = None,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Snapshot.
+
+        Start a snapshot of a ready or paused sandbox. The snapshot is created
+        asynchronously: the response is ``202`` with state ``CREATING``. Poll retrieve
+        a snapshot until the state is ``COMPLETE`` or ``FAILED``. The sandbox must be
+        on a microVM cell. The snapshot captures the boot disk and memory, not the
+        workspace data disk.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param body: Is either a JSON type or a IO[bytes] type. Default value is None.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "name": "str",  # Optional. An optional name for the snapshot. 1 to 63
+                      characters: lowercase letters, digits and hyphens.
+                    "ttl": "str"  # Optional. How long to keep the snapshot. When unset, the
+                      platform default applies.
+                }
+
+                # response body for status code(s): 200, 202
+                response == {
+                    "snapshot": {
+                        "created_at": "2020-02-20 00:00:00",  # The time the snapshot was
+                          created, in ISO 8601 format. Required.
+                        "sandbox_id": "str",  # The ID of the sandbox the snapshot was taken
+                          from. Required.
+                        "snapshot_id": "str",  # The ID of the snapshot. Required.
+                        "state": "SNAPSHOT_STATE_UNSPECIFIED",  # Default value is
+                          "SNAPSHOT_STATE_UNSPECIFIED". Where a snapshot is in its life.   *
+                          ``SNAPSHOT_STATE_CREATING``"" : The capture is in progress. *
+                          ``SNAPSHOT_STATE_UPLOADING``"" : The capture finished and the artifacts are
+                          uploading to storage. * ``SNAPSHOT_STATE_COMPLETE``"" : The snapshot is
+                          ready. You can start sandboxes from it. * ``SNAPSHOT_STATE_FAILED``"" : The
+                          snapshot failed. See ``error_message``. Known values are:
+                          "SNAPSHOT_STATE_UNSPECIFIED", "SNAPSHOT_STATE_CREATING",
+                          "SNAPSHOT_STATE_UPLOADING", "SNAPSHOT_STATE_COMPLETE", and
+                          "SNAPSHOT_STATE_FAILED".
+                        "error_message": "str",  # Optional. Why the snapshot failed. Set
+                          when the state is ``FAILED``.
+                        "name": "str",  # Optional. The name given when the snapshot was
+                          created, if any.
+                        "size_bytes": "str",  # Optional. The size of the snapshot in bytes.
+                          Set when the snapshot is ``COMPLETE``.
+                        "ttl": "str"  # Optional. How long the snapshot is kept. Unset when
+                          the platform default applies.
+                    }
+                }
+                # response body for status code(s): 400, 403, 404
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            if body is not None:
+                _json = body
+            else:
+                _json = None
+
+        _request = build_sandboxes_create_snapshot_request(
+            sandbox_id=sandbox_id,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 202, 400, 403, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 202:
             response_headers["ratelimit-limit"] = self._deserialize(
                 "int", response.headers.get("ratelimit-limit")
             )

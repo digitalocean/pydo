@@ -20,12 +20,14 @@ import asyncio
 import time
 from typing import Any, AsyncIterator, List, Mapping, Optional
 
+from pydo.sandbox import _snapshots as _snap
 from pydo.sandbox import types as _t
 from pydo.sandbox._connection import resolve
 from pydo.sandbox._hybrid import by_id_or_self
 
 from ._transport import call as _call
 from .commands import Commands
+from .snapshots import Snapshot, _create as _create_snapshot
 from pydo.sandbox.errors import NotFoundError, SandboxError, SandboxTimeoutError
 from pydo.sandbox.types import (
     SandboxInfo,
@@ -199,6 +201,18 @@ class Sandbox:
     ) -> bool:
         async with _make_client(token, api_url) as client:
             return await _delete(client, require_id(sandbox_id))
+
+    async def create_snapshot(
+        self, *, name: Optional[str] = None, ttl: Optional[str] = None
+    ) -> Snapshot:
+        """Starts a snapshot of this sandbox, which must be running or paused.
+
+        Returns as soon as the snapshot is accepted, in the ``CREATING`` state.
+        Await ``snapshot.wait_until_ready()`` before relying on it. The snapshot
+        shares this sandbox's connection: closing the sandbox closes it too.
+        """
+        body = _snap.create_body(name, ttl)
+        return await _create_snapshot(self._client, self.sandbox_id, body, False)
 
     async def wait_until_running(
         self, *, timeout: float = 120.0, poll_interval: float = 1.0

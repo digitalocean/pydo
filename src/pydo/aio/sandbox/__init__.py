@@ -30,6 +30,8 @@ from pydo.sandbox._templates import (
     TemplateInfo,
     TemplateStatus,
 )
+from pydo.sandbox._snapshots import SnapshotInfo, SnapshotState
+from .snapshots import Snapshot
 from .templates import Pages, Template
 from .sandbox import Sandbox, SandboxPaginator
 
@@ -42,6 +44,9 @@ __all__ = [
     "Commands",
     "ImageSource",
     "Pages",
+    "Snapshot",
+    "SnapshotInfo",
+    "SnapshotState",
     "Template",
     "TemplateBuildInfo",
     "TemplateInfo",

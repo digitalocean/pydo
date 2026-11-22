@@ -256,6 +256,24 @@ template.delete()                            # False if it is already gone; Temp
 
 Global base templates are not listed: pass them by name to `Sandbox.create`. The async `Template` is in `pydo.aio.sandbox`.
 
+Snapshot a running or paused sandbox:
+
+```python
+from pydo.sandbox import Snapshot
+
+# The snapshot is created asynchronously: this returns in the SNAPSHOT_STATE_CREATING state
+snapshot = sandbox.create_snapshot(name="before-upgrade", ttl="168h")  # both optional
+snapshot.wait_until_ready()                  # polls until complete; raises with the error if it fails
+print(snapshot.snapshot_id, snapshot.info.size_bytes)
+
+for s in Snapshot.list(sandbox_id=sandbox.sandbox_id):   # newest first; omit sandbox_id for the whole team
+    print(s.snapshot_id, s.name, s.state)
+again = Snapshot.get(snapshot.snapshot_id)
+snapshot.delete()                            # False if it is already gone; Snapshot.delete(id) works too
+```
+
+A snapshot captures the boot disk and memory, not the workspace data disk. A `name` is 1 to 63 lowercase letters, digits and hyphens, checked before the request is sent. `Snapshot.create(sandbox_id, ...)`, `SandboxClient(...).Snapshot` and the async `Snapshot` in `pydo.aio.sandbox` work the same way. The API has no call to start a sandbox from a snapshot yet.
+
 The async version has the same names: `await sandbox.commands.run(...)` and `async for event in cmd.stream()`. Output can only be read while a command runs: a command that exits before the stream attaches raises `NotFoundError`. File transfer is not available yet: it needs routes that are not in the API.
 
 ## **AI & Inference**

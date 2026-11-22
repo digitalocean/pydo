@@ -26,7 +26,9 @@ from ._connection import resolve
 from ._hybrid import by_id_or_self
 from ._transport import call as _call
 from .commands import Commands
+from . import _snapshots as _snap
 from .errors import NotFoundError, SandboxError, SandboxTimeoutError
+from .snapshots import Snapshot, _create as _create_snapshot
 from .types import SandboxInfo, SandboxState, create_body, require_id, to_info
 
 
@@ -207,6 +209,21 @@ class Sandbox:
     ) -> bool:
         with _make_client(token, api_url) as client:
             return _delete(client, require_id(sandbox_id))
+
+    def create_snapshot(
+        self, *, name: Optional[str] = None, ttl: Optional[str] = None
+    ) -> Snapshot:
+        """Starts a snapshot of this sandbox, which must be running or paused.
+
+        Returns as soon as the snapshot is accepted, in the ``CREATING`` state.
+        Call ``snapshot.wait_until_ready()`` before relying on it. The snapshot
+        shares this sandbox's connection: closing the sandbox closes it too.
+
+        :keyword name: Optional name: 1 to 63 lowercase letters, digits and hyphens.
+        :keyword ttl: How long to keep the snapshot, such as ``168h``. Defaults to the platform's.
+        """
+        body = _snap.create_body(name, ttl)
+        return _create_snapshot(self._client, self.sandbox_id, body, False)
 
     def wait_until_running(
         self, *, timeout: float = 120.0, poll_interval: float = 1.0

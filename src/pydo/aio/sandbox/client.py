@@ -9,6 +9,7 @@ from typing import Mapping, Optional
 from pydo.sandbox.types import SandboxInfo, SandboxState
 
 from .sandbox import Sandbox, SandboxPaginator
+from .snapshots import Snapshot
 from .templates import Pages, Template
 
 
@@ -86,6 +87,39 @@ class _BoundTemplate:
         return await Template.delete(template_id, **self._conn)
 
 
+class _BoundSnapshot:
+    """``Snapshot`` with the client's token and API origin filled in."""
+
+    def __init__(self, token: Optional[str], api_url: Optional[str]) -> None:
+        self._conn = {"token": token, "api_url": api_url}
+
+    async def create(
+        self,
+        sandbox_id: str,
+        *,
+        name: Optional[str] = None,
+        ttl: Optional[str] = None,
+    ) -> Snapshot:
+        return await Snapshot.create(sandbox_id, name=name, ttl=ttl, **self._conn)
+
+    async def get(self, snapshot_id: str) -> Snapshot:
+        return await Snapshot.get(snapshot_id, **self._conn)
+
+    def list(
+        self,
+        *,
+        sandbox_id: Optional[str] = None,
+        limit: Optional[int] = None,
+        next_token: Optional[str] = None,
+    ) -> Pages:
+        return Snapshot.list(
+            sandbox_id=sandbox_id, limit=limit, next_token=next_token, **self._conn
+        )
+
+    async def delete(self, snapshot_id: str) -> bool:
+        return await Snapshot.delete(snapshot_id, **self._conn)
+
+
 class SandboxClient:
     """Binds connection options once.
 
@@ -100,6 +134,7 @@ class SandboxClient:
     ) -> None:
         self.Sandbox = _BoundSandbox(token, api_url)  # pylint: disable=invalid-name
         self.Template = _BoundTemplate(token, api_url)  # pylint: disable=invalid-name
+        self.Snapshot = _BoundSnapshot(token, api_url)  # pylint: disable=invalid-name
 
 
 __all__ = ["SandboxClient"]
