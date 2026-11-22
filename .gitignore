@@ -22,3 +22,4 @@ DigitalOcean-public.v2.yaml
 node_modules/
 testscript.py
 changelist.md
+.venv/
