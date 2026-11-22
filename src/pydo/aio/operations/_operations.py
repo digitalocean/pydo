@@ -38,10 +38,15 @@ from azure.core.tracing.decorator_async import distributed_trace_async
 from azure.core.utils import case_insensitive_dict
 
 from ...operations._operations import (
+    build_sandboxes_create_command_request,
     build_sandboxes_create_request,
     build_sandboxes_delete_request,
+    build_sandboxes_get_commands_stream_request,
     build_sandboxes_get_request,
+    build_sandboxes_list_commands_request,
     build_sandboxes_list_request,
+    build_sandboxes_post_commands_signal_request,
+    build_sandboxes_post_commands_stdin_request,
     build_sandboxes_post_pause_request,
     build_sandboxes_post_resume_request,
     build_account_get_request,
@@ -253624,6 +253629,1078 @@ class SandboxesOperations:
 
         _request = build_sandboxes_get_request(
             sandbox_id=sandbox_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 403, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def list_commands(self, sandbox_id: str, **kwargs: Any) -> JSON:
+        """List Sandbox Commands.
+
+        List running commands. Returns ``pid``\\ , ``cmd``\\ , and ``cwd`` only.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "commands": [
+                        {
+                            "cmd": "str",  # The executable that was started. Required.
+                            "pid": 0,  # The process ID of the command. Required.
+                            "cwd": "str"  # Optional. The working directory of the
+                              command.
+                        }
+                    ]
+                }
+                # response body for status code(s): 403, 404
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_sandboxes_list_commands_request(
+            sandbox_id=sandbox_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 403, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def create_command(
+        self,
+        sandbox_id: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Start a Sandbox Command.
+
+        Start a command and return its ``pid``. The process keeps running after this
+        call returns. Use the attach stream to read output.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "cmd": "str",  # Executable (not a shell string). Use ``cmd="bash"``"" ,
+                      ``args=["-lc", "..."]`` for a shell. Required.
+                    "args": [
+                        "str"  # Optional. Arguments passed to the executable.
+                    ],
+                    "cwd": "str",  # Optional. Working directory for the command.
+                    "env_vars": {
+                        "str": "str"  # Optional. Environment variables for the command.
+                    },
+                    "stdin": bool,  # Optional. When true, leave stdin open for later writes.
+                    "timeout_seconds": "str"  # Optional. Zero means no timeout. Encoded as a
+                      string per protobuf JSON.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "pid": 0  # Optional. The process ID of the started command.
+                }
+                # response body for status code(s): 400, 403, 404
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+
+    @overload
+    async def create_command(
+        self,
+        sandbox_id: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        """Start a Sandbox Command.
+
+        Start a command and return its ``pid``. The process keeps running after this
+        call returns. Use the attach stream to read output.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "pid": 0  # Optional. The process ID of the started command.
+                }
+                # response body for status code(s): 400, 403, 404
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+
+    @distributed_trace_async
+    async def create_command(
+        self, sandbox_id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Start a Sandbox Command.
+
+        Start a command and return its ``pid``. The process keeps running after this
+        call returns. Use the attach stream to read output.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "cmd": "str",  # Executable (not a shell string). Use ``cmd="bash"``"" ,
+                      ``args=["-lc", "..."]`` for a shell. Required.
+                    "args": [
+                        "str"  # Optional. Arguments passed to the executable.
+                    ],
+                    "cwd": "str",  # Optional. Working directory for the command.
+                    "env_vars": {
+                        "str": "str"  # Optional. Environment variables for the command.
+                    },
+                    "stdin": bool,  # Optional. When true, leave stdin open for later writes.
+                    "timeout_seconds": "str"  # Optional. Zero means no timeout. Encoded as a
+                      string per protobuf JSON.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "pid": 0  # Optional. The process ID of the started command.
+                }
+                # response body for status code(s): 400, 403, 404
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_sandboxes_create_command_request(
+            sandbox_id=sandbox_id,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def post_commands_signal(
+        self,
+        sandbox_id: str,
+        pid: int,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Signal a Sandbox Command.
+
+        Send ``SIGTERM`` or ``SIGKILL`` by ``pid``. Defaults to ``SIGTERM``.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param pid: The process ID of the command in the sandbox. Required.
+        :type pid: int
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON or JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "signal": "SANDBOX_COMMAND_SIGNAL_UNSPECIFIED"  # Optional. Default value is
+                      "SANDBOX_COMMAND_SIGNAL_UNSPECIFIED". Signal to send to a sandbox command.
+                      Defaults to SIGTERM when unset. Known values are:
+                      "SANDBOX_COMMAND_SIGNAL_UNSPECIFIED", "SANDBOX_COMMAND_SIGNAL_SIGTERM", and
+                      "SANDBOX_COMMAND_SIGNAL_SIGKILL".
+                }
+
+                # response body for status code(s): 400, 403, 404
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+
+    @overload
+    async def post_commands_signal(
+        self,
+        sandbox_id: str,
+        pid: int,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        """Signal a Sandbox Command.
+
+        Send ``SIGTERM`` or ``SIGKILL`` by ``pid``. Defaults to ``SIGTERM``.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param pid: The process ID of the command in the sandbox. Required.
+        :type pid: int
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON or JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 400, 403, 404
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+
+    @distributed_trace_async
+    async def post_commands_signal(
+        self, sandbox_id: str, pid: int, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Signal a Sandbox Command.
+
+        Send ``SIGTERM`` or ``SIGKILL`` by ``pid``. Defaults to ``SIGTERM``.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param pid: The process ID of the command in the sandbox. Required.
+        :type pid: int
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON or JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "signal": "SANDBOX_COMMAND_SIGNAL_UNSPECIFIED"  # Optional. Default value is
+                      "SANDBOX_COMMAND_SIGNAL_UNSPECIFIED". Signal to send to a sandbox command.
+                      Defaults to SIGTERM when unset. Known values are:
+                      "SANDBOX_COMMAND_SIGNAL_UNSPECIFIED", "SANDBOX_COMMAND_SIGNAL_SIGTERM", and
+                      "SANDBOX_COMMAND_SIGNAL_SIGKILL".
+                }
+
+                # response body for status code(s): 400, 403, 404
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_sandboxes_post_commands_signal_request(
+            sandbox_id=sandbox_id,
+            pid=pid,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    async def post_commands_stdin(
+        self,
+        sandbox_id: str,
+        pid: int,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        """Write Sandbox Command Stdin.
+
+        Write stdin to a command started with ``stdin=true``. Set ``eof`` to close.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param pid: The process ID of the command in the sandbox. Required.
+        :type pid: int
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON or JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "data": bytes("bytes", encoding="utf-8"),  # Optional. Base64-encoded stdin
+                      bytes.
+                    "eof": bool  # Optional. When true, close stdin after writing.
+                }
+
+                # response body for status code(s): 400, 403, 404
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+
+    @overload
+    async def post_commands_stdin(
+        self,
+        sandbox_id: str,
+        pid: int,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        """Write Sandbox Command Stdin.
+
+        Write stdin to a command started with ``stdin=true``. Set ``eof`` to close.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param pid: The process ID of the command in the sandbox. Required.
+        :type pid: int
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON or JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 400, 403, 404
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+
+    @distributed_trace_async
+    async def post_commands_stdin(
+        self, sandbox_id: str, pid: int, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        """Write Sandbox Command Stdin.
+
+        Write stdin to a command started with ``stdin=true``. Set ``eof`` to close.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param pid: The process ID of the command in the sandbox. Required.
+        :type pid: int
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON or JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "data": bytes("bytes", encoding="utf-8"),  # Optional. Base64-encoded stdin
+                      bytes.
+                    "eof": bool  # Optional. When true, close stdin after writing.
+                }
+
+                # response body for status code(s): 400, 403, 404
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_sandboxes_post_commands_stdin_request(
+            sandbox_id=sandbox_id,
+            pid=pid,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace_async
+    async def get_commands_stream(
+        self, sandbox_id: str, pid: int, **kwargs: Any
+    ) -> JSON:
+        """Attach to a Sandbox Command.
+
+        Stream output from a running command by ``pid``. Unknown or exited pids return
+        ``404``. Each streamed chunk is a JSON object with either ``result`` (a command
+        event) or ``error`` (a stream transport error).
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param pid: The process ID of the command in the sandbox. Required.
+        :type pid: int
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "error": {
+                        "details": [
+                            {
+                                "type_url": "str",  # Optional. A streaming transport
+                                  error from the gateway.
+                                "value": bytes("bytes", encoding="utf-8")  #
+                                  Optional. A streaming transport error from the gateway.
+                            }
+                        ],
+                        "grpc_code": 0,  # Optional. A streaming transport error from the
+                          gateway.
+                        "http_code": 0,  # Optional. A streaming transport error from the
+                          gateway.
+                        "http_status": "str",  # Optional. A streaming transport error from
+                          the gateway.
+                        "message": "str"  # Optional. A streaming transport error from the
+                          gateway.
+                    },
+                    "result": {
+                        "exit": {
+                            "error": "str",  # Optional. An error message when the
+                              process failed abnormally.
+                            "exit_code": 0,  # Optional. The process exit code.
+                            "status": "str"  # Optional. A short status string for the
+                              exit.
+                        },
+                        "keepalive": {},  # Optional. An empty keepalive event on the attach
+                          stream.
+                        "started": {
+                            "pid": 0  # Optional. The process ID of the started command.
+                        },
+                        "stderr": bytes("bytes", encoding="utf-8"),  # Optional.
+                          Base64-encoded stderr chunk.
+                        "stdout": bytes("bytes", encoding="utf-8")  # Optional.
+                          Base64-encoded stdout chunk.
+                    }
+                }
+                # response body for status code(s): 403, 404
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_sandboxes_get_commands_stream_request(
+            sandbox_id=sandbox_id,
+            pid=pid,
             headers=_headers,
             params=_params,
         )

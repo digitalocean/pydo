@@ -19,7 +19,9 @@ import it where you use it.
 The async twin is :mod:`pydo.aio.sandbox`.
 """
 
+from ._commands import CommandEvent, CommandInfo, CommandResult
 from .client import SandboxClient
+from .commands import Command, Commands
 from .errors import (
     AuthenticationError,
     ConflictError,
@@ -36,6 +38,11 @@ from .types import DEFAULT_SIZE, DEFAULT_TEMPLATE, SandboxInfo, SandboxState
 
 __all__ = [
     "AuthenticationError",
+    "Command",
+    "CommandEvent",
+    "CommandInfo",
+    "CommandResult",
+    "Commands",
     "ConflictError",
     "DEFAULT_SIZE",
     "DEFAULT_TEMPLATE",

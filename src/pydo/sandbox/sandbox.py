@@ -21,19 +21,12 @@ match the rest of pydo.
 import time
 from typing import Any, Iterator, List, Mapping, Optional
 
-from azure.core.exceptions import HttpResponseError
-
 from . import types as _t
 from ._connection import resolve
 from ._hybrid import by_id_or_self
-from .errors import (
-    NotFoundError,
-    SandboxError,
-    SandboxTimeoutError,
-    to_sandbox_error,
-    unwrap,
-    with_response,
-)
+from ._transport import call as _call
+from .commands import Commands
+from .errors import NotFoundError, SandboxError, SandboxTimeoutError
 from .types import SandboxInfo, SandboxState, create_body, require_id, to_info
 
 
@@ -42,13 +35,6 @@ def _make_client(token: Optional[str], api_url: Optional[str]) -> Any:
 
     resolved, url = resolve(token, api_url)
     return Client(resolved, endpoint=url)
-
-
-def _call(operation, *args, **kwargs) -> Any:
-    try:
-        return unwrap(operation(*args, cls=with_response, **kwargs))
-    except HttpResponseError as err:
-        raise to_sandbox_error(err) from err
 
 
 class Sandbox:
@@ -63,6 +49,8 @@ class Sandbox:
         self._client = client
         #: The record as last returned by the API. Call :meth:`get_info` to refresh it.
         self.info = info
+        #: Start, list and stream the commands running in this sandbox.
+        self.commands = Commands(client, info.sandbox_id)
 
     def __repr__(self) -> str:
         return "Sandbox(sandbox_id=%r, state=%r)" % (self.sandbox_id, self.state)

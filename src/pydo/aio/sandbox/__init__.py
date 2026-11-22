@@ -19,13 +19,20 @@ from pydo.sandbox.errors import (
     SandboxTimeoutError,
     ServiceError,
 )
+from pydo.sandbox._commands import CommandEvent, CommandInfo, CommandResult
 from pydo.sandbox.types import DEFAULT_SIZE, DEFAULT_TEMPLATE, SandboxInfo, SandboxState
 
 from .client import SandboxClient
+from .commands import Command, Commands
 from .sandbox import Sandbox, SandboxPaginator
 
 __all__ = [
     "AuthenticationError",
+    "Command",
+    "CommandEvent",
+    "CommandInfo",
+    "CommandResult",
+    "Commands",
     "ConflictError",
     "DEFAULT_SIZE",
     "DEFAULT_TEMPLATE",

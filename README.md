@@ -217,7 +217,26 @@ except RateLimitError as err:
 
 The other types are `AuthenticationError` (401), `PermissionDeniedError` (403), `InvalidRequestError` (400, 422), `ConflictError` (409), `ServiceError` (5xx) and `SandboxTimeoutError`. An argument the SDK does not support, such as `timeout=` on `create`, raises `TypeError` before any request is sent.
 
-Running commands and file transfer are not available yet: they need data-plane routes that are not in the API.
+Run commands with `sandbox.commands`:
+
+```python
+# A shell command (bash -lc): wait for it and read the result
+result = sandbox.commands.run('echo "Hello"', cwd="/workspace",
+                              on_stdout=lambda text: print(text, end=""))  # optional, as output arrives
+print(result.stdout, result.exit_code)   # a non-zero exit code is returned, not raised
+
+# An executable and its arguments: start it, then attach, write to it or stop it
+cmd = sandbox.commands.start("cat", stdin=True)
+cmd.write_stdin("hello\n", eof=True)
+for event in cmd.stream():               # started, stdout, stderr, exit
+    if event.type == "stdout":
+        print(event.text, end="")
+
+running = sandbox.commands.list()                    # [CommandInfo(pid, cmd, cwd)]
+sandbox.commands.connect(running[0].pid).kill()      # SIGTERM; kill("SIGKILL") to force
+```
+
+The async version has the same names: `await sandbox.commands.run(...)` and `async for event in cmd.stream()`. Output can only be read while a command runs: a command that exits before the stream attaches raises `NotFoundError`. File transfer is not available yet: it needs routes that are not in the API.
 
 ## **AI & Inference**
 

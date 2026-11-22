@@ -20,19 +20,13 @@ import asyncio
 import time
 from typing import Any, AsyncIterator, List, Mapping, Optional
 
-from azure.core.exceptions import HttpResponseError
-
 from pydo.sandbox import types as _t
 from pydo.sandbox._connection import resolve
 from pydo.sandbox._hybrid import by_id_or_self
-from pydo.sandbox.errors import (
-    NotFoundError,
-    SandboxError,
-    SandboxTimeoutError,
-    to_sandbox_error,
-    unwrap,
-    with_response,
-)
+
+from ._transport import call as _call
+from .commands import Commands
+from pydo.sandbox.errors import NotFoundError, SandboxError, SandboxTimeoutError
 from pydo.sandbox.types import (
     SandboxInfo,
     SandboxState,
@@ -49,13 +43,6 @@ def _make_client(token: Optional[str], api_url: Optional[str]) -> Any:
     return Client(resolved, endpoint=url)
 
 
-async def _call(operation, *args, **kwargs) -> Any:
-    try:
-        return unwrap(await operation(*args, cls=with_response, **kwargs))
-    except HttpResponseError as err:
-        raise to_sandbox_error(err) from err
-
-
 class Sandbox:
     """A DigitalOcean Sandbox (async).
 
@@ -68,6 +55,8 @@ class Sandbox:
         self._client = client
         #: The record as last returned by the API. Await :meth:`get_info` to refresh it.
         self.info = info
+        #: Start, list and stream the commands running in this sandbox.
+        self.commands = Commands(client, info.sandbox_id)
 
     def __repr__(self) -> str:
         return "Sandbox(sandbox_id=%r, state=%r)" % (self.sandbox_id, self.state)

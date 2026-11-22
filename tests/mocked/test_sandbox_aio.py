@@ -138,7 +138,7 @@ async def test_list_pages_and_async_for(fake):
     pages = Sandbox.list(limit=1, state="SANDBOX_STATE_RUNNING")
     assert [s.sandbox_id async for s in pages] == ["a", "b"]
     first, second = clients[0].sandboxes.calls
-    assert first[2] == {
+    assert {k: v for k, v in first[2].items() if k != "raw_response_hook"} == {
         "page_size": 1,
         "page_token": None,
         "state": "SANDBOX_STATE_RUNNING",
@@ -198,7 +198,9 @@ async def test_options_are_validated_before_sending(fake):
 
 async def test_async_with_kills_and_closes(fake):
     clients = fake({"create": [(201, {"sandbox": raw("sb-1")})], "delete": [(200, {})]})
-    async with await SandboxClient(token="t").Sandbox.create(template="coding-base") as sb:
+    async with await SandboxClient(token="t").Sandbox.create(
+        template="coding-base"
+    ) as sb:
         assert sb.sandbox_id == "sb-1"
     assert clients[0].sandboxes.calls[-1][0] == "delete"
     assert clients[0].closed
