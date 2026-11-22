@@ -23523,6 +23523,178 @@ def build_sandboxes_create_request(**kwargs: Any) -> HttpRequest:
     return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
 
 
+def build_sandboxes_list_templates_request(
+    *, page_size: Optional[int] = None, page_token: Optional[str] = None, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/sandboxes/templates"
+
+    # Construct parameters
+    if page_size is not None:
+        _params["page_size"] = _SERIALIZER.query("page_size", page_size, "int")
+    if page_token is not None:
+        _params["page_token"] = _SERIALIZER.query("page_token", page_token, "str")
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
+
+
+def build_sandboxes_create_template_request(**kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/sandboxes/templates"
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_sandboxes_delete_template_request(
+    template_id: str, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/sandboxes/templates/{template_id}"
+    path_format_arguments = {
+        "template_id": _SERIALIZER.url("template_id", template_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="DELETE", url=_url, headers=_headers, **kwargs)
+
+
+def build_sandboxes_get_template_request(
+    template_id: str, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/sandboxes/templates/{template_id}"
+    path_format_arguments = {
+        "template_id": _SERIALIZER.url("template_id", template_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
+
+
+def build_sandboxes_update_template_request(
+    template_id: str, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/sandboxes/templates/{template_id}"
+    path_format_arguments = {
+        "template_id": _SERIALIZER.url("template_id", template_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="PUT", url=_url, headers=_headers, **kwargs)
+
+
+def build_sandboxes_list_template_builds_request(  # pylint: disable=name-too-long
+    template_id: str,
+    *,
+    page_size: Optional[int] = None,
+    page_token: Optional[str] = None,
+    **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/sandboxes/templates/{template_id}/builds"
+    path_format_arguments = {
+        "template_id": _SERIALIZER.url("template_id", template_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct parameters
+    if page_size is not None:
+        _params["page_size"] = _SERIALIZER.query("page_size", page_size, "int")
+    if page_token is not None:
+        _params["page_token"] = _SERIALIZER.query("page_token", page_token, "str")
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
+
+
+def build_sandboxes_get_template_build_request(  # pylint: disable=name-too-long
+    template_id: str, build_id: str, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/sandboxes/templates/{template_id}/builds/{build_id}"
+    path_format_arguments = {
+        "template_id": _SERIALIZER.url("template_id", template_id, "str"),
+        "build_id": _SERIALIZER.url("build_id", build_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
+
+
 def build_sandboxes_delete_request(sandbox_id: str, **kwargs: Any) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
 
@@ -276112,6 +276284,1520 @@ class SandboxesOperations:
                 deserialized = None
 
         if response.status_code == 429:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def list_templates(
+        self,
+        *,
+        page_size: Optional[int] = None,
+        page_token: Optional[str] = None,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Templates.
+
+        List your team's custom templates. Global base templates are not included;
+        pass them by name on sandbox create.
+
+        :keyword page_size: The maximum number of sandboxes to return. Default value is None.
+        :paramtype page_size: int
+        :keyword page_token: The ``next_page_token`` of the previous page. Empty starts from the
+         beginning. Default value is None.
+        :paramtype page_token: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "next_page_token": "str",  # Optional. The token for the next page. Empty on
+                      the last page.
+                    "templates": [
+                        {
+                            "name": "str",  # The template name. Required.
+                            "status": "TEMPLATE_STATUS_UNSPECIFIED",  # Default value is
+                              "TEMPLATE_STATUS_UNSPECIFIED". The product status of a team custom
+                              template. Known values are: "TEMPLATE_STATUS_UNSPECIFIED",
+                              "TEMPLATE_STATUS_PENDING", "TEMPLATE_STATUS_BUILDING",
+                              "TEMPLATE_STATUS_READY", and "TEMPLATE_STATUS_FAILED".
+                            "template_id": "str",  # The unique ID of the template.
+                              Required.
+                            "created_at": "2020-02-20 00:00:00",  # Optional. The time
+                              the template was created, in ISO 8601 format.
+                            "spec": {
+                                "base_template": "str",  # Optional. Accepted base
+                                  template key (for example ``coding-base``"" ).
+                                "image": {
+                                    "digest": "str",  # Optional. When set,
+                                      preferred over tag for pulls.
+                                    "registry": "str",  # Optional. Identifies a
+                                      customer OCI image. Auth for private DOCR images is resolved
+                                      server-side from the caller's team.
+                                    "repository": "str",  # Optional. Identifies
+                                      a customer OCI image. Auth for private DOCR images is resolved
+                                      server-side from the caller's team.
+                                    "tag": "str"  # Optional. Identifies a
+                                      customer OCI image. Auth for private DOCR images is resolved
+                                      server-side from the caller's team.
+                                }
+                            },
+                            "updated_at": "2020-02-20 00:00:00"  # Optional. The time the
+                              template was last updated, in ISO 8601 format.
+                        }
+                    ]
+                }
+                # response body for status code(s): 403
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_sandboxes_list_templates_request(
+            page_size=page_size,
+            page_token=page_token,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 403]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    def create_template(
+        self, body: JSON, *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Template.
+
+        Create a team custom template by rebasing a customer OCI image onto an
+        accepted base template. Kicks an asynchronous build; poll get template /
+        list template builds. CPU and memory are chosen at sandbox create via
+        ``size_slug``\\ , not at build time. There is no fluent build-step DSL or
+        Dockerfile API.
+
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "base_template": "str",  # Accepted base template key to rebase onto (for
+                      example ``coding-base``"" ). Required.
+                    "name": "str",  # Template name. Must not collide with a global base template
+                      name. Required.
+                    "source_oci_ref": "str"  # Customer OCI image reference (""
+                      ``registry/repository:tag`` or ``@digest``"" ). Equivalent to E2B ``fromImage``""
+                      ; parsed into an image source server-side. Required.
+                }
+
+                # response body for status code(s): 200, 201
+                response == {
+                    "template": {
+                        "name": "str",  # The template name. Required.
+                        "status": "TEMPLATE_STATUS_UNSPECIFIED",  # Default value is
+                          "TEMPLATE_STATUS_UNSPECIFIED". The product status of a team custom template.
+                          Known values are: "TEMPLATE_STATUS_UNSPECIFIED", "TEMPLATE_STATUS_PENDING",
+                          "TEMPLATE_STATUS_BUILDING", "TEMPLATE_STATUS_READY", and
+                          "TEMPLATE_STATUS_FAILED".
+                        "template_id": "str",  # The unique ID of the template. Required.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. The time the
+                          template was created, in ISO 8601 format.
+                        "spec": {
+                            "base_template": "str",  # Optional. Accepted base template
+                              key (for example ``coding-base``"" ).
+                            "image": {
+                                "digest": "str",  # Optional. When set, preferred
+                                  over tag for pulls.
+                                "registry": "str",  # Optional. Identifies a customer
+                                  OCI image. Auth for private DOCR images is resolved server-side from
+                                  the caller's team.
+                                "repository": "str",  # Optional. Identifies a
+                                  customer OCI image. Auth for private DOCR images is resolved
+                                  server-side from the caller's team.
+                                "tag": "str"  # Optional. Identifies a customer OCI
+                                  image. Auth for private DOCR images is resolved server-side from the
+                                  caller's team.
+                            }
+                        },
+                        "updated_at": "2020-02-20 00:00:00"  # Optional. The time the
+                          template was last updated, in ISO 8601 format.
+                    }
+                }
+                # response body for status code(s): 400, 403, 409, 422
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+
+    @overload
+    def create_template(
+        self, body: IO[bytes], *, content_type: str = "application/json", **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Template.
+
+        Create a team custom template by rebasing a customer OCI image onto an
+        accepted base template. Kicks an asynchronous build; poll get template /
+        list template builds. CPU and memory are chosen at sandbox create via
+        ``size_slug``\\ , not at build time. There is no fluent build-step DSL or
+        Dockerfile API.
+
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200, 201
+                response == {
+                    "template": {
+                        "name": "str",  # The template name. Required.
+                        "status": "TEMPLATE_STATUS_UNSPECIFIED",  # Default value is
+                          "TEMPLATE_STATUS_UNSPECIFIED". The product status of a team custom template.
+                          Known values are: "TEMPLATE_STATUS_UNSPECIFIED", "TEMPLATE_STATUS_PENDING",
+                          "TEMPLATE_STATUS_BUILDING", "TEMPLATE_STATUS_READY", and
+                          "TEMPLATE_STATUS_FAILED".
+                        "template_id": "str",  # The unique ID of the template. Required.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. The time the
+                          template was created, in ISO 8601 format.
+                        "spec": {
+                            "base_template": "str",  # Optional. Accepted base template
+                              key (for example ``coding-base``"" ).
+                            "image": {
+                                "digest": "str",  # Optional. When set, preferred
+                                  over tag for pulls.
+                                "registry": "str",  # Optional. Identifies a customer
+                                  OCI image. Auth for private DOCR images is resolved server-side from
+                                  the caller's team.
+                                "repository": "str",  # Optional. Identifies a
+                                  customer OCI image. Auth for private DOCR images is resolved
+                                  server-side from the caller's team.
+                                "tag": "str"  # Optional. Identifies a customer OCI
+                                  image. Auth for private DOCR images is resolved server-side from the
+                                  caller's team.
+                            }
+                        },
+                        "updated_at": "2020-02-20 00:00:00"  # Optional. The time the
+                          template was last updated, in ISO 8601 format.
+                    }
+                }
+                # response body for status code(s): 400, 403, 409, 422
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+
+    @distributed_trace
+    def create_template(self, body: Union[JSON, IO[bytes]], **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Template.
+
+        Create a team custom template by rebasing a customer OCI image onto an
+        accepted base template. Kicks an asynchronous build; poll get template /
+        list template builds. CPU and memory are chosen at sandbox create via
+        ``size_slug``\\ , not at build time. There is no fluent build-step DSL or
+        Dockerfile API.
+
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "base_template": "str",  # Accepted base template key to rebase onto (for
+                      example ``coding-base``"" ). Required.
+                    "name": "str",  # Template name. Must not collide with a global base template
+                      name. Required.
+                    "source_oci_ref": "str"  # Customer OCI image reference (""
+                      ``registry/repository:tag`` or ``@digest``"" ). Equivalent to E2B ``fromImage``""
+                      ; parsed into an image source server-side. Required.
+                }
+
+                # response body for status code(s): 200, 201
+                response == {
+                    "template": {
+                        "name": "str",  # The template name. Required.
+                        "status": "TEMPLATE_STATUS_UNSPECIFIED",  # Default value is
+                          "TEMPLATE_STATUS_UNSPECIFIED". The product status of a team custom template.
+                          Known values are: "TEMPLATE_STATUS_UNSPECIFIED", "TEMPLATE_STATUS_PENDING",
+                          "TEMPLATE_STATUS_BUILDING", "TEMPLATE_STATUS_READY", and
+                          "TEMPLATE_STATUS_FAILED".
+                        "template_id": "str",  # The unique ID of the template. Required.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. The time the
+                          template was created, in ISO 8601 format.
+                        "spec": {
+                            "base_template": "str",  # Optional. Accepted base template
+                              key (for example ``coding-base``"" ).
+                            "image": {
+                                "digest": "str",  # Optional. When set, preferred
+                                  over tag for pulls.
+                                "registry": "str",  # Optional. Identifies a customer
+                                  OCI image. Auth for private DOCR images is resolved server-side from
+                                  the caller's team.
+                                "repository": "str",  # Optional. Identifies a
+                                  customer OCI image. Auth for private DOCR images is resolved
+                                  server-side from the caller's team.
+                                "tag": "str"  # Optional. Identifies a customer OCI
+                                  image. Auth for private DOCR images is resolved server-side from the
+                                  caller's team.
+                            }
+                        },
+                        "updated_at": "2020-02-20 00:00:00"  # Optional. The time the
+                          template was last updated, in ISO 8601 format.
+                    }
+                }
+                # response body for status code(s): 400, 403, 409, 422
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_sandboxes_create_template_request(
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 201, 400, 403, 409, 422]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 201:
+            response_headers["Location"] = self._deserialize(
+                "str", response.headers.get("Location")
+            )
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 422:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def delete_template(self, template_id: str, **kwargs: Any) -> JSON:
+        """Delete a Template.
+
+        Delete a team custom template.
+
+        :param template_id: The unique ID of the template. Required.
+        :type template_id: str
+        :return: JSON or JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 403, 404
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_sandboxes_delete_template_request(
+            template_id=template_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 403, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def get_template(self, template_id: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve a Template.
+
+        Retrieve a team custom template by ID. The template must belong to your team.
+
+        :param template_id: The unique ID of the template. Required.
+        :type template_id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "template": {
+                        "name": "str",  # The template name. Required.
+                        "status": "TEMPLATE_STATUS_UNSPECIFIED",  # Default value is
+                          "TEMPLATE_STATUS_UNSPECIFIED". The product status of a team custom template.
+                          Known values are: "TEMPLATE_STATUS_UNSPECIFIED", "TEMPLATE_STATUS_PENDING",
+                          "TEMPLATE_STATUS_BUILDING", "TEMPLATE_STATUS_READY", and
+                          "TEMPLATE_STATUS_FAILED".
+                        "template_id": "str",  # The unique ID of the template. Required.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. The time the
+                          template was created, in ISO 8601 format.
+                        "spec": {
+                            "base_template": "str",  # Optional. Accepted base template
+                              key (for example ``coding-base``"" ).
+                            "image": {
+                                "digest": "str",  # Optional. When set, preferred
+                                  over tag for pulls.
+                                "registry": "str",  # Optional. Identifies a customer
+                                  OCI image. Auth for private DOCR images is resolved server-side from
+                                  the caller's team.
+                                "repository": "str",  # Optional. Identifies a
+                                  customer OCI image. Auth for private DOCR images is resolved
+                                  server-side from the caller's team.
+                                "tag": "str"  # Optional. Identifies a customer OCI
+                                  image. Auth for private DOCR images is resolved server-side from the
+                                  caller's team.
+                            }
+                        },
+                        "updated_at": "2020-02-20 00:00:00"  # Optional. The time the
+                          template was last updated, in ISO 8601 format.
+                    }
+                }
+                # response body for status code(s): 403, 404
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_sandboxes_get_template_request(
+            template_id=template_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 403, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    def update_template(
+        self,
+        template_id: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update a Template.
+
+        Update a team custom template's ``base_template`` and/or ``source_oci_ref`` and
+        kick a new build. Omitted fields keep their previous values.
+
+        :param template_id: The unique ID of the template. Required.
+        :type template_id: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "base_template": "str",  # Optional. When set, replaces the stored base
+                      template for the next build.
+                    "source_oci_ref": "str"  # Optional. When set, replaces the customer image
+                      for the next build.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "template": {
+                        "name": "str",  # The template name. Required.
+                        "status": "TEMPLATE_STATUS_UNSPECIFIED",  # Default value is
+                          "TEMPLATE_STATUS_UNSPECIFIED". The product status of a team custom template.
+                          Known values are: "TEMPLATE_STATUS_UNSPECIFIED", "TEMPLATE_STATUS_PENDING",
+                          "TEMPLATE_STATUS_BUILDING", "TEMPLATE_STATUS_READY", and
+                          "TEMPLATE_STATUS_FAILED".
+                        "template_id": "str",  # The unique ID of the template. Required.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. The time the
+                          template was created, in ISO 8601 format.
+                        "spec": {
+                            "base_template": "str",  # Optional. Accepted base template
+                              key (for example ``coding-base``"" ).
+                            "image": {
+                                "digest": "str",  # Optional. When set, preferred
+                                  over tag for pulls.
+                                "registry": "str",  # Optional. Identifies a customer
+                                  OCI image. Auth for private DOCR images is resolved server-side from
+                                  the caller's team.
+                                "repository": "str",  # Optional. Identifies a
+                                  customer OCI image. Auth for private DOCR images is resolved
+                                  server-side from the caller's team.
+                                "tag": "str"  # Optional. Identifies a customer OCI
+                                  image. Auth for private DOCR images is resolved server-side from the
+                                  caller's team.
+                            }
+                        },
+                        "updated_at": "2020-02-20 00:00:00"  # Optional. The time the
+                          template was last updated, in ISO 8601 format.
+                    }
+                }
+                # response body for status code(s): 400, 403, 404, 409, 422
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+
+    @overload
+    def update_template(
+        self,
+        template_id: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update a Template.
+
+        Update a team custom template's ``base_template`` and/or ``source_oci_ref`` and
+        kick a new build. Omitted fields keep their previous values.
+
+        :param template_id: The unique ID of the template. Required.
+        :type template_id: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "template": {
+                        "name": "str",  # The template name. Required.
+                        "status": "TEMPLATE_STATUS_UNSPECIFIED",  # Default value is
+                          "TEMPLATE_STATUS_UNSPECIFIED". The product status of a team custom template.
+                          Known values are: "TEMPLATE_STATUS_UNSPECIFIED", "TEMPLATE_STATUS_PENDING",
+                          "TEMPLATE_STATUS_BUILDING", "TEMPLATE_STATUS_READY", and
+                          "TEMPLATE_STATUS_FAILED".
+                        "template_id": "str",  # The unique ID of the template. Required.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. The time the
+                          template was created, in ISO 8601 format.
+                        "spec": {
+                            "base_template": "str",  # Optional. Accepted base template
+                              key (for example ``coding-base``"" ).
+                            "image": {
+                                "digest": "str",  # Optional. When set, preferred
+                                  over tag for pulls.
+                                "registry": "str",  # Optional. Identifies a customer
+                                  OCI image. Auth for private DOCR images is resolved server-side from
+                                  the caller's team.
+                                "repository": "str",  # Optional. Identifies a
+                                  customer OCI image. Auth for private DOCR images is resolved
+                                  server-side from the caller's team.
+                                "tag": "str"  # Optional. Identifies a customer OCI
+                                  image. Auth for private DOCR images is resolved server-side from the
+                                  caller's team.
+                            }
+                        },
+                        "updated_at": "2020-02-20 00:00:00"  # Optional. The time the
+                          template was last updated, in ISO 8601 format.
+                    }
+                }
+                # response body for status code(s): 400, 403, 404, 409, 422
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+
+    @distributed_trace
+    def update_template(
+        self, template_id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Update a Template.
+
+        Update a team custom template's ``base_template`` and/or ``source_oci_ref`` and
+        kick a new build. Omitted fields keep their previous values.
+
+        :param template_id: The unique ID of the template. Required.
+        :type template_id: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "base_template": "str",  # Optional. When set, replaces the stored base
+                      template for the next build.
+                    "source_oci_ref": "str"  # Optional. When set, replaces the customer image
+                      for the next build.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "template": {
+                        "name": "str",  # The template name. Required.
+                        "status": "TEMPLATE_STATUS_UNSPECIFIED",  # Default value is
+                          "TEMPLATE_STATUS_UNSPECIFIED". The product status of a team custom template.
+                          Known values are: "TEMPLATE_STATUS_UNSPECIFIED", "TEMPLATE_STATUS_PENDING",
+                          "TEMPLATE_STATUS_BUILDING", "TEMPLATE_STATUS_READY", and
+                          "TEMPLATE_STATUS_FAILED".
+                        "template_id": "str",  # The unique ID of the template. Required.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. The time the
+                          template was created, in ISO 8601 format.
+                        "spec": {
+                            "base_template": "str",  # Optional. Accepted base template
+                              key (for example ``coding-base``"" ).
+                            "image": {
+                                "digest": "str",  # Optional. When set, preferred
+                                  over tag for pulls.
+                                "registry": "str",  # Optional. Identifies a customer
+                                  OCI image. Auth for private DOCR images is resolved server-side from
+                                  the caller's team.
+                                "repository": "str",  # Optional. Identifies a
+                                  customer OCI image. Auth for private DOCR images is resolved
+                                  server-side from the caller's team.
+                                "tag": "str"  # Optional. Identifies a customer OCI
+                                  image. Auth for private DOCR images is resolved server-side from the
+                                  caller's team.
+                            }
+                        },
+                        "updated_at": "2020-02-20 00:00:00"  # Optional. The time the
+                          template was last updated, in ISO 8601 format.
+                    }
+                }
+                # response body for status code(s): 400, 403, 404, 409, 422
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_sandboxes_update_template_request(
+            template_id=template_id,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404, 409, 422]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 422:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def list_template_builds(
+        self,
+        template_id: str,
+        *,
+        page_size: Optional[int] = None,
+        page_token: Optional[str] = None,
+        **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Template Builds.
+
+        List builds for a team custom template.
+
+        :param template_id: The unique ID of the template. Required.
+        :type template_id: str
+        :keyword page_size: The maximum number of sandboxes to return. Default value is None.
+        :paramtype page_size: int
+        :keyword page_token: The ``next_page_token`` of the previous page. Empty starts from the
+         beginning. Default value is None.
+        :paramtype page_token: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "builds": [
+                        {
+                            "build_id": "str",  # The unique ID of the build. Required.
+                            "status": "TEMPLATE_BUILD_STATUS_UNSPECIFIED",  # Default
+                              value is "TEMPLATE_BUILD_STATUS_UNSPECIFIED". The status of a single
+                              rebase build. Known values are: "TEMPLATE_BUILD_STATUS_UNSPECIFIED",
+                              "TEMPLATE_BUILD_STATUS_PENDING", "TEMPLATE_BUILD_STATUS_BUILDING",
+                              "TEMPLATE_BUILD_STATUS_SUCCEEDED", and "TEMPLATE_BUILD_STATUS_FAILED".
+                            "template_id": "str",  # The unique ID of the template.
+                              Required.
+                            "created_at": "2020-02-20 00:00:00",  # Optional. The time
+                              the build was created, in ISO 8601 format.
+                            "error": "str",  # Optional. An error message when the build
+                              failed.
+                            "name": "str",  # Optional. The template name at the time of
+                              the build.
+                            "spec": {
+                                "base_template": "str",  # Optional. Accepted base
+                                  template key (for example ``coding-base``"" ).
+                                "image": {
+                                    "digest": "str",  # Optional. When set,
+                                      preferred over tag for pulls.
+                                    "registry": "str",  # Optional. Identifies a
+                                      customer OCI image. Auth for private DOCR images is resolved
+                                      server-side from the caller's team.
+                                    "repository": "str",  # Optional. Identifies
+                                      a customer OCI image. Auth for private DOCR images is resolved
+                                      server-side from the caller's team.
+                                    "tag": "str"  # Optional. Identifies a
+                                      customer OCI image. Auth for private DOCR images is resolved
+                                      server-side from the caller's team.
+                                }
+                            },
+                            "updated_at": "2020-02-20 00:00:00"  # Optional. The time the
+                              build was last updated, in ISO 8601 format.
+                        }
+                    ],
+                    "next_page_token": "str"  # Optional. The token for the next page. Empty on
+                      the last page.
+                }
+                # response body for status code(s): 403, 404
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_sandboxes_list_template_builds_request(
+            template_id=template_id,
+            page_size=page_size,
+            page_token=page_token,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 403, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def get_template_build(
+        self, template_id: str, build_id: str, **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve a Template Build.
+
+        Retrieve a build for a team custom template.
+
+        :param template_id: The unique ID of the template. Required.
+        :type template_id: str
+        :param build_id: The unique ID of the template build. Required.
+        :type build_id: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "build": {
+                        "build_id": "str",  # The unique ID of the build. Required.
+                        "status": "TEMPLATE_BUILD_STATUS_UNSPECIFIED",  # Default value is
+                          "TEMPLATE_BUILD_STATUS_UNSPECIFIED". The status of a single rebase build.
+                          Known values are: "TEMPLATE_BUILD_STATUS_UNSPECIFIED",
+                          "TEMPLATE_BUILD_STATUS_PENDING", "TEMPLATE_BUILD_STATUS_BUILDING",
+                          "TEMPLATE_BUILD_STATUS_SUCCEEDED", and "TEMPLATE_BUILD_STATUS_FAILED".
+                        "template_id": "str",  # The unique ID of the template. Required.
+                        "created_at": "2020-02-20 00:00:00",  # Optional. The time the build
+                          was created, in ISO 8601 format.
+                        "error": "str",  # Optional. An error message when the build failed.
+                        "name": "str",  # Optional. The template name at the time of the
+                          build.
+                        "spec": {
+                            "base_template": "str",  # Optional. Accepted base template
+                              key (for example ``coding-base``"" ).
+                            "image": {
+                                "digest": "str",  # Optional. When set, preferred
+                                  over tag for pulls.
+                                "registry": "str",  # Optional. Identifies a customer
+                                  OCI image. Auth for private DOCR images is resolved server-side from
+                                  the caller's team.
+                                "repository": "str",  # Optional. Identifies a
+                                  customer OCI image. Auth for private DOCR images is resolved
+                                  server-side from the caller's team.
+                                "tag": "str"  # Optional. Identifies a customer OCI
+                                  image. Auth for private DOCR images is resolved server-side from the
+                                  caller's team.
+                            }
+                        },
+                        "updated_at": "2020-02-20 00:00:00"  # Optional. The time the build
+                          was last updated, in ISO 8601 format.
+                    }
+                }
+                # response body for status code(s): 403, 404
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_sandboxes_get_template_build_request(
+            template_id=template_id,
+            build_id=build_id,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 403, 404]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
             response_headers["ratelimit-limit"] = self._deserialize(
                 "int", response.headers.get("ratelimit-limit")
             )

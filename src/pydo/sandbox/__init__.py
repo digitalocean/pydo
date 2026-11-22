@@ -22,6 +22,8 @@ The async twin is :mod:`pydo.aio.sandbox`.
 from ._commands import CommandEvent, CommandInfo, CommandResult
 from .client import SandboxClient
 from .commands import Command, Commands
+from ._templates import ImageSource, TemplateBuildInfo, TemplateInfo, TemplateStatus
+from .templates import Pages, Template
 from .errors import (
     AuthenticationError,
     ConflictError,
@@ -43,6 +45,12 @@ __all__ = [
     "CommandInfo",
     "CommandResult",
     "Commands",
+    "ImageSource",
+    "Pages",
+    "Template",
+    "TemplateBuildInfo",
+    "TemplateInfo",
+    "TemplateStatus",
     "ConflictError",
     "DEFAULT_SIZE",
     "DEFAULT_TEMPLATE",

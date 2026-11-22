@@ -236,6 +236,26 @@ running = sandbox.commands.list()                    # [CommandInfo(pid, cmd, cw
 sandbox.commands.connect(running[0].pid).kill()      # SIGTERM; kill("SIGKILL") to force
 ```
 
+Build and manage custom templates:
+
+```python
+from pydo.sandbox import Template
+
+# Build a template from an OCI image (rebased onto a base template, coding-base by default)
+template = Template.create(name="my-template",
+                           source_oci_ref="registry.digitalocean.com/my-team/my-image:v1")
+template.wait_until_ready()                  # the build is asynchronous; raises if it fails
+sandbox = Sandbox.create(template=template.name)
+
+for t in Template.list():
+    print(t.template_id, t.name, t.status)
+template.update(source_oci_ref="registry.digitalocean.com/my-team/my-image:v2")  # starts a new build
+builds = template.builds().next_items()      # [TemplateBuildInfo(build_id, status, error, ...)]
+template.delete()                            # False if it is already gone; Template.delete(id) works too
+```
+
+Global base templates are not listed: pass them by name to `Sandbox.create`. The async `Template` is in `pydo.aio.sandbox`.
+
 The async version has the same names: `await sandbox.commands.run(...)` and `async for event in cmd.stream()`. Output can only be read while a command runs: a command that exits before the stream attaches raises `NotFoundError`. File transfer is not available yet: it needs routes that are not in the API.
 
 ## **AI & Inference**

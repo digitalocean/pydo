@@ -24,6 +24,13 @@ from pydo.sandbox.types import DEFAULT_SIZE, DEFAULT_TEMPLATE, SandboxInfo, Sand
 
 from .client import SandboxClient
 from .commands import Command, Commands
+from pydo.sandbox._templates import (
+    ImageSource,
+    TemplateBuildInfo,
+    TemplateInfo,
+    TemplateStatus,
+)
+from .templates import Pages, Template
 from .sandbox import Sandbox, SandboxPaginator
 
 __all__ = [
@@ -33,6 +40,12 @@ __all__ = [
     "CommandInfo",
     "CommandResult",
     "Commands",
+    "ImageSource",
+    "Pages",
+    "Template",
+    "TemplateBuildInfo",
+    "TemplateInfo",
+    "TemplateStatus",
     "ConflictError",
     "DEFAULT_SIZE",
     "DEFAULT_TEMPLATE",
