@@ -621,6 +621,7 @@ from ...operations._operations import (
     build_microvms_get_console_request,
     build_microvms_get_file_request,
     build_microvms_get_options_request,
+    build_microvms_get_port_forward_request,
     build_microvms_get_request,
     build_microvms_list_request,
     build_microvms_post_pause_request,
@@ -30761,6 +30762,23 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               "AGENT_KIND_HERMES", "AGENT_KIND_OPENAI_CODEX", "AGENT_KIND_LANGGRAPH",
                               and "AGENT_KIND_CREWAI".
                             "config_diff": {
+                                "egress": {
+                                    "added": [
+                                        "str"  # Optional. The hosts and IP
+                                          addresses an ``egress`` change added or removed, and the new
+                                          egress mode when it changed. Omitted when the egress policy
+                                          is unchanged.
+                                    ],
+                                    "mode": "str",  # Optional. The new egress
+                                      mode. Present only when the mode changed. Known values are:
+                                      "allowlist", "unrestricted", and "deny_all".
+                                    "removed": [
+                                        "str"  # Optional. The hosts and IP
+                                          addresses an ``egress`` change added or removed, and the new
+                                          egress mode when it changed. Omitted when the egress policy
+                                          is unchanged.
+                                    ]
+                                },
                                 "env": {
                                     "added": [
                                         "str"  # Optional. Names of the
@@ -30777,16 +30795,25 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 },
                                 "secrets": {
                                     "added": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ]
                                 },
                                 "tools": {
@@ -30895,6 +30922,23 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               "SESSION_STATUS_LOCKED".
                             "update": {
                                 "changes": {
+                                    "egress": {
+                                        "added": [
+                                            "str"  # Optional. The hosts
+                                              and IP addresses an ``egress`` change added or removed,
+                                              and the new egress mode when it changed. Omitted when the
+                                              egress policy is unchanged.
+                                        ],
+                                        "mode": "str",  # Optional. The new
+                                          egress mode. Present only when the mode changed. Known values
+                                          are: "allowlist", "unrestricted", and "deny_all".
+                                        "removed": [
+                                            "str"  # Optional. The hosts
+                                              and IP addresses an ``egress`` change added or removed,
+                                              and the new egress mode when it changed. Omitted when the
+                                              egress policy is unchanged.
+                                        ]
+                                    },
                                     "env": {
                                         "added": [
                                             "str"  # Optional. Names of
@@ -30914,19 +30958,28 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     },
                                     "secrets": {
                                         "added": [
-                                            "str"  # Optional. Names of
-                                              the entries added, removed, or changed in one manifest
-                                              section.
+                                            "str"  # Optional. Secret
+                                              names, never values. On an update, ``changed`` lists the
+                                              secrets that got a new value or were bound to another URL
+                                              or scheme. On ``config_diff``"" , ``changed`` lists only
+                                              the secrets bound to a different URL or scheme than in
+                                              the agent config.
                                         ],
                                         "changed": [
-                                            "str"  # Optional. Names of
-                                              the entries added, removed, or changed in one manifest
-                                              section.
+                                            "str"  # Optional. Secret
+                                              names, never values. On an update, ``changed`` lists the
+                                              secrets that got a new value or were bound to another URL
+                                              or scheme. On ``config_diff``"" , ``changed`` lists only
+                                              the secrets bound to a different URL or scheme than in
+                                              the agent config.
                                         ],
                                         "removed": [
-                                            "str"  # Optional. Names of
-                                              the entries added, removed, or changed in one manifest
-                                              section.
+                                            "str"  # Optional. Secret
+                                              names, never values. On an update, ``changed`` lists the
+                                              secrets that got a new value or were bound to another URL
+                                              or scheme. On ``config_diff``"" , ``changed`` lists only
+                                              the secrets bound to a different URL or scheme than in
+                                              the agent config.
                                         ]
                                     },
                                     "tools": {
@@ -30976,7 +31029,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "state": "str",  # Optional. State of a session
                                   settings update. `APPLYING`: in progress. `APPLIED`: live.
                                   `APPLIED_RESTARTED`: live, and the agent was restarted to apply it
-                                  (`env` and `secrets` changes). `FAILED`: the update did not take
+                                  (`env` and plain secret changes). `FAILED`: the update did not take
                                   effect; see ``reverted`` and ``detail``. Known values are:
                                   "APPLYING", "APPLIED", "APPLIED_RESTARTED", and "FAILED".
                                 "update_id": "str",  # Optional. The most recent
@@ -31320,6 +31373,23 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               "AGENT_KIND_HERMES", "AGENT_KIND_OPENAI_CODEX", "AGENT_KIND_LANGGRAPH",
                               and "AGENT_KIND_CREWAI".
                             "config_diff": {
+                                "egress": {
+                                    "added": [
+                                        "str"  # Optional. The hosts and IP
+                                          addresses an ``egress`` change added or removed, and the new
+                                          egress mode when it changed. Omitted when the egress policy
+                                          is unchanged.
+                                    ],
+                                    "mode": "str",  # Optional. The new egress
+                                      mode. Present only when the mode changed. Known values are:
+                                      "allowlist", "unrestricted", and "deny_all".
+                                    "removed": [
+                                        "str"  # Optional. The hosts and IP
+                                          addresses an ``egress`` change added or removed, and the new
+                                          egress mode when it changed. Omitted when the egress policy
+                                          is unchanged.
+                                    ]
+                                },
                                 "env": {
                                     "added": [
                                         "str"  # Optional. Names of the
@@ -31336,16 +31406,25 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 },
                                 "secrets": {
                                     "added": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ]
                                 },
                                 "tools": {
@@ -31454,6 +31533,23 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               "SESSION_STATUS_LOCKED".
                             "update": {
                                 "changes": {
+                                    "egress": {
+                                        "added": [
+                                            "str"  # Optional. The hosts
+                                              and IP addresses an ``egress`` change added or removed,
+                                              and the new egress mode when it changed. Omitted when the
+                                              egress policy is unchanged.
+                                        ],
+                                        "mode": "str",  # Optional. The new
+                                          egress mode. Present only when the mode changed. Known values
+                                          are: "allowlist", "unrestricted", and "deny_all".
+                                        "removed": [
+                                            "str"  # Optional. The hosts
+                                              and IP addresses an ``egress`` change added or removed,
+                                              and the new egress mode when it changed. Omitted when the
+                                              egress policy is unchanged.
+                                        ]
+                                    },
                                     "env": {
                                         "added": [
                                             "str"  # Optional. Names of
@@ -31473,19 +31569,28 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     },
                                     "secrets": {
                                         "added": [
-                                            "str"  # Optional. Names of
-                                              the entries added, removed, or changed in one manifest
-                                              section.
+                                            "str"  # Optional. Secret
+                                              names, never values. On an update, ``changed`` lists the
+                                              secrets that got a new value or were bound to another URL
+                                              or scheme. On ``config_diff``"" , ``changed`` lists only
+                                              the secrets bound to a different URL or scheme than in
+                                              the agent config.
                                         ],
                                         "changed": [
-                                            "str"  # Optional. Names of
-                                              the entries added, removed, or changed in one manifest
-                                              section.
+                                            "str"  # Optional. Secret
+                                              names, never values. On an update, ``changed`` lists the
+                                              secrets that got a new value or were bound to another URL
+                                              or scheme. On ``config_diff``"" , ``changed`` lists only
+                                              the secrets bound to a different URL or scheme than in
+                                              the agent config.
                                         ],
                                         "removed": [
-                                            "str"  # Optional. Names of
-                                              the entries added, removed, or changed in one manifest
-                                              section.
+                                            "str"  # Optional. Secret
+                                              names, never values. On an update, ``changed`` lists the
+                                              secrets that got a new value or were bound to another URL
+                                              or scheme. On ``config_diff``"" , ``changed`` lists only
+                                              the secrets bound to a different URL or scheme than in
+                                              the agent config.
                                         ]
                                     },
                                     "tools": {
@@ -31535,7 +31640,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "state": "str",  # Optional. State of a session
                                   settings update. `APPLYING`: in progress. `APPLIED`: live.
                                   `APPLIED_RESTARTED`: live, and the agent was restarted to apply it
-                                  (`env` and `secrets` changes). `FAILED`: the update did not take
+                                  (`env` and plain secret changes). `FAILED`: the update did not take
                                   effect; see ``reverted`` and ``detail``. Known values are:
                                   "APPLYING", "APPLIED", "APPLIED_RESTARTED", and "FAILED".
                                 "update_id": "str",  # Optional. The most recent
@@ -31787,6 +31892,21 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           "AGENT_KIND_CUSTOM", "AGENT_KIND_HERMES", "AGENT_KIND_OPENAI_CODEX",
                           "AGENT_KIND_LANGGRAPH", and "AGENT_KIND_CREWAI".
                         "config_diff": {
+                            "egress": {
+                                "added": [
+                                    "str"  # Optional. The hosts and IP addresses
+                                      an ``egress`` change added or removed, and the new egress mode
+                                      when it changed. Omitted when the egress policy is unchanged.
+                                ],
+                                "mode": "str",  # Optional. The new egress mode.
+                                  Present only when the mode changed. Known values are: "allowlist",
+                                  "unrestricted", and "deny_all".
+                                "removed": [
+                                    "str"  # Optional. The hosts and IP addresses
+                                      an ``egress`` change added or removed, and the new egress mode
+                                      when it changed. Omitted when the egress policy is unchanged.
+                                ]
+                            },
                             "env": {
                                 "added": [
                                     "str"  # Optional. Names of the entries
@@ -31803,16 +31923,25 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             },
                             "secrets": {
                                 "added": [
-                                    "str"  # Optional. Names of the entries
-                                      added, removed, or changed in one manifest section.
+                                    "str"  # Optional. Secret names, never
+                                      values. On an update, ``changed`` lists the secrets that got a
+                                      new value or were bound to another URL or scheme. On
+                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
+                                      different URL or scheme than in the agent config.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Names of the entries
-                                      added, removed, or changed in one manifest section.
+                                    "str"  # Optional. Secret names, never
+                                      values. On an update, ``changed`` lists the secrets that got a
+                                      new value or were bound to another URL or scheme. On
+                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
+                                      different URL or scheme than in the agent config.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Names of the entries
-                                      added, removed, or changed in one manifest section.
+                                    "str"  # Optional. Secret names, never
+                                      values. On an update, ``changed`` lists the secrets that got a
+                                      new value or were bound to another URL or scheme. On
+                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
+                                      different URL or scheme than in the agent config.
                                 ]
                             },
                             "tools": {
@@ -31917,6 +32046,23 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           "SESSION_STATUS_ALL", and "SESSION_STATUS_LOCKED".
                         "update": {
                             "changes": {
+                                "egress": {
+                                    "added": [
+                                        "str"  # Optional. The hosts and IP
+                                          addresses an ``egress`` change added or removed, and the new
+                                          egress mode when it changed. Omitted when the egress policy
+                                          is unchanged.
+                                    ],
+                                    "mode": "str",  # Optional. The new egress
+                                      mode. Present only when the mode changed. Known values are:
+                                      "allowlist", "unrestricted", and "deny_all".
+                                    "removed": [
+                                        "str"  # Optional. The hosts and IP
+                                          addresses an ``egress`` change added or removed, and the new
+                                          egress mode when it changed. Omitted when the egress policy
+                                          is unchanged.
+                                    ]
+                                },
                                 "env": {
                                     "added": [
                                         "str"  # Optional. Names of the
@@ -31933,16 +32079,25 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 },
                                 "secrets": {
                                     "added": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ]
                                 },
                                 "tools": {
@@ -31988,7 +32143,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               of a failed one.
                             "state": "str",  # Optional. State of a session settings
                               update. `APPLYING`: in progress. `APPLIED`: live. `APPLIED_RESTARTED`:
-                              live, and the agent was restarted to apply it (`env` and `secrets`
+                              live, and the agent was restarted to apply it (`env` and plain secret
                               changes). `FAILED`: the update did not take effect; see ``reverted`` and
                               ``detail``. Known values are: "APPLYING", "APPLIED", "APPLIED_RESTARTED",
                               and "FAILED".
@@ -32119,6 +32274,21 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           "AGENT_KIND_CUSTOM", "AGENT_KIND_HERMES", "AGENT_KIND_OPENAI_CODEX",
                           "AGENT_KIND_LANGGRAPH", and "AGENT_KIND_CREWAI".
                         "config_diff": {
+                            "egress": {
+                                "added": [
+                                    "str"  # Optional. The hosts and IP addresses
+                                      an ``egress`` change added or removed, and the new egress mode
+                                      when it changed. Omitted when the egress policy is unchanged.
+                                ],
+                                "mode": "str",  # Optional. The new egress mode.
+                                  Present only when the mode changed. Known values are: "allowlist",
+                                  "unrestricted", and "deny_all".
+                                "removed": [
+                                    "str"  # Optional. The hosts and IP addresses
+                                      an ``egress`` change added or removed, and the new egress mode
+                                      when it changed. Omitted when the egress policy is unchanged.
+                                ]
+                            },
                             "env": {
                                 "added": [
                                     "str"  # Optional. Names of the entries
@@ -32135,16 +32305,25 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             },
                             "secrets": {
                                 "added": [
-                                    "str"  # Optional. Names of the entries
-                                      added, removed, or changed in one manifest section.
+                                    "str"  # Optional. Secret names, never
+                                      values. On an update, ``changed`` lists the secrets that got a
+                                      new value or were bound to another URL or scheme. On
+                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
+                                      different URL or scheme than in the agent config.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Names of the entries
-                                      added, removed, or changed in one manifest section.
+                                    "str"  # Optional. Secret names, never
+                                      values. On an update, ``changed`` lists the secrets that got a
+                                      new value or were bound to another URL or scheme. On
+                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
+                                      different URL or scheme than in the agent config.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Names of the entries
-                                      added, removed, or changed in one manifest section.
+                                    "str"  # Optional. Secret names, never
+                                      values. On an update, ``changed`` lists the secrets that got a
+                                      new value or were bound to another URL or scheme. On
+                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
+                                      different URL or scheme than in the agent config.
                                 ]
                             },
                             "tools": {
@@ -32249,6 +32428,23 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           "SESSION_STATUS_ALL", and "SESSION_STATUS_LOCKED".
                         "update": {
                             "changes": {
+                                "egress": {
+                                    "added": [
+                                        "str"  # Optional. The hosts and IP
+                                          addresses an ``egress`` change added or removed, and the new
+                                          egress mode when it changed. Omitted when the egress policy
+                                          is unchanged.
+                                    ],
+                                    "mode": "str",  # Optional. The new egress
+                                      mode. Present only when the mode changed. Known values are:
+                                      "allowlist", "unrestricted", and "deny_all".
+                                    "removed": [
+                                        "str"  # Optional. The hosts and IP
+                                          addresses an ``egress`` change added or removed, and the new
+                                          egress mode when it changed. Omitted when the egress policy
+                                          is unchanged.
+                                    ]
+                                },
                                 "env": {
                                     "added": [
                                         "str"  # Optional. Names of the
@@ -32265,16 +32461,25 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 },
                                 "secrets": {
                                     "added": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ]
                                 },
                                 "tools": {
@@ -32320,7 +32525,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               of a failed one.
                             "state": "str",  # Optional. State of a session settings
                               update. `APPLYING`: in progress. `APPLIED`: live. `APPLIED_RESTARTED`:
-                              live, and the agent was restarted to apply it (`env` and `secrets`
+                              live, and the agent was restarted to apply it (`env` and plain secret
                               changes). `FAILED`: the update did not take effect; see ``reverted`` and
                               ``detail``. Known values are: "APPLYING", "APPLIED", "APPLIED_RESTARTED",
                               and "FAILED".
@@ -32471,6 +32676,21 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           "AGENT_KIND_CUSTOM", "AGENT_KIND_HERMES", "AGENT_KIND_OPENAI_CODEX",
                           "AGENT_KIND_LANGGRAPH", and "AGENT_KIND_CREWAI".
                         "config_diff": {
+                            "egress": {
+                                "added": [
+                                    "str"  # Optional. The hosts and IP addresses
+                                      an ``egress`` change added or removed, and the new egress mode
+                                      when it changed. Omitted when the egress policy is unchanged.
+                                ],
+                                "mode": "str",  # Optional. The new egress mode.
+                                  Present only when the mode changed. Known values are: "allowlist",
+                                  "unrestricted", and "deny_all".
+                                "removed": [
+                                    "str"  # Optional. The hosts and IP addresses
+                                      an ``egress`` change added or removed, and the new egress mode
+                                      when it changed. Omitted when the egress policy is unchanged.
+                                ]
+                            },
                             "env": {
                                 "added": [
                                     "str"  # Optional. Names of the entries
@@ -32487,16 +32707,25 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             },
                             "secrets": {
                                 "added": [
-                                    "str"  # Optional. Names of the entries
-                                      added, removed, or changed in one manifest section.
+                                    "str"  # Optional. Secret names, never
+                                      values. On an update, ``changed`` lists the secrets that got a
+                                      new value or were bound to another URL or scheme. On
+                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
+                                      different URL or scheme than in the agent config.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Names of the entries
-                                      added, removed, or changed in one manifest section.
+                                    "str"  # Optional. Secret names, never
+                                      values. On an update, ``changed`` lists the secrets that got a
+                                      new value or were bound to another URL or scheme. On
+                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
+                                      different URL or scheme than in the agent config.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Names of the entries
-                                      added, removed, or changed in one manifest section.
+                                    "str"  # Optional. Secret names, never
+                                      values. On an update, ``changed`` lists the secrets that got a
+                                      new value or were bound to another URL or scheme. On
+                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
+                                      different URL or scheme than in the agent config.
                                 ]
                             },
                             "tools": {
@@ -32601,6 +32830,23 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           "SESSION_STATUS_ALL", and "SESSION_STATUS_LOCKED".
                         "update": {
                             "changes": {
+                                "egress": {
+                                    "added": [
+                                        "str"  # Optional. The hosts and IP
+                                          addresses an ``egress`` change added or removed, and the new
+                                          egress mode when it changed. Omitted when the egress policy
+                                          is unchanged.
+                                    ],
+                                    "mode": "str",  # Optional. The new egress
+                                      mode. Present only when the mode changed. Known values are:
+                                      "allowlist", "unrestricted", and "deny_all".
+                                    "removed": [
+                                        "str"  # Optional. The hosts and IP
+                                          addresses an ``egress`` change added or removed, and the new
+                                          egress mode when it changed. Omitted when the egress policy
+                                          is unchanged.
+                                    ]
+                                },
                                 "env": {
                                     "added": [
                                         "str"  # Optional. Names of the
@@ -32617,16 +32863,25 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 },
                                 "secrets": {
                                     "added": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ]
                                 },
                                 "tools": {
@@ -32672,7 +32927,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               of a failed one.
                             "state": "str",  # Optional. State of a session settings
                               update. `APPLYING`: in progress. `APPLIED`: live. `APPLIED_RESTARTED`:
-                              live, and the agent was restarted to apply it (`env` and `secrets`
+                              live, and the agent was restarted to apply it (`env` and plain secret
                               changes). `FAILED`: the update did not take effect; see ``reverted`` and
                               ``detail``. Known values are: "APPLYING", "APPLIED", "APPLIED_RESTARTED",
                               and "FAILED".
@@ -33450,6 +33705,21 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           "AGENT_KIND_CUSTOM", "AGENT_KIND_HERMES", "AGENT_KIND_OPENAI_CODEX",
                           "AGENT_KIND_LANGGRAPH", and "AGENT_KIND_CREWAI".
                         "config_diff": {
+                            "egress": {
+                                "added": [
+                                    "str"  # Optional. The hosts and IP addresses
+                                      an ``egress`` change added or removed, and the new egress mode
+                                      when it changed. Omitted when the egress policy is unchanged.
+                                ],
+                                "mode": "str",  # Optional. The new egress mode.
+                                  Present only when the mode changed. Known values are: "allowlist",
+                                  "unrestricted", and "deny_all".
+                                "removed": [
+                                    "str"  # Optional. The hosts and IP addresses
+                                      an ``egress`` change added or removed, and the new egress mode
+                                      when it changed. Omitted when the egress policy is unchanged.
+                                ]
+                            },
                             "env": {
                                 "added": [
                                     "str"  # Optional. Names of the entries
@@ -33466,16 +33736,25 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             },
                             "secrets": {
                                 "added": [
-                                    "str"  # Optional. Names of the entries
-                                      added, removed, or changed in one manifest section.
+                                    "str"  # Optional. Secret names, never
+                                      values. On an update, ``changed`` lists the secrets that got a
+                                      new value or were bound to another URL or scheme. On
+                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
+                                      different URL or scheme than in the agent config.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Names of the entries
-                                      added, removed, or changed in one manifest section.
+                                    "str"  # Optional. Secret names, never
+                                      values. On an update, ``changed`` lists the secrets that got a
+                                      new value or were bound to another URL or scheme. On
+                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
+                                      different URL or scheme than in the agent config.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Names of the entries
-                                      added, removed, or changed in one manifest section.
+                                    "str"  # Optional. Secret names, never
+                                      values. On an update, ``changed`` lists the secrets that got a
+                                      new value or were bound to another URL or scheme. On
+                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
+                                      different URL or scheme than in the agent config.
                                 ]
                             },
                             "tools": {
@@ -33580,6 +33859,23 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           "SESSION_STATUS_ALL", and "SESSION_STATUS_LOCKED".
                         "update": {
                             "changes": {
+                                "egress": {
+                                    "added": [
+                                        "str"  # Optional. The hosts and IP
+                                          addresses an ``egress`` change added or removed, and the new
+                                          egress mode when it changed. Omitted when the egress policy
+                                          is unchanged.
+                                    ],
+                                    "mode": "str",  # Optional. The new egress
+                                      mode. Present only when the mode changed. Known values are:
+                                      "allowlist", "unrestricted", and "deny_all".
+                                    "removed": [
+                                        "str"  # Optional. The hosts and IP
+                                          addresses an ``egress`` change added or removed, and the new
+                                          egress mode when it changed. Omitted when the egress policy
+                                          is unchanged.
+                                    ]
+                                },
                                 "env": {
                                     "added": [
                                         "str"  # Optional. Names of the
@@ -33596,16 +33892,25 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 },
                                 "secrets": {
                                     "added": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ]
                                 },
                                 "tools": {
@@ -33651,7 +33956,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               of a failed one.
                             "state": "str",  # Optional. State of a session settings
                               update. `APPLYING`: in progress. `APPLIED`: live. `APPLIED_RESTARTED`:
-                              live, and the agent was restarted to apply it (`env` and `secrets`
+                              live, and the agent was restarted to apply it (`env` and plain secret
                               changes). `FAILED`: the update did not take effect; see ``reverted`` and
                               ``detail``. Known values are: "APPLYING", "APPLIED", "APPLIED_RESTARTED",
                               and "FAILED".
@@ -33844,23 +34149,84 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
            * - ``env.HARNESS_INFERENCE_MODEL``
              - The model, for sessions that use DigitalOcean Serverless Inference.
              - Yes
+           * - ``env.MODEL``\\ , ``env.OPENAI_MODEL``\\ , ``env.ANTHROPIC_MODEL``
+             - The model, for sessions that use their own OpenAI-compatible or Anthropic endpoint.
+             - Yes
            * - ``secrets``
              - Plain secrets (name and value).
              - Yes
+           * - ``secrets`` (URL-bound)
+             - URL-bound secrets: value, ``url``\\ , and ``scheme``.
+             - No
+           * - ``egress``
+             - The hosts and IP addresses the session can reach (\\ ``allow_hosts`` and ``allow_ips``\\
+        ).
+             - No
 
 
         Sections you omit are not changed. Each section you include replaces that section in full; see
         ``manifest_yaml`` for the exact rules.
 
-        The only way to change a session's model is to set ``HARNESS_INFERENCE_MODEL`` in ``env``. This
-        works only for sessions that were created with a DigitalOcean Serverless Inference model;
-        sessions that use a third-party model provider can't change their model. A top-level ``model``
-        section returns ``400``.
+        Changing the model
+        ^^^^^^^^^^^^^^^^^^
 
-        The following can't be changed on an existing session: custom MCP servers (\\ ``422``\\ ),
-        egress rules,
-        GitHub OAuth connections, URL-bound secrets, platform-managed model keys, and ``permissions``
-        (\\ ``400``\\ ). To use a different custom MCP server, create a new session.
+        You change a session's model through ``env``\\ ; a top-level ``model`` section returns ``400``.
+        The key
+        to set depends on the model endpoint the session was created with:
+
+        .. list-table::
+           :header-rows: 1
+
+           * - Session created with
+             - Model endpoint
+             - ``env`` key that sets the model
+           * - ``HARNESS_INFERENCE_MODEL``\\ , and none of the keys below
+             - DigitalOcean Serverless Inference
+             - ``HARNESS_INFERENCE_MODEL``
+           * - ``OPENAI_BASE_URL``
+             - Your OpenAI-compatible endpoint
+             - ``MODEL``\\ , or ``OPENAI_MODEL``
+           * - ``ANTHROPIC_BASE_URL``\\ , or an ``ANTHROPIC_API_KEY`` secret
+             - Your Anthropic endpoint, or the Anthropic API
+             - ``ANTHROPIC_MODEL``\\ , or ``MODEL``
+
+
+        A session keeps the model endpoint it was created with. Its provider and base URL can't be
+        changed (\\ ``422``\\ ). The provider API key (\\ ``OPENAI_API_KEY`` or ``ANTHROPIC_API_KEY``\\
+        ) can be rotated
+        but not added, removed, or moved to another URL or scheme (\\ ``422``\\ ). See
+        ``manifest_yaml`` for the
+        rules.
+
+        The following can't be changed on an existing session: custom MCP servers (\\ ``422``\\ ), the
+        egress
+        VPC (\\ ``vpc_uuid`` and ``subnet_uuid``\\ , ``422``\\ ), GitHub OAuth connections,
+        platform-managed model keys,
+        and ``permissions`` (\\ ``400``\\ ). To use a different custom MCP server or VPC, create a new
+        session.
+
+        URL-bound secrets and egress
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+        URL-bound secret and ``egress`` changes take effect on the session's next outbound connection.
+        An update that changes only URL-bound secrets and ``egress`` doesn't restart the agent and ends
+        in
+        ``APPLIED``. Connections that are already open stay open, including connections to a host that
+        the update removed.
+
+        These updates have the following additional requirements:
+
+
+        * URL-bound secret and egress updates must be enabled for your team. Otherwise, the request
+          returns ``403``.
+        * The session must have been created with a URL-bound secret or an egress allowlist. A session
+          created with unrestricted egress and no URL-bound secrets can't gain either one: the update
+          ends in ``FAILED`` with ``error`` set to ``requires_new_session``.
+        * Changing ``egress``\\ , or adding a URL-bound secret for a host the session can't reach yet,
+          requires that the session's agent runtime supports egress updates. Sessions created before
+          egress updates were available don't support them (\\ ``409``\\ ).
+
+        See ``manifest_yaml`` for the format of each change.
 
         Tracking an update
         ^^^^^^^^^^^^^^^^^^
@@ -33882,8 +34248,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
            * ``FAILED``\\ : the update did not take effect. ``session.update.detail`` explains why, and
              ``session.update.reverted`` is ``true`` if the previous settings were restored.
 
-        Tool updates usually finish within a few seconds. Updates to ``env`` (including the model) or
-        ``secrets`` restart the agent and can take up to about two minutes.
+        Tool, URL-bound secret, and ``egress`` updates usually finish within a few seconds. Updates to
+        ``env`` (including the model) or plain secrets restart the agent and can take up to about two
+        minutes.
 
         If the request matches the session's current settings, it returns ``200`` with ``outcome`` set
         to
@@ -33937,40 +34304,103 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                       string, that holds only the sections to change. Can't be combined with
                       ``resume_on_topoff``. Requires session settings updates to be enabled for your
                       team ("" ``403`` otherwise).  Supported sections are ``tools``"" , ``env``"" ,
-                      and ``secrets``. Sections you omit are not changed. Any other top-level key
-                      returns ``400``"" , including ``model`` (to change the model, set
-                      ``HARNESS_INFERENCE_MODEL`` in ``env``"" ) and ``permissions`` (can't be changed
-                      on an existing session).  Each section you include replaces that section in full:
+                      ``secrets``"" , and ``egress``. Sections you omit are not changed. Any other
+                      top-level key returns ``400``"" , including ``model`` (set the model in ``env``
+                      instead; see **Changing the model**"" ) and ``permissions`` (can't be changed on
+                      an existing session).  Each section you include replaces that section in full:
                       * ``tools``"" : the complete list of tools for the session. Only Action Gateway
                       tools   ("" ``do.actions`` entries) can be added, removed, or changed. Custom MCP
                       servers can't be   changed on an existing session: include the session's current
                       custom MCP servers   exactly as they are. Adding, removing, or changing one
-                      returns ``422``. To remove all Action Gateway tools from a session that has no
-                      custom   MCP servers, send ``tools: []``. ``tools: null`` returns ``400``. *
+                      returns ``422``. To remove all   Action Gateway tools from a session that has no
+                      custom MCP servers, send ``tools: []``.   ``tools: null`` returns ``400``. *
                       ``env``"" : the complete set of environment variables, as name-value pairs. A
                       variable you   leave out is removed. ``env: {}`` removes all variables; ``env:
                       null`` returns ``400``. * ``secrets``"" : the complete set of secrets, as
                       name-value pairs. A secret you leave out is   removed. For each secret, set the
                       value to a string to add or rotate it, or to ``{}`` to   keep its current value.
-                      A ``null`` value returns ``400``.  **Changing the model.** The only way to change
-                      a session's model is through ``env``. Set ``HARNESS_INFERENCE_MODEL`` to a
-                      DigitalOcean Serverless Inference model ID, or to ``router:<name>`` for an
-                      inference router. This works only on sessions created with
-                      ``HARNESS_INFERENCE_MODEL`` set and without their own inference endpoint. Adding,
-                      removing, or changing the key on any other session, or moving a session to its
-                      own endpoint, returns ``422``. A malformed value (empty, multi-line, or over 256
-                      bytes) returns ``400``. Whether the model exists is not checked when you send the
-                      request; an unknown model fails on the agent's next turn.  **Reserved keys.**
-                      ``HARNESS_INFERENCE_API_KEY`` and ``HARNESS_INFERENCE_BASE_URL`` are managed by
-                      the platform: include them with their current values, or the request returns
-                      ``422``. Framework keys can't be changed either ("" ``422``"" ). Secrets that are
-                      not plain values (such as URL-bound or OAuth secrets) can't be changed on an
-                      existing session ("" ``422``"" ).  Example that changes the model, keeps one
-                      secret, and rotates another. Because each section is a full replacement, the
-                      example assumes the session has no other env variables or secrets:  ..
-                      code-block:: yaml     env:      HARNESS_INFERENCE_MODEL: llama3.3-70b-instruct
-                      LOG_LEVEL: info    secrets:      GITHUB_TOKEN: {}      JIRA_API_TOKEN:
-                      new-token-value.
+                      URL-bound secrets also accept an object; see **URL-bound   secrets**. A ``null``
+                      value returns ``400``. * ``egress``"" : the complete egress allowlist, as an
+                      object with ``allow_hosts`` (hostnames) and   ``allow_ips`` (exact IPv4 or IPv6
+                      addresses, not CIDR ranges). Only this object form is   supported in an update.
+                      It replaces the session's   current allowlist: a host or IP address you leave out
+                      is removed. Leave out ``vpc_uuid``   and ``subnet_uuid`` to keep the session's
+                      current VPC, or set them to their current values.   A different value returns
+                      ``422``. See **Egress**.  **URL-bound secrets.** The egress proxy sends a
+                      URL-bound secret only to requests that match its ``url``"" ; the agent never
+                      receives the value. An update to a URL-bound secret doesn't restart the agent. In
+                      ``secrets``"" , you can:   * Rotate the value: set the secret to the new value as
+                      a string. Its ``url`` and ``scheme``   don't change. * Move it to another URL or
+                      scheme: set it to ``{value, url, scheme}``. A new host or path,   or a change to
+                      ``scheme: raw``"" , requires ``value`` ("" ``400`` otherwise). Sending the
+                      current   ``value``"" , ``url``"" , and ``scheme`` again is not a change. * Add
+                      one: set it to ``{value, url}``. ``scheme`` is optional and defaults to
+                      ``bearer``   ("" ``Authorization: Bearer <value>``"" ); ``raw`` sends the value
+                      exactly as stored. * Bind an existing plain secret to a URL: set it to ``{url}``.
+                      The secret keeps its current   value. * Keep one unchanged: set it to ``{}``. *
+                      Remove one: leave it out of ``secrets``.  ``url`` must use ``https://`` and name
+                      an exact hostname (no wildcards, IP addresses, or ``localhost``"" ), with an
+                      optional path and no port, query, or fragment. A session can have up to 16
+                      URL-bound secrets, fewer if it has storage mounts, which count toward the same
+                      limit. A URL-bound secret can't be changed back to a plain secret. If the session
+                      has an egress allowlist, the secret's host is added to it. After a rollback or
+                      fork, a URL-bound secret that was moved off its agent config's URL can need its
+                      value again: the request returns ``409`` until you send ``value``.  **Egress.**
+                      ``egress`` changes the hosts and IP addresses the session can reach. The new
+                      allowlist takes effect on the session's next outbound connection, without an
+                      agent restart. Connections that are already open stay open, including connections
+                      to a host you removed. Only ``allow_hosts`` and ``allow_ips`` can change; the VPC
+                      is fixed when the session is created. A session created with unrestricted egress
+                      and no URL-bound secrets can't gain an allowlist: the update ends in ``FAILED``
+                      with ``error`` set to ``requires_new_session``.  **Changing the model.** You
+                      change a session's model through ``env``. The key to set depends on the model
+                      endpoint the session was created with:   * DigitalOcean Serverless Inference
+                      (created with ``HARNESS_INFERENCE_MODEL`` and without   ``OPENAI_BASE_URL``"" ,
+                      ``ANTHROPIC_BASE_URL``"" , or an ``ANTHROPIC_API_KEY`` secret): set
+                      ``HARNESS_INFERENCE_MODEL`` to a Serverless Inference model ID, or to
+                      ``router:<name>`` for   an inference router. Removing the key, or moving the
+                      session to its own endpoint,   returns ``422``. Adding the key to a session that
+                      was created without it also returns   ``422``. * Your own OpenAI-compatible
+                      endpoint (created with ``OPENAI_BASE_URL``"" ): set ``MODEL``. The   session
+                      reads ``MODEL`` before ``OPENAI_MODEL``"" , so set ``OPENAI_MODEL`` only if the
+                      session   uses it and doesn't have ``MODEL``. * Your own Anthropic endpoint
+                      (created with ``ANTHROPIC_BASE_URL``"" ), or the Anthropic API   (created with an
+                      ``ANTHROPIC_API_KEY`` secret and no base URL): set ``ANTHROPIC_MODEL``. The
+                      session reads ``ANTHROPIC_MODEL`` before ``MODEL``.  On a session that uses its
+                      own endpoint, the following rules also apply:   * Removing the model key makes
+                      the agent use its default model for that endpoint. * The model provider and the
+                      base URL ("" ``OPENAI_BASE_URL`` or ``ANTHROPIC_BASE_URL``"" ) can't be   changed
+                      ("" ``422``"" ). Include the base URL with its current value. * The provider API
+                      key ("" ``OPENAI_API_KEY`` or ``ANTHROPIC_API_KEY``"" ) can only be rotated: set
+                      it to the new value as a string, or to ``{}`` to keep it. Removing it, adding it
+                      to a   session that was created without it, or changing its ``url`` or ``scheme``
+                      returns ``422``.   If the key is URL-bound, rotating it follows the URL-bound
+                      secret rules: the agent isn't   restarted, and URL-bound secret updates must be
+                      enabled for your team ("" ``403``   otherwise).  A model name can't be empty,
+                      start or end with whitespace, span more than one line, be longer than 256 bytes,
+                      or contain ``#`` or ``:`` ("" ``400``"" ). Whether the endpoint serves the model
+                      is not checked when you send the request; an unknown model fails on the agent's
+                      next turn.  **Reserved keys.** ``HARNESS_INFERENCE_API_KEY`` and
+                      ``HARNESS_INFERENCE_BASE_URL`` are managed by the platform: include them with
+                      their current values, or the request returns ``422``. Framework keys can't be
+                      changed either ("" ``422``"" ). OAuth secrets and mount-only secrets ("" ``env:
+                      false``"" ) can't be changed on an existing session: set them to ``{}`` (""
+                      ``422`` otherwise).  Example that changes the model, keeps one secret, and
+                      rotates another. Because each section is a full replacement, the example assumes
+                      the session has no other env variables or secrets:  .. code-block:: yaml     env:
+                      HARNESS_INFERENCE_MODEL: llama3.3-70b-instruct      LOG_LEVEL: info    secrets:
+                      GITHUB_TOKEN: {}      JIRA_API_TOKEN: new-token-value  Example that changes the
+                      model and rotates the provider API key of a session that was created with its own
+                      OpenAI-compatible endpoint. The example assumes the session has no other env
+                      variables or secrets:  .. code-block:: yaml     env:      OPENAI_BASE_URL:
+                      https://llm.example.com/v1      MODEL: my-model-v2    secrets:
+                      OPENAI_API_KEY: new-api-key  Example that keeps one URL-bound secret, moves
+                      another to a new URL, and replaces the egress allowlist. The example assumes the
+                      session has no other secrets:  .. code-block:: yaml     secrets:
+                      GITHUB_TOKEN: {}      JIRA_API_TOKEN:        value: new-token-value        url:
+                      https://example.atlassian.net/rest/api/3    egress:      allow_hosts:        -
+                      api.github.com        - example.atlassian.net      allow_ips:        -
+                      203.0.113.10.
                     "resume_on_topoff": bool  # Optional. Whether this session resumes
                       automatically after it is paused for low balance and your team's prepaid balance
                       is topped up. Applies to this session only. Can't be combined with
@@ -34003,6 +34433,21 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           "AGENT_KIND_CUSTOM", "AGENT_KIND_HERMES", "AGENT_KIND_OPENAI_CODEX",
                           "AGENT_KIND_LANGGRAPH", and "AGENT_KIND_CREWAI".
                         "config_diff": {
+                            "egress": {
+                                "added": [
+                                    "str"  # Optional. The hosts and IP addresses
+                                      an ``egress`` change added or removed, and the new egress mode
+                                      when it changed. Omitted when the egress policy is unchanged.
+                                ],
+                                "mode": "str",  # Optional. The new egress mode.
+                                  Present only when the mode changed. Known values are: "allowlist",
+                                  "unrestricted", and "deny_all".
+                                "removed": [
+                                    "str"  # Optional. The hosts and IP addresses
+                                      an ``egress`` change added or removed, and the new egress mode
+                                      when it changed. Omitted when the egress policy is unchanged.
+                                ]
+                            },
                             "env": {
                                 "added": [
                                     "str"  # Optional. Names of the entries
@@ -34019,16 +34464,25 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             },
                             "secrets": {
                                 "added": [
-                                    "str"  # Optional. Names of the entries
-                                      added, removed, or changed in one manifest section.
+                                    "str"  # Optional. Secret names, never
+                                      values. On an update, ``changed`` lists the secrets that got a
+                                      new value or were bound to another URL or scheme. On
+                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
+                                      different URL or scheme than in the agent config.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Names of the entries
-                                      added, removed, or changed in one manifest section.
+                                    "str"  # Optional. Secret names, never
+                                      values. On an update, ``changed`` lists the secrets that got a
+                                      new value or were bound to another URL or scheme. On
+                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
+                                      different URL or scheme than in the agent config.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Names of the entries
-                                      added, removed, or changed in one manifest section.
+                                    "str"  # Optional. Secret names, never
+                                      values. On an update, ``changed`` lists the secrets that got a
+                                      new value or were bound to another URL or scheme. On
+                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
+                                      different URL or scheme than in the agent config.
                                 ]
                             },
                             "tools": {
@@ -34133,6 +34587,23 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           "SESSION_STATUS_ALL", and "SESSION_STATUS_LOCKED".
                         "update": {
                             "changes": {
+                                "egress": {
+                                    "added": [
+                                        "str"  # Optional. The hosts and IP
+                                          addresses an ``egress`` change added or removed, and the new
+                                          egress mode when it changed. Omitted when the egress policy
+                                          is unchanged.
+                                    ],
+                                    "mode": "str",  # Optional. The new egress
+                                      mode. Present only when the mode changed. Known values are:
+                                      "allowlist", "unrestricted", and "deny_all".
+                                    "removed": [
+                                        "str"  # Optional. The hosts and IP
+                                          addresses an ``egress`` change added or removed, and the new
+                                          egress mode when it changed. Omitted when the egress policy
+                                          is unchanged.
+                                    ]
+                                },
                                 "env": {
                                     "added": [
                                         "str"  # Optional. Names of the
@@ -34149,16 +34620,25 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 },
                                 "secrets": {
                                     "added": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ]
                                 },
                                 "tools": {
@@ -34204,7 +34684,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               of a failed one.
                             "state": "str",  # Optional. State of a session settings
                               update. `APPLYING`: in progress. `APPLIED`: live. `APPLIED_RESTARTED`:
-                              live, and the agent was restarted to apply it (`env` and `secrets`
+                              live, and the agent was restarted to apply it (`env` and plain secret
                               changes). `FAILED`: the update did not take effect; see ``reverted`` and
                               ``detail``. Known values are: "APPLYING", "APPLIED", "APPLIED_RESTARTED",
                               and "FAILED".
@@ -34292,23 +34772,84 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
            * - ``env.HARNESS_INFERENCE_MODEL``
              - The model, for sessions that use DigitalOcean Serverless Inference.
              - Yes
+           * - ``env.MODEL``\\ , ``env.OPENAI_MODEL``\\ , ``env.ANTHROPIC_MODEL``
+             - The model, for sessions that use their own OpenAI-compatible or Anthropic endpoint.
+             - Yes
            * - ``secrets``
              - Plain secrets (name and value).
              - Yes
+           * - ``secrets`` (URL-bound)
+             - URL-bound secrets: value, ``url``\\ , and ``scheme``.
+             - No
+           * - ``egress``
+             - The hosts and IP addresses the session can reach (\\ ``allow_hosts`` and ``allow_ips``\\
+        ).
+             - No
 
 
         Sections you omit are not changed. Each section you include replaces that section in full; see
         ``manifest_yaml`` for the exact rules.
 
-        The only way to change a session's model is to set ``HARNESS_INFERENCE_MODEL`` in ``env``. This
-        works only for sessions that were created with a DigitalOcean Serverless Inference model;
-        sessions that use a third-party model provider can't change their model. A top-level ``model``
-        section returns ``400``.
+        Changing the model
+        ^^^^^^^^^^^^^^^^^^
 
-        The following can't be changed on an existing session: custom MCP servers (\\ ``422``\\ ),
-        egress rules,
-        GitHub OAuth connections, URL-bound secrets, platform-managed model keys, and ``permissions``
-        (\\ ``400``\\ ). To use a different custom MCP server, create a new session.
+        You change a session's model through ``env``\\ ; a top-level ``model`` section returns ``400``.
+        The key
+        to set depends on the model endpoint the session was created with:
+
+        .. list-table::
+           :header-rows: 1
+
+           * - Session created with
+             - Model endpoint
+             - ``env`` key that sets the model
+           * - ``HARNESS_INFERENCE_MODEL``\\ , and none of the keys below
+             - DigitalOcean Serverless Inference
+             - ``HARNESS_INFERENCE_MODEL``
+           * - ``OPENAI_BASE_URL``
+             - Your OpenAI-compatible endpoint
+             - ``MODEL``\\ , or ``OPENAI_MODEL``
+           * - ``ANTHROPIC_BASE_URL``\\ , or an ``ANTHROPIC_API_KEY`` secret
+             - Your Anthropic endpoint, or the Anthropic API
+             - ``ANTHROPIC_MODEL``\\ , or ``MODEL``
+
+
+        A session keeps the model endpoint it was created with. Its provider and base URL can't be
+        changed (\\ ``422``\\ ). The provider API key (\\ ``OPENAI_API_KEY`` or ``ANTHROPIC_API_KEY``\\
+        ) can be rotated
+        but not added, removed, or moved to another URL or scheme (\\ ``422``\\ ). See
+        ``manifest_yaml`` for the
+        rules.
+
+        The following can't be changed on an existing session: custom MCP servers (\\ ``422``\\ ), the
+        egress
+        VPC (\\ ``vpc_uuid`` and ``subnet_uuid``\\ , ``422``\\ ), GitHub OAuth connections,
+        platform-managed model keys,
+        and ``permissions`` (\\ ``400``\\ ). To use a different custom MCP server or VPC, create a new
+        session.
+
+        URL-bound secrets and egress
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+        URL-bound secret and ``egress`` changes take effect on the session's next outbound connection.
+        An update that changes only URL-bound secrets and ``egress`` doesn't restart the agent and ends
+        in
+        ``APPLIED``. Connections that are already open stay open, including connections to a host that
+        the update removed.
+
+        These updates have the following additional requirements:
+
+
+        * URL-bound secret and egress updates must be enabled for your team. Otherwise, the request
+          returns ``403``.
+        * The session must have been created with a URL-bound secret or an egress allowlist. A session
+          created with unrestricted egress and no URL-bound secrets can't gain either one: the update
+          ends in ``FAILED`` with ``error`` set to ``requires_new_session``.
+        * Changing ``egress``\\ , or adding a URL-bound secret for a host the session can't reach yet,
+          requires that the session's agent runtime supports egress updates. Sessions created before
+          egress updates were available don't support them (\\ ``409``\\ ).
+
+        See ``manifest_yaml`` for the format of each change.
 
         Tracking an update
         ^^^^^^^^^^^^^^^^^^
@@ -34330,8 +34871,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
            * ``FAILED``\\ : the update did not take effect. ``session.update.detail`` explains why, and
              ``session.update.reverted`` is ``true`` if the previous settings were restored.
 
-        Tool updates usually finish within a few seconds. Updates to ``env`` (including the model) or
-        ``secrets`` restart the agent and can take up to about two minutes.
+        Tool, URL-bound secret, and ``egress`` updates usually finish within a few seconds. Updates to
+        ``env`` (including the model) or plain secrets restart the agent and can take up to about two
+        minutes.
 
         If the request matches the session's current settings, it returns ``200`` with ``outcome`` set
         to
@@ -34405,6 +34947,21 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           "AGENT_KIND_CUSTOM", "AGENT_KIND_HERMES", "AGENT_KIND_OPENAI_CODEX",
                           "AGENT_KIND_LANGGRAPH", and "AGENT_KIND_CREWAI".
                         "config_diff": {
+                            "egress": {
+                                "added": [
+                                    "str"  # Optional. The hosts and IP addresses
+                                      an ``egress`` change added or removed, and the new egress mode
+                                      when it changed. Omitted when the egress policy is unchanged.
+                                ],
+                                "mode": "str",  # Optional. The new egress mode.
+                                  Present only when the mode changed. Known values are: "allowlist",
+                                  "unrestricted", and "deny_all".
+                                "removed": [
+                                    "str"  # Optional. The hosts and IP addresses
+                                      an ``egress`` change added or removed, and the new egress mode
+                                      when it changed. Omitted when the egress policy is unchanged.
+                                ]
+                            },
                             "env": {
                                 "added": [
                                     "str"  # Optional. Names of the entries
@@ -34421,16 +34978,25 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             },
                             "secrets": {
                                 "added": [
-                                    "str"  # Optional. Names of the entries
-                                      added, removed, or changed in one manifest section.
+                                    "str"  # Optional. Secret names, never
+                                      values. On an update, ``changed`` lists the secrets that got a
+                                      new value or were bound to another URL or scheme. On
+                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
+                                      different URL or scheme than in the agent config.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Names of the entries
-                                      added, removed, or changed in one manifest section.
+                                    "str"  # Optional. Secret names, never
+                                      values. On an update, ``changed`` lists the secrets that got a
+                                      new value or were bound to another URL or scheme. On
+                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
+                                      different URL or scheme than in the agent config.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Names of the entries
-                                      added, removed, or changed in one manifest section.
+                                    "str"  # Optional. Secret names, never
+                                      values. On an update, ``changed`` lists the secrets that got a
+                                      new value or were bound to another URL or scheme. On
+                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
+                                      different URL or scheme than in the agent config.
                                 ]
                             },
                             "tools": {
@@ -34535,6 +35101,23 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           "SESSION_STATUS_ALL", and "SESSION_STATUS_LOCKED".
                         "update": {
                             "changes": {
+                                "egress": {
+                                    "added": [
+                                        "str"  # Optional. The hosts and IP
+                                          addresses an ``egress`` change added or removed, and the new
+                                          egress mode when it changed. Omitted when the egress policy
+                                          is unchanged.
+                                    ],
+                                    "mode": "str",  # Optional. The new egress
+                                      mode. Present only when the mode changed. Known values are:
+                                      "allowlist", "unrestricted", and "deny_all".
+                                    "removed": [
+                                        "str"  # Optional. The hosts and IP
+                                          addresses an ``egress`` change added or removed, and the new
+                                          egress mode when it changed. Omitted when the egress policy
+                                          is unchanged.
+                                    ]
+                                },
                                 "env": {
                                     "added": [
                                         "str"  # Optional. Names of the
@@ -34551,16 +35134,25 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 },
                                 "secrets": {
                                     "added": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ]
                                 },
                                 "tools": {
@@ -34606,7 +35198,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               of a failed one.
                             "state": "str",  # Optional. State of a session settings
                               update. `APPLYING`: in progress. `APPLIED`: live. `APPLIED_RESTARTED`:
-                              live, and the agent was restarted to apply it (`env` and `secrets`
+                              live, and the agent was restarted to apply it (`env` and plain secret
                               changes). `FAILED`: the update did not take effect; see ``reverted`` and
                               ``detail``. Known values are: "APPLYING", "APPLIED", "APPLIED_RESTARTED",
                               and "FAILED".
@@ -34689,23 +35281,84 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
            * - ``env.HARNESS_INFERENCE_MODEL``
              - The model, for sessions that use DigitalOcean Serverless Inference.
              - Yes
+           * - ``env.MODEL``\\ , ``env.OPENAI_MODEL``\\ , ``env.ANTHROPIC_MODEL``
+             - The model, for sessions that use their own OpenAI-compatible or Anthropic endpoint.
+             - Yes
            * - ``secrets``
              - Plain secrets (name and value).
              - Yes
+           * - ``secrets`` (URL-bound)
+             - URL-bound secrets: value, ``url``\\ , and ``scheme``.
+             - No
+           * - ``egress``
+             - The hosts and IP addresses the session can reach (\\ ``allow_hosts`` and ``allow_ips``\\
+        ).
+             - No
 
 
         Sections you omit are not changed. Each section you include replaces that section in full; see
         ``manifest_yaml`` for the exact rules.
 
-        The only way to change a session's model is to set ``HARNESS_INFERENCE_MODEL`` in ``env``. This
-        works only for sessions that were created with a DigitalOcean Serverless Inference model;
-        sessions that use a third-party model provider can't change their model. A top-level ``model``
-        section returns ``400``.
+        Changing the model
+        ^^^^^^^^^^^^^^^^^^
 
-        The following can't be changed on an existing session: custom MCP servers (\\ ``422``\\ ),
-        egress rules,
-        GitHub OAuth connections, URL-bound secrets, platform-managed model keys, and ``permissions``
-        (\\ ``400``\\ ). To use a different custom MCP server, create a new session.
+        You change a session's model through ``env``\\ ; a top-level ``model`` section returns ``400``.
+        The key
+        to set depends on the model endpoint the session was created with:
+
+        .. list-table::
+           :header-rows: 1
+
+           * - Session created with
+             - Model endpoint
+             - ``env`` key that sets the model
+           * - ``HARNESS_INFERENCE_MODEL``\\ , and none of the keys below
+             - DigitalOcean Serverless Inference
+             - ``HARNESS_INFERENCE_MODEL``
+           * - ``OPENAI_BASE_URL``
+             - Your OpenAI-compatible endpoint
+             - ``MODEL``\\ , or ``OPENAI_MODEL``
+           * - ``ANTHROPIC_BASE_URL``\\ , or an ``ANTHROPIC_API_KEY`` secret
+             - Your Anthropic endpoint, or the Anthropic API
+             - ``ANTHROPIC_MODEL``\\ , or ``MODEL``
+
+
+        A session keeps the model endpoint it was created with. Its provider and base URL can't be
+        changed (\\ ``422``\\ ). The provider API key (\\ ``OPENAI_API_KEY`` or ``ANTHROPIC_API_KEY``\\
+        ) can be rotated
+        but not added, removed, or moved to another URL or scheme (\\ ``422``\\ ). See
+        ``manifest_yaml`` for the
+        rules.
+
+        The following can't be changed on an existing session: custom MCP servers (\\ ``422``\\ ), the
+        egress
+        VPC (\\ ``vpc_uuid`` and ``subnet_uuid``\\ , ``422``\\ ), GitHub OAuth connections,
+        platform-managed model keys,
+        and ``permissions`` (\\ ``400``\\ ). To use a different custom MCP server or VPC, create a new
+        session.
+
+        URL-bound secrets and egress
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+        URL-bound secret and ``egress`` changes take effect on the session's next outbound connection.
+        An update that changes only URL-bound secrets and ``egress`` doesn't restart the agent and ends
+        in
+        ``APPLIED``. Connections that are already open stay open, including connections to a host that
+        the update removed.
+
+        These updates have the following additional requirements:
+
+
+        * URL-bound secret and egress updates must be enabled for your team. Otherwise, the request
+          returns ``403``.
+        * The session must have been created with a URL-bound secret or an egress allowlist. A session
+          created with unrestricted egress and no URL-bound secrets can't gain either one: the update
+          ends in ``FAILED`` with ``error`` set to ``requires_new_session``.
+        * Changing ``egress``\\ , or adding a URL-bound secret for a host the session can't reach yet,
+          requires that the session's agent runtime supports egress updates. Sessions created before
+          egress updates were available don't support them (\\ ``409``\\ ).
+
+        See ``manifest_yaml`` for the format of each change.
 
         Tracking an update
         ^^^^^^^^^^^^^^^^^^
@@ -34727,8 +35380,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
            * ``FAILED``\\ : the update did not take effect. ``session.update.detail`` explains why, and
              ``session.update.reverted`` is ``true`` if the previous settings were restored.
 
-        Tool updates usually finish within a few seconds. Updates to ``env`` (including the model) or
-        ``secrets`` restart the agent and can take up to about two minutes.
+        Tool, URL-bound secret, and ``egress`` updates usually finish within a few seconds. Updates to
+        ``env`` (including the model) or plain secrets restart the agent and can take up to about two
+        minutes.
 
         If the request matches the session's current settings, it returns ``200`` with ``outcome`` set
         to
@@ -34780,40 +35434,103 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                       string, that holds only the sections to change. Can't be combined with
                       ``resume_on_topoff``. Requires session settings updates to be enabled for your
                       team ("" ``403`` otherwise).  Supported sections are ``tools``"" , ``env``"" ,
-                      and ``secrets``. Sections you omit are not changed. Any other top-level key
-                      returns ``400``"" , including ``model`` (to change the model, set
-                      ``HARNESS_INFERENCE_MODEL`` in ``env``"" ) and ``permissions`` (can't be changed
-                      on an existing session).  Each section you include replaces that section in full:
+                      ``secrets``"" , and ``egress``. Sections you omit are not changed. Any other
+                      top-level key returns ``400``"" , including ``model`` (set the model in ``env``
+                      instead; see **Changing the model**"" ) and ``permissions`` (can't be changed on
+                      an existing session).  Each section you include replaces that section in full:
                       * ``tools``"" : the complete list of tools for the session. Only Action Gateway
                       tools   ("" ``do.actions`` entries) can be added, removed, or changed. Custom MCP
                       servers can't be   changed on an existing session: include the session's current
                       custom MCP servers   exactly as they are. Adding, removing, or changing one
-                      returns ``422``. To remove all Action Gateway tools from a session that has no
-                      custom   MCP servers, send ``tools: []``. ``tools: null`` returns ``400``. *
+                      returns ``422``. To remove all   Action Gateway tools from a session that has no
+                      custom MCP servers, send ``tools: []``.   ``tools: null`` returns ``400``. *
                       ``env``"" : the complete set of environment variables, as name-value pairs. A
                       variable you   leave out is removed. ``env: {}`` removes all variables; ``env:
                       null`` returns ``400``. * ``secrets``"" : the complete set of secrets, as
                       name-value pairs. A secret you leave out is   removed. For each secret, set the
                       value to a string to add or rotate it, or to ``{}`` to   keep its current value.
-                      A ``null`` value returns ``400``.  **Changing the model.** The only way to change
-                      a session's model is through ``env``. Set ``HARNESS_INFERENCE_MODEL`` to a
-                      DigitalOcean Serverless Inference model ID, or to ``router:<name>`` for an
-                      inference router. This works only on sessions created with
-                      ``HARNESS_INFERENCE_MODEL`` set and without their own inference endpoint. Adding,
-                      removing, or changing the key on any other session, or moving a session to its
-                      own endpoint, returns ``422``. A malformed value (empty, multi-line, or over 256
-                      bytes) returns ``400``. Whether the model exists is not checked when you send the
-                      request; an unknown model fails on the agent's next turn.  **Reserved keys.**
-                      ``HARNESS_INFERENCE_API_KEY`` and ``HARNESS_INFERENCE_BASE_URL`` are managed by
-                      the platform: include them with their current values, or the request returns
-                      ``422``. Framework keys can't be changed either ("" ``422``"" ). Secrets that are
-                      not plain values (such as URL-bound or OAuth secrets) can't be changed on an
-                      existing session ("" ``422``"" ).  Example that changes the model, keeps one
-                      secret, and rotates another. Because each section is a full replacement, the
-                      example assumes the session has no other env variables or secrets:  ..
-                      code-block:: yaml     env:      HARNESS_INFERENCE_MODEL: llama3.3-70b-instruct
-                      LOG_LEVEL: info    secrets:      GITHUB_TOKEN: {}      JIRA_API_TOKEN:
-                      new-token-value.
+                      URL-bound secrets also accept an object; see **URL-bound   secrets**. A ``null``
+                      value returns ``400``. * ``egress``"" : the complete egress allowlist, as an
+                      object with ``allow_hosts`` (hostnames) and   ``allow_ips`` (exact IPv4 or IPv6
+                      addresses, not CIDR ranges). Only this object form is   supported in an update.
+                      It replaces the session's   current allowlist: a host or IP address you leave out
+                      is removed. Leave out ``vpc_uuid``   and ``subnet_uuid`` to keep the session's
+                      current VPC, or set them to their current values.   A different value returns
+                      ``422``. See **Egress**.  **URL-bound secrets.** The egress proxy sends a
+                      URL-bound secret only to requests that match its ``url``"" ; the agent never
+                      receives the value. An update to a URL-bound secret doesn't restart the agent. In
+                      ``secrets``"" , you can:   * Rotate the value: set the secret to the new value as
+                      a string. Its ``url`` and ``scheme``   don't change. * Move it to another URL or
+                      scheme: set it to ``{value, url, scheme}``. A new host or path,   or a change to
+                      ``scheme: raw``"" , requires ``value`` ("" ``400`` otherwise). Sending the
+                      current   ``value``"" , ``url``"" , and ``scheme`` again is not a change. * Add
+                      one: set it to ``{value, url}``. ``scheme`` is optional and defaults to
+                      ``bearer``   ("" ``Authorization: Bearer <value>``"" ); ``raw`` sends the value
+                      exactly as stored. * Bind an existing plain secret to a URL: set it to ``{url}``.
+                      The secret keeps its current   value. * Keep one unchanged: set it to ``{}``. *
+                      Remove one: leave it out of ``secrets``.  ``url`` must use ``https://`` and name
+                      an exact hostname (no wildcards, IP addresses, or ``localhost``"" ), with an
+                      optional path and no port, query, or fragment. A session can have up to 16
+                      URL-bound secrets, fewer if it has storage mounts, which count toward the same
+                      limit. A URL-bound secret can't be changed back to a plain secret. If the session
+                      has an egress allowlist, the secret's host is added to it. After a rollback or
+                      fork, a URL-bound secret that was moved off its agent config's URL can need its
+                      value again: the request returns ``409`` until you send ``value``.  **Egress.**
+                      ``egress`` changes the hosts and IP addresses the session can reach. The new
+                      allowlist takes effect on the session's next outbound connection, without an
+                      agent restart. Connections that are already open stay open, including connections
+                      to a host you removed. Only ``allow_hosts`` and ``allow_ips`` can change; the VPC
+                      is fixed when the session is created. A session created with unrestricted egress
+                      and no URL-bound secrets can't gain an allowlist: the update ends in ``FAILED``
+                      with ``error`` set to ``requires_new_session``.  **Changing the model.** You
+                      change a session's model through ``env``. The key to set depends on the model
+                      endpoint the session was created with:   * DigitalOcean Serverless Inference
+                      (created with ``HARNESS_INFERENCE_MODEL`` and without   ``OPENAI_BASE_URL``"" ,
+                      ``ANTHROPIC_BASE_URL``"" , or an ``ANTHROPIC_API_KEY`` secret): set
+                      ``HARNESS_INFERENCE_MODEL`` to a Serverless Inference model ID, or to
+                      ``router:<name>`` for   an inference router. Removing the key, or moving the
+                      session to its own endpoint,   returns ``422``. Adding the key to a session that
+                      was created without it also returns   ``422``. * Your own OpenAI-compatible
+                      endpoint (created with ``OPENAI_BASE_URL``"" ): set ``MODEL``. The   session
+                      reads ``MODEL`` before ``OPENAI_MODEL``"" , so set ``OPENAI_MODEL`` only if the
+                      session   uses it and doesn't have ``MODEL``. * Your own Anthropic endpoint
+                      (created with ``ANTHROPIC_BASE_URL``"" ), or the Anthropic API   (created with an
+                      ``ANTHROPIC_API_KEY`` secret and no base URL): set ``ANTHROPIC_MODEL``. The
+                      session reads ``ANTHROPIC_MODEL`` before ``MODEL``.  On a session that uses its
+                      own endpoint, the following rules also apply:   * Removing the model key makes
+                      the agent use its default model for that endpoint. * The model provider and the
+                      base URL ("" ``OPENAI_BASE_URL`` or ``ANTHROPIC_BASE_URL``"" ) can't be   changed
+                      ("" ``422``"" ). Include the base URL with its current value. * The provider API
+                      key ("" ``OPENAI_API_KEY`` or ``ANTHROPIC_API_KEY``"" ) can only be rotated: set
+                      it to the new value as a string, or to ``{}`` to keep it. Removing it, adding it
+                      to a   session that was created without it, or changing its ``url`` or ``scheme``
+                      returns ``422``.   If the key is URL-bound, rotating it follows the URL-bound
+                      secret rules: the agent isn't   restarted, and URL-bound secret updates must be
+                      enabled for your team ("" ``403``   otherwise).  A model name can't be empty,
+                      start or end with whitespace, span more than one line, be longer than 256 bytes,
+                      or contain ``#`` or ``:`` ("" ``400``"" ). Whether the endpoint serves the model
+                      is not checked when you send the request; an unknown model fails on the agent's
+                      next turn.  **Reserved keys.** ``HARNESS_INFERENCE_API_KEY`` and
+                      ``HARNESS_INFERENCE_BASE_URL`` are managed by the platform: include them with
+                      their current values, or the request returns ``422``. Framework keys can't be
+                      changed either ("" ``422``"" ). OAuth secrets and mount-only secrets ("" ``env:
+                      false``"" ) can't be changed on an existing session: set them to ``{}`` (""
+                      ``422`` otherwise).  Example that changes the model, keeps one secret, and
+                      rotates another. Because each section is a full replacement, the example assumes
+                      the session has no other env variables or secrets:  .. code-block:: yaml     env:
+                      HARNESS_INFERENCE_MODEL: llama3.3-70b-instruct      LOG_LEVEL: info    secrets:
+                      GITHUB_TOKEN: {}      JIRA_API_TOKEN: new-token-value  Example that changes the
+                      model and rotates the provider API key of a session that was created with its own
+                      OpenAI-compatible endpoint. The example assumes the session has no other env
+                      variables or secrets:  .. code-block:: yaml     env:      OPENAI_BASE_URL:
+                      https://llm.example.com/v1      MODEL: my-model-v2    secrets:
+                      OPENAI_API_KEY: new-api-key  Example that keeps one URL-bound secret, moves
+                      another to a new URL, and replaces the egress allowlist. The example assumes the
+                      session has no other secrets:  .. code-block:: yaml     secrets:
+                      GITHUB_TOKEN: {}      JIRA_API_TOKEN:        value: new-token-value        url:
+                      https://example.atlassian.net/rest/api/3    egress:      allow_hosts:        -
+                      api.github.com        - example.atlassian.net      allow_ips:        -
+                      203.0.113.10.
                     "resume_on_topoff": bool  # Optional. Whether this session resumes
                       automatically after it is paused for low balance and your team's prepaid balance
                       is topped up. Applies to this session only. Can't be combined with
@@ -34846,6 +35563,21 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           "AGENT_KIND_CUSTOM", "AGENT_KIND_HERMES", "AGENT_KIND_OPENAI_CODEX",
                           "AGENT_KIND_LANGGRAPH", and "AGENT_KIND_CREWAI".
                         "config_diff": {
+                            "egress": {
+                                "added": [
+                                    "str"  # Optional. The hosts and IP addresses
+                                      an ``egress`` change added or removed, and the new egress mode
+                                      when it changed. Omitted when the egress policy is unchanged.
+                                ],
+                                "mode": "str",  # Optional. The new egress mode.
+                                  Present only when the mode changed. Known values are: "allowlist",
+                                  "unrestricted", and "deny_all".
+                                "removed": [
+                                    "str"  # Optional. The hosts and IP addresses
+                                      an ``egress`` change added or removed, and the new egress mode
+                                      when it changed. Omitted when the egress policy is unchanged.
+                                ]
+                            },
                             "env": {
                                 "added": [
                                     "str"  # Optional. Names of the entries
@@ -34862,16 +35594,25 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             },
                             "secrets": {
                                 "added": [
-                                    "str"  # Optional. Names of the entries
-                                      added, removed, or changed in one manifest section.
+                                    "str"  # Optional. Secret names, never
+                                      values. On an update, ``changed`` lists the secrets that got a
+                                      new value or were bound to another URL or scheme. On
+                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
+                                      different URL or scheme than in the agent config.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Names of the entries
-                                      added, removed, or changed in one manifest section.
+                                    "str"  # Optional. Secret names, never
+                                      values. On an update, ``changed`` lists the secrets that got a
+                                      new value or were bound to another URL or scheme. On
+                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
+                                      different URL or scheme than in the agent config.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Names of the entries
-                                      added, removed, or changed in one manifest section.
+                                    "str"  # Optional. Secret names, never
+                                      values. On an update, ``changed`` lists the secrets that got a
+                                      new value or were bound to another URL or scheme. On
+                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
+                                      different URL or scheme than in the agent config.
                                 ]
                             },
                             "tools": {
@@ -34976,6 +35717,23 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           "SESSION_STATUS_ALL", and "SESSION_STATUS_LOCKED".
                         "update": {
                             "changes": {
+                                "egress": {
+                                    "added": [
+                                        "str"  # Optional. The hosts and IP
+                                          addresses an ``egress`` change added or removed, and the new
+                                          egress mode when it changed. Omitted when the egress policy
+                                          is unchanged.
+                                    ],
+                                    "mode": "str",  # Optional. The new egress
+                                      mode. Present only when the mode changed. Known values are:
+                                      "allowlist", "unrestricted", and "deny_all".
+                                    "removed": [
+                                        "str"  # Optional. The hosts and IP
+                                          addresses an ``egress`` change added or removed, and the new
+                                          egress mode when it changed. Omitted when the egress policy
+                                          is unchanged.
+                                    ]
+                                },
                                 "env": {
                                     "added": [
                                         "str"  # Optional. Names of the
@@ -34992,16 +35750,25 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 },
                                 "secrets": {
                                     "added": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ]
                                 },
                                 "tools": {
@@ -35047,7 +35814,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               of a failed one.
                             "state": "str",  # Optional. State of a session settings
                               update. `APPLYING`: in progress. `APPLIED`: live. `APPLIED_RESTARTED`:
-                              live, and the agent was restarted to apply it (`env` and `secrets`
+                              live, and the agent was restarted to apply it (`env` and plain secret
                               changes). `FAILED`: the update did not take effect; see ``reverted`` and
                               ``detail``. Known values are: "APPLYING", "APPLIED", "APPLIED_RESTARTED",
                               and "FAILED".
@@ -36448,6 +37215,21 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           "AGENT_KIND_CUSTOM", "AGENT_KIND_HERMES", "AGENT_KIND_OPENAI_CODEX",
                           "AGENT_KIND_LANGGRAPH", and "AGENT_KIND_CREWAI".
                         "config_diff": {
+                            "egress": {
+                                "added": [
+                                    "str"  # Optional. The hosts and IP addresses
+                                      an ``egress`` change added or removed, and the new egress mode
+                                      when it changed. Omitted when the egress policy is unchanged.
+                                ],
+                                "mode": "str",  # Optional. The new egress mode.
+                                  Present only when the mode changed. Known values are: "allowlist",
+                                  "unrestricted", and "deny_all".
+                                "removed": [
+                                    "str"  # Optional. The hosts and IP addresses
+                                      an ``egress`` change added or removed, and the new egress mode
+                                      when it changed. Omitted when the egress policy is unchanged.
+                                ]
+                            },
                             "env": {
                                 "added": [
                                     "str"  # Optional. Names of the entries
@@ -36464,16 +37246,25 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             },
                             "secrets": {
                                 "added": [
-                                    "str"  # Optional. Names of the entries
-                                      added, removed, or changed in one manifest section.
+                                    "str"  # Optional. Secret names, never
+                                      values. On an update, ``changed`` lists the secrets that got a
+                                      new value or were bound to another URL or scheme. On
+                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
+                                      different URL or scheme than in the agent config.
                                 ],
                                 "changed": [
-                                    "str"  # Optional. Names of the entries
-                                      added, removed, or changed in one manifest section.
+                                    "str"  # Optional. Secret names, never
+                                      values. On an update, ``changed`` lists the secrets that got a
+                                      new value or were bound to another URL or scheme. On
+                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
+                                      different URL or scheme than in the agent config.
                                 ],
                                 "removed": [
-                                    "str"  # Optional. Names of the entries
-                                      added, removed, or changed in one manifest section.
+                                    "str"  # Optional. Secret names, never
+                                      values. On an update, ``changed`` lists the secrets that got a
+                                      new value or were bound to another URL or scheme. On
+                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
+                                      different URL or scheme than in the agent config.
                                 ]
                             },
                             "tools": {
@@ -36578,6 +37369,23 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           "SESSION_STATUS_ALL", and "SESSION_STATUS_LOCKED".
                         "update": {
                             "changes": {
+                                "egress": {
+                                    "added": [
+                                        "str"  # Optional. The hosts and IP
+                                          addresses an ``egress`` change added or removed, and the new
+                                          egress mode when it changed. Omitted when the egress policy
+                                          is unchanged.
+                                    ],
+                                    "mode": "str",  # Optional. The new egress
+                                      mode. Present only when the mode changed. Known values are:
+                                      "allowlist", "unrestricted", and "deny_all".
+                                    "removed": [
+                                        "str"  # Optional. The hosts and IP
+                                          addresses an ``egress`` change added or removed, and the new
+                                          egress mode when it changed. Omitted when the egress policy
+                                          is unchanged.
+                                    ]
+                                },
                                 "env": {
                                     "added": [
                                         "str"  # Optional. Names of the
@@ -36594,16 +37402,25 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 },
                                 "secrets": {
                                     "added": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ]
                                 },
                                 "tools": {
@@ -36649,7 +37466,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               of a failed one.
                             "state": "str",  # Optional. State of a session settings
                               update. `APPLYING`: in progress. `APPLIED`: live. `APPLIED_RESTARTED`:
-                              live, and the agent was restarted to apply it (`env` and `secrets`
+                              live, and the agent was restarted to apply it (`env` and plain secret
                               changes). `FAILED`: the update did not take effect; see ``reverted`` and
                               ``detail``. Known values are: "APPLYING", "APPLIED", "APPLIED_RESTARTED",
                               and "FAILED".
@@ -36912,6 +37729,23 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               "AGENT_KIND_HERMES", "AGENT_KIND_OPENAI_CODEX", "AGENT_KIND_LANGGRAPH",
                               and "AGENT_KIND_CREWAI".
                             "config_diff": {
+                                "egress": {
+                                    "added": [
+                                        "str"  # Optional. The hosts and IP
+                                          addresses an ``egress`` change added or removed, and the new
+                                          egress mode when it changed. Omitted when the egress policy
+                                          is unchanged.
+                                    ],
+                                    "mode": "str",  # Optional. The new egress
+                                      mode. Present only when the mode changed. Known values are:
+                                      "allowlist", "unrestricted", and "deny_all".
+                                    "removed": [
+                                        "str"  # Optional. The hosts and IP
+                                          addresses an ``egress`` change added or removed, and the new
+                                          egress mode when it changed. Omitted when the egress policy
+                                          is unchanged.
+                                    ]
+                                },
                                 "env": {
                                     "added": [
                                         "str"  # Optional. Names of the
@@ -36928,16 +37762,25 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 },
                                 "secrets": {
                                     "added": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ]
                                 },
                                 "tools": {
@@ -37050,6 +37893,23 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               "SESSION_STATUS_LOCKED".
                             "update": {
                                 "changes": {
+                                    "egress": {
+                                        "added": [
+                                            "str"  # Optional. The hosts
+                                              and IP addresses an ``egress`` change added or removed,
+                                              and the new egress mode when it changed. Omitted when the
+                                              egress policy is unchanged.
+                                        ],
+                                        "mode": "str",  # Optional. The new
+                                          egress mode. Present only when the mode changed. Known values
+                                          are: "allowlist", "unrestricted", and "deny_all".
+                                        "removed": [
+                                            "str"  # Optional. The hosts
+                                              and IP addresses an ``egress`` change added or removed,
+                                              and the new egress mode when it changed. Omitted when the
+                                              egress policy is unchanged.
+                                        ]
+                                    },
                                     "env": {
                                         "added": [
                                             "str"  # Optional. Names of
@@ -37069,19 +37929,28 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     },
                                     "secrets": {
                                         "added": [
-                                            "str"  # Optional. Names of
-                                              the entries added, removed, or changed in one manifest
-                                              section.
+                                            "str"  # Optional. Secret
+                                              names, never values. On an update, ``changed`` lists the
+                                              secrets that got a new value or were bound to another URL
+                                              or scheme. On ``config_diff``"" , ``changed`` lists only
+                                              the secrets bound to a different URL or scheme than in
+                                              the agent config.
                                         ],
                                         "changed": [
-                                            "str"  # Optional. Names of
-                                              the entries added, removed, or changed in one manifest
-                                              section.
+                                            "str"  # Optional. Secret
+                                              names, never values. On an update, ``changed`` lists the
+                                              secrets that got a new value or were bound to another URL
+                                              or scheme. On ``config_diff``"" , ``changed`` lists only
+                                              the secrets bound to a different URL or scheme than in
+                                              the agent config.
                                         ],
                                         "removed": [
-                                            "str"  # Optional. Names of
-                                              the entries added, removed, or changed in one manifest
-                                              section.
+                                            "str"  # Optional. Secret
+                                              names, never values. On an update, ``changed`` lists the
+                                              secrets that got a new value or were bound to another URL
+                                              or scheme. On ``config_diff``"" , ``changed`` lists only
+                                              the secrets bound to a different URL or scheme than in
+                                              the agent config.
                                         ]
                                     },
                                     "tools": {
@@ -37131,7 +38000,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "state": "str",  # Optional. State of a session
                                   settings update. `APPLYING`: in progress. `APPLIED`: live.
                                   `APPLIED_RESTARTED`: live, and the agent was restarted to apply it
-                                  (`env` and `secrets` changes). `FAILED`: the update did not take
+                                  (`env` and plain secret changes). `FAILED`: the update did not take
                                   effect; see ``reverted`` and ``detail``. Known values are:
                                   "APPLYING", "APPLIED", "APPLIED_RESTARTED", and "FAILED".
                                 "update_id": "str",  # Optional. The most recent
@@ -37227,6 +38096,23 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               "AGENT_KIND_HERMES", "AGENT_KIND_OPENAI_CODEX", "AGENT_KIND_LANGGRAPH",
                               and "AGENT_KIND_CREWAI".
                             "config_diff": {
+                                "egress": {
+                                    "added": [
+                                        "str"  # Optional. The hosts and IP
+                                          addresses an ``egress`` change added or removed, and the new
+                                          egress mode when it changed. Omitted when the egress policy
+                                          is unchanged.
+                                    ],
+                                    "mode": "str",  # Optional. The new egress
+                                      mode. Present only when the mode changed. Known values are:
+                                      "allowlist", "unrestricted", and "deny_all".
+                                    "removed": [
+                                        "str"  # Optional. The hosts and IP
+                                          addresses an ``egress`` change added or removed, and the new
+                                          egress mode when it changed. Omitted when the egress policy
+                                          is unchanged.
+                                    ]
+                                },
                                 "env": {
                                     "added": [
                                         "str"  # Optional. Names of the
@@ -37243,16 +38129,25 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 },
                                 "secrets": {
                                     "added": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ]
                                 },
                                 "tools": {
@@ -37365,6 +38260,23 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               "SESSION_STATUS_LOCKED".
                             "update": {
                                 "changes": {
+                                    "egress": {
+                                        "added": [
+                                            "str"  # Optional. The hosts
+                                              and IP addresses an ``egress`` change added or removed,
+                                              and the new egress mode when it changed. Omitted when the
+                                              egress policy is unchanged.
+                                        ],
+                                        "mode": "str",  # Optional. The new
+                                          egress mode. Present only when the mode changed. Known values
+                                          are: "allowlist", "unrestricted", and "deny_all".
+                                        "removed": [
+                                            "str"  # Optional. The hosts
+                                              and IP addresses an ``egress`` change added or removed,
+                                              and the new egress mode when it changed. Omitted when the
+                                              egress policy is unchanged.
+                                        ]
+                                    },
                                     "env": {
                                         "added": [
                                             "str"  # Optional. Names of
@@ -37384,19 +38296,28 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     },
                                     "secrets": {
                                         "added": [
-                                            "str"  # Optional. Names of
-                                              the entries added, removed, or changed in one manifest
-                                              section.
+                                            "str"  # Optional. Secret
+                                              names, never values. On an update, ``changed`` lists the
+                                              secrets that got a new value or were bound to another URL
+                                              or scheme. On ``config_diff``"" , ``changed`` lists only
+                                              the secrets bound to a different URL or scheme than in
+                                              the agent config.
                                         ],
                                         "changed": [
-                                            "str"  # Optional. Names of
-                                              the entries added, removed, or changed in one manifest
-                                              section.
+                                            "str"  # Optional. Secret
+                                              names, never values. On an update, ``changed`` lists the
+                                              secrets that got a new value or were bound to another URL
+                                              or scheme. On ``config_diff``"" , ``changed`` lists only
+                                              the secrets bound to a different URL or scheme than in
+                                              the agent config.
                                         ],
                                         "removed": [
-                                            "str"  # Optional. Names of
-                                              the entries added, removed, or changed in one manifest
-                                              section.
+                                            "str"  # Optional. Secret
+                                              names, never values. On an update, ``changed`` lists the
+                                              secrets that got a new value or were bound to another URL
+                                              or scheme. On ``config_diff``"" , ``changed`` lists only
+                                              the secrets bound to a different URL or scheme than in
+                                              the agent config.
                                         ]
                                     },
                                     "tools": {
@@ -37446,7 +38367,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "state": "str",  # Optional. State of a session
                                   settings update. `APPLYING`: in progress. `APPLIED`: live.
                                   `APPLIED_RESTARTED`: live, and the agent was restarted to apply it
-                                  (`env` and `secrets` changes). `FAILED`: the update did not take
+                                  (`env` and plain secret changes). `FAILED`: the update did not take
                                   effect; see ``reverted`` and ``detail``. Known values are:
                                   "APPLYING", "APPLIED", "APPLIED_RESTARTED", and "FAILED".
                                 "update_id": "str",  # Optional. The most recent
@@ -37547,6 +38468,23 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               "AGENT_KIND_HERMES", "AGENT_KIND_OPENAI_CODEX", "AGENT_KIND_LANGGRAPH",
                               and "AGENT_KIND_CREWAI".
                             "config_diff": {
+                                "egress": {
+                                    "added": [
+                                        "str"  # Optional. The hosts and IP
+                                          addresses an ``egress`` change added or removed, and the new
+                                          egress mode when it changed. Omitted when the egress policy
+                                          is unchanged.
+                                    ],
+                                    "mode": "str",  # Optional. The new egress
+                                      mode. Present only when the mode changed. Known values are:
+                                      "allowlist", "unrestricted", and "deny_all".
+                                    "removed": [
+                                        "str"  # Optional. The hosts and IP
+                                          addresses an ``egress`` change added or removed, and the new
+                                          egress mode when it changed. Omitted when the egress policy
+                                          is unchanged.
+                                    ]
+                                },
                                 "env": {
                                     "added": [
                                         "str"  # Optional. Names of the
@@ -37563,16 +38501,25 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 },
                                 "secrets": {
                                     "added": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ],
                                     "changed": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ],
                                     "removed": [
-                                        "str"  # Optional. Names of the
-                                          entries added, removed, or changed in one manifest section.
+                                        "str"  # Optional. Secret names,
+                                          never values. On an update, ``changed`` lists the secrets
+                                          that got a new value or were bound to another URL or scheme.
+                                          On ``config_diff``"" , ``changed`` lists only the secrets
+                                          bound to a different URL or scheme than in the agent config.
                                     ]
                                 },
                                 "tools": {
@@ -37685,6 +38632,23 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                               "SESSION_STATUS_LOCKED".
                             "update": {
                                 "changes": {
+                                    "egress": {
+                                        "added": [
+                                            "str"  # Optional. The hosts
+                                              and IP addresses an ``egress`` change added or removed,
+                                              and the new egress mode when it changed. Omitted when the
+                                              egress policy is unchanged.
+                                        ],
+                                        "mode": "str",  # Optional. The new
+                                          egress mode. Present only when the mode changed. Known values
+                                          are: "allowlist", "unrestricted", and "deny_all".
+                                        "removed": [
+                                            "str"  # Optional. The hosts
+                                              and IP addresses an ``egress`` change added or removed,
+                                              and the new egress mode when it changed. Omitted when the
+                                              egress policy is unchanged.
+                                        ]
+                                    },
                                     "env": {
                                         "added": [
                                             "str"  # Optional. Names of
@@ -37704,19 +38668,28 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     },
                                     "secrets": {
                                         "added": [
-                                            "str"  # Optional. Names of
-                                              the entries added, removed, or changed in one manifest
-                                              section.
+                                            "str"  # Optional. Secret
+                                              names, never values. On an update, ``changed`` lists the
+                                              secrets that got a new value or were bound to another URL
+                                              or scheme. On ``config_diff``"" , ``changed`` lists only
+                                              the secrets bound to a different URL or scheme than in
+                                              the agent config.
                                         ],
                                         "changed": [
-                                            "str"  # Optional. Names of
-                                              the entries added, removed, or changed in one manifest
-                                              section.
+                                            "str"  # Optional. Secret
+                                              names, never values. On an update, ``changed`` lists the
+                                              secrets that got a new value or were bound to another URL
+                                              or scheme. On ``config_diff``"" , ``changed`` lists only
+                                              the secrets bound to a different URL or scheme than in
+                                              the agent config.
                                         ],
                                         "removed": [
-                                            "str"  # Optional. Names of
-                                              the entries added, removed, or changed in one manifest
-                                              section.
+                                            "str"  # Optional. Secret
+                                              names, never values. On an update, ``changed`` lists the
+                                              secrets that got a new value or were bound to another URL
+                                              or scheme. On ``config_diff``"" , ``changed`` lists only
+                                              the secrets bound to a different URL or scheme than in
+                                              the agent config.
                                         ]
                                     },
                                     "tools": {
@@ -37766,7 +38739,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "state": "str",  # Optional. State of a session
                                   settings update. `APPLYING`: in progress. `APPLIED`: live.
                                   `APPLIED_RESTARTED`: live, and the agent was restarted to apply it
-                                  (`env` and `secrets` changes). `FAILED`: the update did not take
+                                  (`env` and plain secret changes). `FAILED`: the update did not take
                                   effect; see ``reverted`` and ``detail``. Known values are:
                                   "APPLYING", "APPLIED", "APPLIED_RESTARTED", and "FAILED".
                                 "update_id": "str",  # Optional. The most recent
@@ -221853,6 +222826,150 @@ class MicrovmsOperations:
             response_headers["ratelimit-reset"] = self._deserialize(
                 "int", response.headers.get("ratelimit-reset")
             )
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, deserialized, response_headers)  # type: ignore
+
+        return deserialized  # type: ignore
+
+    @distributed_trace_async
+    async def get_port_forward(
+        self, microvm_id: str, *, port: int, **kwargs: Any
+    ) -> Optional[JSON]:
+        """Forward a port to a MicroVM.
+
+        To open a TCP connection to a port inside a MicroVM, open a WebSocket connection to
+        ``wss://api.digitalocean.com/v2/microvms/{microvm_id}/port_forward?port={port}``. The
+        connection goes to ``127.0.0.1:{port}`` in the MicroVM, so the port does not need to be
+        public.
+
+        One WebSocket carries one TCP connection. To forward a local port, open a new WebSocket
+        for each local connection.
+
+        Send the API token in the ``Authorization`` header of the handshake. Browsers cannot set this
+        header, so you cannot open a port forward from browser JavaScript. Requires the
+        ``port_forward`` feature. If the MicroVM is paused and auto-resume is on, opening a port
+        forward resumes it.
+
+        :param microvm_id: The unique ID of the MicroVM. Required.
+        :type microvm_id: str
+        :keyword port: The TCP port to connect to inside the MicroVM. Port 50051 is reserved and cannot
+         be forwarded. Required.
+        :paramtype port: int
+        :return: JSON object or None
+        :rtype: JSON or None
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 400, 403, 404
+                response == {
+                    "code": "str",  # A service-defined error code. Required.
+                    "message": "str"  # A human-readable description of the error. Required.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[Optional[JSON]] = kwargs.pop("cls", None)
+
+        _request = build_microvms_get_port_forward_request(
+            microvm_id=microvm_id,
+            port=port,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            await self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [101, 400, 403, 404]:
+            if _stream:
+                await response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        deserialized = None
+        response_headers = {}
+        if response.status_code == 101:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
 
         if response.status_code == 403:
             response_headers["ratelimit-limit"] = self._deserialize(
