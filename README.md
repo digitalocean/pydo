@@ -276,6 +276,80 @@ A snapshot captures the boot disk and memory, not the workspace data disk. A `na
 
 The async version has the same names: `await sandbox.commands.run(...)` and `async for event in cmd.stream()`. Output can only be read while a command runs: a command that exits before the stream attaches raises `NotFoundError`. File transfer is not available yet: it needs routes that are not in the API.
 
+### Migrating from E2B, Modal and Daytona
+
+> Migration only. The clients below keep another sandbox platform's names and
+> signatures so existing code runs on DigitalOcean Sandboxes after an import swap.
+> New code should use `pydo.Sandbox` above.
+
+```python
+from pydo.sandbox.compat.e2b import Sandbox              # was: from e2b import Sandbox
+from pydo.sandbox.compat.daytona import Daytona, DaytonaConfig   # was: from daytona import ...
+import pydo.sandbox.compat.modal as modal                # was: import modal
+```
+
+The async twins are `pydo.aio.sandbox.compat.e2b` (`AsyncSandbox`),
+`pydo.aio.sandbox.compat.daytona` (`AsyncDaytona`) and Modal's `.aio` calls
+(`await modal.Sandbox.create.aio(...)`). They load on first use, never on
+`import pydo`, and need none of the vendor packages. Signatures match
+**e2b 2.64.0**, **daytona 2.1.0** (and the legacy `daytona-sdk` 0.233.0 shapes) and
+**modal 1.6.4**; `scripts/gen_compat_mirror.py` regenerates them from the vendor
+wheels.
+
+Each platform also has a client class that binds a DigitalOcean token once, like
+`SandboxClient`: `E2bClient(api_key=...)`, `DaytonaClient(DaytonaConfig(api_key=...))`
+and `ModalClient(token_secret=...)`. The vendor key (`api_key`, `token_secret`) is
+the **DigitalOcean API token**, read from `DIGITALOCEAN_ACCESS_TOKEN` when omitted;
+`E2B_API_KEY`, `DAYTONA_API_KEY` and `MODAL_TOKEN_*` are never read, and nothing
+contacts the vendor. Options that point at the vendor's servers (E2B `domain`,
+`api_url`, `sandbox_url`; Daytona `api_url`, `jwt_token`, `organization_id`,
+`target`; ...) raise, so a DigitalOcean token is never sent to them. `do_api_url`
+and `size` are DigitalOcean extras on the client constructors.
+
+Anything the Sandboxes API cannot do yet keeps the platform's exact signature and
+raises `SandboxNotImplementedError` (a `SandboxError` and a `NotImplementedError`):
+
+```python
+from pydo.sandbox import SandboxNotImplementedError
+
+try:
+    sandbox.files.read("/etc/hostname")
+except SandboxNotImplementedError as err:
+    print(err)   # E2B.Filesystem.read is not implemented on DigitalOcean Sandboxes yet: needs the file APIs
+```
+
+Options that would change what a sandbox is or how long it lives (E2B `timeout`,
+`metadata`, `lifecycle`; Daytona `labels`, `auto_stop_interval`, `volumes`; Modal
+`timeout`, `tags`, `volumes`, ports) raise the same error when you pass them, before
+any request: nothing is silently ignored. Options that only tune the HTTP client
+(`request_timeout`, `retries`, `headers`, `debug`, `proxy`) are accepted and ignored.
+Failed calls raise the platform's own exceptions (`e2b.NotFoundException`,
+`daytona.DaytonaNotFoundError`, `modal.exception.NotFoundError`, ...) with the
+Sandboxes error as `__cause__`.
+
+| | E2B | Daytona (`v0` and `v2`) | Modal |
+| --- | --- | --- | --- |
+| **Works** | `Sandbox.create`, `connect`, `kill`, `pause`, `is_running`, `get_info`, `list`; `commands.run` (foreground, `background=True`, `stdin`, `shell`, callbacks), `list`, `kill`, `send_stdin`, `connect`; `CommandHandle`; `create_snapshot`, `list_snapshots`, `delete_snapshot` | `create` (snapshot params, `env_vars`, `network_block_all`), `get`, `list`, `start`, `stop`, `delete`; `sandbox.process.exec`, `create_snapshot`, `refresh_data`; `daytona.snapshot` (create from an OCI image, `list`, `get`, `delete`); v2 `create_from_snapshot`, `exec`, `wait` | `Sandbox.create` (`cpu`/`memory`, `env`, `secrets`, `block_network`, `workdir`, an entrypoint), `exec`, `stdout`/`stderr`/`stdin`, `wait`, `poll`, `terminate`, `from_id`, `list`; `Image.debian_slim()`, `Image.from_registry()`, `Secret.from_dict()`; `.aio` forms |
+| **Raises** | `files` (read, write, list, watch, ...), `pty`, `git`, `Template` builder, `Volume`, `Secret`, `set_timeout`, `get_metrics`, `get_host`, `download_url`/`upload_url`, `update_network`, `fork`, MCP | `fs`, `git`, LSP, code interpreter, computer use, volumes, sessions and PTY, `code_run`, labels, preview links, SSH, auto-stop and archive settings, `resize`, `fork`, `Image` builders, `create(image=...)` | `filesystem`, `tunnels`, tags, snapshots, `Volume`, `CloudBucketMount`, `NetworkFileSystem`, `Image` builders (`pip_install`, ...), `App.run`/`deploy`/`function` |
+
+Semantic differences to know before you migrate:
+
+- **Non-zero exit codes follow the platform.** E2B's `commands.run` raises
+  `CommandExitException`; Daytona's `process.exec` and Modal's `exec` return the exit
+  code. The native `pydo.Sandbox` returns it in the result.
+- **A Daytona snapshot is a DigitalOcean template** (`daytona.snapshot`), while
+  `sandbox.create_snapshot(name)` is a DigitalOcean snapshot. A DigitalOcean snapshot
+  cannot be started from yet, so E2B's `Sandbox.create(template=<snapshot id>)` and
+  Daytona's snapshot restore raise or return not-found.
+- **`stop` means pause.** E2B `pause`, Daytona `stop`/`pause` and Modal
+  `_experimental_pause` all call the DigitalOcean pause; `start`/`connect` resume.
+- **Modal `timeout=300`** is Modal's own default and cannot be told from "not
+  passed", so it is accepted; any other lifetime raises. Modal's `exec` stdout is
+  read as the command runs, but `poll()` only reports an exit code once you have read
+  the stream to its end.
+- **Sizes.** E2B `cpu_count` and Daytona `resources` raise; pass `size=` to the client.
+  Modal `cpu`/`memory` round up to the smallest DigitalOcean size that fits.
+
 ## **AI & Inference**
 
 > Talk to models on DigitalOcean's

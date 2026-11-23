@@ -70,6 +70,37 @@ class SandboxTimeoutError(SandboxError):
     """A wait ran out of time. The operation may still finish later."""
 
 
+class SandboxNotImplementedError(SandboxError, NotImplementedError):
+    """The call is valid for another sandbox platform but has no DigitalOcean Sandboxes API yet.
+
+    Raised by the migration-only compat clients (``pydo.sandbox.compat``) for
+    methods that keep a platform's signature but that the Sandboxes API cannot
+    serve, such as file transfer. It is also a :class:`NotImplementedError`.
+    """
+
+    def __init__(
+        self, feature: str, needs: Optional[str] = None, *, reason: Optional[str] = None
+    ) -> None:
+        if reason:
+            # An option that points at another platform's servers or accounts:
+            # not a gap in the API, so it will not be wired up later.
+            msg = "%s is not supported on DigitalOcean Sandboxes: %s" % (
+                feature,
+                reason,
+            )
+        else:
+            msg = "%s is not implemented on DigitalOcean Sandboxes yet" % feature
+            if needs:
+                msg += ": needs %s" % needs
+        super().__init__(msg)
+        #: The platform call that was attempted, such as ``E2B.Filesystem.read``.
+        self.feature = feature
+        #: The missing DigitalOcean Sandboxes capability.
+        self.needs = needs
+        #: Set when the option has no DigitalOcean counterpart at all.
+        self.reason = reason
+
+
 _BY_STATUS = {
     400: InvalidRequestError,
     401: AuthenticationError,

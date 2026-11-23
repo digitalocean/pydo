@@ -34,6 +34,7 @@ from .errors import (
     PermissionDeniedError,
     RateLimitError,
     SandboxError,
+    SandboxNotImplementedError,
     SandboxTimeoutError,
     ServiceError,
 )
@@ -67,6 +68,7 @@ __all__ = [
     "SandboxClient",
     "SandboxError",
     "SandboxInfo",
+    "SandboxNotImplementedError",
     "SandboxPaginator",
     "SandboxState",
     "SandboxTimeoutError",

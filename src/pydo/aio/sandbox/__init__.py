@@ -16,6 +16,7 @@ from pydo.sandbox.errors import (
     PermissionDeniedError,
     RateLimitError,
     SandboxError,
+    SandboxNotImplementedError,
     SandboxTimeoutError,
     ServiceError,
 )
@@ -64,6 +65,7 @@ __all__ = [
     "SandboxInfo",
     "SandboxPaginator",
     "SandboxState",
+    "SandboxNotImplementedError",
     "SandboxTimeoutError",
     "ServiceError",
 ]
