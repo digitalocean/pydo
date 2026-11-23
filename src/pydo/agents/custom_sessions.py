@@ -731,9 +731,10 @@ class SessionsOperations:
         and no port, query or fragment. A URL-bound secret cannot be changed back
         to a plain secret.
 
-        ``egress`` replaces the session's allowlist: ``allow_hosts`` (hostnames)
-        and ``allow_ips`` (exact IPv4 or IPv6 addresses, not CIDR ranges). A host
-        or IP address left out is removed. The VPC cannot change: leave out
+        ``egress`` replaces the session's allowlist. Send it as an object with
+        ``allow_hosts`` (hostnames) and ``allow_ips`` (exact IPv4 or IPv6
+        addresses, not CIDR ranges); only this form is supported in an update. A
+        host or IP address left out is removed. The VPC cannot change: leave out
         ``vpc_uuid`` and ``subnet_uuid``, or send their current values (a
         different value is ``422``).
 
