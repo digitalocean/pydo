@@ -3,7 +3,9 @@
 The manifest holds only the sections to change. ``tools`` is the full
 replacement list, but only Action Gateway (``do.actions``) entries can change;
 include any custom MCP servers the session has exactly as they are. ``env``
-and ``secrets`` (when sent) are full sets.
+and ``secrets`` (when sent) are full sets. ``egress`` (when sent) replaces
+``allow_hosts`` and ``allow_ips``; the VPC cannot change. See
+``SessionsOperations.update_config`` for URL-bound secret and model updates.
 """
 
 import os
