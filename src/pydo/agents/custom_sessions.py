@@ -697,13 +697,14 @@ class SessionsOperations:
 
     # The generated operations module still describes the older rules (``model``
     # and ``permissions`` as 501, ``tools: []`` as a way to detach every MCP
-    # server) and catches up on the next regeneration from openapi. Do not
-    # reconcile the docstring below back to it.
+    # server, URL-bound secrets and egress as fixed at create) and catches up on
+    # the next regeneration from openapi. Do not reconcile the docstring below
+    # back to it.
     def update_config(self, session_id: str, *, manifest_yaml: str) -> Any:
         """Patch the live config of a session (``PATCH .../sessions/{session_id}``).
 
         ``manifest_yaml`` holds only the sections to change (``tools``, ``env``,
-        ``secrets``); absent sections are untouched. ``tools`` is the full
+        ``secrets``, ``egress``); absent sections are untouched. ``tools`` is the full
         replacement list, but only Action Gateway (``do.actions``) entries can
         change: include the session's custom MCP servers exactly as they are
         (adding, removing or changing one is ``422``). ``env`` and ``secrets`` are
@@ -714,6 +715,35 @@ class SessionsOperations:
         set ``HARNESS_INFERENCE_MODEL`` in ``env`` to another Serverless
         Inference model id or ``router:<name>``. A session on any other model
         provider cannot change its model (``422``).
+
+        URL-bound secrets: the egress proxy sends the value only to requests that
+        match the secret's ``url``; the agent never receives it. In ``secrets``:
+
+        - a new value as a string rotates the secret; ``url`` and ``scheme`` stay
+          the same.
+        - ``{value, url, scheme}`` moves it. A new host or path, or a change to
+          ``scheme: raw``, requires ``value`` (``400`` otherwise).
+        - ``{value, url}`` adds one. ``scheme`` defaults to ``bearer``.
+        - ``{url}`` binds an existing plain secret to a URL and keeps its value.
+        - ``{}`` keeps it; leaving it out removes it.
+
+        ``url`` must use ``https://`` and an exact hostname, with an optional path
+        and no port, query or fragment. A URL-bound secret cannot be changed back
+        to a plain secret.
+
+        ``egress`` replaces the session's allowlist: ``allow_hosts`` (hostnames)
+        and ``allow_ips`` (exact IPv4 or IPv6 addresses, not CIDR ranges). A host
+        or IP address left out is removed. The VPC cannot change: leave out
+        ``vpc_uuid`` and ``subnet_uuid``, or send their current values (a
+        different value is ``422``).
+
+        URL-bound secret and ``egress`` changes do not restart the agent (an
+        update with only those ends ``APPLIED``) and take effect on the session's
+        next outbound connection; open connections stay open. They require
+        URL-bound secret and egress updates to be enabled for the team (``422``
+        otherwise). A session created with unrestricted egress and no URL-bound
+        secrets cannot gain either one: the update ends ``FAILED`` with
+        ``requires_new_session``.
 
         The session status must be ``SESSION_STATUS_READY``,
         ``SESSION_STATUS_DETACHED`` or ``SESSION_STATUS_PAUSED`` (a paused session

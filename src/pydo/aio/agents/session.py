@@ -378,12 +378,14 @@ class AsyncAgentSession:
         )
 
     async def update_config(self, manifest_yaml: str) -> Any:
-        """Patch the live config (tools, env, secrets) from a partial manifest YAML.
+        """Patch the live config (tools, env, secrets, egress) from partial YAML.
 
         Only Action Gateway (``do.actions``) tools can change; custom MCP
         servers must be sent back unchanged. The model changes only through
         ``env.HARNESS_INFERENCE_MODEL``, and only on a session whose model
-        provider is DigitalOcean Serverless Inference. The session must be
+        provider is DigitalOcean Serverless Inference. URL-bound secrets can be
+        rotated, moved, added or removed, and ``egress`` replaces
+        ``allow_hosts`` and ``allow_ips``; the VPC cannot change. The session must be
         ``SESSION_STATUS_READY``, ``SESSION_STATUS_DETACHED`` or
         ``SESSION_STATUS_PAUSED`` (not paused for zero balance) and idle. See
         :meth:`AsyncSessionsOperations.update_config` for the full rules.
