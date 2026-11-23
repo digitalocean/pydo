@@ -709,12 +709,30 @@ class SessionsOperations:
         change: include the session's custom MCP servers exactly as they are
         (adding, removing or changing one is ``422``). ``env`` and ``secrets`` are
         full sets (a key left out is removed). A top-level ``model`` or
-        ``permissions`` section is ``400``. The model can change only when the
-        session's model provider is DigitalOcean Serverless Inference (created
-        with ``HARNESS_INFERENCE_MODEL`` and no inference endpoint of its own):
-        set ``HARNESS_INFERENCE_MODEL`` in ``env`` to another Serverless
-        Inference model id or ``router:<name>``. A session on any other model
-        provider cannot change its model (``422``).
+        ``permissions`` section is ``400``.
+
+        The model is set in ``env``, in the key that matches the endpoint the
+        session was created with:
+
+        - DigitalOcean Serverless Inference (``HARNESS_INFERENCE_MODEL``, no
+          endpoint of its own): ``HARNESS_INFERENCE_MODEL``, set to a model id
+          or ``router:<name>``.
+        - Its own OpenAI-compatible endpoint (``OPENAI_BASE_URL``): ``MODEL``,
+          which is read before ``OPENAI_MODEL``.
+        - Its own Anthropic endpoint (``ANTHROPIC_BASE_URL``) or the Anthropic
+          API (an ``ANTHROPIC_API_KEY`` secret): ``ANTHROPIC_MODEL``, which is
+          read before ``MODEL``.
+
+        A session keeps its endpoint: changing the provider or the base URL, or
+        adding or removing ``HARNESS_INFERENCE_MODEL``, is ``422``. On a session
+        with its own endpoint, removing the model key selects the agent's
+        default model, and the provider key (``OPENAI_API_KEY`` or
+        ``ANTHROPIC_API_KEY``) can only be rotated (a new value, or ``{}`` to
+        keep it): removing it, adding it, or changing its ``url`` or ``scheme``
+        is ``422``. Rotating a URL-bound provider key follows the URL-bound
+        secret rules below. A model name must be one line of at most 256 bytes,
+        with no leading or trailing whitespace and no ``" #"`` or ``": "``
+        (``400``).
 
         URL-bound secrets: the egress proxy sends the value only to requests that
         match the secret's ``url``; the agent never receives it. In ``secrets``:
