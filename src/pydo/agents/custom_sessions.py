@@ -740,7 +740,7 @@ class SessionsOperations:
         URL-bound secret and ``egress`` changes do not restart the agent (an
         update with only those ends ``APPLIED``) and take effect on the session's
         next outbound connection; open connections stay open. They require
-        URL-bound secret and egress updates to be enabled for the team (``422``
+        URL-bound secret and egress updates to be enabled for the team (``403``
         otherwise). A session created with unrestricted egress and no URL-bound
         secrets cannot gain either one: the update ends ``FAILED`` with
         ``requires_new_session``.
