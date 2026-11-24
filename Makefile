@@ -29,6 +29,7 @@ clean: ## Removes all generated code (except _patch.py files)
 	@find src/pydo -type f \
 		! -name "_patch.py" ! -name "custom_*.py" ! -name "exceptions.py" \
 		! -path "src/pydo/agents/*" \
+		! -path "src/pydo/_agents/*" \
 		! -path "src/pydo/aio/agents/*" \
 		! -path "*/gateway/*" \
 		! -path "*/action_gateway/*" \
