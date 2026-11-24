@@ -13,7 +13,7 @@ from azure.core.credentials import AccessToken
 
 from pydo.custom_policies import CustomHttpLoggingPolicy
 from pydo.custom_extensions import _BaseURLProxy, INFERENCE_BASE_URL
-from pydo import GeneratedClient, _version
+from pydo import GeneratedClient, _version, _agents
 
 try:
     from pydo.resources.client_surface import AgentClientSurface, InferenceClientSurface
@@ -102,6 +102,9 @@ class Client(  # type: ignore
             sdk_moniker=sdk_moniker,
             **kwargs,
         )
+        agent_token = _agents.user_agent_token()
+        if agent_token:
+            self._config.user_agent_policy.add_user_agent(agent_token)
 
         self._setup_inference_routing(inference_endpoint, agent_endpoint)
 
