@@ -23935,6 +23935,253 @@ def build_sandboxes_get_commands_stream_request(  # pylint: disable=name-too-lon
     return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
 
 
+def build_sandboxes_get_files_download_request(  # pylint: disable=name-too-long
+    sandbox_id: str, *, path: str, as_archive: Optional[bool] = None, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/octet-stream, application/json")
+
+    # Construct URL
+    _url = "/v2/sandboxes/{sandbox_id}/files/download"
+    path_format_arguments = {
+        "sandbox_id": _SERIALIZER.url("sandbox_id", sandbox_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct parameters
+    _params["path"] = _SERIALIZER.query("path", path, "str")
+    if as_archive is not None:
+        _params["as_archive"] = _SERIALIZER.query("as_archive", as_archive, "bool")
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
+
+
+def build_sandboxes_get_files_exists_request(
+    sandbox_id: str, *, path: str, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/sandboxes/{sandbox_id}/files/exists"
+    path_format_arguments = {
+        "sandbox_id": _SERIALIZER.url("sandbox_id", sandbox_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct parameters
+    _params["path"] = _SERIALIZER.query("path", path, "str")
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
+
+
+def build_sandboxes_get_file_info_request(
+    sandbox_id: str, *, path: str, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/sandboxes/{sandbox_id}/files/info"
+    path_format_arguments = {
+        "sandbox_id": _SERIALIZER.url("sandbox_id", sandbox_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct parameters
+    _params["path"] = _SERIALIZER.query("path", path, "str")
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
+
+
+def build_sandboxes_list_files_request(
+    sandbox_id: str, *, path: str, depth: Optional[int] = None, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/sandboxes/{sandbox_id}/files/list"
+    path_format_arguments = {
+        "sandbox_id": _SERIALIZER.url("sandbox_id", sandbox_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct parameters
+    _params["path"] = _SERIALIZER.query("path", path, "str")
+    if depth is not None:
+        _params["depth"] = _SERIALIZER.query("depth", depth, "int")
+
+    # Construct headers
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(
+        method="GET", url=_url, params=_params, headers=_headers, **kwargs
+    )
+
+
+def build_sandboxes_post_files_make_directory_request(  # pylint: disable=name-too-long
+    sandbox_id: str, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/sandboxes/{sandbox_id}/files/make-directory"
+    path_format_arguments = {
+        "sandbox_id": _SERIALIZER.url("sandbox_id", sandbox_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_sandboxes_post_files_move_request(
+    sandbox_id: str, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/sandboxes/{sandbox_id}/files/move"
+    path_format_arguments = {
+        "sandbox_id": _SERIALIZER.url("sandbox_id", sandbox_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_sandboxes_post_files_remove_request(  # pylint: disable=name-too-long
+    sandbox_id: str, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/sandboxes/{sandbox_id}/files/remove"
+    path_format_arguments = {
+        "sandbox_id": _SERIALIZER.url("sandbox_id", sandbox_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_sandboxes_post_files_upload_request(  # pylint: disable=name-too-long
+    sandbox_id: str,
+    *,
+    path: str,
+    content: IO[bytes],
+    is_archive: Optional[bool] = None,
+    x_content_sha256: Optional[str] = None,
+    **kwargs: Any,
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+    _params = case_insensitive_dict(kwargs.pop("params", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/sandboxes/{sandbox_id}/files/upload"
+    path_format_arguments = {
+        "sandbox_id": _SERIALIZER.url("sandbox_id", sandbox_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct parameters
+    _params["path"] = _SERIALIZER.query("path", path, "str")
+    if is_archive is not None:
+        _params["is_archive"] = _SERIALIZER.query("is_archive", is_archive, "bool")
+
+    # Construct headers
+    if x_content_sha256 is not None:
+        _headers["X-Content-Sha256"] = _SERIALIZER.header(
+            "x_content_sha256", x_content_sha256, "str"
+        )
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(
+        method="POST",
+        url=_url,
+        params=_params,
+        headers=_headers,
+        content=content,
+        **kwargs,
+    )
+
+
 def build_sandboxes_post_pause_request(sandbox_id: str, **kwargs: Any) -> HttpRequest:
     _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
 
@@ -279661,6 +279908,1880 @@ class SandboxesOperations:  # pylint: disable=too-many-public-methods
                 deserialized = None
 
         if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def get_files_download(
+        self,
+        sandbox_id: str,
+        *,
+        path: str,
+        as_archive: Optional[bool] = None,
+        **kwargs: Any,
+    ) -> Union[Iterator[bytes], JSON]:
+        """Download a File.
+
+        Stream a file from the sandbox, or a directory as a tar archive when
+        ``as_archive`` is set, up to 50 MiB. The ``path`` query parameter is required.
+
+        The body is the payload followed by a 73-byte integrity footer: ``DOWSSHA1``
+        (8 bytes), the 64-character lowercase hex SHA-256 of the payload, and a
+        newline. Strip the footer before you save the payload. Concurrent direct
+        transfers are limited; over the limit the request answers ``503``.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :keyword path: A file or directory path inside the sandbox workspace. Relative paths are
+         resolved from the workspace root. Required.
+        :paramtype path: str
+        :keyword as_archive: When true, send the path as a tar archive. Required to download a
+         directory. Default value is None.
+        :paramtype as_archive: bool
+        :return: Iterator[bytes] or JSON object
+        :rtype: Iterator[bytes] or JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 400, 403, 404, 409, 413, 503
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[Union[Iterator[bytes], JSON]] = kwargs.pop("cls", None)
+
+        _request = build_sandboxes_get_files_download_request(
+            sandbox_id=sandbox_id,
+            path=path,
+            as_archive=as_archive,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = True
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404, 409, 413, 503]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+            response_headers["X-Workspace-Is-Archive"] = self._deserialize(
+                "str", response.headers.get("X-Workspace-Is-Archive")
+            )
+            response_headers["X-Workspace-Size-Bytes"] = self._deserialize(
+                "str", response.headers.get("X-Workspace-Size-Bytes")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if response.status_code == 413:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if response.status_code == 503:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            deserialized = response.iter_bytes()
+
+        if cls:
+            return cls(pipeline_response, cast(Union[Iterator[bytes], JSON], deserialized), response_headers)  # type: ignore
+
+        return cast(Union[Iterator[bytes], JSON], deserialized)  # type: ignore
+
+    @distributed_trace
+    def get_files_exists(self, sandbox_id: str, *, path: str, **kwargs: Any) -> JSON:
+        """Check That a File Exists.
+
+        Check whether a file, directory, or symlink exists at a path in the sandbox.
+        A missing path answers ``200`` with ``exists`` false; ``404`` means the sandbox
+        was not found. A false ``exists`` is omitted from the JSON body, so ``{}``
+        means the path does not exist.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :keyword path: A file or directory path inside the sandbox workspace. Relative paths are
+         resolved from the workspace root. Required.
+        :paramtype path: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "exists": bool  # Optional. True when a file, directory, or symlink exists at
+                      ``path``. Omitted when false.
+                }
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_sandboxes_get_files_exists_request(
+            sandbox_id=sandbox_id,
+            path=path,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404, 409]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def get_file_info(self, sandbox_id: str, *, path: str, **kwargs: Any) -> JSON:
+        # pylint: disable=line-too-long
+        """Retrieve File Information.
+
+        Retrieve the name, type, size, mode, owner, and modification time of a file,
+        directory, or symlink in the sandbox. When the path is a symlink,
+        ``symlink_target`` is where it points. A missing path answers ``404``\\ ; to test
+        for a path without an error, use the exists route.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :keyword path: A file or directory path inside the sandbox workspace. Relative paths are
+         resolved from the workspace root. Required.
+        :paramtype path: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "entry": {
+                        "group": "str",  # Optional. The group that owns the entry.
+                        "mode": 0,  # Optional. The Unix file mode bits, for example ``420``
+                          ("" ``0644``"" ).
+                        "modified_time": "2020-02-20 00:00:00",  # Optional. When the entry
+                          was last modified.
+                        "name": "str",  # Optional. The base name of the entry.
+                        "owner": "str",  # Optional. The user that owns the entry.
+                        "path": "str",  # Optional. The absolute path of the entry in the
+                          sandbox.
+                        "permissions": "str",  # Optional. The permissions in ``ls`` form,
+                          for example ``-rw-r--r--``.
+                        "size": "str",  # Optional. The size in bytes. Encoded as a string
+                          per protobuf JSON.
+                        "symlink_target": "str",  # Optional. Symlink only. The path the
+                          symlink points to. Empty unless ``type`` is ``FILE_ENTRY_TYPE_SYMLINK``.
+                        "type": "str"  # Optional. The type of a file system entry. Known
+                          values are: "FILE_ENTRY_TYPE_UNSPECIFIED", "FILE_ENTRY_TYPE_FILE",
+                          "FILE_ENTRY_TYPE_DIRECTORY", and "FILE_ENTRY_TYPE_SYMLINK".
+                    }
+                }
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_sandboxes_get_file_info_request(
+            sandbox_id=sandbox_id,
+            path=path,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404, 409]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def list_files(
+        self, sandbox_id: str, *, path: str, depth: Optional[int] = None, **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """List Files in a Directory.
+
+        List the files, directories, and symlinks in a directory of the sandbox.
+        ``depth`` sets how many levels to list: ``1``\\ , the default, lists the
+        directory's own entries; ``2`` also lists the entries of its subdirectories,
+        and so on. Symlinks inside the directory are listed, not followed.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :keyword path: A file or directory path inside the sandbox workspace. Relative paths are
+         resolved from the workspace root. Required.
+        :paramtype path: str
+        :keyword depth: How many levels to list. ``0`` or ``1`` lists the directory's own entries;
+         ``2`` also lists the entries of its subdirectories, and so on. Default value is None.
+        :paramtype depth: int
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "entries": [
+                        {
+                            "group": "str",  # Optional. The group that owns the entry.
+                            "mode": 0,  # Optional. The Unix file mode bits, for example
+                              ``420`` ("" ``0644``"" ).
+                            "modified_time": "2020-02-20 00:00:00",  # Optional. When the
+                              entry was last modified.
+                            "name": "str",  # Optional. The base name of the entry.
+                            "owner": "str",  # Optional. The user that owns the entry.
+                            "path": "str",  # Optional. The absolute path of the entry in
+                              the sandbox.
+                            "permissions": "str",  # Optional. The permissions in ``ls``
+                              form, for example ``-rw-r--r--``.
+                            "size": "str",  # Optional. The size in bytes. Encoded as a
+                              string per protobuf JSON.
+                            "symlink_target": "str",  # Optional. Symlink only. The path
+                              the symlink points to. Empty unless ``type`` is
+                              ``FILE_ENTRY_TYPE_SYMLINK``.
+                            "type": "str"  # Optional. The type of a file system entry.
+                              Known values are: "FILE_ENTRY_TYPE_UNSPECIFIED", "FILE_ENTRY_TYPE_FILE",
+                              "FILE_ENTRY_TYPE_DIRECTORY", and "FILE_ENTRY_TYPE_SYMLINK".
+                        }
+                    ]
+                }
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = kwargs.pop("headers", {}) or {}
+        _params = kwargs.pop("params", {}) or {}
+
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _request = build_sandboxes_list_files_request(
+            sandbox_id=sandbox_id,
+            path=path,
+            depth=depth,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404, 409]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    def post_files_make_directory(
+        self,
+        sandbox_id: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Directory.
+
+        Create a directory in the sandbox, with any missing parent directories. When
+        the directory already exists, nothing changes: ``created`` is false, and is
+        omitted from the JSON body. ``entry`` describes the directory in both cases.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "path": "str"  # The directory to create. Required.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "created": bool,  # Optional. False when the directory already existed.
+                      Omitted when false.
+                    "entry": {
+                        "group": "str",  # Optional. The group that owns the entry.
+                        "mode": 0,  # Optional. The Unix file mode bits, for example ``420``
+                          ("" ``0644``"" ).
+                        "modified_time": "2020-02-20 00:00:00",  # Optional. When the entry
+                          was last modified.
+                        "name": "str",  # Optional. The base name of the entry.
+                        "owner": "str",  # Optional. The user that owns the entry.
+                        "path": "str",  # Optional. The absolute path of the entry in the
+                          sandbox.
+                        "permissions": "str",  # Optional. The permissions in ``ls`` form,
+                          for example ``-rw-r--r--``.
+                        "size": "str",  # Optional. The size in bytes. Encoded as a string
+                          per protobuf JSON.
+                        "symlink_target": "str",  # Optional. Symlink only. The path the
+                          symlink points to. Empty unless ``type`` is ``FILE_ENTRY_TYPE_SYMLINK``.
+                        "type": "str"  # Optional. The type of a file system entry. Known
+                          values are: "FILE_ENTRY_TYPE_UNSPECIFIED", "FILE_ENTRY_TYPE_FILE",
+                          "FILE_ENTRY_TYPE_DIRECTORY", and "FILE_ENTRY_TYPE_SYMLINK".
+                    }
+                }
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+
+    @overload
+    def post_files_make_directory(
+        self,
+        sandbox_id: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Directory.
+
+        Create a directory in the sandbox, with any missing parent directories. When
+        the directory already exists, nothing changes: ``created`` is false, and is
+        omitted from the JSON body. ``entry`` describes the directory in both cases.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "created": bool,  # Optional. False when the directory already existed.
+                      Omitted when false.
+                    "entry": {
+                        "group": "str",  # Optional. The group that owns the entry.
+                        "mode": 0,  # Optional. The Unix file mode bits, for example ``420``
+                          ("" ``0644``"" ).
+                        "modified_time": "2020-02-20 00:00:00",  # Optional. When the entry
+                          was last modified.
+                        "name": "str",  # Optional. The base name of the entry.
+                        "owner": "str",  # Optional. The user that owns the entry.
+                        "path": "str",  # Optional. The absolute path of the entry in the
+                          sandbox.
+                        "permissions": "str",  # Optional. The permissions in ``ls`` form,
+                          for example ``-rw-r--r--``.
+                        "size": "str",  # Optional. The size in bytes. Encoded as a string
+                          per protobuf JSON.
+                        "symlink_target": "str",  # Optional. Symlink only. The path the
+                          symlink points to. Empty unless ``type`` is ``FILE_ENTRY_TYPE_SYMLINK``.
+                        "type": "str"  # Optional. The type of a file system entry. Known
+                          values are: "FILE_ENTRY_TYPE_UNSPECIFIED", "FILE_ENTRY_TYPE_FILE",
+                          "FILE_ENTRY_TYPE_DIRECTORY", and "FILE_ENTRY_TYPE_SYMLINK".
+                    }
+                }
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+
+    @distributed_trace
+    def post_files_make_directory(
+        self, sandbox_id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Create a Directory.
+
+        Create a directory in the sandbox, with any missing parent directories. When
+        the directory already exists, nothing changes: ``created`` is false, and is
+        omitted from the JSON body. ``entry`` describes the directory in both cases.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "path": "str"  # The directory to create. Required.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "created": bool,  # Optional. False when the directory already existed.
+                      Omitted when false.
+                    "entry": {
+                        "group": "str",  # Optional. The group that owns the entry.
+                        "mode": 0,  # Optional. The Unix file mode bits, for example ``420``
+                          ("" ``0644``"" ).
+                        "modified_time": "2020-02-20 00:00:00",  # Optional. When the entry
+                          was last modified.
+                        "name": "str",  # Optional. The base name of the entry.
+                        "owner": "str",  # Optional. The user that owns the entry.
+                        "path": "str",  # Optional. The absolute path of the entry in the
+                          sandbox.
+                        "permissions": "str",  # Optional. The permissions in ``ls`` form,
+                          for example ``-rw-r--r--``.
+                        "size": "str",  # Optional. The size in bytes. Encoded as a string
+                          per protobuf JSON.
+                        "symlink_target": "str",  # Optional. Symlink only. The path the
+                          symlink points to. Empty unless ``type`` is ``FILE_ENTRY_TYPE_SYMLINK``.
+                        "type": "str"  # Optional. The type of a file system entry. Known
+                          values are: "FILE_ENTRY_TYPE_UNSPECIFIED", "FILE_ENTRY_TYPE_FILE",
+                          "FILE_ENTRY_TYPE_DIRECTORY", and "FILE_ENTRY_TYPE_SYMLINK".
+                    }
+                }
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_sandboxes_post_files_make_directory_request(
+            sandbox_id=sandbox_id,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404, 409]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    def post_files_move(
+        self,
+        sandbox_id: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Move or Rename a File.
+
+        Move or rename a file, directory, or symlink in the sandbox. Both ``source``
+        and ``destination`` must be inside the workspace. Missing parent directories
+        of the destination are created, and a file already at the destination is
+        replaced. The response is the entry at its new path.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "destination": "str",  # The new path. Required.
+                    "source": "str"  # The file, directory, or symlink to move. Required.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "entry": {
+                        "group": "str",  # Optional. The group that owns the entry.
+                        "mode": 0,  # Optional. The Unix file mode bits, for example ``420``
+                          ("" ``0644``"" ).
+                        "modified_time": "2020-02-20 00:00:00",  # Optional. When the entry
+                          was last modified.
+                        "name": "str",  # Optional. The base name of the entry.
+                        "owner": "str",  # Optional. The user that owns the entry.
+                        "path": "str",  # Optional. The absolute path of the entry in the
+                          sandbox.
+                        "permissions": "str",  # Optional. The permissions in ``ls`` form,
+                          for example ``-rw-r--r--``.
+                        "size": "str",  # Optional. The size in bytes. Encoded as a string
+                          per protobuf JSON.
+                        "symlink_target": "str",  # Optional. Symlink only. The path the
+                          symlink points to. Empty unless ``type`` is ``FILE_ENTRY_TYPE_SYMLINK``.
+                        "type": "str"  # Optional. The type of a file system entry. Known
+                          values are: "FILE_ENTRY_TYPE_UNSPECIFIED", "FILE_ENTRY_TYPE_FILE",
+                          "FILE_ENTRY_TYPE_DIRECTORY", and "FILE_ENTRY_TYPE_SYMLINK".
+                    }
+                }
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+
+    @overload
+    def post_files_move(
+        self,
+        sandbox_id: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Move or Rename a File.
+
+        Move or rename a file, directory, or symlink in the sandbox. Both ``source``
+        and ``destination`` must be inside the workspace. Missing parent directories
+        of the destination are created, and a file already at the destination is
+        replaced. The response is the entry at its new path.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "entry": {
+                        "group": "str",  # Optional. The group that owns the entry.
+                        "mode": 0,  # Optional. The Unix file mode bits, for example ``420``
+                          ("" ``0644``"" ).
+                        "modified_time": "2020-02-20 00:00:00",  # Optional. When the entry
+                          was last modified.
+                        "name": "str",  # Optional. The base name of the entry.
+                        "owner": "str",  # Optional. The user that owns the entry.
+                        "path": "str",  # Optional. The absolute path of the entry in the
+                          sandbox.
+                        "permissions": "str",  # Optional. The permissions in ``ls`` form,
+                          for example ``-rw-r--r--``.
+                        "size": "str",  # Optional. The size in bytes. Encoded as a string
+                          per protobuf JSON.
+                        "symlink_target": "str",  # Optional. Symlink only. The path the
+                          symlink points to. Empty unless ``type`` is ``FILE_ENTRY_TYPE_SYMLINK``.
+                        "type": "str"  # Optional. The type of a file system entry. Known
+                          values are: "FILE_ENTRY_TYPE_UNSPECIFIED", "FILE_ENTRY_TYPE_FILE",
+                          "FILE_ENTRY_TYPE_DIRECTORY", and "FILE_ENTRY_TYPE_SYMLINK".
+                    }
+                }
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+
+    @distributed_trace
+    def post_files_move(
+        self, sandbox_id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Move or Rename a File.
+
+        Move or rename a file, directory, or symlink in the sandbox. Both ``source``
+        and ``destination`` must be inside the workspace. Missing parent directories
+        of the destination are created, and a file already at the destination is
+        replaced. The response is the entry at its new path.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "destination": "str",  # The new path. Required.
+                    "source": "str"  # The file, directory, or symlink to move. Required.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "entry": {
+                        "group": "str",  # Optional. The group that owns the entry.
+                        "mode": 0,  # Optional. The Unix file mode bits, for example ``420``
+                          ("" ``0644``"" ).
+                        "modified_time": "2020-02-20 00:00:00",  # Optional. When the entry
+                          was last modified.
+                        "name": "str",  # Optional. The base name of the entry.
+                        "owner": "str",  # Optional. The user that owns the entry.
+                        "path": "str",  # Optional. The absolute path of the entry in the
+                          sandbox.
+                        "permissions": "str",  # Optional. The permissions in ``ls`` form,
+                          for example ``-rw-r--r--``.
+                        "size": "str",  # Optional. The size in bytes. Encoded as a string
+                          per protobuf JSON.
+                        "symlink_target": "str",  # Optional. Symlink only. The path the
+                          symlink points to. Empty unless ``type`` is ``FILE_ENTRY_TYPE_SYMLINK``.
+                        "type": "str"  # Optional. The type of a file system entry. Known
+                          values are: "FILE_ENTRY_TYPE_UNSPECIFIED", "FILE_ENTRY_TYPE_FILE",
+                          "FILE_ENTRY_TYPE_DIRECTORY", and "FILE_ENTRY_TYPE_SYMLINK".
+                    }
+                }
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_sandboxes_post_files_move_request(
+            sandbox_id=sandbox_id,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404, 409]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    def post_files_remove(
+        self,
+        sandbox_id: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        """Remove a File.
+
+        Remove a file from the sandbox, or a directory with everything in it.
+        Removing a path that does not exist succeeds and changes nothing.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON or JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "path": "str"  # The file or directory to remove. Required.
+                }
+
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+
+    @overload
+    def post_files_remove(
+        self,
+        sandbox_id: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        """Remove a File.
+
+        Remove a file from the sandbox, or a directory with everything in it.
+        Removing a path that does not exist succeeds and changes nothing.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON or JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+
+    @distributed_trace
+    def post_files_remove(
+        self, sandbox_id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        """Remove a File.
+
+        Remove a file from the sandbox, or a directory with everything in it.
+        Removing a path that does not exist succeeds and changes nothing.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON or JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "path": "str"  # The file or directory to remove. Required.
+                }
+
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_sandboxes_post_files_remove_request(
+            sandbox_id=sandbox_id,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404, 409]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @distributed_trace
+    def post_files_upload(
+        self,
+        sandbox_id: str,
+        data: IO[bytes],
+        *,
+        path: str,
+        is_archive: Optional[bool] = None,
+        x_content_sha256: Optional[str] = None,
+        **kwargs: Any,
+    ) -> JSON:
+        """Upload a File.
+
+        Write the raw request body (\\ ``Content-Type: application/octet-stream``\\ ) to a
+        path in the sandbox, up to 50 MiB.
+
+        Query parameters: ``path`` (required) is where to write the file; with
+        ``is_archive``\\ , the directory to extract into. ``is_archive`` means the body is
+        a tar archive to extract at ``path``.
+
+        The optional ``X-Content-Sha256`` request header carries the lowercase hex
+        SHA-256 of the body; the sandbox checks it after the write. Concurrent
+        direct transfers are limited; over the limit the request answers ``503``.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param data: The raw file content, or a tar archive when ``is_archive`` is true. Required.
+        :type data: IO[bytes]
+        :keyword path: A file or directory path inside the sandbox workspace. Relative paths are
+         resolved from the workspace root. Required.
+        :paramtype path: str
+        :keyword is_archive: When true, the request body is a tar archive to extract at ``path``.
+         Default value is None.
+        :paramtype is_archive: bool
+        :keyword x_content_sha256: Lowercase hex SHA-256 of the upload body. The sandbox checks it
+         after the write. Default value is None.
+        :paramtype x_content_sha256: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "bytes_written": "str",  # Optional. The number of bytes written. Encoded as
+                      a string per protobuf JSON.
+                    "path": "str"  # Optional. The absolute path the file was written to.
+                }
+                # response body for status code(s): 400, 403, 404, 409, 413, 503
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: str = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", "application/octet-stream")
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        _content = data
+
+        _request = build_sandboxes_post_files_upload_request(
+            sandbox_id=sandbox_id,
+            path=path,
+            is_archive=is_archive,
+            x_content_sha256=x_content_sha256,
+            content_type=content_type,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404, 409, 413, 503]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 413:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 503:
             response_headers["ratelimit-limit"] = self._deserialize(
                 "int", response.headers.get("ratelimit-limit")
             )

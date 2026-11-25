@@ -11,7 +11,7 @@ from typing import Any
 
 from azure.core.exceptions import HttpResponseError
 
-from pydo.sandbox._transport import guard_response
+from pydo.sandbox._transport import guard_response, keep_response, response_error
 from pydo.sandbox.errors import to_sandbox_error, unwrap, with_response
 
 
@@ -44,3 +44,21 @@ async def open_stream(client: Any, sandbox_id: str, pid: int) -> Any:
     )
     request.url = client._client.format_url(request.url)
     return (await client._client._pipeline.run(request, stream=True)).http_response
+
+
+async def download(operation: Any, *args: Any, **kwargs: Any) -> bytes:
+    """Runs a generated binary download and returns its whole body.
+
+    The pipeline does not retry by status here (``retry_status=0``): the files
+    facade retries a ``503`` itself, so it is not retried twice.
+    """
+    try:
+        status, response = await operation(
+            *args, cls=keep_response, retry_status=0, **kwargs
+        )
+        body = await response.read()
+    except HttpResponseError as err:
+        raise to_sandbox_error(err) from err
+    if status >= 400:
+        raise response_error(status, body, response.headers)
+    return body

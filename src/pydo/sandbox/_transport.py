@@ -7,6 +7,7 @@
 Hand-written; preserved across ``make generate``.
 """
 
+import json
 from typing import Any
 
 from azure.core.exceptions import HttpResponseError
@@ -68,3 +69,34 @@ def open_stream(client: Any, sandbox_id: str, pid: int) -> Any:
     )
     request.url = client._client.format_url(request.url)
     return client._client._pipeline.run(request, stream=True).http_response
+
+
+def keep_response(pipeline_response: Any, _deserialized: Any, _headers: Any) -> Any:
+    """``cls`` callback for a binary operation: returns the status and raw response."""
+    response = pipeline_response.http_response
+    return response.status_code, response
+
+
+def response_error(status: int, body: bytes, headers: Any) -> Any:
+    """Builds the typed error for a binary operation's error response."""
+    try:
+        parsed = json.loads(body)
+    except ValueError:
+        parsed = None
+    return build_error(status, parsed, None, headers)
+
+
+def download(operation: Any, *args: Any, **kwargs: Any) -> bytes:
+    """Runs a generated binary download and returns its whole body.
+
+    The pipeline does not retry by status here (``retry_status=0``): the files
+    facade retries a ``503`` itself, so it is not retried twice.
+    """
+    try:
+        status, response = operation(*args, cls=keep_response, retry_status=0, **kwargs)
+        body = response.read()
+    except HttpResponseError as err:
+        raise to_sandbox_error(err) from err
+    if status >= 400:
+        raise response_error(status, body, response.headers)
+    return body

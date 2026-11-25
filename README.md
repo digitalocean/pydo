@@ -274,7 +274,27 @@ snapshot.delete()                            # False if it is already gone; Snap
 
 A snapshot captures the boot disk and memory, not the workspace data disk. A `name` is 1 to 63 lowercase letters, digits and hyphens, checked before the request is sent. `Snapshot.create(sandbox_id, ...)`, `SandboxClient(...).Snapshot` and the async `Snapshot` in `pydo.aio.sandbox` work the same way. The API has no call to start a sandbox from a snapshot yet.
 
-The async version has the same names: `await sandbox.commands.run(...)` and `async for event in cmd.stream()`. Output can only be read while a command runs: a command that exits before the stream attaches raises `NotFoundError`. File transfer is not available yet: it needs routes that are not in the API.
+Read and write files with `sandbox.files`:
+
+```python
+info = sandbox.files.write("/workspace/hello.txt", "Hello\n")   # str (UTF-8) or bytes, up to 50 MiB
+print(info.path, info.bytes_written)
+data = sandbox.files.read("/workspace/hello.txt")              # bytes; read_text() decodes
+sandbox.files.write_archive("/workspace/src", tar_bytes)       # extract a tar into a directory
+tar_bytes = sandbox.files.read_archive("/workspace/src")       # a directory (or file) as a tar
+
+for entry in sandbox.files.list("/workspace", depth=2):        # depth defaults to 1
+    print(entry.type, entry.path, entry.size)                  # type: file, directory, symlink
+sandbox.files.get_info("/workspace/hello.txt")                 # FileEntry; NotFoundError if missing
+sandbox.files.exists("/workspace/hello.txt")                   # True or False
+sandbox.files.make_dir("/workspace/out/logs")                  # creates parents; .created is False if it existed
+sandbox.files.move("/workspace/hello.txt", "/workspace/hi.txt")  # returns the entry at its new path
+sandbox.files.remove("/workspace/out")                         # a file, or a directory and its contents
+```
+
+Uploads send the SHA-256 of the body for the sandbox to check, and downloads are checked against the SHA-256 the sandbox sends after the payload: a mismatch raises `SandboxError`. When too many transfers run at once the API answers 503: the SDK retries up to 3 times (0.5 s, 1 s, 2 s, or the `Retry-After` wait), then raises `ServiceError`. An empty path raises `SandboxError` before any request is sent. The async version has the same names: `await sandbox.files.read(...)`.
+
+The async version has the same names: `await sandbox.commands.run(...)` and `async for event in cmd.stream()`. Output can only be read while a command runs: a command that exits before the stream attaches raises `NotFoundError`.
 
 ## **AI & Inference**
 

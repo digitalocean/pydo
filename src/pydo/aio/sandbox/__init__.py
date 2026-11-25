@@ -24,6 +24,8 @@ from pydo.sandbox.types import DEFAULT_SIZE, DEFAULT_TEMPLATE, SandboxInfo, Sand
 
 from .client import SandboxClient
 from .commands import Command, Commands
+from pydo.sandbox._files import FileEntry, FileType, MakeDirResult, WriteInfo
+from .files import Files
 from pydo.sandbox._templates import (
     ImageSource,
     TemplateBuildInfo,
@@ -42,6 +44,11 @@ __all__ = [
     "CommandInfo",
     "CommandResult",
     "Commands",
+    "FileEntry",
+    "FileType",
+    "Files",
+    "MakeDirResult",
+    "WriteInfo",
     "ImageSource",
     "Pages",
     "Snapshot",

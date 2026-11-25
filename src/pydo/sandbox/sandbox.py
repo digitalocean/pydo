@@ -26,6 +26,7 @@ from ._connection import resolve
 from ._hybrid import by_id_or_self
 from ._transport import call as _call
 from .commands import Commands
+from .files import Files
 from . import _snapshots as _snap
 from .errors import NotFoundError, SandboxError, SandboxTimeoutError
 from .snapshots import Snapshot, _create as _create_snapshot
@@ -53,6 +54,8 @@ class Sandbox:
         self.info = info
         #: Start, list and stream the commands running in this sandbox.
         self.commands = Commands(client, info.sandbox_id)
+        #: Read, write and manage the files in this sandbox.
+        self.files = Files(client, info.sandbox_id)
 
     def __repr__(self) -> str:
         return "Sandbox(sandbox_id=%r, state=%r)" % (self.sandbox_id, self.state)
