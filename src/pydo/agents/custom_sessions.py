@@ -783,9 +783,9 @@ class SessionsOperations:
         ``secrets``, set it to ``{source: oauth, provider, actor}`` with the new
         connection's ``user_id`` as ``actor`` (see
         :meth:`list_connections`), and keep every other secret as ``{}``. The
-        new connection must be active, and yours or shared with your team
-        (``400`` otherwise); switching back to the connection the agent config
-        names doesn't need that. The agent restarts to read the new token;
+        new connection must be active and owned by you (``400`` otherwise,
+        including for another team member's connection); switching back to the
+        connection the agent config names doesn't need that. The agent restarts to read the new token;
         sending the connection the secret already uses is ``UNCHANGED``. The
         switch applies to this session only: new sessions from the same config
         start on the config's connection, and a rollback or fork uses the

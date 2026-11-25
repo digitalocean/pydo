@@ -3,10 +3,10 @@ SESSION_ID, CONNECTION (the new connection's ``user_id``) and KEEP_SECRETS.
 
 The session's ``GITHUB_TOKEN`` secret must have been created with ``actor``
 (``{source: oauth, provider: github, actor: <user_id>}``). The new connection
-must be active, and yours or shared with your team. ``secrets`` is a full set:
-a secret left out is removed. List every other secret the session has in
-KEEP_SECRETS (comma-separated names); each is sent as ``{}`` to keep it. The
-agent restarts to read the new token. See ``SessionsOperations.update_config``
+must be active and owned by you; another team member's connection is refused.
+``secrets`` is a full set: a secret left out is removed. List every other
+secret the session has in KEEP_SECRETS (comma-separated names); each is sent as
+``{}`` to keep it. The agent restarts to read the new token. See ``SessionsOperations.update_config``
 for the full rules.
 """
 
