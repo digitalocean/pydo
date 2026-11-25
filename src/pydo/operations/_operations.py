@@ -53450,23 +53450,46 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "added": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "changed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "removed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
+                                    ]
+                                },
+                                "skills": {
+                                    "added": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
                                     ]
                                 },
                                 "tools": {
@@ -53487,7 +53510,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "config_drifted": bool,  # Optional. True when the running
                               config differs from the manifest the session was created from, for
                               example after a successful PATCH with ``manifest_yaml``. Omitted when
-                              false.
+                              false. ``config_diff`` doesn't cover every kind of drift: after an update
+                              that only switched an OAuth connection, ``config_drifted`` is true and
+                              ``config_diff`` is omitted. ``manifest`` shows the new ``actor``.
                             "config_id": "str",  # Optional. Durable Environment Config
                               UUID the session was created from (inline manifests persist a config too,
                               named after the session). Persisted and returned on create/get/list;
@@ -53514,6 +53539,48 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "str": {}  # Optional. The effective manifest of the
                                   session. Present only when ``config_drifted`` is true. Never contains
                                   secret values.
+                            },
+                            "mutability": {
+                                "custom_tools": bool,  # A live update can add,
+                                  modify, or remove a custom MCP server ("" ``name`` and ``url``"" ) in
+                                  the ``tools`` section. It also needs ``tools``. The agent restarts
+                                  when the change alters its environment. A session reads ``false``
+                                  until its agent's custom-server update is supported, and keeps
+                                  reading ``false`` after that if it was created earlier. A server with
+                                  ``auth`` that is added, moved to another ``url``"" , or given another
+                                  secret slot must carry its secret's value in the same request, or use
+                                  a URL-bound secret whose ``url`` covers the server's ``url`` (""
+                                  ``400`` otherwise). A new server host under an egress allowlist also
+                                  needs ``egress``. Required.
+                                "egress": bool,  # A live update can change the
+                                  ``egress`` section: the destinations the session can reach. Required.
+                                "env": bool,  # A live update can change ``env`` keys
+                                  other than the model keys. A patch that changes both needs both.
+                                  Required.
+                                "model": bool,  # The session's model can be changed,
+                                  through ``env.HARNESS_INFERENCE_MODEL`` or, on a session with its own
+                                  endpoint, the env key that endpoint reads its model from. Independent
+                                  of ``env``. Required.
+                                "permissions": bool,  # A live update can change
+                                  ``permissions``"" : the default and the rules of the types the
+                                  session's agent enforces live. ``filesystem`` and ``network`` never
+                                  change on a running session. Required.
+                                "secrets": bool,  # A live update can change the
+                                  ``secrets`` section. Required.
+                                "skills": bool,  # A live update can change the
+                                  ``skills`` section, the inline skill list, which is replaced as a
+                                  whole. Only claude-code, codex and opencode can reload skills live. A
+                                  session reads ``false`` until its agent's live skill update is
+                                  supported, and keeps reading ``false`` after that if it was created
+                                  earlier. While skills updates are enabled team by team, a team that
+                                  has them can also change the skills of a claude-code, codex, or
+                                  opencode session that reads ``false``"" , unless the session was
+                                  created before this field existed. Required.
+                                "system_prompt": bool,  # The session's standing
+                                  instruction can be replaced by a live update. Required.
+                                "tools": bool  # A live update can change the
+                                  ``tools`` section: the Action Gateway ("" ``do.actions``"" ) entries.
+                                  A custom MCP server also needs ``custom_tools``. Required.
                             },
                             "name": "str",  # Optional. User-assignable display name,
                               unique per team among non-terminal sessions. Usable in place of
@@ -53645,26 +53712,46 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                         "added": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
                                         ],
                                         "changed": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
                                         ],
                                         "removed": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
+                                        ]
+                                    },
+                                    "skills": {
+                                        "added": [
+                                            "str"  # Optional. Skill
+                                              names, never their content. ``changed`` lists the skills
+                                              kept under the same name whose definition changed.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Skill
+                                              names, never their content. ``changed`` lists the skills
+                                              kept under the same name whose definition changed.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Skill
+                                              names, never their content. ``changed`` lists the skills
+                                              kept under the same name whose definition changed.
                                         ]
                                     },
                                     "tools": {
@@ -54121,23 +54208,46 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "added": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "changed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "removed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
+                                    ]
+                                },
+                                "skills": {
+                                    "added": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
                                     ]
                                 },
                                 "tools": {
@@ -54158,7 +54268,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "config_drifted": bool,  # Optional. True when the running
                               config differs from the manifest the session was created from, for
                               example after a successful PATCH with ``manifest_yaml``. Omitted when
-                              false.
+                              false. ``config_diff`` doesn't cover every kind of drift: after an update
+                              that only switched an OAuth connection, ``config_drifted`` is true and
+                              ``config_diff`` is omitted. ``manifest`` shows the new ``actor``.
                             "config_id": "str",  # Optional. Durable Environment Config
                               UUID the session was created from (inline manifests persist a config too,
                               named after the session). Persisted and returned on create/get/list;
@@ -54185,6 +54297,48 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "str": {}  # Optional. The effective manifest of the
                                   session. Present only when ``config_drifted`` is true. Never contains
                                   secret values.
+                            },
+                            "mutability": {
+                                "custom_tools": bool,  # A live update can add,
+                                  modify, or remove a custom MCP server ("" ``name`` and ``url``"" ) in
+                                  the ``tools`` section. It also needs ``tools``. The agent restarts
+                                  when the change alters its environment. A session reads ``false``
+                                  until its agent's custom-server update is supported, and keeps
+                                  reading ``false`` after that if it was created earlier. A server with
+                                  ``auth`` that is added, moved to another ``url``"" , or given another
+                                  secret slot must carry its secret's value in the same request, or use
+                                  a URL-bound secret whose ``url`` covers the server's ``url`` (""
+                                  ``400`` otherwise). A new server host under an egress allowlist also
+                                  needs ``egress``. Required.
+                                "egress": bool,  # A live update can change the
+                                  ``egress`` section: the destinations the session can reach. Required.
+                                "env": bool,  # A live update can change ``env`` keys
+                                  other than the model keys. A patch that changes both needs both.
+                                  Required.
+                                "model": bool,  # The session's model can be changed,
+                                  through ``env.HARNESS_INFERENCE_MODEL`` or, on a session with its own
+                                  endpoint, the env key that endpoint reads its model from. Independent
+                                  of ``env``. Required.
+                                "permissions": bool,  # A live update can change
+                                  ``permissions``"" : the default and the rules of the types the
+                                  session's agent enforces live. ``filesystem`` and ``network`` never
+                                  change on a running session. Required.
+                                "secrets": bool,  # A live update can change the
+                                  ``secrets`` section. Required.
+                                "skills": bool,  # A live update can change the
+                                  ``skills`` section, the inline skill list, which is replaced as a
+                                  whole. Only claude-code, codex and opencode can reload skills live. A
+                                  session reads ``false`` until its agent's live skill update is
+                                  supported, and keeps reading ``false`` after that if it was created
+                                  earlier. While skills updates are enabled team by team, a team that
+                                  has them can also change the skills of a claude-code, codex, or
+                                  opencode session that reads ``false``"" , unless the session was
+                                  created before this field existed. Required.
+                                "system_prompt": bool,  # The session's standing
+                                  instruction can be replaced by a live update. Required.
+                                "tools": bool  # A live update can change the
+                                  ``tools`` section: the Action Gateway ("" ``do.actions``"" ) entries.
+                                  A custom MCP server also needs ``custom_tools``. Required.
                             },
                             "name": "str",  # Optional. User-assignable display name,
                               unique per team among non-terminal sessions. Usable in place of
@@ -54316,26 +54470,46 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                         "added": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
                                         ],
                                         "changed": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
                                         ],
                                         "removed": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
+                                        ]
+                                    },
+                                    "skills": {
+                                        "added": [
+                                            "str"  # Optional. Skill
+                                              names, never their content. ``changed`` lists the skills
+                                              kept under the same name whose definition changed.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Skill
+                                              names, never their content. ``changed`` lists the skills
+                                              kept under the same name whose definition changed.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Skill
+                                              names, never their content. ``changed`` lists the skills
+                                              kept under the same name whose definition changed.
                                         ]
                                     },
                                     "tools": {
@@ -54698,23 +54872,43 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "added": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "changed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "removed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
+                                ]
+                            },
+                            "skills": {
+                                "added": [
+                                    "str"  # Optional. Skill names, never their
+                                      content. ``changed`` lists the skills kept under the same name
+                                      whose definition changed.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Skill names, never their
+                                      content. ``changed`` lists the skills kept under the same name
+                                      whose definition changed.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Skill names, never their
+                                      content. ``changed`` lists the skills kept under the same name
+                                      whose definition changed.
                                 ]
                             },
                             "tools": {
@@ -54734,7 +54928,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         },
                         "config_drifted": bool,  # Optional. True when the running config
                           differs from the manifest the session was created from, for example after a
-                          successful PATCH with ``manifest_yaml``. Omitted when false.
+                          successful PATCH with ``manifest_yaml``. Omitted when false. ``config_diff``
+                          doesn't cover every kind of drift: after an update that only switched an
+                          OAuth connection, ``config_drifted`` is true and ``config_diff`` is omitted.
+                          ``manifest`` shows the new ``actor``.
                         "config_id": "str",  # Optional. Durable Environment Config UUID the
                           session was created from (inline manifests persist a config too, named after
                           the session). Persisted and returned on create/get/list; absent only for
@@ -54761,6 +54958,46 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "str": {}  # Optional. The effective manifest of the session.
                               Present only when ``config_drifted`` is true. Never contains secret
                               values.
+                        },
+                        "mutability": {
+                            "custom_tools": bool,  # A live update can add, modify, or
+                              remove a custom MCP server ("" ``name`` and ``url``"" ) in the ``tools``
+                              section. It also needs ``tools``. The agent restarts when the change
+                              alters its environment. A session reads ``false`` until its agent's
+                              custom-server update is supported, and keeps reading ``false`` after that
+                              if it was created earlier. A server with ``auth`` that is added, moved to
+                              another ``url``"" , or given another secret slot must carry its secret's
+                              value in the same request, or use a URL-bound secret whose ``url`` covers
+                              the server's ``url`` ("" ``400`` otherwise). A new server host under an
+                              egress allowlist also needs ``egress``. Required.
+                            "egress": bool,  # A live update can change the ``egress``
+                              section: the destinations the session can reach. Required.
+                            "env": bool,  # A live update can change ``env`` keys other
+                              than the model keys. A patch that changes both needs both. Required.
+                            "model": bool,  # The session's model can be changed, through
+                              ``env.HARNESS_INFERENCE_MODEL`` or, on a session with its own endpoint,
+                              the env key that endpoint reads its model from. Independent of ``env``.
+                              Required.
+                            "permissions": bool,  # A live update can change
+                              ``permissions``"" : the default and the rules of the types the session's
+                              agent enforces live. ``filesystem`` and ``network`` never change on a
+                              running session. Required.
+                            "secrets": bool,  # A live update can change the ``secrets``
+                              section. Required.
+                            "skills": bool,  # A live update can change the ``skills``
+                              section, the inline skill list, which is replaced as a whole. Only
+                              claude-code, codex and opencode can reload skills live. A session reads
+                              ``false`` until its agent's live skill update is supported, and keeps
+                              reading ``false`` after that if it was created earlier. While skills
+                              updates are enabled team by team, a team that has them can also change
+                              the skills of a claude-code, codex, or opencode session that reads
+                              ``false``"" , unless the session was created before this field existed.
+                              Required.
+                            "system_prompt": bool,  # The session's standing instruction
+                              can be replaced by a live update. Required.
+                            "tools": bool  # A live update can change the ``tools``
+                              section: the Action Gateway ("" ``do.actions``"" ) entries. A custom MCP
+                              server also needs ``custom_tools``. Required.
                         },
                         "name": "str",  # Optional. User-assignable display name, unique per
                           team among non-terminal sessions. Usable in place of session_id by clients
@@ -54882,23 +55119,46 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "added": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "changed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "removed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
+                                    ]
+                                },
+                                "skills": {
+                                    "added": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
                                     ]
                                 },
                                 "tools": {
@@ -55136,23 +55396,43 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "added": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "changed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "removed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
+                                ]
+                            },
+                            "skills": {
+                                "added": [
+                                    "str"  # Optional. Skill names, never their
+                                      content. ``changed`` lists the skills kept under the same name
+                                      whose definition changed.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Skill names, never their
+                                      content. ``changed`` lists the skills kept under the same name
+                                      whose definition changed.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Skill names, never their
+                                      content. ``changed`` lists the skills kept under the same name
+                                      whose definition changed.
                                 ]
                             },
                             "tools": {
@@ -55172,7 +55452,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         },
                         "config_drifted": bool,  # Optional. True when the running config
                           differs from the manifest the session was created from, for example after a
-                          successful PATCH with ``manifest_yaml``. Omitted when false.
+                          successful PATCH with ``manifest_yaml``. Omitted when false. ``config_diff``
+                          doesn't cover every kind of drift: after an update that only switched an
+                          OAuth connection, ``config_drifted`` is true and ``config_diff`` is omitted.
+                          ``manifest`` shows the new ``actor``.
                         "config_id": "str",  # Optional. Durable Environment Config UUID the
                           session was created from (inline manifests persist a config too, named after
                           the session). Persisted and returned on create/get/list; absent only for
@@ -55199,6 +55482,46 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "str": {}  # Optional. The effective manifest of the session.
                               Present only when ``config_drifted`` is true. Never contains secret
                               values.
+                        },
+                        "mutability": {
+                            "custom_tools": bool,  # A live update can add, modify, or
+                              remove a custom MCP server ("" ``name`` and ``url``"" ) in the ``tools``
+                              section. It also needs ``tools``. The agent restarts when the change
+                              alters its environment. A session reads ``false`` until its agent's
+                              custom-server update is supported, and keeps reading ``false`` after that
+                              if it was created earlier. A server with ``auth`` that is added, moved to
+                              another ``url``"" , or given another secret slot must carry its secret's
+                              value in the same request, or use a URL-bound secret whose ``url`` covers
+                              the server's ``url`` ("" ``400`` otherwise). A new server host under an
+                              egress allowlist also needs ``egress``. Required.
+                            "egress": bool,  # A live update can change the ``egress``
+                              section: the destinations the session can reach. Required.
+                            "env": bool,  # A live update can change ``env`` keys other
+                              than the model keys. A patch that changes both needs both. Required.
+                            "model": bool,  # The session's model can be changed, through
+                              ``env.HARNESS_INFERENCE_MODEL`` or, on a session with its own endpoint,
+                              the env key that endpoint reads its model from. Independent of ``env``.
+                              Required.
+                            "permissions": bool,  # A live update can change
+                              ``permissions``"" : the default and the rules of the types the session's
+                              agent enforces live. ``filesystem`` and ``network`` never change on a
+                              running session. Required.
+                            "secrets": bool,  # A live update can change the ``secrets``
+                              section. Required.
+                            "skills": bool,  # A live update can change the ``skills``
+                              section, the inline skill list, which is replaced as a whole. Only
+                              claude-code, codex and opencode can reload skills live. A session reads
+                              ``false`` until its agent's live skill update is supported, and keeps
+                              reading ``false`` after that if it was created earlier. While skills
+                              updates are enabled team by team, a team that has them can also change
+                              the skills of a claude-code, codex, or opencode session that reads
+                              ``false``"" , unless the session was created before this field existed.
+                              Required.
+                            "system_prompt": bool,  # The session's standing instruction
+                              can be replaced by a live update. Required.
+                            "tools": bool  # A live update can change the ``tools``
+                              section: the Action Gateway ("" ``do.actions``"" ) entries. A custom MCP
+                              server also needs ``custom_tools``. Required.
                         },
                         "name": "str",  # Optional. User-assignable display name, unique per
                           team among non-terminal sessions. Usable in place of session_id by clients
@@ -55320,23 +55643,46 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "added": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "changed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "removed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
+                                    ]
+                                },
+                                "skills": {
+                                    "added": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
                                     ]
                                 },
                                 "tools": {
@@ -55594,23 +55940,43 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "added": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "changed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "removed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
+                                ]
+                            },
+                            "skills": {
+                                "added": [
+                                    "str"  # Optional. Skill names, never their
+                                      content. ``changed`` lists the skills kept under the same name
+                                      whose definition changed.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Skill names, never their
+                                      content. ``changed`` lists the skills kept under the same name
+                                      whose definition changed.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Skill names, never their
+                                      content. ``changed`` lists the skills kept under the same name
+                                      whose definition changed.
                                 ]
                             },
                             "tools": {
@@ -55630,7 +55996,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         },
                         "config_drifted": bool,  # Optional. True when the running config
                           differs from the manifest the session was created from, for example after a
-                          successful PATCH with ``manifest_yaml``. Omitted when false.
+                          successful PATCH with ``manifest_yaml``. Omitted when false. ``config_diff``
+                          doesn't cover every kind of drift: after an update that only switched an
+                          OAuth connection, ``config_drifted`` is true and ``config_diff`` is omitted.
+                          ``manifest`` shows the new ``actor``.
                         "config_id": "str",  # Optional. Durable Environment Config UUID the
                           session was created from (inline manifests persist a config too, named after
                           the session). Persisted and returned on create/get/list; absent only for
@@ -55657,6 +56026,46 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "str": {}  # Optional. The effective manifest of the session.
                               Present only when ``config_drifted`` is true. Never contains secret
                               values.
+                        },
+                        "mutability": {
+                            "custom_tools": bool,  # A live update can add, modify, or
+                              remove a custom MCP server ("" ``name`` and ``url``"" ) in the ``tools``
+                              section. It also needs ``tools``. The agent restarts when the change
+                              alters its environment. A session reads ``false`` until its agent's
+                              custom-server update is supported, and keeps reading ``false`` after that
+                              if it was created earlier. A server with ``auth`` that is added, moved to
+                              another ``url``"" , or given another secret slot must carry its secret's
+                              value in the same request, or use a URL-bound secret whose ``url`` covers
+                              the server's ``url`` ("" ``400`` otherwise). A new server host under an
+                              egress allowlist also needs ``egress``. Required.
+                            "egress": bool,  # A live update can change the ``egress``
+                              section: the destinations the session can reach. Required.
+                            "env": bool,  # A live update can change ``env`` keys other
+                              than the model keys. A patch that changes both needs both. Required.
+                            "model": bool,  # The session's model can be changed, through
+                              ``env.HARNESS_INFERENCE_MODEL`` or, on a session with its own endpoint,
+                              the env key that endpoint reads its model from. Independent of ``env``.
+                              Required.
+                            "permissions": bool,  # A live update can change
+                              ``permissions``"" : the default and the rules of the types the session's
+                              agent enforces live. ``filesystem`` and ``network`` never change on a
+                              running session. Required.
+                            "secrets": bool,  # A live update can change the ``secrets``
+                              section. Required.
+                            "skills": bool,  # A live update can change the ``skills``
+                              section, the inline skill list, which is replaced as a whole. Only
+                              claude-code, codex and opencode can reload skills live. A session reads
+                              ``false`` until its agent's live skill update is supported, and keeps
+                              reading ``false`` after that if it was created earlier. While skills
+                              updates are enabled team by team, a team that has them can also change
+                              the skills of a claude-code, codex, or opencode session that reads
+                              ``false``"" , unless the session was created before this field existed.
+                              Required.
+                            "system_prompt": bool,  # The session's standing instruction
+                              can be replaced by a live update. Required.
+                            "tools": bool  # A live update can change the ``tools``
+                              section: the Action Gateway ("" ``do.actions``"" ) entries. A custom MCP
+                              server also needs ``custom_tools``. Required.
                         },
                         "name": "str",  # Optional. User-assignable display name, unique per
                           team among non-terminal sessions. Usable in place of session_id by clients
@@ -55778,23 +56187,46 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "added": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "changed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "removed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
+                                    ]
+                                },
+                                "skills": {
+                                    "added": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
                                     ]
                                 },
                                 "tools": {
@@ -56679,23 +57111,43 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "added": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "changed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "removed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
+                                ]
+                            },
+                            "skills": {
+                                "added": [
+                                    "str"  # Optional. Skill names, never their
+                                      content. ``changed`` lists the skills kept under the same name
+                                      whose definition changed.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Skill names, never their
+                                      content. ``changed`` lists the skills kept under the same name
+                                      whose definition changed.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Skill names, never their
+                                      content. ``changed`` lists the skills kept under the same name
+                                      whose definition changed.
                                 ]
                             },
                             "tools": {
@@ -56715,7 +57167,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         },
                         "config_drifted": bool,  # Optional. True when the running config
                           differs from the manifest the session was created from, for example after a
-                          successful PATCH with ``manifest_yaml``. Omitted when false.
+                          successful PATCH with ``manifest_yaml``. Omitted when false. ``config_diff``
+                          doesn't cover every kind of drift: after an update that only switched an
+                          OAuth connection, ``config_drifted`` is true and ``config_diff`` is omitted.
+                          ``manifest`` shows the new ``actor``.
                         "config_id": "str",  # Optional. Durable Environment Config UUID the
                           session was created from (inline manifests persist a config too, named after
                           the session). Persisted and returned on create/get/list; absent only for
@@ -56742,6 +57197,46 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "str": {}  # Optional. The effective manifest of the session.
                               Present only when ``config_drifted`` is true. Never contains secret
                               values.
+                        },
+                        "mutability": {
+                            "custom_tools": bool,  # A live update can add, modify, or
+                              remove a custom MCP server ("" ``name`` and ``url``"" ) in the ``tools``
+                              section. It also needs ``tools``. The agent restarts when the change
+                              alters its environment. A session reads ``false`` until its agent's
+                              custom-server update is supported, and keeps reading ``false`` after that
+                              if it was created earlier. A server with ``auth`` that is added, moved to
+                              another ``url``"" , or given another secret slot must carry its secret's
+                              value in the same request, or use a URL-bound secret whose ``url`` covers
+                              the server's ``url`` ("" ``400`` otherwise). A new server host under an
+                              egress allowlist also needs ``egress``. Required.
+                            "egress": bool,  # A live update can change the ``egress``
+                              section: the destinations the session can reach. Required.
+                            "env": bool,  # A live update can change ``env`` keys other
+                              than the model keys. A patch that changes both needs both. Required.
+                            "model": bool,  # The session's model can be changed, through
+                              ``env.HARNESS_INFERENCE_MODEL`` or, on a session with its own endpoint,
+                              the env key that endpoint reads its model from. Independent of ``env``.
+                              Required.
+                            "permissions": bool,  # A live update can change
+                              ``permissions``"" : the default and the rules of the types the session's
+                              agent enforces live. ``filesystem`` and ``network`` never change on a
+                              running session. Required.
+                            "secrets": bool,  # A live update can change the ``secrets``
+                              section. Required.
+                            "skills": bool,  # A live update can change the ``skills``
+                              section, the inline skill list, which is replaced as a whole. Only
+                              claude-code, codex and opencode can reload skills live. A session reads
+                              ``false`` until its agent's live skill update is supported, and keeps
+                              reading ``false`` after that if it was created earlier. While skills
+                              updates are enabled team by team, a team that has them can also change
+                              the skills of a claude-code, codex, or opencode session that reads
+                              ``false``"" , unless the session was created before this field existed.
+                              Required.
+                            "system_prompt": bool,  # The session's standing instruction
+                              can be replaced by a live update. Required.
+                            "tools": bool  # A live update can change the ``tools``
+                              section: the Action Gateway ("" ``do.actions``"" ) entries. A custom MCP
+                              server also needs ``custom_tools``. Required.
                         },
                         "name": "str",  # Optional. User-assignable display name, unique per
                           team among non-terminal sessions. Usable in place of session_id by clients
@@ -56863,23 +57358,46 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "added": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "changed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "removed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
+                                    ]
+                                },
+                                "skills": {
+                                    "added": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
                                     ]
                                 },
                                 "tools": {
@@ -57109,9 +57627,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
              - What it changes
              - Agent restart
            * - ``tools``
-             - The session's Action Gateway tools (\\ ``do.actions`` entries). Custom MCP servers can't
-        be changed.
-             - No (LangGraph: yes)
+             - The session's Action Gateway tools (\\ ``do.actions`` entries). Custom MCP servers too,
+        where the session's ``mutability.custom_tools`` is ``true``.
+             - No (LangGraph: yes). A custom MCP server change: when it alters the agent's environment
            * - ``env``
              - Environment variables (name and value).
              - Yes
@@ -57138,6 +57656,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
              - The permission policy: the default action and the full rules list. What can change
         depends on the agent; see below.
              - No (LangGraph: yes for ``do.actions`` rules or ``default``\\ )
+           * - ``skills``
+             - The full list of inline skills. Supported on ``claude-code``\\ , ``codex``\\ , and
+        ``opencode``\\ ; see below.
+             - No
 
 
         Sections you omit are not changed. Each section you include replaces that section in full; see
@@ -57174,11 +57696,47 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         ``manifest_yaml`` for the
         rules.
 
-        The following can't be changed on an existing session: custom MCP servers (\\ ``422``\\ ), the
-        egress
-        VPC (\\ ``vpc_uuid`` and ``subnet_uuid``\\ , ``422``\\ ), and platform-managed model keys. To
-        use a different
-        custom MCP server or VPC, create a new session.
+        The following can't be changed on an existing session: the egress VPC (\\ ``vpc_uuid`` and
+        ``subnet_uuid``\\ , ``422``\\ ) and platform-managed model keys. To use a different VPC, create
+        a new
+        session.
+
+        Custom MCP servers
+        ^^^^^^^^^^^^^^^^^^
+
+        A custom MCP server (\\ ``name`` and ``url``\\ ) in ``tools`` can be added, modified, or
+        removed on a running
+        session only where the session's ``mutability.custom_tools`` is ``true``\\ , and
+        ``mutability.tools`` is
+        ``true`` too. Read ``mutability`` from the session (\\ ``GET
+        /v2/agents/sessions/{session_id}``\\ ). Where
+        ``custom_tools`` is ``false``\\ , the request returns ``409`` and the message ends with
+        ``(update_unsupported)``. The flag is ``false`` for every agent until its custom-server update
+        is
+        supported, and a session created before an agent was enabled keeps reading ``false``\\ ; create
+        a new
+        session to change its custom MCP servers.
+
+        Include the session's other custom MCP servers exactly as they are, because ``tools`` replaces
+        the
+        whole list. The agent restarts when the change alters its environment (a server added, removed
+        or
+        moved, or a changed credential), and the update then ends ``APPLIED_RESTARTED``. A change that
+        doesn't, such as editing the ``tools`` allowlist of an existing server, ends ``APPLIED``.
+
+        A server with ``auth`` that is added, moved to another ``url``\\ , or given another secret slot
+        must carry
+        its credential in the same request, so a credential never goes to a destination the request did
+        not name. Either send the secret's value in ``secrets`` (a plain secret), or use a URL-bound
+        secret
+        whose ``url`` covers the server's URL: the same host, a path prefix of the server's path, and
+        the
+        default port. A URL-bound secret needs that coverage even when you send its value. Otherwise
+        the
+        request returns ``400``. A server whose ``url`` differs only in the case of the scheme or host
+        is the
+        same server. A new server host under an egress allowlist also needs ``mutability.egress`` to be
+        ``true``.
 
         Switching an OAuth connection
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -57190,17 +57748,19 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         <#operation/harness_list_provider_connections>`_.
         Send the secret with ``source``\\ , ``provider``\\ , and the new ``actor``\\ , and keep every
         other secret as
-        ``{}``. See ``manifest_yaml`` for an example.
+        ``{}``. Leaving out ``provider`` or ``actor`` returns ``400``. See ``manifest_yaml`` for an
+        example.
 
-        The platform first checks that you can use the new connection: it must be active, and either
-        yours or shared with your team (\\ ``400`` otherwise). Switching back to the connection the
-        agent
-        config names skips this check, so any team member can do it. The platform then gives the
-        session
-        that connection's token and restarts the agent, so the next ``git`` operation uses the new
-        connection. Sending the connection the secret already uses returns ``200`` with ``outcome`` set
-        to
-        ``UNCHANGED``.
+        The platform first checks that you can use the new connection: it must be active and owned by
+        you. Another team member's connection returns ``400``\\ , even when it is active. Switching
+        back to
+        the connection the agent config names skips this check, so any team member can do it. If the
+        platform can't reach its connection service to check, the request returns ``503``\\ ; retry it.
+        The
+        platform then gives the session that connection's token and restarts the agent, so the next
+        ``git`` operation uses the new connection. Sending the connection the secret already uses
+        returns
+        ``200`` with ``outcome`` set to ``UNCHANGED``.
 
         The switch applies to this session only:
 
@@ -57313,6 +57873,47 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         remove the
         permission changes the agent can't take and send the update again.
 
+        Changing skills
+        ^^^^^^^^^^^^^^^
+
+        ``skills`` replaces the session's whole list of inline skills. Send every skill the session
+        should keep, with the same fields as when you create the session: ``name``\\ ,
+        ``description``\\ ,
+        ``instructions``\\ , and optionally ``license``\\ , ``metadata``\\ , and ``allowed_tools``. A
+        skill you leave
+        out is removed. ``skills: []`` removes every skill, and ``skills: null`` returns ``400``. The
+        list is
+        checked with the same rules and limits as at session creation: at most 32 skills, and at most
+        512 KiB for all skills together (\\ ``400`` otherwise). ``manifest_yaml`` itself can be at most
+        1 MiB
+        and the request body at most 2 MiB (\\ ``413`` otherwise). The same skills in a different order
+        are
+        not a change.
+
+        The agent is not restarted, so the conversation continues. The agent reloads its skills, and
+        the new list is in use once the update is ``APPLIED``. ``session.update.changes.skills`` names
+        the
+        skills added, removed, or changed, never their content.
+
+        Changing ``skills`` is supported on ``claude-code``\\ , ``codex``\\ , and ``opencode``
+        sessions. On any other
+        agent, or on a session created before live updates were available, a manifest with a ``skills``
+        section returns ``409``\\ , even if the list matches the session's skills. Changing ``skills``
+        must be
+        enabled for your team (see Requirements below).
+
+        If the agent refuses the new skills after the request is accepted, the update ends ``FAILED``
+        with ``error`` set to ``update_failed`` and ``session.update.reverted`` set to ``true``\\ , and
+        the
+        session keeps its previous skills. This happens when a skill has the same name as one the
+        session's repository already provides: rename the skill and send the update again on the same
+        session. Only when the session's agent can't reload skills while it runs does the update end
+        with ``error`` set to ``requires_new_session``. If the same update also changes
+        ``permissions``\\ , the platform can't tell which of the two the agent refused: the update ends
+        ``FAILED`` with ``error`` set to ``update_failed``\\ , and sending the ``permissions`` and
+        ``skills`` changes
+        as separate updates shows which one the agent can't take.
+
         Tracking an update
         ^^^^^^^^^^^^^^^^^^
 
@@ -57333,12 +57934,14 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
            * ``FAILED``\\ : the update did not take effect. ``session.update.detail`` explains why, and
              ``session.update.reverted`` is ``true`` if the previous settings were restored.
 
-        Tool, URL-bound secret, ``egress``\\ , and ``permissions`` updates usually finish within a few
-        seconds, except on ``langgraph``\\ , where a ``tools`` update or a ``permissions`` change to
-        ``default``
-        or ``do.actions/<tool>`` rules restarts the agent. Updates to ``env`` (including the model) or
-        plain secrets, and OAuth connection switches, restart the agent and can take up to about two
-        minutes.
+        Tool, URL-bound secret, ``egress``\\ , ``permissions``\\ , and ``skills`` updates usually
+        finish within a
+        few seconds, except on ``langgraph``\\ , where a ``tools`` update or a ``permissions`` change
+        to
+        ``default`` or ``do.actions/<tool>`` rules restarts the agent. Updates to ``env`` (including
+        the
+        model) or plain secrets, and OAuth connection switches, restart the agent and can take up to
+        about two minutes.
 
         If the request matches the session's current settings, it returns ``200`` with ``outcome`` set
         to
@@ -57371,7 +57974,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         * The session must be idle: no agent turn running and no approval pending (\\ ``409``\\ ).
         * Session settings updates must be enabled for your team. Changing ``permissions`` must also be
           enabled for your team; if it isn't, a request whose manifest includes a ``permissions``
-          section returns ``403``\\ , even if the section matches the session's policy.
+          section returns ``403``\\ , even if the section matches the session's policy. Likewise,
+        changing
+          ``skills`` must be enabled for your team; if it isn't, a request whose manifest includes a
+          ``skills`` section returns ``403``\\ , even if the list matches the session's skills.
         * Not every agent runtime supports every section, or every ``permissions`` change (see Changing
           permissions above). An unsupported change returns ``409``\\ , and nothing is applied.
 
@@ -57395,16 +58001,20 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                       string, that holds only the sections to change. Can't be combined with
                       ``resume_on_topoff``. Requires session settings updates to be enabled for your
                       team ("" ``403`` otherwise).  Supported sections are ``tools``"" , ``env``"" ,
-                      ``secrets``"" , ``egress``"" , and ``permissions``. Sections you omit are not
-                      changed. Any other top-level key returns ``400``"" , including ``model`` (set the
-                      model in ``env`` instead; see **Changing the model**"" ).  Each section you
-                      include replaces that section in full:   * ``tools``"" : the complete list of
-                      tools for the session. Only Action Gateway tools   ("" ``do.actions`` entries)
-                      can be added, removed, or changed. Custom MCP servers can't be   changed on an
-                      existing session: include the session's current custom MCP servers   exactly as
-                      they are. Adding, removing, or changing one returns ``422``. To remove all
-                      Action Gateway tools from a session that has no custom MCP servers, send ``tools:
-                      []``.   ``tools: null`` returns ``400``. * ``env``"" : the complete set of
+                      ``secrets``"" , ``egress``"" , ``permissions``"" , and ``skills``. Sections you
+                      omit are not changed. Any other top-level key returns ``400``"" , including
+                      ``model`` (set the model in ``env`` instead; see **Changing the model**"" ).
+                      Each section you include replaces that section in full:   * ``tools``"" : the
+                      complete list of tools for the session. Action Gateway tools   ("" ``do.actions``
+                      entries) can be added, removed, or changed. A custom MCP server can be   added,
+                      modified, or removed only where the session's ``mutability.custom_tools`` is
+                      ``true``"" ; otherwise the request returns ``409``. Include the session's current
+                      custom MCP   servers exactly as they are unless you are changing them. A server
+                      with ``auth`` that is   added, moved to another ``url``"" , or given another
+                      secret slot needs its secret's value in   the same request, or a URL-bound secret
+                      that covers its ``url``"" ; otherwise the request   returns ``400``. To remove
+                      all Action Gateway tools from a session that has no custom MCP   servers, send
+                      ``tools: []``. ``tools: null`` returns ``400``. * ``env``"" : the complete set of
                       environment variables, as name-value pairs. A variable you   leave out is
                       removed. ``env: {}`` removes all variables; ``env: null`` returns ``400``. *
                       ``secrets``"" : the complete set of secrets, as name-value pairs. A secret you
@@ -57428,22 +58038,33 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                       change   can't be applied on the agent, the request returns ``409`` and nothing
                       is applied; the   error message names the unsupported changes so you can remove
                       them and send the update   again. Sessions created before live permissions
-                      updates were released return ``409``.  **URL-bound secrets.** The egress proxy
-                      sends a URL-bound secret only to requests that match its ``url``"" ; the agent
-                      never receives the value. An update to a URL-bound secret doesn't restart the
-                      agent. In ``secrets``"" , you can:   * Rotate the value: set the secret to the
-                      new value as a string. Its ``url`` and ``scheme``   don't change. * Move it to
-                      another URL or scheme: set it to ``{value, url, scheme}``. A new host or path,
-                      or a change to ``scheme: raw``"" , requires ``value`` ("" ``400`` otherwise).
-                      Sending the current   ``value``"" , ``url``"" , and ``scheme`` again is not a
-                      change. * Add one: set it to ``{value, url}``. ``scheme`` is optional and
-                      defaults to ``bearer``   ("" ``Authorization: Bearer <value>``"" ); ``raw`` sends
-                      the value exactly as stored. * Bind an existing plain secret to a URL: set it to
-                      ``{url}``. The secret keeps its current   value. * Keep one unchanged: set it to
-                      ``{}``. * Remove one: leave it out of ``secrets``.  ``url`` must use ``https://``
-                      and name an exact hostname (no wildcards, IP addresses, or ``localhost``"" ),
-                      with an optional path and no port, query, or fragment. A session can have up to
-                      16 URL-bound secrets, fewer if it has storage mounts, which count toward the same
+                      updates were released return ``409``. * ``skills``"" : the complete list of
+                      inline skills, with the same fields and limits as at   session creation. A skill
+                      you leave out is removed. ``skills: []`` removes every skill;   ``skills: null``
+                      returns ``400``. The same skills in a different order are not a change.
+                      Supported on ``claude-code``"" , ``codex``"" , and ``opencode`` sessions (""
+                      ``409`` otherwise), and must   be enabled for your team ("" ``403`` otherwise).
+                      The agent reloads its skills without a   restart. If the agent refuses them (for
+                      example, a skill named like one the session's   repository already ships), the
+                      update ends in ``FAILED`` with ``error`` set to   ``update_failed`` and the
+                      session keeps its previous skills: rename the skill and send the   update again.
+                      Only an agent that can't reload skills on a running session ends with
+                      ``requires_new_session``.  **URL-bound secrets.** The egress proxy sends a
+                      URL-bound secret only to requests that match its ``url``"" ; the agent never
+                      receives the value. An update to a URL-bound secret doesn't restart the agent. In
+                      ``secrets``"" , you can:   * Rotate the value: set the secret to the new value as
+                      a string. Its ``url`` and ``scheme``   don't change. * Move it to another URL or
+                      scheme: set it to ``{value, url, scheme}``. A new host or path,   or a change to
+                      ``scheme: raw``"" , requires ``value`` ("" ``400`` otherwise). Sending the
+                      current   ``value``"" , ``url``"" , and ``scheme`` again is not a change. * Add
+                      one: set it to ``{value, url}``. ``scheme`` is optional and defaults to
+                      ``bearer``   ("" ``Authorization: Bearer <value>``"" ); ``raw`` sends the value
+                      exactly as stored. * Bind an existing plain secret to a URL: set it to ``{url}``.
+                      The secret keeps its current   value. * Keep one unchanged: set it to ``{}``. *
+                      Remove one: leave it out of ``secrets``.  ``url`` must use ``https://`` and name
+                      an exact hostname (no wildcards, IP addresses, or ``localhost``"" ), with an
+                      optional path and no port, query, or fragment. A session can have up to 16
+                      URL-bound secrets, fewer if it has storage mounts, which count toward the same
                       limit. A URL-bound secret can't be changed back to a plain secret. If the session
                       has an egress allowlist, the secret's host is added to it. After a rollback or
                       fork, a URL-bound secret that was moved off its agent config's URL can need its
@@ -57457,22 +58078,23 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                       with ``error`` set to ``requires_new_session``.  **Switching an OAuth
                       connection.** An OAuth secret that was created with ``actor`` can move to another
                       connection of the same provider: set it to ``{source: oauth, provider, actor}``
-                      with the new connection's ``user_id`` as ``actor``. The connection must be
-                      active, and either yours or shared with your team ("" ``400`` otherwise), except
-                      when you switch back to the connection the agent config names. Switching OAuth
-                      connections must be enabled for your team ("" ``403`` otherwise). The agent
-                      restarts to read the new token. Sending the connection the secret already uses is
-                      not a change. Adding or removing an OAuth secret, changing its provider, or
-                      switching one that was created without ``actor`` returns ``422``. This example
-                      switches ``GITHUB_TOKEN`` to the connection ``github2`` and assumes the session
-                      has no other secrets:  .. code-block:: yaml     secrets:      GITHUB_TOKEN:
-                      source: oauth        provider: github        actor: github2  **Changing the
-                      model.** You change a session's model through ``env``. The key to set depends on
-                      the model endpoint the session was created with:   * DigitalOcean Serverless
-                      Inference (created with ``HARNESS_INFERENCE_MODEL`` and without
-                      ``OPENAI_BASE_URL``"" , ``ANTHROPIC_BASE_URL``"" , or an ``ANTHROPIC_API_KEY``
-                      secret): set   ``HARNESS_INFERENCE_MODEL`` to a Serverless Inference model ID, or
-                      to ``router:<name>`` for   an inference router. Removing the key, or moving the
+                      with the new connection's ``user_id`` as ``actor``"" ; leaving out ``provider``
+                      or ``actor`` returns ``400``. The connection must be active and owned by you,
+                      except when you switch back to the connection the agent config names. Another
+                      team member's connection returns ``400``. Switching OAuth connections must be
+                      enabled for your team ("" ``403`` otherwise). The agent restarts to read the new
+                      token. Sending the connection the secret already uses is not a change. Adding or
+                      removing an OAuth secret, changing its provider, or switching one that was
+                      created without ``actor`` returns ``422``. This example switches ``GITHUB_TOKEN``
+                      to the connection ``github2`` and assumes the session has no other secrets:  ..
+                      code-block:: yaml     secrets:      GITHUB_TOKEN:        source: oauth
+                      provider: github        actor: github2  **Changing the model.** You change a
+                      session's model through ``env``. The key to set depends on the model endpoint the
+                      session was created with:   * DigitalOcean Serverless Inference (created with
+                      ``HARNESS_INFERENCE_MODEL`` and without   ``OPENAI_BASE_URL``"" ,
+                      ``ANTHROPIC_BASE_URL``"" , or an ``ANTHROPIC_API_KEY`` secret): set
+                      ``HARNESS_INFERENCE_MODEL`` to a Serverless Inference model ID, or to
+                      ``router:<name>`` for   an inference router. Removing the key, or moving the
                       session to its own endpoint,   returns ``422``. Adding the key to a session that
                       was created without it also returns   ``422``. * Your own OpenAI-compatible
                       endpoint (created with ``OPENAI_BASE_URL``"" ): set ``MODEL``. The   session
@@ -57608,23 +58230,43 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "added": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "changed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "removed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
+                                ]
+                            },
+                            "skills": {
+                                "added": [
+                                    "str"  # Optional. Skill names, never their
+                                      content. ``changed`` lists the skills kept under the same name
+                                      whose definition changed.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Skill names, never their
+                                      content. ``changed`` lists the skills kept under the same name
+                                      whose definition changed.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Skill names, never their
+                                      content. ``changed`` lists the skills kept under the same name
+                                      whose definition changed.
                                 ]
                             },
                             "tools": {
@@ -57644,7 +58286,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         },
                         "config_drifted": bool,  # Optional. True when the running config
                           differs from the manifest the session was created from, for example after a
-                          successful PATCH with ``manifest_yaml``. Omitted when false.
+                          successful PATCH with ``manifest_yaml``. Omitted when false. ``config_diff``
+                          doesn't cover every kind of drift: after an update that only switched an
+                          OAuth connection, ``config_drifted`` is true and ``config_diff`` is omitted.
+                          ``manifest`` shows the new ``actor``.
                         "config_id": "str",  # Optional. Durable Environment Config UUID the
                           session was created from (inline manifests persist a config too, named after
                           the session). Persisted and returned on create/get/list; absent only for
@@ -57671,6 +58316,46 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "str": {}  # Optional. The effective manifest of the session.
                               Present only when ``config_drifted`` is true. Never contains secret
                               values.
+                        },
+                        "mutability": {
+                            "custom_tools": bool,  # A live update can add, modify, or
+                              remove a custom MCP server ("" ``name`` and ``url``"" ) in the ``tools``
+                              section. It also needs ``tools``. The agent restarts when the change
+                              alters its environment. A session reads ``false`` until its agent's
+                              custom-server update is supported, and keeps reading ``false`` after that
+                              if it was created earlier. A server with ``auth`` that is added, moved to
+                              another ``url``"" , or given another secret slot must carry its secret's
+                              value in the same request, or use a URL-bound secret whose ``url`` covers
+                              the server's ``url`` ("" ``400`` otherwise). A new server host under an
+                              egress allowlist also needs ``egress``. Required.
+                            "egress": bool,  # A live update can change the ``egress``
+                              section: the destinations the session can reach. Required.
+                            "env": bool,  # A live update can change ``env`` keys other
+                              than the model keys. A patch that changes both needs both. Required.
+                            "model": bool,  # The session's model can be changed, through
+                              ``env.HARNESS_INFERENCE_MODEL`` or, on a session with its own endpoint,
+                              the env key that endpoint reads its model from. Independent of ``env``.
+                              Required.
+                            "permissions": bool,  # A live update can change
+                              ``permissions``"" : the default and the rules of the types the session's
+                              agent enforces live. ``filesystem`` and ``network`` never change on a
+                              running session. Required.
+                            "secrets": bool,  # A live update can change the ``secrets``
+                              section. Required.
+                            "skills": bool,  # A live update can change the ``skills``
+                              section, the inline skill list, which is replaced as a whole. Only
+                              claude-code, codex and opencode can reload skills live. A session reads
+                              ``false`` until its agent's live skill update is supported, and keeps
+                              reading ``false`` after that if it was created earlier. While skills
+                              updates are enabled team by team, a team that has them can also change
+                              the skills of a claude-code, codex, or opencode session that reads
+                              ``false``"" , unless the session was created before this field existed.
+                              Required.
+                            "system_prompt": bool,  # The session's standing instruction
+                              can be replaced by a live update. Required.
+                            "tools": bool  # A live update can change the ``tools``
+                              section: the Action Gateway ("" ``do.actions``"" ) entries. A custom MCP
+                              server also needs ``custom_tools``. Required.
                         },
                         "name": "str",  # Optional. User-assignable display name, unique per
                           team among non-terminal sessions. Usable in place of session_id by clients
@@ -57792,23 +58477,46 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "added": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "changed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "removed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
+                                    ]
+                                },
+                                "skills": {
+                                    "added": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
                                     ]
                                 },
                                 "tools": {
@@ -57885,7 +58593,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           from being accepted.
                     ]
                 }
-                # response body for status code(s): 400, 403, 404, 409, 422, 423
+                # response body for status code(s): 400, 403, 404, 409, 413, 422, 423, 503
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -57933,9 +58641,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
              - What it changes
              - Agent restart
            * - ``tools``
-             - The session's Action Gateway tools (\\ ``do.actions`` entries). Custom MCP servers can't
-        be changed.
-             - No (LangGraph: yes)
+             - The session's Action Gateway tools (\\ ``do.actions`` entries). Custom MCP servers too,
+        where the session's ``mutability.custom_tools`` is ``true``.
+             - No (LangGraph: yes). A custom MCP server change: when it alters the agent's environment
            * - ``env``
              - Environment variables (name and value).
              - Yes
@@ -57962,6 +58670,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
              - The permission policy: the default action and the full rules list. What can change
         depends on the agent; see below.
              - No (LangGraph: yes for ``do.actions`` rules or ``default``\\ )
+           * - ``skills``
+             - The full list of inline skills. Supported on ``claude-code``\\ , ``codex``\\ , and
+        ``opencode``\\ ; see below.
+             - No
 
 
         Sections you omit are not changed. Each section you include replaces that section in full; see
@@ -57998,11 +58710,47 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         ``manifest_yaml`` for the
         rules.
 
-        The following can't be changed on an existing session: custom MCP servers (\\ ``422``\\ ), the
-        egress
-        VPC (\\ ``vpc_uuid`` and ``subnet_uuid``\\ , ``422``\\ ), and platform-managed model keys. To
-        use a different
-        custom MCP server or VPC, create a new session.
+        The following can't be changed on an existing session: the egress VPC (\\ ``vpc_uuid`` and
+        ``subnet_uuid``\\ , ``422``\\ ) and platform-managed model keys. To use a different VPC, create
+        a new
+        session.
+
+        Custom MCP servers
+        ^^^^^^^^^^^^^^^^^^
+
+        A custom MCP server (\\ ``name`` and ``url``\\ ) in ``tools`` can be added, modified, or
+        removed on a running
+        session only where the session's ``mutability.custom_tools`` is ``true``\\ , and
+        ``mutability.tools`` is
+        ``true`` too. Read ``mutability`` from the session (\\ ``GET
+        /v2/agents/sessions/{session_id}``\\ ). Where
+        ``custom_tools`` is ``false``\\ , the request returns ``409`` and the message ends with
+        ``(update_unsupported)``. The flag is ``false`` for every agent until its custom-server update
+        is
+        supported, and a session created before an agent was enabled keeps reading ``false``\\ ; create
+        a new
+        session to change its custom MCP servers.
+
+        Include the session's other custom MCP servers exactly as they are, because ``tools`` replaces
+        the
+        whole list. The agent restarts when the change alters its environment (a server added, removed
+        or
+        moved, or a changed credential), and the update then ends ``APPLIED_RESTARTED``. A change that
+        doesn't, such as editing the ``tools`` allowlist of an existing server, ends ``APPLIED``.
+
+        A server with ``auth`` that is added, moved to another ``url``\\ , or given another secret slot
+        must carry
+        its credential in the same request, so a credential never goes to a destination the request did
+        not name. Either send the secret's value in ``secrets`` (a plain secret), or use a URL-bound
+        secret
+        whose ``url`` covers the server's URL: the same host, a path prefix of the server's path, and
+        the
+        default port. A URL-bound secret needs that coverage even when you send its value. Otherwise
+        the
+        request returns ``400``. A server whose ``url`` differs only in the case of the scheme or host
+        is the
+        same server. A new server host under an egress allowlist also needs ``mutability.egress`` to be
+        ``true``.
 
         Switching an OAuth connection
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -58014,17 +58762,19 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         <#operation/harness_list_provider_connections>`_.
         Send the secret with ``source``\\ , ``provider``\\ , and the new ``actor``\\ , and keep every
         other secret as
-        ``{}``. See ``manifest_yaml`` for an example.
+        ``{}``. Leaving out ``provider`` or ``actor`` returns ``400``. See ``manifest_yaml`` for an
+        example.
 
-        The platform first checks that you can use the new connection: it must be active, and either
-        yours or shared with your team (\\ ``400`` otherwise). Switching back to the connection the
-        agent
-        config names skips this check, so any team member can do it. The platform then gives the
-        session
-        that connection's token and restarts the agent, so the next ``git`` operation uses the new
-        connection. Sending the connection the secret already uses returns ``200`` with ``outcome`` set
-        to
-        ``UNCHANGED``.
+        The platform first checks that you can use the new connection: it must be active and owned by
+        you. Another team member's connection returns ``400``\\ , even when it is active. Switching
+        back to
+        the connection the agent config names skips this check, so any team member can do it. If the
+        platform can't reach its connection service to check, the request returns ``503``\\ ; retry it.
+        The
+        platform then gives the session that connection's token and restarts the agent, so the next
+        ``git`` operation uses the new connection. Sending the connection the secret already uses
+        returns
+        ``200`` with ``outcome`` set to ``UNCHANGED``.
 
         The switch applies to this session only:
 
@@ -58137,6 +58887,47 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         remove the
         permission changes the agent can't take and send the update again.
 
+        Changing skills
+        ^^^^^^^^^^^^^^^
+
+        ``skills`` replaces the session's whole list of inline skills. Send every skill the session
+        should keep, with the same fields as when you create the session: ``name``\\ ,
+        ``description``\\ ,
+        ``instructions``\\ , and optionally ``license``\\ , ``metadata``\\ , and ``allowed_tools``. A
+        skill you leave
+        out is removed. ``skills: []`` removes every skill, and ``skills: null`` returns ``400``. The
+        list is
+        checked with the same rules and limits as at session creation: at most 32 skills, and at most
+        512 KiB for all skills together (\\ ``400`` otherwise). ``manifest_yaml`` itself can be at most
+        1 MiB
+        and the request body at most 2 MiB (\\ ``413`` otherwise). The same skills in a different order
+        are
+        not a change.
+
+        The agent is not restarted, so the conversation continues. The agent reloads its skills, and
+        the new list is in use once the update is ``APPLIED``. ``session.update.changes.skills`` names
+        the
+        skills added, removed, or changed, never their content.
+
+        Changing ``skills`` is supported on ``claude-code``\\ , ``codex``\\ , and ``opencode``
+        sessions. On any other
+        agent, or on a session created before live updates were available, a manifest with a ``skills``
+        section returns ``409``\\ , even if the list matches the session's skills. Changing ``skills``
+        must be
+        enabled for your team (see Requirements below).
+
+        If the agent refuses the new skills after the request is accepted, the update ends ``FAILED``
+        with ``error`` set to ``update_failed`` and ``session.update.reverted`` set to ``true``\\ , and
+        the
+        session keeps its previous skills. This happens when a skill has the same name as one the
+        session's repository already provides: rename the skill and send the update again on the same
+        session. Only when the session's agent can't reload skills while it runs does the update end
+        with ``error`` set to ``requires_new_session``. If the same update also changes
+        ``permissions``\\ , the platform can't tell which of the two the agent refused: the update ends
+        ``FAILED`` with ``error`` set to ``update_failed``\\ , and sending the ``permissions`` and
+        ``skills`` changes
+        as separate updates shows which one the agent can't take.
+
         Tracking an update
         ^^^^^^^^^^^^^^^^^^
 
@@ -58157,12 +58948,14 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
            * ``FAILED``\\ : the update did not take effect. ``session.update.detail`` explains why, and
              ``session.update.reverted`` is ``true`` if the previous settings were restored.
 
-        Tool, URL-bound secret, ``egress``\\ , and ``permissions`` updates usually finish within a few
-        seconds, except on ``langgraph``\\ , where a ``tools`` update or a ``permissions`` change to
-        ``default``
-        or ``do.actions/<tool>`` rules restarts the agent. Updates to ``env`` (including the model) or
-        plain secrets, and OAuth connection switches, restart the agent and can take up to about two
-        minutes.
+        Tool, URL-bound secret, ``egress``\\ , ``permissions``\\ , and ``skills`` updates usually
+        finish within a
+        few seconds, except on ``langgraph``\\ , where a ``tools`` update or a ``permissions`` change
+        to
+        ``default`` or ``do.actions/<tool>`` rules restarts the agent. Updates to ``env`` (including
+        the
+        model) or plain secrets, and OAuth connection switches, restart the agent and can take up to
+        about two minutes.
 
         If the request matches the session's current settings, it returns ``200`` with ``outcome`` set
         to
@@ -58195,7 +58988,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         * The session must be idle: no agent turn running and no approval pending (\\ ``409``\\ ).
         * Session settings updates must be enabled for your team. Changing ``permissions`` must also be
           enabled for your team; if it isn't, a request whose manifest includes a ``permissions``
-          section returns ``403``\\ , even if the section matches the session's policy.
+          section returns ``403``\\ , even if the section matches the session's policy. Likewise,
+        changing
+          ``skills`` must be enabled for your team; if it isn't, a request whose manifest includes a
+          ``skills`` section returns ``403``\\ , even if the list matches the session's skills.
         * Not every agent runtime supports every section, or every ``permissions`` change (see Changing
           permissions above). An unsupported change returns ``409``\\ , and nothing is applied.
 
@@ -58300,23 +59096,43 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "added": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "changed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "removed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
+                                ]
+                            },
+                            "skills": {
+                                "added": [
+                                    "str"  # Optional. Skill names, never their
+                                      content. ``changed`` lists the skills kept under the same name
+                                      whose definition changed.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Skill names, never their
+                                      content. ``changed`` lists the skills kept under the same name
+                                      whose definition changed.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Skill names, never their
+                                      content. ``changed`` lists the skills kept under the same name
+                                      whose definition changed.
                                 ]
                             },
                             "tools": {
@@ -58336,7 +59152,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         },
                         "config_drifted": bool,  # Optional. True when the running config
                           differs from the manifest the session was created from, for example after a
-                          successful PATCH with ``manifest_yaml``. Omitted when false.
+                          successful PATCH with ``manifest_yaml``. Omitted when false. ``config_diff``
+                          doesn't cover every kind of drift: after an update that only switched an
+                          OAuth connection, ``config_drifted`` is true and ``config_diff`` is omitted.
+                          ``manifest`` shows the new ``actor``.
                         "config_id": "str",  # Optional. Durable Environment Config UUID the
                           session was created from (inline manifests persist a config too, named after
                           the session). Persisted and returned on create/get/list; absent only for
@@ -58363,6 +59182,46 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "str": {}  # Optional. The effective manifest of the session.
                               Present only when ``config_drifted`` is true. Never contains secret
                               values.
+                        },
+                        "mutability": {
+                            "custom_tools": bool,  # A live update can add, modify, or
+                              remove a custom MCP server ("" ``name`` and ``url``"" ) in the ``tools``
+                              section. It also needs ``tools``. The agent restarts when the change
+                              alters its environment. A session reads ``false`` until its agent's
+                              custom-server update is supported, and keeps reading ``false`` after that
+                              if it was created earlier. A server with ``auth`` that is added, moved to
+                              another ``url``"" , or given another secret slot must carry its secret's
+                              value in the same request, or use a URL-bound secret whose ``url`` covers
+                              the server's ``url`` ("" ``400`` otherwise). A new server host under an
+                              egress allowlist also needs ``egress``. Required.
+                            "egress": bool,  # A live update can change the ``egress``
+                              section: the destinations the session can reach. Required.
+                            "env": bool,  # A live update can change ``env`` keys other
+                              than the model keys. A patch that changes both needs both. Required.
+                            "model": bool,  # The session's model can be changed, through
+                              ``env.HARNESS_INFERENCE_MODEL`` or, on a session with its own endpoint,
+                              the env key that endpoint reads its model from. Independent of ``env``.
+                              Required.
+                            "permissions": bool,  # A live update can change
+                              ``permissions``"" : the default and the rules of the types the session's
+                              agent enforces live. ``filesystem`` and ``network`` never change on a
+                              running session. Required.
+                            "secrets": bool,  # A live update can change the ``secrets``
+                              section. Required.
+                            "skills": bool,  # A live update can change the ``skills``
+                              section, the inline skill list, which is replaced as a whole. Only
+                              claude-code, codex and opencode can reload skills live. A session reads
+                              ``false`` until its agent's live skill update is supported, and keeps
+                              reading ``false`` after that if it was created earlier. While skills
+                              updates are enabled team by team, a team that has them can also change
+                              the skills of a claude-code, codex, or opencode session that reads
+                              ``false``"" , unless the session was created before this field existed.
+                              Required.
+                            "system_prompt": bool,  # The session's standing instruction
+                              can be replaced by a live update. Required.
+                            "tools": bool  # A live update can change the ``tools``
+                              section: the Action Gateway ("" ``do.actions``"" ) entries. A custom MCP
+                              server also needs ``custom_tools``. Required.
                         },
                         "name": "str",  # Optional. User-assignable display name, unique per
                           team among non-terminal sessions. Usable in place of session_id by clients
@@ -58484,23 +59343,46 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "added": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "changed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "removed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
+                                    ]
+                                },
+                                "skills": {
+                                    "added": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
                                     ]
                                 },
                                 "tools": {
@@ -58577,7 +59459,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           from being accepted.
                     ]
                 }
-                # response body for status code(s): 400, 403, 404, 409, 422, 423
+                # response body for status code(s): 400, 403, 404, 409, 413, 422, 423, 503
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -58620,9 +59502,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
              - What it changes
              - Agent restart
            * - ``tools``
-             - The session's Action Gateway tools (\\ ``do.actions`` entries). Custom MCP servers can't
-        be changed.
-             - No (LangGraph: yes)
+             - The session's Action Gateway tools (\\ ``do.actions`` entries). Custom MCP servers too,
+        where the session's ``mutability.custom_tools`` is ``true``.
+             - No (LangGraph: yes). A custom MCP server change: when it alters the agent's environment
            * - ``env``
              - Environment variables (name and value).
              - Yes
@@ -58649,6 +59531,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
              - The permission policy: the default action and the full rules list. What can change
         depends on the agent; see below.
              - No (LangGraph: yes for ``do.actions`` rules or ``default``\\ )
+           * - ``skills``
+             - The full list of inline skills. Supported on ``claude-code``\\ , ``codex``\\ , and
+        ``opencode``\\ ; see below.
+             - No
 
 
         Sections you omit are not changed. Each section you include replaces that section in full; see
@@ -58685,11 +59571,47 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         ``manifest_yaml`` for the
         rules.
 
-        The following can't be changed on an existing session: custom MCP servers (\\ ``422``\\ ), the
-        egress
-        VPC (\\ ``vpc_uuid`` and ``subnet_uuid``\\ , ``422``\\ ), and platform-managed model keys. To
-        use a different
-        custom MCP server or VPC, create a new session.
+        The following can't be changed on an existing session: the egress VPC (\\ ``vpc_uuid`` and
+        ``subnet_uuid``\\ , ``422``\\ ) and platform-managed model keys. To use a different VPC, create
+        a new
+        session.
+
+        Custom MCP servers
+        ^^^^^^^^^^^^^^^^^^
+
+        A custom MCP server (\\ ``name`` and ``url``\\ ) in ``tools`` can be added, modified, or
+        removed on a running
+        session only where the session's ``mutability.custom_tools`` is ``true``\\ , and
+        ``mutability.tools`` is
+        ``true`` too. Read ``mutability`` from the session (\\ ``GET
+        /v2/agents/sessions/{session_id}``\\ ). Where
+        ``custom_tools`` is ``false``\\ , the request returns ``409`` and the message ends with
+        ``(update_unsupported)``. The flag is ``false`` for every agent until its custom-server update
+        is
+        supported, and a session created before an agent was enabled keeps reading ``false``\\ ; create
+        a new
+        session to change its custom MCP servers.
+
+        Include the session's other custom MCP servers exactly as they are, because ``tools`` replaces
+        the
+        whole list. The agent restarts when the change alters its environment (a server added, removed
+        or
+        moved, or a changed credential), and the update then ends ``APPLIED_RESTARTED``. A change that
+        doesn't, such as editing the ``tools`` allowlist of an existing server, ends ``APPLIED``.
+
+        A server with ``auth`` that is added, moved to another ``url``\\ , or given another secret slot
+        must carry
+        its credential in the same request, so a credential never goes to a destination the request did
+        not name. Either send the secret's value in ``secrets`` (a plain secret), or use a URL-bound
+        secret
+        whose ``url`` covers the server's URL: the same host, a path prefix of the server's path, and
+        the
+        default port. A URL-bound secret needs that coverage even when you send its value. Otherwise
+        the
+        request returns ``400``. A server whose ``url`` differs only in the case of the scheme or host
+        is the
+        same server. A new server host under an egress allowlist also needs ``mutability.egress`` to be
+        ``true``.
 
         Switching an OAuth connection
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -58701,17 +59623,19 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         <#operation/harness_list_provider_connections>`_.
         Send the secret with ``source``\\ , ``provider``\\ , and the new ``actor``\\ , and keep every
         other secret as
-        ``{}``. See ``manifest_yaml`` for an example.
+        ``{}``. Leaving out ``provider`` or ``actor`` returns ``400``. See ``manifest_yaml`` for an
+        example.
 
-        The platform first checks that you can use the new connection: it must be active, and either
-        yours or shared with your team (\\ ``400`` otherwise). Switching back to the connection the
-        agent
-        config names skips this check, so any team member can do it. The platform then gives the
-        session
-        that connection's token and restarts the agent, so the next ``git`` operation uses the new
-        connection. Sending the connection the secret already uses returns ``200`` with ``outcome`` set
-        to
-        ``UNCHANGED``.
+        The platform first checks that you can use the new connection: it must be active and owned by
+        you. Another team member's connection returns ``400``\\ , even when it is active. Switching
+        back to
+        the connection the agent config names skips this check, so any team member can do it. If the
+        platform can't reach its connection service to check, the request returns ``503``\\ ; retry it.
+        The
+        platform then gives the session that connection's token and restarts the agent, so the next
+        ``git`` operation uses the new connection. Sending the connection the secret already uses
+        returns
+        ``200`` with ``outcome`` set to ``UNCHANGED``.
 
         The switch applies to this session only:
 
@@ -58824,6 +59748,47 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         remove the
         permission changes the agent can't take and send the update again.
 
+        Changing skills
+        ^^^^^^^^^^^^^^^
+
+        ``skills`` replaces the session's whole list of inline skills. Send every skill the session
+        should keep, with the same fields as when you create the session: ``name``\\ ,
+        ``description``\\ ,
+        ``instructions``\\ , and optionally ``license``\\ , ``metadata``\\ , and ``allowed_tools``. A
+        skill you leave
+        out is removed. ``skills: []`` removes every skill, and ``skills: null`` returns ``400``. The
+        list is
+        checked with the same rules and limits as at session creation: at most 32 skills, and at most
+        512 KiB for all skills together (\\ ``400`` otherwise). ``manifest_yaml`` itself can be at most
+        1 MiB
+        and the request body at most 2 MiB (\\ ``413`` otherwise). The same skills in a different order
+        are
+        not a change.
+
+        The agent is not restarted, so the conversation continues. The agent reloads its skills, and
+        the new list is in use once the update is ``APPLIED``. ``session.update.changes.skills`` names
+        the
+        skills added, removed, or changed, never their content.
+
+        Changing ``skills`` is supported on ``claude-code``\\ , ``codex``\\ , and ``opencode``
+        sessions. On any other
+        agent, or on a session created before live updates were available, a manifest with a ``skills``
+        section returns ``409``\\ , even if the list matches the session's skills. Changing ``skills``
+        must be
+        enabled for your team (see Requirements below).
+
+        If the agent refuses the new skills after the request is accepted, the update ends ``FAILED``
+        with ``error`` set to ``update_failed`` and ``session.update.reverted`` set to ``true``\\ , and
+        the
+        session keeps its previous skills. This happens when a skill has the same name as one the
+        session's repository already provides: rename the skill and send the update again on the same
+        session. Only when the session's agent can't reload skills while it runs does the update end
+        with ``error`` set to ``requires_new_session``. If the same update also changes
+        ``permissions``\\ , the platform can't tell which of the two the agent refused: the update ends
+        ``FAILED`` with ``error`` set to ``update_failed``\\ , and sending the ``permissions`` and
+        ``skills`` changes
+        as separate updates shows which one the agent can't take.
+
         Tracking an update
         ^^^^^^^^^^^^^^^^^^
 
@@ -58844,12 +59809,14 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
            * ``FAILED``\\ : the update did not take effect. ``session.update.detail`` explains why, and
              ``session.update.reverted`` is ``true`` if the previous settings were restored.
 
-        Tool, URL-bound secret, ``egress``\\ , and ``permissions`` updates usually finish within a few
-        seconds, except on ``langgraph``\\ , where a ``tools`` update or a ``permissions`` change to
-        ``default``
-        or ``do.actions/<tool>`` rules restarts the agent. Updates to ``env`` (including the model) or
-        plain secrets, and OAuth connection switches, restart the agent and can take up to about two
-        minutes.
+        Tool, URL-bound secret, ``egress``\\ , ``permissions``\\ , and ``skills`` updates usually
+        finish within a
+        few seconds, except on ``langgraph``\\ , where a ``tools`` update or a ``permissions`` change
+        to
+        ``default`` or ``do.actions/<tool>`` rules restarts the agent. Updates to ``env`` (including
+        the
+        model) or plain secrets, and OAuth connection switches, restart the agent and can take up to
+        about two minutes.
 
         If the request matches the session's current settings, it returns ``200`` with ``outcome`` set
         to
@@ -58882,7 +59849,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         * The session must be idle: no agent turn running and no approval pending (\\ ``409``\\ ).
         * Session settings updates must be enabled for your team. Changing ``permissions`` must also be
           enabled for your team; if it isn't, a request whose manifest includes a ``permissions``
-          section returns ``403``\\ , even if the section matches the session's policy.
+          section returns ``403``\\ , even if the section matches the session's policy. Likewise,
+        changing
+          ``skills`` must be enabled for your team; if it isn't, a request whose manifest includes a
+          ``skills`` section returns ``403``\\ , even if the list matches the session's skills.
         * Not every agent runtime supports every section, or every ``permissions`` change (see Changing
           permissions above). An unsupported change returns ``409``\\ , and nothing is applied.
 
@@ -58904,16 +59874,20 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                       string, that holds only the sections to change. Can't be combined with
                       ``resume_on_topoff``. Requires session settings updates to be enabled for your
                       team ("" ``403`` otherwise).  Supported sections are ``tools``"" , ``env``"" ,
-                      ``secrets``"" , ``egress``"" , and ``permissions``. Sections you omit are not
-                      changed. Any other top-level key returns ``400``"" , including ``model`` (set the
-                      model in ``env`` instead; see **Changing the model**"" ).  Each section you
-                      include replaces that section in full:   * ``tools``"" : the complete list of
-                      tools for the session. Only Action Gateway tools   ("" ``do.actions`` entries)
-                      can be added, removed, or changed. Custom MCP servers can't be   changed on an
-                      existing session: include the session's current custom MCP servers   exactly as
-                      they are. Adding, removing, or changing one returns ``422``. To remove all
-                      Action Gateway tools from a session that has no custom MCP servers, send ``tools:
-                      []``.   ``tools: null`` returns ``400``. * ``env``"" : the complete set of
+                      ``secrets``"" , ``egress``"" , ``permissions``"" , and ``skills``. Sections you
+                      omit are not changed. Any other top-level key returns ``400``"" , including
+                      ``model`` (set the model in ``env`` instead; see **Changing the model**"" ).
+                      Each section you include replaces that section in full:   * ``tools``"" : the
+                      complete list of tools for the session. Action Gateway tools   ("" ``do.actions``
+                      entries) can be added, removed, or changed. A custom MCP server can be   added,
+                      modified, or removed only where the session's ``mutability.custom_tools`` is
+                      ``true``"" ; otherwise the request returns ``409``. Include the session's current
+                      custom MCP   servers exactly as they are unless you are changing them. A server
+                      with ``auth`` that is   added, moved to another ``url``"" , or given another
+                      secret slot needs its secret's value in   the same request, or a URL-bound secret
+                      that covers its ``url``"" ; otherwise the request   returns ``400``. To remove
+                      all Action Gateway tools from a session that has no custom MCP   servers, send
+                      ``tools: []``. ``tools: null`` returns ``400``. * ``env``"" : the complete set of
                       environment variables, as name-value pairs. A variable you   leave out is
                       removed. ``env: {}`` removes all variables; ``env: null`` returns ``400``. *
                       ``secrets``"" : the complete set of secrets, as name-value pairs. A secret you
@@ -58937,22 +59911,33 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                       change   can't be applied on the agent, the request returns ``409`` and nothing
                       is applied; the   error message names the unsupported changes so you can remove
                       them and send the update   again. Sessions created before live permissions
-                      updates were released return ``409``.  **URL-bound secrets.** The egress proxy
-                      sends a URL-bound secret only to requests that match its ``url``"" ; the agent
-                      never receives the value. An update to a URL-bound secret doesn't restart the
-                      agent. In ``secrets``"" , you can:   * Rotate the value: set the secret to the
-                      new value as a string. Its ``url`` and ``scheme``   don't change. * Move it to
-                      another URL or scheme: set it to ``{value, url, scheme}``. A new host or path,
-                      or a change to ``scheme: raw``"" , requires ``value`` ("" ``400`` otherwise).
-                      Sending the current   ``value``"" , ``url``"" , and ``scheme`` again is not a
-                      change. * Add one: set it to ``{value, url}``. ``scheme`` is optional and
-                      defaults to ``bearer``   ("" ``Authorization: Bearer <value>``"" ); ``raw`` sends
-                      the value exactly as stored. * Bind an existing plain secret to a URL: set it to
-                      ``{url}``. The secret keeps its current   value. * Keep one unchanged: set it to
-                      ``{}``. * Remove one: leave it out of ``secrets``.  ``url`` must use ``https://``
-                      and name an exact hostname (no wildcards, IP addresses, or ``localhost``"" ),
-                      with an optional path and no port, query, or fragment. A session can have up to
-                      16 URL-bound secrets, fewer if it has storage mounts, which count toward the same
+                      updates were released return ``409``. * ``skills``"" : the complete list of
+                      inline skills, with the same fields and limits as at   session creation. A skill
+                      you leave out is removed. ``skills: []`` removes every skill;   ``skills: null``
+                      returns ``400``. The same skills in a different order are not a change.
+                      Supported on ``claude-code``"" , ``codex``"" , and ``opencode`` sessions (""
+                      ``409`` otherwise), and must   be enabled for your team ("" ``403`` otherwise).
+                      The agent reloads its skills without a   restart. If the agent refuses them (for
+                      example, a skill named like one the session's   repository already ships), the
+                      update ends in ``FAILED`` with ``error`` set to   ``update_failed`` and the
+                      session keeps its previous skills: rename the skill and send the   update again.
+                      Only an agent that can't reload skills on a running session ends with
+                      ``requires_new_session``.  **URL-bound secrets.** The egress proxy sends a
+                      URL-bound secret only to requests that match its ``url``"" ; the agent never
+                      receives the value. An update to a URL-bound secret doesn't restart the agent. In
+                      ``secrets``"" , you can:   * Rotate the value: set the secret to the new value as
+                      a string. Its ``url`` and ``scheme``   don't change. * Move it to another URL or
+                      scheme: set it to ``{value, url, scheme}``. A new host or path,   or a change to
+                      ``scheme: raw``"" , requires ``value`` ("" ``400`` otherwise). Sending the
+                      current   ``value``"" , ``url``"" , and ``scheme`` again is not a change. * Add
+                      one: set it to ``{value, url}``. ``scheme`` is optional and defaults to
+                      ``bearer``   ("" ``Authorization: Bearer <value>``"" ); ``raw`` sends the value
+                      exactly as stored. * Bind an existing plain secret to a URL: set it to ``{url}``.
+                      The secret keeps its current   value. * Keep one unchanged: set it to ``{}``. *
+                      Remove one: leave it out of ``secrets``.  ``url`` must use ``https://`` and name
+                      an exact hostname (no wildcards, IP addresses, or ``localhost``"" ), with an
+                      optional path and no port, query, or fragment. A session can have up to 16
+                      URL-bound secrets, fewer if it has storage mounts, which count toward the same
                       limit. A URL-bound secret can't be changed back to a plain secret. If the session
                       has an egress allowlist, the secret's host is added to it. After a rollback or
                       fork, a URL-bound secret that was moved off its agent config's URL can need its
@@ -58966,22 +59951,23 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                       with ``error`` set to ``requires_new_session``.  **Switching an OAuth
                       connection.** An OAuth secret that was created with ``actor`` can move to another
                       connection of the same provider: set it to ``{source: oauth, provider, actor}``
-                      with the new connection's ``user_id`` as ``actor``. The connection must be
-                      active, and either yours or shared with your team ("" ``400`` otherwise), except
-                      when you switch back to the connection the agent config names. Switching OAuth
-                      connections must be enabled for your team ("" ``403`` otherwise). The agent
-                      restarts to read the new token. Sending the connection the secret already uses is
-                      not a change. Adding or removing an OAuth secret, changing its provider, or
-                      switching one that was created without ``actor`` returns ``422``. This example
-                      switches ``GITHUB_TOKEN`` to the connection ``github2`` and assumes the session
-                      has no other secrets:  .. code-block:: yaml     secrets:      GITHUB_TOKEN:
-                      source: oauth        provider: github        actor: github2  **Changing the
-                      model.** You change a session's model through ``env``. The key to set depends on
-                      the model endpoint the session was created with:   * DigitalOcean Serverless
-                      Inference (created with ``HARNESS_INFERENCE_MODEL`` and without
-                      ``OPENAI_BASE_URL``"" , ``ANTHROPIC_BASE_URL``"" , or an ``ANTHROPIC_API_KEY``
-                      secret): set   ``HARNESS_INFERENCE_MODEL`` to a Serverless Inference model ID, or
-                      to ``router:<name>`` for   an inference router. Removing the key, or moving the
+                      with the new connection's ``user_id`` as ``actor``"" ; leaving out ``provider``
+                      or ``actor`` returns ``400``. The connection must be active and owned by you,
+                      except when you switch back to the connection the agent config names. Another
+                      team member's connection returns ``400``. Switching OAuth connections must be
+                      enabled for your team ("" ``403`` otherwise). The agent restarts to read the new
+                      token. Sending the connection the secret already uses is not a change. Adding or
+                      removing an OAuth secret, changing its provider, or switching one that was
+                      created without ``actor`` returns ``422``. This example switches ``GITHUB_TOKEN``
+                      to the connection ``github2`` and assumes the session has no other secrets:  ..
+                      code-block:: yaml     secrets:      GITHUB_TOKEN:        source: oauth
+                      provider: github        actor: github2  **Changing the model.** You change a
+                      session's model through ``env``. The key to set depends on the model endpoint the
+                      session was created with:   * DigitalOcean Serverless Inference (created with
+                      ``HARNESS_INFERENCE_MODEL`` and without   ``OPENAI_BASE_URL``"" ,
+                      ``ANTHROPIC_BASE_URL``"" , or an ``ANTHROPIC_API_KEY`` secret): set
+                      ``HARNESS_INFERENCE_MODEL`` to a Serverless Inference model ID, or to
+                      ``router:<name>`` for   an inference router. Removing the key, or moving the
                       session to its own endpoint,   returns ``422``. Adding the key to a session that
                       was created without it also returns   ``422``. * Your own OpenAI-compatible
                       endpoint (created with ``OPENAI_BASE_URL``"" ): set ``MODEL``. The   session
@@ -59117,23 +60103,43 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "added": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "changed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "removed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
+                                ]
+                            },
+                            "skills": {
+                                "added": [
+                                    "str"  # Optional. Skill names, never their
+                                      content. ``changed`` lists the skills kept under the same name
+                                      whose definition changed.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Skill names, never their
+                                      content. ``changed`` lists the skills kept under the same name
+                                      whose definition changed.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Skill names, never their
+                                      content. ``changed`` lists the skills kept under the same name
+                                      whose definition changed.
                                 ]
                             },
                             "tools": {
@@ -59153,7 +60159,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         },
                         "config_drifted": bool,  # Optional. True when the running config
                           differs from the manifest the session was created from, for example after a
-                          successful PATCH with ``manifest_yaml``. Omitted when false.
+                          successful PATCH with ``manifest_yaml``. Omitted when false. ``config_diff``
+                          doesn't cover every kind of drift: after an update that only switched an
+                          OAuth connection, ``config_drifted`` is true and ``config_diff`` is omitted.
+                          ``manifest`` shows the new ``actor``.
                         "config_id": "str",  # Optional. Durable Environment Config UUID the
                           session was created from (inline manifests persist a config too, named after
                           the session). Persisted and returned on create/get/list; absent only for
@@ -59180,6 +60189,46 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "str": {}  # Optional. The effective manifest of the session.
                               Present only when ``config_drifted`` is true. Never contains secret
                               values.
+                        },
+                        "mutability": {
+                            "custom_tools": bool,  # A live update can add, modify, or
+                              remove a custom MCP server ("" ``name`` and ``url``"" ) in the ``tools``
+                              section. It also needs ``tools``. The agent restarts when the change
+                              alters its environment. A session reads ``false`` until its agent's
+                              custom-server update is supported, and keeps reading ``false`` after that
+                              if it was created earlier. A server with ``auth`` that is added, moved to
+                              another ``url``"" , or given another secret slot must carry its secret's
+                              value in the same request, or use a URL-bound secret whose ``url`` covers
+                              the server's ``url`` ("" ``400`` otherwise). A new server host under an
+                              egress allowlist also needs ``egress``. Required.
+                            "egress": bool,  # A live update can change the ``egress``
+                              section: the destinations the session can reach. Required.
+                            "env": bool,  # A live update can change ``env`` keys other
+                              than the model keys. A patch that changes both needs both. Required.
+                            "model": bool,  # The session's model can be changed, through
+                              ``env.HARNESS_INFERENCE_MODEL`` or, on a session with its own endpoint,
+                              the env key that endpoint reads its model from. Independent of ``env``.
+                              Required.
+                            "permissions": bool,  # A live update can change
+                              ``permissions``"" : the default and the rules of the types the session's
+                              agent enforces live. ``filesystem`` and ``network`` never change on a
+                              running session. Required.
+                            "secrets": bool,  # A live update can change the ``secrets``
+                              section. Required.
+                            "skills": bool,  # A live update can change the ``skills``
+                              section, the inline skill list, which is replaced as a whole. Only
+                              claude-code, codex and opencode can reload skills live. A session reads
+                              ``false`` until its agent's live skill update is supported, and keeps
+                              reading ``false`` after that if it was created earlier. While skills
+                              updates are enabled team by team, a team that has them can also change
+                              the skills of a claude-code, codex, or opencode session that reads
+                              ``false``"" , unless the session was created before this field existed.
+                              Required.
+                            "system_prompt": bool,  # The session's standing instruction
+                              can be replaced by a live update. Required.
+                            "tools": bool  # A live update can change the ``tools``
+                              section: the Action Gateway ("" ``do.actions``"" ) entries. A custom MCP
+                              server also needs ``custom_tools``. Required.
                         },
                         "name": "str",  # Optional. User-assignable display name, unique per
                           team among non-terminal sessions. Usable in place of session_id by clients
@@ -59301,23 +60350,46 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "added": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "changed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "removed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
+                                    ]
+                                },
+                                "skills": {
+                                    "added": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
                                     ]
                                 },
                                 "tools": {
@@ -59394,7 +60466,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           from being accepted.
                     ]
                 }
-                # response body for status code(s): 400, 403, 404, 409, 422, 423
+                # response body for status code(s): 400, 403, 404, 409, 413, 422, 423, 503
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -59454,7 +60526,18 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
 
         response = pipeline_response.http_response
 
-        if response.status_code not in [200, 202, 400, 403, 404, 409, 422, 423]:
+        if response.status_code not in [
+            200,
+            202,
+            400,
+            403,
+            404,
+            409,
+            413,
+            422,
+            423,
+            503,
+        ]:
             if _stream:
                 response.read()  # Load the body in memory and close the socket
             map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
@@ -59557,6 +60640,22 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
             else:
                 deserialized = None
 
+        if response.status_code == 413:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
         if response.status_code == 422:
             response_headers["ratelimit-limit"] = self._deserialize(
                 "int", response.headers.get("ratelimit-limit")
@@ -59574,6 +60673,22 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                 deserialized = None
 
         if response.status_code == 423:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 503:
             response_headers["ratelimit-limit"] = self._deserialize(
                 "int", response.headers.get("ratelimit-limit")
             )
@@ -60825,23 +61940,43 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "added": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "changed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "removed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
+                                ]
+                            },
+                            "skills": {
+                                "added": [
+                                    "str"  # Optional. Skill names, never their
+                                      content. ``changed`` lists the skills kept under the same name
+                                      whose definition changed.
+                                ],
+                                "changed": [
+                                    "str"  # Optional. Skill names, never their
+                                      content. ``changed`` lists the skills kept under the same name
+                                      whose definition changed.
+                                ],
+                                "removed": [
+                                    "str"  # Optional. Skill names, never their
+                                      content. ``changed`` lists the skills kept under the same name
+                                      whose definition changed.
                                 ]
                             },
                             "tools": {
@@ -60861,7 +61996,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         },
                         "config_drifted": bool,  # Optional. True when the running config
                           differs from the manifest the session was created from, for example after a
-                          successful PATCH with ``manifest_yaml``. Omitted when false.
+                          successful PATCH with ``manifest_yaml``. Omitted when false. ``config_diff``
+                          doesn't cover every kind of drift: after an update that only switched an
+                          OAuth connection, ``config_drifted`` is true and ``config_diff`` is omitted.
+                          ``manifest`` shows the new ``actor``.
                         "config_id": "str",  # Optional. Durable Environment Config UUID the
                           session was created from (inline manifests persist a config too, named after
                           the session). Persisted and returned on create/get/list; absent only for
@@ -60888,6 +62026,46 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "str": {}  # Optional. The effective manifest of the session.
                               Present only when ``config_drifted`` is true. Never contains secret
                               values.
+                        },
+                        "mutability": {
+                            "custom_tools": bool,  # A live update can add, modify, or
+                              remove a custom MCP server ("" ``name`` and ``url``"" ) in the ``tools``
+                              section. It also needs ``tools``. The agent restarts when the change
+                              alters its environment. A session reads ``false`` until its agent's
+                              custom-server update is supported, and keeps reading ``false`` after that
+                              if it was created earlier. A server with ``auth`` that is added, moved to
+                              another ``url``"" , or given another secret slot must carry its secret's
+                              value in the same request, or use a URL-bound secret whose ``url`` covers
+                              the server's ``url`` ("" ``400`` otherwise). A new server host under an
+                              egress allowlist also needs ``egress``. Required.
+                            "egress": bool,  # A live update can change the ``egress``
+                              section: the destinations the session can reach. Required.
+                            "env": bool,  # A live update can change ``env`` keys other
+                              than the model keys. A patch that changes both needs both. Required.
+                            "model": bool,  # The session's model can be changed, through
+                              ``env.HARNESS_INFERENCE_MODEL`` or, on a session with its own endpoint,
+                              the env key that endpoint reads its model from. Independent of ``env``.
+                              Required.
+                            "permissions": bool,  # A live update can change
+                              ``permissions``"" : the default and the rules of the types the session's
+                              agent enforces live. ``filesystem`` and ``network`` never change on a
+                              running session. Required.
+                            "secrets": bool,  # A live update can change the ``secrets``
+                              section. Required.
+                            "skills": bool,  # A live update can change the ``skills``
+                              section, the inline skill list, which is replaced as a whole. Only
+                              claude-code, codex and opencode can reload skills live. A session reads
+                              ``false`` until its agent's live skill update is supported, and keeps
+                              reading ``false`` after that if it was created earlier. While skills
+                              updates are enabled team by team, a team that has them can also change
+                              the skills of a claude-code, codex, or opencode session that reads
+                              ``false``"" , unless the session was created before this field existed.
+                              Required.
+                            "system_prompt": bool,  # The session's standing instruction
+                              can be replaced by a live update. Required.
+                            "tools": bool  # A live update can change the ``tools``
+                              section: the Action Gateway ("" ``do.actions``"" ) entries. A custom MCP
+                              server also needs ``custom_tools``. Required.
                         },
                         "name": "str",  # Optional. User-assignable display name, unique per
                           team among non-terminal sessions. Usable in place of session_id by clients
@@ -61009,23 +62187,46 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "added": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "changed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "removed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
+                                    ]
+                                },
+                                "skills": {
+                                    "added": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
                                     ]
                                 },
                                 "tools": {
@@ -61397,23 +62598,46 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "added": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "changed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "removed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
+                                    ]
+                                },
+                                "skills": {
+                                    "added": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
                                     ]
                                 },
                                 "tools": {
@@ -61434,7 +62658,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "config_drifted": bool,  # Optional. True when the running
                               config differs from the manifest the session was created from, for
                               example after a successful PATCH with ``manifest_yaml``. Omitted when
-                              false.
+                              false. ``config_diff`` doesn't cover every kind of drift: after an update
+                              that only switched an OAuth connection, ``config_drifted`` is true and
+                              ``config_diff`` is omitted. ``manifest`` shows the new ``actor``.
                             "config_id": "str",  # Optional. Durable Environment Config
                               UUID the session was created from (inline manifests persist a config too,
                               named after the session). Persisted and returned on create/get/list;
@@ -61463,6 +62689,48 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "str": {}  # Optional. The effective manifest of the
                                   session. Present only when ``config_drifted`` is true. Never contains
                                   secret values.
+                            },
+                            "mutability": {
+                                "custom_tools": bool,  # A live update can add,
+                                  modify, or remove a custom MCP server ("" ``name`` and ``url``"" ) in
+                                  the ``tools`` section. It also needs ``tools``. The agent restarts
+                                  when the change alters its environment. A session reads ``false``
+                                  until its agent's custom-server update is supported, and keeps
+                                  reading ``false`` after that if it was created earlier. A server with
+                                  ``auth`` that is added, moved to another ``url``"" , or given another
+                                  secret slot must carry its secret's value in the same request, or use
+                                  a URL-bound secret whose ``url`` covers the server's ``url`` (""
+                                  ``400`` otherwise). A new server host under an egress allowlist also
+                                  needs ``egress``. Required.
+                                "egress": bool,  # A live update can change the
+                                  ``egress`` section: the destinations the session can reach. Required.
+                                "env": bool,  # A live update can change ``env`` keys
+                                  other than the model keys. A patch that changes both needs both.
+                                  Required.
+                                "model": bool,  # The session's model can be changed,
+                                  through ``env.HARNESS_INFERENCE_MODEL`` or, on a session with its own
+                                  endpoint, the env key that endpoint reads its model from. Independent
+                                  of ``env``. Required.
+                                "permissions": bool,  # A live update can change
+                                  ``permissions``"" : the default and the rules of the types the
+                                  session's agent enforces live. ``filesystem`` and ``network`` never
+                                  change on a running session. Required.
+                                "secrets": bool,  # A live update can change the
+                                  ``secrets`` section. Required.
+                                "skills": bool,  # A live update can change the
+                                  ``skills`` section, the inline skill list, which is replaced as a
+                                  whole. Only claude-code, codex and opencode can reload skills live. A
+                                  session reads ``false`` until its agent's live skill update is
+                                  supported, and keeps reading ``false`` after that if it was created
+                                  earlier. While skills updates are enabled team by team, a team that
+                                  has them can also change the skills of a claude-code, codex, or
+                                  opencode session that reads ``false``"" , unless the session was
+                                  created before this field existed. Required.
+                                "system_prompt": bool,  # The session's standing
+                                  instruction can be replaced by a live update. Required.
+                                "tools": bool  # A live update can change the
+                                  ``tools`` section: the Action Gateway ("" ``do.actions``"" ) entries.
+                                  A custom MCP server also needs ``custom_tools``. Required.
                             },
                             "name": "str",  # Optional. User-assignable display name,
                               unique per team among non-terminal sessions. Usable in place of
@@ -61596,26 +62864,46 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                         "added": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
                                         ],
                                         "changed": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
                                         ],
                                         "removed": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
+                                        ]
+                                    },
+                                    "skills": {
+                                        "added": [
+                                            "str"  # Optional. Skill
+                                              names, never their content. ``changed`` lists the skills
+                                              kept under the same name whose definition changed.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Skill
+                                              names, never their content. ``changed`` lists the skills
+                                              kept under the same name whose definition changed.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Skill
+                                              names, never their content. ``changed`` lists the skills
+                                              kept under the same name whose definition changed.
                                         ]
                                     },
                                     "tools": {
@@ -61824,23 +63112,46 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "added": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "changed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "removed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
+                                    ]
+                                },
+                                "skills": {
+                                    "added": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
                                     ]
                                 },
                                 "tools": {
@@ -61861,7 +63172,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "config_drifted": bool,  # Optional. True when the running
                               config differs from the manifest the session was created from, for
                               example after a successful PATCH with ``manifest_yaml``. Omitted when
-                              false.
+                              false. ``config_diff`` doesn't cover every kind of drift: after an update
+                              that only switched an OAuth connection, ``config_drifted`` is true and
+                              ``config_diff`` is omitted. ``manifest`` shows the new ``actor``.
                             "config_id": "str",  # Optional. Durable Environment Config
                               UUID the session was created from (inline manifests persist a config too,
                               named after the session). Persisted and returned on create/get/list;
@@ -61890,6 +63203,48 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "str": {}  # Optional. The effective manifest of the
                                   session. Present only when ``config_drifted`` is true. Never contains
                                   secret values.
+                            },
+                            "mutability": {
+                                "custom_tools": bool,  # A live update can add,
+                                  modify, or remove a custom MCP server ("" ``name`` and ``url``"" ) in
+                                  the ``tools`` section. It also needs ``tools``. The agent restarts
+                                  when the change alters its environment. A session reads ``false``
+                                  until its agent's custom-server update is supported, and keeps
+                                  reading ``false`` after that if it was created earlier. A server with
+                                  ``auth`` that is added, moved to another ``url``"" , or given another
+                                  secret slot must carry its secret's value in the same request, or use
+                                  a URL-bound secret whose ``url`` covers the server's ``url`` (""
+                                  ``400`` otherwise). A new server host under an egress allowlist also
+                                  needs ``egress``. Required.
+                                "egress": bool,  # A live update can change the
+                                  ``egress`` section: the destinations the session can reach. Required.
+                                "env": bool,  # A live update can change ``env`` keys
+                                  other than the model keys. A patch that changes both needs both.
+                                  Required.
+                                "model": bool,  # The session's model can be changed,
+                                  through ``env.HARNESS_INFERENCE_MODEL`` or, on a session with its own
+                                  endpoint, the env key that endpoint reads its model from. Independent
+                                  of ``env``. Required.
+                                "permissions": bool,  # A live update can change
+                                  ``permissions``"" : the default and the rules of the types the
+                                  session's agent enforces live. ``filesystem`` and ``network`` never
+                                  change on a running session. Required.
+                                "secrets": bool,  # A live update can change the
+                                  ``secrets`` section. Required.
+                                "skills": bool,  # A live update can change the
+                                  ``skills`` section, the inline skill list, which is replaced as a
+                                  whole. Only claude-code, codex and opencode can reload skills live. A
+                                  session reads ``false`` until its agent's live skill update is
+                                  supported, and keeps reading ``false`` after that if it was created
+                                  earlier. While skills updates are enabled team by team, a team that
+                                  has them can also change the skills of a claude-code, codex, or
+                                  opencode session that reads ``false``"" , unless the session was
+                                  created before this field existed. Required.
+                                "system_prompt": bool,  # The session's standing
+                                  instruction can be replaced by a live update. Required.
+                                "tools": bool  # A live update can change the
+                                  ``tools`` section: the Action Gateway ("" ``do.actions``"" ) entries.
+                                  A custom MCP server also needs ``custom_tools``. Required.
                             },
                             "name": "str",  # Optional. User-assignable display name,
                               unique per team among non-terminal sessions. Usable in place of
@@ -62023,26 +63378,46 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                         "added": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
                                         ],
                                         "changed": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
                                         ],
                                         "removed": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
+                                        ]
+                                    },
+                                    "skills": {
+                                        "added": [
+                                            "str"  # Optional. Skill
+                                              names, never their content. ``changed`` lists the skills
+                                              kept under the same name whose definition changed.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Skill
+                                              names, never their content. ``changed`` lists the skills
+                                              kept under the same name whose definition changed.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Skill
+                                              names, never their content. ``changed`` lists the skills
+                                              kept under the same name whose definition changed.
                                         ]
                                     },
                                     "tools": {
@@ -62256,23 +63631,46 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "added": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "changed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "removed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
+                                    ]
+                                },
+                                "skills": {
+                                    "added": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Skill names, never
+                                          their content. ``changed`` lists the skills kept under the
+                                          same name whose definition changed.
                                     ]
                                 },
                                 "tools": {
@@ -62293,7 +63691,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "config_drifted": bool,  # Optional. True when the running
                               config differs from the manifest the session was created from, for
                               example after a successful PATCH with ``manifest_yaml``. Omitted when
-                              false.
+                              false. ``config_diff`` doesn't cover every kind of drift: after an update
+                              that only switched an OAuth connection, ``config_drifted`` is true and
+                              ``config_diff`` is omitted. ``manifest`` shows the new ``actor``.
                             "config_id": "str",  # Optional. Durable Environment Config
                               UUID the session was created from (inline manifests persist a config too,
                               named after the session). Persisted and returned on create/get/list;
@@ -62322,6 +63722,48 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "str": {}  # Optional. The effective manifest of the
                                   session. Present only when ``config_drifted`` is true. Never contains
                                   secret values.
+                            },
+                            "mutability": {
+                                "custom_tools": bool,  # A live update can add,
+                                  modify, or remove a custom MCP server ("" ``name`` and ``url``"" ) in
+                                  the ``tools`` section. It also needs ``tools``. The agent restarts
+                                  when the change alters its environment. A session reads ``false``
+                                  until its agent's custom-server update is supported, and keeps
+                                  reading ``false`` after that if it was created earlier. A server with
+                                  ``auth`` that is added, moved to another ``url``"" , or given another
+                                  secret slot must carry its secret's value in the same request, or use
+                                  a URL-bound secret whose ``url`` covers the server's ``url`` (""
+                                  ``400`` otherwise). A new server host under an egress allowlist also
+                                  needs ``egress``. Required.
+                                "egress": bool,  # A live update can change the
+                                  ``egress`` section: the destinations the session can reach. Required.
+                                "env": bool,  # A live update can change ``env`` keys
+                                  other than the model keys. A patch that changes both needs both.
+                                  Required.
+                                "model": bool,  # The session's model can be changed,
+                                  through ``env.HARNESS_INFERENCE_MODEL`` or, on a session with its own
+                                  endpoint, the env key that endpoint reads its model from. Independent
+                                  of ``env``. Required.
+                                "permissions": bool,  # A live update can change
+                                  ``permissions``"" : the default and the rules of the types the
+                                  session's agent enforces live. ``filesystem`` and ``network`` never
+                                  change on a running session. Required.
+                                "secrets": bool,  # A live update can change the
+                                  ``secrets`` section. Required.
+                                "skills": bool,  # A live update can change the
+                                  ``skills`` section, the inline skill list, which is replaced as a
+                                  whole. Only claude-code, codex and opencode can reload skills live. A
+                                  session reads ``false`` until its agent's live skill update is
+                                  supported, and keeps reading ``false`` after that if it was created
+                                  earlier. While skills updates are enabled team by team, a team that
+                                  has them can also change the skills of a claude-code, codex, or
+                                  opencode session that reads ``false``"" , unless the session was
+                                  created before this field existed. Required.
+                                "system_prompt": bool,  # The session's standing
+                                  instruction can be replaced by a live update. Required.
+                                "tools": bool  # A live update can change the
+                                  ``tools`` section: the Action Gateway ("" ``do.actions``"" ) entries.
+                                  A custom MCP server also needs ``custom_tools``. Required.
                             },
                             "name": "str",  # Optional. User-assignable display name,
                               unique per team among non-terminal sessions. Usable in place of
@@ -62455,26 +63897,46 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                         "added": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
                                         ],
                                         "changed": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
                                         ],
                                         "removed": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
+                                        ]
+                                    },
+                                    "skills": {
+                                        "added": [
+                                            "str"  # Optional. Skill
+                                              names, never their content. ``changed`` lists the skills
+                                              kept under the same name whose definition changed.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Skill
+                                              names, never their content. ``changed`` lists the skills
+                                              kept under the same name whose definition changed.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Skill
+                                              names, never their content. ``changed`` lists the skills
+                                              kept under the same name whose definition changed.
                                         ]
                                     },
                                     "tools": {
