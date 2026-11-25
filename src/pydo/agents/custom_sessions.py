@@ -713,8 +713,11 @@ class SessionsOperations:
         full sets (a key left out is removed). A top-level ``model`` or
         ``permissions`` section is ``400``.
 
-        A custom MCP server change restarts the agent (the update ends
-        ``APPLIED_RESTARTED``). A server with ``auth`` that is added, moved to
+        A custom MCP server change restarts the agent when it alters the agent's
+        environment (a server added, removed or moved, or a changed credential),
+        and the update then ends ``APPLIED_RESTARTED``; a change that doesn't,
+        such as editing the ``tools`` allowlist of an existing server, ends
+        ``APPLIED``. A server with ``auth`` that is added, moved to
         another ``url`` or given another secret slot must carry its credential in
         the same request: send the secret's value in ``secrets``, or use a
         URL-bound secret whose ``url`` covers the server's URL (the host, a path
