@@ -764,6 +764,23 @@ class SessionsOperations:
         secrets cannot gain either one: the update ends ``FAILED`` with
         ``requires_new_session``.
 
+        OAuth connection: an OAuth secret that names a provider connection with
+        ``actor`` can switch to another connection of the same provider. In
+        ``secrets``, set it to ``{source: oauth, provider, actor}`` with the new
+        connection's ``user_id`` as ``actor`` (see
+        :meth:`list_connections`), and keep every other secret as ``{}``. The
+        new connection must be active, and yours or shared with your team
+        (``400`` otherwise); switching back to the connection the agent config
+        names doesn't need that. The agent restarts to read the new token;
+        sending the connection the secret already uses is ``UNCHANGED``. The
+        switch applies to this session only: new sessions from the same config
+        start on the config's connection, and a rollback or fork uses the
+        connection recorded in its checkpoint. Action Gateway (``do.actions``)
+        tools keep using the connection Action Gateway picks for the session.
+        Adding or removing an OAuth secret, changing its provider, or switching
+        one that has no ``actor`` is ``422``; switching must be enabled for the
+        team (``403`` otherwise).
+
         The session status must be ``SESSION_STATUS_READY``,
         ``SESSION_STATUS_DETACHED`` or ``SESSION_STATUS_PAUSED`` (a paused session
         is resumed for the update and paused again, unless it was paused for zero

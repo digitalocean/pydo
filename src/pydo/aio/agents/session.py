@@ -387,7 +387,9 @@ class AsyncAgentSession:
         ``ANTHROPIC_MODEL`` on its own Anthropic endpoint; the endpoint itself
         cannot change, and its provider API key can only be rotated. URL-bound
         secrets can be rotated, moved, added or removed, and ``egress`` replaces
-        ``allow_hosts`` and ``allow_ips``; the VPC cannot change. The session must be
+        ``allow_hosts`` and ``allow_ips``; the VPC cannot change. An OAuth secret
+        created with ``actor`` can switch to another connection of its provider.
+        The session must be
         ``SESSION_STATUS_READY``, ``SESSION_STATUS_DETACHED`` or
         ``SESSION_STATUS_PAUSED`` (not paused for zero balance) and idle. See
         :meth:`AsyncSessionsOperations.update_config` for the full rules.
