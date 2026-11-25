@@ -704,12 +704,36 @@ class SessionsOperations:
         """Patch the live config of a session (``PATCH .../sessions/{session_id}``).
 
         ``manifest_yaml`` holds only the sections to change (``tools``, ``env``,
-        ``secrets``, ``egress``); absent sections are untouched. ``tools`` is the full
+        ``secrets``, ``egress``, ``permissions``, ``skills``); absent sections are
+        untouched. ``tools`` is the full
         replacement list, but only Action Gateway (``do.actions``) entries can
         change: include the session's custom MCP servers exactly as they are
         (adding, removing or changing one is ``422``). ``env`` and ``secrets`` are
-        full sets (a key left out is removed). A top-level ``model`` or
-        ``permissions`` section is ``400``.
+        full sets (a key left out is removed). A top-level ``model`` section is
+        ``400``. ``permissions`` is the full policy (``default`` and every rule;
+        ``permissions: null`` is ``400``); what can change depends on the agent,
+        a change the agent can't apply is ``409``, and permission updates must be
+        enabled for the team (``403`` otherwise). See the API reference for the
+        rules per agent.
+
+        ``skills`` is the full list of inline skills, in the same form as at
+        create (``name``, ``description``, ``instructions``, and optionally
+        ``license``, ``metadata`` and ``allowed_tools``), so a skill left out is
+        removed. ``skills: []`` removes every skill; ``skills: null`` or a list
+        that create would refuse is ``400``. The same skills in another order are
+        ``UNCHANGED``. The agent reloads its skills without a restart, so the
+        conversation continues, and ``update.changes.skills`` names the skills
+        added, removed or changed (never their content). Only ``claude-code``,
+        ``codex`` and ``opencode`` sessions take skills (``409`` otherwise, and
+        for a session created before live updates were tracked), and skills
+        updates must be enabled for the team (``403`` otherwise). If the agent
+        refuses the new skills (a skill named like one the session's repository
+        already ships), the update ends ``FAILED`` with ``update_failed``,
+        ``reverted`` is true, and the session keeps its previous skills: rename
+        the skill and send the update again. Only an agent that can't reload
+        skills live ends ``requires_new_session``. When the same update
+        also changes ``permissions`` it ends ``FAILED`` with ``update_failed``;
+        send the two changes separately to see which one the agent can't take.
 
         The model is set in ``env``, in the key that matches the endpoint the
         session was created with:
