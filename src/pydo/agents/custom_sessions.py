@@ -705,11 +705,22 @@ class SessionsOperations:
 
         ``manifest_yaml`` holds only the sections to change (``tools``, ``env``,
         ``secrets``, ``egress``); absent sections are untouched. ``tools`` is the full
-        replacement list, but only Action Gateway (``do.actions``) entries can
-        change: include the session's custom MCP servers exactly as they are
-        (adding, removing or changing one is ``422``). ``env`` and ``secrets`` are
+        replacement list: Action Gateway (``do.actions``) entries can change, and
+        a custom MCP server (``name`` and ``url``) can be added, modified or
+        removed only where the session's ``mutability.custom_tools`` is true (and
+        ``tools`` is too); otherwise it is ``409``. Include the session's other
+        custom MCP servers exactly as they are. ``env`` and ``secrets`` are
         full sets (a key left out is removed). A top-level ``model`` or
         ``permissions`` section is ``400``.
+
+        A custom MCP server change restarts the agent (the update ends
+        ``APPLIED_RESTARTED``). A server with ``auth`` that is added, moved to
+        another ``url`` or given another secret slot must carry its credential in
+        the same request: send the secret's value in ``secrets``, or use a
+        URL-bound secret whose ``url`` covers the server's URL (the host, a path
+        prefix and the default port; it needs that even when you send the value).
+        Otherwise it is ``400``. A new server host under an egress allowlist also
+        needs ``mutability.egress``.
 
         The model is set in ``env``, in the key that matches the endpoint the
         session was created with:
