@@ -46,6 +46,26 @@ async def open_stream(client: Any, sandbox_id: str, pid: int) -> Any:
     return (await client._client._pipeline.run(request, stream=True)).http_response
 
 
+async def open_exec(client: Any, sandbox_id: str, body: Any) -> Any:
+    """Opens the exec stream and returns the streaming HTTP response.
+
+    The request is built by the generated request builder and sent through the
+    client's own pipeline with ``stream=True``: the generated operation would
+    buffer the whole body.
+    """
+    # pylint: disable=protected-access,import-outside-toplevel
+    from pydo.operations._operations import build_sandboxes_create_exec_request
+
+    request = build_sandboxes_create_exec_request(
+        sandbox_id=sandbox_id,
+        json=body,
+        content_type="application/json",
+        headers={"Accept": "application/json"},
+    )
+    request.url = client._client.format_url(request.url)
+    return (await client._client._pipeline.run(request, stream=True)).http_response
+
+
 async def download(operation: Any, *args: Any, **kwargs: Any) -> bytes:
     """Runs a generated binary download and returns its whole body.
 

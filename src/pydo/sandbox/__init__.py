@@ -22,6 +22,8 @@ The async twin is :mod:`pydo.aio.sandbox`.
 from ._commands import CommandEvent, CommandInfo, CommandResult
 from .client import SandboxClient
 from .commands import Command, Commands
+from ._exec import ExecEvent, ExecResult
+from .exec import Exec, ExecSession
 from ._files import FileEntry, FileType, MakeDirResult, WriteInfo
 from .files import Files
 from ._templates import ImageSource, TemplateBuildInfo, TemplateInfo, TemplateStatus
@@ -49,6 +51,10 @@ __all__ = [
     "CommandInfo",
     "CommandResult",
     "Commands",
+    "Exec",
+    "ExecEvent",
+    "ExecResult",
+    "ExecSession",
     "FileEntry",
     "FileType",
     "Files",

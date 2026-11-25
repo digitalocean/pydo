@@ -296,6 +296,28 @@ Uploads send the SHA-256 of the body for the sandbox to check, and downloads are
 
 The async version has the same names: `await sandbox.commands.run(...)` and `async for event in cmd.stream()`. Output can only be read while a command runs: a command that exits before the stream attaches raises `NotFoundError`.
 
+#### Exec
+
+Run a process with `sandbox.exec`. Its output arrives on the same request that starts it, so there is no attach race: prefer `exec.run` over `commands.run` for short commands.
+
+```python
+result = sandbox.exec.run("echo hello; exit 3")      # a str runs as bash -lc; a list is the argv
+print(result.stdout, result.stderr, result.exit_code)  # a non-zero exit code is returned, not raised
+sandbox.exec.run(["python", "-c", "print(1)"], cwd="/workspace", env_vars={"A": "1"},
+                 timeout_seconds=30, stdin="input\n", on_stdout=print)
+
+with sandbox.exec.start(["cat"]) as session:          # stdin stays open; session.exec_id is set
+    session.write_stdin("hi\n")                       # the byte offset is tracked for you
+    session.close_stdin()
+    for event in session:                             # started, stdout, stderr, exit
+        print(event.type, event.text)
+
+with sandbox.exec.start(pty={"rows": 24, "cols": 80}) as shell:  # PTY: no command means the default shell
+    shell.resize(40, 120)
+```
+
+`session.wait()` returns the `ExecResult`. A stream that ends before the process exits raises `SandboxError`, because the outcome is unknown. An error before the stream starts (such as a template that does not support stdin or a PTY) raises `InvalidRequestError`. The async version has the same names: `await sandbox.exec.run(...)` and `async for event in session`.
+
 ## **AI & Inference**
 
 > Talk to models on DigitalOcean's

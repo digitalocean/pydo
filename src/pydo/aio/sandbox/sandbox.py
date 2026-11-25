@@ -27,6 +27,7 @@ from pydo.sandbox._hybrid import by_id_or_self
 
 from ._transport import call as _call
 from .commands import Commands
+from .exec import Exec
 from .files import Files
 from .snapshots import Snapshot, _create as _create_snapshot
 from pydo.sandbox.errors import NotFoundError, SandboxError, SandboxTimeoutError
@@ -62,6 +63,8 @@ class Sandbox:
         self.commands = Commands(client, info.sandbox_id)
         #: Read, write and manage the files in this sandbox.
         self.files = Files(client, info.sandbox_id)
+        #: Run processes in this sandbox and stream their output, with stdin and PTY.
+        self.exec = Exec(client, info.sandbox_id)
 
     def __repr__(self) -> str:
         return "Sandbox(sandbox_id=%r, state=%r)" % (self.sandbox_id, self.state)

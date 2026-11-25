@@ -23935,6 +23935,90 @@ def build_sandboxes_get_commands_stream_request(  # pylint: disable=name-too-lon
     return HttpRequest(method="GET", url=_url, headers=_headers, **kwargs)
 
 
+def build_sandboxes_create_exec_request(sandbox_id: str, **kwargs: Any) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/sandboxes/{sandbox_id}/exec"
+    path_format_arguments = {
+        "sandbox_id": _SERIALIZER.url("sandbox_id", sandbox_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_sandboxes_post_exec_resize_request(
+    sandbox_id: str, exec_id: str, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/sandboxes/{sandbox_id}/exec/{exec_id}/resize"
+    path_format_arguments = {
+        "sandbox_id": _SERIALIZER.url("sandbox_id", sandbox_id, "str"),
+        "exec_id": _SERIALIZER.url("exec_id", exec_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
+def build_sandboxes_post_exec_stdin_request(
+    sandbox_id: str, exec_id: str, **kwargs: Any
+) -> HttpRequest:
+    _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+
+    content_type: Optional[str] = kwargs.pop(
+        "content_type", _headers.pop("Content-Type", None)
+    )
+    accept = _headers.pop("Accept", "application/json")
+
+    # Construct URL
+    _url = "/v2/sandboxes/{sandbox_id}/exec/{exec_id}/stdin"
+    path_format_arguments = {
+        "sandbox_id": _SERIALIZER.url("sandbox_id", sandbox_id, "str"),
+        "exec_id": _SERIALIZER.url("exec_id", exec_id, "str"),
+    }
+
+    _url: str = _url.format(**path_format_arguments)  # type: ignore
+
+    # Construct headers
+    if content_type is not None:
+        _headers["Content-Type"] = _SERIALIZER.header(
+            "content_type", content_type, "str"
+        )
+    _headers["Accept"] = _SERIALIZER.header("accept", accept, "str")
+
+    return HttpRequest(method="POST", url=_url, headers=_headers, **kwargs)
+
+
 def build_sandboxes_get_files_download_request(  # pylint: disable=name-too-long
     sandbox_id: str, *, path: str, as_archive: Optional[bool] = None, **kwargs: Any
 ) -> HttpRequest:
@@ -279908,6 +279992,996 @@ class SandboxesOperations:  # pylint: disable=too-many-public-methods
                 deserialized = None
 
         if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    def create_exec(
+        self,
+        sandbox_id: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Start a Sandbox Exec.
+
+        Start a command in a sandbox and stream output as Server-Sent Events. Set
+        ``pty`` to allocate a pseudo-terminal. When ``pty`` or ``keep_stdin_open`` is set,
+        the stream begins with event ``started`` containing ``exec_id`` for later
+        resize and stdin writes.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "argv": [
+                        "str"  # Optional. ``argv[0]`` is the executable. Empty ``argv`` is
+                          allowed only when ``pty`` is set (guest default shell, typically ``/bin/bash
+                          -l``"" ).
+                    ],
+                    "env_vars": {
+                        "str": "str"  # Optional. Environment variables for the exec.
+                    },
+                    "keep_stdin_open": bool,  # Optional. When true, stdin stays open for later
+                      stdin writes after the start stream half-closes.
+                    "pty": {
+                        "cols": 0,  # Optional. Terminal columns. Defaults to 80.
+                        "rows": 0,  # Optional. Terminal rows. Defaults to 24.
+                        "term": "str"  # Optional. Terminal type. Defaults to
+                          ``xterm-256color``.
+                    },
+                    "stdin": bytes("bytes", encoding="utf-8"),  # Optional. Optional first stdin
+                      chunk sent with the start frame (base64 over HTTP).
+                    "timeout_seconds": "str",  # Optional. Zero means the service default stream
+                      timeout. Encoded as a string per protobuf JSON.
+                    "workdir": "str"  # Optional. Working directory for the exec.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "error": {
+                        "details": [
+                            {
+                                "type_url": "str",  # Optional. A streaming transport
+                                  error from the gateway.
+                                "value": bytes("bytes", encoding="utf-8")  #
+                                  Optional. A streaming transport error from the gateway.
+                            }
+                        ],
+                        "grpc_code": 0,  # Optional. A streaming transport error from the
+                          gateway.
+                        "http_code": 0,  # Optional. A streaming transport error from the
+                          gateway.
+                        "http_status": "str",  # Optional. A streaming transport error from
+                          the gateway.
+                        "message": "str"  # Optional. A streaming transport error from the
+                          gateway.
+                    },
+                    "result": {
+                        "exit": {
+                            "duration_ms": "str",  # Optional. How long the process ran,
+                              in milliseconds. Encoded as a string per protobuf JSON.
+                            "error": "str",  # Optional. Error message when the process
+                              did not exit cleanly.
+                            "exit_code": 0,  # Optional. Process exit code.
+                            "status": "str"  # Optional. Exit status string from the
+                              guest.
+                        },
+                        "keepalive": {},  # Optional. An empty keepalive event on the exec
+                          stream.
+                        "started": {
+                            "exec_id": "str"  # Optional. The ID of the started exec
+                              session.
+                        },
+                        "stderr": bytes("bytes", encoding="utf-8"),  # Optional.
+                          Base64-encoded stderr chunk.
+                        "stdout": bytes("bytes", encoding="utf-8")  # Optional.
+                          Base64-encoded stdout chunk.
+                    }
+                }
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+
+    @overload
+    def create_exec(
+        self,
+        sandbox_id: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Start a Sandbox Exec.
+
+        Start a command in a sandbox and stream output as Server-Sent Events. Set
+        ``pty`` to allocate a pseudo-terminal. When ``pty`` or ``keep_stdin_open`` is set,
+        the stream begins with event ``started`` containing ``exec_id`` for later
+        resize and stdin writes.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "error": {
+                        "details": [
+                            {
+                                "type_url": "str",  # Optional. A streaming transport
+                                  error from the gateway.
+                                "value": bytes("bytes", encoding="utf-8")  #
+                                  Optional. A streaming transport error from the gateway.
+                            }
+                        ],
+                        "grpc_code": 0,  # Optional. A streaming transport error from the
+                          gateway.
+                        "http_code": 0,  # Optional. A streaming transport error from the
+                          gateway.
+                        "http_status": "str",  # Optional. A streaming transport error from
+                          the gateway.
+                        "message": "str"  # Optional. A streaming transport error from the
+                          gateway.
+                    },
+                    "result": {
+                        "exit": {
+                            "duration_ms": "str",  # Optional. How long the process ran,
+                              in milliseconds. Encoded as a string per protobuf JSON.
+                            "error": "str",  # Optional. Error message when the process
+                              did not exit cleanly.
+                            "exit_code": 0,  # Optional. Process exit code.
+                            "status": "str"  # Optional. Exit status string from the
+                              guest.
+                        },
+                        "keepalive": {},  # Optional. An empty keepalive event on the exec
+                          stream.
+                        "started": {
+                            "exec_id": "str"  # Optional. The ID of the started exec
+                              session.
+                        },
+                        "stderr": bytes("bytes", encoding="utf-8"),  # Optional.
+                          Base64-encoded stderr chunk.
+                        "stdout": bytes("bytes", encoding="utf-8")  # Optional.
+                          Base64-encoded stdout chunk.
+                    }
+                }
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+
+    @distributed_trace
+    def create_exec(
+        self, sandbox_id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Start a Sandbox Exec.
+
+        Start a command in a sandbox and stream output as Server-Sent Events. Set
+        ``pty`` to allocate a pseudo-terminal. When ``pty`` or ``keep_stdin_open`` is set,
+        the stream begins with event ``started`` containing ``exec_id`` for later
+        resize and stdin writes.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "argv": [
+                        "str"  # Optional. ``argv[0]`` is the executable. Empty ``argv`` is
+                          allowed only when ``pty`` is set (guest default shell, typically ``/bin/bash
+                          -l``"" ).
+                    ],
+                    "env_vars": {
+                        "str": "str"  # Optional. Environment variables for the exec.
+                    },
+                    "keep_stdin_open": bool,  # Optional. When true, stdin stays open for later
+                      stdin writes after the start stream half-closes.
+                    "pty": {
+                        "cols": 0,  # Optional. Terminal columns. Defaults to 80.
+                        "rows": 0,  # Optional. Terminal rows. Defaults to 24.
+                        "term": "str"  # Optional. Terminal type. Defaults to
+                          ``xterm-256color``.
+                    },
+                    "stdin": bytes("bytes", encoding="utf-8"),  # Optional. Optional first stdin
+                      chunk sent with the start frame (base64 over HTTP).
+                    "timeout_seconds": "str",  # Optional. Zero means the service default stream
+                      timeout. Encoded as a string per protobuf JSON.
+                    "workdir": "str"  # Optional. Working directory for the exec.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "error": {
+                        "details": [
+                            {
+                                "type_url": "str",  # Optional. A streaming transport
+                                  error from the gateway.
+                                "value": bytes("bytes", encoding="utf-8")  #
+                                  Optional. A streaming transport error from the gateway.
+                            }
+                        ],
+                        "grpc_code": 0,  # Optional. A streaming transport error from the
+                          gateway.
+                        "http_code": 0,  # Optional. A streaming transport error from the
+                          gateway.
+                        "http_status": "str",  # Optional. A streaming transport error from
+                          the gateway.
+                        "message": "str"  # Optional. A streaming transport error from the
+                          gateway.
+                    },
+                    "result": {
+                        "exit": {
+                            "duration_ms": "str",  # Optional. How long the process ran,
+                              in milliseconds. Encoded as a string per protobuf JSON.
+                            "error": "str",  # Optional. Error message when the process
+                              did not exit cleanly.
+                            "exit_code": 0,  # Optional. Process exit code.
+                            "status": "str"  # Optional. Exit status string from the
+                              guest.
+                        },
+                        "keepalive": {},  # Optional. An empty keepalive event on the exec
+                          stream.
+                        "started": {
+                            "exec_id": "str"  # Optional. The ID of the started exec
+                              session.
+                        },
+                        "stderr": bytes("bytes", encoding="utf-8"),  # Optional.
+                          Base64-encoded stderr chunk.
+                        "stdout": bytes("bytes", encoding="utf-8")  # Optional.
+                          Base64-encoded stdout chunk.
+                    }
+                }
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_sandboxes_create_exec_request(
+            sandbox_id=sandbox_id,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404, 409]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    def post_exec_resize(
+        self,
+        sandbox_id: str,
+        exec_id: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        """Resize a Sandbox Exec PTY.
+
+        Change the window size of a PTY exec. ``rows`` and ``cols`` must be between 1
+        and 1000. Returns ``409`` when the exec is not a PTY.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param exec_id: The ID of the exec session returned by the start stream. Required.
+        :type exec_id: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON or JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "cols": 0,  # Terminal columns. Must be between 1 and 1000. Required.
+                    "rows": 0  # Terminal rows. Must be between 1 and 1000. Required.
+                }
+
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+
+    @overload
+    def post_exec_resize(
+        self,
+        sandbox_id: str,
+        exec_id: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        """Resize a Sandbox Exec PTY.
+
+        Change the window size of a PTY exec. ``rows`` and ``cols`` must be between 1
+        and 1000. Returns ``409`` when the exec is not a PTY.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param exec_id: The ID of the exec session returned by the start stream. Required.
+        :type exec_id: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON or JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+
+    @distributed_trace
+    def post_exec_resize(
+        self, sandbox_id: str, exec_id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        """Resize a Sandbox Exec PTY.
+
+        Change the window size of a PTY exec. ``rows`` and ``cols`` must be between 1
+        and 1000. Returns ``409`` when the exec is not a PTY.
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param exec_id: The ID of the exec session returned by the start stream. Required.
+        :type exec_id: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON or JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "cols": 0,  # Terminal columns. Must be between 1 and 1000. Required.
+                    "rows": 0  # Terminal rows. Must be between 1 and 1000. Required.
+                }
+
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_sandboxes_post_exec_resize_request(
+            sandbox_id=sandbox_id,
+            exec_id=exec_id,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404, 409]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if cls:
+            return cls(pipeline_response, cast(JSON, deserialized), response_headers)  # type: ignore
+
+        return cast(JSON, deserialized)  # type: ignore
+
+    @overload
+    def post_exec_stdin(
+        self,
+        sandbox_id: str,
+        exec_id: str,
+        body: JSON,
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Write Sandbox Exec Stdin.
+
+        Write stdin bytes to a running exec. ``offset`` is the number of bytes the
+        guest has already accepted. ``eof`` closes stdin on a pipe exec; on a PTY it
+        sends VEOF (\\ ``0x04``\\ ).
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param exec_id: The ID of the exec session returned by the start stream. Required.
+        :type exec_id: str
+        :param body: Required.
+        :type body: JSON
+        :keyword content_type: Body Parameter content-type. Content type parameter for JSON body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "data": bytes("bytes", encoding="utf-8"),  # Optional. Base64-encoded stdin
+                      bytes.
+                    "eof": bool,  # Optional. When true, close stdin on a pipe exec; on a PTY
+                      send VEOF ("" ``0x04``"" ).
+                    "offset": "str"  # Optional. Bytes the guest has already accepted. Zero is a
+                      valid first write. Encoded as a string per protobuf JSON.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "offset": "str"  # Optional. Bytes the guest has accepted after this write.
+                      Encoded as a string per protobuf JSON.
+                }
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+
+    @overload
+    def post_exec_stdin(
+        self,
+        sandbox_id: str,
+        exec_id: str,
+        body: IO[bytes],
+        *,
+        content_type: str = "application/json",
+        **kwargs: Any,
+    ) -> JSON:
+        """Write Sandbox Exec Stdin.
+
+        Write stdin bytes to a running exec. ``offset`` is the number of bytes the
+        guest has already accepted. ``eof`` closes stdin on a pipe exec; on a PTY it
+        sends VEOF (\\ ``0x04``\\ ).
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param exec_id: The ID of the exec session returned by the start stream. Required.
+        :type exec_id: str
+        :param body: Required.
+        :type body: IO[bytes]
+        :keyword content_type: Body Parameter content-type. Content type parameter for binary body.
+         Default value is "application/json".
+        :paramtype content_type: str
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # response body for status code(s): 200
+                response == {
+                    "offset": "str"  # Optional. Bytes the guest has accepted after this write.
+                      Encoded as a string per protobuf JSON.
+                }
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+
+    @distributed_trace
+    def post_exec_stdin(
+        self, sandbox_id: str, exec_id: str, body: Union[JSON, IO[bytes]], **kwargs: Any
+    ) -> JSON:
+        # pylint: disable=line-too-long
+        """Write Sandbox Exec Stdin.
+
+        Write stdin bytes to a running exec. ``offset`` is the number of bytes the
+        guest has already accepted. ``eof`` closes stdin on a pipe exec; on a PTY it
+        sends VEOF (\\ ``0x04``\\ ).
+
+        :param sandbox_id: The unique ID of the sandbox. Required.
+        :type sandbox_id: str
+        :param exec_id: The ID of the exec session returned by the start stream. Required.
+        :type exec_id: str
+        :param body: Is either a JSON type or a IO[bytes] type. Required.
+        :type body: JSON or IO[bytes]
+        :return: JSON object
+        :rtype: JSON
+        :raises ~azure.core.exceptions.HttpResponseError:
+
+        Example:
+            .. code-block:: python
+
+                # JSON input template you can fill out and use as your body input.
+                body = {
+                    "data": bytes("bytes", encoding="utf-8"),  # Optional. Base64-encoded stdin
+                      bytes.
+                    "eof": bool,  # Optional. When true, close stdin on a pipe exec; on a PTY
+                      send VEOF ("" ``0x04``"" ).
+                    "offset": "str"  # Optional. Bytes the guest has already accepted. Zero is a
+                      valid first write. Encoded as a string per protobuf JSON.
+                }
+
+                # response body for status code(s): 200
+                response == {
+                    "offset": "str"  # Optional. Bytes the guest has accepted after this write.
+                      Encoded as a string per protobuf JSON.
+                }
+                # response body for status code(s): 400, 403, 404, 409
+                response == {
+                    "id": "str",  # A short, stable ID for the error, for example ``not_found``.
+                      Required.
+                    "message": "str",  # A message that explains the error. Required.
+                    "request_id": "str"  # Optional. The ID of the request. Give it to support
+                      when you report a problem.
+                }
+        """
+        error_map: MutableMapping[int, Type[HttpResponseError]] = {
+            404: ResourceNotFoundError,
+            409: ResourceExistsError,
+            304: ResourceNotModifiedError,
+            401: cast(
+                Type[HttpResponseError],
+                lambda response: ClientAuthenticationError(response=response),
+            ),
+            429: HttpResponseError,
+            500: HttpResponseError,
+        }
+        error_map.update(kwargs.pop("error_map", {}) or {})
+
+        _headers = case_insensitive_dict(kwargs.pop("headers", {}) or {})
+        _params = kwargs.pop("params", {}) or {}
+
+        content_type: Optional[str] = kwargs.pop(
+            "content_type", _headers.pop("Content-Type", None)
+        )
+        cls: ClsType[JSON] = kwargs.pop("cls", None)
+
+        content_type = content_type or "application/json"
+        _json = None
+        _content = None
+        if isinstance(body, (IOBase, bytes)):
+            _content = body
+        else:
+            _json = body
+
+        _request = build_sandboxes_post_exec_stdin_request(
+            sandbox_id=sandbox_id,
+            exec_id=exec_id,
+            content_type=content_type,
+            json=_json,
+            content=_content,
+            headers=_headers,
+            params=_params,
+        )
+        _request.url = self._client.format_url(_request.url)
+
+        _stream = False
+        pipeline_response: PipelineResponse = (
+            self._client._pipeline.run(  # pylint: disable=protected-access
+                _request, stream=_stream, **kwargs
+            )
+        )
+
+        response = pipeline_response.http_response
+
+        if response.status_code not in [200, 400, 403, 404, 409]:
+            if _stream:
+                response.read()  # Load the body in memory and close the socket
+            map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
+            raise HttpResponseError(response=response)
+
+        response_headers = {}
+        if response.status_code == 200:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 400:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 403:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 404:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 409:
             response_headers["ratelimit-limit"] = self._deserialize(
                 "int", response.headers.get("ratelimit-limit")
             )
