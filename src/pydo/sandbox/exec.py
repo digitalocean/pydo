@@ -26,7 +26,7 @@ prefer :meth:`Exec.run` over ``commands.run`` for short commands.
 import codecs
 import threading
 from collections import deque
-from typing import Any, Callable, Deque, Iterator, Mapping, Optional
+from typing import Any, Callable, Deque, Iterator, Mapping, Optional, Union
 
 from . import _exec as _e
 from ._exec import Command, ExecEvent, ExecResult
@@ -40,6 +40,41 @@ class Exec:
     def __init__(self, client: Any, sandbox_id: str) -> None:
         self._client = client
         self._sandbox_id = sandbox_id
+
+    def __call__(
+        self,
+        command: Command,
+        *,
+        cwd: Optional[str] = None,
+        env: Optional[Mapping[str, str]] = None,
+        env_vars: Optional[Mapping[str, str]] = None,
+        timeout: Union[int, str, None] = None,
+        timeout_seconds: Optional[int] = None,
+        check: bool = False,
+        stdin: Any = None,
+        on_stdout: Optional[Callable[[str], None]] = None,
+        on_stderr: Optional[Callable[[str], None]] = None,
+    ) -> ExecResult:
+        """Runs a command and waits for it to exit: ``sandbox.exec("pytest -x")``.
+
+        Like :meth:`run`, with ``env`` (alias of ``env_vars``) and ``timeout``
+        (alias of ``timeout_seconds``: seconds, or ``"90s"``, ``"10m"``, ``"2h"``).
+        A non-zero exit is returned; with ``check=True`` it raises
+        :class:`~pydo.sandbox.CommandError`.
+        """
+        env_vars, timeout_seconds = _e.call_options(
+            env, env_vars, timeout, timeout_seconds
+        )
+        result = self.run(
+            command,
+            cwd=cwd,
+            env_vars=env_vars,
+            timeout_seconds=timeout_seconds,
+            stdin=stdin,
+            on_stdout=on_stdout,
+            on_stderr=on_stderr,
+        )
+        return _e.check_result(result, check)
 
     def run(
         self,

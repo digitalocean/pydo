@@ -32,6 +32,7 @@ from ._snapshots import SnapshotInfo, SnapshotState
 from .snapshots import Snapshot
 from .errors import (
     AuthenticationError,
+    CommandError,
     ConflictError,
     InvalidRequestError,
     NotFoundError,
@@ -69,6 +70,7 @@ __all__ = [
     "TemplateBuildInfo",
     "TemplateInfo",
     "TemplateStatus",
+    "CommandError",
     "ConflictError",
     "DEFAULT_SIZE",
     "DEFAULT_TEMPLATE",

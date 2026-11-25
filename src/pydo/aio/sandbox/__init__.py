@@ -10,6 +10,7 @@ Hand-written; preserved across ``make generate``. The async twin of
 
 from pydo.sandbox.errors import (
     AuthenticationError,
+    CommandError,
     ConflictError,
     InvalidRequestError,
     NotFoundError,
@@ -64,6 +65,7 @@ __all__ = [
     "TemplateBuildInfo",
     "TemplateInfo",
     "TemplateStatus",
+    "CommandError",
     "ConflictError",
     "DEFAULT_SIZE",
     "DEFAULT_TEMPLATE",

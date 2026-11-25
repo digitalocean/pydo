@@ -9,11 +9,12 @@ Hand-written; preserved across ``make generate``.
 
 import base64
 import codecs
+import re
 from dataclasses import dataclass
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Union
 
 from ._commands import JsonObjectReader, TextAssembler  # noqa: F401 (re-exported)
-from .errors import SandboxError
+from .errors import CommandError, SandboxError
 
 #: A shell string, or an argv list.
 Command = Union[str, Sequence[str]]
@@ -38,6 +39,11 @@ class ExecResult:
     status: Optional[str] = None
     #: Set when the process failed abnormally.
     error: Optional[str] = None
+
+    @property
+    def ok(self) -> bool:
+        """``True`` when the process exited with code 0."""
+        return self.exit_code == 0
 
 
 @dataclass
@@ -64,6 +70,55 @@ def _int(raw: Any) -> int:
         return int(raw) if raw not in (None, "") else 0
     except (TypeError, ValueError):
         return 0
+
+
+_DURATION = re.compile(r"^(\d+)\s*([smh]?)$")
+_DURATION_UNITS = {"s": 1, "m": 60, "h": 3600}
+
+
+def parse_duration(value: Any) -> int:
+    """Seconds from an int, or a string such as ``"90"``, ``"90s"``, ``"10m"``, ``"2h"``."""
+    if isinstance(value, bool):
+        pass
+    elif isinstance(value, int):
+        if value >= 0:
+            return value
+        raise SandboxError(
+            "exec: `timeout` must be a non-negative whole number of seconds"
+        )
+    elif isinstance(value, str):
+        match = _DURATION.match(value.strip())
+        if match:
+            return int(match.group(1)) * _DURATION_UNITS[match.group(2) or "s"]
+    raise SandboxError(
+        'exec: `timeout` must be seconds or a string such as "90s", "10m" or "2h"'
+    )
+
+
+def call_options(
+    env: Optional[Mapping[str, str]],
+    env_vars: Optional[Mapping[str, str]],
+    timeout: Any,
+    timeout_seconds: Optional[int],
+) -> Any:
+    """Resolves the ``env`` and ``timeout`` aliases of a callable exec.
+
+    Returns ``(env_vars, timeout_seconds)``. Raises before any request.
+    """
+    if env is not None and env_vars is not None:
+        raise SandboxError("exec: pass `env` or `env_vars`, not both")
+    if timeout is not None:
+        if timeout_seconds is not None:
+            raise SandboxError("exec: pass `timeout` or `timeout_seconds`, not both")
+        timeout_seconds = parse_duration(timeout)
+    return (env if env is not None else env_vars), timeout_seconds
+
+
+def check_result(result: ExecResult, check: bool) -> ExecResult:
+    """Raises :class:`CommandError` for a non-zero exit when ``check`` is set."""
+    if check and not result.ok:
+        raise CommandError("command exited with code %s" % result.exit_code, result)
+    return result
 
 
 def argv_for(command: Optional[Command], pty: bool = False) -> List[str]:

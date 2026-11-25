@@ -70,6 +70,17 @@ class SandboxTimeoutError(SandboxError):
     """A wait ran out of time. The operation may still finish later."""
 
 
+class CommandError(SandboxError):
+    """A command exited non-zero and the call asked to ``check`` it.
+
+    ``result`` is the :class:`~pydo.sandbox.ExecResult` with the output.
+    """
+
+    def __init__(self, message: str, result: Any) -> None:
+        super().__init__(message)
+        self.result = result
+
+
 _BY_STATUS = {
     400: InvalidRequestError,
     401: AuthenticationError,

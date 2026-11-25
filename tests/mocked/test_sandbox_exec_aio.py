@@ -11,7 +11,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from pydo.aio.sandbox import InvalidRequestError, Sandbox, SandboxError
+from pydo.aio.sandbox import CommandError, InvalidRequestError, Sandbox, SandboxError
 from pydo.aio.sandbox import sandbox as sandbox_module
 
 pytestmark = pytest.mark.asyncio
@@ -227,3 +227,72 @@ async def test_exports():
 
     for name in ("Exec", "ExecSession", "ExecResult", "ExecEvent"):
         assert name in mod.__all__
+
+
+def _exit_stream(code):
+    return FakeStreamResponse(
+        200, [line({"stdout": b64("out\n")}) + line({"exit": {"exit_code": code}})]
+    )
+
+
+async def test_exec_is_callable_and_reports_ok(install):
+    client = install(stream=_exit_stream(0))
+    sb = await Sandbox.get(ID)
+    result = await sb.exec("echo out")
+    assert (result.exit_code, result.stdout, result.ok) == (0, "out\n", True)
+    assert client.bodies == [{"argv": ["bash", "-lc", "echo out"]}]
+
+
+async def test_exec_call_maps_env_and_a_duration_timeout(install):
+    client = install(stream=_exit_stream(0))
+    sb = await Sandbox.get(ID)
+    await sb.exec("pytest -x", cwd="/workspace", env={"CI": "1"}, timeout="2m")
+    assert client.bodies == [
+        {
+            "argv": ["bash", "-lc", "pytest -x"],
+            "workdir": "/workspace",
+            "env_vars": {"CI": "1"},
+            "timeout_seconds": "120",
+        }
+    ]
+
+
+async def test_exec_call_does_not_raise_on_failure_unless_checked(install):
+    install(stream=_exit_stream(3))
+    sb = await Sandbox.get(ID)
+    result = await sb.exec("exit 3")
+    assert (result.exit_code, result.ok) == (3, False)
+    with pytest.raises(CommandError) as info:
+        await sb.exec("exit 3", check=True)
+    assert isinstance(info.value, SandboxError)
+    assert str(info.value) == "command exited with code 3"
+    assert info.value.result.exit_code == 3 and info.value.result.stdout == "out\n"
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"timeout": "soon"},
+        {"timeout": "1d"},
+        {"timeout": -1},
+        {"timeout": "-5"},
+        {"timeout": 1.5},
+        {"env": {"A": "1"}, "env_vars": {"B": "2"}},
+        {"timeout": 5, "timeout_seconds": 5},
+    ],
+)
+async def test_exec_call_validates_options_before_any_request(install, kwargs):
+    client = install(stream=_exit_stream(0))
+    sb = await Sandbox.get(ID)
+    with pytest.raises(SandboxError):
+        await sb.exec("true", **kwargs)
+    assert client.requested == []
+
+
+async def test_run_and_start_still_work_beside_the_call(install):
+    client = install(stream=_exit_stream(0))
+    sb = await Sandbox.get(ID)
+    assert (await sb.exec.run(["true"])).ok
+    assert client.bodies == [{"argv": ["true"]}]
+    session = await sb.exec.start(["true"], keep_stdin_open=False)
+    assert (await session.wait()).ok
