@@ -520,7 +520,7 @@ class AgentSession:
         return self._sessions.update(self.session_id, resume_on_topoff=resume_on_topoff)
 
     def update_config(self, manifest_yaml: str) -> Any:
-        """Patch the live config (tools, env, secrets, egress) from partial YAML.
+        """Patch the live config (tools, env, secrets, egress, ...) from partial YAML.
 
         Only Action Gateway (``do.actions``) tools can change; custom MCP
         servers must be sent back unchanged. The model is set in ``env``:
@@ -531,7 +531,9 @@ class AgentSession:
         secrets can be rotated, moved, added or removed, and ``egress`` replaces
         ``allow_hosts`` and ``allow_ips``; the VPC cannot change. An OAuth secret
         created with ``actor`` can switch to another connection of its provider.
-        The session must be
+        ``skills`` replaces the whole skill list on ``claude-code``, ``codex`` and
+        ``opencode`` sessions without a restart; skills updates must be enabled
+        for the team. The session must be
         ``SESSION_STATUS_READY``, ``SESSION_STATUS_DETACHED`` or
         ``SESSION_STATUS_PAUSED`` (not paused for zero balance) and idle. See
         :meth:`SessionsOperations.update_config` for the full rules.
