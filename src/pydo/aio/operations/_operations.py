@@ -30916,23 +30916,29 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "added": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "changed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "removed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ]
                                 },
                                 "tools": {
@@ -30953,7 +30959,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "config_drifted": bool,  # Optional. True when the running
                               config differs from the manifest the session was created from, for
                               example after a successful PATCH with ``manifest_yaml``. Omitted when
-                              false.
+                              false. ``config_diff`` doesn't cover every kind of drift: after an update
+                              that only switched an OAuth connection, ``config_drifted`` is true and
+                              ``config_diff`` is omitted. ``manifest`` shows the new ``actor``.
                             "config_id": "str",  # Optional. Durable Environment Config
                               UUID the session was created from (inline manifests persist a config too,
                               named after the session). Persisted and returned on create/get/list;
@@ -31111,26 +31119,29 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                         "added": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
                                         ],
                                         "changed": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
                                         ],
                                         "removed": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
                                         ]
                                     },
                                     "tools": {
@@ -31587,23 +31598,29 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "added": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "changed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "removed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ]
                                 },
                                 "tools": {
@@ -31624,7 +31641,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "config_drifted": bool,  # Optional. True when the running
                               config differs from the manifest the session was created from, for
                               example after a successful PATCH with ``manifest_yaml``. Omitted when
-                              false.
+                              false. ``config_diff`` doesn't cover every kind of drift: after an update
+                              that only switched an OAuth connection, ``config_drifted`` is true and
+                              ``config_diff`` is omitted. ``manifest`` shows the new ``actor``.
                             "config_id": "str",  # Optional. Durable Environment Config
                               UUID the session was created from (inline manifests persist a config too,
                               named after the session). Persisted and returned on create/get/list;
@@ -31782,26 +31801,29 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                         "added": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
                                         ],
                                         "changed": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
                                         ],
                                         "removed": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
                                         ]
                                     },
                                     "tools": {
@@ -32164,23 +32186,26 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "added": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "changed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "removed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ]
                             },
                             "tools": {
@@ -32200,7 +32225,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         },
                         "config_drifted": bool,  # Optional. True when the running config
                           differs from the manifest the session was created from, for example after a
-                          successful PATCH with ``manifest_yaml``. Omitted when false.
+                          successful PATCH with ``manifest_yaml``. Omitted when false. ``config_diff``
+                          doesn't cover every kind of drift: after an update that only switched an
+                          OAuth connection, ``config_drifted`` is true and ``config_diff`` is omitted.
+                          ``manifest`` shows the new ``actor``.
                         "config_id": "str",  # Optional. Durable Environment Config UUID the
                           session was created from (inline manifests persist a config too, named after
                           the session). Persisted and returned on create/get/list; absent only for
@@ -32348,23 +32376,29 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "added": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "changed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "removed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ]
                                 },
                                 "tools": {
@@ -32602,23 +32636,26 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "added": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "changed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "removed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ]
                             },
                             "tools": {
@@ -32638,7 +32675,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         },
                         "config_drifted": bool,  # Optional. True when the running config
                           differs from the manifest the session was created from, for example after a
-                          successful PATCH with ``manifest_yaml``. Omitted when false.
+                          successful PATCH with ``manifest_yaml``. Omitted when false. ``config_diff``
+                          doesn't cover every kind of drift: after an update that only switched an
+                          OAuth connection, ``config_drifted`` is true and ``config_diff`` is omitted.
+                          ``manifest`` shows the new ``actor``.
                         "config_id": "str",  # Optional. Durable Environment Config UUID the
                           session was created from (inline manifests persist a config too, named after
                           the session). Persisted and returned on create/get/list; absent only for
@@ -32786,23 +32826,29 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "added": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "changed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "removed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ]
                                 },
                                 "tools": {
@@ -33060,23 +33106,26 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "added": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "changed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "removed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ]
                             },
                             "tools": {
@@ -33096,7 +33145,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         },
                         "config_drifted": bool,  # Optional. True when the running config
                           differs from the manifest the session was created from, for example after a
-                          successful PATCH with ``manifest_yaml``. Omitted when false.
+                          successful PATCH with ``manifest_yaml``. Omitted when false. ``config_diff``
+                          doesn't cover every kind of drift: after an update that only switched an
+                          OAuth connection, ``config_drifted`` is true and ``config_diff`` is omitted.
+                          ``manifest`` shows the new ``actor``.
                         "config_id": "str",  # Optional. Durable Environment Config UUID the
                           session was created from (inline manifests persist a config too, named after
                           the session). Persisted and returned on create/get/list; absent only for
@@ -33244,23 +33296,29 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "added": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "changed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "removed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ]
                                 },
                                 "tools": {
@@ -34145,23 +34203,26 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "added": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "changed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "removed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ]
                             },
                             "tools": {
@@ -34181,7 +34242,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         },
                         "config_drifted": bool,  # Optional. True when the running config
                           differs from the manifest the session was created from, for example after a
-                          successful PATCH with ``manifest_yaml``. Omitted when false.
+                          successful PATCH with ``manifest_yaml``. Omitted when false. ``config_diff``
+                          doesn't cover every kind of drift: after an update that only switched an
+                          OAuth connection, ``config_drifted`` is true and ``config_diff`` is omitted.
+                          ``manifest`` shows the new ``actor``.
                         "config_id": "str",  # Optional. Durable Environment Config UUID the
                           session was created from (inline manifests persist a config too, named after
                           the session). Persisted and returned on create/get/list; absent only for
@@ -34329,23 +34393,29 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "added": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "changed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "removed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ]
                                 },
                                 "tools": {
@@ -34656,17 +34726,19 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         <#operation/harness_list_provider_connections>`_.
         Send the secret with ``source``\\ , ``provider``\\ , and the new ``actor``\\ , and keep every
         other secret as
-        ``{}``. See ``manifest_yaml`` for an example.
+        ``{}``. Leaving out ``provider`` or ``actor`` returns ``400``. See ``manifest_yaml`` for an
+        example.
 
-        The platform first checks that you can use the new connection: it must be active, and either
-        yours or shared with your team (\\ ``400`` otherwise). Switching back to the connection the
-        agent
-        config names skips this check, so any team member can do it. The platform then gives the
-        session
-        that connection's token and restarts the agent, so the next ``git`` operation uses the new
-        connection. Sending the connection the secret already uses returns ``200`` with ``outcome`` set
-        to
-        ``UNCHANGED``.
+        The platform first checks that you can use the new connection: it must be active and owned by
+        you. Another team member's connection returns ``400``\\ , even when it is active. Switching
+        back to
+        the connection the agent config names skips this check, so any team member can do it. If the
+        platform can't reach its connection service to check, the request returns ``503``\\ ; retry it.
+        The
+        platform then gives the session that connection's token and restarts the agent, so the next
+        ``git`` operation uses the new connection. Sending the connection the secret already uses
+        returns
+        ``200`` with ``outcome`` set to ``UNCHANGED``.
 
         The switch applies to this session only:
 
@@ -34923,22 +34995,23 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                       with ``error`` set to ``requires_new_session``.  **Switching an OAuth
                       connection.** An OAuth secret that was created with ``actor`` can move to another
                       connection of the same provider: set it to ``{source: oauth, provider, actor}``
-                      with the new connection's ``user_id`` as ``actor``. The connection must be
-                      active, and either yours or shared with your team ("" ``400`` otherwise), except
-                      when you switch back to the connection the agent config names. Switching OAuth
-                      connections must be enabled for your team ("" ``403`` otherwise). The agent
-                      restarts to read the new token. Sending the connection the secret already uses is
-                      not a change. Adding or removing an OAuth secret, changing its provider, or
-                      switching one that was created without ``actor`` returns ``422``. This example
-                      switches ``GITHUB_TOKEN`` to the connection ``github2`` and assumes the session
-                      has no other secrets:  .. code-block:: yaml     secrets:      GITHUB_TOKEN:
-                      source: oauth        provider: github        actor: github2  **Changing the
-                      model.** You change a session's model through ``env``. The key to set depends on
-                      the model endpoint the session was created with:   * DigitalOcean Serverless
-                      Inference (created with ``HARNESS_INFERENCE_MODEL`` and without
-                      ``OPENAI_BASE_URL``"" , ``ANTHROPIC_BASE_URL``"" , or an ``ANTHROPIC_API_KEY``
-                      secret): set   ``HARNESS_INFERENCE_MODEL`` to a Serverless Inference model ID, or
-                      to ``router:<name>`` for   an inference router. Removing the key, or moving the
+                      with the new connection's ``user_id`` as ``actor``"" ; leaving out ``provider``
+                      or ``actor`` returns ``400``. The connection must be active and owned by you,
+                      except when you switch back to the connection the agent config names. Another
+                      team member's connection returns ``400``. Switching OAuth connections must be
+                      enabled for your team ("" ``403`` otherwise). The agent restarts to read the new
+                      token. Sending the connection the secret already uses is not a change. Adding or
+                      removing an OAuth secret, changing its provider, or switching one that was
+                      created without ``actor`` returns ``422``. This example switches ``GITHUB_TOKEN``
+                      to the connection ``github2`` and assumes the session has no other secrets:  ..
+                      code-block:: yaml     secrets:      GITHUB_TOKEN:        source: oauth
+                      provider: github        actor: github2  **Changing the model.** You change a
+                      session's model through ``env``. The key to set depends on the model endpoint the
+                      session was created with:   * DigitalOcean Serverless Inference (created with
+                      ``HARNESS_INFERENCE_MODEL`` and without   ``OPENAI_BASE_URL``"" ,
+                      ``ANTHROPIC_BASE_URL``"" , or an ``ANTHROPIC_API_KEY`` secret): set
+                      ``HARNESS_INFERENCE_MODEL`` to a Serverless Inference model ID, or to
+                      ``router:<name>`` for   an inference router. Removing the key, or moving the
                       session to its own endpoint,   returns ``422``. Adding the key to a session that
                       was created without it also returns   ``422``. * Your own OpenAI-compatible
                       endpoint (created with ``OPENAI_BASE_URL``"" ): set ``MODEL``. The   session
@@ -35074,23 +35147,26 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "added": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "changed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "removed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ]
                             },
                             "tools": {
@@ -35110,7 +35186,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         },
                         "config_drifted": bool,  # Optional. True when the running config
                           differs from the manifest the session was created from, for example after a
-                          successful PATCH with ``manifest_yaml``. Omitted when false.
+                          successful PATCH with ``manifest_yaml``. Omitted when false. ``config_diff``
+                          doesn't cover every kind of drift: after an update that only switched an
+                          OAuth connection, ``config_drifted`` is true and ``config_diff`` is omitted.
+                          ``manifest`` shows the new ``actor``.
                         "config_id": "str",  # Optional. Durable Environment Config UUID the
                           session was created from (inline manifests persist a config too, named after
                           the session). Persisted and returned on create/get/list; absent only for
@@ -35258,23 +35337,29 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "added": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "changed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "removed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ]
                                 },
                                 "tools": {
@@ -35351,7 +35436,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           from being accepted.
                     ]
                 }
-                # response body for status code(s): 400, 403, 404, 409, 422, 423
+                # response body for status code(s): 400, 403, 404, 409, 422, 423, 503
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -35480,17 +35565,19 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         <#operation/harness_list_provider_connections>`_.
         Send the secret with ``source``\\ , ``provider``\\ , and the new ``actor``\\ , and keep every
         other secret as
-        ``{}``. See ``manifest_yaml`` for an example.
+        ``{}``. Leaving out ``provider`` or ``actor`` returns ``400``. See ``manifest_yaml`` for an
+        example.
 
-        The platform first checks that you can use the new connection: it must be active, and either
-        yours or shared with your team (\\ ``400`` otherwise). Switching back to the connection the
-        agent
-        config names skips this check, so any team member can do it. The platform then gives the
-        session
-        that connection's token and restarts the agent, so the next ``git`` operation uses the new
-        connection. Sending the connection the secret already uses returns ``200`` with ``outcome`` set
-        to
-        ``UNCHANGED``.
+        The platform first checks that you can use the new connection: it must be active and owned by
+        you. Another team member's connection returns ``400``\\ , even when it is active. Switching
+        back to
+        the connection the agent config names skips this check, so any team member can do it. If the
+        platform can't reach its connection service to check, the request returns ``503``\\ ; retry it.
+        The
+        platform then gives the session that connection's token and restarts the agent, so the next
+        ``git`` operation uses the new connection. Sending the connection the secret already uses
+        returns
+        ``200`` with ``outcome`` set to ``UNCHANGED``.
 
         The switch applies to this session only:
 
@@ -35766,23 +35853,26 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "added": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "changed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "removed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ]
                             },
                             "tools": {
@@ -35802,7 +35892,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         },
                         "config_drifted": bool,  # Optional. True when the running config
                           differs from the manifest the session was created from, for example after a
-                          successful PATCH with ``manifest_yaml``. Omitted when false.
+                          successful PATCH with ``manifest_yaml``. Omitted when false. ``config_diff``
+                          doesn't cover every kind of drift: after an update that only switched an
+                          OAuth connection, ``config_drifted`` is true and ``config_diff`` is omitted.
+                          ``manifest`` shows the new ``actor``.
                         "config_id": "str",  # Optional. Durable Environment Config UUID the
                           session was created from (inline manifests persist a config too, named after
                           the session). Persisted and returned on create/get/list; absent only for
@@ -35950,23 +36043,29 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "added": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "changed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "removed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ]
                                 },
                                 "tools": {
@@ -36043,7 +36142,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           from being accepted.
                     ]
                 }
-                # response body for status code(s): 400, 403, 404, 409, 422, 423
+                # response body for status code(s): 400, 403, 404, 409, 422, 423, 503
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -36167,17 +36266,19 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         <#operation/harness_list_provider_connections>`_.
         Send the secret with ``source``\\ , ``provider``\\ , and the new ``actor``\\ , and keep every
         other secret as
-        ``{}``. See ``manifest_yaml`` for an example.
+        ``{}``. Leaving out ``provider`` or ``actor`` returns ``400``. See ``manifest_yaml`` for an
+        example.
 
-        The platform first checks that you can use the new connection: it must be active, and either
-        yours or shared with your team (\\ ``400`` otherwise). Switching back to the connection the
-        agent
-        config names skips this check, so any team member can do it. The platform then gives the
-        session
-        that connection's token and restarts the agent, so the next ``git`` operation uses the new
-        connection. Sending the connection the secret already uses returns ``200`` with ``outcome`` set
-        to
-        ``UNCHANGED``.
+        The platform first checks that you can use the new connection: it must be active and owned by
+        you. Another team member's connection returns ``400``\\ , even when it is active. Switching
+        back to
+        the connection the agent config names skips this check, so any team member can do it. If the
+        platform can't reach its connection service to check, the request returns ``503``\\ ; retry it.
+        The
+        platform then gives the session that connection's token and restarts the agent, so the next
+        ``git`` operation uses the new connection. Sending the connection the secret already uses
+        returns
+        ``200`` with ``outcome`` set to ``UNCHANGED``.
 
         The switch applies to this session only:
 
@@ -36432,22 +36533,23 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                       with ``error`` set to ``requires_new_session``.  **Switching an OAuth
                       connection.** An OAuth secret that was created with ``actor`` can move to another
                       connection of the same provider: set it to ``{source: oauth, provider, actor}``
-                      with the new connection's ``user_id`` as ``actor``. The connection must be
-                      active, and either yours or shared with your team ("" ``400`` otherwise), except
-                      when you switch back to the connection the agent config names. Switching OAuth
-                      connections must be enabled for your team ("" ``403`` otherwise). The agent
-                      restarts to read the new token. Sending the connection the secret already uses is
-                      not a change. Adding or removing an OAuth secret, changing its provider, or
-                      switching one that was created without ``actor`` returns ``422``. This example
-                      switches ``GITHUB_TOKEN`` to the connection ``github2`` and assumes the session
-                      has no other secrets:  .. code-block:: yaml     secrets:      GITHUB_TOKEN:
-                      source: oauth        provider: github        actor: github2  **Changing the
-                      model.** You change a session's model through ``env``. The key to set depends on
-                      the model endpoint the session was created with:   * DigitalOcean Serverless
-                      Inference (created with ``HARNESS_INFERENCE_MODEL`` and without
-                      ``OPENAI_BASE_URL``"" , ``ANTHROPIC_BASE_URL``"" , or an ``ANTHROPIC_API_KEY``
-                      secret): set   ``HARNESS_INFERENCE_MODEL`` to a Serverless Inference model ID, or
-                      to ``router:<name>`` for   an inference router. Removing the key, or moving the
+                      with the new connection's ``user_id`` as ``actor``"" ; leaving out ``provider``
+                      or ``actor`` returns ``400``. The connection must be active and owned by you,
+                      except when you switch back to the connection the agent config names. Another
+                      team member's connection returns ``400``. Switching OAuth connections must be
+                      enabled for your team ("" ``403`` otherwise). The agent restarts to read the new
+                      token. Sending the connection the secret already uses is not a change. Adding or
+                      removing an OAuth secret, changing its provider, or switching one that was
+                      created without ``actor`` returns ``422``. This example switches ``GITHUB_TOKEN``
+                      to the connection ``github2`` and assumes the session has no other secrets:  ..
+                      code-block:: yaml     secrets:      GITHUB_TOKEN:        source: oauth
+                      provider: github        actor: github2  **Changing the model.** You change a
+                      session's model through ``env``. The key to set depends on the model endpoint the
+                      session was created with:   * DigitalOcean Serverless Inference (created with
+                      ``HARNESS_INFERENCE_MODEL`` and without   ``OPENAI_BASE_URL``"" ,
+                      ``ANTHROPIC_BASE_URL``"" , or an ``ANTHROPIC_API_KEY`` secret): set
+                      ``HARNESS_INFERENCE_MODEL`` to a Serverless Inference model ID, or to
+                      ``router:<name>`` for   an inference router. Removing the key, or moving the
                       session to its own endpoint,   returns ``422``. Adding the key to a session that
                       was created without it also returns   ``422``. * Your own OpenAI-compatible
                       endpoint (created with ``OPENAI_BASE_URL``"" ): set ``MODEL``. The   session
@@ -36583,23 +36685,26 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "added": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "changed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "removed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ]
                             },
                             "tools": {
@@ -36619,7 +36724,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         },
                         "config_drifted": bool,  # Optional. True when the running config
                           differs from the manifest the session was created from, for example after a
-                          successful PATCH with ``manifest_yaml``. Omitted when false.
+                          successful PATCH with ``manifest_yaml``. Omitted when false. ``config_diff``
+                          doesn't cover every kind of drift: after an update that only switched an
+                          OAuth connection, ``config_drifted`` is true and ``config_diff`` is omitted.
+                          ``manifest`` shows the new ``actor``.
                         "config_id": "str",  # Optional. Durable Environment Config UUID the
                           session was created from (inline manifests persist a config too, named after
                           the session). Persisted and returned on create/get/list; absent only for
@@ -36767,23 +36875,29 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "added": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "changed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "removed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ]
                                 },
                                 "tools": {
@@ -36860,7 +36974,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                           from being accepted.
                     ]
                 }
-                # response body for status code(s): 400, 403, 404, 409, 422, 423
+                # response body for status code(s): 400, 403, 404, 409, 422, 423, 503
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -36920,7 +37034,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
 
         response = pipeline_response.http_response
 
-        if response.status_code not in [200, 202, 400, 403, 404, 409, 422, 423]:
+        if response.status_code not in [200, 202, 400, 403, 404, 409, 422, 423, 503]:
             if _stream:
                 await response.read()  # Load the body in memory and close the socket
             map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
@@ -37040,6 +37154,22 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                 deserialized = None
 
         if response.status_code == 423:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 503:
             response_headers["ratelimit-limit"] = self._deserialize(
                 "int", response.headers.get("ratelimit-limit")
             )
@@ -38291,23 +38421,26 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                 "added": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "changed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ],
                                 "removed": [
                                     "str"  # Optional. Secret names, never
                                       values. On an update, ``changed`` lists the secrets that got a
-                                      new value or were bound to another URL or scheme. On
-                                      ``config_diff``"" , ``changed`` lists only the secrets bound to a
-                                      different URL or scheme than in the agent config.
+                                      new value, were bound to another URL or scheme, or were switched
+                                      to another OAuth connection. On ``config_diff``"" , ``changed``
+                                      lists only the secrets bound to a different URL or scheme than in
+                                      the agent config; a switched OAuth connection isn't listed there.
                                 ]
                             },
                             "tools": {
@@ -38327,7 +38460,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                         },
                         "config_drifted": bool,  # Optional. True when the running config
                           differs from the manifest the session was created from, for example after a
-                          successful PATCH with ``manifest_yaml``. Omitted when false.
+                          successful PATCH with ``manifest_yaml``. Omitted when false. ``config_diff``
+                          doesn't cover every kind of drift: after an update that only switched an
+                          OAuth connection, ``config_drifted`` is true and ``config_diff`` is omitted.
+                          ``manifest`` shows the new ``actor``.
                         "config_id": "str",  # Optional. Durable Environment Config UUID the
                           session was created from (inline manifests persist a config too, named after
                           the session). Persisted and returned on create/get/list; absent only for
@@ -38475,23 +38611,29 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "added": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "changed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "removed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ]
                                 },
                                 "tools": {
@@ -38863,23 +39005,29 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "added": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "changed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "removed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ]
                                 },
                                 "tools": {
@@ -38900,7 +39048,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "config_drifted": bool,  # Optional. True when the running
                               config differs from the manifest the session was created from, for
                               example after a successful PATCH with ``manifest_yaml``. Omitted when
-                              false.
+                              false. ``config_diff`` doesn't cover every kind of drift: after an update
+                              that only switched an OAuth connection, ``config_drifted`` is true and
+                              ``config_diff`` is omitted. ``manifest`` shows the new ``actor``.
                             "config_id": "str",  # Optional. Durable Environment Config
                               UUID the session was created from (inline manifests persist a config too,
                               named after the session). Persisted and returned on create/get/list;
@@ -39062,26 +39212,29 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                         "added": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
                                         ],
                                         "changed": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
                                         ],
                                         "removed": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
                                         ]
                                     },
                                     "tools": {
@@ -39290,23 +39443,29 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "added": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "changed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "removed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ]
                                 },
                                 "tools": {
@@ -39327,7 +39486,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "config_drifted": bool,  # Optional. True when the running
                               config differs from the manifest the session was created from, for
                               example after a successful PATCH with ``manifest_yaml``. Omitted when
-                              false.
+                              false. ``config_diff`` doesn't cover every kind of drift: after an update
+                              that only switched an OAuth connection, ``config_drifted`` is true and
+                              ``config_diff`` is omitted. ``manifest`` shows the new ``actor``.
                             "config_id": "str",  # Optional. Durable Environment Config
                               UUID the session was created from (inline manifests persist a config too,
                               named after the session). Persisted and returned on create/get/list;
@@ -39489,26 +39650,29 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                         "added": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
                                         ],
                                         "changed": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
                                         ],
                                         "removed": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
                                         ]
                                     },
                                     "tools": {
@@ -39722,23 +39886,29 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "added": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "changed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ],
                                     "removed": [
                                         "str"  # Optional. Secret names,
                                           never values. On an update, ``changed`` lists the secrets
-                                          that got a new value or were bound to another URL or scheme.
-                                          On ``config_diff``"" , ``changed`` lists only the secrets
-                                          bound to a different URL or scheme than in the agent config.
+                                          that got a new value, were bound to another URL or scheme, or
+                                          were switched to another OAuth connection. On
+                                          ``config_diff``"" , ``changed`` lists only the secrets bound
+                                          to a different URL or scheme than in the agent config; a
+                                          switched OAuth connection isn't listed there.
                                     ]
                                 },
                                 "tools": {
@@ -39759,7 +39929,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                             "config_drifted": bool,  # Optional. True when the running
                               config differs from the manifest the session was created from, for
                               example after a successful PATCH with ``manifest_yaml``. Omitted when
-                              false.
+                              false. ``config_diff`` doesn't cover every kind of drift: after an update
+                              that only switched an OAuth connection, ``config_drifted`` is true and
+                              ``config_diff`` is omitted. ``manifest`` shows the new ``actor``.
                             "config_id": "str",  # Optional. Durable Environment Config
                               UUID the session was created from (inline manifests persist a config too,
                               named after the session). Persisted and returned on create/get/list;
@@ -39921,26 +40093,29 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                         "added": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
                                         ],
                                         "changed": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
                                         ],
                                         "removed": [
                                             "str"  # Optional. Secret
                                               names, never values. On an update, ``changed`` lists the
-                                              secrets that got a new value or were bound to another URL
-                                              or scheme. On ``config_diff``"" , ``changed`` lists only
-                                              the secrets bound to a different URL or scheme than in
-                                              the agent config.
+                                              secrets that got a new value, were bound to another URL
+                                              or scheme, or were switched to another OAuth connection.
+                                              On ``config_diff``"" , ``changed`` lists only the secrets
+                                              bound to a different URL or scheme than in the agent
+                                              config; a switched OAuth connection isn't listed there.
                                         ]
                                     },
                                     "tools": {
