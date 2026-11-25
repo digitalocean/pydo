@@ -53418,6 +53418,34 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                           entries added, removed, or changed in one manifest section.
                                     ]
                                 },
+                                "permissions": {
+                                    "default": "str",  # Optional. The new
+                                      default action ("" ``allow``"" , ``ask``"" , or ``deny``"" ),
+                                      when it changed. Empty when the default was removed.
+                                    "rules": {
+                                        "added": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ]
+                                    }
+                                },
                                 "secrets": {
                                     "added": [
                                         "str"  # Optional. Secret names,
@@ -53580,6 +53608,38 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                               the entries added, removed, or changed in one manifest
                                               section.
                                         ]
+                                    },
+                                    "permissions": {
+                                        "default": "str",  # Optional. The
+                                          new default action ("" ``allow``"" , ``ask``"" , or
+                                          ``deny``"" ), when it changed. Empty when the default was
+                                          removed.
+                                        "rules": {
+                                            "added": [
+                                                "str"  # Optional.
+                                                  Names of the rules added, removed, or changed.
+                                                  ``changed`` covers a rule kept under the same tool
+                                                  and match with another action, or at another
+                                                  position. The last matching rule wins, so the order
+                                                  is part of the policy.
+                                            ],
+                                            "changed": [
+                                                "str"  # Optional.
+                                                  Names of the rules added, removed, or changed.
+                                                  ``changed`` covers a rule kept under the same tool
+                                                  and match with another action, or at another
+                                                  position. The last matching rule wins, so the order
+                                                  is part of the policy.
+                                            ],
+                                            "removed": [
+                                                "str"  # Optional.
+                                                  Names of the rules added, removed, or changed.
+                                                  ``changed`` covers a rule kept under the same tool
+                                                  and match with another action, or at another
+                                                  position. The last matching rule wins, so the order
+                                                  is part of the policy.
+                                            ]
+                                        }
                                     },
                                     "secrets": {
                                         "added": [
@@ -54029,6 +54089,34 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                           entries added, removed, or changed in one manifest section.
                                     ]
                                 },
+                                "permissions": {
+                                    "default": "str",  # Optional. The new
+                                      default action ("" ``allow``"" , ``ask``"" , or ``deny``"" ),
+                                      when it changed. Empty when the default was removed.
+                                    "rules": {
+                                        "added": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ]
+                                    }
+                                },
                                 "secrets": {
                                     "added": [
                                         "str"  # Optional. Secret names,
@@ -54191,6 +54279,38 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                               the entries added, removed, or changed in one manifest
                                               section.
                                         ]
+                                    },
+                                    "permissions": {
+                                        "default": "str",  # Optional. The
+                                          new default action ("" ``allow``"" , ``ask``"" , or
+                                          ``deny``"" ), when it changed. Empty when the default was
+                                          removed.
+                                        "rules": {
+                                            "added": [
+                                                "str"  # Optional.
+                                                  Names of the rules added, removed, or changed.
+                                                  ``changed`` covers a rule kept under the same tool
+                                                  and match with another action, or at another
+                                                  position. The last matching rule wins, so the order
+                                                  is part of the policy.
+                                            ],
+                                            "changed": [
+                                                "str"  # Optional.
+                                                  Names of the rules added, removed, or changed.
+                                                  ``changed`` covers a rule kept under the same tool
+                                                  and match with another action, or at another
+                                                  position. The last matching rule wins, so the order
+                                                  is part of the policy.
+                                            ],
+                                            "removed": [
+                                                "str"  # Optional.
+                                                  Names of the rules added, removed, or changed.
+                                                  ``changed`` covers a rule kept under the same tool
+                                                  and match with another action, or at another
+                                                  position. The last matching rule wins, so the order
+                                                  is part of the policy.
+                                            ]
+                                        }
                                     },
                                     "secrets": {
                                         "added": [
@@ -54546,6 +54666,34 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                       added, removed, or changed in one manifest section.
                                 ]
                             },
+                            "permissions": {
+                                "default": "str",  # Optional. The new default action
+                                  ("" ``allow``"" , ``ask``"" , or ``deny``"" ), when it changed. Empty
+                                  when the default was removed.
+                                "rules": {
+                                    "added": [
+                                        "str"  # Optional. Names of the rules
+                                          added, removed, or changed. ``changed`` covers a rule kept
+                                          under the same tool and match with another action, or at
+                                          another position. The last matching rule wins, so the order
+                                          is part of the policy.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Names of the rules
+                                          added, removed, or changed. ``changed`` covers a rule kept
+                                          under the same tool and match with another action, or at
+                                          another position. The last matching rule wins, so the order
+                                          is part of the policy.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Names of the rules
+                                          added, removed, or changed. ``changed`` covers a rule kept
+                                          under the same tool and match with another action, or at
+                                          another position. The last matching rule wins, so the order
+                                          is part of the policy.
+                                    ]
+                                }
+                            },
                             "secrets": {
                                 "added": [
                                     "str"  # Optional. Secret names, never
@@ -54701,6 +54849,34 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                         "str"  # Optional. Names of the
                                           entries added, removed, or changed in one manifest section.
                                     ]
+                                },
+                                "permissions": {
+                                    "default": "str",  # Optional. The new
+                                      default action ("" ``allow``"" , ``ask``"" , or ``deny``"" ),
+                                      when it changed. Empty when the default was removed.
+                                    "rules": {
+                                        "added": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ]
+                                    }
                                 },
                                 "secrets": {
                                     "added": [
@@ -54928,6 +55104,34 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                       added, removed, or changed in one manifest section.
                                 ]
                             },
+                            "permissions": {
+                                "default": "str",  # Optional. The new default action
+                                  ("" ``allow``"" , ``ask``"" , or ``deny``"" ), when it changed. Empty
+                                  when the default was removed.
+                                "rules": {
+                                    "added": [
+                                        "str"  # Optional. Names of the rules
+                                          added, removed, or changed. ``changed`` covers a rule kept
+                                          under the same tool and match with another action, or at
+                                          another position. The last matching rule wins, so the order
+                                          is part of the policy.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Names of the rules
+                                          added, removed, or changed. ``changed`` covers a rule kept
+                                          under the same tool and match with another action, or at
+                                          another position. The last matching rule wins, so the order
+                                          is part of the policy.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Names of the rules
+                                          added, removed, or changed. ``changed`` covers a rule kept
+                                          under the same tool and match with another action, or at
+                                          another position. The last matching rule wins, so the order
+                                          is part of the policy.
+                                    ]
+                                }
+                            },
                             "secrets": {
                                 "added": [
                                     "str"  # Optional. Secret names, never
@@ -55083,6 +55287,34 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                         "str"  # Optional. Names of the
                                           entries added, removed, or changed in one manifest section.
                                     ]
+                                },
+                                "permissions": {
+                                    "default": "str",  # Optional. The new
+                                      default action ("" ``allow``"" , ``ask``"" , or ``deny``"" ),
+                                      when it changed. Empty when the default was removed.
+                                    "rules": {
+                                        "added": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ]
+                                    }
                                 },
                                 "secrets": {
                                     "added": [
@@ -55330,6 +55562,34 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                       added, removed, or changed in one manifest section.
                                 ]
                             },
+                            "permissions": {
+                                "default": "str",  # Optional. The new default action
+                                  ("" ``allow``"" , ``ask``"" , or ``deny``"" ), when it changed. Empty
+                                  when the default was removed.
+                                "rules": {
+                                    "added": [
+                                        "str"  # Optional. Names of the rules
+                                          added, removed, or changed. ``changed`` covers a rule kept
+                                          under the same tool and match with another action, or at
+                                          another position. The last matching rule wins, so the order
+                                          is part of the policy.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Names of the rules
+                                          added, removed, or changed. ``changed`` covers a rule kept
+                                          under the same tool and match with another action, or at
+                                          another position. The last matching rule wins, so the order
+                                          is part of the policy.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Names of the rules
+                                          added, removed, or changed. ``changed`` covers a rule kept
+                                          under the same tool and match with another action, or at
+                                          another position. The last matching rule wins, so the order
+                                          is part of the policy.
+                                    ]
+                                }
+                            },
                             "secrets": {
                                 "added": [
                                     "str"  # Optional. Secret names, never
@@ -55485,6 +55745,34 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                         "str"  # Optional. Names of the
                                           entries added, removed, or changed in one manifest section.
                                     ]
+                                },
+                                "permissions": {
+                                    "default": "str",  # Optional. The new
+                                      default action ("" ``allow``"" , ``ask``"" , or ``deny``"" ),
+                                      when it changed. Empty when the default was removed.
+                                    "rules": {
+                                        "added": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ]
+                                    }
                                 },
                                 "secrets": {
                                     "added": [
@@ -56359,6 +56647,34 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                       added, removed, or changed in one manifest section.
                                 ]
                             },
+                            "permissions": {
+                                "default": "str",  # Optional. The new default action
+                                  ("" ``allow``"" , ``ask``"" , or ``deny``"" ), when it changed. Empty
+                                  when the default was removed.
+                                "rules": {
+                                    "added": [
+                                        "str"  # Optional. Names of the rules
+                                          added, removed, or changed. ``changed`` covers a rule kept
+                                          under the same tool and match with another action, or at
+                                          another position. The last matching rule wins, so the order
+                                          is part of the policy.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Names of the rules
+                                          added, removed, or changed. ``changed`` covers a rule kept
+                                          under the same tool and match with another action, or at
+                                          another position. The last matching rule wins, so the order
+                                          is part of the policy.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Names of the rules
+                                          added, removed, or changed. ``changed`` covers a rule kept
+                                          under the same tool and match with another action, or at
+                                          another position. The last matching rule wins, so the order
+                                          is part of the policy.
+                                    ]
+                                }
+                            },
                             "secrets": {
                                 "added": [
                                     "str"  # Optional. Secret names, never
@@ -56514,6 +56830,34 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                         "str"  # Optional. Names of the
                                           entries added, removed, or changed in one manifest section.
                                     ]
+                                },
+                                "permissions": {
+                                    "default": "str",  # Optional. The new
+                                      default action ("" ``allow``"" , ``ask``"" , or ``deny``"" ),
+                                      when it changed. Empty when the default was removed.
+                                    "rules": {
+                                        "added": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ]
+                                    }
                                 },
                                 "secrets": {
                                     "added": [
@@ -56767,7 +57111,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
            * - ``tools``
              - The session's Action Gateway tools (\\ ``do.actions`` entries). Custom MCP servers can't
         be changed.
-             - No
+             - No (LangGraph: yes)
            * - ``env``
              - Environment variables (name and value).
              - Yes
@@ -56790,6 +57134,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
              - The hosts and IP addresses the session can reach (\\ ``allow_hosts`` and ``allow_ips``\\
         ).
              - No
+           * - ``permissions``
+             - The permission policy: the default action and the full rules list. What can change
+        depends on the agent; see below.
+             - No (LangGraph: yes for ``do.actions`` rules or ``default``\\ )
 
 
         Sections you omit are not changed. Each section you include replaces that section in full; see
@@ -56828,9 +57176,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
 
         The following can't be changed on an existing session: custom MCP servers (\\ ``422``\\ ), the
         egress
-        VPC (\\ ``vpc_uuid`` and ``subnet_uuid``\\ , ``422``\\ ), platform-managed model keys, and
-        ``permissions``
-        (\\ ``400``\\ ). To use a different custom MCP server or VPC, create a new session.
+        VPC (\\ ``vpc_uuid`` and ``subnet_uuid``\\ , ``422``\\ ), and platform-managed model keys. To
+        use a different
+        custom MCP server or VPC, create a new session.
 
         Switching an OAuth connection
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -56896,6 +57244,75 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
 
         See ``manifest_yaml`` for the format of each change.
 
+        Changing permissions
+        ^^^^^^^^^^^^^^^^^^^^
+
+        ``permissions`` replaces the whole policy: ``default`` and the full ``rules`` list. A rule you
+        leave
+        out is removed. Use the same fields as when you create the session. ``permissions: {}`` removes
+        the policy, so the agent goes back to its built-in default, as long as every rule it removes is
+        one the agent can change (see below). ``permissions: null`` returns ``400``.
+
+        Rules are checked in the order you list them, and the last rule that matches wins. The order is
+        part of the policy, so moving a rule counts as a change and is applied like any other.
+
+        The agent is not restarted; the new rules apply from its next tool call once the update is
+        ``APPLIED``. On ``langgraph``\\ , a change to ``do.actions/<tool>`` rules or ``default``
+        restarts the
+        agent, as a ``tools`` change does.
+
+        Only sessions created after live permissions updates were released can change ``permissions``.
+        An older session returns ``409``\\ ; create a new session instead.
+
+        What can change depends on the session's agent:
+
+
+        * ``claude-code``\\ , ``opencode``\\ : ``default`` and ``bash``\\ , ``file.read``\\ ,
+        ``file.write``\\ , ``mcp``\\ , and
+          ``do.actions/<tool>`` rules, with ``allow``\\ , ``ask``\\ , or ``deny``.
+        * ``openhands``\\ : ``default`` and ``bash``\\ , ``file.read``\\ , ``file.write``\\ , and
+        ``web.fetch`` rules. Not
+          ``mcp`` or ``do.actions/<tool>`` rules. While the session uses ``do.actions`` tools,
+        ``default``
+          can't change: the change would move the session to a new Action Gateway endpoint, which
+          ``openhands`` can't pick up while running.
+        * ``codex``\\ : ``default`` and ``bash`` and ``do.actions/<tool>`` rules, with ``allow``\\ ,
+        ``ask``\\ , or ``deny``.
+          Not ``file.read``\\ , ``file.write``\\ , ``web.fetch``\\ , or ``mcp`` rules.
+        * ``hermes``\\ , ``langgraph``\\ : ``do.actions/<tool>`` rules with ``allow`` or ``deny``\\ ,
+        and ``default`` set to
+          ``allow`` or ``deny``. Not ``ask``\\ , and no other rule types.
+        * ``crewai``\\ , ``cursor``\\ , and any other agent: nothing.
+
+        ``permissions.filesystem`` and ``permissions.network`` can't be changed on any agent. If your
+        ``permissions`` section leaves them out, the session keeps the ones it has; if it sets them to
+        something different, the request returns ``409``.
+
+        Only the differences from the current policy are checked: rules you add, remove, change, or
+        move, and a changed ``default``. Rules you keep as they are never cause a refusal. A removed
+        rule
+        is checked like an added one, so a rule of a type the agent can't change can't be removed
+        either: every ``permissions`` section you send has to keep it, and ``permissions: {}`` returns
+        ``409`` while the policy has one. For example, ``{}`` returns ``409`` on a ``codex`` session
+        with a
+        ``file.read`` rule, or on a ``hermes`` session with a ``bash`` rule.
+
+        If any change can't be applied on the session's agent, the request returns ``409`` and nothing
+        is
+        applied, including changes to other sections. The error message names the unsupported changes
+        and what the agent can change. Remove them and send the update again. For example:
+
+        .. code-block::
+
+           permissions can't change live on hermes for: bash rule "rm -rf *" (only do.actions
+        allow/deny rules and an allow or deny default action can change on this agent). Remove these
+        changes and send the update again (update_unsupported)
+
+        If the agent itself refuses a change after the request is accepted, the update ends ``FAILED``
+        with ``session.update.reverted`` set to ``true``\\ , and ``session.update.detail`` says to
+        remove the
+        permission changes the agent can't take and send the update again.
+
         Tracking an update
         ^^^^^^^^^^^^^^^^^^
 
@@ -56916,10 +57333,12 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
            * ``FAILED``\\ : the update did not take effect. ``session.update.detail`` explains why, and
              ``session.update.reverted`` is ``true`` if the previous settings were restored.
 
-        Tool, URL-bound secret, and ``egress`` updates usually finish within a few seconds. Updates to
-        ``env`` (including the model) or plain secrets, and OAuth connection switches, restart the
-        agent
-        and can take up to about two minutes.
+        Tool, URL-bound secret, ``egress``\\ , and ``permissions`` updates usually finish within a few
+        seconds, except on ``langgraph``\\ , where a ``tools`` update or a ``permissions`` change to
+        ``default``
+        or ``do.actions/<tool>`` rules restarts the agent. Updates to ``env`` (including the model) or
+        plain secrets, and OAuth connection switches, restart the agent and can take up to about two
+        minutes.
 
         If the request matches the session's current settings, it returns ``200`` with ``outcome`` set
         to
@@ -56950,8 +57369,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         balance,
           and a destroyed or failed session. A locked session returns ``423``.
         * The session must be idle: no agent turn running and no approval pending (\\ ``409``\\ ).
-        * Session settings updates must be enabled for your team.
-        * Not every agent runtime supports every section. An unsupported change returns ``409``.
+        * Session settings updates must be enabled for your team. Changing ``permissions`` must also be
+          enabled for your team; if it isn't, a request whose manifest includes a ``permissions``
+          section returns ``403``\\ , even if the section matches the session's policy.
+        * Not every agent runtime supports every section, or every ``permissions`` change (see Changing
+          permissions above). An unsupported change returns ``409``\\ , and nothing is applied.
 
         :param session_id: The session UUID. Required.
         :type session_id: str
@@ -56973,74 +57395,84 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                       string, that holds only the sections to change. Can't be combined with
                       ``resume_on_topoff``. Requires session settings updates to be enabled for your
                       team ("" ``403`` otherwise).  Supported sections are ``tools``"" , ``env``"" ,
-                      ``secrets``"" , and ``egress``. Sections you omit are not changed. Any other
-                      top-level key returns ``400``"" , including ``model`` (set the model in ``env``
-                      instead; see **Changing the model**"" ) and ``permissions`` (can't be changed on
-                      an existing session).  Each section you include replaces that section in full:
-                      * ``tools``"" : the complete list of tools for the session. Only Action Gateway
-                      tools   ("" ``do.actions`` entries) can be added, removed, or changed. Custom MCP
-                      servers can't be   changed on an existing session: include the session's current
-                      custom MCP servers   exactly as they are. Adding, removing, or changing one
-                      returns ``422``. To remove all   Action Gateway tools from a session that has no
-                      custom MCP servers, send ``tools: []``.   ``tools: null`` returns ``400``. *
-                      ``env``"" : the complete set of environment variables, as name-value pairs. A
-                      variable you   leave out is removed. ``env: {}`` removes all variables; ``env:
-                      null`` returns ``400``. * ``secrets``"" : the complete set of secrets, as
-                      name-value pairs. A secret you leave out is   removed. For each secret, set the
-                      value to a string to add or rotate it, or to ``{}`` to   keep its current value.
-                      URL-bound and OAuth secrets also accept an object; see   **URL-bound secrets**
-                      and **Switching an OAuth connection**. A ``null`` value returns   ``400``. *
-                      ``egress``"" : the complete egress allowlist, as an object with ``allow_hosts``
-                      (hostnames) and   ``allow_ips`` (exact IPv4 or IPv6 addresses, not CIDR ranges).
-                      Only this object form is   supported in an update. It replaces the session's
-                      current allowlist: a host or IP address you leave out is removed. Leave out
-                      ``vpc_uuid``   and ``subnet_uuid`` to keep the session's current VPC, or set them
-                      to their current values.   A different value returns ``422``. See **Egress**.
-                      **URL-bound secrets.** The egress proxy sends a URL-bound secret only to requests
-                      that match its ``url``"" ; the agent never receives the value. An update to a
-                      URL-bound secret doesn't restart the agent. In ``secrets``"" , you can:   *
-                      Rotate the value: set the secret to the new value as a string. Its ``url`` and
-                      ``scheme``   don't change. * Move it to another URL or scheme: set it to
-                      ``{value, url, scheme}``. A new host or path,   or a change to ``scheme: raw``""
-                      , requires ``value`` ("" ``400`` otherwise). Sending the current   ``value``"" ,
-                      ``url``"" , and ``scheme`` again is not a change. * Add one: set it to ``{value,
-                      url}``. ``scheme`` is optional and defaults to ``bearer``   ("" ``Authorization:
-                      Bearer <value>``"" ); ``raw`` sends the value exactly as stored. * Bind an
-                      existing plain secret to a URL: set it to ``{url}``. The secret keeps its current
-                      value. * Keep one unchanged: set it to ``{}``. * Remove one: leave it out of
-                      ``secrets``.  ``url`` must use ``https://`` and name an exact hostname (no
-                      wildcards, IP addresses, or ``localhost``"" ), with an optional path and no port,
-                      query, or fragment. A session can have up to 16 URL-bound secrets, fewer if it
-                      has storage mounts, which count toward the same limit. A URL-bound secret can't
-                      be changed back to a plain secret. If the session has an egress allowlist, the
-                      secret's host is added to it. After a rollback or fork, a URL-bound secret that
-                      was moved off its agent config's URL can need its value again: the request
-                      returns ``409`` until you send ``value``.  **Egress.** ``egress`` changes the
-                      hosts and IP addresses the session can reach. The new allowlist takes effect on
-                      the session's next outbound connection, without an agent restart. Connections
-                      that are already open stay open, including connections to a host you removed.
-                      Only ``allow_hosts`` and ``allow_ips`` can change; the VPC is fixed when the
-                      session is created. A session created with unrestricted egress and no URL-bound
-                      secrets can't gain an allowlist: the update ends in ``FAILED`` with ``error`` set
-                      to ``requires_new_session``.  **Switching an OAuth connection.** An OAuth secret
-                      that was created with ``actor`` can move to another connection of the same
-                      provider: set it to ``{source: oauth, provider, actor}`` with the new
-                      connection's ``user_id`` as ``actor``. The connection must be active, and either
-                      yours or shared with your team ("" ``400`` otherwise), except when you switch
-                      back to the connection the agent config names. Switching OAuth connections must
-                      be enabled for your team ("" ``403`` otherwise). The agent restarts to read the
-                      new token. Sending the connection the secret already uses is not a change. Adding
-                      or removing an OAuth secret, changing its provider, or switching one that was
-                      created without ``actor`` returns ``422``. This example switches ``GITHUB_TOKEN``
-                      to the connection ``github2`` and assumes the session has no other secrets:  ..
-                      code-block:: yaml     secrets:      GITHUB_TOKEN:        source: oauth
-                      provider: github        actor: github2  **Changing the model.** You change a
-                      session's model through ``env``. The key to set depends on the model endpoint the
-                      session was created with:   * DigitalOcean Serverless Inference (created with
-                      ``HARNESS_INFERENCE_MODEL`` and without   ``OPENAI_BASE_URL``"" ,
-                      ``ANTHROPIC_BASE_URL``"" , or an ``ANTHROPIC_API_KEY`` secret): set
-                      ``HARNESS_INFERENCE_MODEL`` to a Serverless Inference model ID, or to
-                      ``router:<name>`` for   an inference router. Removing the key, or moving the
+                      ``secrets``"" , ``egress``"" , and ``permissions``. Sections you omit are not
+                      changed. Any other top-level key returns ``400``"" , including ``model`` (set the
+                      model in ``env`` instead; see **Changing the model**"" ).  Each section you
+                      include replaces that section in full:   * ``tools``"" : the complete list of
+                      tools for the session. Only Action Gateway tools   ("" ``do.actions`` entries)
+                      can be added, removed, or changed. Custom MCP servers can't be   changed on an
+                      existing session: include the session's current custom MCP servers   exactly as
+                      they are. Adding, removing, or changing one returns ``422``. To remove all
+                      Action Gateway tools from a session that has no custom MCP servers, send ``tools:
+                      []``.   ``tools: null`` returns ``400``. * ``env``"" : the complete set of
+                      environment variables, as name-value pairs. A variable you   leave out is
+                      removed. ``env: {}`` removes all variables; ``env: null`` returns ``400``. *
+                      ``secrets``"" : the complete set of secrets, as name-value pairs. A secret you
+                      leave out is   removed. For each secret, set the value to a string to add or
+                      rotate it, or to ``{}`` to   keep its current value. URL-bound and OAuth secrets
+                      also accept an object; see   **URL-bound secrets** and **Switching an OAuth
+                      connection**. A ``null`` value returns   ``400``. * ``egress``"" : the complete
+                      egress allowlist, as an object with ``allow_hosts`` (hostnames) and
+                      ``allow_ips`` (exact IPv4 or IPv6 addresses, not CIDR ranges). Only this object
+                      form is   supported in an update. It replaces the session's   current allowlist:
+                      a host or IP address you leave out is removed. Leave out ``vpc_uuid``   and
+                      ``subnet_uuid`` to keep the session's current VPC, or set them to their current
+                      values.   A different value returns ``422``. See **Egress**. * ``permissions``""
+                      : the complete permission policy, ``default`` and the full ``rules`` list,   with
+                      the same fields as at session creation. A rule you leave out is removed.
+                      ``permissions: {}`` removes the policy (the agent's built-in default applies);
+                      ``permissions: null`` returns ``400``. What can change depends on the session's
+                      agent, and   ``permissions.filesystem`` and ``permissions.network`` can't be
+                      changed. Removing a rule is   a change too: a rule of a type the agent can't
+                      change must be kept, so ``{}`` returns   ``409`` while the policy has one. If any
+                      change   can't be applied on the agent, the request returns ``409`` and nothing
+                      is applied; the   error message names the unsupported changes so you can remove
+                      them and send the update   again. Sessions created before live permissions
+                      updates were released return ``409``.  **URL-bound secrets.** The egress proxy
+                      sends a URL-bound secret only to requests that match its ``url``"" ; the agent
+                      never receives the value. An update to a URL-bound secret doesn't restart the
+                      agent. In ``secrets``"" , you can:   * Rotate the value: set the secret to the
+                      new value as a string. Its ``url`` and ``scheme``   don't change. * Move it to
+                      another URL or scheme: set it to ``{value, url, scheme}``. A new host or path,
+                      or a change to ``scheme: raw``"" , requires ``value`` ("" ``400`` otherwise).
+                      Sending the current   ``value``"" , ``url``"" , and ``scheme`` again is not a
+                      change. * Add one: set it to ``{value, url}``. ``scheme`` is optional and
+                      defaults to ``bearer``   ("" ``Authorization: Bearer <value>``"" ); ``raw`` sends
+                      the value exactly as stored. * Bind an existing plain secret to a URL: set it to
+                      ``{url}``. The secret keeps its current   value. * Keep one unchanged: set it to
+                      ``{}``. * Remove one: leave it out of ``secrets``.  ``url`` must use ``https://``
+                      and name an exact hostname (no wildcards, IP addresses, or ``localhost``"" ),
+                      with an optional path and no port, query, or fragment. A session can have up to
+                      16 URL-bound secrets, fewer if it has storage mounts, which count toward the same
+                      limit. A URL-bound secret can't be changed back to a plain secret. If the session
+                      has an egress allowlist, the secret's host is added to it. After a rollback or
+                      fork, a URL-bound secret that was moved off its agent config's URL can need its
+                      value again: the request returns ``409`` until you send ``value``.  **Egress.**
+                      ``egress`` changes the hosts and IP addresses the session can reach. The new
+                      allowlist takes effect on the session's next outbound connection, without an
+                      agent restart. Connections that are already open stay open, including connections
+                      to a host you removed. Only ``allow_hosts`` and ``allow_ips`` can change; the VPC
+                      is fixed when the session is created. A session created with unrestricted egress
+                      and no URL-bound secrets can't gain an allowlist: the update ends in ``FAILED``
+                      with ``error`` set to ``requires_new_session``.  **Switching an OAuth
+                      connection.** An OAuth secret that was created with ``actor`` can move to another
+                      connection of the same provider: set it to ``{source: oauth, provider, actor}``
+                      with the new connection's ``user_id`` as ``actor``. The connection must be
+                      active, and either yours or shared with your team ("" ``400`` otherwise), except
+                      when you switch back to the connection the agent config names. Switching OAuth
+                      connections must be enabled for your team ("" ``403`` otherwise). The agent
+                      restarts to read the new token. Sending the connection the secret already uses is
+                      not a change. Adding or removing an OAuth secret, changing its provider, or
+                      switching one that was created without ``actor`` returns ``422``. This example
+                      switches ``GITHUB_TOKEN`` to the connection ``github2`` and assumes the session
+                      has no other secrets:  .. code-block:: yaml     secrets:      GITHUB_TOKEN:
+                      source: oauth        provider: github        actor: github2  **Changing the
+                      model.** You change a session's model through ``env``. The key to set depends on
+                      the model endpoint the session was created with:   * DigitalOcean Serverless
+                      Inference (created with ``HARNESS_INFERENCE_MODEL`` and without
+                      ``OPENAI_BASE_URL``"" , ``ANTHROPIC_BASE_URL``"" , or an ``ANTHROPIC_API_KEY``
+                      secret): set   ``HARNESS_INFERENCE_MODEL`` to a Serverless Inference model ID, or
+                      to ``router:<name>`` for   an inference router. Removing the key, or moving the
                       session to its own endpoint,   returns ``422``. Adding the key to a session that
                       was created without it also returns   ``422``. * Your own OpenAI-compatible
                       endpoint (created with ``OPENAI_BASE_URL``"" ): set ``MODEL``. The   session
@@ -57143,6 +57575,34 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "str"  # Optional. Names of the entries
                                       added, removed, or changed in one manifest section.
                                 ]
+                            },
+                            "permissions": {
+                                "default": "str",  # Optional. The new default action
+                                  ("" ``allow``"" , ``ask``"" , or ``deny``"" ), when it changed. Empty
+                                  when the default was removed.
+                                "rules": {
+                                    "added": [
+                                        "str"  # Optional. Names of the rules
+                                          added, removed, or changed. ``changed`` covers a rule kept
+                                          under the same tool and match with another action, or at
+                                          another position. The last matching rule wins, so the order
+                                          is part of the policy.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Names of the rules
+                                          added, removed, or changed. ``changed`` covers a rule kept
+                                          under the same tool and match with another action, or at
+                                          another position. The last matching rule wins, so the order
+                                          is part of the policy.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Names of the rules
+                                          added, removed, or changed. ``changed`` covers a rule kept
+                                          under the same tool and match with another action, or at
+                                          another position. The last matching rule wins, so the order
+                                          is part of the policy.
+                                    ]
+                                }
                             },
                             "secrets": {
                                 "added": [
@@ -57299,6 +57759,34 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                         "str"  # Optional. Names of the
                                           entries added, removed, or changed in one manifest section.
                                     ]
+                                },
+                                "permissions": {
+                                    "default": "str",  # Optional. The new
+                                      default action ("" ``allow``"" , ``ask``"" , or ``deny``"" ),
+                                      when it changed. Empty when the default was removed.
+                                    "rules": {
+                                        "added": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ]
+                                    }
                                 },
                                 "secrets": {
                                     "added": [
@@ -57447,7 +57935,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
            * - ``tools``
              - The session's Action Gateway tools (\\ ``do.actions`` entries). Custom MCP servers can't
         be changed.
-             - No
+             - No (LangGraph: yes)
            * - ``env``
              - Environment variables (name and value).
              - Yes
@@ -57470,6 +57958,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
              - The hosts and IP addresses the session can reach (\\ ``allow_hosts`` and ``allow_ips``\\
         ).
              - No
+           * - ``permissions``
+             - The permission policy: the default action and the full rules list. What can change
+        depends on the agent; see below.
+             - No (LangGraph: yes for ``do.actions`` rules or ``default``\\ )
 
 
         Sections you omit are not changed. Each section you include replaces that section in full; see
@@ -57508,9 +58000,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
 
         The following can't be changed on an existing session: custom MCP servers (\\ ``422``\\ ), the
         egress
-        VPC (\\ ``vpc_uuid`` and ``subnet_uuid``\\ , ``422``\\ ), platform-managed model keys, and
-        ``permissions``
-        (\\ ``400``\\ ). To use a different custom MCP server or VPC, create a new session.
+        VPC (\\ ``vpc_uuid`` and ``subnet_uuid``\\ , ``422``\\ ), and platform-managed model keys. To
+        use a different
+        custom MCP server or VPC, create a new session.
 
         Switching an OAuth connection
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -57576,6 +58068,75 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
 
         See ``manifest_yaml`` for the format of each change.
 
+        Changing permissions
+        ^^^^^^^^^^^^^^^^^^^^
+
+        ``permissions`` replaces the whole policy: ``default`` and the full ``rules`` list. A rule you
+        leave
+        out is removed. Use the same fields as when you create the session. ``permissions: {}`` removes
+        the policy, so the agent goes back to its built-in default, as long as every rule it removes is
+        one the agent can change (see below). ``permissions: null`` returns ``400``.
+
+        Rules are checked in the order you list them, and the last rule that matches wins. The order is
+        part of the policy, so moving a rule counts as a change and is applied like any other.
+
+        The agent is not restarted; the new rules apply from its next tool call once the update is
+        ``APPLIED``. On ``langgraph``\\ , a change to ``do.actions/<tool>`` rules or ``default``
+        restarts the
+        agent, as a ``tools`` change does.
+
+        Only sessions created after live permissions updates were released can change ``permissions``.
+        An older session returns ``409``\\ ; create a new session instead.
+
+        What can change depends on the session's agent:
+
+
+        * ``claude-code``\\ , ``opencode``\\ : ``default`` and ``bash``\\ , ``file.read``\\ ,
+        ``file.write``\\ , ``mcp``\\ , and
+          ``do.actions/<tool>`` rules, with ``allow``\\ , ``ask``\\ , or ``deny``.
+        * ``openhands``\\ : ``default`` and ``bash``\\ , ``file.read``\\ , ``file.write``\\ , and
+        ``web.fetch`` rules. Not
+          ``mcp`` or ``do.actions/<tool>`` rules. While the session uses ``do.actions`` tools,
+        ``default``
+          can't change: the change would move the session to a new Action Gateway endpoint, which
+          ``openhands`` can't pick up while running.
+        * ``codex``\\ : ``default`` and ``bash`` and ``do.actions/<tool>`` rules, with ``allow``\\ ,
+        ``ask``\\ , or ``deny``.
+          Not ``file.read``\\ , ``file.write``\\ , ``web.fetch``\\ , or ``mcp`` rules.
+        * ``hermes``\\ , ``langgraph``\\ : ``do.actions/<tool>`` rules with ``allow`` or ``deny``\\ ,
+        and ``default`` set to
+          ``allow`` or ``deny``. Not ``ask``\\ , and no other rule types.
+        * ``crewai``\\ , ``cursor``\\ , and any other agent: nothing.
+
+        ``permissions.filesystem`` and ``permissions.network`` can't be changed on any agent. If your
+        ``permissions`` section leaves them out, the session keeps the ones it has; if it sets them to
+        something different, the request returns ``409``.
+
+        Only the differences from the current policy are checked: rules you add, remove, change, or
+        move, and a changed ``default``. Rules you keep as they are never cause a refusal. A removed
+        rule
+        is checked like an added one, so a rule of a type the agent can't change can't be removed
+        either: every ``permissions`` section you send has to keep it, and ``permissions: {}`` returns
+        ``409`` while the policy has one. For example, ``{}`` returns ``409`` on a ``codex`` session
+        with a
+        ``file.read`` rule, or on a ``hermes`` session with a ``bash`` rule.
+
+        If any change can't be applied on the session's agent, the request returns ``409`` and nothing
+        is
+        applied, including changes to other sections. The error message names the unsupported changes
+        and what the agent can change. Remove them and send the update again. For example:
+
+        .. code-block::
+
+           permissions can't change live on hermes for: bash rule "rm -rf *" (only do.actions
+        allow/deny rules and an allow or deny default action can change on this agent). Remove these
+        changes and send the update again (update_unsupported)
+
+        If the agent itself refuses a change after the request is accepted, the update ends ``FAILED``
+        with ``session.update.reverted`` set to ``true``\\ , and ``session.update.detail`` says to
+        remove the
+        permission changes the agent can't take and send the update again.
+
         Tracking an update
         ^^^^^^^^^^^^^^^^^^
 
@@ -57596,10 +58157,12 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
            * ``FAILED``\\ : the update did not take effect. ``session.update.detail`` explains why, and
              ``session.update.reverted`` is ``true`` if the previous settings were restored.
 
-        Tool, URL-bound secret, and ``egress`` updates usually finish within a few seconds. Updates to
-        ``env`` (including the model) or plain secrets, and OAuth connection switches, restart the
-        agent
-        and can take up to about two minutes.
+        Tool, URL-bound secret, ``egress``\\ , and ``permissions`` updates usually finish within a few
+        seconds, except on ``langgraph``\\ , where a ``tools`` update or a ``permissions`` change to
+        ``default``
+        or ``do.actions/<tool>`` rules restarts the agent. Updates to ``env`` (including the model) or
+        plain secrets, and OAuth connection switches, restart the agent and can take up to about two
+        minutes.
 
         If the request matches the session's current settings, it returns ``200`` with ``outcome`` set
         to
@@ -57630,8 +58193,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         balance,
           and a destroyed or failed session. A locked session returns ``423``.
         * The session must be idle: no agent turn running and no approval pending (\\ ``409``\\ ).
-        * Session settings updates must be enabled for your team.
-        * Not every agent runtime supports every section. An unsupported change returns ``409``.
+        * Session settings updates must be enabled for your team. Changing ``permissions`` must also be
+          enabled for your team; if it isn't, a request whose manifest includes a ``permissions``
+          section returns ``403``\\ , even if the section matches the session's policy.
+        * Not every agent runtime supports every section, or every ``permissions`` change (see Changing
+          permissions above). An unsupported change returns ``409``\\ , and nothing is applied.
 
         :param session_id: The session UUID. Required.
         :type session_id: str
@@ -57701,6 +58267,34 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "str"  # Optional. Names of the entries
                                       added, removed, or changed in one manifest section.
                                 ]
+                            },
+                            "permissions": {
+                                "default": "str",  # Optional. The new default action
+                                  ("" ``allow``"" , ``ask``"" , or ``deny``"" ), when it changed. Empty
+                                  when the default was removed.
+                                "rules": {
+                                    "added": [
+                                        "str"  # Optional. Names of the rules
+                                          added, removed, or changed. ``changed`` covers a rule kept
+                                          under the same tool and match with another action, or at
+                                          another position. The last matching rule wins, so the order
+                                          is part of the policy.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Names of the rules
+                                          added, removed, or changed. ``changed`` covers a rule kept
+                                          under the same tool and match with another action, or at
+                                          another position. The last matching rule wins, so the order
+                                          is part of the policy.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Names of the rules
+                                          added, removed, or changed. ``changed`` covers a rule kept
+                                          under the same tool and match with another action, or at
+                                          another position. The last matching rule wins, so the order
+                                          is part of the policy.
+                                    ]
+                                }
                             },
                             "secrets": {
                                 "added": [
@@ -57857,6 +58451,34 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                         "str"  # Optional. Names of the
                                           entries added, removed, or changed in one manifest section.
                                     ]
+                                },
+                                "permissions": {
+                                    "default": "str",  # Optional. The new
+                                      default action ("" ``allow``"" , ``ask``"" , or ``deny``"" ),
+                                      when it changed. Empty when the default was removed.
+                                    "rules": {
+                                        "added": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ]
+                                    }
                                 },
                                 "secrets": {
                                     "added": [
@@ -58000,7 +58622,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
            * - ``tools``
              - The session's Action Gateway tools (\\ ``do.actions`` entries). Custom MCP servers can't
         be changed.
-             - No
+             - No (LangGraph: yes)
            * - ``env``
              - Environment variables (name and value).
              - Yes
@@ -58023,6 +58645,10 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
              - The hosts and IP addresses the session can reach (\\ ``allow_hosts`` and ``allow_ips``\\
         ).
              - No
+           * - ``permissions``
+             - The permission policy: the default action and the full rules list. What can change
+        depends on the agent; see below.
+             - No (LangGraph: yes for ``do.actions`` rules or ``default``\\ )
 
 
         Sections you omit are not changed. Each section you include replaces that section in full; see
@@ -58061,9 +58687,9 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
 
         The following can't be changed on an existing session: custom MCP servers (\\ ``422``\\ ), the
         egress
-        VPC (\\ ``vpc_uuid`` and ``subnet_uuid``\\ , ``422``\\ ), platform-managed model keys, and
-        ``permissions``
-        (\\ ``400``\\ ). To use a different custom MCP server or VPC, create a new session.
+        VPC (\\ ``vpc_uuid`` and ``subnet_uuid``\\ , ``422``\\ ), and platform-managed model keys. To
+        use a different
+        custom MCP server or VPC, create a new session.
 
         Switching an OAuth connection
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -58129,6 +58755,75 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
 
         See ``manifest_yaml`` for the format of each change.
 
+        Changing permissions
+        ^^^^^^^^^^^^^^^^^^^^
+
+        ``permissions`` replaces the whole policy: ``default`` and the full ``rules`` list. A rule you
+        leave
+        out is removed. Use the same fields as when you create the session. ``permissions: {}`` removes
+        the policy, so the agent goes back to its built-in default, as long as every rule it removes is
+        one the agent can change (see below). ``permissions: null`` returns ``400``.
+
+        Rules are checked in the order you list them, and the last rule that matches wins. The order is
+        part of the policy, so moving a rule counts as a change and is applied like any other.
+
+        The agent is not restarted; the new rules apply from its next tool call once the update is
+        ``APPLIED``. On ``langgraph``\\ , a change to ``do.actions/<tool>`` rules or ``default``
+        restarts the
+        agent, as a ``tools`` change does.
+
+        Only sessions created after live permissions updates were released can change ``permissions``.
+        An older session returns ``409``\\ ; create a new session instead.
+
+        What can change depends on the session's agent:
+
+
+        * ``claude-code``\\ , ``opencode``\\ : ``default`` and ``bash``\\ , ``file.read``\\ ,
+        ``file.write``\\ , ``mcp``\\ , and
+          ``do.actions/<tool>`` rules, with ``allow``\\ , ``ask``\\ , or ``deny``.
+        * ``openhands``\\ : ``default`` and ``bash``\\ , ``file.read``\\ , ``file.write``\\ , and
+        ``web.fetch`` rules. Not
+          ``mcp`` or ``do.actions/<tool>`` rules. While the session uses ``do.actions`` tools,
+        ``default``
+          can't change: the change would move the session to a new Action Gateway endpoint, which
+          ``openhands`` can't pick up while running.
+        * ``codex``\\ : ``default`` and ``bash`` and ``do.actions/<tool>`` rules, with ``allow``\\ ,
+        ``ask``\\ , or ``deny``.
+          Not ``file.read``\\ , ``file.write``\\ , ``web.fetch``\\ , or ``mcp`` rules.
+        * ``hermes``\\ , ``langgraph``\\ : ``do.actions/<tool>`` rules with ``allow`` or ``deny``\\ ,
+        and ``default`` set to
+          ``allow`` or ``deny``. Not ``ask``\\ , and no other rule types.
+        * ``crewai``\\ , ``cursor``\\ , and any other agent: nothing.
+
+        ``permissions.filesystem`` and ``permissions.network`` can't be changed on any agent. If your
+        ``permissions`` section leaves them out, the session keeps the ones it has; if it sets them to
+        something different, the request returns ``409``.
+
+        Only the differences from the current policy are checked: rules you add, remove, change, or
+        move, and a changed ``default``. Rules you keep as they are never cause a refusal. A removed
+        rule
+        is checked like an added one, so a rule of a type the agent can't change can't be removed
+        either: every ``permissions`` section you send has to keep it, and ``permissions: {}`` returns
+        ``409`` while the policy has one. For example, ``{}`` returns ``409`` on a ``codex`` session
+        with a
+        ``file.read`` rule, or on a ``hermes`` session with a ``bash`` rule.
+
+        If any change can't be applied on the session's agent, the request returns ``409`` and nothing
+        is
+        applied, including changes to other sections. The error message names the unsupported changes
+        and what the agent can change. Remove them and send the update again. For example:
+
+        .. code-block::
+
+           permissions can't change live on hermes for: bash rule "rm -rf *" (only do.actions
+        allow/deny rules and an allow or deny default action can change on this agent). Remove these
+        changes and send the update again (update_unsupported)
+
+        If the agent itself refuses a change after the request is accepted, the update ends ``FAILED``
+        with ``session.update.reverted`` set to ``true``\\ , and ``session.update.detail`` says to
+        remove the
+        permission changes the agent can't take and send the update again.
+
         Tracking an update
         ^^^^^^^^^^^^^^^^^^
 
@@ -58149,10 +58844,12 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
            * ``FAILED``\\ : the update did not take effect. ``session.update.detail`` explains why, and
              ``session.update.reverted`` is ``true`` if the previous settings were restored.
 
-        Tool, URL-bound secret, and ``egress`` updates usually finish within a few seconds. Updates to
-        ``env`` (including the model) or plain secrets, and OAuth connection switches, restart the
-        agent
-        and can take up to about two minutes.
+        Tool, URL-bound secret, ``egress``\\ , and ``permissions`` updates usually finish within a few
+        seconds, except on ``langgraph``\\ , where a ``tools`` update or a ``permissions`` change to
+        ``default``
+        or ``do.actions/<tool>`` rules restarts the agent. Updates to ``env`` (including the model) or
+        plain secrets, and OAuth connection switches, restart the agent and can take up to about two
+        minutes.
 
         If the request matches the session's current settings, it returns ``200`` with ``outcome`` set
         to
@@ -58183,8 +58880,11 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         balance,
           and a destroyed or failed session. A locked session returns ``423``.
         * The session must be idle: no agent turn running and no approval pending (\\ ``409``\\ ).
-        * Session settings updates must be enabled for your team.
-        * Not every agent runtime supports every section. An unsupported change returns ``409``.
+        * Session settings updates must be enabled for your team. Changing ``permissions`` must also be
+          enabled for your team; if it isn't, a request whose manifest includes a ``permissions``
+          section returns ``403``\\ , even if the section matches the session's policy.
+        * Not every agent runtime supports every section, or every ``permissions`` change (see Changing
+          permissions above). An unsupported change returns ``409``\\ , and nothing is applied.
 
         :param session_id: The session UUID. Required.
         :type session_id: str
@@ -58204,74 +58904,84 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                       string, that holds only the sections to change. Can't be combined with
                       ``resume_on_topoff``. Requires session settings updates to be enabled for your
                       team ("" ``403`` otherwise).  Supported sections are ``tools``"" , ``env``"" ,
-                      ``secrets``"" , and ``egress``. Sections you omit are not changed. Any other
-                      top-level key returns ``400``"" , including ``model`` (set the model in ``env``
-                      instead; see **Changing the model**"" ) and ``permissions`` (can't be changed on
-                      an existing session).  Each section you include replaces that section in full:
-                      * ``tools``"" : the complete list of tools for the session. Only Action Gateway
-                      tools   ("" ``do.actions`` entries) can be added, removed, or changed. Custom MCP
-                      servers can't be   changed on an existing session: include the session's current
-                      custom MCP servers   exactly as they are. Adding, removing, or changing one
-                      returns ``422``. To remove all   Action Gateway tools from a session that has no
-                      custom MCP servers, send ``tools: []``.   ``tools: null`` returns ``400``. *
-                      ``env``"" : the complete set of environment variables, as name-value pairs. A
-                      variable you   leave out is removed. ``env: {}`` removes all variables; ``env:
-                      null`` returns ``400``. * ``secrets``"" : the complete set of secrets, as
-                      name-value pairs. A secret you leave out is   removed. For each secret, set the
-                      value to a string to add or rotate it, or to ``{}`` to   keep its current value.
-                      URL-bound and OAuth secrets also accept an object; see   **URL-bound secrets**
-                      and **Switching an OAuth connection**. A ``null`` value returns   ``400``. *
-                      ``egress``"" : the complete egress allowlist, as an object with ``allow_hosts``
-                      (hostnames) and   ``allow_ips`` (exact IPv4 or IPv6 addresses, not CIDR ranges).
-                      Only this object form is   supported in an update. It replaces the session's
-                      current allowlist: a host or IP address you leave out is removed. Leave out
-                      ``vpc_uuid``   and ``subnet_uuid`` to keep the session's current VPC, or set them
-                      to their current values.   A different value returns ``422``. See **Egress**.
-                      **URL-bound secrets.** The egress proxy sends a URL-bound secret only to requests
-                      that match its ``url``"" ; the agent never receives the value. An update to a
-                      URL-bound secret doesn't restart the agent. In ``secrets``"" , you can:   *
-                      Rotate the value: set the secret to the new value as a string. Its ``url`` and
-                      ``scheme``   don't change. * Move it to another URL or scheme: set it to
-                      ``{value, url, scheme}``. A new host or path,   or a change to ``scheme: raw``""
-                      , requires ``value`` ("" ``400`` otherwise). Sending the current   ``value``"" ,
-                      ``url``"" , and ``scheme`` again is not a change. * Add one: set it to ``{value,
-                      url}``. ``scheme`` is optional and defaults to ``bearer``   ("" ``Authorization:
-                      Bearer <value>``"" ); ``raw`` sends the value exactly as stored. * Bind an
-                      existing plain secret to a URL: set it to ``{url}``. The secret keeps its current
-                      value. * Keep one unchanged: set it to ``{}``. * Remove one: leave it out of
-                      ``secrets``.  ``url`` must use ``https://`` and name an exact hostname (no
-                      wildcards, IP addresses, or ``localhost``"" ), with an optional path and no port,
-                      query, or fragment. A session can have up to 16 URL-bound secrets, fewer if it
-                      has storage mounts, which count toward the same limit. A URL-bound secret can't
-                      be changed back to a plain secret. If the session has an egress allowlist, the
-                      secret's host is added to it. After a rollback or fork, a URL-bound secret that
-                      was moved off its agent config's URL can need its value again: the request
-                      returns ``409`` until you send ``value``.  **Egress.** ``egress`` changes the
-                      hosts and IP addresses the session can reach. The new allowlist takes effect on
-                      the session's next outbound connection, without an agent restart. Connections
-                      that are already open stay open, including connections to a host you removed.
-                      Only ``allow_hosts`` and ``allow_ips`` can change; the VPC is fixed when the
-                      session is created. A session created with unrestricted egress and no URL-bound
-                      secrets can't gain an allowlist: the update ends in ``FAILED`` with ``error`` set
-                      to ``requires_new_session``.  **Switching an OAuth connection.** An OAuth secret
-                      that was created with ``actor`` can move to another connection of the same
-                      provider: set it to ``{source: oauth, provider, actor}`` with the new
-                      connection's ``user_id`` as ``actor``. The connection must be active, and either
-                      yours or shared with your team ("" ``400`` otherwise), except when you switch
-                      back to the connection the agent config names. Switching OAuth connections must
-                      be enabled for your team ("" ``403`` otherwise). The agent restarts to read the
-                      new token. Sending the connection the secret already uses is not a change. Adding
-                      or removing an OAuth secret, changing its provider, or switching one that was
-                      created without ``actor`` returns ``422``. This example switches ``GITHUB_TOKEN``
-                      to the connection ``github2`` and assumes the session has no other secrets:  ..
-                      code-block:: yaml     secrets:      GITHUB_TOKEN:        source: oauth
-                      provider: github        actor: github2  **Changing the model.** You change a
-                      session's model through ``env``. The key to set depends on the model endpoint the
-                      session was created with:   * DigitalOcean Serverless Inference (created with
-                      ``HARNESS_INFERENCE_MODEL`` and without   ``OPENAI_BASE_URL``"" ,
-                      ``ANTHROPIC_BASE_URL``"" , or an ``ANTHROPIC_API_KEY`` secret): set
-                      ``HARNESS_INFERENCE_MODEL`` to a Serverless Inference model ID, or to
-                      ``router:<name>`` for   an inference router. Removing the key, or moving the
+                      ``secrets``"" , ``egress``"" , and ``permissions``. Sections you omit are not
+                      changed. Any other top-level key returns ``400``"" , including ``model`` (set the
+                      model in ``env`` instead; see **Changing the model**"" ).  Each section you
+                      include replaces that section in full:   * ``tools``"" : the complete list of
+                      tools for the session. Only Action Gateway tools   ("" ``do.actions`` entries)
+                      can be added, removed, or changed. Custom MCP servers can't be   changed on an
+                      existing session: include the session's current custom MCP servers   exactly as
+                      they are. Adding, removing, or changing one returns ``422``. To remove all
+                      Action Gateway tools from a session that has no custom MCP servers, send ``tools:
+                      []``.   ``tools: null`` returns ``400``. * ``env``"" : the complete set of
+                      environment variables, as name-value pairs. A variable you   leave out is
+                      removed. ``env: {}`` removes all variables; ``env: null`` returns ``400``. *
+                      ``secrets``"" : the complete set of secrets, as name-value pairs. A secret you
+                      leave out is   removed. For each secret, set the value to a string to add or
+                      rotate it, or to ``{}`` to   keep its current value. URL-bound and OAuth secrets
+                      also accept an object; see   **URL-bound secrets** and **Switching an OAuth
+                      connection**. A ``null`` value returns   ``400``. * ``egress``"" : the complete
+                      egress allowlist, as an object with ``allow_hosts`` (hostnames) and
+                      ``allow_ips`` (exact IPv4 or IPv6 addresses, not CIDR ranges). Only this object
+                      form is   supported in an update. It replaces the session's   current allowlist:
+                      a host or IP address you leave out is removed. Leave out ``vpc_uuid``   and
+                      ``subnet_uuid`` to keep the session's current VPC, or set them to their current
+                      values.   A different value returns ``422``. See **Egress**. * ``permissions``""
+                      : the complete permission policy, ``default`` and the full ``rules`` list,   with
+                      the same fields as at session creation. A rule you leave out is removed.
+                      ``permissions: {}`` removes the policy (the agent's built-in default applies);
+                      ``permissions: null`` returns ``400``. What can change depends on the session's
+                      agent, and   ``permissions.filesystem`` and ``permissions.network`` can't be
+                      changed. Removing a rule is   a change too: a rule of a type the agent can't
+                      change must be kept, so ``{}`` returns   ``409`` while the policy has one. If any
+                      change   can't be applied on the agent, the request returns ``409`` and nothing
+                      is applied; the   error message names the unsupported changes so you can remove
+                      them and send the update   again. Sessions created before live permissions
+                      updates were released return ``409``.  **URL-bound secrets.** The egress proxy
+                      sends a URL-bound secret only to requests that match its ``url``"" ; the agent
+                      never receives the value. An update to a URL-bound secret doesn't restart the
+                      agent. In ``secrets``"" , you can:   * Rotate the value: set the secret to the
+                      new value as a string. Its ``url`` and ``scheme``   don't change. * Move it to
+                      another URL or scheme: set it to ``{value, url, scheme}``. A new host or path,
+                      or a change to ``scheme: raw``"" , requires ``value`` ("" ``400`` otherwise).
+                      Sending the current   ``value``"" , ``url``"" , and ``scheme`` again is not a
+                      change. * Add one: set it to ``{value, url}``. ``scheme`` is optional and
+                      defaults to ``bearer``   ("" ``Authorization: Bearer <value>``"" ); ``raw`` sends
+                      the value exactly as stored. * Bind an existing plain secret to a URL: set it to
+                      ``{url}``. The secret keeps its current   value. * Keep one unchanged: set it to
+                      ``{}``. * Remove one: leave it out of ``secrets``.  ``url`` must use ``https://``
+                      and name an exact hostname (no wildcards, IP addresses, or ``localhost``"" ),
+                      with an optional path and no port, query, or fragment. A session can have up to
+                      16 URL-bound secrets, fewer if it has storage mounts, which count toward the same
+                      limit. A URL-bound secret can't be changed back to a plain secret. If the session
+                      has an egress allowlist, the secret's host is added to it. After a rollback or
+                      fork, a URL-bound secret that was moved off its agent config's URL can need its
+                      value again: the request returns ``409`` until you send ``value``.  **Egress.**
+                      ``egress`` changes the hosts and IP addresses the session can reach. The new
+                      allowlist takes effect on the session's next outbound connection, without an
+                      agent restart. Connections that are already open stay open, including connections
+                      to a host you removed. Only ``allow_hosts`` and ``allow_ips`` can change; the VPC
+                      is fixed when the session is created. A session created with unrestricted egress
+                      and no URL-bound secrets can't gain an allowlist: the update ends in ``FAILED``
+                      with ``error`` set to ``requires_new_session``.  **Switching an OAuth
+                      connection.** An OAuth secret that was created with ``actor`` can move to another
+                      connection of the same provider: set it to ``{source: oauth, provider, actor}``
+                      with the new connection's ``user_id`` as ``actor``. The connection must be
+                      active, and either yours or shared with your team ("" ``400`` otherwise), except
+                      when you switch back to the connection the agent config names. Switching OAuth
+                      connections must be enabled for your team ("" ``403`` otherwise). The agent
+                      restarts to read the new token. Sending the connection the secret already uses is
+                      not a change. Adding or removing an OAuth secret, changing its provider, or
+                      switching one that was created without ``actor`` returns ``422``. This example
+                      switches ``GITHUB_TOKEN`` to the connection ``github2`` and assumes the session
+                      has no other secrets:  .. code-block:: yaml     secrets:      GITHUB_TOKEN:
+                      source: oauth        provider: github        actor: github2  **Changing the
+                      model.** You change a session's model through ``env``. The key to set depends on
+                      the model endpoint the session was created with:   * DigitalOcean Serverless
+                      Inference (created with ``HARNESS_INFERENCE_MODEL`` and without
+                      ``OPENAI_BASE_URL``"" , ``ANTHROPIC_BASE_URL``"" , or an ``ANTHROPIC_API_KEY``
+                      secret): set   ``HARNESS_INFERENCE_MODEL`` to a Serverless Inference model ID, or
+                      to ``router:<name>`` for   an inference router. Removing the key, or moving the
                       session to its own endpoint,   returns ``422``. Adding the key to a session that
                       was created without it also returns   ``422``. * Your own OpenAI-compatible
                       endpoint (created with ``OPENAI_BASE_URL``"" ): set ``MODEL``. The   session
@@ -58374,6 +59084,34 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                     "str"  # Optional. Names of the entries
                                       added, removed, or changed in one manifest section.
                                 ]
+                            },
+                            "permissions": {
+                                "default": "str",  # Optional. The new default action
+                                  ("" ``allow``"" , ``ask``"" , or ``deny``"" ), when it changed. Empty
+                                  when the default was removed.
+                                "rules": {
+                                    "added": [
+                                        "str"  # Optional. Names of the rules
+                                          added, removed, or changed. ``changed`` covers a rule kept
+                                          under the same tool and match with another action, or at
+                                          another position. The last matching rule wins, so the order
+                                          is part of the policy.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Names of the rules
+                                          added, removed, or changed. ``changed`` covers a rule kept
+                                          under the same tool and match with another action, or at
+                                          another position. The last matching rule wins, so the order
+                                          is part of the policy.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Names of the rules
+                                          added, removed, or changed. ``changed`` covers a rule kept
+                                          under the same tool and match with another action, or at
+                                          another position. The last matching rule wins, so the order
+                                          is part of the policy.
+                                    ]
+                                }
                             },
                             "secrets": {
                                 "added": [
@@ -58530,6 +59268,34 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                         "str"  # Optional. Names of the
                                           entries added, removed, or changed in one manifest section.
                                     ]
+                                },
+                                "permissions": {
+                                    "default": "str",  # Optional. The new
+                                      default action ("" ``allow``"" , ``ask``"" , or ``deny``"" ),
+                                      when it changed. Empty when the default was removed.
+                                    "rules": {
+                                        "added": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ]
+                                    }
                                 },
                                 "secrets": {
                                     "added": [
@@ -60027,6 +60793,34 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                       added, removed, or changed in one manifest section.
                                 ]
                             },
+                            "permissions": {
+                                "default": "str",  # Optional. The new default action
+                                  ("" ``allow``"" , ``ask``"" , or ``deny``"" ), when it changed. Empty
+                                  when the default was removed.
+                                "rules": {
+                                    "added": [
+                                        "str"  # Optional. Names of the rules
+                                          added, removed, or changed. ``changed`` covers a rule kept
+                                          under the same tool and match with another action, or at
+                                          another position. The last matching rule wins, so the order
+                                          is part of the policy.
+                                    ],
+                                    "changed": [
+                                        "str"  # Optional. Names of the rules
+                                          added, removed, or changed. ``changed`` covers a rule kept
+                                          under the same tool and match with another action, or at
+                                          another position. The last matching rule wins, so the order
+                                          is part of the policy.
+                                    ],
+                                    "removed": [
+                                        "str"  # Optional. Names of the rules
+                                          added, removed, or changed. ``changed`` covers a rule kept
+                                          under the same tool and match with another action, or at
+                                          another position. The last matching rule wins, so the order
+                                          is part of the policy.
+                                    ]
+                                }
+                            },
                             "secrets": {
                                 "added": [
                                     "str"  # Optional. Secret names, never
@@ -60182,6 +60976,34 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                         "str"  # Optional. Names of the
                                           entries added, removed, or changed in one manifest section.
                                     ]
+                                },
+                                "permissions": {
+                                    "default": "str",  # Optional. The new
+                                      default action ("" ``allow``"" , ``ask``"" , or ``deny``"" ),
+                                      when it changed. Empty when the default was removed.
+                                    "rules": {
+                                        "added": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ]
+                                    }
                                 },
                                 "secrets": {
                                     "added": [
@@ -60543,6 +61365,34 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                           entries added, removed, or changed in one manifest section.
                                     ]
                                 },
+                                "permissions": {
+                                    "default": "str",  # Optional. The new
+                                      default action ("" ``allow``"" , ``ask``"" , or ``deny``"" ),
+                                      when it changed. Empty when the default was removed.
+                                    "rules": {
+                                        "added": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ]
+                                    }
+                                },
                                 "secrets": {
                                     "added": [
                                         "str"  # Optional. Secret names,
@@ -60709,6 +61559,38 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                               the entries added, removed, or changed in one manifest
                                               section.
                                         ]
+                                    },
+                                    "permissions": {
+                                        "default": "str",  # Optional. The
+                                          new default action ("" ``allow``"" , ``ask``"" , or
+                                          ``deny``"" ), when it changed. Empty when the default was
+                                          removed.
+                                        "rules": {
+                                            "added": [
+                                                "str"  # Optional.
+                                                  Names of the rules added, removed, or changed.
+                                                  ``changed`` covers a rule kept under the same tool
+                                                  and match with another action, or at another
+                                                  position. The last matching rule wins, so the order
+                                                  is part of the policy.
+                                            ],
+                                            "changed": [
+                                                "str"  # Optional.
+                                                  Names of the rules added, removed, or changed.
+                                                  ``changed`` covers a rule kept under the same tool
+                                                  and match with another action, or at another
+                                                  position. The last matching rule wins, so the order
+                                                  is part of the policy.
+                                            ],
+                                            "removed": [
+                                                "str"  # Optional.
+                                                  Names of the rules added, removed, or changed.
+                                                  ``changed`` covers a rule kept under the same tool
+                                                  and match with another action, or at another
+                                                  position. The last matching rule wins, so the order
+                                                  is part of the policy.
+                                            ]
+                                        }
                                     },
                                     "secrets": {
                                         "added": [
@@ -60910,6 +61792,34 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                           entries added, removed, or changed in one manifest section.
                                     ]
                                 },
+                                "permissions": {
+                                    "default": "str",  # Optional. The new
+                                      default action ("" ``allow``"" , ``ask``"" , or ``deny``"" ),
+                                      when it changed. Empty when the default was removed.
+                                    "rules": {
+                                        "added": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ]
+                                    }
+                                },
                                 "secrets": {
                                     "added": [
                                         "str"  # Optional. Secret names,
@@ -61076,6 +61986,38 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                               the entries added, removed, or changed in one manifest
                                               section.
                                         ]
+                                    },
+                                    "permissions": {
+                                        "default": "str",  # Optional. The
+                                          new default action ("" ``allow``"" , ``ask``"" , or
+                                          ``deny``"" ), when it changed. Empty when the default was
+                                          removed.
+                                        "rules": {
+                                            "added": [
+                                                "str"  # Optional.
+                                                  Names of the rules added, removed, or changed.
+                                                  ``changed`` covers a rule kept under the same tool
+                                                  and match with another action, or at another
+                                                  position. The last matching rule wins, so the order
+                                                  is part of the policy.
+                                            ],
+                                            "changed": [
+                                                "str"  # Optional.
+                                                  Names of the rules added, removed, or changed.
+                                                  ``changed`` covers a rule kept under the same tool
+                                                  and match with another action, or at another
+                                                  position. The last matching rule wins, so the order
+                                                  is part of the policy.
+                                            ],
+                                            "removed": [
+                                                "str"  # Optional.
+                                                  Names of the rules added, removed, or changed.
+                                                  ``changed`` covers a rule kept under the same tool
+                                                  and match with another action, or at another
+                                                  position. The last matching rule wins, so the order
+                                                  is part of the policy.
+                                            ]
+                                        }
                                     },
                                     "secrets": {
                                         "added": [
@@ -61282,6 +62224,34 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                           entries added, removed, or changed in one manifest section.
                                     ]
                                 },
+                                "permissions": {
+                                    "default": "str",  # Optional. The new
+                                      default action ("" ``allow``"" , ``ask``"" , or ``deny``"" ),
+                                      when it changed. Empty when the default was removed.
+                                    "rules": {
+                                        "added": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ],
+                                        "changed": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ],
+                                        "removed": [
+                                            "str"  # Optional. Names of
+                                              the rules added, removed, or changed. ``changed`` covers
+                                              a rule kept under the same tool and match with another
+                                              action, or at another position. The last matching rule
+                                              wins, so the order is part of the policy.
+                                        ]
+                                    }
+                                },
                                 "secrets": {
                                     "added": [
                                         "str"  # Optional. Secret names,
@@ -61448,6 +62418,38 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                                               the entries added, removed, or changed in one manifest
                                               section.
                                         ]
+                                    },
+                                    "permissions": {
+                                        "default": "str",  # Optional. The
+                                          new default action ("" ``allow``"" , ``ask``"" , or
+                                          ``deny``"" ), when it changed. Empty when the default was
+                                          removed.
+                                        "rules": {
+                                            "added": [
+                                                "str"  # Optional.
+                                                  Names of the rules added, removed, or changed.
+                                                  ``changed`` covers a rule kept under the same tool
+                                                  and match with another action, or at another
+                                                  position. The last matching rule wins, so the order
+                                                  is part of the policy.
+                                            ],
+                                            "changed": [
+                                                "str"  # Optional.
+                                                  Names of the rules added, removed, or changed.
+                                                  ``changed`` covers a rule kept under the same tool
+                                                  and match with another action, or at another
+                                                  position. The last matching rule wins, so the order
+                                                  is part of the policy.
+                                            ],
+                                            "removed": [
+                                                "str"  # Optional.
+                                                  Names of the rules added, removed, or changed.
+                                                  ``changed`` covers a rule kept under the same tool
+                                                  and match with another action, or at another
+                                                  position. The last matching rule wins, so the order
+                                                  is part of the policy.
+                                            ]
+                                        }
                                     },
                                     "secrets": {
                                         "added": [
