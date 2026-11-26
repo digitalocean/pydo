@@ -34,6 +34,7 @@ from .custom_models import (
     TriggerSessionMode,
     TriggerStatus,
     WebhookProviderKey,
+    WorkspaceState,
 )
 from .custom_sessions import (
     FORK_MAX_COUNT,
@@ -50,6 +51,7 @@ from .custom_sessions import (
 from .custom_configs import ConfigsOperations
 from .custom_templates import TemplatesOperations
 from .custom_triggers import TriggersOperations
+from .custom_workspaces import WorkspacesOperations
 from .custom_openai_sandbox import (
     OPENAI_CODEX_ADAPTERS,
     OpenAIAgentsError,
@@ -118,6 +120,7 @@ class AgentsResources:
         self.configs = ConfigsOperations(self._proxy)
         self.templates = TemplatesOperations(self._proxy)
         self.triggers = TriggersOperations(self._proxy)
+        self.workspaces = WorkspacesOperations(self._proxy)
 
     @property
     def base_url(self) -> str:
@@ -144,6 +147,11 @@ class AgentsResources:
         resolve ``${ENV_ID}`` / ``${REMOTE_URL}`` / ``${OPENAI_API_KEY}`` into
         ``spec.env``, then create the DO session with ``openai_session_id`` as
         a query param.
+
+        A persistent workspace cannot be attached when creating from a
+        manifest; save the manifest as a config and use
+        :meth:`pydo.agents.custom_sessions.SessionsOperations.create_from_config`
+        with ``workspace_id``.
 
         Use as a context manager to auto-destroy on exit::
 
@@ -297,6 +305,7 @@ __all__ = [
     "ConfigsOperations",
     "TemplatesOperations",
     "TriggersOperations",
+    "WorkspacesOperations",
     "HarnessEventStream",
     "HarnessStreamError",
     "HistoryPage",
@@ -337,5 +346,6 @@ __all__ = [
     "CheckpointKind",
     "TemplateStatus",
     "TemplateBuildStatus",
+    "WorkspaceState",
     "FORK_MAX_COUNT",
 ]
