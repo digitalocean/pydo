@@ -34361,7 +34361,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
         Example:
             .. code-block:: python
 
-                # response body for status code(s): 403, 404, 423
+                # response body for status code(s): 403, 404, 423, 429
                 response == {
                     "id": "str",  # A short identifier corresponding to the HTTP status code
                       returned. For  example, the ID for a response returning a 404 status code would
@@ -34381,7 +34381,6 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
                 Type[HttpResponseError],
                 lambda response: ClientAuthenticationError(response=response),
             ),
-            429: HttpResponseError,
             500: HttpResponseError,
         }
         error_map.update(kwargs.pop("error_map", {}) or {})
@@ -34408,7 +34407,7 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
 
         response = pipeline_response.http_response
 
-        if response.status_code not in [204, 403, 404, 423]:
+        if response.status_code not in [204, 403, 404, 423, 429]:
             if _stream:
                 await response.read()  # Load the body in memory and close the socket
             map_error(status_code=response.status_code, response=response, error_map=error_map)  # type: ignore
@@ -34468,6 +34467,25 @@ class HarnessOperations:  # pylint: disable=too-many-public-methods
             )
             response_headers["ratelimit-reset"] = self._deserialize(
                 "int", response.headers.get("ratelimit-reset")
+            )
+
+            if response.content:
+                deserialized = response.json()
+            else:
+                deserialized = None
+
+        if response.status_code == 429:
+            response_headers["ratelimit-limit"] = self._deserialize(
+                "int", response.headers.get("ratelimit-limit")
+            )
+            response_headers["ratelimit-remaining"] = self._deserialize(
+                "int", response.headers.get("ratelimit-remaining")
+            )
+            response_headers["ratelimit-reset"] = self._deserialize(
+                "int", response.headers.get("ratelimit-reset")
+            )
+            response_headers["Retry-After"] = self._deserialize(
+                "int", response.headers.get("Retry-After")
             )
 
             if response.content:
