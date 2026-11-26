@@ -29,6 +29,7 @@ clean: ## Removes all generated code (except _patch.py files)
 	@find src/pydo -type f \
 		! -name "_patch.py" ! -name "custom_*.py" ! -name "exceptions.py" \
 		! -path "src/pydo/agents/*" \
+		! -path "src/pydo/_agents/*" \
 		! -path "src/pydo/aio/agents/*" \
 		! -path "*/gateway/*" \
 		! -path "*/action_gateway/*" \
@@ -114,7 +115,7 @@ clean-docs: ## Delete everything in docs/build/html
 
 .PHONY: _install_github_release_notes
 _install_github_release_notes:
-	@GO111MODULE=off go get -u github.com/digitalocean/github-changelog-generator
+	@go install github.com/digitalocean/github-changelog-generator@latest
 
 .PHONY: changes
 changes: _install_github_release_notes

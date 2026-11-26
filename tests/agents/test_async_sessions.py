@@ -114,6 +114,30 @@ async def test_async_create_from_manifest_strips_team_id_and_tenant_id():
 
 
 @pytest.mark.asyncio
+async def test_async_update_config_accepts_202():
+    body = {
+        "session": {"session_id": "s1", "status": "SESSION_STATUS_UPDATING"},
+        "outcome": "ACCEPTED",
+    }
+    resources = _make_async_resources([_FakeAsyncResponse(202, body)])
+
+    resp = await resources.sessions.update_config("s1", manifest_yaml="tools: []\n")
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "PATCH"
+    assert call.request.url.endswith("/v2/agents/sessions/s1")
+    assert json.loads(call.request.content) == {"manifest_yaml": "tools: []\n"}
+    assert resp.outcome == "ACCEPTED"
+
+
+@pytest.mark.asyncio
+async def test_async_update_config_rejects_empty():
+    resources = _make_async_resources([])
+    with pytest.raises(ValueError, match="manifest_yaml is required"):
+        await resources.sessions.update_config("s1", manifest_yaml="")
+
+
+@pytest.mark.asyncio
 async def test_async_pause_session():
     resources = _make_async_resources(
         [_FakeAsyncResponse(200, {"session": {"session_id": "abc-123"}})]
@@ -514,3 +538,38 @@ async def test_async_delete_connection_requires_id():
     resources = _make_async_resources([])
     with pytest.raises(ValueError):
         await resources.sessions.delete_connection("github", "")
+
+
+@pytest.mark.asyncio
+async def test_async_reconnect_connection_posts_empty_body():
+    body = {
+        "connection": {
+            "id": "conn_1",
+            "provider": "github",
+            "user_id": "alice",
+            "status": "pending",
+        },
+        "authorization": {
+            "status": "pending",
+            "connect_url": "https://x/confirm?token=abc",
+        },
+    }
+    resources = _make_async_resources([_FakeAsyncResponse(200, body)])
+
+    resp = await resources.sessions.reconnect_connection("github", "conn_1")
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "POST"
+    assert call.request.url.endswith(
+        "/v2/agents/auth/github/connections/conn_1/reconnect"
+    )
+    assert json.loads(call.request.content) == {}
+    assert resp.connection.status == "pending"
+    assert resp.authorization.connect_url.endswith("token=abc")
+
+
+@pytest.mark.asyncio
+async def test_async_reconnect_connection_requires_id():
+    resources = _make_async_resources([])
+    with pytest.raises(ValueError):
+        await resources.sessions.reconnect_connection("github", "")

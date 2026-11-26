@@ -4,8 +4,9 @@
 # ------------------------------------
 """Action Gateway entry point: ``from pydo.action_gateway import ActionGatewayClient``.
 
-Purpose-built client for the Action Gateway. Create a session first, then
-use ``session.tools`` / ``session.code`` / ``session.handle_tool_calls``.
+Purpose-built client for the Action Gateway. Create an endpoint first, then
+use ``endpoint.tools`` / ``endpoint.code`` / ``endpoint.handle_tool_calls``.
+Sessions (``client.session``) are deprecated in favour of endpoints.
 Inference surfaces inherited from :class:`pydo.Client` (``chat``,
 ``messages``, ``responses``, …) remain available for agentic loops.
 
@@ -15,15 +16,15 @@ Example::
     from pydo.action_gateway import ActionGatewayClient
 
     client = ActionGatewayClient(token=os.environ["DIGITALOCEAN_TOKEN"])
-    session = client.session.create(actor_id="user-123")
+    endpoint = client.endpoints.create("support-agent", actor_id="user-123")
 
-    tools = session.tools()
+    tools = endpoint.tools()
     response = client.chat.completions.create(
         model="openai-gpt-4o",
         messages=[{"role": "user", "content": "Search for DigitalOcean news"}],
         tools=tools,
     )
-    messages = session.handle_tool_calls(response)
+    messages = endpoint.handle_tool_calls(response)
 """
 
 from __future__ import annotations
@@ -39,6 +40,9 @@ from pydo.gateway import (
     META_TOOL_NAMES,
     DEFAULT_GATEWAY_BASE_URL,
     ChatCompletionsProvider,
+    Endpoint,
+    EndpointsOperations,
+    EndpointVersion,
     GatewayProtocolError,
     GatewayToolError,
     MessagesProvider,
@@ -56,6 +60,9 @@ _GATEWAY_SURFACE: tuple = (
     "base_url",
     "chat",
     "create_toolbelt",
+    "endpoint_versions",
+    "endpoints",
+    "endpoints_api",
     "messages",
     "provider",
     "responses",
@@ -74,11 +81,13 @@ class Client(_DigitalOceanClient):
 
     Primary surface:
 
-    * ``client.session.create(actor_id=...)`` → :class:`Session`
-    * ``session.tools`` / ``session.tools()`` — discover and wrap tools
-    * ``session.code`` — sandboxed Python execution
-    * ``session.handle_tool_calls(response)`` — run model tool calls
-    * ``session.url`` — MCP URL for external clients
+    * ``client.endpoints.create(name, ...)`` → :class:`Endpoint`
+    * ``endpoint.tools`` / ``endpoint.tools()`` — discover and wrap tools
+    * ``endpoint.code`` — sandboxed Python execution
+    * ``endpoint.handle_tool_calls(response)`` — run model tool calls
+    * ``endpoint.url`` — MCP URL that follows the head version
+    * ``endpoint.head_version.url`` — MCP URL pinned to one version
+    * ``client.session.create(actor_id=...)`` — deprecated; use endpoints
 
     Inherits the full :class:`pydo.Client` machinery (auth, transport,
     inference routing), so agentic loops can call ``client.chat`` /
@@ -109,6 +118,8 @@ class Client(_DigitalOceanClient):
                 "Action Gateway package is unavailable; "
                 "ensure pydo.gateway is installed"
             )
+        self.endpoints_api = getattr(self, "endpoints", None)
+        self.endpoints = gateway.endpoints
         self.sessions_api = self.sessions
         self.sessions = gateway.sessions
         self.session = self.sessions
@@ -145,6 +156,9 @@ __all__ = [
     "Client",
     "ActionGatewayClient",
     "TokenCredentials",
+    "Endpoint",
+    "EndpointsOperations",
+    "EndpointVersion",
     "Session",
     "SessionsOperations",
     "Toolbelt",

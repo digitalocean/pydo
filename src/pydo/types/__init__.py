@@ -15,6 +15,8 @@ Usage::
 """
 
 from pydo.types.async_invoke import AsyncInvokeResponse
+from pydo.types.audio import SpeechAudioItem
+from pydo.types.audio import SpeechResponse
 from pydo.types.batches import Batch
 from pydo.types.batches import BatchFileCreateResponse
 from pydo.types.batches import BatchResultsResponse
@@ -45,9 +47,13 @@ from pydo.types.systemone import Error
 from pydo.types.systemone import SystemoneAnswer
 from pydo.types.systemone import SystemoneResponse
 from pydo.types.systemone import SystemoneUsage
+from pydo.types.videos import VideoGeneration
+from pydo.types.videos import VideoGenerationOutput
 
 __all__ = [
     "AsyncInvokeResponse",
+    "SpeechAudioItem",
+    "SpeechResponse",
     "Batch",
     "BatchFileCreateResponse",
     "BatchResultsResponse",
@@ -78,4 +84,6 @@ __all__ = [
     "SystemoneAnswer",
     "SystemoneResponse",
     "SystemoneUsage",
+    "VideoGeneration",
+    "VideoGenerationOutput",
 ]

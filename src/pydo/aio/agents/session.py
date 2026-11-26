@@ -23,6 +23,7 @@ from pydo.agents.session import (
     RunResult,
     _OpenAIEventAdapter,
     _decide_hitl,
+    _raise_if_update_failed,
 )
 
 
@@ -375,6 +376,55 @@ class AsyncAgentSession:
         return await self._sessions.update(
             self.session_id, resume_on_topoff=resume_on_topoff
         )
+
+    async def update_config(self, manifest_yaml: str) -> Any:
+        """Patch the live config (tools, env, secrets, egress) from partial YAML.
+
+        Action Gateway (``do.actions``) tools can change. A custom MCP server
+        can be added, modified or removed only where the session's
+        ``mutability.custom_tools`` is true, otherwise ``409``; the agent
+        restarts to apply it. The model is set in ``env``:
+        ``HARNESS_INFERENCE_MODEL`` on DigitalOcean Serverless Inference,
+        ``MODEL`` on the session's own OpenAI-compatible endpoint, or
+        ``ANTHROPIC_MODEL`` on its own Anthropic endpoint; the endpoint itself
+        cannot change, and its provider API key can only be rotated. URL-bound
+        secrets can be rotated, moved, added or removed, and ``egress`` replaces
+        ``allow_hosts`` and ``allow_ips``; the VPC cannot change. An OAuth secret
+        created with ``actor`` can switch to another connection of its provider.
+        The session must be
+        ``SESSION_STATUS_READY``, ``SESSION_STATUS_DETACHED`` or
+        ``SESSION_STATUS_PAUSED`` (not paused for zero balance) and idle. See
+        :meth:`AsyncSessionsOperations.update_config` for the full rules.
+
+        Returns the PATCH response (``session``, ``outcome``, ``warnings``). On
+        ``ACCEPTED`` call :meth:`wait_until_updated`.
+        """
+        return await self._sessions.update_config(
+            self.session_id, manifest_yaml=manifest_yaml
+        )
+
+    async def wait_until_updated(
+        self, *, timeout: float = 300.0, poll_interval: float = 2.0
+    ) -> Any:
+        """Wait until the session leaves ``UPDATING`` and return its ``update``.
+
+        Raises ``SessionConfigUpdateError`` when the update FAILED, and
+        ``TimeoutError`` on timeout.
+        """
+        loop = asyncio.get_event_loop()
+        deadline = loop.time() + timeout
+        while True:
+            info = await self.refresh()
+            status = (getattr(info, "get", lambda *_: None))("status")
+            if status != SessionStatus.UPDATING:
+                update = (getattr(info, "get", lambda *_: None))("update")
+                _raise_if_update_failed(self.session_id, update)
+                return update
+            if loop.time() > deadline:
+                raise TimeoutError(
+                    f"session {self.session_id} still updating after {timeout}s"
+                )
+            await asyncio.sleep(poll_interval)
 
     async def exec(
         self,

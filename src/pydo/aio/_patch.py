@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Optional
 from azure.core.credentials import AccessToken
 from azure.core.credentials_async import AsyncTokenCredential
 
-from pydo import _version
+from pydo import _version, _agents
 from pydo.custom_policies import CustomHttpLoggingPolicy
 from pydo.custom_extensions import _BaseURLProxy, INFERENCE_BASE_URL
 from pydo.aio import GeneratedClient
@@ -108,6 +108,9 @@ class Client(  # type: ignore
             sdk_moniker=sdk_moniker,
             **kwargs,
         )
+        agent_token = _agents.user_agent_token()
+        if agent_token:
+            self._config.user_agent_policy.add_user_agent(agent_token)
 
         self._setup_inference_routing(inference_endpoint, agent_endpoint)
 

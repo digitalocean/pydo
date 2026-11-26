@@ -12,6 +12,14 @@ pydo.aio.gateway.custom\_operations module
    :undoc-members:
    :show-inheritance:
 
+pydo.aio.gateway.endpoint module
+--------------------------------
+
+.. automodule:: pydo.aio.gateway.endpoint
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pydo.aio.gateway.session module
 -------------------------------
 

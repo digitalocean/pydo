@@ -33,6 +33,8 @@ from .operations import (
     DomainsOperations,
     DropletActionsOperations,
     DropletsOperations,
+    EndpointVersionsOperations,
+    EndpointsOperations,
     FirewallsOperations,
     FunctionsAccessKeyOperations,
     FunctionsOperations,
@@ -50,7 +52,9 @@ from .operations import (
     KubernetesOperations,
     LoadBalancersOperations,
     McpServersOperations,
+    MicrovmAccessTokensOperations,
     MicrovmCheckpointsOperations,
+    MicrovmURLsOperations,
     MicrovmsOperations,
     MonitoringOperations,
     NfsOperations,
@@ -61,6 +65,7 @@ from .operations import (
     PrepaymentConfigOperations,
     PrepaymentStatusOperations,
     ProjectsOperations,
+    ProviderCredentialsOperations,
     RegionsOperations,
     RegistriesOperations,
     RegistryOperations,
@@ -102,12 +107,18 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
 
     :ivar actor_limits: ActorLimitsOperations operations
     :vartype actor_limits: pydo.operations.ActorLimitsOperations
+    :ivar provider_credentials: ProviderCredentialsOperations operations
+    :vartype provider_credentials: pydo.operations.ProviderCredentialsOperations
     :ivar connections: ConnectionsOperations operations
     :vartype connections: pydo.operations.ConnectionsOperations
     :ivar mcp_servers: McpServersOperations operations
     :vartype mcp_servers: pydo.operations.McpServersOperations
     :ivar output_views: OutputViewsOperations operations
     :vartype output_views: pydo.operations.OutputViewsOperations
+    :ivar endpoints: EndpointsOperations operations
+    :vartype endpoints: pydo.operations.EndpointsOperations
+    :ivar endpoint_versions: EndpointVersionsOperations operations
+    :vartype endpoint_versions: pydo.operations.EndpointVersionsOperations
     :ivar sessions: SessionsOperations operations
     :vartype sessions: pydo.operations.SessionsOperations
     :ivar toolbelts: ToolbeltsOperations operations
@@ -188,6 +199,10 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype microvms: pydo.operations.MicrovmsOperations
     :ivar microvm_checkpoints: MicrovmCheckpointsOperations operations
     :vartype microvm_checkpoints: pydo.operations.MicrovmCheckpointsOperations
+    :ivar microvm_urls: MicrovmURLsOperations operations
+    :vartype microvm_urls: pydo.operations.MicrovmURLsOperations
+    :ivar microvm_access_tokens: MicrovmAccessTokensOperations operations
+    :vartype microvm_access_tokens: pydo.operations.MicrovmAccessTokensOperations
     :ivar monitoring: MonitoringOperations operations
     :vartype monitoring: pydo.operations.MonitoringOperations
     :ivar nfs: NfsOperations operations
@@ -297,6 +312,9 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
         self.actor_limits = ActorLimitsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
+        self.provider_credentials = ProviderCredentialsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
         self.connections = ConnectionsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
@@ -304,6 +322,12 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.output_views = OutputViewsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.endpoints = EndpointsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.endpoint_versions = EndpointVersionsOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.sessions = SessionsOperations(
@@ -424,6 +448,12 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.microvm_checkpoints = MicrovmCheckpointsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.microvm_urls = MicrovmURLsOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.microvm_access_tokens = MicrovmAccessTokensOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.monitoring = MonitoringOperations(

@@ -93,6 +93,39 @@ class WorkspaceTransferError(RuntimeError):
     """A workspace transfer failed (integrity check, timeout, or server error)."""
 
 
+class SessionConfigUpdateError(RuntimeError):
+    """A live session config update finished in the FAILED state.
+
+    ``reverted`` is true when the server rolled the session back to its previous
+    config; ``detail`` is the server's explanation; ``update`` is the full
+    ``session["update"]`` object.
+    """
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        reverted: bool = False,
+        detail: Optional[str] = None,
+        update: Any = None,
+    ) -> None:
+        super().__init__(message)
+        self.reverted = reverted
+        self.detail = detail
+        self.update = update
+
+
+def _manifest_yaml_arg(manifest_yaml: Any) -> str:
+    """Validate the ``manifest_yaml`` argument of ``update_config``.
+
+    Only a string is accepted: PyYAML is an optional dependency, so dicts are not
+    serialised here.
+    """
+    if not isinstance(manifest_yaml, str) or not manifest_yaml.strip():
+        raise ValueError("manifest_yaml is required")
+    return manifest_yaml
+
+
 def _field(obj: Any, key: str, default: Any = None) -> Any:
     if obj is None:
         return default
@@ -662,6 +695,126 @@ class SessionsOperations:
             ),
         )
 
+    # The generated operations module still describes the older rules (``model``
+    # and ``permissions`` as 501, ``tools: []`` as a way to detach every MCP
+    # server, URL-bound secrets and egress as fixed at create) and catches up on
+    # the next regeneration from openapi. Do not reconcile the docstring below
+    # back to it.
+    def update_config(self, session_id: str, *, manifest_yaml: str) -> Any:
+        """Patch the live config of a session (``PATCH .../sessions/{session_id}``).
+
+        ``manifest_yaml`` holds only the sections to change (``tools``, ``env``,
+        ``secrets``, ``egress``); absent sections are untouched. ``tools`` is the full
+        replacement list: Action Gateway (``do.actions``) entries can change, and
+        a custom MCP server (``name`` and ``url``) can be added, modified or
+        removed only where the session's ``mutability.custom_tools`` is true (and
+        ``tools`` is too); otherwise it is ``409``. Include the session's other
+        custom MCP servers exactly as they are. ``env`` and ``secrets`` are
+        full sets (a key left out is removed). A top-level ``model`` or
+        ``permissions`` section is ``400``.
+
+        A custom MCP server change restarts the agent when it alters the agent's
+        environment (a server added, removed or moved, or a changed credential),
+        and the update then ends ``APPLIED_RESTARTED``; a change that doesn't,
+        such as editing the ``tools`` allowlist of an existing server, ends
+        ``APPLIED``. A server with ``auth`` that is added, moved to
+        another ``url`` or given another secret slot must carry its credential in
+        the same request: send the secret's value in ``secrets``, or use a
+        URL-bound secret whose ``url`` covers the server's URL (the host, a path
+        prefix and the default port; it needs that even when you send the value).
+        Otherwise it is ``400``. A new server host under an egress allowlist also
+        needs ``mutability.egress``.
+
+        The model is set in ``env``, in the key that matches the endpoint the
+        session was created with:
+
+        - DigitalOcean Serverless Inference (``HARNESS_INFERENCE_MODEL``, no
+          endpoint of its own): ``HARNESS_INFERENCE_MODEL``, set to a model id
+          or ``router:<name>``.
+        - Its own OpenAI-compatible endpoint (``OPENAI_BASE_URL``): ``MODEL``,
+          which is read before ``OPENAI_MODEL``.
+        - Its own Anthropic endpoint (``ANTHROPIC_BASE_URL``) or the Anthropic
+          API (an ``ANTHROPIC_API_KEY`` secret): ``ANTHROPIC_MODEL``, which is
+          read before ``MODEL``.
+
+        A session keeps its endpoint: changing the provider or the base URL, or
+        adding or removing ``HARNESS_INFERENCE_MODEL``, is ``422``. On a session
+        with its own endpoint, removing the model key selects the agent's
+        default model, and the provider key (``OPENAI_API_KEY`` or
+        ``ANTHROPIC_API_KEY``) can only be rotated (a new value, or ``{}`` to
+        keep it): removing it, adding it, or changing its ``url`` or ``scheme``
+        is ``422``. Rotating a URL-bound provider key follows the URL-bound
+        secret rules below. A model name must be one line of at most 256 bytes,
+        with no leading or trailing whitespace and no ``" #"`` or ``": "``
+        (``400``).
+
+        URL-bound secrets: the egress proxy sends the value only to requests that
+        match the secret's ``url``; the agent never receives it. In ``secrets``:
+
+        - a new value as a string rotates the secret; ``url`` and ``scheme`` stay
+          the same.
+        - ``{value, url, scheme}`` moves it. A new host or path, or a change to
+          ``scheme: raw``, requires ``value`` (``400`` otherwise).
+        - ``{value, url}`` adds one. ``scheme`` defaults to ``bearer``.
+        - ``{url}`` binds an existing plain secret to a URL and keeps its value.
+        - ``{}`` keeps it; leaving it out removes it.
+
+        ``url`` must use ``https://`` and an exact hostname, with an optional path
+        and no port, query or fragment. A URL-bound secret cannot be changed back
+        to a plain secret.
+
+        ``egress`` replaces the session's allowlist. Send it as an object with
+        ``allow_hosts`` (hostnames) and ``allow_ips`` (exact IPv4 or IPv6
+        addresses, not CIDR ranges); only this form is supported in an update. A
+        host or IP address left out is removed. The VPC cannot change: leave out
+        ``vpc_uuid`` and ``subnet_uuid``, or send their current values (a
+        different value is ``422``).
+
+        URL-bound secret and ``egress`` changes do not restart the agent (an
+        update with only those ends ``APPLIED``) and take effect on the session's
+        next outbound connection; open connections stay open. They require
+        URL-bound secret and egress updates to be enabled for the team (``403``
+        otherwise). A session created with unrestricted egress and no URL-bound
+        secrets cannot gain either one: the update ends ``FAILED`` with
+        ``requires_new_session``.
+
+        OAuth connection: an OAuth secret that names a provider connection with
+        ``actor`` can switch to another connection of the same provider. In
+        ``secrets``, set it to ``{source: oauth, provider, actor}`` with the new
+        connection's ``user_id`` as ``actor`` (see
+        :meth:`list_connections`), and keep every other secret as ``{}``. The
+        new connection must be active and owned by you (``400`` otherwise,
+        including for another team member's connection); switching back to the
+        connection the agent config names doesn't need that. The agent restarts to read the new token;
+        sending the connection the secret already uses is ``UNCHANGED``. The
+        switch applies to this session only: new sessions from the same config
+        start on the config's connection, and a rollback or fork uses the
+        connection recorded in its checkpoint. Action Gateway (``do.actions``)
+        tools keep using the connection Action Gateway picks for the session.
+        Adding or removing an OAuth secret, changing its provider, or switching
+        one that has no ``actor`` is ``422``; switching must be enabled for the
+        team (``403`` otherwise).
+
+        The session status must be ``SESSION_STATUS_READY``,
+        ``SESSION_STATUS_DETACHED`` or ``SESSION_STATUS_PAUSED`` (a paused session
+        is resumed for the update and paused again, unless it was paused for zero
+        balance), with no turn running and no approval pending. Any other status,
+        including ``SESSION_STATUS_PROVISIONING`` and ``SESSION_STATUS_UPDATING``,
+        is ``409``; a locked session is ``423``. Returns
+        ``{"session", "outcome", "warnings"}``. ``outcome`` is
+        ``ACCEPTED`` (HTTP 202; the session is ``SESSION_STATUS_UPDATING``, poll
+        until it leaves that status, see ``AgentSession.wait_until_updated``) or
+        ``UNCHANGED`` (HTTP 200). Cannot be combined with ``resume_on_topoff``
+        (use :meth:`update` for that).
+        """
+        return self._parse_json(
+            self._send(
+                "PATCH",
+                f"{_BASE_PATH}/{_quote(session_id)}",
+                body={"manifest_yaml": _manifest_yaml_arg(manifest_yaml)},
+            ),
+        )
+
     def validate_policy(self, manifest: Union[str, bytes]) -> Any:
         """Validate a manifest's tool-permission policy without creating a session.
 
@@ -975,15 +1128,19 @@ class SessionsOperations:
         user_id: str,
         scopes: Optional[Sequence[str]] = None,
     ) -> Any:
-        """Create (or resume) a connection for an actor.
+        """Create a connection for an actor.
 
         ``POST /v2/agents/auth/{provider}/connections`` with ``{"user_id":
         ..., "scopes": [...]}``. ``user_id`` is the actor the connection acts
         for (required). Omit ``scopes`` to request the provider's full
         configured scope set. A new connection comes back ``pending`` with an
         ``authorization`` block (``connect_url`` / ``verification_code``) for
-        the browser step; an already-connected actor comes back ``active`` with
-        no authorization. Returns ``{"connection": {...}, "authorization": {...}?}``.
+        the browser step. Returns ``{"connection": {...}, "authorization": {...}}``.
+
+        Create is strict: if the actor already has an active, pending, or
+        expired connection for the provider, the API answers 409 Conflict
+        rather than resuming it. Use :meth:`reconnect_connection` to resume or
+        restart that connection's authorization.
         """
         if not user_id or not str(user_id).strip():
             raise ValueError("user_id is required")
@@ -1027,6 +1184,28 @@ class SessionsOperations:
                 "DELETE",
                 f"/v2/agents/auth/{_quote(provider)}/connections/"
                 f"{_quote(connection_id)}",
+            ),
+        )
+
+    def reconnect_connection(self, provider: str, connection_id: str) -> Any:
+        """Resume or restart a connection by id.
+
+        ``POST .../connections/{id}/reconnect`` with ``{}``. Resumes a pending
+        connection's authorization, or starts a new one for an expired or
+        revoked connection. The connection keeps its id, actor, and scopes, so
+        agent configs that use it keep working once it is active again. An
+        active connection comes back unchanged. Only the connection's owner can
+        reconnect it. Returns the same envelope as
+        :meth:`create_connection`: ``{"connection": {...}, "authorization": {...}?}``.
+        """
+        if not connection_id:
+            raise ValueError("connection_id is required")
+        return self._parse_json(
+            self._send(
+                "POST",
+                f"/v2/agents/auth/{_quote(provider)}/connections/"
+                f"{_quote(connection_id)}/reconnect",
+                body={},
             ),
         )
 
@@ -1531,6 +1710,7 @@ class WorkspaceDownload:
 
 
 __all__ = [
+    "SessionConfigUpdateError",
     "SessionsOperations",
     "HarnessEventStream",
     "HarnessStreamError",

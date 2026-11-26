@@ -6,6 +6,7 @@ Required env:
 Optional env:
   ACTOR_ID
   CONNECTION_ID   enables get, update, and delete connection examples
+  ENDPOINT_NAME   name for the example endpoint (default: pydo-public-api)
   SESSION_URN     enables session deletion example
 """
 
@@ -61,8 +62,26 @@ if connection_id:
 print("Users:", client.users.list())
 print("User:", client.users.get(actor_id))
 
-# Sessions are generated too. The convenience session API delegates creation
-# to this same generated resource and returns a session bound to response.mcpUrl.
+# Endpoints and versions are generated too. client.endpoints wraps them and
+# binds each result to its MCP URL; the raw operations stay available.
+endpoint = client.endpoints_api.create(
+    body={
+        "name": os.environ.get("ENDPOINT_NAME", "pydo-public-api"),
+        "version": {"actor_id": actor_id, "tools": ["exa_web_search@v1"]},
+    }
+)
+endpoint_id = endpoint["endpoint"]["id"]
+print("Endpoint MCP URL:", endpoint["mcp_url"])
+print("Pinned version MCP URL:", endpoint["version_mcp_url"])
+print("Endpoints:", client.endpoints_api.list(actor_id=actor_id))
+print("Search:", client.endpoints_api.list_search(query="pydo"))
+print("Versions:", client.endpoint_versions.list(endpoint_id))
+client.endpoints_api.patch(endpoint_id, body={"insights": {"logs": True}})
+client.endpoints_api.delete(endpoint_id)
+
+# Sessions are deprecated in favour of endpoints. The convenience session API
+# delegates creation to the generated resource and returns a session bound to
+# response.mcpUrl.
 print("Sessions:", client.sessions_api.list(end_user_id=actor_id))
 session = client.session.create(
     actor_id=actor_id,

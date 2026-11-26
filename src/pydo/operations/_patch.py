@@ -134,6 +134,30 @@ if _HAS_INSIGHTS:
 
 
 # ---------------------------------------------------------------------------
+# Signals path id alias
+# ---------------------------------------------------------------------------
+
+try:
+    from ._operations import SignalsOperations as _GeneratedSignalsOperations
+
+    _HAS_SIGNALS = True
+except ImportError:
+    _HAS_SIGNALS = False
+
+if _HAS_SIGNALS:
+    from pydo.custom_signals import with_agent_id_alias
+
+    class SignalsOperations(_GeneratedSignalsOperations):
+        """Signals operations. ``agent_id`` aliases ``environment_id``."""
+
+        get_consent = with_agent_id_alias(_GeneratedSignalsOperations.get_consent)
+        update_consent = with_agent_id_alias(_GeneratedSignalsOperations.update_consent)
+        list_agent_sessions = with_agent_id_alias(
+            _GeneratedSignalsOperations.list_agent_sessions
+        )
+
+
+# ---------------------------------------------------------------------------
 # Exports
 # ---------------------------------------------------------------------------
 
@@ -144,6 +168,8 @@ if _HAS_AGENT_INFERENCE:
     __all__.append("AgentInferenceOperations")
 if _HAS_INSIGHTS:
     __all__.append("InsightsOperations")
+if _HAS_SIGNALS:
+    __all__.append("SignalsOperations")
 
 
 def patch_sdk():

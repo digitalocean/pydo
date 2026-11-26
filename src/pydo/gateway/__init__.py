@@ -4,10 +4,13 @@
 # ------------------------------------
 """Action Gateway API — hand-written; preserved across ``make generate``.
 
-Session-first surface: create a session on the DigitalOcean API
-(generated ``POST /v2/action-gateway/sessions``), then discover/invoke tools and run code
-through the API-returned MCP endpoint. Composio-style providers make session
-tools plug into pydo inference surfaces (chat completions, messages, responses).
+Endpoint-first surface: create an endpoint on the DigitalOcean API
+(generated ``POST /v2/action-gateway/endpoints``), then discover/invoke tools and
+run code through the API-returned MCP URL, which follows the endpoint's head
+version, or through a version's pinned MCP URL. Sessions
+(``POST /v2/action-gateway/sessions``) are deprecated in favour of endpoints.
+Composio-style providers make gateway tools plug into pydo inference surfaces
+(chat completions, messages, responses).
 """
 
 from __future__ import annotations
@@ -32,6 +35,13 @@ from .custom_operations import (
     ToolsOperations,
     normalize_invoke_arguments,
 )
+from .endpoint import (
+    Endpoint,
+    EndpointPage,
+    EndpointsOperations,
+    EndpointVersion,
+    EndpointVersionPage,
+)
 from .providers import (
     BaseProvider,
     ChatCompletionsProvider,
@@ -52,6 +62,7 @@ from .transport import (
     MCP_PROTOCOL_VERSION,
     SESSION_ID_HEADER,
     DEFAULT_GATEWAY_BASE_URL,
+    EndpointMCPTransport,
     GatewayTransport,
     MCPTransport,
     RESTTransport,
@@ -65,8 +76,9 @@ _ENV_VAR = "PYDO_GATEWAY_ENDPOINT"  # kept for docs / discoverability
 class GatewayResources:
     """Action Gateway surface attached at ``client.gateway``.
 
-    Primary entry point is :attr:`sessions` — create a :class:`Session` before
-    invoking tools. Legacy ``tools`` / ``code`` attributes require an explicit
+    Primary entry point is :attr:`endpoints` — create an :class:`Endpoint`
+    before invoking tools. :attr:`sessions` is deprecated and kept for existing
+    callers. Legacy ``tools`` / ``code`` attributes require an explicit
     session-bound transport and are not usable until a session exists.
     """
 
@@ -82,6 +94,11 @@ class GatewayResources:
         self._gateway_endpoint = gateway_endpoint
         self._gateway_base_url = resolve_gateway_base_url(gateway_endpoint)
         self.provider = provider or default_provider()
+        self.endpoints = EndpointsOperations(
+            parent_client,
+            gateway_endpoint=gateway_endpoint,
+            provider=self.provider,
+        )
         self.sessions = SessionsOperations(
             parent_client,
             gateway_endpoint=gateway_endpoint,
@@ -133,6 +150,11 @@ class GatewayResources:
 
 __all__ = [
     "GatewayResources",
+    "Endpoint",
+    "EndpointPage",
+    "EndpointsOperations",
+    "EndpointVersion",
+    "EndpointVersionPage",
     "Session",
     "SessionsOperations",
     "normalize_permissions",
@@ -142,6 +164,7 @@ __all__ = [
     "GatewayTransport",
     "RESTTransport",
     "MCPTransport",
+    "EndpointMCPTransport",
     "MCP_PROTOCOL_VERSION",
     "ACTOR_ID_HEADER",
     "SESSION_ID_HEADER",

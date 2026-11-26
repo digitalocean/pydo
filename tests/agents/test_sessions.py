@@ -630,6 +630,58 @@ def test_delete_connection_requires_id():
         resources.sessions.delete_connection(OAuthProvider.GITHUB, "")
 
 
+def test_reconnect_connection_posts_empty_body():
+    body = {
+        "connection": {
+            "id": "conn_1",
+            "provider": "github",
+            "user_id": "alice",
+            "status": "pending",
+        },
+        "authorization": {
+            "status": "pending",
+            "connect_url": "https://cloud.digitalocean.com/security/connectlinks/confirm?token=abc",
+            "verification_code": "k5r2cprq",
+        },
+    }
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    resp = resources.sessions.reconnect_connection(OAuthProvider.GITHUB, "conn_1")
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "POST"
+    assert call.request.url.endswith(
+        "/v2/agents/auth/github/connections/conn_1/reconnect"
+    )
+    # The API takes an empty JSON object, not an empty body.
+    assert json.loads(call.request.content) == {}
+    assert resp.connection.status == "pending"
+    assert resp.authorization.verification_code == "k5r2cprq"
+
+
+def test_reconnect_connection_active_has_no_authorization():
+    body = {
+        "connection": {
+            "id": "conn_1",
+            "provider": "github",
+            "user_id": "alice",
+            "status": "active",
+        }
+    }
+    resources = _make_resources([_FakeResponse(200, body)])
+
+    resp = resources.sessions.reconnect_connection(OAuthProvider.GITHUB, "conn_1")
+
+    assert resp.connection.status == "active"
+    assert getattr(resp, "authorization", None) is None
+
+
+def test_reconnect_connection_requires_id():
+    resources = _make_resources([])
+    with pytest.raises(ValueError):
+        resources.sessions.reconnect_connection(OAuthProvider.GITHUB, "")
+
+
 # ---------------------------------------------------------------------------
 # Streaming
 # ---------------------------------------------------------------------------
@@ -879,6 +931,41 @@ def test_update_session_requires_field():
     resources = _make_resources([])
     with pytest.raises(ValueError, match="at least one field"):
         resources.sessions.update("s1")
+
+
+def test_update_config_sends_manifest_yaml_and_accepts_202():
+    manifest = "tools:\n  - do.actions:\n      tools: [toolbelt:read-only@1]\n"
+    body = {
+        "session": {"session_id": "s1", "status": "SESSION_STATUS_UPDATING"},
+        "outcome": "ACCEPTED",
+        "warnings": ["w"],
+    }
+    resources = _make_resources([_FakeResponse(202, body)])
+
+    resp = resources.sessions.update_config("s1", manifest_yaml=manifest)
+
+    call = resources._proxy._original._pipeline.calls[0]
+    assert call.request.method == "PATCH"
+    assert _path(call.request.url).endswith("/v2/agents/sessions/s1")
+    assert json.loads(call.request.content) == {"manifest_yaml": manifest}
+    assert resp.outcome == "ACCEPTED"
+    assert resp.session.status == "SESSION_STATUS_UPDATING"
+    assert resp.warnings == ["w"]
+
+
+def test_update_config_unchanged_200():
+    resources = _make_resources(
+        [_FakeResponse(200, {"session": {"session_id": "s1"}, "outcome": "UNCHANGED"})]
+    )
+    resp = resources.sessions.update_config("s1", manifest_yaml="tools: []\n")
+    assert resp.outcome == "UNCHANGED"
+
+
+@pytest.mark.parametrize("value", ["", "   ", None, {"tools": []}])
+def test_update_config_requires_string_manifest(value):
+    resources = _make_resources([])
+    with pytest.raises(ValueError, match="manifest_yaml is required"):
+        resources.sessions.update_config("s1", manifest_yaml=value)
 
 
 def test_validate_policy_uploads_yaml():

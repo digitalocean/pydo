@@ -32,8 +32,35 @@ class SessionStatus:
     DESTROYING = "SESSION_STATUS_DESTROYING"
     DESTROYED = "SESSION_STATUS_DESTROYED"
     FAILED = "SESSION_STATUS_FAILED"
+    # A live config update (``sessions.update_config``) is being applied.
+    UPDATING = "SESSION_STATUS_UPDATING"
     # List filter sentinel — not an actual session state.
     ALL = "SESSION_STATUS_ALL"
+
+
+class SessionConfigUpdateState:
+    """States of a live session config update (``session["update"]["state"]``)."""
+
+    APPLYING = "APPLYING"
+    APPLIED = "APPLIED"
+    APPLIED_RESTARTED = "APPLIED_RESTARTED"
+    FAILED = "FAILED"
+
+
+class SessionConfigUpdateKind:
+    """Whether a config update was requested or an automatic rollback."""
+
+    UPDATE = "update"
+    ROLLBACK = "rollback"
+
+
+class SessionConfigUpdateOutcome:
+    """``outcome`` of a ``sessions.update_config`` call."""
+
+    # HTTP 202: update accepted, session is SESSION_STATUS_UPDATING.
+    ACCEPTED = "ACCEPTED"
+    # HTTP 200: nothing to change.
+    UNCHANGED = "UNCHANGED"
 
 
 class RunState:
