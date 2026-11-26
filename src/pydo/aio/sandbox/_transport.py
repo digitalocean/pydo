@@ -7,11 +7,17 @@
 Hand-written; preserved across ``make generate``.
 """
 
-from typing import Any
+from typing import Any, Mapping, Optional
 
 from azure.core.exceptions import HttpResponseError
 
-from pydo.sandbox._transport import guard_response, keep_response, response_error
+from pydo.sandbox._transport import (
+    guard_response,
+    keep_response,
+    parse_response,
+    raw_request,
+    response_error,
+)
 from pydo.sandbox.errors import to_sandbox_error, unwrap, with_response
 
 
@@ -26,6 +32,27 @@ async def call(operation: Any, *args: Any, **kwargs: Any) -> Any:
                 **kwargs,
             )
         )
+    except HttpResponseError as err:
+        raise to_sandbox_error(err) from err
+
+
+async def call_raw(
+    client: Any,
+    method: str,
+    path: str,
+    *,
+    params: Optional[Mapping[str, Any]] = None,
+    body: Any = None,
+) -> Any:
+    """Sends a request the generated client has no operation for.
+
+    See :func:`pydo.sandbox._transport.call_raw`.
+    """
+    try:
+        response = await client.send_request(
+            raw_request(method, path, params=params, body=body)
+        )
+        return parse_response(response)
     except HttpResponseError as err:
         raise to_sandbox_error(err) from err
 

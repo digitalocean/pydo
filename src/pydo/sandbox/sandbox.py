@@ -85,6 +85,7 @@ class Sandbox:
         size: Optional[str] = None,
         allow_internet_access: Optional[bool] = None,
         env_vars: Optional[Mapping[str, str]] = None,
+        workspace_id: Optional[str] = None,
         token: Optional[str] = None,
         api_url: Optional[str] = None,
     ) -> "Sandbox":
@@ -95,11 +96,15 @@ class Sandbox:
         :keyword allow_internet_access: ``False`` limits egress to the platform
             file-transfer host. Defaults to unrestricted.
         :keyword env_vars: Environment variables for the sandbox. The values are secrets.
+        :keyword workspace_id: A persistent workspace to attach, from
+            :class:`~pydo.sandbox.Workspace`. It must be available.
         :keyword token: An API token. Defaults to ``DIGITALOCEAN_ACCESS_TOKEN``.
         :keyword api_url: The API origin. Defaults to ``DIGITALOCEAN_API_URL``,
             then https://api.digitalocean.com.
         """
-        body = create_body(template, size, allow_internet_access, env_vars)
+        body = create_body(
+            template, size, allow_internet_access, env_vars, workspace_id
+        )
         client = _make_client(token, api_url)
         try:
             return cls(client, to_info(_call(client.sandboxes.create, body)))

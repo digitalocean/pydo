@@ -8,9 +8,10 @@ Hand-written; preserved across ``make generate``.
 """
 
 import json
-from typing import Any
+from typing import Any, Mapping, Optional
 
 from azure.core.exceptions import HttpResponseError
+from azure.core.rest import HttpRequest
 
 from .errors import build_error, to_sandbox_error, unwrap, with_response
 
@@ -23,7 +24,11 @@ def guard_response(pipeline_response: Any) -> None:
     on it with a bare JSON decode error that hides the status, so raise the usual
     typed error with the status and the start of the body instead.
     """
-    response = pipeline_response.http_response
+    guard_http_response(pipeline_response.http_response)
+
+
+def guard_http_response(response: Any) -> None:
+    """:func:`guard_response` for a response already in hand."""
     ctype = (response.headers.get("Content-Type") or "").lower()
     if response.status_code == 204 or not ctype or "json" in ctype:
         return
@@ -51,6 +56,62 @@ def call(operation: Any, *args: Any, **kwargs: Any) -> Any:
                 **kwargs,
             )
         )
+    except HttpResponseError as err:
+        raise to_sandbox_error(err) from err
+
+
+def parse_response(response: Any) -> Any:
+    """Returns the JSON body of a raw response, or raises the typed error.
+
+    For endpoints without a generated operation, sent with
+    ``client.send_request``. That method does no error handling, so this does
+    what :func:`call` does for a generated operation.
+    """
+    guard_http_response(response)
+    try:
+        body = response.json() if response.content else None
+    except ValueError:
+        body = None
+    if response.status_code >= 400:
+        raise build_error(response.status_code, body, None, response.headers)
+    return body
+
+
+def raw_request(
+    method: str,
+    path: str,
+    *,
+    params: Optional[Mapping[str, Any]] = None,
+    body: Any = None,
+) -> HttpRequest:
+    """Builds a request for ``path`` (relative to the API origin) with a JSON body."""
+    return HttpRequest(
+        method,
+        path,
+        params={k: v for k, v in (params or {}).items() if v is not None},
+        json=body,
+        headers={"Accept": "application/json"},
+    )
+
+
+def call_raw(
+    client: Any,
+    method: str,
+    path: str,
+    *,
+    params: Optional[Mapping[str, Any]] = None,
+    body: Any = None,
+) -> Any:
+    """Sends a request the generated client has no operation for.
+
+    The request goes through ``client.send_request``, so it gets the same
+    authentication, endpoint and retry policies as a generated operation.
+    """
+    try:
+        response = client.send_request(
+            raw_request(method, path, params=params, body=body)
+        )
+        return parse_response(response)
     except HttpResponseError as err:
         raise to_sandbox_error(err) from err
 

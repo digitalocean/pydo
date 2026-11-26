@@ -65,6 +65,7 @@ def create_body(
     size: Optional[str],
     allow_internet_access: Optional[bool],
     env_vars: Optional[Mapping[str, str]],
+    workspace_id: Optional[str] = None,
 ) -> dict:
     """Validates create arguments and builds the request body."""
     if template is None:
@@ -76,6 +77,10 @@ def create_body(
         body["allow_internet_access"] = allow_internet_access
     if env_vars:
         body["env_vars"] = dict(env_vars)
+    if workspace_id is not None:
+        if not str(workspace_id).strip():
+            raise SandboxError("Sandbox.create: `workspace_id` must not be empty")
+        body["workspace_id"] = workspace_id
     return body
 
 

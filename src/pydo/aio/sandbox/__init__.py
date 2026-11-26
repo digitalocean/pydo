@@ -35,10 +35,12 @@ from pydo.sandbox._templates import (
     TemplateInfo,
     TemplateStatus,
 )
+from pydo.sandbox._workspaces import WorkspaceInfo, WorkspaceState
 from pydo.sandbox._snapshots import SnapshotInfo, SnapshotState
 from .snapshots import Snapshot
 from .templates import Pages, Template
 from .sandbox import Sandbox, SandboxPaginator
+from .workspaces import Workspace
 
 __all__ = [
     "AuthenticationError",
@@ -65,6 +67,9 @@ __all__ = [
     "TemplateBuildInfo",
     "TemplateInfo",
     "TemplateStatus",
+    "Workspace",
+    "WorkspaceInfo",
+    "WorkspaceState",
     "CommandError",
     "ConflictError",
     "DEFAULT_SIZE",
