@@ -44,8 +44,6 @@ class WorkspaceInfo:
     #: The sandbox the workspace is attached to, if any.
     attached_sandbox_id: Optional[str] = None
     last_saved_at: Optional[datetime] = None
-    #: ``0`` until the platform reports usage.
-    bytes_used: int = 0
     created_at: Optional[datetime] = None
 
 
@@ -54,7 +52,7 @@ def _time(raw: Any) -> Optional[datetime]:
 
 
 def _int(raw: Any) -> int:
-    # ``bytes_used`` is a uint64, which the API sends as a JSON string.
+    # uint64 fields such as ``size_limit_gib`` can arrive as JSON strings.
     try:
         return int(raw or 0)
     except (TypeError, ValueError):
@@ -72,7 +70,6 @@ def to_workspace(raw: Any) -> WorkspaceInfo:
         name=raw.get("name") or "",
         attached_sandbox_id=raw.get("attached_sandbox_id") or None,
         last_saved_at=_time(raw.get("last_saved_at")),
-        bytes_used=_int(raw.get("bytes_used")),
         created_at=_time(raw.get("created_at")),
     )
 

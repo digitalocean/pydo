@@ -33,7 +33,6 @@ def ws(state="WORKSPACE_STATE_AVAILABLE", workspace_id="ws-1", **extra):
         "state": state,
         "attached_sandbox_id": "",
         "last_saved_at": "2026-11-20T12:05:00Z",
-        "bytes_used": "2048",
         "created_at": "2026-11-20T12:00:00Z",
     }
     out.update(extra)
@@ -72,7 +71,6 @@ def test_create_sends_name_and_size_and_authenticates(rsps):
         "WORKSPACE_STATE_CREATING",
     )
     assert workspace.info.size_limit_gib == 10
-    assert workspace.info.bytes_used == 2048
     assert workspace.info.attached_sandbox_id is None
     assert workspace.info.created_at.year == 2026
     assert workspace.info.last_saved_at.minute == 5

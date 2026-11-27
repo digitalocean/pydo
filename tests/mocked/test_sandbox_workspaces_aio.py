@@ -37,7 +37,6 @@ def ws(state="WORKSPACE_STATE_AVAILABLE", workspace_id="ws-1", **extra):
         "name": "my-project",
         "size_limit_gib": 10,
         "state": state,
-        "bytes_used": "2048",
         "created_at": "2026-11-20T12:00:00Z",
     }
     out.update(extra)
@@ -80,7 +79,6 @@ async def test_create_sends_name_and_size(mock):
             "ws-1",
             "WORKSPACE_STATE_CREATING",
         )
-        assert workspace.info.bytes_used == 2048
 
 
 async def test_create_validates_and_raises_typed_errors(mock):
