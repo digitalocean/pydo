@@ -73,6 +73,7 @@ from .operations import (
     ReservedIPsOperations,
     ReservedIPv6ActionsOperations,
     ReservedIPv6Operations,
+    SandboxesOperations,
     SecurityOperations,
     SessionsOperations,
     SignalsOperations,
@@ -229,6 +230,8 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
     :vartype reserved_ipv6_actions: pydo.aio.operations.ReservedIPv6ActionsOperations
     :ivar byoip_prefixes: ByoipPrefixesOperations operations
     :vartype byoip_prefixes: pydo.aio.operations.ByoipPrefixesOperations
+    :ivar sandboxes: SandboxesOperations operations
+    :vartype sandboxes: pydo.aio.operations.SandboxesOperations
     :ivar security: SecurityOperations operations
     :vartype security: pydo.aio.operations.SecurityOperations
     :ivar sizes: SizesOperations operations
@@ -493,6 +496,9 @@ class GeneratedClient:  # pylint: disable=client-accepts-api-version-keyword,too
             self._client, self._config, self._serialize, self._deserialize
         )
         self.byoip_prefixes = ByoipPrefixesOperations(
+            self._client, self._config, self._serialize, self._deserialize
+        )
+        self.sandboxes = SandboxesOperations(
             self._client, self._config, self._serialize, self._deserialize
         )
         self.security = SecurityOperations(
