@@ -61,7 +61,9 @@
   },
   { "name": "GEMINI_CLI detected as gemini-cli", "env": { "GEMINI_CLI": "1" }, "expected": "gemini-cli" },
   { "name": "COPILOT_CLI detected as github-copilot", "env": { "COPILOT_CLI": "1" }, "expected": "github-copilot" },
-  { "name": "COPILOT_MODEL detected as github-copilot", "env": { "COPILOT_MODEL": "gpt-5" }, "expected": "github-copilot" },
+  { "name": "COPILOT_MODEL alone is not an agent", "env": { "COPILOT_MODEL": "gpt-5" }, "expected": null },
+  { "name": "COPILOT_ALLOW_ALL alone is not an agent", "env": { "COPILOT_ALLOW_ALL": "true" }, "expected": null },
+  { "name": "COPILOT_GITHUB_TOKEN alone is not an agent", "env": { "COPILOT_GITHUB_TOKEN": "token" }, "expected": null },
   { "name": "OPENCODE detected as opencode", "env": { "OPENCODE": "1" }, "expected": "opencode" },
   { "name": "OPENCODE_CLIENT detected as opencode", "env": { "OPENCODE_CLIENT": "vscode" }, "expected": "opencode" },
   { "name": "ANTIGRAVITY_AGENT detected as antigravity", "env": { "ANTIGRAVITY_AGENT": "1" }, "expected": "antigravity" },
@@ -108,7 +110,7 @@
   { "name": "WORKBUDDY_APP_NAME detected as workbuddy", "env": { "WORKBUDDY_APP_NAME": "workbuddy" }, "expected": "workbuddy" },
   { "name": "QODER_WORK_INTEGRATION_PRODUCT detected as qwenwork", "env": { "QODER_WORK_INTEGRATION_PRODUCT": "qwen" }, "expected": "qwenwork" },
   { "name": "DOUBAO_OFFICE_AGENT_NAME detected as doubao-work", "env": { "DOUBAO_OFFICE_AGENT_NAME": "doubao" }, "expected": "doubao-work" },
-  { "name": "REPL_ID detected as replit", "env": { "REPL_ID": "abc" }, "expected": "replit" },
+  { "name": "REPL_ID alone is not an agent", "env": { "REPL_ID": "abc" }, "expected": null },
 
   { "name": "CURSOR_TRACE_ID alone is not an agent", "env": { "CURSOR_TRACE_ID": "abc" }, "expected": null },
   {
@@ -117,7 +119,7 @@
     "expected": "claude-code"
   },
   {
-    "name": "an agent running on Replit wins over replit",
+    "name": "codex on Replit is codex",
     "env": { "REPL_ID": "abc", "CODEX_SANDBOX": "seatbelt" },
     "expected": "codex"
   },
@@ -152,8 +154,8 @@
     "expected": "manus"
   },
   {
-    "name": "github-copilot on Replit is github-copilot",
-    "env": { "REPL_ID": "abc", "COPILOT_CLI": "1" },
+    "name": "github-copilot started by the Cursor agent wins over cursor-cli",
+    "env": { "CURSOR_AGENT": "1", "COPILOT_CLI": "1" },
     "expected": "github-copilot"
   }
 ]

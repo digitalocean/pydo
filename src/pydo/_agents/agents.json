@@ -68,6 +68,11 @@
       "match": { "type": "anyOf", "conditions": [{ "type": "env_set", "name": "GEMINI_CLI" }] }
     },
     {
+      "name": "github-copilot",
+      "description": "GitHub Copilot CLI. Only COPILOT_CLI, which the CLI sets for its own processes; COPILOT_GITHUB_TOKEN, COPILOT_MODEL and COPILOT_ALLOW_ALL are user settings that may be exported in any shell.",
+      "match": { "type": "anyOf", "conditions": [{ "type": "env_set", "name": "COPILOT_CLI" }] }
+    },
+    {
       "name": "opencode",
       "description": "opencode.",
       "match": {
@@ -273,24 +278,6 @@
       "name": "grok-bot",
       "description": "Grok Bot.",
       "match": { "type": "anyOf", "conditions": [{ "type": "env_set", "name": "SAND_AGENT" }] }
-    },
-    {
-      "name": "github-copilot",
-      "description": "GitHub Copilot, including the Copilot CLI. Kept near the end: COPILOT_GITHUB_TOKEN and COPILOT_MODEL are user settings that may be exported in any shell.",
-      "match": {
-        "type": "anyOf",
-        "conditions": [
-          { "type": "env_set", "name": "COPILOT_CLI" },
-          { "type": "env_set", "name": "COPILOT_MODEL" },
-          { "type": "env_set", "name": "COPILOT_ALLOW_ALL" },
-          { "type": "env_set", "name": "COPILOT_GITHUB_TOKEN" }
-        ]
-      }
-    },
-    {
-      "name": "replit",
-      "description": "Replit. Checked last: REPL_ID is set everywhere on Replit, so any other agent running there should win.",
-      "match": { "type": "anyOf", "conditions": [{ "type": "env_set", "name": "REPL_ID" }] }
     }
   ]
 }
