@@ -100,8 +100,7 @@ def sent(mock, name):
         if urlparse(str(url)).path.endswith("/files/" + name):
             # aioresponses may leave path query values percent-encoded.
             query = {
-                k: unquote(v[0])
-                for k, v in parse_qs(urlparse(str(url)).query).items()
+                k: unquote(v[0]) for k, v in parse_qs(urlparse(str(url)).query).items()
             }
             out.extend((query, call.kwargs) for call in calls)
     return out
