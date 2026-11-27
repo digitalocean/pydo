@@ -1,4 +1,4 @@
-# pylint: disable=missing-function-docstring,redefined-outer-name
+# pylint: disable=missing-function-docstring,redefined-outer-name,unexpected-keyword-arg,duplicate-code
 """Mocked tests for async sandbox workspaces (``pydo.aio.sandbox``).
 
 Runs through the real async pipeline, with aioresponses.
@@ -31,7 +31,7 @@ def route(suffix=""):
     return re.compile(rf"^{re.escape(BASE)}{suffix}(\?.*)?$")
 
 
-def ws(state="WORKSPACE_STATE_AVAILABLE", workspace_id="ws-1", **extra):
+def workspace_payload(state="WORKSPACE_STATE_AVAILABLE", workspace_id="ws-1", **extra):
     out = {
         "workspace_id": workspace_id,
         "name": "my-project",
@@ -51,20 +51,22 @@ def clean_env(monkeypatch):
 
 @pytest.fixture
 def mock():
-    with aioresponses() as m:
-        yield m
+    with aioresponses() as mocked:
+        yield mocked
 
 
 def request_of(mock, method, url_re):
-    for (m, url), calls in mock.requests.items():
-        if m == method and url_re.match(str(url)):
+    for (request_method, url), calls in mock.requests.items():
+        if request_method == method and url_re.match(str(url)):
             return calls[-1]
-    raise AssertionError("no %s request to %s" % (method, url_re.pattern))
+    raise AssertionError(f"no {method} request to {url_re.pattern}")
 
 
 async def test_create_sends_name_and_size(mock):
     mock.post(
-        route(), payload={"workspace": ws("WORKSPACE_STATE_CREATING")}, status=201
+        route(),
+        payload={"workspace": workspace_payload("WORKSPACE_STATE_CREATING")},
+        status=201,
     )
     async with await Workspace.create(
         name="my-project", size_limit_gib=10, **CONN
@@ -95,7 +97,7 @@ async def test_create_validates_and_raises_typed_errors(mock):
 
 
 async def test_get_and_not_found(mock):
-    mock.get(route("/ws-1"), payload={"workspace": ws()})
+    mock.get(route("/ws-1"), payload={"workspace": workspace_payload()})
     workspace = await Workspace.get("ws-1", **CONN)
     assert workspace.state == "WORKSPACE_STATE_AVAILABLE"
     await workspace.close()
@@ -123,9 +125,12 @@ async def test_a_non_json_gateway_error_keeps_its_status(mock):
 async def test_list_pages_and_async_for(mock):
     mock.get(
         route(),
-        payload={"workspaces": [ws(workspace_id="a")], "next_page_token": "t2"},
+        payload={
+            "workspaces": [workspace_payload(workspace_id="a")],
+            "next_page_token": "t2",
+        },
     )
-    mock.get(route(), payload={"workspaces": [ws(workspace_id="b")]})
+    mock.get(route(), payload={"workspaces": [workspace_payload(workspace_id="b")]})
     pages = Workspace.list(state="WORKSPACE_STATE_AVAILABLE", limit=1, **CONN)
     assert [w.workspace_id async for w in pages] == ["a", "b"]
     assert not pages.has_next
@@ -143,15 +148,18 @@ async def test_delete_by_id_and_on_the_instance(mock):
         route("/gone"), payload={"id": "not_found", "message": "gone"}, status=404
     )
     assert await Workspace.delete("gone", **CONN) is False
-    mock.get(route("/ws-1"), payload={"workspace": ws()})
+    mock.get(route("/ws-1"), payload={"workspace": workspace_payload()})
     mock.delete(route("/ws-1"), payload={})
     async with await Workspace.get("ws-1", **CONN) as workspace:
         assert await workspace.delete() is True
 
 
 async def test_wait_until_available_polls_fails_and_times_out(mock):
-    mock.get(route("/ws-1"), payload={"workspace": ws("WORKSPACE_STATE_CREATING")})
-    mock.get(route("/ws-1"), payload={"workspace": ws()})
+    mock.get(
+        route("/ws-1"),
+        payload={"workspace": workspace_payload("WORKSPACE_STATE_CREATING")},
+    )
+    mock.get(route("/ws-1"), payload={"workspace": workspace_payload()})
     workspace = await Workspace.get("ws-1", **CONN)
     await workspace.wait_until_available(poll_interval=0.001)
     assert workspace.state == "WORKSPACE_STATE_AVAILABLE"
@@ -159,7 +167,11 @@ async def test_wait_until_available_polls_fails_and_times_out(mock):
 
     mock.get(
         route("/ws-2"),
-        payload={"workspace": ws("WORKSPACE_STATE_FAILED", workspace_id="ws-2")},
+        payload={
+            "workspace": workspace_payload(
+                "WORKSPACE_STATE_FAILED", workspace_id="ws-2"
+            )
+        },
     )
     failed = await Workspace.get("ws-2", **CONN)
     with pytest.raises(SandboxError, match="cannot become available"):
@@ -168,7 +180,11 @@ async def test_wait_until_available_polls_fails_and_times_out(mock):
 
     mock.get(
         route("/ws-3"),
-        payload={"workspace": ws("WORKSPACE_STATE_CREATING", workspace_id="ws-3")},
+        payload={
+            "workspace": workspace_payload(
+                "WORKSPACE_STATE_CREATING", workspace_id="ws-3"
+            )
+        },
         repeat=True,
     )
     slow = await Workspace.get("ws-3", **CONN)
@@ -178,7 +194,7 @@ async def test_wait_until_available_polls_fails_and_times_out(mock):
 
 
 async def test_sandbox_client_binds_options_and_sandbox_attaches_a_workspace(mock):
-    mock.post(route(), payload={"workspace": ws()}, status=201)
+    mock.post(route(), payload={"workspace": workspace_payload()}, status=201)
     workspace = await SandboxClient(**CONN).Workspace.create(size_limit_gib=10)
     assert workspace.workspace_id == "ws-1"
     await workspace.close()

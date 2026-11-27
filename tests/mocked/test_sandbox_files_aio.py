@@ -1,4 +1,4 @@
-# pylint: disable=missing-function-docstring,redefined-outer-name
+# pylint: disable=missing-function-docstring,redefined-outer-name,duplicate-code,invalid-name,unbalanced-tuple-unpacking
 """Mocked tests for async sandbox files (``pydo.aio.sandbox``).
 
 Runs through the real async pipeline, with aioresponses.

@@ -1,4 +1,4 @@
-# pylint: disable=missing-function-docstring,redefined-outer-name
+# pylint: disable=missing-function-docstring,redefined-outer-name,duplicate-code,import-outside-toplevel,invalid-name,unexpected-keyword-arg,line-too-long
 """Mocked tests for the Sandbox SDK (``pydo.sandbox``)."""
 
 import json

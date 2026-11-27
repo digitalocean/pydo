@@ -1,4 +1,4 @@
-# pylint: disable=missing-function-docstring,redefined-outer-name
+# pylint: disable=missing-function-docstring,redefined-outer-name,unexpected-keyword-arg,duplicate-code
 """Mocked tests for sandbox workspaces (``pydo.sandbox``), through the real pipeline.
 
 The generated client has no workspace operations, so these also cover the raw
@@ -25,7 +25,7 @@ CONN = {"token": "test-token", "api_url": API}
 BASE = API + "/v2/sandboxes/workspaces"
 
 
-def ws(state="WORKSPACE_STATE_AVAILABLE", workspace_id="ws-1", **extra):
+def workspace_payload(state="WORKSPACE_STATE_AVAILABLE", workspace_id="ws-1", **extra):
     out = {
         "workspace_id": workspace_id,
         "name": "my-project",
@@ -59,7 +59,7 @@ def test_create_sends_name_and_size_and_authenticates(rsps):
     rsps.add(
         responses.POST,
         BASE,
-        json={"workspace": ws("WORKSPACE_STATE_CREATING")},
+        json={"workspace": workspace_payload("WORKSPACE_STATE_CREATING")},
         status=201,
     )
     workspace = Workspace.create(name="my-project", size_limit_gib=10, **CONN)
@@ -77,7 +77,7 @@ def test_create_sends_name_and_size_and_authenticates(rsps):
 
 
 def test_create_omits_a_blank_name(rsps):
-    rsps.add(responses.POST, BASE, json={"workspace": ws()}, status=201)
+    rsps.add(responses.POST, BASE, json={"workspace": workspace_payload()}, status=201)
     Workspace.create(size_limit_gib=1, **CONN)
     assert body_of(rsps) == {"size_limit_gib": 1}
 
@@ -104,7 +104,7 @@ def test_create_raises_typed_errors_from_the_api(rsps):
 
 
 def test_get_quotes_the_id_and_raises_not_found(rsps):
-    rsps.add(responses.GET, BASE + "/ws-1", json={"workspace": ws()})
+    rsps.add(responses.GET, BASE + "/ws-1", json={"workspace": workspace_payload()})
     assert Workspace.get("ws-1", **CONN).state == "WORKSPACE_STATE_AVAILABLE"
     rsps.add(
         responses.GET,
@@ -117,7 +117,7 @@ def test_get_quotes_the_id_and_raises_not_found(rsps):
     assert info.value.request_id == "r"
     with pytest.raises(SandboxError, match="workspace_id"):
         Workspace.get(" ", **CONN)
-    rsps.add(responses.GET, BASE + "/a%2Fb", json={"workspace": ws()})
+    rsps.add(responses.GET, BASE + "/a%2Fb", json={"workspace": workspace_payload()})
     Workspace.get("a/b", **CONN)
     assert rsps.calls[-1].request.url.endswith("/workspaces/a%2Fb")
 
@@ -139,9 +139,14 @@ def test_list_walks_every_page_and_filters_by_state(rsps):
     rsps.add(
         responses.GET,
         BASE,
-        json={"workspaces": [ws(workspace_id="a")], "next_page_token": "t2"},
+        json={
+            "workspaces": [workspace_payload(workspace_id="a")],
+            "next_page_token": "t2",
+        },
     )
-    rsps.add(responses.GET, BASE, json={"workspaces": [ws(workspace_id="b")]})
+    rsps.add(
+        responses.GET, BASE, json={"workspaces": [workspace_payload(workspace_id="b")]}
+    )
     ids = [
         w.workspace_id
         for w in Workspace.list(state="WORKSPACE_STATE_AVAILABLE", limit=1, **CONN)
@@ -154,7 +159,11 @@ def test_list_walks_every_page_and_filters_by_state(rsps):
 
 
 def test_list_one_page_at_a_time(rsps):
-    rsps.add(responses.GET, BASE, json={"workspaces": [ws()], "next_page_token": "t2"})
+    rsps.add(
+        responses.GET,
+        BASE,
+        json={"workspaces": [workspace_payload()], "next_page_token": "t2"},
+    )
     pages = Workspace.list(**CONN)
     assert [w.workspace_id for w in pages.next_items()] == ["ws-1"]
     assert pages.next_token == "t2"
@@ -171,7 +180,7 @@ def test_delete_by_id_and_on_the_instance(rsps):
         status=404,
     )
     assert Workspace.delete("gone", **CONN) is False
-    rsps.add(responses.GET, BASE + "/ws-1", json={"workspace": ws()})
+    rsps.add(responses.GET, BASE + "/ws-1", json={"workspace": workspace_payload()})
     assert Workspace.get("ws-1", **CONN).delete() is True
 
 
@@ -190,13 +199,17 @@ def test_refresh_updates_info(rsps):
     rsps.add(
         responses.GET,
         BASE + "/ws-1",
-        json={"workspace": ws("WORKSPACE_STATE_CREATING")},
+        json={"workspace": workspace_payload("WORKSPACE_STATE_CREATING")},
     )
     workspace = Workspace.get("ws-1", **CONN)
     rsps.replace(
         responses.GET,
         BASE + "/ws-1",
-        json={"workspace": ws("WORKSPACE_STATE_ATTACHED", attached_sandbox_id="sb-1")},
+        json={
+            "workspace": workspace_payload(
+                "WORKSPACE_STATE_ATTACHED", attached_sandbox_id="sb-1"
+            )
+        },
     )
     assert workspace.refresh().attached_sandbox_id == "sb-1"
     assert workspace.state == "WORKSPACE_STATE_ATTACHED"
@@ -206,10 +219,10 @@ def test_wait_until_available_polls_a_creating_workspace(rsps):
     rsps.add(
         responses.GET,
         BASE + "/ws-1",
-        json={"workspace": ws("WORKSPACE_STATE_CREATING")},
+        json={"workspace": workspace_payload("WORKSPACE_STATE_CREATING")},
     )
     workspace = Workspace.get("ws-1", **CONN)
-    rsps.replace(responses.GET, BASE + "/ws-1", json={"workspace": ws()})
+    rsps.replace(responses.GET, BASE + "/ws-1", json={"workspace": workspace_payload()})
     workspace.wait_until_available(poll_interval=0.01)
     assert workspace.state == "WORKSPACE_STATE_AVAILABLE"
 
@@ -218,7 +231,9 @@ def test_wait_until_available_polls_a_creating_workspace(rsps):
     "state", ["WORKSPACE_STATE_FAILED", "WORKSPACE_STATE_DELETING"]
 )
 def test_wait_until_available_gives_up_on_a_dead_workspace(rsps, state):
-    rsps.add(responses.GET, BASE + "/ws-1", json={"workspace": ws(state)})
+    rsps.add(
+        responses.GET, BASE + "/ws-1", json={"workspace": workspace_payload(state)}
+    )
     workspace = Workspace.get("ws-1", **CONN)
     with pytest.raises(SandboxError, match="cannot become available"):
         workspace.wait_until_available()
@@ -229,7 +244,7 @@ def test_wait_until_available_times_out(rsps):
     rsps.add(
         responses.GET,
         BASE + "/ws-1",
-        json={"workspace": ws("WORKSPACE_STATE_CREATING")},
+        json={"workspace": workspace_payload("WORKSPACE_STATE_CREATING")},
     )
     workspace = Workspace.get("ws-1", **CONN)
     with pytest.raises(SandboxError, match="not available in time"):
@@ -240,7 +255,7 @@ def test_sandbox_client_binds_options_for_workspaces(rsps):
     rsps.add(
         responses.POST,
         BASE,
-        json={"workspace": ws("WORKSPACE_STATE_CREATING")},
+        json={"workspace": workspace_payload("WORKSPACE_STATE_CREATING")},
         status=201,
     )
     workspace = SandboxClient(**CONN).Workspace.create(size_limit_gib=10)

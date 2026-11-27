@@ -1,4 +1,4 @@
-# pylint: disable=missing-function-docstring,redefined-outer-name
+# pylint: disable=missing-function-docstring,redefined-outer-name,duplicate-code,invalid-name
 """Mocked tests for sandbox files (``pydo.sandbox``), through the real pipeline."""
 
 import hashlib
