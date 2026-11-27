@@ -89,11 +89,14 @@ class Sandbox:
         size: Optional[str] = None,
         allow_internet_access: Optional[bool] = None,
         env_vars: Optional[Mapping[str, str]] = None,
+        workspace_id: Optional[str] = None,
         token: Optional[str] = None,
         api_url: Optional[str] = None,
     ) -> "Sandbox":
         """Creates a sandbox. Returns once it is running. See :meth:`pydo.sandbox.Sandbox.create`."""
-        body = create_body(template, size, allow_internet_access, env_vars)
+        body = create_body(
+            template, size, allow_internet_access, env_vars, workspace_id
+        )
         client = _make_client(token, api_url)
         try:
             return cls(client, to_info(await _call(client.sandboxes.create, body)))

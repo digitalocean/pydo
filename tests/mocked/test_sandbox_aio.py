@@ -1,4 +1,4 @@
-# pylint: disable=missing-function-docstring,redefined-outer-name,protected-access
+# pylint: disable=missing-function-docstring,redefined-outer-name,protected-access,duplicate-code,invalid-name,missing-class-docstring,too-few-public-methods,unexpected-keyword-arg,unused-argument
 """Mocked tests for the async Sandbox SDK (``pydo.aio.sandbox``).
 
 The sync tests run the real generated pipeline. These swap the generated

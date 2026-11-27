@@ -256,6 +256,24 @@ template.delete()                            # False if it is already gone; Temp
 
 Global base templates are not listed: pass them by name to `Sandbox.create`. The async `Template` is in `pydo.aio.sandbox`.
 
+Keep data across sandboxes with a persistent workspace:
+
+```python
+from pydo.sandbox import Sandbox, Workspace
+
+workspace = Workspace.create(name="my-project", size_limit_gib=10)   # size_limit_gib is required (API max 100)
+workspace.wait_until_available()               # raises if the workspace failed or is being deleted
+sandbox = Sandbox.create(workspace_id=workspace.workspace_id)
+
+for w in Workspace.list(state="WORKSPACE_STATE_AVAILABLE"):
+    print(w.workspace_id, w.name, w.state, w.info.size_limit_gib)
+sandbox.kill()
+workspace.refresh()                            # state goes back to WORKSPACE_STATE_AVAILABLE once it is saved
+workspace.delete()                             # 409 ConflictError while a sandbox has it attached; False if already gone
+```
+
+The async `Workspace` is in `pydo.aio.sandbox`.
+
 Snapshot a running or paused sandbox:
 
 ```python

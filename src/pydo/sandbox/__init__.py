@@ -28,6 +28,8 @@ from ._files import FileEntry, FileType, MakeDirResult, WriteInfo
 from .files import Files
 from ._templates import ImageSource, TemplateBuildInfo, TemplateInfo, TemplateStatus
 from .templates import Pages, Template
+from ._workspaces import WorkspaceInfo, WorkspaceState
+from .workspaces import Workspace
 from ._snapshots import SnapshotInfo, SnapshotState
 from .snapshots import Snapshot
 from .errors import (
@@ -70,6 +72,9 @@ __all__ = [
     "TemplateBuildInfo",
     "TemplateInfo",
     "TemplateStatus",
+    "Workspace",
+    "WorkspaceInfo",
+    "WorkspaceState",
     "CommandError",
     "ConflictError",
     "DEFAULT_SIZE",

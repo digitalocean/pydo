@@ -1,4 +1,4 @@
-# pylint: disable=missing-function-docstring,redefined-outer-name
+# pylint: disable=missing-function-docstring,redefined-outer-name,duplicate-code,invalid-name,unbalanced-tuple-unpacking
 """Mocked tests for async sandbox files (``pydo.aio.sandbox``).
 
 Runs through the real async pipeline, with aioresponses.
@@ -8,7 +8,7 @@ import hashlib
 import json
 import re
 from types import SimpleNamespace
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
 
 import pytest
 import pytest_asyncio
@@ -98,7 +98,10 @@ def sent(mock, name):
     out = []
     for (_method, url), calls in mock.requests.items():
         if urlparse(str(url)).path.endswith("/files/" + name):
-            query = {k: v[0] for k, v in parse_qs(urlparse(str(url)).query).items()}
+            # aioresponses may leave path query values percent-encoded.
+            query = {
+                k: unquote(v[0]) for k, v in parse_qs(urlparse(str(url)).query).items()
+            }
             out.extend((query, call.kwargs) for call in calls)
     return out
 

@@ -6,11 +6,13 @@
 
 from typing import Mapping, Optional
 
+from pydo.sandbox._workspaces import WorkspaceState
 from pydo.sandbox.types import SandboxInfo, SandboxState
 
 from .sandbox import Sandbox, SandboxPaginator
 from .snapshots import Snapshot
 from .templates import Pages, Template
+from .workspaces import Workspace
 
 
 class _BoundSandbox:
@@ -26,12 +28,14 @@ class _BoundSandbox:
         size: Optional[str] = None,
         allow_internet_access: Optional[bool] = None,
         env_vars: Optional[Mapping[str, str]] = None,
+        workspace_id: Optional[str] = None,
     ) -> Sandbox:
         return await Sandbox.create(
             template=template,
             size=size,
             allow_internet_access=allow_internet_access,
             env_vars=env_vars,
+            workspace_id=workspace_id,
             **self._conn,
         )
 
@@ -120,6 +124,37 @@ class _BoundSnapshot:
         return await Snapshot.delete(snapshot_id, **self._conn)
 
 
+class _BoundWorkspace:
+    """``Workspace`` with the client's token and API origin filled in."""
+
+    def __init__(self, token: Optional[str], api_url: Optional[str]) -> None:
+        self._conn = {"token": token, "api_url": api_url}
+
+    async def create(
+        self, *, size_limit_gib: int, name: Optional[str] = None
+    ) -> Workspace:
+        return await Workspace.create(
+            size_limit_gib=size_limit_gib, name=name, **self._conn
+        )
+
+    async def get(self, workspace_id: str) -> Workspace:
+        return await Workspace.get(workspace_id, **self._conn)
+
+    def list(
+        self,
+        *,
+        state: Optional[WorkspaceState] = None,
+        limit: Optional[int] = None,
+        next_token: Optional[str] = None,
+    ) -> Pages:
+        return Workspace.list(
+            state=state, limit=limit, next_token=next_token, **self._conn
+        )
+
+    async def delete(self, workspace_id: str) -> bool:
+        return await Workspace.delete(workspace_id, **self._conn)
+
+
 class SandboxClient:
     """Binds connection options once.
 
@@ -135,6 +170,7 @@ class SandboxClient:
         self.Sandbox = _BoundSandbox(token, api_url)  # pylint: disable=invalid-name
         self.Template = _BoundTemplate(token, api_url)  # pylint: disable=invalid-name
         self.Snapshot = _BoundSnapshot(token, api_url)  # pylint: disable=invalid-name
+        self.Workspace = _BoundWorkspace(token, api_url)  # pylint: disable=invalid-name
 
 
 __all__ = ["SandboxClient"]

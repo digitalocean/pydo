@@ -1,4 +1,4 @@
-# pylint: disable=missing-function-docstring,redefined-outer-name
+# pylint: disable=missing-function-docstring,redefined-outer-name,consider-using-f-string,duplicate-code,invalid-name,use-implicit-booleaness-not-comparison
 """Mocked tests for sandbox commands (``pydo.sandbox``), through the real pipeline."""
 
 import base64

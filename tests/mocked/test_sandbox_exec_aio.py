@@ -1,4 +1,4 @@
-# pylint: disable=missing-function-docstring,redefined-outer-name,protected-access
+# pylint: disable=missing-function-docstring,redefined-outer-name,protected-access,duplicate-code,import-outside-toplevel,invalid-name,missing-class-docstring,too-few-public-methods,unused-argument
 """Mocked tests for async sandbox exec (``pydo.aio.sandbox``).
 
 Fakes the generated operations (honouring ``cls``) and the client's pipeline, so
