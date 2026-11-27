@@ -66,6 +66,7 @@ from ._operations import ReservedIPsActionsOperations
 from ._operations import ReservedIPv6Operations
 from ._operations import ReservedIPv6ActionsOperations
 from ._operations import ByoipPrefixesOperations
+from ._operations import SandboxesOperations
 from ._operations import SecurityOperations
 from ._operations import SizesOperations
 from ._operations import SnapshotsOperations
@@ -153,6 +154,7 @@ __all__ = [
     "ReservedIPv6Operations",
     "ReservedIPv6ActionsOperations",
     "ByoipPrefixesOperations",
+    "SandboxesOperations",
     "SecurityOperations",
     "SizesOperations",
     "SnapshotsOperations",
